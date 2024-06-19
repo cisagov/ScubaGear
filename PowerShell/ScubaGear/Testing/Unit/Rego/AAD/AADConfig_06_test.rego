@@ -17,10 +17,8 @@ test_PasswordValidityPeriodInDays_Correct if {
 
 test_PasswordValidityPeriodInDays_Incorrect if {
     Settings := json.patch(DomainSettings,
-                [{"op": "add", "path": "0/PasswordValidityPeriodInDays",
-                "value": 0},
-                {"op": "add", "path": "1/PasswordValidityPeriodInDays",
-                "value": 0}])
+                [{"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 0},
+                {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 0}])
 
     Output := aad.tests with input.domain_settings as Settings
 
@@ -30,14 +28,10 @@ test_PasswordValidityPeriodInDays_Incorrect if {
 
 test_IsVerified_Correct if {
     Settings := json.patch(DomainSettings,
-                [{"op": "add", "path": "0/IsVerified",
-                "value": null},
-                {"op": "add", "path": "1/IsVerified",
-                "value": false},
-                {"op": "add", "path": "0/PasswordValidityPeriodInDays",
-                "value": 0},
-                {"op": "add", "path": "1/PasswordValidityPeriodInDays",
-                "value": 0}])
+                [{"op": "add", "path": "0/IsVerified", "value": null},
+                {"op": "add", "path": "1/IsVerified", "value": false},
+                {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 0},
+                {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 0}])
 
     Output := aad.tests with input.domain_settings as Settings
 

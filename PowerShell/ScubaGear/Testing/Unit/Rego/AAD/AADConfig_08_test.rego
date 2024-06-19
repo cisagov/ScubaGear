@@ -17,8 +17,7 @@ test_GuestUserRoleId_Correct_V1 if {
 
 test_GuestUserRoleId_Correct_V2 if {
     Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "GuestUserRoleId",
-                "value": "10dae51f-b6af-4016-8d66-8c2a99b929b3"}])
+                [{"op": "add", "path": "GuestUserRoleId", "value": "10dae51f-b6af-4016-8d66-8c2a99b929b3"}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
@@ -28,8 +27,7 @@ test_GuestUserRoleId_Correct_V2 if {
 
 test_GuestUserRoleId_Incorrect_V1 if {
     Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "GuestUserRoleId",
-                "value": "a0b1b346-4d3e-4e8b-98f8-753987be4970"}])
+                [{"op": "add", "path": "GuestUserRoleId", "value": "a0b1b346-4d3e-4e8b-98f8-753987be4970"}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
@@ -38,9 +36,7 @@ test_GuestUserRoleId_Incorrect_V1 if {
 }
 
 test_GuestUserRoleId_Incorrect_V2 if {
-    Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "GuestUserRoleId",
-                "value": "Hello World"}])
+    Policies := json.patch(AuthorizationPolicies, [{"op": "add", "path": "GuestUserRoleId", "value": "Hello World"}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
@@ -50,10 +46,8 @@ test_GuestUserRoleId_Incorrect_V2 if {
 
 test_GuestUserRoleId_Incorrect_V3 if {
     Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "GuestUserRoleId",
-                "value": "Hello World"},
-                {"op": "add", "path": "Id",
-                "value": "policy 1"}])
+                [{"op": "add", "path": "GuestUserRoleId", "value": "Hello World"},
+                {"op": "add", "path": "Id", "value": "policy 1"}])
 
     Output := aad.tests with input.authorization_policies as [Policies, AuthorizationPolicies]
 
@@ -73,9 +67,7 @@ test_AllowInvitesFrom_Correct if {
 }
 
 test_AllowInvitesFrom_Incorrect if {
-    Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "AllowInvitesFrom",
-                "value": "Bad value"}])
+    Policies := json.patch(AuthorizationPolicies, [{"op": "add", "path": "AllowInvitesFrom", "value": "Bad value"}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 

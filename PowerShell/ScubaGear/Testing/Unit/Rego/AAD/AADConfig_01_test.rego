@@ -20,8 +20,7 @@ test_NoExclusionsConditions_Correct if {
 
 test_NoExclusionsIncludeApplications_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
-                "value": ["Office365"]}])
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications", "value": ["Office365"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -35,8 +34,7 @@ test_NoExclusionsIncludeApplications_Incorrect if {
 
 test_NoExclusionsIncludeUsers_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -48,8 +46,7 @@ test_NoExclusionsIncludeUsers_Incorrect if {
 
 test_NoExclusionsExcludeUsers_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -61,8 +58,7 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 
 test_NoExclusionsExcludeGroups_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -74,8 +70,7 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 
 test_NoExclusionsClientAppTypes_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/ClientAppTypes",
-                "value": [""]}])
+                [{"op": "add", "path": "Conditions/ClientAppTypes", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -87,8 +82,7 @@ test_NoExclusionsClientAppTypes_Incorrect if {
 
 test_NoExclusionsBuiltInControls_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls",
-                "value": []}])
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -100,8 +94,7 @@ test_NoExclusionsBuiltInControls_Incorrect if {
 
 test_NoExclusionsState_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "State",
-                "value": "disabled"}])
+                [{"op": "add", "path": "State", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -127,8 +120,7 @@ test_NoExclusionsExemptUsers_Correct if {
 
 test_UserExclusionsConditions_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -145,10 +137,7 @@ test_UserExclusionsConditions_Correct if {
 test_MultiUserExclusionsConditions_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                        "df269963-a081-4315-b7de-172755221504"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -167,8 +156,7 @@ test_MultiUserExclusionsConditions_Correct if {
 
 test_UserExclusionNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -181,10 +169,7 @@ test_UserExclusionNoExempt_Incorrect if {
 test_UserExclusionsSingleExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                        "df269963-a081-4315-b7de-172755221504"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -199,10 +184,7 @@ test_UserExclusionsSingleExempt_Incorrect if {
 test_UserExclusionsNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                        "df269963-a081-4315-b7de-172755221504"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -215,10 +197,8 @@ test_UserExclusionsNoExempt_Incorrect if {
 
 test_UserExclusionsIncludeApplications_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
-                "value": ["Office365"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications", "value": ["Office365"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -232,10 +212,8 @@ test_UserExclusionsIncludeApplications_Incorrect if {
 
 test_UserExclusionsIncludeUsers_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -249,10 +227,8 @@ test_UserExclusionsIncludeUsers_Incorrect if {
 
 test_UserExclusionsExcludeGroups_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -266,10 +242,8 @@ test_UserExclusionsExcludeGroups_Incorrect if {
 
 test_UserExclusionsClientAppTypes_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/ClientAppTypes",
-                "value": [""]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/ClientAppTypes", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -283,10 +257,8 @@ test_UserExclusionsClientAppTypes_Incorrect if {
 
 test_UserExclusionsBuiltInControls_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "GrantControls/BuiltInControls",
-                "value": []}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "GrantControls/BuiltInControls", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -300,10 +272,8 @@ test_UserExclusionsBuiltInControls_Incorrect if {
 
 test_UserExclusionsState_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "State",
-                "value": "disabled"}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "State", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -331,8 +301,7 @@ test_NoExclusionsExemptGroups_Correct if {
 
 test_GroupExclusionNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -346,10 +315,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 test_GroupExclusionsNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -363,10 +329,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 test_GroupExclusionsSingleExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -380,8 +343,7 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 
 test_GroupExclusionConditions_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -398,10 +360,7 @@ test_GroupExclusionConditions_Correct if {
 test_MultiGroupExclusionsConditions_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                        "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                        "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -421,10 +380,8 @@ test_MultiGroupExclusionsConditions_Correct if {
 # tests when both group and user exclusions present
 test_UserGroupExclusionConditions_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -441,10 +398,8 @@ test_UserGroupExclusionConditions_Correct if {
 
 test_UserGroupExclusionNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -456,10 +411,8 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -473,10 +426,8 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
@@ -491,12 +442,8 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                        "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                        "df269963-a081-4315-b7de-172755221504"
-                        ]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "df269963-a081-4315-b7de-172755221504"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig

@@ -51,8 +51,7 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -64,8 +63,7 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
 
 test_UserExclusionConditions_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -83,10 +81,7 @@ test_UserExclusionConditions_Correct_V1 if {
 test_UserExclusionsNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -99,10 +94,7 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
 test_UserExclusionsSingleExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -117,10 +109,7 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
 test_MultiUserExclusionsConditions_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -141,8 +130,7 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
 # Group Exclusion tests #
 test_GroupExclusionNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -154,8 +142,7 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
 
 test_GroupExclusionsConditions_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -173,10 +160,7 @@ test_GroupExclusionsConditions_Correct_V1 if {
 test_GroupExclusionsNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -189,10 +173,7 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
 test_GroupExclusionsSingleExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -207,10 +188,7 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
 test_MultiGroupExclusionsConditions_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -230,10 +208,8 @@ test_MultiGroupExclusionsConditions_Correct_V1 if {
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -250,10 +226,8 @@ test_UserGroupExclusionConditions_Correct_V1 if {
 
 test_UserGroupExclusionNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -265,10 +239,8 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -282,10 +254,8 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -300,12 +270,8 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -321,8 +287,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
 # Other Conditions tests
 test_IncludeApplications_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
-                "value": ["Office365"]}])
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications", "value": ["Office365"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -334,8 +299,7 @@ test_IncludeApplications_Incorrect_V1 if {
 
 test_IncludeUsers_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -347,8 +311,7 @@ test_IncludeUsers_Incorrect_V1 if {
 
 test_ExcludeUsers_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -360,8 +323,7 @@ test_ExcludeUsers_Incorrect_V1 if {
 
 test_ExcludeGroups_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -373,8 +335,7 @@ test_ExcludeGroups_Incorrect_V1 if {
 
 test_ExcludeRoles_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeRoles",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeRoles", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -386,8 +347,7 @@ test_ExcludeRoles_Incorrect_V1 if {
 
 test_BuiltInControls_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls",
-                "value": [""]}])
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -399,8 +359,7 @@ test_BuiltInControls_Incorrect_V1 if {
 
 test_State_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "State",
-                "value": "disabled"}])
+                [{"op": "add", "path": "State", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -412,8 +371,7 @@ test_State_Incorrect_V1 if {
 
 test_UserRiskLevels_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/UserRiskLevels",
-                "value": [""]}])
+                [{"op": "add", "path": "Conditions/UserRiskLevels", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -425,8 +383,7 @@ test_UserRiskLevels_Incorrect if {
 
 test_ServicePlans_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/UserRiskLevels",
-                "value": [""]}])
+                [{"op": "add", "path": "Conditions/UserRiskLevels", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as [ServicePlans[0]]
@@ -496,8 +453,7 @@ test_NoExclusionsExemptGroups_Correct_V2 if {
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -509,8 +465,7 @@ test_UserExclusionNoExempt_Incorrect_V2 if {
 
 test_UserExclusionConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -528,10 +483,7 @@ test_UserExclusionConditions_Correct_V2 if {
 test_UserExclusionsNoExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -544,10 +496,7 @@ test_UserExclusionsNoExempt_Incorrect_V2 if {
 test_UserExclusionsSingleExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -562,10 +511,7 @@ test_UserExclusionsSingleExempt_Incorrect_V2 if {
 test_MultiUserExclusionsConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -586,8 +532,7 @@ test_MultiUserExclusionsConditions_Correct_V2 if {
 # Group Exclusion tests
 test_GroupExclusionNoExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -599,8 +544,7 @@ test_GroupExclusionNoExempt_Incorrect_V2 if {
 
 test_GroupExclusionsConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -618,10 +562,7 @@ test_GroupExclusionsConditions_Correct_V2 if {
 test_GroupExclusionsNoExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -634,10 +575,7 @@ test_GroupExclusionsNoExempt_Incorrect_V2 if {
 test_GroupExclusionsSingleExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -652,10 +590,7 @@ test_GroupExclusionsSingleExempt_Incorrect_V2 if {
 test_MultiGroupExclusionsConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
-                            "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                        ]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -676,10 +611,8 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
 # User and group exclusions tests
 test_UserGroupExclusionConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -697,10 +630,8 @@ test_UserGroupExclusionConditions_Correct_V2 if {
 
 test_UserGroupExclusionNoExempt_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -713,10 +644,8 @@ test_UserGroupExclusionNoExempt_Incorrect_V2 if {
 
 test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -730,10 +659,8 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -748,12 +675,8 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
 test_UserGroupExclusionTooFewUserExempts_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": [
-                    "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
-                    "65fea286-22d3-42f9-b4ca-93a6f75817d4"
-                    ]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
+                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "65fea286-22d3-42f9-b4ca-93a6f75817d4"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -781,8 +704,7 @@ test_Conditions_Correct if {
 
 test_IncludeApplications_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Applications/IncludeApplications",
-                "value": ["Office365"]}])
+                [{"op": "add", "path": "Conditions/Applications/IncludeApplications", "value": ["Office365"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -794,8 +716,7 @@ test_IncludeApplications_Incorrect_V2 if {
 
 test_IncludeUsers_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/IncludeUsers",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/IncludeUsers", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -807,8 +728,7 @@ test_IncludeUsers_Incorrect_V2 if {
 
 test_ExcludeUsers_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -820,8 +740,7 @@ test_ExcludeUsers_Incorrect_V2 if {
 
 test_ExcludeGroups_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -833,8 +752,7 @@ test_ExcludeGroups_Incorrect_V2 if {
 
 test_ExcludeRoles_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeRoles",
-                "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeRoles", "value": ["8bc7c6ee-39a2-42a5-a31b-f77fb51db652"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -845,9 +763,7 @@ test_ExcludeRoles_Incorrect_V2 if {
 }
 
 test_SignInRiskLevels_Incorrect if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/SignInRiskLevels",
-                "value": [""]}])
+    CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "Conditions/SignInRiskLevels", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -858,9 +774,7 @@ test_SignInRiskLevels_Incorrect if {
 }
 
 test_BuiltInControls_Incorrect_V2 if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls",
-                "value": [""]}])
+    CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -871,9 +785,7 @@ test_BuiltInControls_Incorrect_V2 if {
 }
 
 test_State_Incorrect_V2 if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "State",
-                "value": "disabled"}])
+    CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "State", "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans

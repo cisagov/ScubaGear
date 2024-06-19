@@ -15,8 +15,7 @@ test_PrivilegedUsers_Correct if {
 }
 
 test_PrivilegedUsers_Incorrect_V1 if {
-    Users := json.patch(PrivilegedUsers,
-                [{"op": "remove", "path": "User2",}])
+    Users := json.patch(PrivilegedUsers, [{"op": "remove", "path": "User2",}])
 
     Output := aad.tests with input.privileged_users as Users
 
@@ -61,8 +60,7 @@ test_SecureScore_Correct_V1 if {
 
 # Correct because the ratio of global admins to non global admins is equal to 1
 test_SecureScore_Incorrect_V1 if {
-    Users := json.patch(PrivilegedUsers,
-                [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
+    Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
 
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Application Administrator"]}
@@ -77,10 +75,7 @@ test_SecureScore_Incorrect_V1 if {
 test_SecureScore_Incorrect_V2 if {
     Users := json.patch(PrivilegedUsers,
                 [{"op": "add", "path": "User2/roles/0", "value": "Application Administrator"},
-                {"op": "add", "path": "User1/roles", "value": [
-                    "User Administrator",
-                    "Global Administrator"
-                ]}])
+                {"op": "add", "path": "User1/roles", "value": ["User Administrator", "Global Administrator"]}])
 
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Privileged Role Administrator"]}
@@ -92,8 +87,7 @@ test_SecureScore_Incorrect_V2 if {
 
 # Incorrect because the ratio of global admins to non global admins is undefined (all are global admins)
 test_SecureScore_Incorrect_V3 if {
-    Users := json.patch(PrivilegedUsers,
-                [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
+    Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
 
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": [
@@ -108,8 +102,7 @@ test_SecureScore_Incorrect_V3 if {
 
 # Incorrect because the total number of global admins is greater than eight
 test_SecureScore_Incorrect_V4 if {
-    Users := json.patch(PrivilegedUsers,
-                [{"op": "add", "path": "User2/roles/0", "value": "Exchange Administrator"}])
+    Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "Exchange Administrator"}])
 
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Global Administrator"]}
@@ -136,8 +129,8 @@ test_OnPremisesImmutableId_Correct if {
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
-    Users := json.patch(PrivilegedUsers, [
-                {"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"},
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"},
                 {"op": "remove", "path": "User2"}])
 
     Output := aad.tests with input.privileged_users as Users
@@ -172,6 +165,7 @@ test_AdditionalProperties_Correct_V2 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -185,6 +179,7 @@ test_AdditionalProperties_Correct_V3 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -198,6 +193,7 @@ test_AdditionalProperties_LicenseMissing_V1 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.7.4v1"].RoleExclusions.Groups as ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"]
@@ -211,6 +207,7 @@ test_AdditionalProperties_Incorrect_V1 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -222,6 +219,7 @@ test_AdditionalProperties_Incorrect_V2 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -234,6 +232,7 @@ test_AdditionalProperties_Incorrect_V3 if {
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -251,6 +250,7 @@ test_AdditionalProperties_Incorrect_V4 if {
                 {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -266,6 +266,7 @@ test_AdditionalProperties_Incorrect_V5 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -279,6 +280,7 @@ test_AdditionalProperties_Incorrect_V6 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -293,6 +295,7 @@ test_AdditionalProperties_Incorrect_V7 if {
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -312,6 +315,7 @@ test_AdditionalProperties_Incorrect_V8 if {
                 {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -329,6 +333,7 @@ test_AdditionalProperties_Incorrect_V9 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -342,6 +347,7 @@ test_AdditionalProperties_Incorrect_V10 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -355,6 +361,7 @@ test_AdditionalProperties_Incorrect_V11 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -369,6 +376,7 @@ test_AdditionalProperties_Incorrect_V12 if {
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -388,6 +396,7 @@ test_AdditionalProperties_Incorrect_V13 if {
                 {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
                 {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -405,6 +414,7 @@ test_AdditionalProperties_Incorrect_V14 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.7.4v1"] as ScubaConfig
@@ -419,8 +429,8 @@ test_AdditionalProperties_Incorrect_V14 if {
 # Policy MS.AAD.7.5v1
 #--
 test_Assignments_Correct if {
-    Roles := json.patch(PrivilegedRoles,
-                [{"op": "remove", "path": "1"}])
+    Roles := json.patch(PrivilegedRoles, [{"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -432,6 +442,7 @@ test_Assignments_Incorrect if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "0/Assignments/0/StartDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -444,8 +455,8 @@ test_Assignments_Incorrect if {
 # Policy MS.AAD.7.6v1
 #--
 test_AdditionalProperties_Correct_V4 if {
-    Roles := json.patch(PrivilegedRoles,
-                [{"op": "remove", "path": "1"}])
+    Roles := json.patch(PrivilegedRoles, [{"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -459,6 +470,7 @@ test_AdditionalProperties_Correct_V5 if {
                 {"op": "add", "path": "1/Rules/0/AdditionalProperties/setting/isApprovalRequired", "value": false},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Approval_EndUser_Assignment"},
                 {"op": "add", "path": "1/Rules/0/Id", "value": "Approval_EndUser_Assignment"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -471,6 +483,7 @@ test_AdditionalProperties_Incorrect_V15 if {
                 [{"op": "remove", "path": "1"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/setting/isApprovalRequired", "value": false},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Approval_EndUser_Assignment"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -490,6 +503,7 @@ test_PIM_Group_Incorrect_V15 if {
                 {"op": "add", "path": "1/Rules/0/RuleSource", "value": "My PIM GROUP"},
                 {"op": "add", "path": "1/Rules/0/RuleSourceType", "value": "PIM Group"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Approval_EndUser_Assignment"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -506,7 +520,9 @@ test_NoP2License_Incorrect if {
                 [{"op": "remove", "path": "1"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/setting/isApprovalRequired", "value": false},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Approval_EndUser_Assignment"}])
+
     Service := json.patch(ServicePlans,[{"op": "remove", "path": "1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as Service
 
@@ -522,6 +538,7 @@ test_notificationRecipients_Correct if {
                 [{"op": "remove", "path": "1"},
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_Admin_Assignment"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -535,6 +552,7 @@ test_notificationRecipients_Incorrect_V1 if {
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_Admin_Assignment"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -552,6 +570,7 @@ test_notificationRecipients_Incorrect_V2 if {
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_Admin_Assignment"},
                 {"op": "add", "path": "0/Rules/1/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -570,6 +589,7 @@ test_notificationRecipients_Incorrect_V3 if {
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_Admin_Assignment"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationRecipients", "value": []},
                 {"op": "add", "path": "0/Rules/1/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -590,6 +610,7 @@ test_notificationRecipients_PIM_Incorrect_V3 if {
             "notificationRecipients": []
         }
     }
+
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "remove", "path": "1"},
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
@@ -599,6 +620,7 @@ test_notificationRecipients_PIM_Incorrect_V3 if {
                 {"op": "add", "path": "0/Rules/2", "value": TmpRule},
                 {"op": "add", "path": "0/Rules/3", "value": TmpRule},
                 {"op": "add", "path": "0/Rules/3/Id", "value": "Notification_Admin_Admin_Eligibility"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -620,6 +642,7 @@ test_Id_Correct_V1 if {
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_EndUser_Assignment"},
                 {"op": "remove", "path": "0/Rules/1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -635,6 +658,7 @@ test_Id_Correct_V2 if {
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_EndUser_Assignment"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationType", "value": ""},
                 {"op": "remove", "path": "0/Rules/1"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -653,6 +677,7 @@ test_Id_PIM_Correct_V2 if {
                 {"op": "add", "path": "0/Rules/1/RuleSource", "value": "My PIM Group"},
                 {"op": "add", "path": "0/Rules/1/RuleSourceType", "value": "PIM Group"},
                 {"op": "add", "path": "0/Rules/1/AdditionalProperties/notificationType", "value": ""}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -670,6 +695,7 @@ test_Id_PIM_Incorrect_V2 if {
                 {"op": "add", "path": "0/Rules/1/RuleSource", "value": "My PIM Group"},
                 {"op": "add", "path": "0/Rules/1/RuleSourceType", "value": "PIM Group"},
                 {"op": "add", "path": "0/Rules/1/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -687,6 +713,7 @@ test_Id_Incorrect if {
                 {"op": "add", "path": "0/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_EndUser_Assignment"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -710,6 +737,7 @@ test_DisplayName_Correct if {
                 {"op": "add", "path": "0/DisplayName", "value": "Cloud Administrator"},
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Cloud Administrator"},
                 {"op": "add", "path": "0/Rules/0/RuleSource", "value": "Cloud Administrator"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -728,6 +756,7 @@ test_DisplayName_PIM_Correct if {
                 {"op": "add", "path": "1/Rules/0/Id", "value": "Cloud Administrator"},
                 {"op": "add", "path": "1/Rules/0/RuleSource", "value": "MY PIM Group"},
                 {"op": "add", "path": "1/Rules/0/RuleSourceType", "value": "PIM Group"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -745,6 +774,7 @@ test_DisplayName_Incorrect if {
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Notification_Admin_EndUser_Assignment"},
                 {"op": "add", "path": "0/Rules/0/RuleSource", "value": "Cloud Administrator"},
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationRecipients", "value": []}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -767,6 +797,7 @@ test_DisplayName_PIM_Incorrect if {
                 {"op": "add", "path": "0/Rules/1/Id", "value": "Notification_Admin_EndUser_Assignment"},
                 {"op": "add", "path": "0/Rules/1/RuleSource", "value": "MY PIM Group"},
                 {"op": "add", "path": "0/Rules/1/RuleSourceType", "value": "PIM Group"}])
+
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 

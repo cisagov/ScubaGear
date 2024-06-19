@@ -18,8 +18,7 @@ test_AllowedToCreateApps_Correct if {
 
 test_AllowedToCreateApps_Incorrect_V1 if {
     Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "DefaultUserRolePermissions/AllowedToCreateApps",
-                "value": true}])
+                [{"op": "add", "path": "DefaultUserRolePermissions/AllowedToCreateApps", "value": true}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
@@ -60,8 +59,7 @@ test_UserConsentNotAllowed_Correct if {
 
 test_UserConsentNotAllowedEmptyDefaultUserArray_Correct if {
     Policies := json.patch(AuthorizationPolicies,
-                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole",
-                "value": []}])
+                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole", "value": []}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
@@ -119,8 +117,7 @@ test_IsEnabled_Correct if {
 }
 
 test_IsEnabled_Incorrect_Missing if {
-    Settings := json.patch(DirectorySettings,
-                [{"op": "add", "path": "Values/0/Value", "value": "false"}])
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/0/Value", "value": "false"}])
 
     Output := aad.tests with input.directory_settings as [Settings]
 
@@ -128,8 +125,7 @@ test_IsEnabled_Incorrect_Missing if {
 }
 
 test_IsEnabled_Incorrect if {
-    Settings := json.patch(DirectorySettings,
-                [{"op": "add", "path": "Values/0/Value", "value": "false"}])
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/0/Value", "value": "false"}])
 
     Output := aad.tests with input.directory_settings as [Settings]
 
@@ -147,8 +143,7 @@ test_Value_Correct_Lowercase if {
 }
 
 test_Value_Correct_Uppercase if {
-    Settings := json.patch(DirectorySettings,
-                [{"op": "add", "path": "Values/1/Value", "value": "False"}])
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "False"}])
 
     Output := aad.tests with input.directory_settings as [Settings]
 
@@ -156,8 +151,7 @@ test_Value_Correct_Uppercase if {
 }
 
 test_Value_Incorrect_Lowercase if {
-    Settings := json.patch(DirectorySettings,
-                [{"op": "add", "path": "Values/1/Value", "value": "true"}])
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "true"}])
 
     Output := aad.tests with input.directory_settings as [Settings]
 
@@ -165,8 +159,7 @@ test_Value_Incorrect_Lowercase if {
 }
 
 test_Value_Incorrect_Uppercase if {
-    Settings := json.patch(DirectorySettings,
-                [{"op": "add", "path": "Values/1/Value", "value": "True"}])
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "True"}])
 
     Output := aad.tests with input.directory_settings as [Settings]
 
