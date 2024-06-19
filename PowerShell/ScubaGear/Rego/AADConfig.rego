@@ -721,12 +721,18 @@ UserPasswordsSetToNotExpire contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.PasswordValidityPeriodInDays == INT_MAX
     Domain.IsVerified == true
+
+    # Ignore federated domains
+    Domain.AuthenticationType == "Managed"
 }
 
 UserPasswordsSetToExpire contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.PasswordValidityPeriodInDays != INT_MAX
     Domain.IsVerified == true
+
+    # Ignore federated domains
+    Domain.AuthenticationType == "Managed"
 }
 
 tests contains {
