@@ -457,8 +457,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
         "OR" in CAPolicy.GrantControls.Operator,
 
     ]
-    write-host(count(FilterArray(Conditions, true)))
-    count(FilterArray(Conditions, true)) == 3
+    count(FilterArray(Conditions, true)) == 2
 
 
     # Only match policies with user and group exclusions if all exempted
