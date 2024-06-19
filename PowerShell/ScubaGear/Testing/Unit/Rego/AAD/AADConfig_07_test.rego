@@ -753,7 +753,9 @@ test_DisplayName_PIM_Correct if {
                 {"op": "add", "path": "0/Rules/0/Id", "value": "Cloud Administrator"},
                 {"op": "add", "path": "0/Rules/0/RuleSource", "value": "Cloud Administrator"},
                 {"op": "add", "path": "1/RoleTemplateId", "value": "1D2EE3F0-90D3-4764-8AF8-BE81FE9D4D71"},
+                {"op": "add", "path": "1/DisplayName", "value": "Cloud Administrator 2"},
                 {"op": "add", "path": "1/Rules/0/Id", "value": "Cloud Administrator"},
+                {"op": "add", "path": "1/Rules/0/AdditionalProperties/notificationType", "value": "Email"},
                 {"op": "add", "path": "1/Rules/0/RuleSource", "value": "MY PIM Group"},
                 {"op": "add", "path": "1/Rules/0/RuleSourceType", "value": "PIM Group"}])
 
