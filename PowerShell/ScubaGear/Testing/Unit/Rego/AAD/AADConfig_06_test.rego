@@ -33,7 +33,11 @@ test_IsVerified_Correct if {
                 [{"op": "add", "path": "0/IsVerified",
                 "value": null},
                 {"op": "add", "path": "1/IsVerified",
-                "value": false}])
+                "value": false},
+                {"op": "add", "path": "0/PasswordValidityPeriodInDays",
+                "value": 0},
+                {"op": "add", "path": "1/PasswordValidityPeriodInDays",
+                "value": 0}])
 
     Output := aad.tests with input.domain_settings as Settings
 

@@ -49,6 +49,7 @@ test_PrivilegedUsers_Incorrect_V2 if {
 # Correct because the ratio of global admins to non global admins is less than 1
 test_SecureScore_Correct_V1 if {
     Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User2.roles as ["Cloud Application Administrator", "Global Administrator"]
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Application Administrator"]}
                         with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["User Administrator"]}
                         with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Privileged Role Administrator"]}
@@ -135,8 +136,9 @@ test_OnPremisesImmutableId_Correct if {
 }
 
 test_OnPremisesImmutableId_Incorrect_V1 if {
-    Users := json.patch(PrivilegedUsers,
-                [{"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"}])
+    Users := json.patch(PrivilegedUsers, [
+                {"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"},
+                {"op": "remove", "path": "User2"}])
 
     Output := aad.tests with input.privileged_users as Users
 
@@ -454,7 +456,9 @@ test_AdditionalProperties_Correct_V4 if {
 test_AdditionalProperties_Correct_V5 if {
     Roles := json.patch(PrivilegedRoles,
                 [{"op": "add", "path": "1/DisplayName", "value": "Groups Administrator"},
-                {"op": "add", "path": "1/Rules/0/AdditionalProperties/setting/isApprovalRequired", "value": false}])
+                {"op": "add", "path": "1/Rules/0/AdditionalProperties/setting/isApprovalRequired", "value": false},
+                {"op": "add", "path": "0/Rules/0/Id", "value": "Approval_EndUser_Assignment"},
+                {"op": "add", "path": "1/Rules/0/Id", "value": "Approval_EndUser_Assignment"}])
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 
@@ -593,7 +597,8 @@ test_notificationRecipients_PIM_Incorrect_V3 if {
                 {"op": "add", "path": "0/Rules/0/AdditionalProperties/notificationRecipients", "value": []},
                 {"op": "add", "path": "0/Rules/1/AdditionalProperties/notificationRecipients", "value": []},
                 {"op": "add", "path": "0/Rules/2", "value": TmpRule},
-                {"op": "add", "path": "0/Rules/3", "value": TmpRule}])
+                {"op": "add", "path": "0/Rules/3", "value": TmpRule},
+                {"op": "add", "path": "0/Rules/3/Id", "value": "Notification_Admin_Admin_Eligibility"}])
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
 

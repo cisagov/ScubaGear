@@ -571,8 +571,13 @@ test_State_Incorrect_V1 if {
 # Policy MS.AAD.3.3v1
 #--
 test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
+    Auth := json.patch(AuthenticationMethod,
+                [{"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
+                {"op": "remove", "path": "authentication_method_feature_settings/1"}])
+
     Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
-                        with input.authentication_method as [AuthenticationMethod]
+                        with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
     ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
@@ -581,8 +586,10 @@ test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
 
 test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
     Auth := json.patch(AuthenticationMethod,
-                [{"op": "add", "path": "authentication_method_feature_settings/0/State",
-                "value": "disabled"}])
+                [{"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
+                {"op": "remove", "path": "authentication_method_feature_settings/1"}])
 
     Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
                         with input.authentication_method as [Auth]
@@ -597,8 +604,10 @@ test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
                 [{"op": "add", "path": "GrantControls/BuiltInControls",
                 "value": ["mfa"]}])
     Auth := json.patch(AuthenticationMethod,
-                [{"op": "add", "path": "authentication_method_feature_settings/0/State",
-                "value": "disabled"}])
+                [{"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
+                {"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
+                {"op": "remove", "path": "authentication_method_feature_settings/2"},
+                {"op": "remove", "path": "authentication_method_feature_settings/1"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.authentication_method as [Auth]
@@ -786,7 +795,9 @@ test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
 
 test_LowSecurityAuthMethods_PreMigration_NotImplemented if {
     Auth := json.patch(AuthenticationMethod,
-                [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState",
+                [{"op": "add", "path": "authentication_method_feature_settings/1/State",
+                "value": "enabled"},
+                {"op": "add", "path": "authentication_method_policy/PolicyMigrationState",
                 "value": "preMigration"}])
 
     Output := aad.tests with input.authentication_method as [Auth]
@@ -914,7 +925,9 @@ test_BuiltInControls_Incorrect_No_Authentication_Strength if {
                             "Role2"
                         ]},
                 {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations",
-                "value": null}])
+                "value": null},
+                {"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": [""]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.privileged_roles as PrivilegedRoles
@@ -1070,7 +1083,9 @@ test_BuiltInControls_Incorrect_V3 if {
 test_State_Incorrect_V3 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "State",
-                "value": "disabled"}])
+                "value": "disabled"},
+                {"op": "add", "path": "GrantControls/BuiltInControls",
+                "value": ["compliantDevice"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 

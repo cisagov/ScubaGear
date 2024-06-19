@@ -190,7 +190,7 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": [
-                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
+                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]}])
 
@@ -310,7 +310,7 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
@@ -424,7 +424,11 @@ test_UserRiskLevels_Incorrect if {
 }
 
 test_ServicePlans_Incorrect if {
-    Output := aad.tests with input.conditional_access_policies as [ConditionalAccessPolicies]
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/UserRiskLevels",
+                "value": [""]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as [ServicePlans[0]]
 
     ReportDetailStr :=
@@ -596,12 +600,12 @@ test_GroupExclusionNoExempt_Incorrect_V2 if {
 test_GroupExclusionsConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.3v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
@@ -638,7 +642,7 @@ test_GroupExclusionsSingleExempt_Incorrect_V2 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.3v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -649,7 +653,7 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups",
                 "value": [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]}])
 
@@ -657,7 +661,7 @@ test_MultiGroupExclusionsConditions_Correct_V2 if {
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.3v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as [
-                            "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
+                            "49b4dcdf-1f90-41a5-9dd7-5e7c3609b423",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
 
@@ -675,13 +679,13 @@ test_UserGroupExclusionConditions_Correct_V2 if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.3v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
@@ -696,7 +700,7 @@ test_UserGroupExclusionNoExempt_Incorrect_V2 if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -712,7 +716,7 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V2 if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
@@ -729,12 +733,12 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V2 if {
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers",
                 "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups",
-                "value": ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]}])
+                "value": ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.3v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.2.3v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
@@ -869,7 +873,7 @@ test_BuiltInControls_Incorrect_V2 if {
 test_State_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "State",
-                "value": ["disabled"]}])
+                "value": "disabled"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
