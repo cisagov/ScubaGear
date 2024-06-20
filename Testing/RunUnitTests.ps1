@@ -75,7 +75,7 @@ if ($RunAsInstalled){
 }
 
 $RegoUnitTestPath = Join-Path -Path $RootPath -ChildPath "Testing\Unit\Rego"
-$UtilFilename = (Get-ChildItem $RegoUnitTestPath | Where-Object {$_.Name -like "TestAssertions*" }).FullName
+$UtilFilename = (Get-ChildItem $(Join-Path -Path $RootPath -ChildPath "Rego\Utils") | Where-Object {$_.Name -like "TestAssertions*" }).FullName
 $RegoPolicyPath = Join-Path -Path $RootPath -ChildPath "Rego"
 
 function Get-ErrorMsg {
