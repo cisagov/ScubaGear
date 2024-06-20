@@ -6,7 +6,6 @@ import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
-import data.utils.key.Count
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
@@ -238,7 +237,6 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    print(AllMFA)
     Status := count(AllMFA) > 0
 }
 #--
