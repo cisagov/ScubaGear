@@ -1005,17 +1005,18 @@ function Invoke-ReportCreation {
                 $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
                 $LinkClassName = '"individual_reports"' # uses no escape characters
                 $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
-                if ($Report.Skips -gt 0) {
-                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) passed / $($Report.Skips) skipped</div>"
-                }
-                else {
-                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) tests passed</div>"
-                }
+                $PassesSummary = "<div class='summary'></div>"
                 $WarningsSummary = "<div class='summary'></div>"
                 $FailuresSummary = "<div class='summary'></div>"
                 $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
                 $ManualSummary = "<div class='summary'></div>"
-                $ErrorSummary = "<div class='summary'></div>"
+                $OmitSummary = "<div class='summary'></div>"
+                $ErrorSummary = ""
+
+                if ($Report.Passes -gt 0) {
+                    $Noun = Pluralize -SingularNoun "pass" -PluralNoun "passes" -Count $Report.Passes
+                    $PassesSummary = "<div class='summary pass'>$($Report.Passes) $($Noun)</div>"
+                }
 
                 if ($Report.Warnings -gt 0) {
                     $Noun = Pluralize -SingularNoun "warning" -PluralNoun "warnings" -Count $Report.Warnings
@@ -1023,13 +1024,17 @@ function Invoke-ReportCreation {
                 }
 
                 if ($Report.Failures -gt 0) {
-                    $Noun = Pluralize -SingularNoun "test" -PluralNoun "tests" -Count $Report.Failures
-                    $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun) failed</div>"
+                    $Noun = Pluralize -SingularNoun "failure" -PluralNoun "failures" -Count $Report.Failures
+                    $FailuresSummary = "<div class='summary failure'>$($Report.Failures) $($Noun)</div>"
                 }
 
                 if ($Report.Manual -gt 0) {
                     $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Manual
-                    $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun) needed</div>"
+                    $ManualSummary = "<div class='summary manual'>$($Report.Manual) manual $($Noun)</div>"
+                }
+
+                if ($Report.Omits -gt 0) {
+                    $OmitSummary = "<div class='summary manual'>$($Report.Omits) omitted</div>"
                 }
 
                 if ($Report.Errors -gt 0) {
@@ -1039,7 +1044,7 @@ function Invoke-ReportCreation {
 
                 $Fragment += [pscustomobject]@{
                 "Baseline Conformance Reports" = $Link;
-                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($ErrorSummary)"
+                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($OmitSummary) $($ErrorSummary)"
                 }
             }
             $TenantMetaData += [pscustomobject]@{

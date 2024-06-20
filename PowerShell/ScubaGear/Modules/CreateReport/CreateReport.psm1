@@ -88,7 +88,7 @@ function New-Report {
         "Warnings" = 0;
         "Failures" = 0;
         "Passes" = 0;
-        "Skips" = 0;
+        "Omits" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -102,30 +102,30 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
-                $Skip = $false
+                $Omit = $false
                 if (Test-Contains $SettingsExport.scuba_config $BaselineName) {
-                    if (Test-Contains $SettingsExport.scuba_config.$BaselineName "IgnorePolicy") {
-                        if (Test-Contains $SettingsExport.scuba_config.$BaselineName.IgnorePolicy $Control.Id) {
-                            $Skip = $true
+                    if (Test-Contains $SettingsExport.scuba_config.$BaselineName "OmitPolicy") {
+                        if (Test-Contains $SettingsExport.scuba_config.$BaselineName.OmitPolicy $Control.Id) {
+                            $Omit = $true
                         }
                     }
                 }
-                if ($Skip) {
-                    $ReportSummary.Skips += 1
-                    $SkipRationale = $SettingsExport.scuba_config.$BaselineName.IgnorePolicy.$($Control.Id)
-                    if ([string]::IsNullOrEmpty($SkipRationale)) {
-                        Write-Warning "Config file indicates skipping $($Control.Id), but no rationale provided."
-                        $SkipRationale = "Rationale not provided."
+                if ($Omit) {
+                    $ReportSummary.Omits += 1
+                    $OmitRationale = $SettingsExport.scuba_config.$BaselineName.OmitPolicy.$($Control.Id)
+                    if ([string]::IsNullOrEmpty($OmitRationale)) {
+                        Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
+                        $OmitRationale = "Rationale not provided."
                     }
                     else {
-                        $SkipRationale = "`"$($SkipRationale)`""
+                        $OmitRationale = "`"$($OmitRationale)`""
                     }
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
                         "Requirement"=$Control.Value
-                        "Result"= "Skipped"
+                        "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
-                        "Details"= "Test skipped by user. $($SkipRationale)"
+                        "Details"= "Test skipped by user. $($OmitRationale)"
                     }
                     continue
                 }

@@ -19,7 +19,7 @@ OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
 Exo:
-  IgnorePolicy:
+  OmitPolicy:
     MS.EXO.4.3v1: "This policy is not applicable to our company as it only applies
         to federal, executive branch, departments and agencies." # Assuming this config file corresponds to a private
         # company, not a gov entity
@@ -46,7 +46,7 @@ Exo:
     MS.EXO.17.2v1: *DefenderRationale
     MS.EXO.17.3v1: *DefenderRationale
 Teams:
-  IgnorePolicy:
+  OmitPolicy:
     MS.TEAMS.6.1v1: *DefenderRationale
     MS.TEAMS.6.2v1: *DefenderRationale
     MS.TEAMS.7.1v1: *DefenderRationale
