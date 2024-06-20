@@ -1,7 +1,9 @@
+# Purpose: Run unit tests for the code used in workflows
 name: Unit Test Workflow
 
+# This is a reusable workflow called by the pipeline.
 on:
-  push:
+  workflow_call:
   workflow_dispatch:
 
 permissions: read-all
