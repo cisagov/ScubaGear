@@ -1,8 +1,8 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Azure Active Directory
+# CISA M365 Security Configuration Baseline for Entra ID
 
-Microsoft 365 (M365) Azure Active Directory (Azure AD) is a cloud-based identity and access control service that provides security and functional capabilities. This Secure Configuration Baseline (SCB) provides specific policies to help secure Azure AD.
+Microsoft Entra ID is a cloud-based identity and access control service that provides security and functional capabilities. This Secure Configuration Baseline (SCB) provides specific policies to help secure Microsoft Entra ID.
 
 The Secure Cloud Business Applications (SCuBA) project run by the Cybersecurity and Infrastructure Security Agency (CISA) provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -18,23 +18,23 @@ Portions of this document are adapted from documents in Microsoft’s [M365](htt
 ## Assumptions
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
-Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in Azure AD and [implemented strong security measures](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
+Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in Microsoft Entra ID and [implemented strong security measures](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
 
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 The following are key terms and descriptions used in this document.
 
-**Hybrid Azure Active Directory (AD)**: This term denotes the scenario
-when an organization has an on-premises AD domain that contains the
+**Microsoft Entra hybrid**: This term denotes the scenario
+when an organization has an on-premises Microsoft Windows Server Active Directory that contains the
 master user directory but federates access to the cloud M365
-Azure AD tenant.
+Microsoft Entra ID tenant.
 
 **Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
 ## Highly Privileged Roles
 
-This section provides a list of what CISA considers highly privileged [built-in roles in Azure Active Directory](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Azure AD roles as necessary.
+This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Microsoft Entra ID roles as necessary.
 
 - Global Administrator
 - Privileged Role Administrator
@@ -45,11 +45,11 @@ This section provides a list of what CISA considers highly privileged [built-in 
 - Application Administrator
 - Cloud Application Administrator
 
-Throughout this document, this list of highly privileged roles is referenced in numerous baseline policies. Agencies should consider this list a foundational reference and apply respective baseline policies to additional Azure AD roles as necessary.
+Throughout this document, this list of highly privileged roles is referenced in numerous baseline policies. Agencies should consider this list a foundational reference and apply respective baseline policies to additional Microsoft Entra ID roles as necessary.
 
 ## Conditional Access Policies
 
-Numerous policies in this baseline rely on Azure AD Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Azure AD Conditional Access.
+Numerous policies in this baseline rely on Microsoft Entra ID Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Microsoft Entra ID Conditional Access.
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to help prevent unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
 
@@ -87,11 +87,11 @@ Legacy authentication SHALL be blocked.
 
 ## 2. Risk Based Policies
 
-This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Azure AD Identity Protection and Azure AD Conditional Access. Azure AD Identity Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.
+This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.
 
-- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Azure AD applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
+- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
 
-- _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Azure AD Identity Protection service to a user account or sign-in event.
+- _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
 
 ### Policies
 #### MS.ENTRAID.2.1v1
@@ -100,7 +100,7 @@ Users detected as high risk SHALL be blocked.
 <!--Policy: MS.ENTRAID.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
-- _Note:_ Users identified as high risk by Azure AD Identity Protection can be blocked from accessing the system via an Azure AD Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
+- _Note:_ Users identified as high risk by Microsoft Entra ID Protection can be blocked from accessing the system via an Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 
 #### MS.ENTRAID.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -146,7 +146,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 #### MS.ENTRAID.2.2v1 Instructions
 
-1.  [Configure Azure AD Identity Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.
+1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.
 
 #### MS.ENTRAID.2.3v1 Instructions
 
@@ -169,7 +169,7 @@ This section provides policies that help reduce security risks related to user a
 Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), but for a variety of reasons, implementing it for all users may be challenging. This section provides additional backup security policies to mitigate risk associated with lesser forms of MFA. For example, Policy MS.ENTRAID.3.2v1 below enforces MFA without stipulating the specific MFA method.
 
 <img src="/images/aad-mfa.png"
-alt="Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Azure AD Certificate Based Authentication (preferred) and federated PIV card." />
+alt="Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Microsoft Entra certificate-based authentication (preferred) and federated PIV card." />
 
 Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)_
 
@@ -177,9 +177,9 @@ Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Mic
 #### MS.ENTRAID.3.1v1
 Phishing-resistant MFA SHALL be enforced for all users.
 
-The phishing-resistant methods **Azure AD Certificate-Based Authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Azure AD CBA supports federal PIV card authentication directly to Azure AD.
+The phishing-resistant methods ** Microsoft Entra certificate-based authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
-If on-premises PIV authentication and federation to Azure AD is used, [enforce PIV logon via AD group policy](https://www.idmanagement.gov/implement/scl-windows/).
+If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Entra ID group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
 <!--Policy: MS.ENTRAID.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
@@ -284,7 +284,7 @@ Managed Devices SHOULD be required to register MFA.
 #### MS.ENTRAID.3.3v1 Instructions
 If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In **Azure Active Directory**, click **Security > Authentication methods > Microsoft Authenticator**.
+1. In ** Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
@@ -297,7 +297,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
 #### MS.ENTRAID.3.5v1 Instructions
-1. In **Azure Active Directory**, click **Security > Authentication methods**
+1. In **Microsoft Entra admin center** , click **Security > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
 #### MS.ENTRAID.3.6v1 Instructions
@@ -347,7 +347,7 @@ Security logs SHALL be sent to the agency's security operations center for monit
 <!--Policy: MS.ENTRAID.4.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.
 - _Last modified:_ June 2023
-- _Note:_ The following logs (configured in Azure AD diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Azure AD Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
+- _Note:_ The following Microsoft Entra logs (configured in diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Microsoft Entra Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
 - _Note:_ Agencies can benefit from security detection capabilities offered by the CISA Cloud Log Aggregation Warehouse (CLAW) system. Agencies are urged to send the logs to CLAW. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 
 ### Resources
@@ -417,7 +417,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.ENTRAID.5.1v1 Instructions
 
-1.  In **Azure Active Directory**, under **Manage**, select **Users**.
+1.  In **Microsoft Entra admin center** , under **Manage**, select **Users**.
 
 2. Select **User settings**.
 
@@ -427,7 +427,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.ENTRAID.5.2v1 Instructions
 
-1.  In **Azure Active Directory** under **Manage**, select **Enterprise Applications.**
+1.  In **Microsoft Entra admin center**  under **Manage**, select **Enterprise Applications.**
 
 2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
@@ -437,9 +437,9 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.ENTRAID.5.3v1 Instructions
 
-1.  In **Azure Active Directory** create a new Azure AD Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
+1.  In **Microsoft Entra admin center**  create a new Microsoft Entra ID Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then in **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
+2. Then in **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications.**
 
 3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
@@ -451,7 +451,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.ENTRAID.5.4v1 Instructions
 
-1.  In **Azure Active Directory** under **Applications**, select **Enterprise Applications.**
+1.  In **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications.**
 
 2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
 
@@ -491,9 +491,9 @@ User passwords SHALL NOT expire.
 
 ## 7. Highly Privileged User Access
 
-This section provides policies that help reduce security risks related to the usage of [highly privileged Azure AD built-in roles](#highly-privileged-roles). Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies. Special protections are necessary to secure this level of access.
+This section provides policies that help reduce security risks related to the usage of [highly privileged Microsoft Entra ID built-in roles](#highly-privileged-roles). Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies. Special protections are necessary to secure this level of access.
 
-Some of the policy implementations in this section reference specific features of the Azure AD Privileged Identity Management (PIM) service that provides Privileged Access Management (PAM) capabilities. As an alternative to Azure AD PIM, third-party products and services with equivalent PAM capabilities can be leveraged.
+Some of the policy implementations in this section reference specific features of the Microsoft Entra Privileged Identity Management (PIM) service that provides Privileged Access Management (PAM) capabilities. As an alternative to Microsoft Entra PIM, third-party products and services with equivalent PAM capabilities can be leveraged.
 
 ### Policies
 #### MS.ENTRAID.7.1v1
@@ -514,14 +514,14 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
 
 <!--Policy: MS.ENTRAID.7.3v1; Criticality: SHALL -->
-- _Rationale:_ By provisioning cloud-only Azure AD user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
+- _Rationale:_ By provisioning cloud-only Microsoft Entra ID user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
 - _Last modified:_ June 2023
 
 #### MS.ENTRAID.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
 <!--Policy: MS.ENTRAID.7.4v1; Criticality: SHALL -->
-- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Azure AD PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
+- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Microsoft Entra PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
 - _Last modified:_ June 2023
 - _Note:_ Exceptions to this policy are:
   - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios.
@@ -579,17 +579,17 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### License Requirements
 
-- Azure AD PIM requires a Microsoft Entra ID P2 license.
+- Microsoft Entra PIM requires a Microsoft Entra ID P2 license.
 
 ### Implementation
 
-The following implementation instructions that reference the Azure AD PIM service will vary if using a third-party PAM system instead. 
+The following implementation instructions that reference the Microsoft Entra PIM service will vary if using a third-party PAM system instead. 
 
 #### MS.ENTRAID.7.1v1 Instructions
 
 When counting the number of users assigned to the Global Administrator role, count each user only once.
 
-1. In **Azure Active Directory** count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
+1. In **Microsoft Entra admin center**  count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
 
 2. Validate that there are a total of two to eight users assigned to the Global Administrator role.
 
@@ -609,26 +609,26 @@ This policy is based on the ratio below:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Azure AD PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
+2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
 
-3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Azure AD portal.
+3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Microsoft Entra portal.
 
     ```
     Connect-MgGraph
     Get-MgBetaUser -Filter "userPrincipalName eq 'username@somedomain.com'" | FL
     ```
 
-6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Azure AD.
+6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Microsoft Entra.
 
 #### MS.ENTRAID.7.4v1 Instructions
 
-1. In **Azure Active Directory** select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
+1. In **Microsoft Entra admin center**  select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 2. Select the **Global administrator role.**
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Azure AD PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Microsoft Entra PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
 
 Exception cases:
 - Emergency access accounts that require perpetual active assignment.
@@ -639,17 +639,17 @@ Exception cases:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Azure Active Directory** select **Roles and administrators.**
+2. In **Microsoft Entra admin center**  select **Roles and administrators.**
 
 3. Select the **Global administrator role.**
 
 4. Under **Manage**, select **Assignments.** and click the **Active assignments** tab.
 
-5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Azure AD PIM. If the role was assigned outside of Azure AD PIM, delete the assignment and recreate it using Azure AD PIM.
+5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra PIM. If the role was assigned outside of Microsoft Entra PIM, delete the assignment and recreate it using Microsoft Entra PIM.
 
 #### MS.ENTRAID.7.6v1 Instructions
 
-1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles**.
+1. In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -663,7 +663,7 @@ Exception cases:
 
 #### MS.ENTRAID.7.7v1 Instructions
 
-1.  In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
+1.  In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles.**
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -683,7 +683,7 @@ Exception cases:
 
 #### MS.ENTRAID.7.8v1 Instructions
 
-1. In **Azure AD Privileged Identity Management (PIM)**, under **Manage**, select **Azure AD roles.**
+1. In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles.**
 
 2. Under **Manage**, select **Roles**.
 
@@ -710,7 +710,7 @@ Exception cases:
 This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, Teams, and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.ENTRAID.8.1v1
-Guest users SHOULD have limited or restricted access to Azure AD directory objects.
+Guest users SHOULD have limited or restricted access to Microsoft Entra directory objects.
 
 <!--Policy: MS.ENTRAID.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
@@ -744,7 +744,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 #### MS.ENTRAID.8.1v1 Instructions
 
-1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
+1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.
 
 2. Under **Guest user access**, select either **Guest users have limited access to properties and memberships of directory objects** or **Guest user access is restricted to properties and memberships of their own directory objects (most restrictive)**.
 
@@ -752,7 +752,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 #### MS.ENTRAID.8.2v1 Instructions
 
-1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
+1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.
 
 2.  Under **Guest invite settings**, select **Only users assigned to specific admin roles can invite guest users**.
 
@@ -760,7 +760,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 #### MS.ENTRAID.8.3v1 Instructions
 
-1. In **Azure Active Directory** select **External Identities > External collaboration settings**.
+1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.
 
 2. Under **Collaboration restrictions**, select **Allow invitations
     only to the specified domains (most restrictive)**.
@@ -770,15 +770,14 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 4. Click **Save**.
 
 
-# Appendix A: Hybrid Azure AD Guidance
+# Appendix A: Microsoft Entra hybrid Guidance
 
-Most of this document does not focus on securing hybrid Azure AD environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of hybrid Azure AD infrastructure.
+Most of this document does not focus on securing Microsoft Entra hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of Microsoft Entra hybrid infrastructure.
 
 # Appendix B: Cross-tenant Access Guidance
 
-Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Azure AD cross-tenant access settings.
+Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Microsoft Entra cross-tenant access settings.
 
-Microsoft’s [Authentication and Conditional Access for External ID](https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access) provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Azure AD, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview).
+Microsoft’s [Authentication and Conditional Access for External ID](https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access) provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Microsoft Entra External ID, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview).
 
 **`TLP:CLEAR`**
-![image](https://github.com/cisagov/ScubaGear/assets/113476170/bf1a1e90-7f0a-4c66-8ab1-d1ffdda8a73e)
