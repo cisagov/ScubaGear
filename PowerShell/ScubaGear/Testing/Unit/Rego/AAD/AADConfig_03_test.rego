@@ -2959,7 +2959,10 @@ test_ConditionalAccessPolicies_Correct_V3 if {
                     "Users": {
                         "IncludeUsers": [
                             "All"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {

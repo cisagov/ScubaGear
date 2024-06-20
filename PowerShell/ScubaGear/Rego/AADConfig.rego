@@ -454,8 +454,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
         "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
-        "OR" in CAPolicy.GrantControls.Operator,
-
+        CAPolicy.GrantControls.Operator == "OR",
     ]
     count(FilterArray(Conditions, true)) == 3
 
