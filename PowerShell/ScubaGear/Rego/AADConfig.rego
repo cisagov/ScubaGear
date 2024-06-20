@@ -212,10 +212,7 @@ tests contains {
 #--
 
 # Save all policy names if PhishingResistantMFAPolicies exist
-AlternativeMFA contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-    Count(PhishingResistantMFAPolicies) > 0
-}
+AllMFA := AlternativeMFA | PhishingResistantMFAPolicies
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
@@ -236,12 +233,13 @@ tests contains {
     "PolicyId": "MS.AAD.3.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AlternativeMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CAPLINK]),
+    "ActualValue": AllMFA,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(AlternativeMFA) > 0
+    print(AllMFA)
+    Status := count(AllMFA) > 0
 }
 #--
 

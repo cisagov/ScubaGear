@@ -110,13 +110,12 @@ test_NoExclusionsConditions_Correct if {
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
 }
 
-todo_test_3_1_Passes_3_2_Fails_Correct if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "DisplayName", "value": "Bad Test Policy"},
-                {"op": "remove", "path": "GrantControls/BuiltInControls"}])
+test_3_1_Passes_3_2_Fails_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies, [{"op": "remove", "path": "GrantControls/BuiltInControls"}])
 
     CAP2 := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": [""]},
+                [{"op": "add", "path": "DisplayName", "value": "Bad Test Policy"},
+                {"op": "add", "path": "GrantControls/BuiltInControls", "value": [""]},
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP, CAP2]
@@ -129,11 +128,11 @@ todo_test_3_1_Passes_3_2_Fails_Correct if {
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
 }
 
-todo_test_3_1_Fails_3_2_Passes_Correct if {
+test_3_1_Fails_3_2_Passes_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "DisplayName", "value": "Bad Test Policy"},
+                [{"op": "add", "path": "DisplayName", "value": "Bad Policy"},
                 {"op": "remove", "path": "GrantControls/BuiltInControls"},
-                {"op": "add", "path": "GrantControls/AuthenticationStrength/3", "value": "SuperStrength"}])
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations/3", "value": "SuperStrength"}])
 
     CAP2 := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
@@ -143,7 +142,7 @@ todo_test_3_1_Fails_3_2_Passes_Correct if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test name. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
