@@ -10,7 +10,7 @@ permissions: read-all
 
 jobs:
   workflow-tests:
-    name: Unit Test
+    name: Workflow Unit Tests
     runs-on: windows-latest
     defaults:
       run:
