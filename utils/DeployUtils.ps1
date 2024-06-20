@@ -118,7 +118,7 @@ function Publish-ScubaGearModule {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
-        Publish-Module @Parameters
+        # Publish-Module @Parameters
     }
     else {
         Write-Error "Failed to sign module."
@@ -334,7 +334,9 @@ function CallAzureSignTool {
     Write-Output "Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
-    & $ToolPath $SignArguments
+    $Results = & $ToolPath $SignArguments
+    Write-Output "The results of using the AzureSignTool:"
+    Write-Output $Results
 }
 function SignScubaGearModule {
     <#
