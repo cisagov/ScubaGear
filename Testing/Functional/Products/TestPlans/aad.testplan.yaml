@@ -804,12 +804,15 @@ TestPlan:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
@@ -821,12 +824,15 @@ TestPlan:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 0
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
                     PasswordValidityPeriodInDays: 0
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
@@ -838,14 +844,61 @@ TestPlan:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 0
                     IsVerified: null
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
                     PasswordValidityPeriodInDays: 0
                     IsVerified: false
+                    AuthenticationType: "Managed"
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                  - Id: test3.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Compliant case = Check that federated domains are excluded 
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                domain_settings:
+                  - Id: test.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                  - Id: test1.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: false
+                    AuthenticationType: "Federated"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: true 
+      - TestDescription: MS.AAD.6.1v1 Non-Compliant case = Check policy fails if all domains are federated 
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                domain_settings:
+                  - Id: test.url.com
+                    PasswordValidityPeriodInDays: 0
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                  - Id: test1.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+        Postconditions: []
+        ExpectedResult: false 
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached
