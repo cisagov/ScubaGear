@@ -109,8 +109,14 @@ function Publish-ScubaGearModule {
     Write-Output "The module build path is "
     Write-Output $ModuleBuildPath
 
-    Write-Output "Calling SignScubaGearModule function..."
-    $SuccessfullySigned = SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath
+    Write-Output "Calling SignScubaGearModule function with..."
+    Write-Output "AzureKeyVaultUrl $AzureKeyVaultUrl"
+    Write-Output "CertificateName $CertificateName"
+    Write-Output "ModulePath $ModuleBuildPath"
+    $SuccessfullySigned = SignScubaGearModule `
+        -AzureKeyVaultUrl $AzureKeyVaultUrl `
+        -CertificateName $CertificateName `
+        -ModulePath $ModuleBuildPath
 
     if ($SuccessfullySigned) {
         $Parameters = @{
@@ -297,10 +303,10 @@ function CreateFileList {
     if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-    Write-Debug "Found $($FileNames.Count) files to sign"
+    Write-Output "Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Debug "Files: $(Get-Content $FileList)"
+    Write-Output "Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
@@ -391,7 +397,11 @@ function SignScubaGearModule {
     Write-Output "Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
-    $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
+    Write-Output "Calling CreateFileList function with..."
+    Write-Output "SourcePath $ModulePath"
+    $FileList = CreateFileList `
+        -SourcePath $ModulePath `
+        -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
     
     Write-Output "Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
