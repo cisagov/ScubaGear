@@ -109,7 +109,10 @@ function Publish-ScubaGearModule {
     Write-Output "The module build path is "
     Write-Output $ModuleBuildPath
 
-    if (SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath) {
+    Write-Output "Calling SignScubaGearModule function..."
+    $SuccessfullySigned = SignScubaGearModule -AzureKeyVaultUrl $AzureKeyVaultUrl -CertificateName $CertificateName -ModulePath $ModuleBuildPath
+
+    if ($SuccessfullySigned) {
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -287,6 +290,9 @@ function CreateFileList {
         [array]
         $Extensions = @()
     )
+
+    Write-Output "Creating file list..."
+
     $FileNames = @()
     if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
@@ -386,6 +392,8 @@ function SignScubaGearModule {
 
     # Digitally sign scripts, manifest, and modules
     $FileList = CreateFileList -SourcePath $ModulePath -Extensions "*.ps1", "*.psm1", "*.psd1"
+    
+    Write-Output "Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -404,6 +412,7 @@ function SignScubaGearModule {
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
+    Write-Output "Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
