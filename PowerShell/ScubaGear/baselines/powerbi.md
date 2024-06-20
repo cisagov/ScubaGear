@@ -38,8 +38,8 @@ the types of users are defined as follows:
 2.  **External users**: Members of a different M365 tenant.
 3.  **Business to Business (B2B) guest users**: External users that are
   formally invited to view and/or edit Power BI workspace content and
-  are added to the agency's Azure Active Directory (Azure AD) as guest users. These users authenticate with their home organization/tenant and are granted access to Power BI
-  content by virtue of being listed as guest users in the tenant's Azure AD.
+  are added to the agency's Microsoft Entra as guest users. These users authenticate with their home organization/tenant and are granted access to Power BI
+  content by virtue of being listed as guest users in the tenant's Microsoft Entra.
 
 > Note:
 > These terms vary in use across Microsoft documentation.
@@ -50,7 +50,7 @@ the types of users are defined as follows:
 
 Power BI has a capability to publish reports and content to the web.
 This capability creates a publicly accessible web URL that does not
-require authentication or status as an Azure AD user to view it. While this
+require authentication or status as an Microsoft Entra user to view it. While this
 may be needed for a specific use case or collaboration scenario, it is a
 best practice to keep this setting off by default to prevent unintended
 and potentially sensitive data exposure.
@@ -125,7 +125,7 @@ To Disable Completely:
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Disabled**
+4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Disabled**
 
 To Enable with Security Group(s):
 1. Navigate to the **PowerBI Admin Portal**
@@ -134,7 +134,7 @@ To Enable with Security Group(s):
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Allow Azure Active Directory guest users to edit and manage content in the organization** and set to **Enabled**
+4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Enabled**
 
 5. Select the security group(s) you want to have access to the PowerBI tenant.
 > Note:
@@ -146,7 +146,7 @@ This section provides policies that help reduce guest user invitation risks rela
 The settings in this section control whether Power BI allows inviting external users to
 the agency's organization through Power BI's sharing workflows and
 experiences. After an external user accepts the invite, they become an
-Azure AD B2B guest user in the organization. They will then appear in user
+Microsoft Entra B2B guest user in the organization. They will then appear in user
 pickers throughout the Power BI user experience.
 
 ### Policies
@@ -164,7 +164,7 @@ The Invite external users to your organization feature SHOULD be disabled unless
 - [About Power BI Tenant settings \| Microsoft
   Docs](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
 
-- [Distribute Power BI content to external guest users with AAD B2B \|
+- [Distribute Power BI content to external guest users with Microsoft Entra B2B \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-azure-ad-b2b)
 
@@ -202,7 +202,7 @@ To enable with security groups:
 
 ## 4. Power BI Service Principals
 
-Service principals are an authentication method that can be used to let an Azure AD application access Power BI service content and APIs. Power BI supports using service principals to manage application identities. Service principals use APIs to access tenant-level features, controlled by Power BI service administrators and enabled for the entire agency or for agency security groups. Accessing service principals can be controlled by creating dedicated security groups for them and using these groups in any Power BI tenant level-settings. If service principals are employed for Power BI, it is recommended that service principal credentials used for encrypting or accessing Power BI be stored in a key vault, with properly assigned access policies and regularly reviewed access permissions.
+Service principals are an authentication method that can be used to let an Microsoft Entra application access Power BI service content and APIs. Power BI supports using service principals to manage application identities. Service principals use APIs to access tenant-level features, controlled by Power BI service administrators and enabled for the entire agency or for agency security groups. Accessing service principals can be controlled by creating dedicated security groups for them and using these groups in any Power BI tenant level-settings. If service principals are employed for Power BI, it is recommended that service principal credentials used for encrypting or accessing Power BI be stored in a key vault, with properly assigned access policies and regularly reviewed access permissions.
 
 Several high-level use cases for service principals:
 
@@ -289,7 +289,7 @@ block using ResourceKey-based authentication." This baseline statement
 recommends, but does not mandate, setting ResourceKey-based
 authentication to the blocked state.
 
-For streaming datasets created using the Power BI service user interface, the dataset owner receives a URL including a resource key. This key authorizes the requestor to push data into the dataset without using an Azure AD OAuth bearer token, so please keep in mind the implications of having a secret key in the URL when working with this type of dataset and method.
+For streaming datasets created using the Power BI service user interface, the dataset owner receives a URL including a resource key. This key authorizes the requestor to push data into the dataset without using an Microsoft Entra OAuth bearer token, so please keep in mind the implications of having a secret key in the URL when working with this type of dataset and method.
 
 This setting applies to streaming and PUSH datasets. If ResourceKey-based authentication is blocked, users with a resource key will not be allowed to send data to stream and PUSH datasets using the API. However, if developers have an approved need to leverage this feature, an exception to the policy can be investigated.
 
@@ -299,7 +299,7 @@ This setting applies to streaming and PUSH datasets. If ResourceKey-based authen
 ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
 
 <!--Policy: MS.POWERBI.5.1v1; Criticality: SHOULD -->
-- _Rationale:_ If resource keys are allowed, someone can move data without Azure AD OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
+- _Rationale:_ If resource keys are allowed, someone can move data without Microsoft Entra OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
 - _Last modified:_ June 2023
 
 ### Resources
@@ -405,12 +405,12 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 ### License Requirements
 
-- Azure Information Protection Premium P1 or Premium P2 license is required to apply or view
-  Microsoft Information Protection sensitivity labels in Power BI. Azure Information Protection can be purchased either standalone or through one of the Microsoft licensing suites. See [Azure Information Protection
+- Microsoft Purview Information Protection Premium P1 or Premium P2 license is required to apply or view
+  Microsoft Information Protection sensitivity labels in Power BI. Azure Information Protection can be purchased either standalone or through one of the Microsoft licensing suites. See [Microsoft Purview Information Protection
   service description](https://azure.microsoft.com/services/information-protection/) for
   details.
 
-- Azure Information Protection sensitivity labels need to be migrated to
+- Microsoft Purview Information Protection sensitivity labels need to be migrated to
   the Microsoft Information Protection Unified Labeling platform to be
   used in Power BI.
 
@@ -443,7 +443,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 Several best practices and approaches are available to protect sensitive
 data in Power BI:
 
-- Leverage sensitivity labels via Microsoft Information Protection.
+- Leverage sensitivity labels via Microsoft Purview Information Protection.
 
 - Power BI allows service users to bring their own key to protect data
   at rest.
@@ -488,15 +488,15 @@ the agency.
 
 **Information Protection Prerequisites Specific to Power BI**
 
-- An Azure Information Protection Premium P1 or Premium P2 license is
-  required to apply or view Microsoft Information Protection sensitivity
-  labels in Power BI. Azure Information Protection can be purchased
+- An Microsoft Purview Information Protection Premium P1 or Premium P2 license is
+  required to apply or view Microsoft Purview Information Protection sensitivity
+  labels in Power BI. Microsoft Purview Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
-  See [Azure Information Protection
+  See [Microsoft Purview Information Protection
   service](https://learn.microsoft.com/en-us/office365/servicedescriptions/azure-information-protection) description for
   details.
 
-- Azure Information Protection sensitivity labels need to be migrated to
+- Microsoft Purview Information Protection sensitivity labels need to be migrated to
   the Microsoft Information Protection Unified Labeling platform in
   order for them to be used in Power BI.
 
