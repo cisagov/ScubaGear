@@ -203,8 +203,8 @@ DescriptionString := "domain(s) failed"
 # Case 4: Fail; user passwords set to expire, federated domains 
 
 FederatedDomainWarning(domains) := Message if {
-    Message := concat("<br/>", [
-        ReportFullDetailsArray(domains, "federated domain(s) found"),
+    Message := concat("<br/><br/>", [
+        ReportFullDetailsArray(domains, "federated domain(s) present"),
         "Consult with your identity provider on how to configure in a federated context."
     ])
 }
@@ -215,11 +215,7 @@ DomainReportDetails(Status, Metadata) := PASS if {
 } else := Description if {
     Status == true
     count(Metadata.FederatedDomains) > 0
-
-    Description := concat("<br/>", [
-        PASS,
-        FederatedDomainWarning(Metadata.FederatedDomains)
-    ])
+    Description := concat("", [PASS, "; however, there are ", FederatedDomainWarning(Metadata.FederatedDomains)])
 } else := Description if {
     Status == false
     count(Metadata.UserPasswordsSetToExpire) > 0
@@ -238,26 +234,8 @@ DomainReportDetails(Status, Metadata) := PASS if {
     ])
 } else := Description if {
     Status == false 
-    Description := concat("<br/>", [
-        "No managed domains found.",
+    Description := concat(" ", [
+        "Not applicable because no managed domains were found; however, there are",
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 }
-
-
-#VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
-#    tenant.EmailAttestationRequired == true
-#    tenant.EmailAttestationReAuthDays <= 30
-#} else := [ErrStr, false] if {
-#    tenant.EmailAttestationRequired == false
-#    tenant.EmailAttestationReAuthDays <= 30
-#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
-#} else := [ErrStr, false] if {
-#    tenant.EmailAttestationRequired == true
-#    tenant.EmailAttestationReAuthDays > 30
-#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
-#} else := [ErrStr, false] if {
-#    tenant.EmailAttestationRequired == false
-#    tenant.EmailAttestationReAuthDays > 30
-#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
-#} else := [FAIL, false]

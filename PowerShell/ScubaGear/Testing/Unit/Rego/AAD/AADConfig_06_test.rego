@@ -59,8 +59,8 @@ test_AuthenticationType_Incorrect if {
         ]
     }
 
-    ReportDetailString := concat("<br/>", [
-        "No managed domains found.",
+    ReportDetailString := concat(" ", [
+        "Not applicable because no managed domains were found; however, there are",
         FederatedDomainWarning(["test.url.com", "test2.url.com"])
     ])
     TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
