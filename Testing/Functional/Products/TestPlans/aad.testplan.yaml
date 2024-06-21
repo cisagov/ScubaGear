@@ -859,7 +859,7 @@ TestPlan:
                     AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.6.1v1 Compliant case = Check that federated domains are excluded 
+      - TestDescription: MS.AAD.6.1v1 Compliant case = Check that federated domains are excluded
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -877,8 +877,8 @@ TestPlan:
                     IsVerified: true
                     AuthenticationType: "Managed"
         Postconditions: []
-        ExpectedResult: true 
-      - TestDescription: MS.AAD.6.1v1 Compliant case = Check policy fails if all domains are federated 
+        ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Compliant case = Check policy fails if all domains are federated
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -894,7 +894,7 @@ TestPlan:
                     IsVerified: true
                     AuthenticationType: "Federated"
         Postconditions: []
-        ExpectedResult: true 
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached
