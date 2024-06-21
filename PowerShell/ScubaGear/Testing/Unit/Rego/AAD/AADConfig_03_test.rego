@@ -3000,7 +3000,10 @@ test_BuiltInControls_Correct if {
                     "Users": {
                         "IncludeUsers": [
                             "All"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3052,7 +3055,9 @@ test_ExcludeUserCorrect_V1 if {
                         ],
                         "ExcludeUsers": [
                             "SpecialPerson"
-                        ]
+                        ],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3103,7 +3108,9 @@ test_ExcludeGroup_Correct_V1 if {
                         ],
                         "ExcludeGroups": [
                             "SpecialGroup"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3155,6 +3162,9 @@ test_ExcludeUserIncorrect_V1 if {
                         "ExcludeUsers": [
                             "SpecialUser"
                         ]
+                        ,
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3203,7 +3213,9 @@ test_ExcludeGroupIncorrect_V1 if {
                         ],
                         "ExcludeGroups": [
                             "NotSpecialGroup"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3237,7 +3249,10 @@ test_IncludeApplications_Incorrect_V3 if {
                     "Users": {
                         "IncludeUsers": [
                             "All"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3272,7 +3287,10 @@ test_IncludeUsers_Incorrect_V2 if {
                     "Users": {
                         "IncludeUsers": [
                             ""
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3307,7 +3325,10 @@ test_BuiltInControls_Incorrect_V3 if {
                     "Users": {
                         "IncludeUsers": [
                             "All"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
@@ -3339,7 +3360,10 @@ test_State_Incorrect_V3 if {
                     "Users": {
                         "IncludeUsers": [
                             "All"
-                        ]
+                        ],
+                        "ExcludeUsers": [],
+                        "ExcludeGroups": [],
+                        "ExcludeRoles": []
                     }
                 },
                 "GrantControls": {
