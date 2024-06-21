@@ -18,10 +18,10 @@ rules:
       # if you wish.
       level: error
       conventions:
-        - pattern: '^_*[A-Z]+[a-zA-Z0-9_]+$|^tests$|^test_|^check_|^error_'
+        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$|^tests$|^test_|^check_|^error_'
           targets:
             - rule
-        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$'
+        - pattern: '^_*[A-Z]+[a-zA-Z0-9_]+$'
           targets:
             - function
         - pattern: '^[a-z\.]+$|^[a-z\.]+_test$'
