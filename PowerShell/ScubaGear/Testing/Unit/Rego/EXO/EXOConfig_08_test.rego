@@ -6,10 +6,10 @@ import data.utils.key.TestResult
 
 
 #
-# Policy MS.EXO.8.1v1
+# Policy MS.EXO.8.1v2
 #--
 test_3rdParty_Correct_V1 if {
-    PolicyId := "MS.EXO.8.1v1"
+    PolicyId := "MS.EXO.8.1v2"
 
     Output := exo.tests with input as { }
 
@@ -19,10 +19,36 @@ test_3rdParty_Correct_V1 if {
 #--
 
 #
-# Policy MS.EXO.8.2v1
+# Policy MS.EXO.8.2v2
 #--
 test_3rdParty_Correct_V2 if {
-    PolicyId := "MS.EXO.8.2v1"
+    PolicyId := "MS.EXO.8.2v2"
+
+    Output := exo.tests with input as { }
+
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
+}
+#--
+
+#
+# Policy MS.EXO.8.3v1
+#--
+test_3rdParty_Correct_V3 if {
+    PolicyId := "MS.EXO.8.3v1"
+
+    Output := exo.tests with input as { }
+
+    ReportDetailString := DefenderMirrorDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
+}
+#--
+
+#
+# Policy MS.EXO.8.4v1
+#--
+test_3rdParty_Correct_V4 if {
+    PolicyId := "MS.EXO.8.4v1"
 
     Output := exo.tests with input as { }
 
