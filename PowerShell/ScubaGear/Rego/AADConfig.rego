@@ -66,7 +66,6 @@ tests contains {
     "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
-    print(input)
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Status := count(LegacyAuthentication) > 0
 }

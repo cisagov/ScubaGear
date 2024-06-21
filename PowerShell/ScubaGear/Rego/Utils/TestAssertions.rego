@@ -203,8 +203,10 @@ NoneEndsWith(coll, search) if {
 
 # METADATA
 # description: Fail with provided message
-# regal ignore: print-or-trace-call
-Fail(msg) := [][0] if print(msg)
+Fail(msg) := [][0] if {
+    # regal ignore: print-or-trace-call
+    print(msg)
+}
 
 _QuoteStr(x) := concat("", [`"`, x, `"`]) if is_string(x)
 

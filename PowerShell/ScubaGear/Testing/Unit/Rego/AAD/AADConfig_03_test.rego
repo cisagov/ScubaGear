@@ -555,7 +555,10 @@ test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
                         with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
-    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    ReportDetailStr := concat(" ", [
+        "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled.",
+        "See %v for more info"])
+
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
@@ -570,7 +573,10 @@ test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
                         with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
-    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    ReportDetailStr := concat(" ", [
+        "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled.",
+        "See %v for more info"])
+
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
@@ -589,7 +595,10 @@ test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
                         with input.authentication_method as [Auth]
 
     PolicyId := "MS.AAD.3.3v1"
-    ReportDetailStr := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    ReportDetailStr := concat(" ", [
+        "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled.",
+        "See %v for more info"])
+
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
 }
 
