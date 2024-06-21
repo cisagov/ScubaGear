@@ -37,4 +37,29 @@ test_IsVerified_Correct if {
 
     TestResult("MS.AAD.6.1v1", Output, PASS, true) == true
 }
+
+test_AuthenticationType_Incorrect if {
+    Output := aad.tests with input as { 
+        "domain_settings" : [
+            {
+                "Id" : "test.url.com",
+                "IsVerified" : true,
+                "AuthenticationType": "Federated"
+            },
+            {
+                "Id" : "test1.url.com",
+                "IsVerified" : false,
+                "AuthenticationType": "Federated"
+            },
+            {   
+                "Id" : "test2.url.com",
+                "IsVerified" : true,
+                "AuthenticationType": "Federated"
+            }
+        ]
+    }
+
+    ReportDetailString := "Requirement met"
+    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, true) == true
+}
 #--

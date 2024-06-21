@@ -172,12 +172,14 @@ HasAcceptableMFA(Policy) := true if {
 # The report formatting functions below are for the MS.AAD.6.1v1 policy    #
 ############################################################################
 
-DomainReportDetails(Status, _, _) := Description if {
+DescriptionString := "domain(s) failed"
+
+DomainReportDetails(Status, _) := Description if {
     Status == true
     Description := PASS
 }
 
-DomainReportDetails(Status, Array, DescriptionString) := Description if {
+DomainReportDetails(Status, Array) := Description if {
     Status == false
     Description := ReportFullDetailsArray(Array, DescriptionString)
 }

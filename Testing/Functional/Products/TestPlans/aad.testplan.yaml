@@ -870,7 +870,6 @@ TestPlan:
                     IsVerified: true
                     AuthenticationType: "Federated"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 2147483647
                     IsVerified: false
                     AuthenticationType: "Federated"
                   - Id: test2.url.com
@@ -879,26 +878,23 @@ TestPlan:
                     AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: true 
-      - TestDescription: MS.AAD.6.1v1 Non-Compliant case = Check policy fails if all domains are federated 
+      - TestDescription: MS.AAD.6.1v1 Compliant case = Check policy fails if all domains are federated 
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 domain_settings:
                   - Id: test.url.com
-                    PasswordValidityPeriodInDays: 0
                     IsVerified: true
                     AuthenticationType: "Federated"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 2147483647
-                    IsVerified: true
+                    IsVerified: false
                     AuthenticationType: "Federated"
                   - Id: test2.url.com
-                    PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Federated"
         Postconditions: []
-        ExpectedResult: false 
+        ExpectedResult: true 
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached

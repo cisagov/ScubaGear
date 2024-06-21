@@ -740,14 +740,17 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
     "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
-    "ReportDetails": DomainReportDetails(Status, UserPasswordsSetToExpire, DescriptionString),
+    "ReportDetails": DomainReportDetails(Status, UserPasswordsSetToExpire),
     "RequirementMet": Status
 } if {
     # For the rule to pass, the user passwords for all domains shall not expire
     # Then check if at least 1 or more domains with user passwords set to expire exist
-    DescriptionString := "domain(s) failed"
-    Conditions := [count(UserPasswordsSetToExpire) == 0, count(UserPasswordsSetToNotExpire) > 0]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Conditions := [
+        count(UserPasswordsSetToExpire) == 0, 
+        count(UserPasswordsSetToNotExpire) > 0
+    ]
+    Status := count(FilterArray(Conditions, true)) == 2
+    print(DomainReportDetails(Status, UserPasswordsSetToExpire))
 }
 #--
 
