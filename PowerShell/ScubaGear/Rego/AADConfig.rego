@@ -735,12 +735,23 @@ UserPasswordsSetToExpire contains Domain.Id if {
     Domain.AuthenticationType == "Managed"
 }
 
+FederatedDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
+    Domain.AuthenticationType == "Federated"
+}
+
+Metadata := {
+    "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
+    "FederatedDomains": FederatedDomains
+}
+
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
     "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
-    "ReportDetails": DomainReportDetails(Status, UserPasswordsSetToExpire),
+    "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
     # For the rule to pass, the user passwords for all domains shall not expire
@@ -750,7 +761,24 @@ tests contains {
         count(UserPasswordsSetToNotExpire) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
-    print(DomainReportDetails(Status, UserPasswordsSetToExpire))
+    
+    print(Status)
+    print(Metadata)
+    print(DomainReportDetails(Status, Metadata))
+}
+
+# N/A policy if there are no managed domains but federated domains are present
+test contains {
+    "PolicyId": "MS.AAD.6.1v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": [ "Get-MgBetaDomain" ],
+    "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
+    "ReportDetails": DomainReportDetails(Status, Metadata),
+    "RequirementMet": Status
+} if {
+    count(UserPasswordsSetToExpire) == 0
+    count(UserPasswordsSetToNotExpire) == 0
+    Status := false
 }
 #--
 

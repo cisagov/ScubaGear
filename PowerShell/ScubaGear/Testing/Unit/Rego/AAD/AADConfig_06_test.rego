@@ -59,7 +59,10 @@ test_AuthenticationType_Incorrect if {
         ]
     }
 
-    ReportDetailString := "Requirement met"
-    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := concat("<br/>", [
+        "No managed domains found.",
+        FederatedDomainWarning(["test.url.com", "test2.url.com"])
+    ])
+    TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
 }
 #--

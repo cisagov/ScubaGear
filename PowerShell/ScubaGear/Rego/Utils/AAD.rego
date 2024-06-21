@@ -169,17 +169,95 @@ HasAcceptableMFA(Policy) := true if {
 
 
 ############################################################################
-# The report formatting functions below are for the MS.AAD.6.1v1 policy    #
+# Report formatting functions for MS.AAD.6.1v1                             #
 ############################################################################
 
 DescriptionString := "domain(s) failed"
 
-DomainReportDetails(Status, _) := Description if {
-    Status == true
-    Description := PASS
+#DomainReportDetails(Status, Metadata) := Description if {
+#    Status == true
+#    Description := PASS
+#}
+#
+#DomainReportDetails(Status, Metadata) := Description if {
+#    Status == false
+#    Metadata.UserPasswordsSetToExpire > 0
+#    Metadata.FederatedDomains == 0
+#
+#    Description := ReportFullDetailsArray(
+#        Metadata.UserPasswordsSetToExpire, 
+#        DescriptionString
+#    )
+#}
+#
+#DomainReportDetails(Status, Metadata) := Description if {
+#    Status == false
+#    Metadata.UserPasswordsSetToExpire == 0
+#    Metadata.FederatedDomains > 0
+#    Description := "" 
+#}
+
+# Case 1: Pass; no user passwords set to expire, no federated domains 
+# Case 2: Fail; user passwords set to expire, no federated domains 
+# Case 3: N/A; no user passwords set to expire, federated domains 
+# Case 4: Fail; user passwords set to expire, federated domains 
+
+FederatedDomainWarning(domains) := Message if {
+    Message := concat("<br/>", [
+        ReportFullDetailsArray(domains, "federated domain(s) found"),
+        "Consult with your identity provider on how to configure in a federated context."
+    ])
 }
 
-DomainReportDetails(Status, Array) := Description if {
+DomainReportDetails(Status, Metadata) := PASS if {
+    Status == true
+    count(Metadata.FederatedDomains) == 0
+} else := Description if {
+    Status == true
+    count(Metadata.FederatedDomains) > 0
+
+    Description := concat("<br/>", [
+        PASS,
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
+} else := Description if {
     Status == false
-    Description := ReportFullDetailsArray(Array, DescriptionString)
+    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.FederatedDomains) == 0
+    Description := ReportFullDetailsArray(
+        Metadata.UserPasswordsSetToExpire, 
+        DescriptionString
+    )
+} else := Description if {
+    Status == false
+    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.FederatedDomains) > 0
+    Description := concat("<br/>", [
+        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, DescriptionString),
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
+} else := Description if {
+    Status == false 
+    Description := concat("<br/>", [
+        "No managed domains found.",
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
 }
+
+
+#VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
+#    tenant.EmailAttestationRequired == true
+#    tenant.EmailAttestationReAuthDays <= 30
+#} else := [ErrStr, false] if {
+#    tenant.EmailAttestationRequired == false
+#    tenant.EmailAttestationReAuthDays <= 30
+#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+#} else := [ErrStr, false] if {
+#    tenant.EmailAttestationRequired == true
+#    tenant.EmailAttestationReAuthDays > 30
+#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
+#} else := [ErrStr, false] if {
+#    tenant.EmailAttestationRequired == false
+#    tenant.EmailAttestationReAuthDays > 30
+#    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
+#} else := [FAIL, false]
