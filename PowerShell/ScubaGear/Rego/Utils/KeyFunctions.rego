@@ -60,26 +60,37 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 TestResult(PolicyId, Output, ReportDetailStr, Status) := true  if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
+    # regal ignore: print-or-trace-call
     print("\n** Checking if only one test result **")
-    assert.not_empty(RuleOutput)
-    assert.equals(1, count(RuleOutput))
+    assert.NotEmpty(RuleOutput)
+    assert.Equals(1, count(RuleOutput))
 
+    # regal ignore: print-or-trace-call
     print("** Checking RequirementMet **")
-    assert.equals(Status, RuleOutput[0].RequirementMet)
+    assert.Equals(Status, RuleOutput[0].RequirementMet)
 
+    # regal ignore: print-or-trace-call
     print("** Checking ReportDetails **")
-    assert.equals(ReportDetailStr, RuleOutput[0].ReportDetails)
+    assert.Equals(ReportDetailStr, RuleOutput[0].ReportDetails)
 } else := false
 
 # Test that has multiple strings with an unknown order for Report Details
 TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) := true if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
-    assert.not_empty(RuleOutput)
-    assert.equals(count(RuleOutput), 1)
-    assert.equals(RuleOutput[0].RequirementMet, RequirementMet)
+    # regal ignore: print-or-trace-call
+    print("\n** Checking if only one test result **")
+    assert.NotEmpty(RuleOutput)
+    assert.Equals(count(RuleOutput), 1)
+
+    # regal ignore: print-or-trace-call
+    print("** Checking RequirementMet **")
+    assert.Equals(RuleOutput[0].RequirementMet, RequirementMet)
+
+    # regal ignore: print-or-trace-call
+    print("** Checking ReportDetails **")
     Conditions :=  [
-        (assert.does_contains(RuleOutput[0].ReportDetails, String)) |
+        (assert.DoesContains(RuleOutput[0].ReportDetails, String)) |
         some String in ReportDetailArrayStrings
     ]
     count(FilterArray(Conditions, false)) == 0

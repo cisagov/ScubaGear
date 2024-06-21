@@ -9,172 +9,205 @@ import rego.v1
 
 # METADATA
 # description: Assert expected is equal to result
-equals(expected, result) if {
+Equals(expected, result) if {
     expected == result
+    # regal ignore: print-or-trace-call
     print("PASS: expected equals '", expected, "'\n")
 } else := false if {
+    # regal ignore: print-or-trace-call
     print("FAIL: expected equals '", expected, "', got '", result, "'\n")
 }
 
 # METADATA
 # description: Assert expected is not equal to result
-not_equals(expected, result) if {
+NotEquals(expected, result) if {
     expected != result
+    # regal ignore: print-or-trace-call
     print("PASS: expected not equals '", expected, "'\n")
 } else := false if {
+    # regal ignore: print-or-trace-call
     print("FAIL: expected not equals '", expected, "', got '", result, "'\n")
 }
 
 # METADATA
 # description: Assert all items in coll are equal to value
-all_equals(coll, value) if {
+AllEquals(coll, value) if {
     every item in coll {
         item == value
     }
-    print("PASS: expected all items to have value '", _append_comma(value), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected all items to have value '", _AppendComma(value), "'\n")
 } else := false if {
     exceptions := [item | some item in coll; item != value]
-    print("FAIL: expected all items to have value '", _append_comma(value), "', failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected all items to have value '", _AppendComma(value), "', failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert no items in coll are equal to value
-none_equals(coll, value) if {
+NoneEquals(coll, value) if {
     every item in coll {
         item != value
     }
-    print("PASS: expected no items to have value '", _append_comma(value), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected no items to have value '", _AppendComma(value), "'\n")
 } else := false if {
     exceptions := [item | some item in coll; item == value]
-    print("FAIL: expected no items to have value '", _append_comma(value), "', failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected no items to have value '", _AppendComma(value), "', failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert item is in coll
-has(item, coll) if {
+Has(item, coll) if {
     item in coll
-    print("PASS: expected", type_name(item), _quote_str(item), "in", type_name(coll), "\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected", type_name(item), _QuoteStr(item), "in", type_name(coll), "\n")
 } else := false if {
-    print("FAIL: expected", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected", type_name(item), _QuoteStr(item), "in", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert item is not in coll
-not_has(item, coll) if {
+NotHas(item, coll) if {
     not item in coll
-    print("PASS: did not expect", type_name(item), _quote_str(item), "in", type_name(coll), "\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: did not expect", type_name(item), _QuoteStr(item), "in", type_name(coll), "\n")
 } else := false if {
-    print("FAIL: did not expect", type_name(item), _quote_str(item), "in", type_name(coll), "got '", coll, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: did not expect", type_name(item), _QuoteStr(item), "in", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert provided collection is empty
-empty(coll) if {
+Empty(coll) if {
     count(coll) == 0
+    # regal ignore: print-or-trace-call
     print("PASS: expected empty", type_name(coll), "\n")
 } else := false if {
+    # regal ignore: print-or-trace-call
     print("FAIL: expected empty", type_name(coll), "got '", coll, "'\n")
 }
 
 # METADATA
 # description: Assert provided collection is not empty
-not_empty(coll) if {
+NotEmpty(coll) if {
     count(coll) != 0
+    # regal ignore: print-or-trace-call
     print("PASS: expected not empty", type_name(coll))
 } else := false if {
+    # regal ignore: print-or-trace-call
     print("FAIL: expected not empty", type_name(coll))
 }
 
 # METADATA
 # description: Assert string starts with search
-starts_with(str, search) if {
+StartsWith(str, search) if {
     startswith(str, search)
-    print("PASS: expected '", _quote_str(str), "' to start with '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected '", _QuoteStr(str), "' to start with '", _QuoteStr(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to start with '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected '", _QuoteStr(str), "' to start with '", _QuoteStr(search), "'\n")
 }
 
 # METADATA
 # description: Assert string ends with search
-ends_with(str, search) if {
+EndsWith(str, search) if {
     endswith(str, search)
-    print("PASS: expected '", _quote_str(str), "' to end with '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected '", _QuoteStr(str), "' to end with '", _QuoteStr(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to end with '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected '", _QuoteStr(str), "' to end with '", _QuoteStr(search), "'\n")
 }
 
 # METADATA
 # description: Assert string starts with search
-does_contains(str, search) if {
+DoesContains(str, search) if {
     contains(str, search)
-    print("PASS: expected '", _quote_str(str), "' to contain '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected '", _QuoteStr(str), "' to contain '", _QuoteStr(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to contain '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected '", _QuoteStr(str), "' to contain '", _QuoteStr(search), "'\n")
 }
 
 # METADATA
 # description: Assert string ends with search
-not_contains(str, search) if {
+NotContains(str, search) if {
     not contains(str, search)
-    print("PASS: expected '", _quote_str(str), "' to not contain '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected '", _QuoteStr(str), "' to not contain '", _QuoteStr(search), "'\n")
 } else := false if {
-    print("FAIL: expected '", _quote_str(str), "' to not contain '", _quote_str(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected '", _QuoteStr(str), "' to not contain '", _QuoteStr(search), "'\n")
 }
 
 # METADATA
 # description: Assert all strings in coll starts with search
-all_starts_with(coll, search) if {
+AllStartsWith(coll, search) if {
     every str in coll {
         startswith(str, search)
     }
-    print("PASS: expected all strings to start with '", _append_comma(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected all strings to start with '", _AppendComma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; not startswith(str, search)]
-    print("FAIL: expected all strings to start with '", _append_comma(search), "' failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected all strings to start with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert all strings in coll ends with search
-all_ends_with(coll, search) if {
+AllEndsWith(coll, search) if {
     every str in coll {
         endswith(str, search)
     }
-    print("PASS: expected all strings to end with '", _append_comma(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected all strings to end with '", _AppendComma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; not endswith(str, search)]
-    print("FAIL: expected all strings to end with '", _append_comma(search), "' failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected all strings to end with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert no strings in coll starts with search
-none_starts_with(coll, search) if {
+NoneStartsWith(coll, search) if {
     every str in coll {
         not startswith(str, search)
     }
-    print("PASS: expected no strings to start with '", _append_comma(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected no strings to start with '", _AppendComma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; startswith(str, search)]
-    print("FAIL: expected no strings to start with '", _append_comma(search), "' failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected no strings to start with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Assert no strings in coll ends with search
-none_ends_with(coll, search) if {
+NoneEndsWith(coll, search) if {
     every str in coll {
         not endswith(str, search)
     }
-    print("PASS: expected no strings to end with '", _append_comma(search), "'\n")
+    # regal ignore: print-or-trace-call
+    print("PASS: expected no strings to end with '", _AppendComma(search), "'\n")
 } else := false if {
     exceptions := [str | some str in coll; endswith(str, search)]
-    print("FAIL: expected no strings to end with '", _append_comma(search), "' failed for '", exceptions, "'\n")
+    # regal ignore: print-or-trace-call
+    print("FAIL: expected no strings to end with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
 # METADATA
 # description: Fail with provided message
-fail(msg) := [][0] if print(msg)
+# regal ignore: print-or-trace-call
+Fail(msg) := [][0] if print(msg)
 
-_quote_str(x) := concat("", [`"`, x, `"`]) if is_string(x)
+_QuoteStr(x) := concat("", [`"`, x, `"`]) if is_string(x)
 
-_quote_str(x) := x if not is_string(x)
+_QuoteStr(x) := x if not is_string(x)
 
-_append_comma(str) := sprintf("%v,", [_quote_str(str)])
+_AppendComma(str) := sprintf("%v,", [_QuoteStr(str)])
