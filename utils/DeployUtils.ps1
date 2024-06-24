@@ -299,42 +299,6 @@ function ConfigureScubaGearModule {
     return $True
 }
 
-function CreateArrayOfFilePaths {
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $SourcePath,
-        [Parameter(Mandatory = $false)]
-        [AllowEmptyCollection()]
-        [array]
-        $Extensions = @()
-    )
-    $ArrayOfFilePaths = @()
-    if ($Extensions.Count -gt 0) {
-        $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
-        Write-Host ">>> FilePath is $FilePath"
-        $ArrayOfFilePaths += $FilePath
-    }
-    return $ArrayOfFilePaths
-}
-
-function CreateFileList {
-    <#
-    .NOTES
-    Internal function
-    Creates a temp file with a list of filenames
-    #>
-    param($FileNames)
-    Write-Host ">>> Creating file list..."
-    Write-Host ">>> Found $($FileNames.Count) files to sign"
-    $FileList = New-TemporaryFile
-    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    $ContentOfFileList = $(Get-Content $FileList) # String
-    Write-Host ">>> $ContentOfFileList"
-    return $FileList.FullName
-}
-
 function SignScubaGearModule {
     <#
     .SYNOPSIS
@@ -382,7 +346,6 @@ function SignScubaGearModule {
     Write-Host ">> Signing ScubaGear module..."
 
     # Sign scripts, manifest, and modules
-    Write-Host ">> Calling CreateFileList function with $ModulePath"
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
@@ -426,7 +389,9 @@ function SignScubaGearModule {
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
     # There's no -Path parameter.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ArrayOfFilePaths[0] -Detailed
+    # $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
+    Write-Host "Test result is $TestResult"
 
     # ForEach ($File in $FileList) {
     #     Write-Host $File
@@ -440,6 +405,44 @@ function SignScubaGearModule {
         return False
     }
     return False
+}
+
+function CreateArrayOfFilePaths {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $SourcePath,
+        [Parameter(Mandatory = $false)]
+        [AllowEmptyCollection()]
+        [array]
+        $Extensions = @()
+    )
+    Write-Host ">>> Create array of file paths..."
+    $ArrayOfFilePaths = @()
+    if ($Extensions.Count -gt 0) {
+        $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+        $ArrayOfFilePaths += $FilePath
+    }
+    ForEach ($FilePath in $ArrayOfFilePaths) {
+        Write-Host ">>> File path is $FilePath"
+    }
+    return $ArrayOfFilePaths
+}
+
+function CreateFileList {
+    <#
+    .NOTES
+    Internal function
+    Creates a temp file with a list of filenames
+    #>
+    param($FileNames)
+    Write-Host ">>> Creating file list..."
+    Write-Host ">>> Found $($FileNames.Count) files to sign"
+    $FileList = New-TemporaryFile
+    $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
+    # $ContentOfFileList = $(Get-Content $FileList) # String
+    return $FileList.FullName
 }
 
 function CallAzureSignTool {
