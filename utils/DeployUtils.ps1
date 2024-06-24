@@ -382,6 +382,8 @@ function SignScubaGearModule {
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
     Write-Host ">> The file list is $FileList"
     Write-Host ">> The contents of the file list are:"
+    $FileListType = $FileList.GetType().fullname
+    Write-Host ">> The type of file list is $FileListType"
     Get-Content $FileList
     Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
