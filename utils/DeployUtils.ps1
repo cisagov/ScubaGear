@@ -153,7 +153,7 @@ function Publish-ScubaGearModule {
         # Publish-Module @Parameters
     }
     else {
-        Write-Error ">Failed to sign module."
+        Write-Error "> Failed to sign module."
     }
 }
 
@@ -364,7 +364,10 @@ function CallAzureSignTool {
 
     $ToolPath = (Get-Command AzureSignTool).Path
     $Results = & $ToolPath $SignArguments
+    Write-Host ">>> Results"
+    Write-Host $Results
 }
+
 function SignScubaGearModule {
     <#
     .SYNOPSIS
@@ -411,7 +414,7 @@ function SignScubaGearModule {
 
     Write-Host ">> Signing ScubaGear module..."
 
-    # Digitally sign scripts, manifest, and modules
+    # Sign scripts, manifest, and modules
     Write-Host ">> Calling CreateFileList function with $ModulePath"
     $FileList = CreateFileList `
         -SourcePath $ModulePath `
@@ -443,9 +446,17 @@ function SignScubaGearModule {
         -TimeStampServer $TimeStampServer `
         -FileList $CatalogList
 
+    # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
+    # the hashes of the actual files in order to validate their authenticity.
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
     Write-Host ">> Test Result is $TestResult"
-    return 'Valid' -eq $TestResult
+
+    if ($TestResult -eq 'Valid') {
+        Write-Host ">> Signing the module was successful."
+        return True
+    }
+    else {
+        Write-Host ">> Signing the module was NOT successful."
+        return False
+    }
 }
-
-
