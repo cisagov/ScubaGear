@@ -384,11 +384,12 @@ function SignScubaGearModule {
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
-    # There's no -Path parameter.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ArrayOfFilePaths[0]
-    # $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    Write-Host "Test result is $TestResult"
-    if ($TestResult -eq 'Valid') {
+    $AddamsModulePath = "C:\Users\RUNNER~1\AppData\Local\Temp\ScubaGear\PowerShell\ScubaGear"
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $AddamsModulePath -Detailed
+    $TestResultType = $TestResult.GetType().FullName
+    Write-Host ">> Type of test result is $TestResultType"
+    Write-Host ">> Test result is $TestResult"
+    if ('Valid' -eq $TestResult) {
         Write-Host ">> Signing the module was successful."
         return True
     }
@@ -396,7 +397,6 @@ function SignScubaGearModule {
         Write-Host ">> Signing the module was NOT successful."
         return False
     }
-    return False
 }
 
 function CreateArrayOfFilePaths {
