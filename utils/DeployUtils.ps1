@@ -416,8 +416,9 @@ function SignScubaGearModule {
     Write-Host ">> Catalog: $CatalogFilePath"
     Write-Host ">> Path: $ModulePath"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    Get-ChildItem -LiteralPath $ModulePath -File -Force -Recurse {
-        Write-Host $_.FullName
+    $Files = Get-ChildItem -Path $ModulePath -File
+    ForEach ($File in $Files)  {
+        Write-Host $File.FullName
     }
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
@@ -451,6 +452,8 @@ function CallAzureSignTool {
         $FileList
     )
 
+    Write-Host ">>> Running the AzureSignTool method..."
+
     $SignArguments = @(
         'sign',
         '-coe',
@@ -462,10 +465,10 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host ">>> Calling AzureSignTool: $SignArguments"
-
+    Write-Host ">>> The file list is $FileList"
     $ToolPath = (Get-Command AzureSignTool).Path
+    Write-Host ">>> The tool path is $ToolPath"
     $Results = & $ToolPath $SignArguments
-    # Write-Host ">>> Results"
-    # Write-Host $Results
+    Write-Host ">>> Results"
+    Write-Host $Results
 }
