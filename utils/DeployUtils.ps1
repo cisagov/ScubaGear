@@ -401,7 +401,6 @@ function SignScubaGearModule {
     Write-Host ">> The catalog path is $CatalogPath"
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
-    Write-Host $CatalogList | Format-Table
 
     Write-Host ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
@@ -413,10 +412,12 @@ function SignScubaGearModule {
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed
+    Write-Host ">> without results"
+    Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed
 
-    Write-Host ">> Test Result is "
-    $TestResult | Format-Table
+    Write-Host ">> with results"
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed
+    Write-Host ">> Test Result is $TestResult.Status"
 
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
