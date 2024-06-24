@@ -303,6 +303,7 @@ function CreateFileList {
     <#
     .NOTES
     Internal function
+    Creates a temp file with a list of filenames
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -379,8 +380,9 @@ function SignScubaGearModule {
     $FileList = CreateFileList `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
-    Write-Host "The file list is $FileList"
-
+    Write-Host ">> The file list is $FileList"
+    Write-Host ">> The contents of the file list are:"
+    Get-Content $FileList
     Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
@@ -398,7 +400,7 @@ function SignScubaGearModule {
 
     # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
     # for files and folders in the specified paths.
-    $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0 -Verbose
+    $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0
     Write-Host ">> The catalog path is $CatalogFilePath"
     $CatalogList = New-TemporaryFile
     $CatalogFilePath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
@@ -415,20 +417,19 @@ function SignScubaGearModule {
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
     # There's no -Path parameter.
-    Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    # $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
 
     # ForEach ($File in $FileList) {
     #     Write-Host $File
     # }
-    # if ($TestResult -eq 'Valid') {
-    #     Write-Host ">> Signing the module was successful."
-    #     return True
-    # }
-    # else {
-    #     Write-Host ">> Signing the module was NOT successful."
-    #     return False
-    # }
+    if ($TestResult -eq 'Valid') {
+        Write-Host ">> Signing the module was successful."
+        return True
+    }
+    else {
+        Write-Host ">> Signing the module was NOT successful."
+        return False
+    }
     return False
 }
 
