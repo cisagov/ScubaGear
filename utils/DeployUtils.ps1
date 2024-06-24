@@ -328,47 +328,6 @@ function CreateFileList {
     return $FileList.FullName
 }
 
-function CallAzureSignTool {
-    <#
-    .NOTES
-    Internal function
-    #>
-    param (
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
-        [System.Uri]
-        $AzureKeyVaultUrl,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $CertificateName,
-        [Parameter(Mandatory = $false)]
-        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http', 'https' })]
-        $TimeStampServer = 'http://timestamp.digicert.com',
-        [Parameter(Mandatory = $true)]
-        [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
-        $FileList
-    )
-
-    $SignArguments = @(
-        'sign',
-        '-coe',
-        '-fd', "sha256",
-        '-tr', $TimeStampServer,
-        '-kvu', $AzureKeyVaultUrl,
-        '-kvc', $CertificateName,
-        '-kvm'
-        '-ifl', $FileList
-    )
-
-    Write-Host ">>> Calling AzureSignTool: $SignArguments"
-
-    $ToolPath = (Get-Command AzureSignTool).Path
-    $Results = & $ToolPath $SignArguments
-    Write-Host ">>> Results"
-    Write-Host $Results
-}
-
 function SignScubaGearModule {
     <#
     .SYNOPSIS
@@ -431,8 +390,6 @@ function SignScubaGearModule {
     # Create and sign catalog
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
-    Write-Host ">> The catalog path is $CatalogPath"
-
 
     if (Test-Path -Path $CatalogPath -PathType Leaf) {
         Remove-Item -Path $CatalogPath -Force
@@ -441,9 +398,10 @@ function SignScubaGearModule {
     # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
     # for files and folders in the specified paths.
     $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    Write-Host ">> The new catalog path is $CatalogPath"
+    Write-Host ">> The catalog path is $CatalogPath"
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
+    Write-Host $CatalogList | Format-Table
 
     Write-Host ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
@@ -455,8 +413,10 @@ function SignScubaGearModule {
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed 
-    Write-Host ">> Test Result is $TestResult"
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed
+
+    Write-Host ">> Test Result is "
+    $TestResult | Format-Table
 
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
@@ -466,4 +426,45 @@ function SignScubaGearModule {
         Write-Host ">> Signing the module was NOT successful."
         return False
     }
+}
+
+function CallAzureSignTool {
+    <#
+    .NOTES
+    Internal function
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'https' })]
+        [System.Uri]
+        $AzureKeyVaultUrl,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateName,
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({ [uri]::IsWellFormedUriString($_, 'Absolute') -and ([uri] $_).Scheme -in 'http', 'https' })]
+        $TimeStampServer = 'http://timestamp.digicert.com',
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path -Path $_ -PathType Leaf })]
+        $FileList
+    )
+
+    $SignArguments = @(
+        'sign',
+        '-coe',
+        '-fd', "sha256",
+        '-tr', $TimeStampServer,
+        '-kvu', $AzureKeyVaultUrl,
+        '-kvc', $CertificateName,
+        '-kvm'
+        '-ifl', $FileList
+    )
+
+    Write-Host ">>> Calling AzureSignTool: $SignArguments"
+
+    $ToolPath = (Get-Command AzureSignTool).Path
+    $Results = & $ToolPath $SignArguments
+    Write-Host ">>> Results"
+    # Write-Host $Results
 }
