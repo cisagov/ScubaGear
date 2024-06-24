@@ -384,9 +384,13 @@ function SignScubaGearModule {
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    $TestResultType = $TestResult.GetType().FullName
-    Write-Host ">> Type of test result is $TestResultType"
+    # System.Management.Automation.CatalogInformation
+    $TestResultCI = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed 
+    $TestResultCI | Format-List
+    $TestResultCIFL = $TestResultCI | Format-List
+    Write-Host ">> The TRCIFL is $TestResultCIFL"
+    
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
     Write-Host ">> Test result is $TestResult"
     if ('Valid' -eq $TestResult) {
         Write-Host ">> Signing the module was successful."
