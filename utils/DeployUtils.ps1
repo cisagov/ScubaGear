@@ -297,7 +297,7 @@ function CreateFileList {
     Write-Host "  Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Host "  Files: $(Get-Content $FileList)"
+    # Write-Host "  Files: $(Get-Content $FileList)"
     return $FileList.FullName
 }
 
@@ -334,11 +334,11 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host "Calling AzureSignTool: $SignArguments"
+    Write-Host "  Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     $Results = & $ToolPath $SignArguments
-    Write-Host "The results of using the AzureSignTool:"
+    Write-Host "  The results of using the AzureSignTool:"
     Write-Host $Results
 }
 function SignScubaGearModule {
@@ -388,13 +388,12 @@ function SignScubaGearModule {
     Write-Host " Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
-    Write-Host " Calling CreateFileList function with..."
-    Write-Host " SourcePath $ModulePath"
+    Write-Host " Calling CreateFileList function with $ModulePath"
     $FileList = CreateFileList `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
     
-    Write-Host "Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Host " Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -413,7 +412,7 @@ function SignScubaGearModule {
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
-    Write-Host "Calling CallAzureSignTool function to sign catalog list..."
+    Write-Host " Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -421,6 +420,7 @@ function SignScubaGearModule {
         -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
+    Write-Host " Test Result is $TestResult"
     return 'Valid' -eq $TestResult
 }
 
