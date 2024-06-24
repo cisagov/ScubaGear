@@ -389,18 +389,18 @@ function SignScubaGearModule {
 
     # Create and sign catalog
     $CatalogFileName = 'ScubaGear.cat'
-    $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
+    $CatalogFilePath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
 
-    if (Test-Path -Path $CatalogPath -PathType Leaf) {
-        Remove-Item -Path $CatalogPath -Force
+    if (Test-Path -Path $CatalogFilePath -PathType Leaf) {
+        Remove-Item -Path $CatalogFilePath -Force
     }
 
     # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
     # for files and folders in the specified paths.
-    $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
-    Write-Host ">> The catalog path is $CatalogPath"
+    $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0
+    Write-Host ">> The catalog path is $CatalogFilePath"
     $CatalogList = New-TemporaryFile
-    $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
+    $CatalogFilePath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
     Write-Host ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
@@ -412,7 +412,10 @@ function SignScubaGearModule {
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Path $ModulePath -Detailed
+    Write-Host ">> Testing the catalog"
+    Write-Host ">> Catalog: $CatalogFilePath"
+    Write-Host ">> Path: $ModulePath"
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
 
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
@@ -461,6 +464,6 @@ function CallAzureSignTool {
 
     $ToolPath = (Get-Command AzureSignTool).Path
     $Results = & $ToolPath $SignArguments
-    Write-Host ">>> Results"
+    # Write-Host ">>> Results"
     # Write-Host $Results
 }
