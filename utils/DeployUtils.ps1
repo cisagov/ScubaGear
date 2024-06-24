@@ -416,7 +416,7 @@ function SignScubaGearModule {
     Write-Host ">> Catalog: $CatalogFilePath"
     Write-Host ">> Path: $ModulePath"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    Get-ChildItem $ModulePath -Recurse {
+    Get-ChildItem -Path $ModulePath -Force -Recurse {
         Write-Host $_.FullName
     }
     if ($TestResult -eq 'Valid') {
