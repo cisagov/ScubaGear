@@ -413,13 +413,7 @@ function SignScubaGearModule {
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
-    Write-Host ">> Catalog: $CatalogFilePath"
-    Write-Host ">> Path: $ModulePath"
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
-    $Files = Get-ChildItem -Path $ModulePath -File
-    ForEach ($File in $Files)  {
-        Write-Host $File.FullName
-    }
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Detailed
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
         return True
