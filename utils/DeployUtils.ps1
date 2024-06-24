@@ -299,12 +299,7 @@ function ConfigureScubaGearModule {
     return $True
 }
 
-function CreateFileList {
-    <#
-    .NOTES
-    Internal function
-    Creates a temp file with a list of filenames
-    #>
+function CreateArrayOfFilePaths {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -315,15 +310,23 @@ function CreateFileList {
         [array]
         $Extensions = @()
     )
-
-    Write-Host ">>> Creating file list..."
-
-    $FileNames = @()
+    $ArrayOfFilePaths = @()
     if ($Extensions.Count -gt 0) {
-        $Filename = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
-        Write-Host ">>> Filename is $Filename"
-        $FileNames += $Filename
+        $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+        Write-Host ">>> FilePath is $FilePath"
+        $ArrayOfFilePaths += $FilePath
     }
+    return $ArrayOfFilePaths
+}
+
+function CreateFileList {
+    <#
+    .NOTES
+    Internal function
+    Creates a temp file with a list of filenames
+    #>
+    param($FileNames)
+    Write-Host ">>> Creating file list..."
     Write-Host ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
@@ -380,9 +383,10 @@ function SignScubaGearModule {
 
     # Sign scripts, manifest, and modules
     Write-Host ">> Calling CreateFileList function with $ModulePath"
-    $FileList = CreateFileList `
+    $ArrayOfFilePaths = CreateArrayOfFilePaths `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
+    $FileList = CreateFileList $ArrayOfFilePaths
     Write-Host ">> The file list is $FileList"
     Write-Host ">> The contents of the file list are:"
     $FileListType = $FileList.GetType().fullname
