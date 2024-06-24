@@ -384,8 +384,7 @@ function SignScubaGearModule {
     # the hashes of the actual files in order to validate their authenticity.
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
-    $AddamsModulePath = "C:\Users\RUNNER~1\AppData\Local\Temp\ScubaGear\PowerShell\ScubaGear"
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $AddamsModulePath -Detailed
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
     $TestResultType = $TestResult.GetType().FullName
     Write-Host ">> Type of test result is $TestResultType"
     Write-Host ">> Test result is $TestResult"
