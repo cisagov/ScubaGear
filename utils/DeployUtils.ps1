@@ -349,12 +349,8 @@ function SignScubaGearModule {
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
-    $FileList = CreateFileList $ArrayOfFilePaths
+    $FileList = CreateFileList $ArrayOfFilePaths # String
     Write-Host ">> The file list is $FileList"
-    Write-Host ">> The contents of the file list are:"
-    $FileListType = $FileList.GetType().fullname
-    Write-Host ">> The type of file list is $FileListType"
-    Write-Host $FileList
     Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
@@ -389,13 +385,9 @@ function SignScubaGearModule {
     # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
     # There's no -Path parameter.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ArrayOfFilePaths[0] -Detailed
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ArrayOfFilePaths[0]
     # $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed
     Write-Host "Test result is $TestResult"
-
-    # ForEach ($File in $FileList) {
-    #     Write-Host $File
-    # }
     if ($TestResult -eq 'Valid') {
         Write-Host ">> Signing the module was successful."
         return True
@@ -424,9 +416,9 @@ function CreateArrayOfFilePaths {
         $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
         $ArrayOfFilePaths += $FilePath
     }
-    ForEach ($FilePath in $ArrayOfFilePaths) {
-        Write-Host ">>> File path is $FilePath"
-    }
+    # ForEach ($FilePath in $ArrayOfFilePaths) {
+    #     Write-Host ">>> File path is $FilePath"
+    # }
     return $ArrayOfFilePaths
 }
 
