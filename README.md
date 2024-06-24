@@ -1,10 +1,12 @@
 ![CISA Logo](/docs/images/cisa.png)
 
-<p>
-  <a href="https://github.com/cisagov/ScubaGear/releases" alt="ScubaGear version #">
-    <img src="https://img.shields.io/badge/ScubaGear-v1.3.0-%2328B953?labelColor=%23005288" />
-  </a>
-</p>
+[![GitHub Release][github-release-img]][release]
+[![PSGallery Release][psgallery-release-img]][psgallery]
+[![GitHub CICD Workflow][github-cicd-workflow-img]][github-cicd-workflow]
+[![GitHub License][github-license-img]][license]
+[![GitHub Downloads][github-downloads-img]][release]
+[![PSGallery Downloads][psgallery-downloads-img]][psgallery]
+[![GitHub Issues][github-issues-img]][github-issues]
 
 ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](/baselines/README.md).
 
@@ -26,7 +28,7 @@ ScubaGear uses a three-step process:
 
 ## Getting Started
 
-To install ScubaGear from [PSGallery](https://www.powershellgallery.com/packages/ScubaGear), open a PowerShell 5 terminal and install the module:
+To install ScubaGear from [PSGallery](https://www.powershellgallery.com/packages/ScubaGear), open a PowerShell 5 terminal on a Windows computer and install the module:
 
 ```powershell
 # Install ScubaGear
@@ -99,3 +101,16 @@ The following sections should be read in order.
 ## Project License
 
 Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
+
+[release]: https://github.com/cisagov/ScubaGear/releases
+[license]: https://github.com/cisagov/ScubaGear/blob/main/LICENSE
+[psgallery]: https://www.powershellgallery.com/packages/ScubaGear
+[github-cicd-workflow]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml
+[github-issues]: https://github.com/cisagov/ScubaGear/issues
+[github-license-img]: https://img.shields.io/github/license/cisagov/ScubaGear
+[github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=GitHub&logo=github
+[psgallery-release-img]: https://img.shields.io/powershellgallery/v/ScubaGear?logo=powershell&label=PSGallery
+[github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.yaml?logo=github
+[github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
+[psgallery-downloads-img]: https://img.shields.io/powershellgallery/dt/ScubaGear?logo=powershell
+[github-issues-img]: https://img.shields.io/github/issues/cisagov/ScubaGear

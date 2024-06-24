@@ -572,6 +572,7 @@ A DLP solution SHALL be used.
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
+
 #### MS.EXO.8.2v2
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
 
@@ -585,6 +586,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
+
 #### MS.EXO.8.3v1
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
@@ -595,6 +597,7 @@ The selected DLP solution SHOULD offer services comparable to the native DLP sol
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+
 
 #### MS.EXO.8.4v1
 At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.
@@ -609,6 +612,7 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
+
 ### Resources
 
 - None
@@ -620,6 +624,7 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
 ### Implementation
 
 #### MS.EXO.8.1v2 Instructions
+
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 #### MS.EXO.8.2v2 Instructions
@@ -627,6 +632,7 @@ Any product meeting the requirements outlined in this baseline policy may be use
 
 #### MS.EXO.8.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
+
 
 #### MS.EXO.8.4v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
@@ -688,6 +694,7 @@ organization, to be made in accordance with their risk tolerance.
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
+
 #### MS.EXO.9.4v1
 Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
@@ -702,6 +709,7 @@ prevent spread of malware distributed via click-to-run email attachments.
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
+
 #### MS.EXO.9.5v1
 At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 
@@ -712,6 +720,7 @@ Blocking a list of common executable files helps mitigate the risk of adversaria
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+
 
 ### Resources
 
@@ -1134,6 +1143,7 @@ A spam filter SHALL be enabled.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
+
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
 
@@ -1167,6 +1177,13 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
+#### MS.EXO.14.4v1
+If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.
+
+<!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
+- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
+- _Last modified:_ May 2024
+
 ### Resources
 
 - [Configure anti-spam policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-spam-policies-configure?view=o365-worldwide)
@@ -1177,7 +1194,7 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 
 ### Implementation
 
-#### MS.EXO.14.1v1 Instructions
+#### MS.EXO.14.1v2 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be
 used. If the agency uses Microsoft Defender, see the following
@@ -1209,7 +1226,6 @@ used. If the agency uses Microsoft Defender, see the following
 implementation steps for
 [enabling preset security policies](./defender.md#msdefender12v1), which
 include spam filtering.
-
 
 ## 15. Link Protection
 
