@@ -138,9 +138,8 @@ function Publish-ScubaGearModule {
         -CertificateName $CertificateName `
         -ModulePath $ModuleBuildPath
 
-    Write-Host "> Successfully signed? $SuccessfullySigned"
-
     if ($SuccessfullySigned) {
+        Write-Host "> The ScubaGear module was succesfully signed."
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -149,10 +148,12 @@ function Publish-ScubaGearModule {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
+        Write-Host "> The ScubaGear module will be published."
         # TODO Uncomment this to actually publish
         # Publish-Module @Parameters
     }
     else {
+        Write-Host "> The ScubaGear module was not succesfully signed."
         Write-Error "> Failed to sign module."
     }
 }
@@ -448,7 +449,8 @@ function SignScubaGearModule {
 
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
-    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
+    # Signing tool says it was successful, but the test says it was not.
+    $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath -Detailed 
     Write-Host ">> Test Result is $TestResult"
 
     if ($TestResult -eq 'Valid') {
