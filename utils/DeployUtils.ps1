@@ -53,6 +53,29 @@ function New-PrivateGallery {
     }
 }
 
+function IsRegistered {
+    <#
+    .NOTES
+    Internal helper function
+    #>
+    param (
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $RepoName = 'PrivateScubaGearGallery'
+    )
+
+    Write-Debug "Looking for $RepoName local repository"
+    $Registered = $false
+    try {
+        $Registered = (Get-PSRepository).Name -contains $RepoName
+    }
+    catch {
+        Write-Error "Failed to check IsRegistered: $_"
+    }
+    return $Registered
+}
+
 function Publish-ScubaGearModule {
     <#
     .Description
@@ -103,17 +126,19 @@ function Publish-ScubaGearModule {
         $NuGetApiKey
     )
 
-    Write-Host "Publishing ScubaGear module..."
+    Write-Host "> Publishing ScubaGear module..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    Write-Host "Calling SignScubaGearModule function with..."
-    Write-Host "AzureKeyVaultUrl: $AzureKeyVaultUrl"
-    Write-Host "CertificateName: $CertificateName"
-    Write-Host "ModulePath: $ModuleBuildPath"
+    Write-Host "> Calling SignScubaGearModule function with..."
+    Write-Host "> AzureKeyVaultUrl: $AzureKeyVaultUrl"
+    Write-Host "> CertificateName: $CertificateName"
+    Write-Host "> ModulePath: $ModuleBuildPath"
     $SuccessfullySigned = SignScubaGearModule `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
         -ModulePath $ModuleBuildPath
+
+    Write-Host "> Successfully signed? $SuccessfullySigned"
 
     if ($SuccessfullySigned) {
         $Parameters = @{
@@ -124,10 +149,11 @@ function Publish-ScubaGearModule {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
+        # TODO Uncomment this to actually publish
         # Publish-Module @Parameters
     }
     else {
-        Write-Error "Failed to sign module."
+        Write-Error ">Failed to sign module."
     }
 }
 
@@ -151,7 +177,7 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Host " Building ScubaGear module..."
+    Write-Host ">> Building ScubaGear module..."
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -162,7 +188,7 @@ function Build-ScubaModule {
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
     if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)) {
-        Write-Error "Failed to configure scuba module for publishing."
+        Write-Error ">> Failed to configure scuba module for publishing."
     }
 
     return $ModuleBuildPath
@@ -187,27 +213,27 @@ function ConfigureScubaGearModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Host "  Configuring ScubaGear module..."
+    Write-Host ">>> Configuring ScubaGear module..."
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Host "  The module dir exists at $ModulePath"
+        Write-Host ">>> The module dir exists at $ModulePath"
     }
     else {
-        Write-Warning "  The module dir does not exist at $ModulePat"
-        Write-Error "  Failing..."
+        Write-Warning ">>> The module dir does not exist at $ModulePat"
+        Write-Error ">>> Failing..."
     }
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Host "  The manifest file exists at $ManifestPath"
+        Write-Host ">>> The manifest file exists at $ManifestPath"
     }
     else {
-        Write-Warning "  The manifest file does not exist at $ManifestPath"
-        Write-Error "  Failing..."
+        Write-Warning ">>> The manifest file does not exist at $ManifestPath"
+        Write-Error ">>> Failing..."
     }
 
     $ModuleVersion = $OverrideModuleVersion
@@ -218,8 +244,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host "  The prerelease tag is $PrereleaseTag"
-    Write-Host "  The module version is $ModuleVersion"
+    Write-Host ">>> The prerelease tag is $PrereleaseTag"
+    Write-Host ">>> The module version is $ModuleVersion"
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -244,12 +270,12 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Warning "  Error: Cannot update module manifest:"
-        Write-Warning "  Stacktrace:"
+        Write-Warning ">>> Error: Cannot update module manifest:"
+        Write-Warning ">>> Stacktrace:"
         Write-Warning $_.ScriptStackTrace
-        Write-Warning "  Exception:"
+        Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
-        Write-Error "  Failed to update module manifest"
+        Write-Error ">>> Failed to update module manifest"
         return $False
     }
     try {
@@ -259,12 +285,12 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Warning "  Warning: Cannot test module manifest:"
-        Write-Warning "  Stacktrace:"
+        Write-Warning ">>> Warning: Cannot test module manifest:"
+        Write-Warning ">>> Stacktrace:"
         Write-Warning $_.ScriptStackTrace
-        Write-Warning "  Exception:"
+        Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
-        Write-Error "  Failed to test module manifest"
+        Write-Error ">>> Failed to test module manifest"
         return $False
     }
 
@@ -288,13 +314,13 @@ function CreateFileList {
         $Extensions = @()
     )
 
-    Write-Host "  Creating file list..."
+    Write-Host ">>> Creating file list..."
 
     $FileNames = @()
     if ($Extensions.Count -gt 0) {
         $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
     }
-    Write-Host "  Found $($FileNames.Count) files to sign"
+    Write-Host ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     # Write-Host "  Files: $(Get-Content $FileList)"
@@ -334,12 +360,10 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host "  Calling AzureSignTool: $SignArguments"
+    Write-Host ">>> Calling AzureSignTool: $SignArguments"
 
     $ToolPath = (Get-Command AzureSignTool).Path
     $Results = & $ToolPath $SignArguments
-    Write-Host "  The results of using the AzureSignTool:"
-    Write-Host $Results
 }
 function SignScubaGearModule {
     <#
@@ -385,15 +409,15 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Host " Signing ScubaGear module..."
+    Write-Host ">> Signing ScubaGear module..."
 
     # Digitally sign scripts, manifest, and modules
-    Write-Host " Calling CreateFileList function with $ModulePath"
+    Write-Host ">> Calling CreateFileList function with $ModulePath"
     $FileList = CreateFileList `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
     
-    Write-Host " Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -412,7 +436,7 @@ function SignScubaGearModule {
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
-    Write-Host " Calling CallAzureSignTool function to sign catalog list..."
+    Write-Host ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -420,29 +444,8 @@ function SignScubaGearModule {
         -FileList $CatalogList
 
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogPath
-    Write-Host " Test Result is $TestResult"
+    Write-Host ">> Test Result is $TestResult"
     return 'Valid' -eq $TestResult
 }
 
-function IsRegistered {
-    <#
-    .NOTES
-    Internal helper function
-    #>
-    param (
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $RepoName = 'PrivateScubaGearGallery'
-    )
 
-    Write-Debug "Looking for $RepoName local repository"
-    $Registered = $false
-    try {
-        $Registered = (Get-PSRepository).Name -contains $RepoName
-    }
-    catch {
-        Write-Error "Failed to check IsRegistered: $_"
-    }
-    return $Registered
-}
