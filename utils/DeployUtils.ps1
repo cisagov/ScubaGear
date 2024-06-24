@@ -431,12 +431,17 @@ function SignScubaGearModule {
     # Create and sign catalog
     $CatalogFileName = 'ScubaGear.cat'
     $CatalogPath = Join-Path -Path $ModulePath -ChildPath $CatalogFileName
+    Write-Host ">> The catalog path is $CatalogPath"
+
 
     if (Test-Path -Path $CatalogPath -PathType Leaf) {
         Remove-Item -Path $CatalogPath -Force
     }
 
+    # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
+    # for files and folders in the specified paths.
     $CatalogPath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogPath -CatalogVersion 2.0
+    Write-Host ">> The new catalog path is $CatalogPath"
     $CatalogList = New-TemporaryFile
     $CatalogPath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
