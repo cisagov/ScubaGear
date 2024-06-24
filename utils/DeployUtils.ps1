@@ -326,6 +326,9 @@ function CreateFileList {
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     # Write-Host "  Files: $(Get-Content $FileList)"
+    $ContentOfFileList = $(Get-Content $FileList)
+    $ContentOfFileListType = $ContentOfFileList.GetType().FullName
+    Write-Host ">>> The type of contents of file list is $ContentOfFileListType"
     return $FileList.FullName
 }
 
@@ -384,7 +387,7 @@ function SignScubaGearModule {
     Write-Host ">> The contents of the file list are:"
     $FileListType = $FileList.GetType().fullname
     Write-Host ">> The type of file list is $FileListType"
-    Get-Content $FileList
+    Write-Host $FileList
     Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
