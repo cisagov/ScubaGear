@@ -320,15 +320,15 @@ function CreateFileList {
 
     $FileNames = @()
     if ($Extensions.Count -gt 0) {
-        $FileNames += Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+        $Filename = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
+        Write-Host ">>> Filename is $Filename"
+        $FileNames += $Filename
     }
     Write-Host ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    # Write-Host "  Files: $(Get-Content $FileList)"
-    $ContentOfFileList = $(Get-Content $FileList)
-    $ContentOfFileListType = $ContentOfFileList.GetType().FullName
-    Write-Host ">>> The type of contents of file list is $ContentOfFileListType"
+    $ContentOfFileList = $(Get-Content $FileList) # String
+    Write-Host ">>> $ContentOfFileList"
     return $FileList.FullName
 }
 
