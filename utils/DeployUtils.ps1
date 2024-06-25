@@ -127,6 +127,7 @@ function Publish-ScubaGearModule {
     )
 
     Write-Host "> Publishing ScubaGear module..."
+    Write-Output "> Publishing ScubaGear module 2..."
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
     Write-Host "> Calling SignScubaGearModule function with..."
@@ -179,6 +180,7 @@ function Build-ScubaModule {
         $PrereleaseTag = ""
     )
     Write-Host ">> Building ScubaGear module..."
+    Write-Output ">> Building ScubaGear module...2"
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -215,6 +217,7 @@ function ConfigureScubaGearModule {
         $PrereleaseTag = ""
     )
     Write-Host ">>> Configuring ScubaGear module..."
+    Write-Output ">>> Configuring ScubaGear module...2"
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
     # Verify that the module path folder exists
@@ -344,6 +347,7 @@ function SignScubaGearModule {
     )
 
     Write-Host ">> Signing ScubaGear module..."
+    Write-Output ">> Signing ScubaGear module...2"
 
     # Sign scripts, manifest, and modules
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
@@ -414,6 +418,7 @@ function CreateArrayOfFilePaths {
         $Extensions = @()
     )
     Write-Host ">>> Create array of file paths..."
+    Write-Output ">>> Create array of file paths...2"
     $ArrayOfFilePaths = @()
     if ($Extensions.Count -gt 0) {
         $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
@@ -433,6 +438,7 @@ function CreateFileList {
     #>
     param($FileNames)
     Write-Host ">>> Creating file list..."
+    Write-Output ">>> Creating file list...2"
     Write-Host ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
@@ -463,6 +469,7 @@ function CallAzureSignTool {
     )
 
     Write-Host ">>> Running the AzureSignTool method..."
+    Write-Output ">>> Running the AzureSignTool method...2"
 
     $SignArguments = @(
         'sign',
