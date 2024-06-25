@@ -25,7 +25,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
-**Microsoft Entra hybrid**: This term denotes the scenario
+**Microsoft Entra ID hybrid**: This term denotes the scenario
 when an organization has an on-premises Microsoft Windows Server Active Directory that contains the
 master user directory but federates access to the cloud M365
 Microsoft Entra ID tenant.
@@ -177,7 +177,7 @@ Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Mic
 #### MS.ME-ID.3.1v1
 Phishing-resistant MFA SHALL be enforced for all users.
 
-The phishing-resistant methods ** Microsoft Entra certificate-based authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
+The phishing-resistant methods ** Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Entra ID group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
@@ -314,14 +314,14 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 #### MS.ME-ID.3.7v1 Instructions
 
-1. Create a conditional access policy requiring a user's device to be either Microsoft Entra hybrid joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:
+1. Create a conditional access policy requiring a user's device to be either Microsoft Entra ID hybrid joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > Cloud apps > <b>All cloud apps</b>
 
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 #### MS.ME-ID.3.8v1 Instructions
@@ -333,7 +333,7 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
   Target resources > User actions > <b>Register security information</b>
 
-  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
+  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
 ## 4. Centralized Log Collection
@@ -347,7 +347,7 @@ Security logs SHALL be sent to the agency's security operations center for monit
 <!--Policy: MS.ME-ID.4.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.
 - _Last modified:_ June 2023
-- _Note:_ The following Microsoft Entra logs (configured in diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Microsoft Entra Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
+- _Note:_ The following Microsoft Entra ID logs (configured in diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Microsoft Entra ID Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
 - _Note:_ Agencies can benefit from security detection capabilities offered by the CISA Cloud Log Aggregation Warehouse (CLAW) system. Agencies are urged to send the logs to CLAW. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 
 ### Resources
@@ -493,7 +493,7 @@ User passwords SHALL NOT expire.
 
 This section provides policies that help reduce security risks related to the usage of [highly privileged Microsoft Entra ID built-in roles](#highly-privileged-roles). Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies. Special protections are necessary to secure this level of access.
 
-Some of the policy implementations in this section reference specific features of the Microsoft Entra Privileged Identity Management (PIM) service that provides Privileged Access Management (PAM) capabilities. As an alternative to Microsoft Entra PIM, third-party products and services with equivalent PAM capabilities can be leveraged.
+Some of the policy implementations in this section reference specific features of the Microsoft Entra ID Privileged Identity Management (PIM) service that provides Privileged Access Management (PAM) capabilities. As an alternative to Microsoft Entra ID PIM, third-party products and services with equivalent PAM capabilities can be leveraged.
 
 ### Policies
 #### MS.ME-ID.7.1v1
@@ -521,7 +521,7 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
 <!--Policy: MS.ME-ID.7.4v1; Criticality: SHALL -->
-- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Microsoft Entra PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
+- _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Microsoft Entra ID PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
 - _Last modified:_ June 2023
 - _Note:_ Exceptions to this policy are:
   - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios.
@@ -579,17 +579,17 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 
 ### License Requirements
 
-- Microsoft Entra PIM requires a Microsoft Entra ID P2 license.
+- Microsoft Entra ID PIM requires a Microsoft Entra ID P2 license.
 
 ### Implementation
 
-The following implementation instructions that reference the Microsoft Entra PIM service will vary if using a third-party PAM system instead. 
+The following implementation instructions that reference the Microsoft Entra ID PIM service will vary if using a third-party PAM system instead. 
 
 #### MS.ME-ID.7.1v1 Instructions
 
 When counting the number of users assigned to the Global Administrator role, count each user only once.
 
-1. In **Microsoft Entra admin center**  count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
+1. In **Microsoft Entra admin center**  count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
 
 2. Validate that there are a total of two to eight users assigned to the Global Administrator role.
 
@@ -609,9 +609,9 @@ This policy is based on the ratio below:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
+2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.
 
-3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Microsoft Entra portal.
+3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Microsoft Entra ID portal.
 
     ```
     Connect-MgGraph
@@ -628,7 +628,7 @@ This policy is based on the ratio below:
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
-4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Microsoft Entra PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
+4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Microsoft Entra ID PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.
 
 Exception cases:
 - Emergency access accounts that require perpetual active assignment.
@@ -645,7 +645,7 @@ Exception cases:
 
 4. Under **Manage**, select **Assignments.** and click the **Active assignments** tab.
 
-5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra PIM. If the role was assigned outside of Microsoft Entra PIM, delete the assignment and recreate it using Microsoft Entra PIM.
+5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra ID PIM. If the role was assigned outside of Microsoft Entra ID PIM, delete the assignment and recreate it using Microsoft Entra ID PIM.
 
 #### MS.ME-ID.7.6v1 Instructions
 
@@ -710,7 +710,7 @@ Exception cases:
 This section provides policies that help reduce security risks related to integrating M365 guest users. A guest user is a specific type of external user who belongs to a separate organization but can access files, meetings, Teams, and other data in the target tenant. It is common to invite guest users to a tenant for cross-agency collaboration purposes.
 
 #### MS.ME-ID.8.1v1
-Guest users SHOULD have limited or restricted access to Microsoft Entra directory objects.
+Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.
 
 <!--Policy: MS.ME-ID.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
@@ -770,13 +770,13 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 4. Click **Save**.
 
 
-# Appendix A: Microsoft Entra hybrid Guidance
+# Appendix A: Microsoft Entra ID hybrid Guidance
 
-Most of this document does not focus on securing Microsoft Entra hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of Microsoft Entra hybrid infrastructure.
+Most of this document does not focus on securing Microsoft Entra ID hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of Microsoft Entra ID hybrid infrastructure.
 
 # Appendix B: Cross-tenant Access Guidance
 
-Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Microsoft Entra cross-tenant access settings.
+Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Microsoft Entra ID cross-tenant access settings.
 
 Microsoft’s [Authentication and Conditional Access for External ID](https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access) provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Microsoft Entra External ID, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview).
 
