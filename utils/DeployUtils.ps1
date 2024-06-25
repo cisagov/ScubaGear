@@ -149,10 +149,10 @@ function Publish-ScubaGearModule {
         Write-Host "> The ScubaGear module will be published."
         # The -Force parameter is only required if the new version is less than or equal to
         # the current version, which is typically only true when testing.
-        Publish-Module @Parameters -Force
+        # Publish-Module @Parameters -Force
     }
     else {
-        Write-Error "> Failed to sign module."
+        Write-Error "> Failed to publish the module module."
     }
 }
 
@@ -220,8 +220,7 @@ function ConfigureScubaGearModule {
         Write-Host ">>> The module dir exists at $ModulePath"
     }
     else {
-        Write-Warning ">>> The module dir does not exist at $ModulePat"
-        Write-Error ">>> Failing..."
+        Write-Error ">>> Failed to find the module directory at $ModulePat."
     }
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
@@ -231,8 +230,7 @@ function ConfigureScubaGearModule {
         Write-Host ">>> The manifest file exists at $ManifestPath"
     }
     else {
-        Write-Warning ">>> The manifest file does not exist at $ManifestPath"
-        Write-Error ">>> Failing..."
+        Write-Error ">>> Failed to find the manifest file at $ManifestPath"
     }
 
     $ModuleVersion = $OverrideModuleVersion
@@ -269,13 +267,12 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Warning ">>> Error: Cannot update module manifest:"
-        Write-Warning ">>> Stacktrace:"
-        Write-Warning $_.ScriptStackTrace
-        Write-Warning ">>> Exception:"
-        Write-Warning $_.Exception
-        Write-Error ">>> Failed to update module manifest"
-        return $False
+        # Write-Warning ">>> Error: Cannot update module manifest:"
+        # Write-Warning ">>> Stacktrace:"
+        # Write-Warning $_.ScriptStackTrace
+        # Write-Warning ">>> Exception:"
+        # Write-Warning $_.Exception
+        Write-Error ">>> Failed to update the module manifest."
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
@@ -284,13 +281,12 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        Write-Warning ">>> Warning: Cannot test module manifest:"
-        Write-Warning ">>> Stacktrace:"
-        Write-Warning $_.ScriptStackTrace
-        Write-Warning ">>> Exception:"
-        Write-Warning $_.Exception
-        Write-Error ">>> Failed to test module manifest"
-        return $False
+        # Write-Warning ">>> Warning: Cannot test module manifest:"
+        # Write-Warning ">>> Stacktrace:"
+        # Write-Warning $_.ScriptStackTrace
+        # Write-Warning ">>> Exception:"
+        # Write-Warning $_.Exception
+        Write-Error ">>> Failed to test module manifest."
     }
 
     # True indicates that the updating and testing were successful.
@@ -347,6 +343,10 @@ function SignScubaGearModule {
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
         -SourcePath $ModulePath `
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
+    if ($ArrayOfFilePaths.Length -eq 0)
+    {
+        Write-Error "Failed to find any .ps1, .psm1, or .psd files."
+    }
     $FileList = CreateFileList $ArrayOfFilePaths # String
     Write-Host ">> The file list is $FileList"
     Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
@@ -470,6 +470,6 @@ function CallAzureSignTool {
     $ToolPath = (Get-Command AzureSignTool).Path
     Write-Host ">>> The tool path is $ToolPath"
     $Results = & $ToolPath $SignArguments
-    # Write-Host ">>> Results"
-    # Write-Host $Results
+    Write-Host ">>> Results"
+    Write-Host $Results
 }
