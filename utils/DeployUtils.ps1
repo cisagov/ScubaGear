@@ -386,7 +386,6 @@ function SignScubaGearModule {
     }
     else {
         Write-Error ">> Signing the module was NOT successful."
-        return $false
     }
 }
 
@@ -465,13 +464,17 @@ function CallAzureSignTool {
     )
 
     Write-Host ">>> The files to sign are in the temp file $FileList"
-    $Unknown = (Get-Command AzureSignTool).GetType()
-    Write-Host "The type of AST is $Unknown"
+    # Get-Command returns a System.Management.Automation.ApplicationInfo
+    $NumberOfCommands = (Get-Command AzureSignTool) # Should return 1
+    if ($NumberOfCommands -eq 0) {
+        Write-Error "Failed to find the AzureSignTool on this system."
+    }
     $ToolPath = (Get-Command AzureSignTool).Path
     Write-Host ">>> The path to AzureSignTool is $ToolPath"
     $Results = & $ToolPath $SignArguments
     # If there are no failures, this string will be the last line in the results.
-    # Warning: This is brittle.  A unit test should be used to detect changes.
+    # Warning: This is a brittle test, because it depends upon a specific string.  
+    # A unit test should be used to detect changes.
     $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
     # Write-Host ">>> Results"
     # Write-Host $Results
