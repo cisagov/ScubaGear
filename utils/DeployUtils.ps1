@@ -383,10 +383,6 @@ function SignScubaGearModule {
     Write-Host ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
     Write-Host ">> Test result is $TestResult"
-    If ($TestResult -eq [CatalogValidationStatus]::Valid) # Test for enum, not string
-    {
-        Write-Host "HELLO"
-    }
     if ('Valid' -eq $TestResult) {
         Write-Host ">> Signing the module was successful."
         return True
