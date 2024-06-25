@@ -385,11 +385,11 @@ function SignScubaGearModule {
     Write-Host ">> Test result is $TestResult"
     if ('Valid' -eq $TestResult) {
         Write-Host ">> Signing the module was successful."
-        return True
+        return $true
     }
     else {
         Write-Error ">> Signing the module was NOT successful."
-        return False
+        return $false
     }
 }
 
