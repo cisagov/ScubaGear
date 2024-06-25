@@ -233,7 +233,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 ## 3. Power Platform Tenant Isolation
 
 Power Platform tenant isolation is different from Microsoft Entra wide tenant
-restriction. It does not impact Microsoft Entra -based access outside of Power
+restriction. It does not impact Microsoft Entra-based access outside of Power
 Platform. Power Platform tenant isolation only works for connectors
 using Microsoft Entra -based authentication, such as Office 365 Outlook or
 SharePoint. The default configuration in Power Platform has tenant
