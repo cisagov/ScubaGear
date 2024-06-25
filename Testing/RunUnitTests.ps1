@@ -47,7 +47,7 @@ param (
 
     [Parameter(Mandatory=$false)]
     [Alias('v')]
-    [switch]$Ver,
+    [switch]$Verbosity,
 
     [Parameter(Mandatory=$false)]
     [ValidateScript({Test-Path -Path $_ -PathType Container})]
@@ -267,7 +267,7 @@ $cEmpty = $ControlGroups[0] -eq "*"
 $tEmpty = $Tests[0] -eq "*"
 $Flag = ""
 
-if ($Ver.IsPresent) {
+if ($Verbosity.IsPresent) {
     $Flag = "-v"
 }
 if($pEmpty) {
