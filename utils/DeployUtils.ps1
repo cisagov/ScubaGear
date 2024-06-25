@@ -130,17 +130,12 @@ function Publish-ScubaGearModule {
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    Write-Host "> Calling SignScubaGearModule function with..."
-    Write-Host "> AzureKeyVaultUrl: $AzureKeyVaultUrl"
-    Write-Host "> CertificateName: $CertificateName"
-    Write-Host "> ModulePath: $ModuleBuildPath"
     $SuccessfullySigned = SignScubaGearModule `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
         -ModulePath $ModuleBuildPath
 
     if ($SuccessfullySigned) {
-        Write-Host "> The ScubaGear module was succesfully signed."
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -150,11 +145,11 @@ function Publish-ScubaGearModule {
         }
 
         Write-Host "> The ScubaGear module will be published."
-        # TODO Uncomment this to actually publish
-        Publish-Module @Parameters
+        # The -Force parameter is only required if the new version is less than or equal to
+        # the current version, which is typically only true when testing.
+        Publish-Module @Parameters -Force
     }
     else {
-        Write-Host "> The ScubaGear module was not succesfully signed."
         Write-Error "> Failed to sign module."
     }
 }
@@ -383,14 +378,7 @@ function SignScubaGearModule {
 
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
-    # Signing tool says it was successful, but the test says it was not.
     Write-Host ">> Testing the catalog"
-    # System.Management.Automation.CatalogInformation
-    $TestResultCI = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath -Detailed 
-    $TestResultCI | Format-List
-    $TestResultCIFL = $TestResultCI | Format-List
-    Write-Host ">> The TRCIFL is $TestResultCIFL"
-    
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
     Write-Host ">> Test result is $TestResult"
     if ('Valid' -eq $TestResult) {
