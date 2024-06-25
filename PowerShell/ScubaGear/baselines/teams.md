@@ -31,7 +31,7 @@ the types of users are defined as follows:
 
 3.  **Business to Business (B2B) guest users**: External users who are
     formally invited to collaborate with the team and added to the
-    agency's Microsfot Entra as guest users. These users
+    agency's Microsoft Entra as guest users. These users
     authenticate with their home organization/tenant and are granted
     access to the team by virtue of being listed as guest users on the
     tenant's Microsoft Entra.
