@@ -55,8 +55,8 @@ function New-PrivateGallery {
 
 function IsRegistered {
     <#
-    .NOTES
-    Internal helper function
+        .NOTES
+            Internal helper function
     #>
     param (
         [Parameter(Mandatory = $false)]
@@ -78,22 +78,22 @@ function IsRegistered {
 
 function Publish-ScubaGearModule {
     <#
-    .Description
-    Publish ScubaGear module to private package repository
-    .Parameter AzureKeyVaultUrl
-    The URL of the key vault with the code signing certificate
-    .Parameter CertificateName
-    The name of the code signing certificate
-    .Parameter ModulePath
-    Path to module root directory
-    .Parameter GalleryName
-    Name of the private package repository (i.e., gallery)
-    .Parameter OverrideModuleVersion
-    Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
-    .Parameter PrereleaseTag
-    The identifier that will be used in place of a version to identify the module in the gallery
-    .Parameter NuGetApiKey
-    Specifies the API key that you want to use to publish a module to the online gallery.
+        .Description
+            Publish ScubaGear module to private package repository
+        .Parameter AzureKeyVaultUrl
+            The URL of the key vault with the code signing certificate
+        .Parameter CertificateName
+            The name of the code signing certificate
+        .Parameter ModulePath
+            Path to module root directory
+        .Parameter GalleryName
+            Name of the private package repository (i.e., gallery)
+        .Parameter OverrideModuleVersion
+            Optional module version.  If provided it will use as module version. Otherwise, the current version from the manifest with a revision number is added instead.
+        .Parameter PrereleaseTag
+            The identifier that will be used in place of a version to identify the module in the gallery
+        .Parameter NuGetApiKey
+            Specifies the API key that you want to use to publish a module to the online gallery.
     #>
     param (
         [Parameter(Mandatory = $true)]
@@ -186,8 +186,12 @@ function Build-ScubaModule {
     }
 
     Copy-Item $ModulePath -Destination $env:TEMP -Recurse
-    if (-not (ConfigureScubaGearModule -ModulePath $ModuleBuildPath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag)) {
-        Write-Error ">> Failed to configure scuba module for publishing."
+    $ConfiguredCorrectly = ConfigureScubaGearModule `
+                            -ModulePath $ModuleBuildPath `
+                            -OverrideModuleVersion $OverrideModuleVersion `
+                            -PrereleaseTag $PrereleaseTag
+    if (-not $ConfiguredCorrectly) {
+        Write-Error ">> Failed to build ScubaGear module."
     }
 
     return $ModuleBuildPath
@@ -295,30 +299,23 @@ function ConfigureScubaGearModule {
 
 function SignScubaGearModule {
     <#
-    .SYNOPSIS
-    Code sign the specified module
-    .Description
-    This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a
-    signed catalog of the entire module using a certificate housed in an Azure key vault.
-    .Parameter AzureKeyVaultUrl
-    The URL of the key vault with the code signing certificate
-    .Parameter CertificateName
-    The name of the code signing certificate
-    .Parameter ModulePath
-    The root path of the module to be signed
-    .Parameter TimeStampServer
-    Time server to use to timestamp the artifacts
-    .NOTES
-    There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell
-    module to be published to PSGallery.
-    https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x show
-    general guidance.
-
-    There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog For example,
-    Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided.
-
-    There are a number of Non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged.
-    https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
+        .SYNOPSIS
+            Code sign the specified module
+        .Description
+            This function individually signs PowerShell artifacts (i.e., *.ps1, *.pms1) and creates a signed catalog of the entire module using a certificate housed in an Azure key vault.
+        .Parameter AzureKeyVaultUrl
+            The URL of the key vault with the code signing certificate
+        .Parameter CertificateName
+            The name of the code signing certificate
+        .Parameter ModulePath
+            The root path of the module to be signed
+        .Parameter TimeStampServer
+            Time server to use to timestamp the artifacts
+        .NOTES
+            There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell module to be published to PSGallery. This page shows general guidance:
+            https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x 
+            There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog. For example, Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided. There are a number of non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged:
+            https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
     param (
         [Parameter(Mandatory = $true)]
@@ -418,26 +415,24 @@ function CreateArrayOfFilePaths {
 
 function CreateFileList {
     <#
-    .NOTES
-    Internal function
-    Creates a temp file with a list of filenames
+        .NOTES
+            Creates a temp file with a list of filenames
     #>
-    param($FileNames)
+    param([Parameter(Mandatory = $true)][array]$FileNames) 
     Write-Host ">>> Creating file list..."
     Write-Host ">>> Found $($FileNames.Count) files to sign"
-    $FileList = New-TemporaryFile
+    $FileList = New-TemporaryFile # File with a list of the filenames
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    Write-Host ">>>>>>>>>>>>>>>>>"
-    cat $FileList
-    Write-Host ">>>>>>>>>>>>>>>>>"
     # $ContentOfFileList = $(Get-Content $FileList) # String
     return $FileList.FullName
 }
 
 function CallAzureSignTool {
     <#
-    .NOTES
-    Internal function
+        .NOTES
+            Internal function
+            AzureSignTool is a utility for signing code that is used to secure ScubaGear.
+            https://github.com/vcsjones/AzureSignTool
     #>
     param (
         [Parameter(Mandatory = $true)]
@@ -469,9 +464,11 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host ">>> The file list is $FileList"
+    Write-Host ">>> The files to sign are in the temp file $FileList"
+    $Unknown = (Get-Command AzureSignTool).GetType()
+    Write-Host "The type of AST is $Unknown"
     $ToolPath = (Get-Command AzureSignTool).Path
-    Write-Host ">>> The tool path is $ToolPath"
+    Write-Host ">>> The path to AzureSignTool is $ToolPath"
     $Results = & $ToolPath $SignArguments
     # If there are no failures, this string will be the last line in the results.
     # Warning: This is brittle.  A unit test should be used to detect changes.
