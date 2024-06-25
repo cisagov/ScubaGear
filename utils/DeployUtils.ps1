@@ -427,6 +427,9 @@ function CreateFileList {
     Write-Host ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
+    Write-Host ">>>>>>>>>>>>>>>>>"
+    cat $FileList
+    Write-Host ">>>>>>>>>>>>>>>>>"
     # $ContentOfFileList = $(Get-Content $FileList) # String
     return $FileList.FullName
 }
@@ -470,6 +473,15 @@ function CallAzureSignTool {
     $ToolPath = (Get-Command AzureSignTool).Path
     Write-Host ">>> The tool path is $ToolPath"
     $Results = & $ToolPath $SignArguments
-    Write-Host ">>> Results"
-    Write-Host $Results
+    # If there are no failures, this string will be the last line in the results.
+    # Warning: This is brittle.  A unit test should be used to detect changes.
+    $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
+    # Write-Host ">>> Results"
+    # Write-Host $Results
+    if ($FoundNoFailures -eq $true) {
+        Write-Host ">>> Found no failures."
+    }
+    else {
+        Write-Error ">>> Failed to sign filelist without errors."
+    }
 }
