@@ -126,8 +126,8 @@ function Publish-ScubaGearModule {
         $NuGetApiKey
     )
 
-    Write-Host "> Publishing ScubaGear module..."
-    Write-Output "> Publishing ScubaGear module 2..."
+    Write-Output "> Publishing ScubaGear module..."
+
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
     Write-Host "> Calling SignScubaGearModule function with..."
@@ -180,7 +180,6 @@ function Build-ScubaModule {
         $PrereleaseTag = ""
     )
     Write-Host ">> Building ScubaGear module..."
-    Write-Output ">> Building ScubaGear module...2"
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -217,9 +216,8 @@ function ConfigureScubaGearModule {
         $PrereleaseTag = ""
     )
     Write-Host ">>> Configuring ScubaGear module..."
-    Write-Output ">>> Configuring ScubaGear module...2"
-    #TODO: Add any module configuration needed (e.g., adjust Module Version)
 
+    #TODO: Add any module configuration needed (e.g., adjust Module Version)
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
         Write-Host ">>> The module dir exists at $ModulePath"
