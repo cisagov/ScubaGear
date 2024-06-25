@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory=$false)]
-    [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams')]
+    [ValidateSet('AAD','Defender','EXO','PowerPlatform','Sharepoint','Teams', '*')]
     [Alias('p')]
     [string[]]$Products = '*',
 
