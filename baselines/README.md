@@ -1,6 +1,6 @@
 The baselines have been moved into the ScubaGear PowerShell module for easier distribution. Individual baselines can be visited directly at the links below:
 
-- [Microsoft Entra ID](../PowerShell/ScubaGear/baselines/aad.md)
+- [Microsoft Entra ID](../PowerShell/ScubaGear/baselines/entraid.md)
 - [Defender](../PowerShell/ScubaGear/baselines/defender.md)
 - [Exchange Online](../PowerShell/ScubaGear/baselines/exo.md)
 - [Power BI](../PowerShell/ScubaGear/baselines/powerbi.md)
