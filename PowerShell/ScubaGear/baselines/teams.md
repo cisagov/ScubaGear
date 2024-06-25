@@ -34,7 +34,7 @@ the types of users are defined as follows:
     agency's Microsfot Entra as guest users. These users
     authenticate with their home organization/tenant and are granted
     access to the team by virtue of being listed as guest users on the
-    tenant's Microsfot Entra.
+    tenant's Microsoft Entra.
 
 4.  **Unmanaged users**: Users who are not members of any M365 tenant or
     organization (e.g., personal Microsoft accounts).
