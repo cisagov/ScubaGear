@@ -151,7 +151,7 @@ function Publish-ScubaGearModule {
 
         Write-Host "> The ScubaGear module will be published."
         # TODO Uncomment this to actually publish
-        # Publish-Module @Parameters
+        Publish-Module @Parameters
     }
     else {
         Write-Host "> The ScubaGear module was not succesfully signed."
