@@ -130,12 +130,14 @@ function Publish-ScubaGearModule {
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
+    # If the module is not signed, the SignScubaGearModule will through an error
     $SuccessfullySigned = SignScubaGearModule `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
         -ModulePath $ModuleBuildPath
 
     if ($SuccessfullySigned) {
+        Write-Host "> Successfully signed"
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -381,12 +383,16 @@ function SignScubaGearModule {
     Write-Host ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
     Write-Host ">> Test result is $TestResult"
+    If ($TestResult == CatalogValidationStatus.Valid)
+    {
+        Write-Host "HELLO"
+    }
     if ('Valid' -eq $TestResult) {
         Write-Host ">> Signing the module was successful."
         return True
     }
     else {
-        Write-Host ">> Signing the module was NOT successful."
+        Write-Error ">> Signing the module was NOT successful."
         return False
     }
 }
