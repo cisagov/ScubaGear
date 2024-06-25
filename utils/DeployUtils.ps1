@@ -383,7 +383,7 @@ function SignScubaGearModule {
     Write-Host ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
     Write-Host ">> Test result is $TestResult"
-    If ($TestResult == CatalogValidationStatus.Valid)
+    If ($TestResult -eq [CatalogValidationStatus]::Valid) # Test for enum, not string
     {
         Write-Host "HELLO"
     }
