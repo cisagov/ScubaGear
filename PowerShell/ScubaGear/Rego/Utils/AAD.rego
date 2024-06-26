@@ -232,10 +232,4 @@ DomainReportDetails(Status, Metadata) := PASS if {
         ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, DescriptionString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
-}# else := Description if {
-#    Status == false 
-#    Description := concat(" ", [
-#        "Not applicable because no managed domains were found; however, there are",
-#        FederatedDomainWarning(Metadata.FederatedDomains)
-#    ])
-#}
+} else := FAIL
