@@ -174,40 +174,16 @@ HasAcceptableMFA(Policy) := true if {
 
 DescriptionString := "domain(s) failed"
 
-#DomainReportDetails(Status, Metadata) := Description if {
-#    Status == true
-#    Description := PASS
-#}
-#
-#DomainReportDetails(Status, Metadata) := Description if {
-#    Status == false
-#    Metadata.UserPasswordsSetToExpire > 0
-#    Metadata.FederatedDomains == 0
-#
-#    Description := ReportFullDetailsArray(
-#        Metadata.UserPasswordsSetToExpire, 
-#        DescriptionString
-#    )
-#}
-#
-#DomainReportDetails(Status, Metadata) := Description if {
-#    Status == false
-#    Metadata.UserPasswordsSetToExpire == 0
-#    Metadata.FederatedDomains > 0
-#    Description := "" 
-#}
+FederatedDomainWarning(domains) := concat("<br/><br/>", [
+    ReportFullDetailsArray(domains, "federated domain(s) present"),
+    "Check with your identity provider on how to configure in a federated context."
+])
 
 # Case 1: Pass; no user passwords set to expire, no federated domains 
-# Case 2: Fail; user passwords set to expire, no federated domains 
-# Case 3: N/A; no user passwords set to expire, federated domains 
+# Case 2: Pass; no user passwords set to expire, federated domains 
+# Case 3: Fail; user passwords set to expire, no federated domains 
 # Case 4: Fail; user passwords set to expire, federated domains 
-
-FederatedDomainWarning(domains) := Message if {
-    Message := concat("<br/><br/>", [
-        ReportFullDetailsArray(domains, "federated domain(s) present"),
-        "Check with your identity provider on how to configure in a federated context."
-    ])
-}
+# Default: Fail
 
 DomainReportDetails(Status, Metadata) := PASS if {
     Status == true
