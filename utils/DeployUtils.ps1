@@ -1,5 +1,6 @@
 #Requires -Version 5.1
 
+
 function New-PrivateGallery {
     <#
     .Description
@@ -418,11 +419,13 @@ function CreateFileList {
             Creates a temp file with a list of filenames
     #>
     param([Parameter(Mandatory = $true)][array]$FileNames) 
+    if ($FileNames -eq $null) {
+        Write-Error "FileNames is null"
+    }
     Write-Host ">>> Creating file list..."
     Write-Host ">>> Found $($FileNames.Count) files to sign"
-    $FileList = New-TemporaryFile # File with a list of the filenames
+    $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
-    # $ContentOfFileList = $(Get-Content $FileList) # String
     return $FileList.FullName
 }
 

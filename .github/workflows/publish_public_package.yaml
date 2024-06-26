@@ -48,7 +48,6 @@ jobs:
         run: |
           dotnet --version
           # dotnet tool install --global AzureSignTool --version 4.0.1
-          echo "Installing latest version of AST, just for grins..."
           dotnet tool install --global AzureSignTool --version 5.0.0
       # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       - name: Login to Azure
