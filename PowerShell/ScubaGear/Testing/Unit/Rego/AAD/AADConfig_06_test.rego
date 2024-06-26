@@ -38,7 +38,7 @@ test_IsVerified_Correct if {
     TestResult("MS.AAD.6.1v1", Output, PASS, true) == true
 }
 
-test_AuthenticationType_Incorrect if {
+test_PasswordValidityPeriodInDays__ExcludeFederatedDomains_Incorrect if {
     Output := aad.tests with input as { 
         "domain_settings" : [
             {
@@ -53,15 +53,16 @@ test_AuthenticationType_Incorrect if {
             },
             {   
                 "Id" : "test2.url.com",
+                "PasswordValidityPeriodInDays": 0,
                 "IsVerified" : true,
-                "AuthenticationType": "Federated"
+                "AuthenticationType": "Managed"
             }
         ]
     }
 
-    ReportDetailString := concat(" ", [
-        "Not applicable because no managed domains were found; however, there are",
-        FederatedDomainWarning(["test.url.com", "test2.url.com"])
+    ReportDetailString := concat("", [
+        "1 domain(s) failed:<br/>test2.url.com<br/>",
+        FederatedDomainWarning(["test.url.com"])
     ])
     TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
 }

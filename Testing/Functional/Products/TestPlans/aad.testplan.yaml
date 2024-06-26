@@ -880,7 +880,7 @@ TestPlan:
                     AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.6.1v1 Non-Applicable case - If no managed domains are found but federated domains are present
+      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - If domains are invalid and federated domains are present
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -893,8 +893,9 @@ TestPlan:
                     IsVerified: false
                     AuthenticationType: "Federated"
                   - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 0
                     IsVerified: true
-                    AuthenticationType: "Federated"
+                    AuthenticationType: "Managed"
         Postconditions: []
         ExpectedResult: false
 

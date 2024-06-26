@@ -19,6 +19,7 @@ import data.utils.aad.HasAcceptableMFA
 import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
+import data.utils.aad.FederatedDomainWarning
 import data.utils.aad.INT_MAX
 
 
@@ -746,6 +747,27 @@ Metadata := {
     "FederatedDomains": FederatedDomains
 }
 
+# N/A policy if there are no managed domains but federated domains are present
+#test contains {
+#    "PolicyId": PolicyId,
+#    "Criticality": "Shall/Not-Implemented",
+#    "Commandlet": [ "Get-MgBetaDomain" ],
+#    "ActualValue": [],
+#    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+#    "RequirementMet": false
+#} if {
+#    PolicyId := "MS.AAD.6.1v1"
+#    count(UserPasswordsSetToExpire) == 0
+#    count(UserPasswordsSetToNotExpire) == 0
+#    Reason := concat("", [
+#        "Not applicable because no managed domains were found; however, there are ",
+#        FederatedDomainWarning(Metadata.FederatedDomains),
+#        ". ",
+#        "See %v for more info"
+#    ])
+#    print(Reason)
+#}
+
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
@@ -765,20 +787,6 @@ tests contains {
     print(Status)
     print(Metadata)
     print(DomainReportDetails(Status, Metadata))
-}
-
-# N/A policy if there are no managed domains but federated domains are present
-test contains {
-    "PolicyId": "MS.AAD.6.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [ "Get-MgBetaDomain" ],
-    "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
-    "ReportDetails": DomainReportDetails(Status, Metadata),
-    "RequirementMet": Status
-} if {
-    count(UserPasswordsSetToExpire) == 0
-    count(UserPasswordsSetToNotExpire) == 0
-    Status := false
 }
 #--
 

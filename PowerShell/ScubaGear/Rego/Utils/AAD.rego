@@ -205,7 +205,7 @@ DescriptionString := "domain(s) failed"
 FederatedDomainWarning(domains) := Message if {
     Message := concat("<br/><br/>", [
         ReportFullDetailsArray(domains, "federated domain(s) present"),
-        "Consult with your identity provider on how to configure in a federated context."
+        "Check with your identity provider on how to configure in a federated context."
     ])
 }
 
@@ -232,10 +232,10 @@ DomainReportDetails(Status, Metadata) := PASS if {
         ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, DescriptionString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
-} else := Description if {
-    Status == false 
-    Description := concat(" ", [
-        "Not applicable because no managed domains were found; however, there are",
-        FederatedDomainWarning(Metadata.FederatedDomains)
-    ])
-}
+}# else := Description if {
+#    Status == false 
+#    Description := concat(" ", [
+#        "Not applicable because no managed domains were found; however, there are",
+#        FederatedDomainWarning(Metadata.FederatedDomains)
+#    ])
+#}
