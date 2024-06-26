@@ -172,7 +172,7 @@ HasAcceptableMFA(Policy) := true if {
 # Report formatting functions for MS.AAD.6.1v1                             #
 ############################################################################
 
-DescriptionString := "domain(s) failed"
+FailureString := "domain(s) failed"
 
 FederatedDomainWarning(domains) := concat("<br/><br/>", [
     ReportFullDetailsArray(domains, "federated domain(s) present"),
@@ -191,21 +191,22 @@ DomainReportDetails(Status, Metadata) := PASS if {
 } else := Description if {
     Status == true
     count(Metadata.FederatedDomains) > 0
-    Description := concat("", [PASS, "; however, there are ", FederatedDomainWarning(Metadata.FederatedDomains)])
+    Description := concat("", [
+        PASS, 
+        "; however, there are ", 
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
 } else := Description if {
     Status == false
     count(Metadata.UserPasswordsSetToExpire) > 0
     count(Metadata.FederatedDomains) == 0
-    Description := ReportFullDetailsArray(
-        Metadata.UserPasswordsSetToExpire, 
-        DescriptionString
-    )
+    Description := ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString)
 } else := Description if {
     Status == false
     count(Metadata.UserPasswordsSetToExpire) > 0
     count(Metadata.FederatedDomains) > 0
     Description := concat("<br/>", [
-        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, DescriptionString),
+        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
