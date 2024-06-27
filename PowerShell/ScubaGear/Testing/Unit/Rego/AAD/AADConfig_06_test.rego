@@ -76,7 +76,7 @@ test_PasswordValidityPeriodInDays__ExcludeFederatedDomains_Incorrect if {
 
     Output := aad.tests with input.domain_settings as Settings
 
-    ReportDetailString := concat("", [
+    ReportDetailString := concat("<br/>", [
         "1 domain(s) failed:<br/>test.url.com<br/>",
         FederatedDomainWarning(["test2.url.com", "test3.url.com"])
     ])

@@ -205,7 +205,7 @@ DomainReportDetails(Status, Metadata) := PASS if {
     Status == false
     count(Metadata.UserPasswordsSetToExpire) > 0
     count(Metadata.FederatedDomains) > 0
-    Description := concat("<br/>", [
+    Description := concat("<br/><br/>", [
         ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
