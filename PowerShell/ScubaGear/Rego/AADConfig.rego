@@ -6,6 +6,7 @@ import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
+import data.utils.key.Count
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
@@ -210,7 +211,10 @@ tests contains {
 #--
 
 # Save all policy names if PhishingResistantMFAPolicies exist
-AllMFA := AlternativeMFA | PhishingResistantMFAPolicies
+AlternativeMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    Count(PhishingResistantMFAPolicies) > 0
+}
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
@@ -231,12 +235,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AllMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
+    "ActualValue": AlternativeMFA,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(AllMFA) > 0
+    Status := count(AlternativeMFA) > 0
 }
 #--
 
@@ -741,11 +745,6 @@ FederatedDomains contains Domain.Id if {
     Domain.AuthenticationType == "Federated"
 }
 
-Metadata := {
-    "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
-    "FederatedDomains": FederatedDomains
-}
-
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
@@ -754,17 +753,18 @@ tests contains {
     "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
-    # For the rule to pass, the user passwords for all domains shall not expire
+    # For the rule to pass:
+    # User passwords for all domains shall not expire
     # Then check if at least 1 or more domains with user passwords set to expire exist
     Conditions := [
         count(UserPasswordsSetToExpire) == 0, 
         count(UserPasswordsSetToNotExpire) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
-    
-    print(Status)
-    print(Metadata)
-    print(DomainReportDetails(Status, Metadata))
+    Metadata := {
+        "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
+        "FederatedDomains": FederatedDomains
+    }
 }
 #--
 
