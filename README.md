@@ -1,116 +1,143 @@
-![CISA Logo](/docs/images/cisa.png)
+class ScubaConfig {
+    <#
+    .SYNOPSIS
+      This class stores Scuba config data loaded from a file.
+    .DESCRIPTION
+      This class is designed to function as a singleton. The singleton instance
+      is cached on the ScubaConfig type itself. In the context of tests, it may be
+      important to call `.ResetInstance` before and after tests as needed to
+      ensure any preexisting configs are not inadvertantly used for the test,
+      or left in place after the test is finished. The singleton will persist
+      for the life of the powershell session unless the ScubaConfig module is
+      removed. Note that `.LoadConfig` internally calls `.ResetInstance` to avoid
+      issues.
+    .EXAMPLE
+      $Config = [ScubaConfig]::GetInstance()
+      [ScubaConfig]::LoadConfig($SomePath)
+    #>
+    hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
+    hidden static [Boolean]$_IsLoaded = $false
+    hidden static [hashtable]$ScubaDefaults = @{
+        DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+        DefaultProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
+        AllProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+        DefaultM365Environment = "commercial"
+        DefaultLogIn = $true
+        DefaultOutPath = $PWD | Select-Object -ExpandProperty Path
+        DefaultOutFolderName = "M365BaselineConformance"
+        DefaultOutProviderFileName = "ProviderSettingsExport"
+        DefaultOutRegoFileName = "TestResults"
+        DefaultOutReportName = "BaselineReports"
+        DefaultOutJsonFileName = "ScubaResults"
+        DefaultPrivilegedRoles = @(
+            "Global Administrator",
+            "Privileged Role Administrator",
+            "User Administrator",
+            "SharePoint Administrator",
+            "Exchange Administrator",
+            "Hybrid Identity Administrator",
+            "Application Administrator",
+            "Cloud Application Administrator")
+        DefaultOPAVersion = '0.66.0'
+    }
 
-[![GitHub Release][github-release-img]][release]
-[![PSGallery Release][psgallery-release-img]][psgallery]
-[![GitHub CICD Workflow][github-cicd-workflow-img]][github-cicd-workflow]
-[![GitHub License][github-license-img]][license]
-[![GitHub Downloads][github-downloads-img]][release]
-[![PSGallery Downloads][psgallery-downloads-img]][psgallery]
-[![GitHub Issues][github-issues-img]][github-issues]
+    static [object]ScubaDefault ([string]$Name){
+        return [ScubaConfig]::ScubaDefaults[$Name]
+    }
 
-ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Security Configuration Baseline [documents](/baselines/README.md).
+    [Boolean]LoadConfig([System.IO.FileInfo]$Path){
+        if (-Not (Test-Path -PathType Leaf $Path)){
+            throw [System.IO.FileNotFoundException]"Failed to load: $Path"
+        }
+        [ScubaConfig]::ResetInstance()
+        $Content = Get-Content -Raw -Path $Path
+        $this.Configuration = $Content | ConvertFrom-Yaml
 
-> **Note**: This documentation can be read using [GitHub Pages](https://cisagov.github.io/ScubaGear).
+        $this.SetParameterDefaults()
+        [ScubaConfig]::_IsLoaded = $true
 
-## Target Audience
+        return [ScubaConfig]::_IsLoaded
+    }
 
-ScubaGear is for M365 administrators who want to assess their tenant environments against CISA Secure Configuration Baselines.
+    hidden [void]ClearConfiguration(){
+        $this.Configuration = $null
+    }
 
-## Overview
+    hidden [Guid]$Uuid = [Guid]::NewGuid()
+    hidden [hashtable]$Configuration
 
-ScubaGear uses a three-step process:
+    hidden [void]SetParameterDefaults(){
+        Write-Debug "Setting ScubaConfig default values."
+        if (-Not $this.Configuration.ProductNames){
+            $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
+        }
+        else{
+            # Transform ProductNames into list of all products if it contains wildcard
+            if ($this.Configuration.ProductNames.Contains('*')){
+                $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames')
+                Write-Debug "Setting ProductNames to all products because of wildcard"
+            }
+            else{
+                Write-Debug "ProductNames provided - using as is."
+                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
+            }
+        }
 
-- **Step One** - PowerShell code queries M365 APIs for various configuration settings.
-- **Step Two** - It then calls [Open Policy Agent](https://www.openpolicyagent.org) (OPA) to compare these settings against Rego security policies written per the baseline documents.
-- **Step Three** - Finally, it reports the results of the comparison as HTML, JSON, and CSV.
+        if (-Not $this.Configuration.M365Environment){
+            $this.Configuration.M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment')
+        }
 
-<img src="docs/images/scuba-process.png" />
+        if (-Not $this.Configuration.OPAPath){
+            $this.Configuration.OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
+        }
 
-## Getting Started
+        if (-Not $this.Configuration.LogIn){
+            $this.Configuration.LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn')
+        }
 
-To install ScubaGear from [PSGallery](https://www.powershellgallery.com/packages/ScubaGear), open a PowerShell 5 terminal on a Windows computer and install the module:
+        if (-Not $this.Configuration.DisconnectOnExit){
+            $this.Configuration.DisconnectOnExit = $false
+        }
 
-```powershell
-# Install ScubaGear
-Install-Module -Name ScubaGear
-```
+        if (-Not $this.Configuration.OutPath){
+            $this.Configuration.OutPath = [ScubaConfig]::ScubaDefault('DefaultOutPath')
+        }
 
-To install its dependencies:
+        if (-Not $this.Configuration.OutFolderName){
+            $this.Configuration.OutFolderName = [ScubaConfig]::ScubaDefault('DefaultOutFolderName')
+        }
 
-```powershell
-# Install the minimum required dependencies
-Initialize-SCuBA 
-```
+        if (-Not $this.Configuration.OutProviderFileName){
+            $this.Configuration.OutProviderFileName = [ScubaConfig]::ScubaDefault('DefaultOutProviderFileName')
+        }
 
-To verify that it is installed:
+        if (-Not $this.Configuration.OutRegoFileName){
+            $this.Configuration.OutRegoFileName = [ScubaConfig]::ScubaDefault('DefaultOutRegoFileName')
+        }
 
-```powershell
-# Check the version
-Invoke-SCuBA -Version
-```
+        if (-Not $this.Configuration.OutReportName){
+            $this.Configuration.OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName')
+        }
 
-To run ScubaGear:
+        if (-Not $this.Configuration.OutJsonFileName){
+            $this.Configuration.OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName')
+        }
 
-```powershell
-# Assess all products
-Invoke-SCuBA -ProductNames *
-```
+        return
+    }
 
-> **Note**:  Successfully running ScubaGear requires certain prerequisites and configuration settings.  To learn more, read through the sections below.
+    hidden ScubaConfig(){
+    }
 
-## Table of Contents
+    static [void]ResetInstance(){
+        [ScubaConfig]::_Instance.ClearConfiguration()
+        [ScubaConfig]::_IsLoaded = $false
 
-The following sections should be read in order.
+        return
+    }
 
-### Installation
+    static [ScubaConfig]GetInstance(){
+        return [ScubaConfig]::_Instance
+    }
+}
 
-- [Install from PSGallery](docs/installation/psgallery.md)
-- [Download from GitHub](docs/installation/github.md)
-- [Uninstall](docs/installation/uninstall.md)
-
-### Prerequisites
-
-- [Dependencies](docs/prerequisites/dependencies.md)
-- [Required Permissions](docs/prerequisites/permissions.md)
-  - [Interactive Permissions](docs/prerequisites/interactive.md)
-  - [Non-Interactive Permissions](docs/prerequisites/noninteractive.md)
-
-### Execution
-
-- [Execution](docs/execution/execution.md)
-- [Reports](docs/execution/reports.md)
-
-### Configuration
-
-- [Parameters](docs/configuration/parameters.md)
-- [Configuration File](docs/configuration/configuration.md)
-
-### Troubleshooting
-
-- [Multiple Tenants](docs/troubleshooting/tenants.md)
-- [Defender](docs/troubleshooting/defender.md)
-- [Exchange Online](docs/troubleshooting/exchange.md)
-- [Power Platform](docs/troubleshooting/power.md)
-- [Microsoft Graph](docs/troubleshooting/graph.md)
-- [Proxy](docs/troubleshooting/proxy.md)
-
-### Misc
-
-- [Assumptions](docs/misc/assumptions.md)
-
-## Project License
-
-Unless otherwise noted, this project is distributed under the Creative Commons Zero license. With developer approval, contributions may be submitted with an alternate compatible license. If accepted, those contributions will be listed herein with the appropriate license.
-
-[release]: https://github.com/cisagov/ScubaGear/releases
-[license]: https://github.com/cisagov/ScubaGear/blob/main/LICENSE
-[psgallery]: https://www.powershellgallery.com/packages/ScubaGear
-[github-cicd-workflow]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml
-[github-issues]: https://github.com/cisagov/ScubaGear/issues
-[github-license-img]: https://img.shields.io/github/license/cisagov/ScubaGear
-[github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=GitHub&logo=github
-[psgallery-release-img]: https://img.shields.io/powershellgallery/v/ScubaGear?logo=powershell&label=PSGallery
-[github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.yaml?logo=github
-[github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
-[psgallery-downloads-img]: https://img.shields.io/powershellgallery/dt/ScubaGear?logo=powershell
-[github-issues-img]: https://img.shields.io/github/issues/cisagov/ScubaGear
