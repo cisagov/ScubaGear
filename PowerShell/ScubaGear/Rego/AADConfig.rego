@@ -444,15 +444,16 @@ tests contains {
 ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    CAPolicy.State == "enabled"
+    PolicyConditionsMatch(CAPolicy) == true
 
-    Conditions := [
-        "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
-        "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
-    ]
-    count(FilterArray(Conditions, true)) > 0
+    "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
+    "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
+    count(CAPolicy.GrantControls.BuiltInControls) == 2
+    CAPolicy.GrantControls.Operator == "OR"
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
