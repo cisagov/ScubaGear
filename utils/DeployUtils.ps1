@@ -217,12 +217,12 @@ function ConfigureScubaGearModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Debug ">>> Configuring ScubaGear module..."
+    Write-Warning ">>> Configuring ScubaGear module..."
 
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Debug ">>> The module dir exists at $ModulePath"
+        Write-Warning ">>> The module dir exists at $ModulePath"
     }
     else {
         Write-Error ">>> Failed to find the module directory at $ModulePat."
@@ -232,7 +232,7 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Debug ">>> The manifest file exists at $ManifestPath"
+        Write-Warning ">>> The manifest file exists at $ManifestPath"
     }
     else {
         Write-Error ">>> Failed to find the manifest file at $ManifestPath"
@@ -246,8 +246,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Debug ">>> The prerelease tag is $PrereleaseTag"
-    Write-Debug ">>> The module version is $ModuleVersion"
+    Write-Warning ">>> The prerelease tag is $PrereleaseTag"
+    Write-Warning ">>> The module version is $ModuleVersion"
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -335,7 +335,7 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Debug ">> Signing ScubaGear module..."
+    Write-Warning ">> Signing ScubaGear module..."
 
     # Sign scripts, manifest, and modules
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
@@ -346,8 +346,8 @@ function SignScubaGearModule {
         Write-Error "Failed to find any .ps1, .psm1, or .psd files."
     }
     $FileList = CreateFileList $ArrayOfFilePaths # String
-    Write-Debug ">> The file list is $FileList"
-    Write-Debug ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Warning ">> The file list is $FileList"
+    Write-Warning ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -365,11 +365,11 @@ function SignScubaGearModule {
     # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes
     # for files and folders in the specified paths.
     $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0
-    Write-Debug ">> The catalog path is $CatalogFilePath"
+    Write-Warning ">> The catalog path is $CatalogFilePath"
     $CatalogList = New-TemporaryFile
     $CatalogFilePath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
-    Write-Debug ">> Calling CallAzureSignTool function to sign catalog list..."
+    Write-Warning ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -378,11 +378,11 @@ function SignScubaGearModule {
 
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches
     # the hashes of the actual files in order to validate their authenticity.
-    Write-Debug ">> Testing the catalog"
+    Write-Warning ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
-    Write-Debug ">> Test result is $TestResult"
+    Write-Warning ">> Test result is $TestResult"
     if ('Valid' -eq $TestResult) {
-        Write-Debug ">> Signing the module was successful."
+        Write-Warning ">> Signing the module was successful."
         return $true
     }
     else {
@@ -401,7 +401,7 @@ function CreateArrayOfFilePaths {
         [array]
         $Extensions = @()
     )
-    Write-Debug ">>> Create array of file paths..."
+    Write-Warning ">>> Create array of file paths..."
     $ArrayOfFilePaths = @()
     if ($Extensions.Count -gt 0) {
         $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
@@ -422,8 +422,8 @@ function CreateFileList {
     if ($FileNames -eq $null) {
         Write-Error "FileNames is null"
     }
-    Write-Debug ">>> Creating file list..."
-    Write-Debug ">>> Found $($FileNames.Count) files to sign"
+    Write-Warning ">>> Creating file list..."
+    Write-Warning ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     return $FileList.FullName
@@ -453,7 +453,7 @@ function CallAzureSignTool {
         $FileList
     )
 
-    Write-Debug ">>> Running the AzureSignTool method..."
+    Write-Warning ">>> Running the AzureSignTool method..."
 
     $SignArguments = @(
         'sign',
@@ -466,23 +466,23 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Debug ">>> The files to sign are in the temp file $FileList"
+    Write-Warning ">>> The files to sign are in the temp file $FileList"
     # Get-Command returns a System.Management.Automation.ApplicationInfo
     $NumberOfCommands = (Get-Command AzureSignTool) # Should return 1
     if ($NumberOfCommands -eq 0) {
         Write-Error "Failed to find the AzureSignTool on this system."
     }
     $ToolPath = (Get-Command AzureSignTool).Path
-    Write-Debug ">>> The path to AzureSignTool is $ToolPath"
+    Write-Warning ">>> The path to AzureSignTool is $ToolPath"
     $Results = & $ToolPath $SignArguments
     # If there are no failures, this string will be the last line in the results.
-    # Warning: This is a brittle test, because it depends upon a specific string. 
+    # Warning: This is a brittle test, because it depends upon a specific string.
     # A unit test should be used to detect changes.
     $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
     # Write-Debug ">>> Results"
     # Write-Debug $Results
     if ($FoundNoFailures -eq $true) {
-        Write-Debug ">>> Found no failures."
+        Write-Warning ">>> Found no failures."
     }
     else {
         Write-Error ">>> Failed to sign filelist without errors."

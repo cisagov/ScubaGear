@@ -1,5 +1,9 @@
 function ConfigureScubaGearModuleForTesting
 {
+  <#
+    .DESCRIPTION
+    Unit Testing for DeployUtils
+  #>
   Write-Output 'Configuring ScubaGear module for testing...'
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
   Write-Output 'The repo root path is'
@@ -12,6 +16,10 @@ function ConfigureScubaGearModuleForTesting
 
 function CreateArrayOfFilePathsForTesting
 {
+  <#
+    .DESCRIPTION
+    Unit Testing for DeployUtils
+  #>
   Write-Output 'Creating array of file paths for testing...'
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
   Write-Output 'The repo root path is'
@@ -24,6 +32,10 @@ function CreateArrayOfFilePathsForTesting
 
 function CreateFileListForTesting
 {
+  <#
+    .DESCRIPTION
+    Unit Testing for DeployUtils
+  #>
   Write-Output 'Creating file list for testing...'
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
   Write-Output 'The repo root path is'
