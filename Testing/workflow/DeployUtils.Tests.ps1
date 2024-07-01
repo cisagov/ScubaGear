@@ -1,4 +1,4 @@
-# The purpose of this test is to verify that the DeployUtils can successfully publish ScubaGear.
+# The purpose of this test is to verify that some of the DeployUtils functions, used to publish ScubaGear, are working correctly.
 
 # Suppress PSSA warnings here at the root of the test file.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]

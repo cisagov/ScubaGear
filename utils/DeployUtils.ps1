@@ -177,7 +177,7 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Output ">> Building ScubaGear module..."
+    Write-Host ">> Building ScubaGear module..."
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
