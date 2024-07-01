@@ -277,7 +277,8 @@ function ConfigureScubaGearModule {
         Write-Warning $_.ScriptStackTrace
         Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
-        Write-Error ">>> Failed to update the module manifest."
+        # Write-Error ">>> Failed to update the module manifest."
+        return $False
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
