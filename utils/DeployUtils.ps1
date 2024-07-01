@@ -127,7 +127,7 @@ function Publish-ScubaGearModule {
         $NuGetApiKey
     )
 
-    Write-Host "> Publishing ScubaGear module..."
+    Write-Debug "> Publishing ScubaGear module..."
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
@@ -138,7 +138,7 @@ function Publish-ScubaGearModule {
         -ModulePath $ModuleBuildPath
 
     if ($SuccessfullySigned) {
-        Write-Host "> Successfully signed"
+        Write-Debug "> Successfully signed"
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -147,7 +147,7 @@ function Publish-ScubaGearModule {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
-        Write-Host "> The ScubaGear module will be published."
+        Write-Debug "> The ScubaGear module will be published."
         # The -Force parameter is only required if the new version is less than or equal to
         # the current version, which is typically only true when testing.
         # Publish-Module @Parameters -Force
@@ -177,7 +177,7 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Host ">> Building ScubaGear module..."
+    Write-Debug ">> Building ScubaGear module..."
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -200,8 +200,8 @@ function Build-ScubaModule {
 
 function ConfigureScubaGearModule {
     <#
-    .NOTES
-    Internal helper function
+        .NOTES
+            This function updates the manifest file.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
@@ -217,12 +217,12 @@ function ConfigureScubaGearModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Host ">>> Configuring ScubaGear module..."
+    Write-Debug ">>> Configuring ScubaGear module..."
 
     #TODO: Add any module configuration needed (e.g., adjust Module Version)
     # Verify that the module path folder exists
     if (Test-Path -Path $ModulePath) {
-        Write-Host ">>> The module dir exists at $ModulePath"
+        Write-Debug ">>> The module dir exists at $ModulePath"
     }
     else {
         Write-Error ">>> Failed to find the module directory at $ModulePat."
@@ -232,7 +232,7 @@ function ConfigureScubaGearModule {
 
     # Verify that the manifest file exists
     if (Test-Path -Path $ManifestPath) {
-        Write-Host ">>> The manifest file exists at $ManifestPath"
+        Write-Debug ">>> The manifest file exists at $ManifestPath"
     }
     else {
         Write-Error ">>> Failed to find the manifest file at $ManifestPath"
@@ -246,8 +246,8 @@ function ConfigureScubaGearModule {
         $ModuleVersion = "$CurrentModuleVersion.$TimeStamp"
     }
 
-    Write-Host ">>> The prerelease tag is $PrereleaseTag"
-    Write-Host ">>> The module version is $ModuleVersion"
+    Write-Debug ">>> The prerelease tag is $PrereleaseTag"
+    Write-Debug ">>> The module version is $ModuleVersion"
 
     $ProjectUri = "https://github.com/cisagov/ScubaGear"
     $LicenseUri = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE"
@@ -272,11 +272,11 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        # Write-Warning ">>> Error: Cannot update module manifest:"
-        # Write-Warning ">>> Stacktrace:"
-        # Write-Warning $_.ScriptStackTrace
-        # Write-Warning ">>> Exception:"
-        # Write-Warning $_.Exception
+        Write-Warning ">>> Error: Cannot update module manifest:"
+        Write-Warning ">>> Stacktrace:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning ">>> Exception:"
+        Write-Warning $_.Exception
         Write-Error ">>> Failed to update the module manifest."
     }
     try {
@@ -286,11 +286,11 @@ function ConfigureScubaGearModule {
         $ErrorActionPreference = $CurrentErrorActionPreference
     }
     catch {
-        # Write-Warning ">>> Warning: Cannot test module manifest:"
-        # Write-Warning ">>> Stacktrace:"
-        # Write-Warning $_.ScriptStackTrace
-        # Write-Warning ">>> Exception:"
-        # Write-Warning $_.Exception
+        Write-Warning ">>> Warning: Cannot test module manifest:"
+        Write-Warning ">>> Stacktrace:"
+        Write-Warning $_.ScriptStackTrace
+        Write-Warning ">>> Exception:"
+        Write-Warning $_.Exception
         Write-Error ">>> Failed to test module manifest."
     }
 
@@ -335,7 +335,7 @@ function SignScubaGearModule {
         $TimeStampServer = 'http://timestamp.digicert.com'
     )
 
-    Write-Host ">> Signing ScubaGear module..."
+    Write-Debug ">> Signing ScubaGear module..."
 
     # Sign scripts, manifest, and modules
     $ArrayOfFilePaths = CreateArrayOfFilePaths `
@@ -346,8 +346,8 @@ function SignScubaGearModule {
         Write-Error "Failed to find any .ps1, .psm1, or .psd files."
     }
     $FileList = CreateFileList $ArrayOfFilePaths # String
-    Write-Host ">> The file list is $FileList"
-    Write-Host ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Debug ">> The file list is $FileList"
+    Write-Debug ">> Calling CallAzureSignTool function to sign scripts, manifest, and modules..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -365,11 +365,11 @@ function SignScubaGearModule {
     # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
     # for files and folders in the specified paths.
     $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0
-    Write-Host ">> The catalog path is $CatalogFilePath"
+    Write-Debug ">> The catalog path is $CatalogFilePath"
     $CatalogList = New-TemporaryFile
     $CatalogFilePath.FullName | Out-File -FilePath $CatalogList -Encoding utf8 -Force
 
-    Write-Host ">> Calling CallAzureSignTool function to sign catalog list..."
+    Write-Debug ">> Calling CallAzureSignTool function to sign catalog list..."
     CallAzureSignTool `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
@@ -378,11 +378,11 @@ function SignScubaGearModule {
 
     # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
     # the hashes of the actual files in order to validate their authenticity.
-    Write-Host ">> Testing the catalog"
+    Write-Debug ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
-    Write-Host ">> Test result is $TestResult"
+    Write-Debug ">> Test result is $TestResult"
     if ('Valid' -eq $TestResult) {
-        Write-Host ">> Signing the module was successful."
+        Write-Debug ">> Signing the module was successful."
         return $true
     }
     else {
@@ -401,14 +401,14 @@ function CreateArrayOfFilePaths {
         [array]
         $Extensions = @()
     )
-    Write-Host ">>> Create array of file paths..."
+    Write-Debug ">>> Create array of file paths..."
     $ArrayOfFilePaths = @()
     if ($Extensions.Count -gt 0) {
         $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
         $ArrayOfFilePaths += $FilePath
     }
     # ForEach ($FilePath in $ArrayOfFilePaths) {
-    #     Write-Host ">>> File path is $FilePath"
+    #     Write-Debug ">>> File path is $FilePath"
     # }
     return $ArrayOfFilePaths
 }
@@ -422,8 +422,8 @@ function CreateFileList {
     if ($FileNames -eq $null) {
         Write-Error "FileNames is null"
     }
-    Write-Host ">>> Creating file list..."
-    Write-Host ">>> Found $($FileNames.Count) files to sign"
+    Write-Debug ">>> Creating file list..."
+    Write-Debug ">>> Found $($FileNames.Count) files to sign"
     $FileList = New-TemporaryFile
     $FileNames.FullName | Out-File -FilePath $($FileList.FullName) -Encoding utf8 -Force
     return $FileList.FullName
@@ -453,7 +453,7 @@ function CallAzureSignTool {
         $FileList
     )
 
-    Write-Host ">>> Running the AzureSignTool method..."
+    Write-Debug ">>> Running the AzureSignTool method..."
 
     $SignArguments = @(
         'sign',
@@ -466,23 +466,23 @@ function CallAzureSignTool {
         '-ifl', $FileList
     )
 
-    Write-Host ">>> The files to sign are in the temp file $FileList"
+    Write-Debug ">>> The files to sign are in the temp file $FileList"
     # Get-Command returns a System.Management.Automation.ApplicationInfo
     $NumberOfCommands = (Get-Command AzureSignTool) # Should return 1
     if ($NumberOfCommands -eq 0) {
         Write-Error "Failed to find the AzureSignTool on this system."
     }
     $ToolPath = (Get-Command AzureSignTool).Path
-    Write-Host ">>> The path to AzureSignTool is $ToolPath"
+    Write-Debug ">>> The path to AzureSignTool is $ToolPath"
     $Results = & $ToolPath $SignArguments
     # If there are no failures, this string will be the last line in the results.
     # Warning: This is a brittle test, because it depends upon a specific string.  
     # A unit test should be used to detect changes.
     $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
-    # Write-Host ">>> Results"
-    # Write-Host $Results
+    # Write-Debug ">>> Results"
+    # Write-Debug $Results
     if ($FoundNoFailures -eq $true) {
-        Write-Host ">>> Found no failures."
+        Write-Debug ">>> Found no failures."
     }
     else {
         Write-Error ">>> Failed to sign filelist without errors."
