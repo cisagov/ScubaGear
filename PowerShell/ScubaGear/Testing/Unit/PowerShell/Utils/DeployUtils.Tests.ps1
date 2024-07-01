@@ -109,7 +109,7 @@ Context "Unit Test for ConfigureScubaGearModule" {
             $ManifestPath = Join-Path -Path $env:TEMP -ChildPath 'ScubaGear\ScubaGear.psd1' -Resolve
             # 99.1 is an intentionally invalid number
             Get-Content "$ModulePath\ScubaGear.psd1" | ForEach-Object { $_ -replace '5.1', '99.1' } | Set-Content $ManifestPath
-            Mock -CommandName Write-Error {}
+            # Mock -CommandName Write-Error {}
         }
         It 'Validate ConfigureScubaGearModule fails with bad Manifest' {
             ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" | Should -BeFalse
