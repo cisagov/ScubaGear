@@ -446,16 +446,10 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
 
     PolicyConditionsMatch(CAPolicy) == true
 
-    Conditions := [
-        "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
-        "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
-        count(CAPolicy.GrantControls.BuiltInControls) == 2,
-        CAPolicy.GrantControls.Operator == "OR",
-    ]
-
-    
-    count(FilterArray(Conditions, true)) == 4
-    
+    "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
+    "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
+    count(CAPolicy.GrantControls.BuiltInControls) == 2
+    CAPolicy.GrantControls.Operator == "OR"
 
     # Only match policies with user and group exclusions if all exempted
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
