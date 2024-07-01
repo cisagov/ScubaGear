@@ -59,7 +59,9 @@ tests contains {
 # records does not exist, save domain name in DomainsWithoutSpf array.
 DomainsWithoutSpf contains DNSResponse.domain if {
     some DNSResponse in input.spf_records
-    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 ")}
+    #SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 ")}
+    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "-all")} | 
+        {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "redirect")}
     count(SpfRecords) == 0
 }
 

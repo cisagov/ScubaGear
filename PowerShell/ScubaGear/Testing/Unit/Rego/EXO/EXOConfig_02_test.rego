@@ -15,7 +15,7 @@ test_Rdata_Correct_V1 if {
         "spf_records": [
             {
                 "rdata": [
-                    "v=spf1 "
+                    "v=spf1 -all"
                 ],
                 "domain": "Test name"
             }
@@ -31,7 +31,7 @@ test_Rdata_Correct_V2 if {
         "spf_records": [
             {
                 "rdata": [
-                    "v=spf1 something"
+                    "v=spf1 redirect"
                 ],
                 "domain": "Test name"
             }
@@ -80,7 +80,7 @@ test_Rdata_Incorrect_V3 if {
         "spf_records": [
             {
                 "rdata": [
-                    "v=spf1 "
+                    "v=spf1 -all"
                 ],
                 "domain": "good.com"
             },
@@ -112,7 +112,7 @@ test_Rdata_Multiple_Correct_V1 if {
         "spf_records": [
             {
                 "rdata": [
-                    "v=spf1 ",
+                    "v=spf1 -all",
                     "extra stuff that shouldn't matter"
                 ],
                 "domain": "good.com"
@@ -129,7 +129,7 @@ test_Rdata_Multiple_Correct_V2 if {
             {
                 "rdata": [
                     "extra stuff that shouldn't matter",
-                    "v=spf1 "
+                    "v=spf1 -all"
                 ],
                 "domain": "good.com"
             }
