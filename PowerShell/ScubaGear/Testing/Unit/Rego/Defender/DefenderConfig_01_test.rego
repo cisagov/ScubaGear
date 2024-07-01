@@ -11,125 +11,71 @@ import rego.v1
 # Policy MS.DEFENDER.1.1v1
 #--
 test_Enabled_Correct_V1 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "State": "Enabled"
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "State": "Enabled"
-            }
-        ],
-        "atp_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "State": "Enabled"
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "State": "Enabled"
-            }
-        ],
-        "defender_license": true
-    }
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicyRules
+                            with input.atp_policy_rules as AtpPolicyRules
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Correct_V2 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "State": "Enabled"
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "State": "Enabled"
-            }
-        ],
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicyRules
+                            with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Correct_V3 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [],
-        "atp_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "State": "Enabled"
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "State": "Enabled"
-            }
-        ],
-        "defender_license": true
-    }
+    Output := defender.tests with input.protection_policy_rules as []
+                            with input.atp_policy_rules as AtpPolicyRules
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Incorrect_V1 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [],
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    Output := defender.tests with input.protection_policy_rules as []
+                            with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
     TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V2 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Standard Preset Security Policy",
-            "State": "Disabled"
-        }],
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "add", "path": "0/State", "value": "Disabled"},
+                                {"op": "remove", "path": "1"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
     TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V3 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Standard Preset Security Policy",
-            "State": "Enabled"
-        }],
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "1"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     ReportDetailString := "Strict preset policy is disabled"
     TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V4 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "State": "Disabled"
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "State": "Disabled"
-            }
-        ],
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "add", "path": "0/State", "value": "Disabled"},
+                                {"op": "add", "path": "1/State", "value": "Disabled"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     ReportDetailString := "Standard and Strict preset policies are both disabled"
     TestResult("MS.DEFENDER.1.1v1", Output, ReportDetailString, false) == true
@@ -141,15 +87,11 @@ test_Enabled_Incorrect_V4 if {
 # Policy MS.DEFENDER.1.2v1
 #--
 test_AllEOP_Correct_V1 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Standard Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "1"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
