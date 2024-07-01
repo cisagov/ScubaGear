@@ -99,19 +99,33 @@ DirectorySettings := {
 
 DomainSettings := [
     {
-        "Id" : "test.url.com",
-        "PasswordValidityPeriodInDays" : INT_MAX,
-        "IsVerified" : true
+        "Id": "test.url.com",
+        "PasswordValidityPeriodInDays": INT_MAX,
+        "IsVerified": true,
+        "AuthenticationType": "Managed"
     },
     {
-        "Id" : "test1.url.com",
-        "PasswordValidityPeriodInDays" : INT_MAX,
-        "IsVerified" : true
+        "Id": "test1.url.com",
+        "PasswordValidityPeriodInDays": INT_MAX,
+        "IsVerified": true,
+        "AuthenticationType": "Managed"
     },
     {
-        "Id" : "test2.url.com",
-        "PasswordValidityPeriodInDays" : INT_MAX,
-        "IsVerified" : true
+        "Id": "test2.url.com",
+        "PasswordValidityPeriodInDays": INT_MAX,
+        "IsVerified": true,
+        "AuthenticationType": "Managed"
+    },
+    {
+        "Id": "test3.url.com",
+        "PasswordValidityPeriodInDays": INT_MAX,
+        "IsVerified": true,
+        "AuthenticationType": "Managed"
+    },
+    {
+        "Id": "test4.url.com",
+        "IsVerified": true,
+        "AuthenticationType": "Federated"
     }
 ]
 
