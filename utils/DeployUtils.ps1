@@ -127,7 +127,7 @@ function Publish-ScubaGearModule {
         $NuGetApiKey
     )
 
-    Write-Debug "> Publishing ScubaGear module..."
+    Write-Output "> Publishing ScubaGear module..."
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
@@ -138,7 +138,7 @@ function Publish-ScubaGearModule {
         -ModulePath $ModuleBuildPath
 
     if ($SuccessfullySigned) {
-        Write-Debug "> Successfully signed"
+        Write-Output "> Successfully signed"
         $Parameters = @{
             Path       = $ModuleBuildPath
             Repository = $GalleryName
@@ -147,7 +147,7 @@ function Publish-ScubaGearModule {
             $Parameters.Add('NuGetApiKey', $NuGetApiKey)
         }
 
-        Write-Debug "> The ScubaGear module will be published."
+        Write-Output "> The ScubaGear module will be published."
         # The -Force parameter is only required if the new version is less than or equal to
         # the current version, which is typically only true when testing.
         # Publish-Module @Parameters -Force
