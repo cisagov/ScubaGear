@@ -177,7 +177,7 @@ function Build-ScubaModule {
         [string]
         $PrereleaseTag = ""
     )
-    Write-Debug ">> Building ScubaGear module..."
+    Write-Output ">> Building ScubaGear module..."
 
     $Leaf = Split-Path -Path $ModulePath -Leaf
     $ModuleBuildPath = Join-Path -Path $env:TEMP -ChildPath $Leaf
@@ -314,7 +314,7 @@ function SignScubaGearModule {
             Time server to use to timestamp the artifacts
         .NOTES
             There appears to be limited or at least difficult to find documentation on how to properly sign a PowerShell module to be published to PSGallery. This page shows general guidance:
-            https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x 
+            https://learn.microsoft.com/en-us/powershell/gallery/concepts/publishing-guidelines?view=powershellget-3.x
             There is anecdotal evidence to sign all PowerShell artifacts (ps1, psm1, and pdsd1) in additional to a signed catalog. For example, Microsoft.PowerApps.PowerShell (v1.0.34) and see both *.psd1 and *.psm1 files are signed and a catalog provided. There are a number of non-authoritive references such as below showing all ps1, psm1, and psd1 being signed first then cataloged:
             https://github.com/dell/OpenManage-PowerShell-Modules/blob/main/Sign-Module.ps1
     #>
@@ -362,7 +362,7 @@ function SignScubaGearModule {
         Remove-Item -Path $CatalogFilePath -Force
     }
 
-    # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes 
+    # New-FileCatlog creates a Windows catalog file (.cat) containing cryptographic hashes
     # for files and folders in the specified paths.
     $CatalogFilePath = New-FileCatalog -Path $ModulePath -CatalogFilePath $CatalogFilePath -CatalogVersion 2.0
     Write-Debug ">> The catalog path is $CatalogFilePath"
@@ -376,7 +376,7 @@ function SignScubaGearModule {
         -TimeStampServer $TimeStampServer `
         -FileList $CatalogList
 
-    # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches 
+    # Test-FileCatalog validates whether the hashes contained in a catalog file (.cat) matches
     # the hashes of the actual files in order to validate their authenticity.
     Write-Debug ">> Testing the catalog"
     $TestResult = Test-FileCatalog -CatalogFilePath $CatalogFilePath -Path $ModulePath
@@ -418,7 +418,7 @@ function CreateFileList {
         .NOTES
             Creates a temp file with a list of filenames
     #>
-    param([Parameter(Mandatory = $true)][array]$FileNames) 
+    param([Parameter(Mandatory = $true)][array]$FileNames)
     if ($FileNames -eq $null) {
         Write-Error "FileNames is null"
     }
@@ -476,7 +476,7 @@ function CallAzureSignTool {
     Write-Debug ">>> The path to AzureSignTool is $ToolPath"
     $Results = & $ToolPath $SignArguments
     # If there are no failures, this string will be the last line in the results.
-    # Warning: This is a brittle test, because it depends upon a specific string.  
+    # Warning: This is a brittle test, because it depends upon a specific string. 
     # A unit test should be used to detect changes.
     $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
     # Write-Debug ">>> Results"
