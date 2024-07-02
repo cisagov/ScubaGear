@@ -114,7 +114,7 @@ Context "Unit Test for ConfigureScubaGearModule" {
         It 'Validate ConfigureScubaGearModule fails with bad Manifest' {
             # ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" | Should -BeFalse
             # Assert-MockCalled Write-Error -Times 1
-            ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" 
+            ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear"
             $Error.Count | Should -BeGreaterThan 0
         }
     }
