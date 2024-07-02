@@ -943,7 +943,9 @@ test_ExcludeRoles_Incorrect_V2 if {
 #--
 test_ConditionalAccessPolicies_Correct_V3 if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["domainJoinedDevice"]}])
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -957,8 +959,9 @@ test_ConditionalAccessPolicies_Correct_V3 if {
 
 test_BuiltInControls_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice"]}])
-
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
@@ -969,10 +972,42 @@ test_BuiltInControls_Correct if {
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
 }
 
+test_ExcludeUserCorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.Users as ["SpecialPerson"]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_ExcludeGroup_Correct_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups","value": ["SpecialGroup"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.Groups as ["SpecialGroup"]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.7v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+
 test_IncludeApplications_Incorrect_V3 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Applications/IncludeApplications", "value": [""]},
-                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice"]}])
+                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -984,7 +1019,9 @@ test_IncludeApplications_Incorrect_V3 if {
 test_IncludeUsers_Incorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/IncludeUsers", "value": [""]},
-                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice"]}])
+                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -1007,12 +1044,59 @@ test_BuiltInControls_Incorrect_V3 if {
 test_State_Incorrect_V3 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "State", "value": "disabled"},
-                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice"]}])
+                {"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                ])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
+}
+
+test_ExcludeUserIncorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.Users as ["NotSpecialPerson"]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
+}
+
+test_ExcludeGroupIncorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["SpecialGroup"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.Groups as ["NotSpecialGroup"]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
+}
+
+test_OperatorIncorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": ""}
+                ])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ])
+
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
 }
 #--
@@ -1030,7 +1114,7 @@ test_Correct_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeUserCorrect_V1 if {
+test_ExcludeUserCorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]}])
@@ -1043,7 +1127,7 @@ test_ExcludeUserCorrect_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeGroup_Correct_V1 if {
+test_ExcludeGroup_Correct_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups","value": ["SpecialGroup"]}])
@@ -1056,7 +1140,7 @@ test_ExcludeGroup_Correct_V1 if {
     TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
 }
 
-test_ExcludeUserIncorrect_V1 if {
+test_ExcludeUserIncorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]}])
@@ -1070,7 +1154,7 @@ test_ExcludeUserIncorrect_V1 if {
     TestResult("MS.AAD.3.8v1", Output, ReportDetailStr, false) == true
 }
 
-test_ExcludeGroupIncorrect_V1 if {
+test_ExcludeGroupIncorrect_V2 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["SpecialGroup"]}])
