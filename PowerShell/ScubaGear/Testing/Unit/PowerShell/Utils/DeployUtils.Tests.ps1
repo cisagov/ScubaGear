@@ -98,7 +98,7 @@ Context "Unit Test for ConfigureScubaGearModule" {
             $UpdatedManifest.PrivateData.PSData.Prerelease | Should -BeExactly 'Alpha'
         }
     }
-    Describe -Name 'Update manifest Bad' {
+    Describe -Name 'Update manifest with an invalid version' {
         BeforeAll {
             . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
             $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
@@ -109,11 +109,9 @@ Context "Unit Test for ConfigureScubaGearModule" {
             $ManifestPath = Join-Path -Path $env:TEMP -ChildPath 'ScubaGear\ScubaGear.psd1' -Resolve
             # 99.1 is an intentionally invalid number
             Get-Content "$ModulePath\ScubaGear.psd1" | ForEach-Object { $_ -replace '5.1', '99.1' } | Set-Content $ManifestPath
-            # Mock -CommandName Write-Error {}
         }
         It 'Validate ConfigureScubaGearModule fails with bad Manifest' {
-            # ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" | Should -BeFalse
-            # Assert-MockCalled Write-Error -Times 1
+            # This function should throw an error.
             ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear"
             $Error.Count | Should -BeGreaterThan 0
         }
