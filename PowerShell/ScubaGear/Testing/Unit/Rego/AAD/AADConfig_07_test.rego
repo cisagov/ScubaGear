@@ -163,7 +163,7 @@ test_AdditionalProperties_Correct_V1 if {
 
 test_AdditionalProperties_Correct_V2 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -177,7 +177,7 @@ test_AdditionalProperties_Correct_V2 if {
 
 test_AdditionalProperties_Correct_V3 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -191,7 +191,7 @@ test_AdditionalProperties_Correct_V3 if {
 
 test_AdditionalProperties_LicenseMissing_V1 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -205,7 +205,7 @@ test_AdditionalProperties_LicenseMissing_V1 if {
 
 test_AdditionalProperties_Incorrect_V1 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -217,7 +217,7 @@ test_AdditionalProperties_Incorrect_V1 if {
 
 test_AdditionalProperties_Incorrect_V2 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -229,9 +229,9 @@ test_AdditionalProperties_Incorrect_V2 if {
 
 test_AdditionalProperties_Incorrect_V3 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -246,10 +246,10 @@ test_AdditionalProperties_Incorrect_V3 if {
 
 test_AdditionalProperties_Incorrect_V4 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
-                {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
+                {"op": "add", "path": "0/Assignments/1", "value": {"endDateTime": null, "principalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -264,7 +264,7 @@ test_AdditionalProperties_Incorrect_V4 if {
 
 test_AdditionalProperties_Incorrect_V5 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -278,7 +278,7 @@ test_AdditionalProperties_Incorrect_V5 if {
 
 test_AdditionalProperties_Incorrect_V6 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -292,9 +292,9 @@ test_AdditionalProperties_Incorrect_V6 if {
 
 test_AdditionalProperties_Incorrect_V7 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -311,10 +311,10 @@ test_AdditionalProperties_Incorrect_V7 if {
 
 test_AdditionalProperties_Incorrect_V8 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
-                {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
+                {"op": "add", "path": "0/Assignments/1", "value": {"endDateTime": null, "principalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -331,7 +331,7 @@ test_AdditionalProperties_Incorrect_V8 if {
 
 test_AdditionalProperties_Incorrect_V9 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -345,7 +345,7 @@ test_AdditionalProperties_Incorrect_V9 if {
 
 test_AdditionalProperties_Incorrect_V10 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -359,7 +359,7 @@ test_AdditionalProperties_Incorrect_V10 if {
 
 test_AdditionalProperties_Incorrect_V11 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -373,9 +373,9 @@ test_AdditionalProperties_Incorrect_V11 if {
 
 test_AdditionalProperties_Incorrect_V12 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -392,10 +392,10 @@ test_AdditionalProperties_Incorrect_V12 if {
 
 test_AdditionalProperties_Incorrect_V13 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
-                {"op": "add", "path": "0/Assignments/1", "value": {"EndDateTime": null, "PrincipalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
+                {"op": "add", "path": "0/Assignments/1", "value": {"endDateTime": null, "principalId":"38035edd-63a1-4c08-8bd2-ad78d0624057"}},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"},
-                {"op": "add", "path": "1/Assignments/0/EndDateTime", "value": null}])
+                {"op": "add", "path": "1/Assignments/0/endDateTime", "value": null}])
 
     Output := aad.tests with input.privileged_roles as Roles
                         with input.service_plans as ServicePlans
@@ -412,7 +412,7 @@ test_AdditionalProperties_Incorrect_V13 if {
 
 test_AdditionalProperties_Incorrect_V14 if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/EndDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/endDateTime", "value": null},
                 {"op": "add", "path": "1/DisplayName", "value": "Application Administrator"}])
 
     Output := aad.tests with input.privileged_roles as Roles
@@ -440,7 +440,7 @@ test_Assignments_Correct if {
 
 test_Assignments_Incorrect if {
     Roles := json.patch(PrivilegedRoles,
-                [{"op": "add", "path": "0/Assignments/0/StartDateTime", "value": null},
+                [{"op": "add", "path": "0/Assignments/0/startDateTime", "value": null},
                 {"op": "remove", "path": "1"}])
 
     Output := aad.tests with input.privileged_roles as Roles

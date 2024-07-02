@@ -183,9 +183,9 @@ PrivilegedRoles := [
         "DisplayName": "Global Administrator",
         "Assignments": [
             {
-                "StartDateTime": "/Date(1660328610000)/",
-                "EndDateTime": "/Date(1691006065170)/",
-                "PrincipalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                "startDateTime": "/Date(1660328610000)/",
+                "endDateTime": "/Date(1691006065170)/",
+                "principalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
             }
         ],
         "Rules": [
@@ -223,8 +223,8 @@ PrivilegedRoles := [
         "DisplayName": "Privileged Role Administrator",
         "Assignments": [
             {
-                "EndDateTime": "/Date(1691006065170)/",
-                "PrincipalId": "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                "endDateTime": "/Date(1691006065170)/",
+                "principalId": "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
             }
         ],
         "Rules": [
