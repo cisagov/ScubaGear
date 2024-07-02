@@ -112,8 +112,6 @@ Context "Unit tests for Build-ScubaModule" {
 Context "Unit Test for ConfigureScubaGearModule" {
   Describe -Name 'Update manifest' {
     BeforeAll {
-      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
       $Location = Get-Location
       $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       if (Test-Path -Path "$env:TEMP\ScubaGear") {
@@ -142,8 +140,6 @@ Context "Unit Test for ConfigureScubaGearModule" {
   }
   Describe -Name 'Update manifest with version override' {
     BeforeAll {
-      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
       $Location = Get-Location
       $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       if (Test-Path -Path "$env:TEMP\ScubaGear") {
@@ -165,8 +161,6 @@ Context "Unit Test for ConfigureScubaGearModule" {
 
   Describe -Name 'Update manifest with prerelease' {
     BeforeAll {
-      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
       $Location = Get-Location
       $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       if (Test-Path -Path "$env:TEMP\ScubaGear") {
@@ -188,8 +182,6 @@ Context "Unit Test for ConfigureScubaGearModule" {
   }
   Describe -Name 'Update manifest with an invalid version' {
     BeforeAll {
-      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
       $Location = Get-Location
       $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       if (Test-Path -Path "$env:TEMP\ScubaGear") {
