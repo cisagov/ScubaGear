@@ -12,11 +12,12 @@ BeforeAll {
 Describe "Check ConfigureScubaGearModule" {
   It "The manifest file should be altered" {
     # Get contents of manifest file.
-    $ManifestFilePath = Join-Path -Path Get-Location -ChildPath "PowerShell/ScubaGear/ScubaGear.psd1"
+    $Location = Get-Location
+    $ManifestFilePath = Join-Path -Path $Location -ChildPath "PowerShell/ScubaGear/ScubaGear.psd1"
     $OriginalContent = Get-Content -Path $ManifestFilePath
     # ForEach ($Line in $OriginalContent) { Write-Warning $Line }
     # Setup input parameters.
-    $ModuleFolderPath = Join-Path -Path Get-Locationn -ChildPath "/PowerShell/ScubaGear"
+    $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
     $ModuleVersion = "9.9.9"
     $Tag = "help"
     ConfigureScubaGearModule -ModulePath $ModuleFolderPath -OverrideModuleVersion $ModuleVersion -PrereleaseTag $Tag
@@ -87,7 +88,8 @@ Context "Unit tests for Build-ScubaModule" {
       Mock ConfigureScubaGearModule { $true }
     }
     It 'Verify that a valid directory is returned' {
-      $ModuleFolderPath = Join-Path -Path Get-Location -ChildPath "/PowerShell/ScubaGear"
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       Mock ConfigureScubaGearModule { $true }
       ($ModuleBuildFolderPath = Build-ScubaModule -ModulePath $ModuleFolderPath) | Should -Not -BeNullOrEmpty
       Test-Path -Path $ModuleBuildFolderPath -PathType Container | Should -BeTrue
@@ -99,7 +101,8 @@ Context "Unit tests for Build-ScubaModule" {
       Mock -CommandName Write-Error {}
     }
     It 'Verify warning for config failed' {
-      $ModuleFolderPath = Join-Path -Path Get-Location -ChildPath "/PowerShell/ScubaGear"
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       Build-ScubaModule -ModulePath $ModuleFolderPath
       Assert-MockCalled Write-Error -Times 1
     }
