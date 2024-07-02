@@ -150,7 +150,7 @@ function Publish-ScubaGearModule {
         Write-Output "> The ScubaGear module will be published."
         # The -Force parameter is only required if the new version is less than or equal to
         # the current version, which is typically only true when testing.
-        # Publish-Module @Parameters -Force
+        Publish-Module @Parameters -Force
     }
     else {
         Write-Error "> Failed to publish the module module."
