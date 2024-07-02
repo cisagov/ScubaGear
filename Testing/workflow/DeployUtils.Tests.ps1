@@ -109,93 +109,101 @@ Context "Unit tests for Build-ScubaModule" {
   }
 }
 
-# Context "Unit Test for ConfigureScubaGearModule" {
-#   Describe -Name 'Update manifest' {
-#     BeforeAll {
-#       . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-#       $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
-#       if (Test-Path -Path "$env:TEMP\ScubaGear") {
-#         Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
-#       }
-#       Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
-#       ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" | Should -BeTrue
-#       Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
-#     }
-#     It 'Validate Private Data <Name>' -ForEach @(
-#       @{Name = "ProjectUri"; Field = "ProjectUri"; Expected = "https://github.com/cisagov/ScubaGear" },
-#       @{Name = "LicenseUri"; Field = "LicenseUri"; Expected = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE" }
-#     ) {
-#       $UpdatedManifest.PrivateData.PSData.$Field | Should -BeExactly $Expected
-#     }
-#     It 'Validate Manifest Tags' {
-#       $UpdatedManifest.PrivateData.PSData.Tags | Should -Contain "CISA"
-#     }
-#     It 'Validate Manifest ModuleVersion' {
-#       $Version = [version]$UpdatedManifest.ModuleVersion
-#       $Version.Major -Match '[0-9]+' | Should -BeTrue
-#       $Version.Minor -Match '[0-9]+' | Should -BeTrue
-#       $Version.Build -Match '[0-9]+' | Should -BeTrue
-#       $Version.Revision -Match '[0-9]+' | Should -BeTrue
-#     }
-#   }
-#   Describe -Name 'Update manifest with version override' {
-#     BeforeAll {
-#       . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-#       $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
-#       if (Test-Path -Path "$env:TEMP\ScubaGear") {
-#         Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
-#       }
-#       Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
-#       ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" -OverrideModuleVersion "3.0.1"
-#       Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
-#     }
-#     It 'Validate Manifest ModuleVersion' {
-#       $Version = [version]$UpdatedManifest.ModuleVersion
-#       $Version.Major | Should -BeExactly 3
-#       $Version.Minor | Should -BeExactly 0
-#       $Version.Build | Should -BeExactly 1
-#       $Version.Revision | Should -BeExactly -1
-#       $Version | Should -BeExactly "3.0.1"
-#     }
-#   }
+Context "Unit Test for ConfigureScubaGearModule" {
+  Describe -Name 'Update manifest' {
+    BeforeAll {
+      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
+      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+      if (Test-Path -Path "$env:TEMP\ScubaGear") {
+        Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
+      }
+      Copy-Item -Recurse -Path $ModuleFolderPath -Destination $env:TEMP -Force
+      ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" | Should -BeTrue
+      Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
+    }
+    It 'Validate Private Data <Name>' -ForEach @(
+      @{Name = "ProjectUri"; Field = "ProjectUri"; Expected = "https://github.com/cisagov/ScubaGear" },
+      @{Name = "LicenseUri"; Field = "LicenseUri"; Expected = "https://github.com/cisagov/ScubaGear/blob/main/LICENSE" }
+    ) {
+      $UpdatedManifest.PrivateData.PSData.$Field | Should -BeExactly $Expected
+    }
+    It 'Validate Manifest Tags' {
+      $UpdatedManifest.PrivateData.PSData.Tags | Should -Contain "CISA"
+    }
+    It 'Validate Manifest ModuleVersion' {
+      $Version = [version]$UpdatedManifest.ModuleVersion
+      $Version.Major -Match '[0-9]+' | Should -BeTrue
+      $Version.Minor -Match '[0-9]+' | Should -BeTrue
+      $Version.Build -Match '[0-9]+' | Should -BeTrue
+      $Version.Revision -Match '[0-9]+' | Should -BeTrue
+    }
+  }
+  Describe -Name 'Update manifest with version override' {
+    BeforeAll {
+      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
+      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+      if (Test-Path -Path "$env:TEMP\ScubaGear") {
+        Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
+      }
+      Copy-Item -Recurse -Path $ModuleFolderPath -Destination $env:TEMP -Force
+      ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" -OverrideModuleVersion "3.0.1"
+      Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
+    }
+    It 'Validate Manifest ModuleVersion' {
+      $Version = [version]$UpdatedManifest.ModuleVersion
+      $Version.Major | Should -BeExactly 3
+      $Version.Minor | Should -BeExactly 0
+      $Version.Build | Should -BeExactly 1
+      $Version.Revision | Should -BeExactly -1
+      $Version | Should -BeExactly "3.0.1"
+    }
+  }
 
-#   Describe -Name 'Update manifest with prerelease' {
-#     BeforeAll {
-#       . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-#       $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
-#       if (Test-Path -Path "$env:TEMP\ScubaGear") {
-#         Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
-#       }
-#       Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
-#       ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" -OverrideModuleVersion "3.0.1" -PrereleaseTag 'Alpha'
-#       Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
-#     }
-#     It 'Validate Manifest version info with prerelease' {
-#       $Version = [version]$UpdatedManifest.ModuleVersion
-#       $Version.Major | Should -BeExactly 3
-#       $Version.Minor | Should -BeExactly 0
-#       $Version.Build | Should -BeExactly 1
-#       $Version.Revision | Should -BeExactly -1
-#       $Version | Should -BeExactly "3.0.1"
-#       $UpdatedManifest.PrivateData.PSData.Prerelease | Should -BeExactly 'Alpha'
-#     }
-#   }
-#   Describe -Name 'Update manifest with an invalid version' {
-#     BeforeAll {
-#       . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-#       $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
-#       if (Test-Path -Path "$env:TEMP\ScubaGear") {
-#         Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
-#       }
-#       Copy-Item -Recurse -Path $ModulePath -Destination $env:TEMP -Force
-#       $ManifestPath = Join-Path -Path $env:TEMP -ChildPath 'ScubaGear\ScubaGear.psd1' -Resolve
-#       # 99.1 is an intentionally invalid number
-#       Get-Content "$ModulePath\ScubaGear.psd1" | ForEach-Object { $_ -replace '5.1', '99.1' } | Set-Content $ManifestPath
-#     }
-#     It 'Validate ConfigureScubaGearModule fails with bad Manifest' {
-#       # This function should throw an error.
-#       ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear"
-#       $Error.Count | Should -BeGreaterThan 0
-#     }
-#   }
-# }
+  Describe -Name 'Update manifest with prerelease' {
+    BeforeAll {
+      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
+      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+      if (Test-Path -Path "$env:TEMP\ScubaGear") {
+        Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
+      }
+      Copy-Item -Recurse -Path $ModuleFolderPath -Destination $env:TEMP -Force
+      ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear" -OverrideModuleVersion "3.0.1" -PrereleaseTag 'Alpha'
+      Import-LocalizedData -BaseDirectory "$env:TEMP\ScubaGear" -FileName ScubaGear.psd1 -BindingVariable UpdatedManifest
+    }
+    It 'Validate Manifest version info with prerelease' {
+      $Version = [version]$UpdatedManifest.ModuleVersion
+      $Version.Major | Should -BeExactly 3
+      $Version.Minor | Should -BeExactly 0
+      $Version.Build | Should -BeExactly 1
+      $Version.Revision | Should -BeExactly -1
+      $Version | Should -BeExactly "3.0.1"
+      $UpdatedManifest.PrivateData.PSData.Prerelease | Should -BeExactly 'Alpha'
+    }
+  }
+  Describe -Name 'Update manifest with an invalid version' {
+    BeforeAll {
+      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
+      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..\..\..\..\'
+      $Location = Get-Location
+      $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+      if (Test-Path -Path "$env:TEMP\ScubaGear") {
+        Remove-Item -Force -Recurse "$env:TEMP\ScubaGear"
+      }
+      Copy-Item -Recurse -Path $ModuleFolderPath -Destination $env:TEMP -Force
+      $ManifestPath = Join-Path -Path $env:TEMP -ChildPath 'ScubaGear\ScubaGear.psd1' -Resolve
+      # 99.1 is an intentionally invalid number
+      Get-Content "$ModuleFolderPath\ScubaGear.psd1" | ForEach-Object { $_ -replace '5.1', '99.1' } | Set-Content $ManifestPath
+    }
+    It 'Validate ConfigureScubaGearModule fails with bad Manifest' {
+      # This function should throw an error.
+      ConfigureScubaGearModule -ModulePath "$env:TEMP\ScubaGear"
+      $Error.Count | Should -BeGreaterThan 0
+    }
+  }
+}
