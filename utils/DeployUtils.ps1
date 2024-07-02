@@ -131,7 +131,7 @@ function Publish-ScubaGearModule {
 
     $ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath -OverrideModuleVersion $OverrideModuleVersion -PrereleaseTag $PrereleaseTag
 
-    # If the module is not signed, the SignScubaGearModule will through an error
+    # If the module is not signed, the SignScubaGearModule will throw an error
     $SuccessfullySigned = SignScubaGearModule `
         -AzureKeyVaultUrl $AzureKeyVaultUrl `
         -CertificateName $CertificateName `
