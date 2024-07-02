@@ -85,14 +85,14 @@ Describe "Check CreateFileList" {
 Context "Unit tests for Build-ScubaModule" {
   Describe -Name 'Return good build folder' {
     BeforeAll {
-      [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModulePath')]
+      # [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModulePath')]
       # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..'
-      $Location = Get-Location
-      $ModulePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
       Mock ConfigureScubaGearModule { $true }
     }
     It 'Verify a valid directory is returned' {
+      $Location = Get-Location
+      $ModulePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
       Mock ConfigureScubaGearModule { $true }
             ($ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath) | Should -Not -BeNullOrEmpty
       Test-Path -Path $ModuleBuildPath -PathType Container | Should -BeTrue
