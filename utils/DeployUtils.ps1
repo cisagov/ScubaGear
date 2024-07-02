@@ -153,7 +153,7 @@ function Publish-ScubaGearModule {
         Publish-Module @Parameters -Force
     }
     else {
-        Write-Error "> Failed to publish the module module."
+        Write-Error "> Failed to publish the module."
     }
 }
 
