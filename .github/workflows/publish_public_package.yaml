@@ -67,7 +67,8 @@ jobs:
       - name: Sign and Publish Module
         run: |
           # Source the deploy utilities so the functions in it can be called.
-          . repo/utils/DeployUtils.ps1
+          # . repo/utils/DeployUtils.ps1
+          . repo/utils/Publish-ScubaGear.psm1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
           # Extract the API key used to publish to PSGallery
