@@ -12,15 +12,14 @@ BeforeAll {
 Describe "Check ConfigureScubaGearModule" {
   It "The manifest file should be altered" {
     # Get contents of manifest file.
-    $Location = Get-Location
-    $ManifestFilePath = Join-Path -Path $Location -ChildPath "PowerShell/ScubaGear/ScubaGear.psd1"
+    $ManifestFilePath = Join-Path -Path Get-Location -ChildPath "PowerShell/ScubaGear/ScubaGear.psd1"
     $OriginalContent = Get-Content -Path $ManifestFilePath
     # ForEach ($Line in $OriginalContent) { Write-Warning $Line }
     # Setup input parameters.
-    $ModuleDir = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+    $ModuleFolderPath = Join-Path -Path Get-Locationn -ChildPath "/PowerShell/ScubaGear"
     $ModuleVersion = "9.9.9"
     $Tag = "help"
-    ConfigureScubaGearModule -ModulePath $ModuleDir -OverrideModuleVersion $ModuleVersion -PrereleaseTag $Tag
+    ConfigureScubaGearModule -ModulePath $ModuleFolderPath -OverrideModuleVersion $ModuleVersion -PrereleaseTag $Tag
     # Get the new contents of the manifest file
     $ModifiedContent = Get-Content -Path $ManifestFilePath
     # ForEach ($Line in $ModifiedContent) { Write-Warning $Line }
@@ -44,15 +43,15 @@ Describe "Check CreateArrayOfFilePaths" {
   It "The array should have all the files in it" {
     # Pick any location, doesn't matter.  For now, get utils folder.
     $Location = Get-Location
-    $UtilsFolder = Join-Path -Path $Location -ChildPath "utils"
+    $UtilsFolderPath = Join-Path -Path $Location -ChildPath "utils"
     # For this location, get all the PS files.
     # This could be any type of file; it doesn't really matter.
-    $Files = Get-ChildItem -Path $UtilsFolder -Filter "*.ps1"
+    $Files = Get-ChildItem -Path $UtilsFolderPath -Filter "*.ps1"
     # Add the files to an array.
     $ArrayOfPowerShellFiles += $Files
     # Write-Warning "Length of array is $($ArrayOfPowerShellFiles.Length)"
     # Create an array with the method
-    $ArrayOfFilePaths = CreateArrayOfFilePaths -SourcePath $UtilsFolder -Extensions "*.ps1"
+    $ArrayOfFilePaths = CreateArrayOfFilePaths -SourcePath $UtilsFolderPath -Extensions "*.ps1"
     # The resulting file should not be empty.
     $ArrayOfFilePaths | Should -Not -BeNullOrEmpty
     # It should have as many files as we sent to the function.
@@ -83,34 +82,28 @@ Describe "Check CreateFileList" {
 }
 
 Context "Unit tests for Build-ScubaModule" {
-  Describe -Name 'Return good build folder' {
+  Describe -Name 'Return good build folder path' {
     BeforeAll {
-      # [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModulePath')]
-      # $ModulePath = Join-Path -Path $PSScriptRoot -Child '..'
-      # . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
       Mock ConfigureScubaGearModule { $true }
     }
-    It 'Verify a valid directory is returned' {
-      $Location = Get-Location
-      $ModulePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
+    It 'Verify that a valid directory is returned' {
+      $ModuleFolderPath = Join-Path -Path Get-Location -ChildPath "/PowerShell/ScubaGear"
       Mock ConfigureScubaGearModule { $true }
-            ($ModuleBuildPath = Build-ScubaModule -ModulePath $ModulePath) | Should -Not -BeNullOrEmpty
-      Test-Path -Path $ModuleBuildPath -PathType Container | Should -BeTrue
+      ($ModuleBuildFolderPath = Build-ScubaModule -ModulePath $ModuleFolderPath) | Should -Not -BeNullOrEmpty
+      Test-Path -Path $ModuleBuildFolderPath -PathType Container | Should -BeTrue
     }
   }
-  # Describe -Name 'Publish error' {
-  #   BeforeAll {
-  #     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModulePath')]
-  #     $ModulePath = Join-Path -Path $PSScriptRoot -Child '..'
-  #     . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\..\..\utils\DeployUtils.ps1')
-  #     Mock ConfigureScubaGearModule { $false } -Verifiable
-  #     Mock -CommandName Write-Error {}
-  #   }
-  #   It 'Verify warning for config failed' {
-  #     Build-ScubaModule -ModulePath $ModulePath
-  #     Assert-MockCalled Write-Error -Times 1
-  #   }
-  # }
+  Describe -Name 'Publish error' {
+    BeforeAll {
+      Mock ConfigureScubaGearModule { $false } -Verifiable
+      Mock -CommandName Write-Error {}
+    }
+    It 'Verify warning for config failed' {
+      $ModuleFolderPath = Join-Path -Path Get-Location -ChildPath "/PowerShell/ScubaGear"
+      Build-ScubaModule -ModulePath $ModuleFolderPath
+      Assert-MockCalled Write-Error -Times 1
+    }
+  }
 }
 
 # Context "Unit Test for ConfigureScubaGearModule" {

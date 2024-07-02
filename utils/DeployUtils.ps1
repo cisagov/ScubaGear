@@ -159,8 +159,8 @@ function Publish-ScubaGearModule {
 
 function Build-ScubaModule {
     <#
-    .NOTES
-    Internal helper function
+        .NOTES
+            Internal helper function
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '')]
     param (
