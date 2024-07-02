@@ -288,8 +288,8 @@ function ConfigureScubaGearModule {
     }
     catch {
         Write-Warning ">>> Warning: Cannot test module manifest:"
-        Write-Warning ">>> Stacktrace:"
-        Write-Warning $_.ScriptStackTrace
+        # Write-Warning ">>> Stacktrace:"
+        # Write-Warning $_.ScriptStackTrace
         Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
         Write-Error ">>> Failed to test module manifest."
