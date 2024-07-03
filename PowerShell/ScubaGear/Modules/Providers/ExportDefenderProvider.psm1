@@ -140,6 +140,7 @@ function Export-DefenderProvider {
         $DLPComplianceRules = ConvertTo-Json @()
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
+        $DLPLicense = ConvertTo-Json $false
     }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
