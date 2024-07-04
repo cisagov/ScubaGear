@@ -102,17 +102,12 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
-                $Omit = $false
-                if (Test-Contains $SettingsExport.scuba_config $BaselineName) {
-                    if (Test-Contains $SettingsExport.scuba_config.$BaselineName "OmitPolicy") {
-                        if (Test-Contains $SettingsExport.scuba_config.$BaselineName.OmitPolicy $Control.Id) {
-                            $Omit = $true
-                        }
-                    }
-                }
+                # Check if the config file indicates the control should be omitted
+                $Config = $SettingsExport.scuba_config
+                $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
-                    $OmitRationale = $SettingsExport.scuba_config.$BaselineName.OmitPolicy.$($Control.Id)
+                    $OmitRationale = $Config.$BaselineName.OmitPolicy.$($Control.Id).Rationale
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
                         $OmitRationale = "Rationale not provided."
@@ -326,6 +321,67 @@ function Test-Contains {
         $Key
     )
     $Object.psobject.properties.name -Contains $Key
+}
+
+function Get-OmissionState {
+    <#
+    .Description
+    Determine if the supplied control was marked for omission in the config file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+    $Omit = $false
+    if (Test-Contains $Config $BaselineName) {
+        if (Test-Contains $Config.$BaselineName "OmitPolicy") {
+            if (Test-Contains $Config.$BaselineName.OmitPolicy $ControlId) {
+                # The config indicates the control should be omitted
+                if (Test-Contains $Config.$BaselineName.OmitPolicy.$($ControlId) "Expiration") {
+                    # An expiration date for the omission expiration was provided. Evaluate the date
+                    # to see if the control should still be omitted.
+                    $Now = Get-Date
+                    $ExpirationString = $Config.$BaselineName.OmitPolicy.$($ControlId).Expiration
+                    try {
+                        $ExpirationDate = Get-Date -Date $ExpirationString
+                        if ($ExpirationDate -lt $Now) {
+                            # The expiration date is passed, don't omit the policy
+                            $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                            $Warning += "expiration date, $ExpirationString, has passed. Control will "
+                            $Warning += "not be omitted."
+                            Write-Warning $Warning
+                        }
+                        else {
+                            # The expiration date is in the future, omit the policy
+                            $Omit = $true
+                        }
+                    }
+                    catch {
+                        # Malformed date, don't omit the policy
+                        $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                        $Warning += "expiration date, $ExpirationString, is malformed. The expected "
+                        $Warning += "format is yyyy-mm-dd. Control will not be omitted."
+                        Write-Warning $Warning
+                    }
+                }
+                else {
+                    # The expiration date was not provided, omit the policy
+                    $Omit = $true
+                }
+            }
+        }
+    }
+    $Omit
 }
 
 function Import-SecureBaseline{
