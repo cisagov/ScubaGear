@@ -18,7 +18,6 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-Organization: "cisaent.onmicrosoft.com"
 Exo:
   OmitPolicy:
     MS.EXO.2.2v1:
