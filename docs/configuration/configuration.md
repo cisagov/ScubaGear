@@ -96,9 +96,7 @@ In some cases, it may be appropriate to exclude policies from ScubaGear evaluati
 - False positives due to a policy being implemented via a third-party service
 - Policies not applicable to your organization (e.g., MS.EXO.4.3v1, which is only applicable to federal, executive branch, departments and agencies)
 
-Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce blind spots to your system and must be managed carefully.**
-
-The `OmitPolicy` top-level key in the [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml) allows the user to specify the IDs of policies that should be excluded from the ScubaGear report. Excluded policies will show up as "Omitted" in the HTML report and will be colored gray.
+The `OmitPolicy` top-level key in the [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml) allows the user to specify the IDs of policies that should be excluded from the ScubaGear report. Excluded policies will show up as "Omitted" in the HTML report and will be colored gray. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce blind spots to your system and must be managed carefully.**
 
 For each exclusion, the config allows you to indicate the following:
 - `Rationale`: The reason the policy should be excluded from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
