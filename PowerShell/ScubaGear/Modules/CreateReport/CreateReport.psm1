@@ -350,28 +350,35 @@ function Get-OmissionState {
                 if (Test-Contains $Config.$BaselineName.OmitPolicy.$($ControlId) "Expiration") {
                     # An expiration date for the omission expiration was provided. Evaluate the date
                     # to see if the control should still be omitted.
-                    $Now = Get-Date
-                    $ExpirationString = $Config.$BaselineName.OmitPolicy.$($ControlId).Expiration
-                    try {
-                        $ExpirationDate = Get-Date -Date $ExpirationString
-                        if ($ExpirationDate -lt $Now) {
-                            # The expiration date is passed, don't omit the policy
+                    if ($Config.$BaselineName.OmitPolicy.$($ControlId).Expiration -eq "") {
+                        # If the Expiration date is an empty string, omit the policy
+                        $Omit = $true
+                    }
+                    else {
+                        # An expiration date was provided and it's not an empty string
+                        $Now = Get-Date
+                        $ExpirationString = $Config.$BaselineName.OmitPolicy.$($ControlId).Expiration
+                        try {
+                            $ExpirationDate = Get-Date -Date $ExpirationString
+                            if ($ExpirationDate -lt $Now) {
+                                # The expiration date is passed, don't omit the policy
+                                $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                                $Warning += "expiration date, $ExpirationString, has passed. Control will "
+                                $Warning += "not be omitted."
+                                Write-Warning $Warning
+                            }
+                            else {
+                                # The expiration date is in the future, omit the policy
+                                $Omit = $true
+                            }
+                        }
+                        catch {
+                            # Malformed date, don't omit the policy
                             $Warning = "Config file indicates omitting $($ControlId), but the provided "
-                            $Warning += "expiration date, $ExpirationString, has passed. Control will "
-                            $Warning += "not be omitted."
+                            $Warning += "expiration date, $ExpirationString, is malformed. The expected "
+                            $Warning += "format is yyyy-mm-dd. Control will not be omitted."
                             Write-Warning $Warning
                         }
-                        else {
-                            # The expiration date is in the future, omit the policy
-                            $Omit = $true
-                        }
-                    }
-                    catch {
-                        # Malformed date, don't omit the policy
-                        $Warning = "Config file indicates omitting $($ControlId), but the provided "
-                        $Warning += "expiration date, $ExpirationString, is malformed. The expected "
-                        $Warning += "format is yyyy-mm-dd. Control will not be omitted."
-                        Write-Warning $Warning
                     }
                 }
                 else {
