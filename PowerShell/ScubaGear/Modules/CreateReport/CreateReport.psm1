@@ -301,28 +301,6 @@ function New-Report {
     $ReportSummary
 }
 
-function Test-Contains {
-    <#
-    .Description
-    Tests if a custom PowerShell object contains a given key.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [PSCustomObject]
-        $Object,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Key
-    )
-    $Object.psobject.properties.name -Contains $Key
-}
-
 function Get-OmissionState {
     <#
     .Description
@@ -343,10 +321,10 @@ function Get-OmissionState {
         $ControlId
     )
     $Omit = $false
-    if (Test-Contains $Config "OmitPolicy") {
-        if (Test-Contains $Config.OmitPolicy $ControlId) {
+    if ($Config.psobject.properties.name -Contains "OmitPolicy") {
+        if ($Config.OmitPolicy.psobject.properties.name -Contains $ControlId) {
             # The config indicates the control should be omitted
-            if (Test-Contains $Config.OmitPolicy.$($ControlId) "Expiration") {
+            if ($Config.OmitPolicy.$($ControlId).psobject.properties.name -Contains "Expiration") {
                 # An expiration date for the omission expiration was provided. Evaluate the date
                 # to see if the control should still be omitted.
                 if ($Config.OmitPolicy.$($ControlId).Expiration -eq "") {
