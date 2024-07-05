@@ -18,71 +18,20 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-Exo:
-  OmitPolicy:
-    MS.EXO.2.2v1:
-      Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
-        horizon setup but is available publicly."
-      Expiration: "2023-1231"
-    MS.EXO.4.3v1:
-      Rationale: "This policy is not applicable to our company as it only applies
-        to federal, executive branch, departments and agencies."
-        # Assuming this config file corresponds to a private company, not a gov entity
-    MS.EXO.8.1v1:
-      Rationale: &DefenderRationale "Service provided via Microsoft M365 Defender."
-    MS.EXO.8.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.9.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.9.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.9.3v1:
-      Rationale: *DefenderRationale
-    MS.EXO.10.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.10.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.10.3v1:
-      Rationale: *DefenderRationale
-    MS.EXO.11.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.11.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.11.3v1:
-      Rationale: *DefenderRationale
-    MS.EXO.14.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.14.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.14.3v1:
-      Rationale: *DefenderRationale
-    MS.EXO.15.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.15.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.15.3v1:
-      Rationale: *DefenderRationale
-    MS.EXO.16.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.16.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.17.1v1:
-      Rationale: *DefenderRationale
-    MS.EXO.17.2v1:
-      Rationale: *DefenderRationale
-    MS.EXO.17.3v1:
-      Rationale: *DefenderRationale
-Teams:
-  OmitPolicy:
-    MS.TEAMS.6.1v1:
-      Rationale: *DefenderRationale
-    MS.TEAMS.6.2v1:
-      Rationale: *DefenderRationale
-    MS.TEAMS.7.1v1:
-      Rationale: *DefenderRationale
-    MS.TEAMS.7.2v1:
-      Rationale: *DefenderRationale
-    MS.TEAMS.8.1v1:
-      Rationale: *DefenderRationale
-    MS.TEAMS.8.2v1:
-      Rationale: *DefenderRationale
+OmitPolicy:
+  MS.EXO.2.2v1:
+    Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
+      horizon setup but is available publicly."
+    Expiration: "2023-12-31"
+  MS.TEAMS.6.1v1:
+    Rationale: &DefenderRationale "Service provided via Microsoft M365 Defender."
+  MS.TEAMS.6.2v1:
+    Rationale: *DefenderRationale
+  MS.TEAMS.7.1v1:
+    Rationale: *DefenderRationale
+  MS.TEAMS.7.2v1:
+    Rationale: *DefenderRationale
+  MS.TEAMS.8.1v1:
+    Rationale: *DefenderRationale
+  MS.TEAMS.8.2v1:
+    Rationale: *DefenderRationale

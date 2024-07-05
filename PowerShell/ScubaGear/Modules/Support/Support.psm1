@@ -834,8 +834,8 @@ function New-Config {
     }
 
     if ($config.Contains("OmitPolicy")) {
-        # We don't want this parameter to be saved as a top-level key in the config, as this
-        # isn't the place ScubaGear will look for it.
+        # We don't want to immediately save this parameter to the config, as it's not in the right
+        # format yet.
         $config.Remove("OmitPolicy")
     }
 
@@ -869,7 +869,7 @@ function New-Config {
     $OmitPolicyValidated = @()
 
     # Hashmap to structure the ignored policies template
-    $OmitTemplate = @{}
+    $config[$OmissionNamespace] = @{}
 
     foreach ($Policy in $OmitPolicy) {
         if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
@@ -890,13 +890,10 @@ function New-Config {
             Write-Warning $Warning
             Continue
         }
-        if (-not $OmitTemplate.ContainsKey($Product)) {
-            $OmitTemplate[$Product] = @{ $OmissionNamespace = @{} }
-        }
         # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
         $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
         $OmitPolicyValidated += $PolicyCapitalized
-        $OmitTemplate[$Product][$OmissionNamespace][$PolicyCapitalized] = @{
+        $config[$OmissionNamespace][$PolicyCapitalized] = @{
             "Rationale" = "";
             "Expiration" = "";
         }
@@ -958,17 +955,6 @@ function New-Config {
             "defender" {
                 $config.add("Defender", $DefenderTemplate)
                 }
-        }
-    }
-    foreach ($Product in $Products) {
-        if ($OmitTemplate.ContainsKey($Product)) {
-            $ProductTitleCase = $Product.Substring(0, 1).ToUpper()+$Product.ToLower().Substring(1).ToLower()
-            if ($config.Contains($ProductTitleCase)) {
-                $config[$ProductTitleCase][$OmissionNamespace] = $OmitTemplate[$Product][$OmissionNamespace]
-            }
-            else {
-                $config.add($ProductTitleCase, $OmitTemplate[$Product])
-            }
         }
     }
     convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
