@@ -8,7 +8,7 @@ Most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) can be placed into
 
 ## Sample Configuration Files
 
-[Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Five of these sample config files are explained in more detail in the sections below.
+[Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Four of these sample config files are explained in more detail in the sections below.
 
 ### Basic Use
 
@@ -96,7 +96,7 @@ In some cases, it may be appropriate to exclude policies from ScubaGear evaluati
 - False positives due to a policy being implemented via a third-party service
 - Policies not applicable to your organization (e.g., MS.EXO.4.3v1, which is only applicable to federal, executive branch, departments and agencies)
 
-**However, exclusions can introduce blind spots to your system and must be managed carefully.**
+Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce blind spots to your system and must be managed carefully.**
 
 The `OmitPolicy` top-level key in the [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml) allows the user to specify the IDs of policies that should be excluded from the ScubaGear report. Excluded policies will show up as "Omitted" in the HTML report and will be colored gray.
 
