@@ -12,49 +12,28 @@ import data.utils.key.PASS
 # Policy MS.SHAREPOINT.1.1v1
 #--
 test_SharingCapability_Correct_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0
-            }
-        ]
-    }
+    Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
     TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
 }
 
 test_SharingCapability_Correct_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 3
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 3}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.1.1v1", Output, PASS, true) == true
 }
 
 test_SharingCapability_Incorrect_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
 }
 
 test_SharingCapability_Incorrect_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 2
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 2}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
 }
@@ -64,27 +43,16 @@ test_SharingCapability_Incorrect_V2 if {
 # Policy MS.SHAREPOINT.1.2v1
 #--
 test_OneDriveSharingCapability_Correct_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "OneDriveSharingCapability": 0
-            }
-        ],
-        "OneDrive_PnP_Flag": false
-    }
+    Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
+                                with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.1.2v1", Output, PASS, true) == true
 }
 
 test_OneDriveSharingCapability_Correct_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "OneDriveSharingCapability": 3
-            }
-        ],
-        "OneDrive_PnP_Flag": false
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 3}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+                                with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.1.2v1", Output, PASS, true) == true
 }
@@ -92,40 +60,25 @@ test_OneDriveSharingCapability_Correct_V2 if {
 test_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "OneDriveSharingCapability": 3
-            }
-        ],
-        "OneDrive_PnP_Flag": true
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 3}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+                                with input.OneDrive_PnP_Flag as true
 
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "OneDriveSharingCapability": 1
-            }
-        ],
-        "OneDrive_PnP_Flag": false
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+                                with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.1.2v1", Output, FAIL, false) == true
 }
 
 test_OneDriveSharingCapability_Incorrect_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "OneDriveSharingCapability": 2
-            }
-        ],
-        "OneDrive_PnP_Flag": false
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 2}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+                                with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.1.2v1", Output, FAIL, false) == true
 }
@@ -135,14 +88,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 # Policy MS.SHAREPOINT.1.3v1
 #--
 test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "SharingDomainRestrictionMode": 0
-            }
-        ]
-    }
+    Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
     PolicyId := "MS.SHAREPOINT.1.3v1"
     ReportDetailsString := concat(" ", [
@@ -154,14 +100,10 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_Anyone_Correct if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 2,
-                "SharingDomainRestrictionMode": 1
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "SharingDomainRestrictionMode", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement met: Note that we currently only check for approved external domains.",
@@ -172,14 +114,10 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Correct if {
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Correct if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "SharingDomainRestrictionMode": 1
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 1},
+                {"op": "add", "path": "SharingDomainRestrictionMode", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement met: Note that we currently only check for approved external domains.",
@@ -190,14 +128,10 @@ test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Correct if
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Correct if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 3,
-                "SharingDomainRestrictionMode": 1
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 3},
+                {"op": "add", "path": "SharingDomainRestrictionMode", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement met: Note that we currently only check for approved external domains.",
@@ -208,14 +142,8 @@ test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Correct if {
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "SharingDomainRestrictionMode": 0
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement not met: Note that we currently only check for approved external domains.",
@@ -226,14 +154,8 @@ test_SharingDomainRestrictionMode_SharingCapability_NewExistingGuests_Incorrect 
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 3,
-                "SharingDomainRestrictionMode": 0
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 3}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement not met: Note that we currently only check for approved external domains.",
@@ -244,14 +166,8 @@ test_SharingDomainRestrictionMode_SharingCapability_ExistingGuests_Incorrect if 
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 2,
-                "SharingDomainRestrictionMode": 0
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 2}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailString := concat(" ", [
         "Requirement not met: Note that we currently only check for approved external domains.",
@@ -266,14 +182,7 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
 # Policy MS.SHAREPOINT.1.4v1
 #--
 test_SameAccount_NotApplicable_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "RequireAcceptingAccountMatchInvitedAccount": false
-            }
-        ]
-    }
+    Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
     PolicyId := "MS.SHAREPOINT.1.4v1"
     ReportDetailsString := concat(" ", [
@@ -285,14 +194,8 @@ test_SameAccount_NotApplicable_V1 if {
 }
 
 test_SameAccount_NotApplicable_V2 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 0,
-                "RequireAcceptingAccountMatchInvitedAccount": true
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": true}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     PolicyId := "MS.SHAREPOINT.1.4v1"
     ReportDetailsString := concat(" ", [
@@ -304,27 +207,19 @@ test_SameAccount_NotApplicable_V2 if {
 }
 
 test_SameAccount_Correct_V1 if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "RequireAcceptingAccountMatchInvitedAccount": true
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": true},
+                {"op": "add", "path": "SharingCapability", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
 }
 
 test_SameAccount_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_tenant": [
-            {
-                "SharingCapability": 1,
-                "RequireAcceptingAccountMatchInvitedAccount": false
-            }
-        ]
-    }
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": false},
+                {"op": "add", "path": "SharingCapability", "value": 1}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.1.4v1", Output, FAIL, false) == true
 }
