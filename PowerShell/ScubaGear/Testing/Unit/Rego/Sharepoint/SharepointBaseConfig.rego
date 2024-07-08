@@ -7,5 +7,10 @@ SPOTenant := {
     "SharingDomainRestrictionMode": 0,
     "RequireAcceptingAccountMatchInvitedAccount": false,
     "DefaultSharingLinkType": 1,
-    "DefaultLinkPermission": 1
+    "DefaultLinkPermission": 1,
+    "RequireAnonymousLinksExpireInDays": 30,
+    "FileAnonymousLinkType": 1,
+    "FolderAnonymousLinkType": 1,
+    "EmailAttestationRequired": true,
+    "EmailAttestationReAuthDays": 30
 }
