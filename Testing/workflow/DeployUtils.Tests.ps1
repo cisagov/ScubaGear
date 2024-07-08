@@ -15,6 +15,7 @@ Describe "Check ConfigureScubaGearModule" {
     $Location = Get-Location
     $ManifestFilePath = Join-Path -Path $Location -ChildPath "PowerShell/ScubaGear/ScubaGear.psd1"
     $OriginalContent = Get-Content -Path $ManifestFilePath
+    # For debugging
     # ForEach ($Line in $OriginalContent) { Write-Warning $Line }
     # Setup input parameters.
     $ModuleFolderPath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
@@ -23,6 +24,7 @@ Describe "Check ConfigureScubaGearModule" {
     ConfigureScubaGearModule -ModulePath $ModuleFolderPath -OverrideModuleVersion $ModuleVersion -PrereleaseTag $Tag
     # Get the new contents of the manifest file
     $ModifiedContent = Get-Content -Path $ManifestFilePath
+    # For debugging
     # ForEach ($Line in $ModifiedContent) { Write-Warning $Line }
     # Diff the original with the modified
     $Diff = Compare-Object -ReferenceObject $OriginalContent -DifferenceObject $ModifiedContent
@@ -50,6 +52,7 @@ Describe "Check CreateArrayOfFilePaths" {
     $Files = Get-ChildItem -Path $UtilsFolderPath -Filter "*.ps1"
     # Add the files to an array.
     $ArrayOfPowerShellFiles += $Files
+    # For debugging
     # Write-Warning "Length of array is $($ArrayOfPowerShellFiles.Length)"
     # Create an array with the method
     $ArrayOfFilePaths = CreateArrayOfFilePaths -SourcePath $UtilsFolderPath -Extensions "*.ps1"
@@ -69,6 +72,7 @@ Describe "Check CreateFileList" {
     $Files = Get-ChildItem -Path $Location -Filter "*.md"
     # Add the files to an array.
     $ArrayOfMarkdownFiles += $Files
+    # For debugging
     # Write-Warning "Length of array is $($ArrayOfMarkdownFiles.Length)"
     # Create a filelist with the function.
     $FileList = CreateFileList -FileNames $ArrayOfMarkdownFiles
