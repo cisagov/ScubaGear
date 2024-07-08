@@ -5,5 +5,7 @@ SPOTenant := {
     "SharingCapability": 0,
     "OneDriveSharingCapability": 0,
     "SharingDomainRestrictionMode": 0,
-    "RequireAcceptingAccountMatchInvitedAccount": false
+    "RequireAcceptingAccountMatchInvitedAccount": false,
+    "DefaultSharingLinkType": 1,
+    "DefaultLinkPermission": 1
 }
