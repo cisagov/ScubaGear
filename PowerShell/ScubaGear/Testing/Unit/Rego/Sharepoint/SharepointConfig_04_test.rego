@@ -23,25 +23,14 @@ test_NotImplemented_Correct if {
 # Policy MS.SHAREPOINT.4.2v1
 #--
 test_DenyAddAndCustomizePages_Correct if {
-    Output := sharepoint.tests with input as {
-        "SPO_site": [
-            {
-                "DenyAddAndCustomizePages": 2
-            }
-        ]
-    }
+    Output := sharepoint.tests with input.SPO_site as [SPOSite]
 
     TestResult("MS.SHAREPOINT.4.2v1", Output, PASS, true) == true
 }
 
 test_DenyAddAndCustomizePages_Incorrect if {
-    Output := sharepoint.tests with input as {
-        "SPO_site": [
-            {
-                "DenyAddAndCustomizePages": 1
-            }
-        ]
-    }
+    Site := json.patch(SPOSite, [{"op": "add", "path": "DenyAddAndCustomizePages", "value": 1}])
+    Output := sharepoint.tests with input.SPO_site as [Site]
 
     TestResult("MS.SHAREPOINT.4.2v1", Output, FAIL, false) == true
 }
