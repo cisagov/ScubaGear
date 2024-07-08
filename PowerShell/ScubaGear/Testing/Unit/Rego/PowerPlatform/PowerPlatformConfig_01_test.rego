@@ -10,25 +10,15 @@ import data.utils.key.PASS
 # Policy MS.POWERPLATFORM.1.1v1
 #--
 test_disableProductionEnvironmentCreationByNonAdminUsers_Correct if {
-    Output := powerplatform.tests with input as {
-        "environment_creation": [
-            {
-                "disableEnvironmentCreationByNonAdminUsers": true
-            }
-        ]
-    }
+    Output := powerplatform.tests with input.environment_creation as [EnvironmentCreation]
 
     TestResult("MS.POWERPLATFORM.1.1v1", Output, PASS, true) == true
 }
 
 test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
-    Output := powerplatform.tests with input as {
-        "environment_creation": [
-            {
-                "disableEnvironmentCreationByNonAdminUsers": false
-            }
-        ]
-    }
+    EnvCreation := json.patch(EnvironmentCreation, [{"op": "add", "path": "disableEnvironmentCreationByNonAdminUsers", "value": false}])
+
+    Output := powerplatform.tests with input.environment_creation as [EnvCreation]
 
     TestResult("MS.POWERPLATFORM.1.1v1", Output, FAIL, false) == true
 }
@@ -38,25 +28,15 @@ test_disableProductionEnvironmentCreationByNonAdminUsers_Incorrect if {
 # Policy MS.POWERPLATFORM.1.2v1
 #--
 test_disableTrialEnvironmentCreationByNonAdminUsers_Correct if {
-    Output := powerplatform.tests with input as {
-        "environment_creation": [
-            {
-                "disableTrialEnvironmentCreationByNonAdminUsers": true
-            }
-        ]
-    }
+    Output := powerplatform.tests with input.environment_creation as [EnvironmentCreation]
 
     TestResult("MS.POWERPLATFORM.1.2v1", Output, PASS, true) == true
 }
 
 test_disableTrialEnvironmentCreationByNonAdminUsers_Incorrect if {
-    Output := powerplatform.tests with input as {
-        "environment_creation": [
-            {
-                "disableTrialEnvironmentCreationByNonAdminUsers": false
-            }
-        ]
-    }
+    EnvCreation := json.patch(EnvironmentCreation, [{"op": "add", "path": "disableTrialEnvironmentCreationByNonAdminUsers", "value": false}])
+
+    Output := powerplatform.tests with input.environment_creation as [EnvCreation]
 
     TestResult("MS.POWERPLATFORM.1.2v1", Output, FAIL, false) == true
 }
