@@ -97,81 +97,49 @@ test_AllEOP_Correct_V1 if {
 }
 
 test_AllEOP_Correct_V2 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
 
 test_AllEOP_Correct_V3 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "SentTo": null,
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "SentTo": ["user@example.com"],
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            }
-        ],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "add", "path": "1/SentTo", "value": ["user@example.com"]}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.2v1", Output, PASS, true) == true
 }
 
 test_AllEOP_Incorrect_V1 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": []
-    }
+    Output := defender.tests with input.protection_policy_rules as []
 
     TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
 
 test_AllEOP_Incorrect_V2 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": ["user@example.com"],
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"},
+                                {"op": "add", "path": "0/SentTo", "value": ["user@example.com"]}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
 
 test_AllEOP_Incorrect_V3 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [
-            {
-                "Identity": "Strict Preset Security Policy",
-                "SentTo": ["user@example.com"],
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            },
-            {
-                "Identity": "Standard Preset Security Policy",
-                "SentTo": null,
-                "SentToMemberOf": null,
-                "RecipientDomainIs": ["example.com"]
-            }
-        ],
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "add", "path": "0/RecipientDomainIs", "value": ["example.com"]},
+                                {"op": "add", "path": "1/SentTo", "value": ["user@example.com"]}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.2v1", Output, FAIL, false) == true
 }
@@ -182,105 +150,62 @@ test_AllEOP_Incorrect_V3 if {
 # Policy MS.DEFENDER.1.3v1
 #--
 test_AllDefender_Correct_V1 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [{
-            "Identity": "Standard Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    AtpPolicies := json.patch(AtpPolicyRules,
+                                [{"op": "remove", "path": "1"}])
+    Output := defender.tests with input.atp_policy_rules as AtpPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Correct_V2 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    AtpPolicies := json.patch(AtpPolicyRules,
+                                [{"op": "remove", "path": "0"}])
+    Output := defender.tests with input.atp_policy_rules as AtpPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Correct_V3 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [
-            {
-                "Identity": "Standard Preset Security Policy",
-                "SentTo": null,
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            },
-            {
-                "Identity": "Strict Preset Security Policy",
-                "SentTo": ["user@example.com"],
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            }
-        ],
-        "defender_license": true
-    }
+    AtpPolicies := json.patch(AtpPolicyRules,
+                                [{"op": "add", "path": "1/SentTo", "value": ["user@example.com"]}])
+    Output := defender.tests with input.atp_policy_rules as AtpPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, PASS, true) == true
 }
 
 test_AllDefender_Incorrect_V1 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [],
-        "defender_license": true
-    }
+    Output := defender.tests with input.atp_policy_rules as []
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V2 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": ["user@example.com"],
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null
-        }],
-        "defender_license": true
-    }
+    AtpPolicies := json.patch(AtpPolicyRules,
+                                [{"op": "add", "path": "1/SentTo", "value": ["user@example.com"]},
+                                {"op": "remove", "path": "0"}])
+    Output := defender.tests with input.atp_policy_rules as AtpPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V3 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [
-            {
-                "Identity": "Strict Preset Security Policy",
-                "SentTo": ["user@example.com"],
-                "SentToMemberOf": null,
-                "RecipientDomainIs": null
-            },
-            {
-                "Identity": "Standard Preset Security Policy",
-                "SentTo": null,
-                "SentToMemberOf": null,
-                "RecipientDomainIs": ["example.com"]
-            }
-        ],
-        "defender_license": true
-    }
+    AtpPolicies := json.patch(AtpPolicyRules,
+                                [{"op": "add", "path": "0/RecipientDomainIs", "value": ["example.com"]},
+                                {"op": "add", "path": "1/SentTo", "value": ["user@example.com"]}])
+    Output := defender.tests with input.atp_policy_rules as AtpPolicies
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.3v1", Output, FAIL, false) == true
 }
 
 test_AllDefender_Incorrect_V4 if {
-    Output := defender.tests with input as {
-        "atp_policy_rules": [],
-        "defender_license": false
-    }
+    Output := defender.tests with input.atp_policy_rules as []
+                            with input.defender_license as false
 
     ReportDetailString := concat(" ", [FAIL, DEFLICENSEWARNSTR])
 
@@ -293,106 +218,55 @@ test_AllDefender_Incorrect_V4 if {
 # Policy MS.DEFENDER.1.4v1
 #--
 test_SensitiveEOP_Correct_V1 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null,
-            "ExceptIfSentTo": null,
-            "ExceptIfSentToMemberOf": null,
-            "ExceptIfRecipientDomainIs": null,
-            "Conditions": null,
-            "Exceptions": null,
-            "State": "Enabled"
-        }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.4v1": {"SensitiveAccounts": {
-            "IncludedUsers": [],
-            "IncludedGroups": [],
-            "IncludedDomains": [],
-            "ExcludedUsers": [],
-            "ExcludedGroups": [],
-            "ExcludedDomains": []
-        }}}},
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V2 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": null,
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null,
-            "ExceptIfSentTo": null,
-            "ExceptIfSentToMemberOf": null,
-            "ExceptIfRecipientDomainIs": null,
-            "Conditions": null,
-            "Exceptions": null,
-            "State": "Enabled"
-        }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.4v1": {"SensitiveAccounts": {}}}},
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts as {}
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V3 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": ["johndoe@random.example.com"],
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null,
-            "ExceptIfSentTo": null,
-            "ExceptIfSentToMemberOf": null,
-            "ExceptIfRecipientDomainIs": null,
-            "Conditions": ["Rules.Tasks"],
-            "Exceptions": null,
-            "State": "Enabled"
-        }],
-        "scuba_config": {
-            "Defender": {
-                "MS.DEFENDER.1.4v1": {
-                    "SensitiveAccounts": {
-                        "IncludedUsers": ["johndoe@random.example.com"]
-                    }
-                }
-            }
-        },
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"},
+                                {"op": "add", "path": "0/SentTo", "value": ["johndoe@random.example.com"]},
+                                {"op": "add", "path": "0/Conditions", "value": ["Rules.Tasks"]}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts.IncludedUsers as ["johndoe@random.example.com"]
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
 
 test_SensitiveEOP_Correct_V4 if {
-    Output := defender.tests with input as {
-        "protection_policy_rules": [{
-            "Identity": "Strict Preset Security Policy",
-            "SentTo": [
-                "johndoe@random.example.com",
-                "janedoe@random.example.com"
-            ],
-            "SentToMemberOf": null,
-            "RecipientDomainIs": null,
-            "ExceptIfSentTo": null,
-            "ExceptIfSentToMemberOf": null,
-            "ExceptIfRecipientDomainIs": null,
-            "Conditions": ["Rules.Tasks"],
-            "Exceptions": null,
-            "State": "Enabled"
-        }],
-        "scuba_config": {"Defender": {"MS.DEFENDER.1.4v1": {"SensitiveAccounts": {"IncludedUsers": [
-            "johndoe@random.example.com",
-            "janedoe@random.example.com"
-        ]}}}},
-        "defender_license": true
-    }
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "remove", "path": "0"},
+                                {"op": "add", "path": "0/SentTo", "value": [
+                                                                            "johndoe@random.example.com",
+                                                                            "janedoe@random.example.com"
+                                                                            ]},
+                                {"op": "add", "path": "0/Conditions", "value": ["Rules.Tasks"]}])
+
+    Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
+                            with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts.IncludedUsers as [
+                                                                                                        "johndoe@random.example.com",
+                                                                                                        "janedoe@random.example.com"
+                                                                                                        ]
+                            with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
 }
