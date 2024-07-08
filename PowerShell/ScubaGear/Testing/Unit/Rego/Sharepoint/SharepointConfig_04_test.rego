@@ -30,6 +30,7 @@ test_DenyAddAndCustomizePages_Correct if {
 
 test_DenyAddAndCustomizePages_Incorrect if {
     Site := json.patch(SPOSite, [{"op": "add", "path": "DenyAddAndCustomizePages", "value": 1}])
+
     Output := sharepoint.tests with input.SPO_site as [Site]
 
     TestResult("MS.SHAREPOINT.4.2v1", Output, FAIL, false) == true

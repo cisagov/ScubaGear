@@ -17,6 +17,7 @@ test_DefaultSharingLinkType_Correct if {
 
 test_DefaultSharingLinkType_Incorrect if {
     Tenant := json.patch(SPOTenant, [{"op": "add", "path": "DefaultSharingLinkType", "value": 2}])
+
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.2.1v1", Output, FAIL, false) == true
@@ -34,6 +35,7 @@ test_DefaultLinkPermission_Correct if {
 
 test_DefaultLinkPermission_Incorrect if {
     Tenant := json.patch(SPOTenant, [{"op": "add", "path": "DefaultLinkPermission", "value": 2}])
+
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     TestResult("MS.SHAREPOINT.2.2v1", Output, FAIL, false) == true
