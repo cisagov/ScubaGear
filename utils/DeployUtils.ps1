@@ -225,7 +225,7 @@ function ConfigureScubaGearModule {
         Write-Warning ">>> The module dir exists at $ModulePath"
     }
     else {
-        Write-Error ">>> Failed to find the module directory at $ModulePat."
+        Write-Error ">>> Failed to find the module directory at $ModulePath."
     }
 
     $ManifestPath = Join-Path -Path $ModulePath -ChildPath "ScubaGear.psd1"
@@ -273,12 +273,9 @@ function ConfigureScubaGearModule {
     }
     catch {
         Write-Warning ">>> Error: Cannot update module manifest:"
-        # Write-Warning ">>> Stacktrace:"
-        # Write-Warning $_.ScriptStackTrace
         Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
-        # Write-Error ">>> Failed to update the module manifest."
-        return $False
+        Write-Error ">>> Failed to update the module manifest."
     }
     try {
         $CurrentErrorActionPreference = $ErrorActionPreference
@@ -288,8 +285,6 @@ function ConfigureScubaGearModule {
     }
     catch {
         Write-Warning ">>> Warning: Cannot test module manifest:"
-        # Write-Warning ">>> Stacktrace:"
-        # Write-Warning $_.ScriptStackTrace
         Write-Warning ">>> Exception:"
         Write-Warning $_.Exception
         Write-Error ">>> Failed to test module manifest."
@@ -344,7 +339,7 @@ function SignScubaGearModule {
         -Extensions "*.ps1", "*.psm1", "*.psd1"  # Array of extensions
     if ($ArrayOfFilePaths.Length -eq 0)
     {
-        Write-Error "Failed to find any .ps1, .psm1, or .psd files."
+        Write-Error "Failed to find any .ps1, .psm1, or .psd1 files."
     }
     $FileList = CreateFileList $ArrayOfFilePaths # String
     Write-Warning ">> The file list is $FileList"
@@ -408,9 +403,6 @@ function CreateArrayOfFilePaths {
         $FilePath = Get-ChildItem -Recurse -Path $SourcePath -Include $Extensions
         $ArrayOfFilePaths += $FilePath
     }
-    # ForEach ($FilePath in $ArrayOfFilePaths) {
-    #     Write-Debug ">>> File path is $FilePath"
-    # }
     return $ArrayOfFilePaths
 }
 
@@ -480,8 +472,6 @@ function CallAzureSignTool {
     # Warning: This is a brittle test, because it depends upon a specific string.
     # A unit test should be used to detect changes.
     $FoundNoFailures = $Results | Select-String -Pattern 'Failed operations: 0' -Quiet
-    # Write-Debug ">>> Results"
-    # Write-Debug $Results
     if ($FoundNoFailures -eq $true) {
         Write-Warning ">>> Found no failures."
     }
