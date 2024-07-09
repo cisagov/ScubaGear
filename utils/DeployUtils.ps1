@@ -29,7 +29,6 @@ function New-PrivateGallery {
         $Trusted
     )
 
-    # Test
     $GalleryPath = Join-Path -Path $GalleryRootPath -ChildPath $GalleryName
     if (Test-Path $GalleryPath) {
         Write-Debug "Removing private gallery at $GalleryPath"
