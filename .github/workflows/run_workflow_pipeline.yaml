@@ -12,8 +12,7 @@ on:
   pull_request:
   workflow_dispatch:
 
-# test
-# permissions: read-all
+permissions: read-all
 
 jobs:
   # Lint and Syntax Checks
