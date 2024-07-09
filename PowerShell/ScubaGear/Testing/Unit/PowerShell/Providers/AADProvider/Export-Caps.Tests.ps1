@@ -60,7 +60,7 @@ Describe "GetIncludedUsers" {
         $Cap.Conditions.Users.IncludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Users.IncludeRoles += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Users.IncludeGroups += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-        $Cap.Conditions.Users.IncludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.IncludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" #gitleaks:allow
         $Cap.Conditions.Users.IncludeGroups += "faaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersIncluded = $($CapHelper.GetIncludedUsers($Cap)) -Join ", "
         $UsersIncluded | Should -Be "1 specific user, 2 specific roles, 3 specific groups"
@@ -148,7 +148,7 @@ Describe "GetExcludedUsers" {
         $Cap.Conditions.Users.ExcludeRoles += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Users.ExcludeRoles += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Users.ExcludeGroups += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-        $Cap.Conditions.Users.ExcludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Users.ExcludeGroups += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" #gitleaks:allow
         $Cap.Conditions.Users.ExcludeGroups += "faaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $UsersExcluded = $($CapHelper.GetExcludedUsers($Cap)) -Join ", "
         $UsersExcluded | Should -Be "1 specific user, 2 specific roles, 3 specific groups"
@@ -211,7 +211,7 @@ Describe "GetApplications" {
         $Cap.Conditions.Applications.IncludeApplications += "baaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Applications.IncludeApplications += "caaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
         $Cap.Conditions.Applications.ExcludeApplications += "daaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
-        $Cap.Conditions.Applications.ExcludeApplications += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+        $Cap.Conditions.Applications.ExcludeApplications += "eaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" #gitleaks:allow
         $Apps = $($CapHelper.GetApplications($Cap))
         $Apps[0] | Should -Be "Policy applies to: apps"
         $Apps[1] | Should -Be "Apps included: 3 specific apps"
