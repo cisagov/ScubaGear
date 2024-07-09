@@ -1,7 +1,10 @@
 # Refer to https://pages.nist.gov/OSCAL-Reference/models/v1.1.2/assessment-results/json-reference/
 #
 # To validate:
-# ajv validate -s .\oscal_assessment-results_schema.json -d .\results_oscal.json
+# ajv validate -s .\oscal_assessment-results_schema.json -d .\results_oscal.json -c ajv-formats
+# See https://github.com/usnistgov/OSCAL/blob/main/README_validations.md
+
+import os
 import json
 import uuid
 import argparse
@@ -89,7 +92,7 @@ oscal = {
             "roles": [
                 {
                     "id": "prepared-for",
-                    "prepared-for": results['MetaData']['DisplayName'],
+                    "title": results['MetaData']['DisplayName'],
                     "description": "The display name of the M365 tenant being assessed by ScubaGear."
                 },
                 {
@@ -98,7 +101,7 @@ oscal = {
                     # If CISA ran this as part of ScubaConnect, should it say prepared-by CISA here?
                     # TODO open question
                     "id": "prepared-by",
-                    "prepared-by": f"{results['MetaData']['AgencyName']}, {results['MetaData']['SubAgencyName']}",
+                    "title": f"{results['MetaData']['AgencyName']}, {results['MetaData']['SubAgencyName']}",
                     "description": "The entity that ran ScubaGear"
                 }
                 # The example template also includes: fedramp-pmo, content-approver, assessor, assessment-team,
@@ -114,7 +117,11 @@ oscal = {
 
 # Do we need to include "parties" and "responsible-parties"? TODO open question
 
-# import-ap? TODO open question
+# Reference the the SAP, described in the back-matter
+sap_uuid = str(uuid.uuid4())
+oscal['assessment-results']['import-ap'] = {
+    'href': f'#{sap_uuid}'
+}
 
 # local-definitions? TODO open question. Looks like they include a lot of SAP stuff in the template. Why?
 # This is the SAR after all.
@@ -145,6 +152,7 @@ for product in results['MetaData']['ProductsAssessed']:
                     'description': control['Details'],
                     'methods': ["Test"],
                     'types': ['statement-objective'],
+                    'collected': results['MetaData']['TimestampZulu']
                     # 'origins' TODO
                     # 'related-tasks' TODO
                     # 'relevant-evidence' TODO In an ideal world, I think we would refer to the appropriate section
@@ -153,6 +161,7 @@ for product in results['MetaData']['ProductsAssessed']:
                 findings.append({
                     'uuid': str(uuid.uuid4()),
                     'title': control['Control ID'],
+                    'description': control['Details'],
                     'target': {
                         "type": "statement-id",
                         'target-id': control['Control ID'],
@@ -160,7 +169,17 @@ for product in results['MetaData']['ProductsAssessed']:
                             {
                                 "name": "requirement",
                                 "ns": NAME_SPACE,
-                                "value": control['Requirement']
+                                "value": control['Requirement'].replace('\n', ' ').strip()
+                                # without the above replace.strip, this control:
+                                # "At a minimum, the following alerts SHALL be enabled:\na. <b>Suspicious email sending
+                                # patterns detected.</b>\nb. <b>Suspicious Connector Activity.</b>\nc. <b>Suspicious
+                                # Email Forwarding Activity.</b>\nd. <b>Messages have been delayed.</b>\ne. <b>Tenant restricted from sending unprovisioned email.</b>\nf. <b>Tenant restricted from sending
+                                # email.</b>\ng. <b>A potentially malicious URL click was detected.</b>\n<!--Policy:
+                                # MS.EXO.16.1v1; Criticality: SHALL -->"
+                                #
+                                # apparently results in invalid oscal, 'must match pattern "^\\S(.*\\S)?$"'
+                                # AKA, a non-empty string with no leading or trailing whitespace. Which I think that
+                                # string is? It seems like the \n caused problems for whatever reason.
                             }
                         ],
                         'status': {
@@ -176,6 +195,7 @@ for product in results['MetaData']['ProductsAssessed']:
             else:
                 excluded_controls.append({'control-id': control["Control ID"]})
     result = {
+        "uuid": str(uuid.uuid4()),
         "title": f"SCuBA M365 {product} Baseline Assesment Results",
         "description": f"Results of assessment performed by ScubaGear for the {product} baseline",
         "start": results['MetaData']['TimestampZulu'],
@@ -185,15 +205,15 @@ for product in results['MetaData']['ProductsAssessed']:
             # would be defined in the SAP, but we can define them here. Would we want to include
             # them here? TODO open question
             "assessment-assets": {
-                "components": [
-                    {
-                        "uuid": product_uuid,
-                        # Not sure what to put here for "type". TODO open question
-                        "type": "SaaS offering",
-                        "title": product_abbr,
-                        "description": product
-                    }
-                ],
+                # "components": [
+                #     {
+                #         "uuid": product_uuid,
+                #         # Not sure what to put here for "type". TODO open question
+                #         "type": "SaaS offering",
+                #         "title": product_abbr,
+                #         "description": product
+                #     }
+                # ],
                 "assessment-platforms": [
                     {
                         # Should ScubaGear has the same UUID between runs? Or maybe it changes with each new
@@ -222,8 +242,7 @@ for product in results['MetaData']['ProductsAssessed']:
                     "description": f"Include all controls in the {product} baseline, except those that cannot be \
                         checked via ScubaGear.", # TODO also exclude those excluded via config file, once that feature
                         # is complete
-                    "include-all": {},
-                    "exclude-controls": excluded_controls
+                    "include-all": {}
                 }
             ],
             "control-objective-selections": [
@@ -247,12 +266,33 @@ for product in results['MetaData']['ProductsAssessed']:
         "findings": findings
         # TODO risks
     }
+    if len(excluded_controls) > 0:
+        result['reviewed-controls']['control-selections'][0]['exclude-controls'] = excluded_controls
+
     oscal['assessment-results']['results'].append(result)
 
-# Add back-matter
 
-oscal['back-matter'] = {
+# Add back-matter
+oscal['assessment-results']['back-matter'] = {
     'resources': [
+        {
+            'uuid': sap_uuid,
+            'title': "TODO",
+            'props': [
+                {
+                    'name': 'type',
+                    'value': 'security-assessment-plan'
+                },
+                {
+                    'name': 'published',
+                    'value': 'TODO'
+                },
+                {
+                    'name': 'version',
+                    'value': 'TODO'
+                }
+            ]
+        },
         {
             "uuid": str(uuid.uuid4()),
             "title": "ScubaGear Github repository",
@@ -268,7 +308,9 @@ oscal['back-matter'] = {
             "title": "Raw ScubaGear output",
             'rlinks': [
                 {
-                    "href": args.input,
+                    # This names to be a relative path, from the location of the output OSCAL file to the input
+                    # json file. This monstrosity of a one-liner accomplishes that. TODO refactor
+                    "href": os.path.join(os.path.relpath(os.path.dirname(args.output), args.input), os.path.basename(args.input)).replace('\\', '/'),
                     "media-type": "text/json"
                 }
             ]
