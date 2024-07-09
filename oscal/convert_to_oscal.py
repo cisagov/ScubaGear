@@ -62,14 +62,13 @@ oscal = {
             "published": results['MetaData']['TimestampZulu'],
             "last-modified": results['MetaData']['TimestampZulu'],
             "version": f"{results['MetaData']['Tool']} {results['MetaData']['ToolVersion']}",
-            # Not sure what version of OSCAL we should use. 1.0.4 is what the template I
-            # followed used. TODO open question
-            "oscal-version": "1.0.4",
+            "oscal-version": "1.1.2",
             "props": [
                 {
                     "name": "marking",
                     # Real agency data would probably be CUI. Should that be the default marking?
                     # Or should it be something that ScubaConnect adds?
+                    # Should ScubaGear omit this field by default but allow it to be specified as a parameter?
                     # TODO open question
                     "value": "Controlled Unclassified Information"
                 },
@@ -99,16 +98,12 @@ oscal = {
                     # The value I put here is dependent on data inserted by ScubaConnect. Is that ok?
                     # TODO open question
                     # If CISA ran this as part of ScubaConnect, should it say prepared-by CISA here?
+                    # Should it just say "ScubaGear v1.3.0 instead?"
                     # TODO open question
                     "id": "prepared-by",
                     "title": f"{results['MetaData']['AgencyName']}, {results['MetaData']['SubAgencyName']}",
                     "description": "The entity that ran ScubaGear"
                 }
-                # The example template also includes: fedramp-pmo, content-approver, assessor, assessment-team,
-                # assessment-lead, penetration-test-team, penetration-test-lead, assessment-executive,
-                # csp-assessment-poc, csp-operations-center, csp-end-of-testing-poc, csp-results-poc.
-                # Are these required?
-                # TODO open question
             ],
             "locations": locations
         }
@@ -128,7 +123,7 @@ oscal['assessment-results']['import-ap'] = {
 
 
 #
-# Initialize the results section
+# Add the results section
 #
 oscal['assessment-results']['results'] = []
 for product in results['MetaData']['ProductsAssessed']:
@@ -272,6 +267,13 @@ for product in results['MetaData']['ProductsAssessed']:
     oscal['assessment-results']['results'].append(result)
 
 
+
+# Generate a relative path from the location of the OSCAL output the json input
+output_folder = os.path.dirname(args.output)
+relative_path = os.path.relpath(output_folder, args.input)
+input_fname = os.path.basename(args.input)
+path_to_raw = os.path.join(relative_path, input_fname).replace('\\', '/')
+
 # Add back-matter
 oscal['assessment-results']['back-matter'] = {
     'resources': [
@@ -308,9 +310,7 @@ oscal['assessment-results']['back-matter'] = {
             "title": "Raw ScubaGear output",
             'rlinks': [
                 {
-                    # This names to be a relative path, from the location of the output OSCAL file to the input
-                    # json file. This monstrosity of a one-liner accomplishes that. TODO refactor
-                    "href": os.path.join(os.path.relpath(os.path.dirname(args.output), args.input), os.path.basename(args.input)).replace('\\', '/'),
+                    "href": path_to_raw,
                     "media-type": "text/json"
                 }
             ]
