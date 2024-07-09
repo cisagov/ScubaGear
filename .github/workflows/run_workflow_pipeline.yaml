@@ -1,0 +1,16 @@
+# Purpose:  Run the workflow pipeline that tests code in the other workflows.
+# Note:  This pipeline is a work in progress.  At the moment, it is only doing unit testing.  Eventually, it should also do linting, security checking, etc. but only for the workflow code.
+
+name: Run the Workflow Pipeline
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  unit-workflow:
+    name: Unit
+    uses: ./.github/workflows/unit_test_workflows.yaml
