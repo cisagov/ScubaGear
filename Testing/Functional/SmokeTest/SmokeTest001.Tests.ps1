@@ -87,7 +87,7 @@ Describe "Smoke Test: Generate Output" {
             Justification = 'Variable is used in another scope')]
             $ScubaGearExportedFunctions = @(
                 'Disconnect-SCuBATenant',
-                'Invoke-RunCached',
+                'Invoke-SCuBACached',
                 'Invoke-SCuBA',
                 'Copy-ScubaBaselineDocument',
                 'Copy-ScubaSampleConfigFile',

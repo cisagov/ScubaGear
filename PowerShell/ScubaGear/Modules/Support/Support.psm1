@@ -654,7 +654,7 @@ function Copy-ScubaModuleFile {
     }
 }
 
-function New-Config {
+function New-SCuBAConfig {
     <#
     .SYNOPSIS
     Generate a config file for the ScubaGear tool
@@ -913,5 +913,5 @@ Export-ModuleMember -Function @(
     'Debug-SCuBA',
     'Copy-ScubaSampleReport',
     'Copy-ScubaSampleConfigFile',
-    'New-Config'
+    'New-SCuBAConfig'
 )

@@ -77,7 +77,7 @@ NestedModules = @('Modules\Support\Support.psm1')
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
     'Invoke-SCuBA',
-    'Invoke-RunCached',
+    'Invoke-SCuBACached', #First change
     'Disconnect-SCuBATenant',
     'Copy-ScubaBaselineDocument',
     'Install-OPA',
@@ -85,7 +85,7 @@ FunctionsToExport = @(
     'Debug-SCuBA',
     'Copy-ScubaSampleReport',
     'Copy-ScubaSampleConfigFile',
-    'New-Config'
+    'New-SCuBAConfig'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
