@@ -1,0 +1,136 @@
+{
+    "profile": {
+        "uuid": "730b383a-040a-4e43-a2f2-b57225e170a5",
+        "metadata": {
+            "title": "NIST Special Publication 800-53 Revision 5 SCuBA M365 1.3.0 Profile",
+            "last-modified": "2024-07-10T11:18:17.683481Z",
+            "version": "1.3.0",
+            "oscal-version": "1.1.2",
+            "roles": [
+                {
+                    "id": "creator",
+                    "title": "Document Creator"
+                },
+                {
+                    "id": "contact",
+                    "title": "Contact"
+                }
+            ],
+            "parties": [
+                {
+                    "uuid": "f1f51208-1712-4b3c-a86c-890802c2f011",
+                    "type": "organization",
+                    "name": "Cybersecurity and Infrastructure Security Agency",
+                    "email-addresses": [
+                        "CyberSharedServices@cisa.dhs.gov"
+                    ]
+                }
+            ],
+            "responsible-parties": [
+                {
+                    "role-id": "creator",
+                    "party-uuids": [
+                        "f1f51208-1712-4b3c-a86c-890802c2f011"
+                    ]
+                },
+                {
+                    "role-id": "contact",
+                    "party-uuids": [
+                        "f1f51208-1712-4b3c-a86c-890802c2f011"
+                    ]
+                }
+            ]
+        },
+        "imports": [
+            {
+                "href": "#cd068cda-0516-4158-a90d-3ae22b49855c",
+                "include-controls": [
+                    {
+                        "with-ids": [
+                            "ac-2.12",
+                            "ac-2.13",
+                            "si-4.7",
+                            "si-4.5",
+                            "si-4.12",
+                            "ac-2.12",
+                            "ac-2.13",
+                            "si-4.7",
+                            "ia-2.2",
+                            "ia-2.6",
+                            "ia-2.2",
+                            "ia-2.6",
+                            "ia-2.8",
+                            "ia-2.1",
+                            "si-4.20",
+                            "ia-2.8",
+                            "ia-2.12",
+                            "ia-3.1",
+                            "ia-3.4",
+                            "ia-5.6",
+                            "ac-20.3",
+                            "ia-3.1",
+                            "ia-3.4",
+                            "ia-5.6",
+                            "ac-20.3",
+                            "au-2",
+                            "au-3.1",
+                            "au-6.1",
+                            "au-6.3",
+                            "au-6.4",
+                            "au-9.2",
+                            "ac-6.10",
+                            "ac-6.10",
+                            "ac-6.1",
+                            "ac-2.7",
+                            "ac-5",
+                            "ac-6.1",
+                            "ac-6.5",
+                            "ac-6.7",
+                            "ac-2.7",
+                            "ac-5",
+                            "ac-6.1",
+                            "ac-6.5",
+                            "ac-6.7",
+                            "ac-2.6",
+                            "ac-2.6",
+                            "ac-6.5",
+                            "ac-2.1",
+                            "ac-2.6",
+                            "ac-6.9",
+                            "si-4.5",
+                            "ac-2.1",
+                            "ac-2.6",
+                            "si-4.5",
+                            "si-4.2",
+                            "ac-2.1",
+                            "ac-2.6",
+                            "si-4.5",
+                            "ac-6.6",
+                            "ac-2.7",
+                            "ac-5",
+                            "ac-6.10",
+                            "ac-3.3"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "merge": {
+            "as-is": true
+        },
+        "back-matter": {
+            "resources": [
+                {
+                    "uuid": "cd068cda-0516-4158-a90d-3ae22b49855c",
+                    "description": "NIST Special Publication 800-53 Revision 5: Security and Privacy Controls for Federal Information Systems and Organizations",
+                    "rlinks": [
+                        {
+                            "href": "./NIST_SP-800-53_rev5_catalog.json",
+                            "media-type": "application/oscal.catalog+json"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
