@@ -249,8 +249,8 @@ Describe "Policy Checks for <ProductName>"{
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            elseif ('RunCached' -eq $TestDriver){
-                Write-Debug "Driver: RunCached"
+            elseif ('SCuBACached' -eq $TestDriver){
+                Write-Debug "Driver: SCuBACached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
