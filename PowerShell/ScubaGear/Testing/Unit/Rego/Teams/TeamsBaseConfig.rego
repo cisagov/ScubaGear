@@ -6,5 +6,11 @@ MeetingPolicies := {
     "AllowExternalParticipantGiveRequestControl": false,
     "AllowAnonymousUsersToStartMeeting": false,
     "AllowPSTNUsersToBypassLobby": false,
-    "AutoAdmittedUsers": "EveryoneInCompany"
+    "AutoAdmittedUsers": "EveryoneInCompany",
+    "AllowCloudRecording": false
+}
+
+BroadcastPolicies := {
+    "Identity": "Global",
+    "BroadcastRecordingMode": "UserOverride"
 }
