@@ -1,7 +1,7 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support')
 
 InModuleScope Support {
-    Describe -Tag Support -Name 'New-Config' {
+    Describe -Tag Support -Name 'New-SCuBAConfig' {
         BeforeAll {
 
 			[Flags()]
@@ -43,7 +43,7 @@ InModuleScope Support {
         }
         It 'Creates a sample configuration' {
 
-            { New-Config @CMDArgs } | Should -Not -Throw
+            { New-SCuBAConfig @CMDArgs } | Should -Not -Throw
 
             Test-Path -Path "$($TestPath)/SampleConfig.yaml" -PathType leaf | Should -Be $true
         }

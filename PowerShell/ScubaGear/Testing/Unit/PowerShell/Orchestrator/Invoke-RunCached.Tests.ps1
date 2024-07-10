@@ -1,8 +1,8 @@
 $OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Invoke-RunCached' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Invoke-SCuBACached' -Force
 
 InModuleScope Orchestrator {
-    Describe -Tag 'Orchestrator' -Name 'Invoke-RunCached' {
+    Describe -Tag 'Orchestrator' -Name 'Invoke-SCuBACached' {
         BeforeAll {
             Mock -ModuleName Orchestrator Remove-Resources {}
             Mock -ModuleName Orchestrator Import-Resources {}
@@ -35,37 +35,37 @@ InModuleScope Orchestrator {
                 $SplatParams += @{
                     ProductNames = @("aad")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames defender should not throw' {
                 $SplatParams += @{
                     ProductNames = @("defender")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames exo should not throw' {
                 $SplatParams += @{
                     ProductNames = @("exo")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames powerplatform should not throw' {
                 $SplatParams += @{
                     ProductNames = @("powerplatform")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames teams should not throw' {
                 $SplatParams += @{
                     ProductNames = @("teams")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames * should not throw' {
                 $SplatParams += @{
                     ProductNames = @("*")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
         }
         Context 'When omitting the export of the commercial tenant provider json' {
@@ -80,42 +80,42 @@ InModuleScope Orchestrator {
                 $SplatParams += @{
                     ProductNames = @("aad")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames defender should not throw' {
                 $SplatParams += @{
                     ProductNames = @("defender")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames exo should not throw' {
                 $SplatParams += @{
                     ProductNames = @("exo")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames powerplatform should not throw' {
                 $SplatParams += @{
                     ProductNames = @("powerplatform")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames teams should not throw' {
                 $SplatParams += @{
                     ProductNames = @("teams")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames * should not throw' {
                 $SplatParams += @{
                     ProductNames = @("*")
                 }
-                {Invoke-RunCached @SplatParams} | Should -Not -Throw
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
         }
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
-                {Invoke-RunCached -Version} | Should -Not -Throw
+                {Invoke-SCuBACached -Version} | Should -Not -Throw
             }
         }
     }
