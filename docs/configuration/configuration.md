@@ -83,11 +83,11 @@ Invoke-SCuBA -ConfigFilePath full_config.yaml
 
 ## Generate an Empty Sample Configuration File
 
-ScubaGear's support module can generate an empty sample config file. Running the `New-Config` cmdlet will generate a full sample config called `SampleConfig.yaml` that can be filled out based on the guidance below. Parameters can be passed to the `New-Config` cmdlet to change values inside the sample config.
+ScubaGear's support module can generate an empty sample config file. Running the `New-SCuBAConfig` cmdlet will generate a full sample config called `SampleConfig.yaml` that can be filled out based on the guidance below. Parameters can be passed to the `New-SCuBAConfig` cmdlet to change values inside the sample config.
 
 ```powershell
 # Create an empty config file
-New-Config
+New-SCuBAConfig
 ```
 
 ## Product-specific Configuration
