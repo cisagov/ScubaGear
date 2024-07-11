@@ -17,9 +17,6 @@ OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
-CertificateThumbPrint: "51E15BC936056EF821CE6728364F057651260074"
-AppID: "76e2fe6c-af3f-49f7-a6aa-65d53c58c91b"
-Organization: "cisaent.onmicrosoft.com"
 OmitPolicy:
   MS.EXO.2.2v1:
     Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
