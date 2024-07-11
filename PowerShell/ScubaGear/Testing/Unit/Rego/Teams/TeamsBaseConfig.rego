@@ -26,5 +26,6 @@ FederationConfiguration := {
         }
     ],
     "AllowTeamsConsumer": false,
-    "AllowTeamsConsumerInbound": false
+    "AllowTeamsConsumerInbound": false,
+    "AllowPublicUsers": false
 }
