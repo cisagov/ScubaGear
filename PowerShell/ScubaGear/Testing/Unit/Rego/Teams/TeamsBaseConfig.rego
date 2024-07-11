@@ -29,3 +29,16 @@ FederationConfiguration := {
     "AllowTeamsConsumerInbound": false,
     "AllowPublicUsers": false
 }
+
+ClientConfiguration := {
+    "Identity": "Global",
+    "AllowEmailIntoChannel": false
+}
+
+TeamsTenantInfo := {
+    "AssignedPlan": [
+        "MCOEV",
+        "Teams",
+        "MCOProfessional"
+    ]
+}
