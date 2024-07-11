@@ -1,6 +1,0 @@
-# Config file for Mega-Linter
-# PowerShell
-
-ENABLE_LINTERS:
-  - POWERSHELL_POWERSHELL
-LOG_LEVEL: ERROR

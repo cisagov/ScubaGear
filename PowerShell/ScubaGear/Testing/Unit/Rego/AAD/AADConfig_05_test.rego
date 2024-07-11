@@ -10,62 +10,36 @@ import data.utils.key.PASS
 # Policy MS.AAD.5.1v1
 #--
 test_AllowedToCreateApps_Correct if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": false
-                },
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+    Output := aad.tests with input.authorization_policies as [AuthorizationPolicies]
 
     ReportDetailStr := "0 authorization policies found that allow non-admin users to register third-party applications"
     TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, true) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V1 if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": true
-                },
-                "Id": "Bad policy"
-            }
-        ]
-    }
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "DefaultUserRolePermissions/AllowedToCreateApps", "value": true}])
+
+    Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
         "1 authorization policies found that allow non-admin users to register third-party applications:",
-        "<br/>Bad policy"
+        "<br/>authorizationPolicy"
     ])
 
     TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
 }
 
 test_AllowedToCreateApps_Incorrect_V2 if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": true
-                },
-                "Id": "Bad policy"
-            },
-            {
-                "DefaultUserRolePermissions": {
-                    "AllowedToCreateApps": false
-                },
-                "Id": "Good policy"
-            }
-        ]
-    }
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "DefaultUserRolePermissions/AllowedToCreateApps","value": true},
+                {"op": "add", "path": "Id", "value": "Bad Policy"}])
+
+    Output := aad.tests with input.authorization_policies as [Policies, AuthorizationPolicies]
 
     ReportDetailStr := concat("", [
         "1 authorization policies found that allow non-admin users to register third-party applications:",
-        "<br/>Bad policy"
+        "<br/>Bad Policy"
     ])
 
     TestResult("MS.AAD.5.1v1", Output, ReportDetailStr, false) == true
@@ -76,17 +50,7 @@ test_AllowedToCreateApps_Incorrect_V2 if {
 # Policy MS.AAD.5.2v1
 #--
 test_UserConsentNotAllowed_Correct if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
-                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
-                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team"
-                ],
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+    Output := aad.tests with input.authorization_policies as [AuthorizationPolicies]
 
     ReportDetailStr :=
         "0 authorization policies found that allow non-admin users to consent to third-party applications"
@@ -94,15 +58,10 @@ test_UserConsentNotAllowed_Correct if {
 }
 
 test_UserConsentNotAllowedEmptyDefaultUserArray_Correct if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
-                ],
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole", "value": []}])
+
+    Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr :=
         "0 authorization policies found that allow non-admin users to consent to third-party applications"
@@ -110,18 +69,15 @@ test_UserConsentNotAllowedEmptyDefaultUserArray_Correct if {
 }
 
 test_UserConsentFromVerifiedPublishersAllowed_Incorrect if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole",
+                "value": [
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                     "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
-                ],
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+                ]}])
+
+    Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
         "1 authorization policies found that allow non-admin users to consent to third-party applications:",
@@ -132,18 +88,15 @@ test_UserConsentFromVerifiedPublishersAllowed_Incorrect if {
 }
 
 test_UserConsentAllowed_Incorrect if {
-    Output := aad.tests with input as {
-        "authorization_policies": [
-            {
-                "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole",
+                "value": [
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                     "ManagePermissionGrantsForSelf.microsoft-user-default-low"
-                ],
-                "Id": "authorizationPolicy"
-            }
-        ]
-    }
+                ]}])
+
+    Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
         "1 authorization policies found that allow non-admin users to consent to third-party applications:",
@@ -158,55 +111,23 @@ test_UserConsentAllowed_Incorrect if {
 # Policy MS.AAD.5.3v1
 #--
 test_IsEnabled_Correct if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name":  "EnableAdminConsentRequests",
-                        "Value":  "true"
-                    }
-                ]
-            }
-        ]
-    }
+    Output := aad.tests with input.directory_settings as [DirectorySettings]
 
     TestResult("MS.AAD.5.3v1", Output, PASS, true) == true
 }
 
 test_IsEnabled_Incorrect_Missing if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name":  "EnableGroupSpecificConsent",
-                        "Value":  "false"
-                    }
-                ]
-            }
-        ]
-    }
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/0/Value", "value": "false"}])
+
+    Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
 }
 
 test_IsEnabled_Incorrect if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name":  "EnableAdminConsentRequests",
-                        "Value":  "false"
-                    }
-                ]
-            }
-        ]
-    }
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/0/Value", "value": "false"}])
+
+    Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
 }
@@ -216,73 +137,31 @@ test_IsEnabled_Incorrect if {
 # Policy MS.AAD.5.4v1
 #--
 test_Value_Correct_Lowercase if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name": "EnableGroupSpecificConsent",
-                        "Value": "false"
-                    }
-                ]
-            }
-        ]
-    }
+    Output := aad.tests with input.directory_settings as [DirectorySettings]
 
     TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Correct_Uppercase if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name": "EnableGroupSpecificConsent",
-                        "Value": "False"
-                    }
-                ]
-            }
-        ]
-    }
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "False"}])
+
+    Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
 }
 
 test_Value_Incorrect_Lowercase if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name": "EnableGroupSpecificConsent",
-                        "Value": "true"
-                    }
-                ]
-            }
-        ]
-    }
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "true"}])
+
+    Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }
 
 test_Value_Incorrect_Uppercase if {
-    Output := aad.tests with input as {
-        "directory_settings": [
-            {
-                "DisplayName": "Setting display name",
-                "Values": [
-                    {
-                        "Name": "EnableGroupSpecificConsent",
-                        "Value": "True"
-                    }
-                ]
-            }
-        ]
-    }
+    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "True"}])
+
+    Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
 }

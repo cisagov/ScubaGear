@@ -1,0 +1,6 @@
+# Config file for Mega-Linter
+# Checkov
+
+ENABLE_LINTERS:
+  - REPOSITORY_CHECKOV
+LOG_LEVEL: ERROR

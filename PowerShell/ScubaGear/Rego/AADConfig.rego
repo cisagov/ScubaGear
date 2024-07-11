@@ -6,7 +6,6 @@ import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
-import data.utils.key.Count
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
@@ -211,10 +210,7 @@ tests contains {
 #--
 
 # Save all policy names if PhishingResistantMFAPolicies exist
-AlternativeMFA contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-    Count(PhishingResistantMFAPolicies) > 0
-}
+AllMFA := AlternativeMFA | PhishingResistantMFAPolicies
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
@@ -235,12 +231,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AlternativeMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AlternativeMFA, DescriptionString), CAPLINK]),
+    "ActualValue": AllMFA,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(AlternativeMFA) > 0
+    Status := count(AllMFA) > 0
 }
 #--
 
@@ -448,15 +444,16 @@ tests contains {
 ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    CAPolicy.State == "enabled"
+    PolicyConditionsMatch(CAPolicy) == true
 
-    Conditions := [
-        "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
-        "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
-    ]
-    count(FilterArray(Conditions, true)) > 0
+    "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
+    "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
+    count(CAPolicy.GrantControls.BuiltInControls) == 2
+    CAPolicy.GrantControls.Operator == "OR"
+
+    # Only match policies with user and group exclusions if all exempted
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -860,7 +857,7 @@ default PrivilegedRoleExclusions(_, _) := false
 # for users & groups. If there are users with permenant assignment
 # return true if all users + groups are in the config.
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}
+    PrivilegedRoleAssignedPrincipals := {x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}
 
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
@@ -871,7 +868,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 # if no users with permenant assignment & config empty, return true
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    count({x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}) > 0
+    count({x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
     count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
 }
@@ -906,7 +903,7 @@ tests contains {
 # Get all privileged roles that do not have a start date
 RolesAssignedOutsidePim contains Role.DisplayName if {
     some Role in input.privileged_roles
-    NoStartAssignments := {is_null(X.StartDateTime) | some X in Role.Assignments}
+    NoStartAssignments := {is_null(X.startDateTime) | some X in Role.Assignments}
 
     count(FilterArray(NoStartAssignments, true)) > 0
 }

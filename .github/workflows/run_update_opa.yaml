@@ -6,6 +6,8 @@ on:
         - cron: "11 2 * * 1-5"
     workflow_dispatch:
 
+permissions: read-all
+
 jobs:
     update-opa-dependency:
         runs-on: windows-latest
@@ -129,22 +131,6 @@ jobs:
                         $_
                     }
                 } | Set-Content $SupportModulePath
-
-                #
-                # Replace latest supported OPA version in the README
-                #
-                $READMEPath = '.\README.md'
-                $LatestOPAVerRegex = ".*OPA version \(Currently v\d+\.\d+\.\d+\)"
-                $READMEContent = Get-Content -Path $READMEPath -Raw
-                Set-Content -Path $READMEPath -Value $Content
-                if ($READMEContent -match $LatestOPAVerRegex) {
-                    Write-Output "OPA versioning found in the README. Replacing"
-                    $NewContent = $READMEContent -replace $LatestOPAVerRegex, "2. Look for the latest OPA version (Currently v$LatestOPAVersion)"
-                    Set-Content -Path $READMEPath -Value $NewContent -NoNewline
-                }
-                else {
-                    Write-Output "No OPA versioning was found in the README. Check to see if something changed."
-                }
 
             - name: Create the OPA update PR
               if: steps.determine-update-required.outputs.updaterequired == 'true'

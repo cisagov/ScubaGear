@@ -388,7 +388,6 @@ function Get-ScubaSpfRecord {
     if ($NLowConf -gt 0) {
         Write-Warning "Get-ScubaSpfRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
     }
-    $DnsLog += $Response.LogEntries
     $SPFRecords
 }
 

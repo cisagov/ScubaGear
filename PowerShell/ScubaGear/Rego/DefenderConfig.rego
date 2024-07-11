@@ -1,18 +1,20 @@
 package defender
-import rego.v1
-import data.utils.report.NotCheckedDetails
-import data.utils.report.ReportDetailsBoolean
-import data.utils.report.ReportDetailsString
-import data.utils.report.ReportDetailsArray
-import data.utils.key.PASS
-import data.utils.key.FilterArray
+
+import data.utils.defender.ApplyLicenseWarning
+import data.utils.defender.ApplyLicenseWarningString
+import data.utils.defender.DLPLicenseWarningString
+import data.utils.defender.ImpersonationProtection
+import data.utils.defender.ImpersonationProtectionConfig
 import data.utils.defender.SensitiveAccounts
 import data.utils.defender.SensitiveAccountsConfig
 import data.utils.defender.SensitiveAccountsSetting
-import data.utils.defender.ImpersonationProtection
-import data.utils.defender.ImpersonationProtectionConfig
-import data.utils.defender.ApplyLicenseWarning
-
+import data.utils.key.FilterArray
+import data.utils.key.PASS
+import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsArray
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
+import rego.v1
 
 #################
 # MS.DEFENDER.1 #
@@ -33,13 +35,13 @@ ReportDetails1_1(false, false) := "Standard and Strict preset policies are both 
 
 # Parse through all items in Policies, if item identity is the one
 # we want & state is enabled, save item. Return number of items saved.
-GetEnabledPolicies(Policies, Identity) := true if
+GetEnabledPolicies(Policies, Identity) := true if {
     count([Policy |
         some Policy in Policies
         Policy.Identity == Identity
         Policy.State == "Enabled"
     ]) > 0
-else := false
+} else := false
 
 # For this one you need to check both:
 # - Get-EOPProtectionPolicyRule
@@ -98,14 +100,15 @@ tests contains {
 # Parse through all items in Policies, if item identity is the one
 # we want & Users (SentTo) + Groups (SentToMemberOf) + Domains (RecipientDomainIs) are null,
 # save item. Return number of items saved.
-AllRecipient(Policies, Identity) := true if count([Policy |
-    some Policy in Policies
-        Policy.Identity == Identity
-        Policy.SentTo == null
-        Policy.SentToMemberOf == null
-        Policy.RecipientDomainIs == null
-    ]) > 0
-else := false
+AllRecipient(Policies, Identity) := true if {
+    count([Policy |
+                    some Policy in Policies
+                    Policy.Identity == Identity
+                    Policy.SentTo == null
+                    Policy.SentToMemberOf == null
+                    Policy.RecipientDomainIs == null
+        ]) > 0
+} else := false
 
 # If "Apply protection to" is set to "All recipients":
 # - The policy will be included in the list output by
@@ -216,7 +219,6 @@ tests contains {
 }
 #--
 
-
 #################
 # MS.DEFENDER.2 #
 #################
@@ -257,7 +259,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -289,7 +291,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -326,7 +328,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-AntiPhishPolicy"],
     "ActualValue": [StrictIP.Policy, StandardIP.Policy],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     Policies := input.anti_phish_policies
@@ -346,7 +348,6 @@ tests contains {
     Status := count(FilterArray([StrictIP.Result == true, StandardIP.Result == true], false)) == 0
 }
 #--
-
 
 #################
 # MS.DEFENDER.3 #
@@ -378,7 +379,6 @@ tests contains {
     Status := count(Policies) > 0
 }
 #--
-
 
 #################
 # MS.DEFENDER.4 #
@@ -454,7 +454,8 @@ SensitiveRules contains {
 # Each policy that protects SSN, ITIN, & credit cards is saved in
 # PoliciesWithFullProtection.
 PoliciesWithFullProtection := [
-    SensitiveRule | some SensitiveRule in SensitiveRules;
+SensitiveRule |
+    some SensitiveRule in SensitiveRules
     count({Item | some Item in SensitiveContent} - SensitiveRule.ContentNames) == 0
 ]
 
@@ -480,7 +481,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     error_rule := "No matching rules found for:"
@@ -498,14 +499,15 @@ tests contains {
 # If policy also indicates all for the M365 Product & is in the workload, return
 # policy info, else an empty set.
 ProductEnableSensitiveProtection(Name, Location) := {
-    {
-        "Name": Policy.Name,
-        "Locations": Policy[Location],
-        "Workload": Policy.Workload
-    } | some Policy in input.dlp_compliance_policies;
-    some PolicyWithProtection in PoliciesWithFullProtection;
-    Policy.Name in PolicyWithProtection;
-    "All" in Policy[Location];
+{
+    "Name": Policy.Name,
+    "Locations": Policy[Location],
+    "Workload": Policy.Workload
+} |
+    some Policy in input.dlp_compliance_policies
+    some PolicyWithProtection in PoliciesWithFullProtection
+    Policy.Name in PolicyWithProtection
+    "All" in Policy[Location]
     contains(Policy.Workload, Name)
 }
 
@@ -514,35 +516,132 @@ Policies := {
     "SharePoint": ProductEnableSensitiveProtection("SharePoint", "SharePointLocation"),
     "OneDrive": ProductEnableSensitiveProtection("OneDriveForBusiness", "OneDriveLocation"),
     "Teams": ProductEnableSensitiveProtection("Teams", "TeamsLocation"),
-    "Devices": ProductEnableSensitiveProtection("EndpointDevices", "EndpointDlpLocation"),
+    "Devices": ProductEnableSensitiveProtection("EndpointDevices", "EndpointDlpLocation")
 }
 
-# Build the error message if all sensitive content is not protected by
-# any policies for the M365 product.
-error_policies contains "Exchange" if count(Policies.Exchange) == 0
+# Create a set of locations missing from the set of policies
+# protecting sensitive info types
+MissingLocations contains "Exchange" if count(Policies.Exchange) == 0
 
-error_policies contains "SharePoint" if count(Policies.SharePoint) == 0
+MissingLocations contains "SharePoint" if count(Policies.SharePoint) == 0
 
-error_policies contains "OneDrive" if count(Policies.OneDrive) == 0
+MissingLocations contains "OneDrive" if count(Policies.OneDrive) == 0
 
-error_policies contains "Teams" if count(Policies.Teams) == 0
+MissingLocations contains "Teams" if count(Policies.Teams) == 0
 
-error_policies contains "Devices" if count(Policies.Devices) == 0
+MissingLocations contains "Devices" if count(Policies.Devices) == 0
 
-# Create the Report details message for policy
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) > 0
-    error_policy := "No enabled policy found that applies to:"
-    ErrorMessage := concat(" ", [error_policy, concat(", ", error_policies)])
+# Empty license warning string when both Devices and Teams present
+DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
+    not "Devices" in AbsentLocations
+    not "Teams" in AbsentLocations
+    LicenseWarning := ""
 }
 
-DefenderErrorMessage4_2 := ErrorMessage if {
-    count(PoliciesWithFullProtection) == 0
-    ErrorMessage := "No DLP policy matching all types found for evaluation."
+DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
+    # Add license warning when only Teams is missing
+    not "Devices" in AbsentLocations
+    "Teams" in AbsentLocations
+
+    LicenseWarning := "Teams location requires DLP for Teams included in E5/G5 licenses."
 }
 
-# If error_policies contains any value, then some M365 product does not
-# have a policy protectig all sensitive content & check should fail.
+DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
+    # Add license warning when only Devices is missing
+    "Devices" in AbsentLocations
+    not "Teams" in AbsentLocations
+
+    LicenseWarning := "Devices location requires DLP for Endpoint licensing and at least one registered device."
+}
+
+DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
+    # Add both license warnings when Devices and Teams are missing
+    "Devices" in AbsentLocations
+    "Teams" in AbsentLocations
+
+    LicenseWarning := concat(
+        " ",
+        [
+            "Devices location requires DLP for Endpoint licensing and at least one registered device.",
+            "Teams location requires DLP for Teams included in E5/G5 licenses."
+        ]
+    )
+}
+
+# Return results file path when no custom config defined
+ResultsFilePath := Path if {
+    not input.scuba_config.OutputPath
+    not input.scuba_config.OutRegoFileName
+    Path := "./TestResults.json"
+}
+
+# Return results file path when only file name is defined
+ResultsFilePath := Path if {
+    not input.scuba_config.OutputPath
+    Filename := input.scuba_config.OutRegoFileName
+    Path := concat("", ["./", Filename,".json"])
+}
+
+# Return results file path when only file path is defined
+ResultsFilePath := Path if {
+    not input.scuba_config.OutRegoFileName
+    FilePath := input.scuba_config.OutputPath
+    Path := concat("", [FilePath, "/TestResults",".json"])
+}
+
+# Return results file path when custom config defined
+ResultsFilePath := Path if {
+    input.scuba_config.OutputPath
+    input.scuba_config.OutputRegoFileName
+    Path := concat("", [
+        input.scuba_config.OutPath, "/",
+        input.scuba_config.OutRegoFileName,
+        ".json"
+    ])
+}
+
+# DLP policy contains at least one required location
+DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
+    count(PresentLocations) != 0
+
+    LocationsAppliedMsg := "DLP custom policy applied to the following locations: "
+    LocationsMissingMsg := ". Custom policy protecting sensitive info types NOT applied to: "
+    LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
+
+    FullPolicyDetailsMsg := concat("", [
+        " For full policy details, see the ActualValue field in the results file: ",
+        ResultsFilePath
+    ])
+    ErrorMessage := concat("", [
+        LocationsAppliedMsg, concat(", ", PresentLocations),
+        LocationsMissingMsg, concat(", ", MissingLocations),
+        ". ",
+        LicenseNotice,
+        FullPolicyDetailsMsg
+    ])
+}
+
+# Matching DLP policy does not contain any of the required locations
+DefenderErrorMessage4_2(PresentLocations) := ErrorMessage if {
+    count(PresentLocations) == 0
+
+    LocationsMissingMsg := "Custom policy protecting sensitive info types NOT applied to: "
+    LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
+
+    FullPolicyDetailsMsg := concat("", [
+        " For full policy details, see the ActualValue field in the results file: ",
+        ResultsFilePath
+    ])
+    ErrorMessage := concat("", [
+        LocationsMissingMsg, concat(", ", MissingLocations),
+        ". ",
+        LicenseNotice,
+        FullPolicyDetailsMsg
+    ])
+}
+
+# If MissingLocations contains any value, then some M365 product does not
+# have a policy protectig sensitive content & check should fail.
 # Check should also fail if there are no policies that protect all sensitive
 # content.
 tests contains {
@@ -550,14 +649,18 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DLPCompliancePolicy"],
     "ActualValue": Policies,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_2),
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
+    PresentLocations := {"Devices", "Exchange", "OneDrive", "SharePoint", "Teams"} - MissingLocations
+
     Conditions := [
-        count(error_policies) == 0,
-        count(PoliciesWithFullProtection) > 0,
+        count(MissingLocations) == 0,
+        input.defender_dlp_license == true
     ]
-    Status := count(FilterArray(Conditions, true)) == 2
+
+    ErrorMessage := DefenderErrorMessage4_2(PresentLocations)
+    Status := count(FilterArray(Conditions, false)) == 0
 }
 
 #
@@ -599,13 +702,13 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_3(Rules)),
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_3(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotBlocking
     Conditions := [
         count(Rules) == 0,
-        count(PoliciesWithFullProtection) > 0,
+        count(PoliciesWithFullProtection) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
 }
@@ -644,13 +747,13 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,
-    "ReportDetails": ReportDetailsString(Status, DefenderErrorMessage4_4(Rules)),
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_4(Rules)),
     "RequirementMet": Status
 } if {
     Rules := SensitiveRulesNotNotifying
     Conditions := [
         count(Rules) == 0,
-        count(PoliciesWithFullProtection) > 0,
+        count(PoliciesWithFullProtection) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
 }
@@ -685,7 +788,6 @@ tests contains {
     "RequirementMet": false
 }
 #--
-
 
 #################
 # MS.DEFENDER.5 #
@@ -742,7 +844,6 @@ tests contains {
 }
 #--
 
-
 #################
 # MS.DEFENDER.6 #
 #################
@@ -754,7 +855,7 @@ tests contains {
 # Save the identity of audit logs that have logging enabled
 CorrectLogConfigs contains {
     "Identity": AuditLog.Identity,
-    "UnifiedAuditLogIngestionEnabled": AuditLog.UnifiedAuditLogIngestionEnabled,
+    "UnifiedAuditLogIngestionEnabled": AuditLog.UnifiedAuditLogIngestionEnabled
 } if {
     some AuditLog in input.admin_audit_log_config
     AuditLog.UnifiedAuditLogIngestionEnabled == true

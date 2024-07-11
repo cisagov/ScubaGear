@@ -21,7 +21,7 @@ rules:
         - pattern: '^[A-Z]+[a-zA-Z0-9_]+$|^tests$|^test_|^check_|^error_'
           targets:
             - rule
-        - pattern: '^[A-Z]+[a-zA-Z0-9_]+$'
+        - pattern: '^_*[A-Z]+[a-zA-Z0-9_]+$'
           targets:
             - function
         - pattern: '^[a-z\.]+$|^[a-z\.]+_test$'
@@ -59,7 +59,7 @@ rules:
       # Most of these seem fixable by concatenating strings
       # and by using the non-breakable-word-threshold option
       # for when that doesn't work.
-      max-line-length: 120
+      max-line-length: 150
       non-breakable-word-threshold: 100
       level: warning
     # https://docs.styra.com/regal/rules/style/no-whitespace-comment

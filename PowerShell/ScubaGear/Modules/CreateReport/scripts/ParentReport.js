@@ -1,4 +1,4 @@
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', () => {
     applyScopeAttributes();
     mountDarkMode("Parent Report");
 });

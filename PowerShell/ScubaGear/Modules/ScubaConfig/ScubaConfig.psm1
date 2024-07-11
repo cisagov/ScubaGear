@@ -38,7 +38,7 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
-        DefaultOPAVersion = '0.64.1'
+        DefaultOPAVersion = '0.66.0'
     }
 
     static [object]ScubaDefault ([string]$Name){
@@ -79,7 +79,7 @@ class ScubaConfig {
             }
             else{
                 Write-Debug "ProductNames provided - using as is."
-                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object
+                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
             }
         }
 

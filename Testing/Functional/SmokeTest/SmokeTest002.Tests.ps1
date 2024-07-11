@@ -171,11 +171,11 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationN
                         $RowData = Get-SeElement -Element $Row -By TagName 'td'
 
                         if ($RowHeaders.Count -gt 0){
-                            $RowHeaders.Count | Should -BeExactly 3
+                            $RowHeaders.Count | Should -BeExactly 4
                         }
 
                         if ($RowData.Count -gt 0){
-                            $RowData.Count | Should -BeExactly 3
+                            $RowData.Count | Should -BeExactly 4
                         }
                     }
                 }

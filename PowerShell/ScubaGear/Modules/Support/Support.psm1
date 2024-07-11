@@ -94,6 +94,7 @@ function Initialize-SCuBA {
         $ScubaParentDirectory = $env:USERPROFILE
     )
 
+    Write-Output 'Initializing ScubaGear...'
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
@@ -114,6 +115,9 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
+    $CurrentLocation = Get-Location
+    Write-Information 'Importing module...'
+    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
@@ -237,7 +241,8 @@ function Install-OPA {
 
     # Constants
     $ACCEPTABLEVERSIONS = '0.59.0', '0.60.0', '0.61.0',
-    '0.62.1', '0.63.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
+    '0.62.1', '0.63.0', '0.64.1',
+    '0.65.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set prefernces for writing messages
