@@ -8,6 +8,10 @@
 #
 # See https://github.com/usnistgov/OSCAL/blob/main/README_validations.md
 
+# To convert to xml:
+# java -jar "SaxonHE12-5J\saxon-he-12.5.jar" -xsl:"oscal_assessment-results_json-to-xml-converter.xsl" -o:"sar.xml" -it:from-json file="sar.json"
+# download the jar here: https://www.saxonica.com/download/java.xml
+
 import os
 import json
 import uuid
