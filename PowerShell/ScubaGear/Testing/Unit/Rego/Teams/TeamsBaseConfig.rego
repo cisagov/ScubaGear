@@ -14,3 +14,17 @@ BroadcastPolicies := {
     "Identity": "Global",
     "BroadcastRecordingMode": "UserOverride"
 }
+
+FederationConfiguration := {
+    "Identity": "Global",
+    "AllowFederatedUsers": false,
+    "AllowedDomains": [
+        {
+            "AllowedDomain": [
+                "Domain=test365.cisa.dhs.gov"
+            ]
+        }
+    ],
+    "AllowTeamsConsumer": false,
+    "AllowTeamsConsumerInbound": false
+}
