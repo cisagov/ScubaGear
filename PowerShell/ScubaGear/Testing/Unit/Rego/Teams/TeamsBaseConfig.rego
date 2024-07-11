@@ -42,3 +42,10 @@ TeamsTenantInfo := {
         "MCOProfessional"
     ]
 }
+
+AppPolicies := {
+    "Identity": "Global",
+    "DefaultCatalogAppsType": "AllowedAppList",
+    "GlobalCatalogAppsType": "AllowedAppList",
+    "PrivateCatalogAppsType": "AllowedAppList"
+}

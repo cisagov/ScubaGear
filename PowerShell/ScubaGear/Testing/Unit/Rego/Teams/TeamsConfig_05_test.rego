@@ -10,40 +10,23 @@ import data.utils.key.PASS
 # Policy MS.TEAMS.5.1v1
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "DefaultCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    Output := teams.tests with input.app_policies as [AppPolicies]
 
     TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Correct_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "DefaultCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "DefaultCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "DefaultCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
@@ -52,14 +35,11 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "DefaultCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"},
+                {"op": "add", "path": "DefaultCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
@@ -68,22 +48,14 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
 }
 
 test_DefaultCatalogAppsType_Multiple if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "DefaultCatalogAppsType": "AllowedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy1",
-                "DefaultCatalogAppsType": "BlockedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy2",
-                "DefaultCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App1 := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy1"},
+                {"op": "add", "path": "DefaultCatalogAppsType", "value": "BlockedAppList"}])
+    App2 := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy2"},
+                {"op": "add", "path": "DefaultCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [AppPolicies, App1, App2]
 
     ReportDetailArrayStrs := [
         "2 meeting policy(ies) found that does not restrict installation of Microsoft Apps by default: ",
@@ -98,40 +70,23 @@ test_DefaultCatalogAppsType_Multiple if {
 # Policy MS.TEAMS.5.2v1
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "GlobalCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    Output := teams.tests with input.app_policies as [AppPolicies]
 
     TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Correct_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "GlobalCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "GlobalCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "GlobalCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Global"
@@ -140,14 +95,11 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "GlobalCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"},
+                {"op": "add", "path": "GlobalCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
@@ -156,22 +108,13 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
 }
 
 test_GlobalCatalogAppsType_Multiple if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "GlobalCatalogAppsType": "BlockedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy1",
-                "GlobalCatalogAppsType": "AllowedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy2",
-                "GlobalCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App1 := json.patch(AppPolicies, [{"op": "add", "path": "GlobalCatalogAppsType", "value": "BlockedAppList"}])
+    App2 := json.patch(AppPolicies, [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy1"}])
+    App3 := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy2"},
+                {"op": "add", "path": "GlobalCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App1, App2, App3]
 
     ReportDetailArrayStrs := [
         "2 meeting policy(ies) found that does not restrict installation of third-party apps by default: ",
@@ -186,40 +129,23 @@ test_GlobalCatalogAppsType_Multiple if {
 # Policy MS.TEAMS.5.3v1
 #--
 test_PrivateCatalogAppsType_Correct_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "PrivateCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    Output := teams.tests with input.app_policies as [AppPolicies]
 
     TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Correct_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "PrivateCatalogAppsType": "AllowedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V1 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "PrivateCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies, [{"op": "add", "path": "PrivateCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Global"
@@ -228,14 +154,11 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Tag:TestPolicy",
-                "PrivateCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"},
+                {"op": "add", "path": "PrivateCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App]
 
     ReportDetailStr :=
     "1 meeting policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
@@ -244,22 +167,13 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 }
 
 test_PrivateCatalogAppsType_Multiple if {
-    Output := teams.tests with input as {
-        "app_policies": [
-            {
-                "Identity": "Global",
-                "PrivateCatalogAppsType": "BlockedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy1",
-                "PrivateCatalogAppsType": "AllowedAppList"
-            },
-            {
-                "Identity": "Tag:TestPolicy2",
-                "PrivateCatalogAppsType": "BlockedAppList"
-            }
-        ]
-    }
+    App1 := json.patch(AppPolicies, [{"op": "add", "path": "PrivateCatalogAppsType", "value": "BlockedAppList"}])
+    App2 := json.patch(AppPolicies, [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy1"}])
+    App3 := json.patch(AppPolicies,
+                [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy2"},
+                {"op": "add", "path": "PrivateCatalogAppsType", "value": "BlockedAppList"}])
+
+    Output := teams.tests with input.app_policies as [App1, App2, App3]
 
     ReportDetailArrayStrs := [
         "2 meeting policy(ies) found that does not restrict installation of custom apps by default: ",
