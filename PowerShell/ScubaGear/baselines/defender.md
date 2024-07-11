@@ -750,19 +750,19 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
    agency and at a minimum those referenced in the
    [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
 
-   a. Suspicious email sending patterns detected.
+   a. **Suspicious email sending patterns detected.**
 
-   b. Suspicious connector activity.
+   b. **Suspicious connector activity.**
 
-   c. Suspicious Email Forwarding Activity.
+   c. **Suspicious Email Forwarding Activity.**
 
-   d. Messages have been delayed.
+   d. **Messages have been delayed.**
 
-   e. Tenant restricted from sending unprovisioned email.
+   e. **Tenant restricted from sending unprovisioned email.**
 
-   f. Tenant restricted from sending email.
+   f. **Tenant restricted from sending email.**
 
-   g. A potentially malicious URL click was detected.
+   g. **A potentially malicious URL click was detected.**
 
 5. Click the pencil icon from the top menu.
 
