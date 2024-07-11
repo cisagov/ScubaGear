@@ -21,7 +21,7 @@ FederationConfiguration := {
     "AllowedDomains": [
         {
             "AllowedDomain": [
-                "Domain=test365.cisa.dhs.gov"
+                "Domain=test365.some.domain.com"
             ]
         }
     ],
