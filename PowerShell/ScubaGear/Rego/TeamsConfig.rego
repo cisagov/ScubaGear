@@ -32,7 +32,6 @@ tests contains {
     "ReportDetails": ReportDetailsArray(Status, Policies, String),
     "RequirementMet": Status
 } if {
-    print(input)
     Policies := MeetingsAllowingExternalControl
     String := "meeting policy(ies) found that allows external control:"
     Status := count(Policies) == 0
