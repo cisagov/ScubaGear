@@ -752,7 +752,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
    a. Suspicious email sending patterns detected.
 
-   b. Suspicious Connector Activity.
+   b. Suspicious connector activity.
 
    c. Suspicious Email Forwarding Activity.
 
