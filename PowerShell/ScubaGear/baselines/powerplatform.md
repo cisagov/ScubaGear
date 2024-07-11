@@ -256,7 +256,7 @@ connections to or from their tenant, they can turn on tenant isolation.
 Once tenant isolation is turned on, inbound (connections to the tenant
 from external tenants) and outbound (connections from the tenant to
 external tenants) cross-tenant connections are blocked by Power Platform
-even if the user presents valid credentials to the Microsoft Entra -secured data
+even if the user presents valid credentials to the Microsoft Entra-secured data
 source.
 
 ### Policies
