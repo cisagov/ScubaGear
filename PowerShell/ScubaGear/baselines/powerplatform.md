@@ -72,7 +72,7 @@ Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.
 
 ## 1. Creation of Power Platform Environments
 
-By default, any user in the Microsoft Entra Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
+By default, any user in the Microsoft Entra ID Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
 
 ### Policies
 
@@ -151,10 +151,10 @@ connectors and configure them to fit agency needs and security
 requirements. The agency should then create a DLP policy to only allow
 those connectors to be used in Power Platform.
 
-When the Microsoft Entra tenant is created, by default, a Power Platform
+When the Microsoft Entra ID tenant is created, by default, a Power Platform
 environment is created in Power Platform. This Power Platform
 environment will bear the name of the tenant. There is no way to
-restrict users in the Microsoft Entra tenant from creating Power Apps in the
+restrict users in the Microsoft Entra ID tenant from creating Power Apps in the
 default Power Platform environment. Admins can restrict users from
 creating apps in all other created environments.
 
@@ -241,7 +241,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 
 ## 3. Power Platform Tenant Isolation
 
-Power Platform tenant isolation is different from Microsoft Entra wide tenant
+Power Platform tenant isolation is different from Microsoft Entra ID wide tenant
 restriction. It does not impact Microsoft Entra-based access outside of Power
 Platform. Power Platform tenant isolation only works for connectors
 using Microsoft Entra-based authentication, such as Office 365 Outlook or
@@ -265,7 +265,7 @@ source.
 Power Platform tenant isolation SHALL be enabled.
 
 <!--Policy: MS.POWERPLATFORM.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
+- _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
