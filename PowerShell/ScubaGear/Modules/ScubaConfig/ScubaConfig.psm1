@@ -37,7 +37,26 @@ class ScubaConfig {
             "Exchange Administrator",
             "Hybrid Identity Administrator",
             "Application Administrator",
-            "Cloud Application Administrator")
+            "Cloud Application Administrator",
+            "Teams Administrator,"
+            "Privileged Authentication Administrator",
+            "Authentication Administrator",
+            "Security Administrator",
+            "Conditional Access Administrator",
+            "Intune Administrator",
+            "Security Operator",
+            "Application Developer",
+            "Authentication Extensibility Administrator",
+            "B2C IEF Keyset Administrator",
+            "Cloud Device Administrator",
+            "Directory Writers",
+            "Domain Name Administrator",
+            "External Identity Provider Administrator",
+            "Global Reader",
+            "Helpdesk Administrator",
+            "Lifecycle Workflows Administrator",
+            "Password Administrator",
+            "Security Reader")
         DefaultOPAVersion = '0.66.0'
     }
 
