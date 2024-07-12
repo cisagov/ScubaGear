@@ -107,7 +107,7 @@ Users detected as high risk SHALL be blocked.
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
-- _Note:_ Users identified as high risk by Azure AD Identity Protection can be blocked from accessing the system via an Azure AD Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
+- _Note:_ Users identified as high risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
