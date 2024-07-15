@@ -93,6 +93,20 @@ InModuleScope CreateReport {
                 $Result | Should -Be $false
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
+
+            It 'Returns false if the ID is malformed' {
+                # The functions should recognize that the ID is malformed
+                # and mark the policy as not omitted.
+                $Config = [PSCustomObject]@{
+                    "OmitPolicy" = [PSCustomObject]@{
+                        "MSDEFENDER.1.1v1" = [PSCustomObject]@{
+                            "Rationale" = "Example rationale";
+                        }
+                    }
+                }
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
+                $Result | Should -Be $false
+            }
         }
     }
 
