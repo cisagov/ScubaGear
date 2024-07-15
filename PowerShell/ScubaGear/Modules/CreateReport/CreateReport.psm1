@@ -120,7 +120,7 @@ function New-Report {
                         "Requirement"=$Control.Value
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
-                        "Details"= "Test disabled by user. $($OmitRationale)"
+                        "Details"= "Test omitted by user. $($OmitRationale)"
                     }
                     continue
                 }
