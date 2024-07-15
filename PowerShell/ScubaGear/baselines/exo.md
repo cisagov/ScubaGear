@@ -1177,13 +1177,6 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
-#### MS.EXO.14.4v1
-If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.
-
-<!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
-- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
-- _Last modified:_ May 2024
-
 ### Resources
 
 - [Configure anti-spam policies in EOP \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-spam-policies-configure?view=o365-worldwide)
