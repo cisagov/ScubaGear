@@ -96,13 +96,11 @@ In some cases, it may be appropriate to omit specific policies from ScubaGear ev
 - When a policy is implemented by a third-party service that ScubaGear does not audit
 - When a policy is not applicable to your organization (e.g., policy MS.EXO.4.3v1 is only applicable to federal, executive branch, departments and agencies)
 
-The `OmitPolicy` top-level key in the [ScubaGear configuration file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml) allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
+The `OmitPolicy` top-level key, shown in this [example ScubaGear configuration file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml), allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
 
 For each omitted policy, the config file allows you to indicate the following:
 - `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
 - `Expiration`: Optional. A date after which the policy should no longer be omitted from the report. The expected format is yyyy-mm-dd.
-
-Policy omissions can be provided to the `New-Config` function as a comma-separated list of policy IDs under the `OmitPolicy` parameter. However, the `New-Config` function does not allow you to specify the rationales or expiration dates via the commandline; these must be manually entered into the resulting config file.
 
 ## Product-specific Configuration
 
