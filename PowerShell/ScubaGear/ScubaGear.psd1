@@ -80,7 +80,7 @@ FunctionsToExport = @(
     'Invoke-SCuBACached',
     'Disconnect-SCuBATenant',
     'Copy-SCuBABaselineDocument',
-    'Install-OPA',
+    'Install-OPAforSCuBA',
     'Initialize-SCuBA',
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',

@@ -189,7 +189,7 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Install-OPA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+            Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
             $Error[0] | Format-List -Property * -Force | Out-Host
@@ -205,7 +205,7 @@ function Initialize-SCuBA {
     $DebugPreference = $PreferenceStack.Pop()
 }
 
-function Install-OPA {
+function Install-OPAforSCuBA {
     <#
     .SYNOPSIS
         This script installs the required OPA executable used by the
@@ -213,7 +213,7 @@ function Install-OPA {
     .DESCRIPTION
         Installs the OPA executable required to support SCuBAGear.
     .EXAMPLE
-        Install-OPA
+        Install-OPAforSCuBA
     #>
     [CmdletBinding()]
     param(
@@ -908,7 +908,7 @@ function New-SCuBAConfig {
 
 Export-ModuleMember -Function @(
     'Copy-SCuBABaselineDocument',
-    'Install-OPA',
+    'Install-OPAforSCuBA',
     'Initialize-SCuBA',
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',

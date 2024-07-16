@@ -21,7 +21,7 @@ Try this cmdlet first:
 
 ```powershell
 # Download OPA
-Install-OPA
+Install-OPAforSCuBA
 ```
 
 If that fails, you can manually download the OPA executable.
