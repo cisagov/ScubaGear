@@ -140,7 +140,6 @@ test_Rdata_Multiple_Correct_V2 if {
 
 test_Rdata_Multiple_Correct_V3 if {
     # Test SPF redirect
-    PolicyId := "MS.EXO.2.2v2"
     Output := exo.tests with input as {
         "spf_records": [
             {
