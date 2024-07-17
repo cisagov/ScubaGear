@@ -1,11 +1,11 @@
-# Purpose:  Run the CI/CD pipeline that tests, packages, and publishes ScubaGear.
-# Note:  This pipeline is a work in progress.  At the moment, it is only doing linting, syntax checking, security scanning, and unit testing.
+# Purpose:  Run the workflow pipeline that tests code in the other workflows.
+# Note:  This pipeline is a work in progress.  At the moment, it is only doing unit testing.  Eventually, it should also do linting, security checking, etc. but only for the workflow code.
 
-name: Run the CI/CD Pipeline
+name: Run the Workflow Pipeline
 
 on:
   push:
-    paths-ignore:
+    paths:
       - '.github/workflows/*'
       - 'Testing/workflow/*'
       - 'utils/workflow/*'
@@ -22,23 +22,18 @@ jobs:
   lint-powershell:
     name: Lint
     uses: ./.github/workflows/lint_powershell.yaml
-  syntax-markdown:
-    name: Syntax
-    uses: ./.github/workflows/syntax_check_markdown.yaml
   # Security Checks
   scan-secret:
     name: Security
     needs:
       - lint-yaml
       - lint-powershell
-      - syntax-markdown
     uses: ./.github/workflows/run_secret_scan.yaml
   check-security:
     name: Security
     needs:
       - lint-yaml
       - lint-powershell
-      - syntax-markdown
     uses: ./.github/workflows/check_security.yaml
   # Unit Tests
   unit-powershell:
@@ -47,9 +42,9 @@ jobs:
       - scan-secret
       - check-security
     uses: ./.github/workflows/unit_test_powershell.yaml
-  unit-opa:
+  unit-workflow:
     name: Unit
     needs:
       - scan-secret
       - check-security
-    uses: ./.github/workflows/unit_test_opa.yaml
+    uses: ./.github/workflows/unit_test_workflows.yaml

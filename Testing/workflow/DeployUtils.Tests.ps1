@@ -53,9 +53,11 @@ Describe "Check CreateArrayOfFilePaths" {
     # Add the files to an array.
     $ArrayOfPowerShellFiles += $Files
     # For debugging
-    # Write-Warning "Length of array is $($ArrayOfPowerShellFiles.Length)"
+    Write-Warning "Length of input array is $($ArrayOfPowerShellFiles.Length)"
     # Create an array with the method
     $ArrayOfFilePaths = CreateArrayOfFilePaths -SourcePath $UtilsFolderPath -Extensions "*.ps1"
+    # For debugging
+    Write-Warning "Length of output array is $($ArrayOfFilePaths.Length)"
     # The resulting file should not be empty.
     $ArrayOfFilePaths | Should -Not -BeNullOrEmpty
     # It should have as many files as we sent to the function.
