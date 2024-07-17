@@ -1,14 +1,13 @@
 package exo_test
 import rego.v1
 import data.exo
-import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 import data.utils.key.TestResultContains
 import data.utils.key.PASS
 
 
 #
-# Policy MS.EXO.2.1v1
+# Policy MS.EXO.2.2v2
 #--
 test_Rdata_Correct_V1 if {
     Output := exo.tests with input as {
@@ -23,7 +22,7 @@ test_Rdata_Correct_V1 if {
     }
 
 
-    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
 }
 
 test_Rdata_Correct_V2 if {
@@ -38,7 +37,7 @@ test_Rdata_Correct_V2 if {
         ]
     }
 
-    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -54,7 +53,7 @@ test_Rdata_Incorrect_V1 if {
     }
 
     ReportDetailString := "1 agency domain(s) found in violation: Test name"
-    TestResult("MS.EXO.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -70,7 +69,7 @@ test_Rdata_Incorrect_V2 if {
     }
 
     ReportDetailString := "1 agency domain(s) found in violation: Test name"
-    TestResult("MS.EXO.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
 }
 
 # if we can make any assumptions about the order these domains
@@ -104,7 +103,7 @@ test_Rdata_Incorrect_V3 if {
         "bad.com", # I'm not sure
         "2bad.com"
     ]
-    TestResultContains("MS.EXO.2.1v1", Output, ReportDetailArrayStrs, false) == true
+    TestResultContains("MS.EXO.2.2v2", Output, ReportDetailArrayStrs, false) == true
 }
 
 test_Rdata_Multiple_Correct_V1 if {
@@ -120,7 +119,7 @@ test_Rdata_Multiple_Correct_V1 if {
         ]
     }
 
-    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
 }
 
 test_Rdata_Multiple_Correct_V2 if {
@@ -136,12 +135,12 @@ test_Rdata_Multiple_Correct_V2 if {
         ]
     }
 
-    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
 }
 
 test_Rdata_Multiple_Correct_V3 if {
     # Test SPF redirect
-    PolicyId := "MS.EXO.2.1v1"
+    PolicyId := "MS.EXO.2.2v2"
     Output := exo.tests with input as {
         "spf_records": [
             {
@@ -152,7 +151,7 @@ test_Rdata_Multiple_Correct_V3 if {
         "domains": ["test1.name"]
     }
 
-    TestResult("MS.EXO.2.1v1", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
 }
 
 test_Rdata_Multiple_Incorrect if {
@@ -169,6 +168,6 @@ test_Rdata_Multiple_Incorrect if {
     }
 
     ReportDetailString := "1 agency domain(s) found in violation: bad.com"
-    TestResult("MS.EXO.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
 }
 #--

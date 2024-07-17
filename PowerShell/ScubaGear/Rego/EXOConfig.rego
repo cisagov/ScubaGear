@@ -1,6 +1,5 @@
 package exo
 import rego.v1
-import data.utils.report.NotCheckedDetails
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ArraySizeStr
 import data.utils.report.ReportDetailsBoolean
@@ -51,7 +50,7 @@ tests contains {
 ############
 
 #
-# MS.EXO.2.1v1
+# MS.EXO.2.2v2
 #--
 
 # Loop through domain DNS responses & loop through the policies associated
@@ -66,7 +65,7 @@ DomainsWithoutSpf contains DNSResponse.domain if {
 }
 
 tests contains {
-    "PolicyId": "MS.EXO.2.1v1",
+    "PolicyId": "MS.EXO.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": Domains,

@@ -117,7 +117,7 @@ points.
 
 ### Policies
 
-#### MS.EXO.2.1v1
+#### MS.EXO.2.2v2
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
 <!--Policy: MS.EXO.2.1v1; Criticality: SHALL -->
@@ -125,6 +125,7 @@ An SPF policy SHALL be published for each domain that fails all non-approved sen
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
 - _Last modified:_ March 2024
+- _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Fail, as used in this baseline policy, refers to hardfail (i.e., `-`).
 - _MITRE ATT&CK TTP Mapping:_
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -151,7 +152,9 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### Implementation
 
-#### MS.EXO.2.1v1 Instructions
+#### MS.EXO.2.2v2 Instructions
+First, identify any approved senders specific to your agency (see  [Create safe sender lists in EOP](https://learn.microsoft.com/en-us/defender-office-365/create-safe-sender-lists-in-office-365) for tips). SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.
+
 SPF is not configured through the Exchange admin center, but rather via
 DNS records hosted by the agency's domain. Thus, the exact steps needed
 to set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.
