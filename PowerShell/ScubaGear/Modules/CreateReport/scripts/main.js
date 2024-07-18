@@ -25,6 +25,9 @@ const colorRows = () => {
             else if (rows[i].children[statusCol].innerHTML === "Pass") {
                 rows[i].style.background = "var(--test-pass)";
             }
+            else if (rows[i].children[statusCol].innerHTML === "Omitted") {
+                rows[i].style.background = "var(--test-other)";
+            }
             else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
                 rows[i].style.background = "var(--test-other)";
             }

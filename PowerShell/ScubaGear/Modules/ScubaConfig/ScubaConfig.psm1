@@ -56,6 +56,29 @@ class ScubaConfig {
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
 
+        # If OmitPolicy was included in the config file, validate the policy IDs included there.
+        if ($this.Configuration.ContainsKey("OmitPolicy")) {
+            foreach ($Policy in $this.Configuration.OmitPolicy.Keys) {
+                if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
+                    # Note that -match is a case insensitive match
+                    # Note that the regex does not validate the product name, this will be done later
+                    $Warning = "Config file indicates omitting $Policy, but $Policy is not a valid control ID. "
+                    $Warning += "Expected format is 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
+                    $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Control will not be omitted."
+                    Write-Warning $Warning
+                    Continue
+                }
+                $Product = ($Policy -Split "\.")[1]
+                # Here's where the product name is validated
+                if (-not ($this.Configuration.ProductNames -Contains $Product)) {
+                    $Warning = "Config file indicates omitting $Policy, but $Product is not one of the products "
+                    $Warning += "specified in the ProductNames parameter. Control will not be omitted."
+                    Write-Warning $Warning
+                    Continue
+                }
+            }
+        }
+
         return [ScubaConfig]::_IsLoaded
     }
 
