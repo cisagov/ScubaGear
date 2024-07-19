@@ -745,7 +745,12 @@ tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
-    "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
+    # Track invalid/valid and federated domains for future reference
+    "ActualValue": { 
+        "invalid_domains": UserPasswordsSetToExpire, 
+        "valid_domains": UserPasswordsSetToNotExpire,
+        "federated_domains": FederatedDomains
+    },
     "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
