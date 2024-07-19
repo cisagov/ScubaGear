@@ -14,19 +14,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.EXO.2.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.EXO.2.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
-  - PolicyId: MS.EXO.2.2v1
+  - PolicyId: MS.EXO.2.2v2
     TestDriver: RunCached
     Tests:
-      - TestDescription: MS.EXO.2.2v1 Non-Compliant case - SPF policy is missing for one of the domains
+      - TestDescription: MS.EXO.2.2v2 Non-Compliant case - SPF policy is missing for one of the domains
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -41,7 +32,7 @@ TestPlan:
                       - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.EXO.2.2v1 Compliant case - SPF policy is published for the domains
+      - TestDescription: MS.EXO.2.2v2 Compliant case - SPF policy is published for the domains
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
