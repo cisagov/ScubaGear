@@ -1812,18 +1812,6 @@
         "Commandlet":  [
 
                        ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.EXO.2.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/exo.md#msexo21v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.10.3v1",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
@@ -2993,7 +2981,7 @@
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.EXO.2.2v1",
+        "PolicyId":  "MS.EXO.2.2v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },

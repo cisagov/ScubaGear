@@ -88,6 +88,7 @@ function New-Report {
         "Warnings" = 0;
         "Failures" = 0;
         "Passes" = 0;
+        "Omits" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -101,6 +102,29 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
+                # Check if the config file indicates the control should be omitted
+                $Config = $SettingsExport.scuba_config
+                $Omit = Get-OmissionState $Config $Control.Id
+                if ($Omit) {
+                    $ReportSummary.Omits += 1
+                    $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
+                    if ([string]::IsNullOrEmpty($OmitRationale)) {
+                        Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
+                        $OmitRationale = "Rationale not provided."
+                    }
+                    else {
+                        $OmitRationale = "`"$($OmitRationale)`""
+                    }
+                    $Fragment += [pscustomobject]@{
+                        "Control ID"=$Control.Id
+                        "Requirement"=$Control.Value
+                        "Result"= "Omitted"
+                        "Criticality"= $Test.Criticality
+                        "Details"= "Test omitted by user. $($OmitRationale)"
+                    }
+                    continue
+                }
+
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
 
                 if ($MissingCommands.Count -gt 0) {
@@ -275,6 +299,72 @@ function New-Report {
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
 
     $ReportSummary
+}
+
+function Get-OmissionState {
+    <#
+    .Description
+    Determine if the supplied control was marked for omission in the config file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+    $Omit = $false
+    if ($Config.psobject.properties.name -Contains "OmitPolicy") {
+        if ($Config.OmitPolicy.psobject.properties.name -Contains $ControlId) {
+            # The config indicates the control should be omitted
+            if ($Config.OmitPolicy.$($ControlId).psobject.properties.name -Contains "Expiration") {
+                # An expiration date for the omission expiration was provided. Evaluate the date
+                # to see if the control should still be omitted.
+                if ($Config.OmitPolicy.$($ControlId).Expiration -eq "") {
+                    # If the Expiration date is an empty string, omit the policy
+                    $Omit = $true
+                }
+                else {
+                    # An expiration date was provided and it's not an empty string
+                    $Now = Get-Date
+                    $ExpirationString = $Config.OmitPolicy.$($ControlId).Expiration
+                    try {
+                        $ExpirationDate = Get-Date -Date $ExpirationString
+                        if ($ExpirationDate -lt $Now) {
+                            # The expiration date is passed, don't omit the policy
+                            $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                            $Warning += "expiration date, $ExpirationString, has passed. Control will "
+                            $Warning += "not be omitted."
+                            Write-Warning $Warning
+                        }
+                        else {
+                            # The expiration date is in the future, omit the policy
+                            $Omit = $true
+                        }
+                    }
+                    catch {
+                        # Malformed date, don't omit the policy
+                        $Warning = "Config file indicates omitting $($ControlId), but the provided "
+                        $Warning += "expiration date, $ExpirationString, is malformed. The expected "
+                        $Warning += "format is yyyy-mm-dd. Control will not be omitted."
+                        Write-Warning $Warning
+                    }
+                }
+            }
+            else {
+                # The expiration date was not provided, omit the policy
+                $Omit = $true
+            }
+        }
+    }
+    $Omit
 }
 
 function Import-SecureBaseline{

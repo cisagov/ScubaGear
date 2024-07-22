@@ -748,7 +748,21 @@ The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
 
 4. Select the checkbox next to each alert to enable as determined by the
    agency and at a minimum those referenced in the
-   [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1).
+   [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
+
+   a. **Suspicious email sending patterns detected.**
+
+   b. **Suspicious connector activity.**
+
+   c. **Suspicious Email Forwarding Activity.**
+
+   d. **Messages have been delayed.**
+
+   e. **Tenant restricted from sending unprovisioned email.**
+
+   f. **Tenant restricted from sending email.**
+
+   g. **A potentially malicious URL click was detected.**
 
 5. Click the pencil icon from the top menu.
 
@@ -833,7 +847,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 - _Last modified:_ June 2023
 - _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
-          Business, and Azure Active Directory audit records for one year.
+          Business, and Microsoft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.

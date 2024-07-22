@@ -90,6 +90,18 @@ ScubaGear's support module can generate an empty sample config file. Running the
 New-SCuBAConfig
 ```
 
+## Omit Policies
+
+In some cases, it may be appropriate to omit specific policies from ScubaGear evaluation. For example:
+- When a policy is implemented by a third-party service that ScubaGear does not audit
+- When a policy is not applicable to your organization (e.g., policy MS.EXO.4.3v1 is only applicable to federal, executive branch, departments and agencies)
+
+The `OmitPolicy` top-level key, shown in this [example ScubaGear configuration file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml), allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
+
+For each omitted policy, the config file allows you to indicate the following:
+- `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
+- `Expiration`: Optional. A date after which the policy should no longer be omitted from the report. The expected format is yyyy-mm-dd.
+
 ## Product-specific Configuration
 
 Config files can include a top-level level key for a given product whose values are related to that specific product. For example, look for the value of `Defender` in this [Defender config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). Currently, only Entra ID and Defender use this extra configuration.

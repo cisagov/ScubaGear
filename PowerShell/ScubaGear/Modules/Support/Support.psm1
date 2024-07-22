@@ -728,6 +728,9 @@ function New-SCuBAConfig {
     parameters. Additional parameters and variables not available on the
     command line can also be included in the file that will be provided to the
     tool for use in specific tests.
+    .Parameter OmitPolicy
+    A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.DEFENDER.1.1v1.
+    Note that the rationales will need to be manually added to the resulting config file.
     .Functionality
     Public
     #>
@@ -812,7 +815,12 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $ConfigLocation = "./"
+        $ConfigLocation = "./",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $OmitPolicy = @()
     )
 
     $Config = New-Object ([System.Collections.specialized.OrderedDictionary])
@@ -823,6 +831,12 @@ function New-SCuBAConfig {
             #$config[$_] = $val
             $Config.add($_, $Val)
         }
+    }
+
+    if ($config.Contains("OmitPolicy")) {
+        # We don't want to immediately save this parameter to the config, as it's not in the right
+        # format yet.
+        $config.Remove("OmitPolicy")
     }
 
     $CapExclusionNamespace = @(
@@ -849,6 +863,46 @@ function New-SCuBAConfig {
 
     $PartnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
 
+    $OmissionNamespace = "OmitPolicy"
+
+    # List to track which policies the user specified in $OmitPolicies are properly formatted
+    $OmitPolicyValidated = @()
+
+    # Hashmap to structure the ignored policies template
+    $config[$OmissionNamespace] = @{}
+
+    foreach ($Policy in $OmitPolicy) {
+        if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
+            # Note that -match is a case insensitive match
+            # Note that the regex does not validate the product name, this will be done
+            # later
+            $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
+            $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
+            $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        $Product = ($Policy -Split "\.")[1]
+        # Here's where the product name is validated
+        if (-not ($ProductNames -Contains $Product)) {
+            $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not encompassed by "
+            $Warning += "the products specified in the ProductName parameter. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
+        $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
+        $OmitPolicyValidated += $PolicyCapitalized
+        $config[$OmissionNamespace][$PolicyCapitalized] = @{
+            "Rationale" = "";
+            "Expiration" = "";
+        }
+    }
+
+    $Warning = "The following policies have been configured for omission: $($OmitPolicyValidated -Join ', '). "
+    $Warning += "Note that as the New-Config function does not support providing the rationale for omission via "
+    $Warning += "the commandline, you will need to open the resulting config file and manually enter the rationales."
+    Write-Warning $Warning
 
     $AadTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
     $AadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])

@@ -31,10 +31,10 @@ the types of users are defined as follows:
 
 3.  **Business to Business (B2B) guest users**: External users who are
     formally invited to collaborate with the team and added to the
-    agency's Azure Active Directory (Azure AD) as guest users. These users
+    agency's Microsoft Entra as guest users. These users
     authenticate with their home organization/tenant and are granted
     access to the team by virtue of being listed as guest users on the
-    tenant's Azure AD.
+    tenant's Microsoft Entra.
 
 4.  **Unmanaged users**: Users who are not members of any M365 tenant or
     organization (e.g., personal Microsoft accounts).
@@ -268,6 +268,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 <!--Policy: MS.TEAMS.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ July 2023
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
@@ -369,6 +370,7 @@ Contact with Skype users SHALL be blocked.
 <!--Policy: MS.TEAMS.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk.  By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
 

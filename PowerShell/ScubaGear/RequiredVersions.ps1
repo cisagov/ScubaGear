@@ -33,27 +33,27 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.19.99999'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Users'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.19.99999'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Groups'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.19.99999'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Identity.DirectoryManagement'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.19.99999'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Identity.SignIns'
         ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.19.99999'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'powershell-yaml'
