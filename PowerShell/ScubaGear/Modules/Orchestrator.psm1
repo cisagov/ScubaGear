@@ -1331,7 +1331,7 @@ function Remove-Resources {
     Remove-Module "Connection" -ErrorAction "SilentlyContinue"
 }
 
-function Invoke-RunCached {
+function Invoke-SCuBACached {
     <#
     .SYNOPSIS
     Specially execute the SCuBAGear tool security baselines for specified M365 products.
@@ -1413,19 +1413,19 @@ function Invoke-RunCached {
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
-    Invoke-RunCached
+    Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
     Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
-    Invoke-RunCached -Version
+    Invoke-SCuBACached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-RunCached -ProductNames aad, defender -OPAPath . -OutPath .
+    Invoke-SCuBACached -ProductNames aad, defender -OPAPath . -OutPath .
     The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
     .Example
-    Invoke-RunCached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
+    Invoke-SCuBACached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
     .Example
@@ -1626,5 +1626,5 @@ function Invoke-RunCached {
 
 Export-ModuleMember -Function @(
     'Invoke-SCuBA',
-    'Invoke-RunCached'
+    'Invoke-SCuBACached'
 )

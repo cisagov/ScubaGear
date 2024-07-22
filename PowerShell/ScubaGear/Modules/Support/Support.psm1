@@ -1,6 +1,6 @@
 using module '..\ScubaConfig\ScubaConfig.psm1'
 
-function Copy-ScubaBaselineDocument {
+function Copy-SCuBABaselineDocument {
     <#
     .SYNOPSIS
     Copy security baselines documents to a user specified location.
@@ -9,7 +9,7 @@ function Copy-ScubaBaselineDocument {
     .Parameter Destination
     Where to copy the baselines. Defaults to <user home>\ScubaGear\baselines
     .Example
-    Copy-ScubaBaselineDocument
+    Copy-SCuBABaselineDocument
     .Functionality
     Public
     .NOTES
@@ -189,7 +189,7 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Install-OPA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+            Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
             $Error[0] | Format-List -Property * -Force | Out-Host
@@ -205,7 +205,7 @@ function Initialize-SCuBA {
     $DebugPreference = $PreferenceStack.Pop()
 }
 
-function Install-OPA {
+function Install-OPAforSCuBA {
     <#
     .SYNOPSIS
         This script installs the required OPA executable used by the
@@ -213,7 +213,7 @@ function Install-OPA {
     .DESCRIPTION
         Installs the OPA executable required to support SCuBAGear.
     .EXAMPLE
-        Install-OPA
+        Install-OPAforSCuBA
     #>
     [CmdletBinding()]
     param(
@@ -551,7 +551,7 @@ function Debug-SCuBA {
     $DebugPreference = $PreferenceStack.Pop()
 }
 
-function Copy-ScubaSampleReport {
+function Copy-SCuBASampleReport {
     <#
     .SYNOPSIS
     Copy sample reports to user defined location.
@@ -560,7 +560,7 @@ function Copy-ScubaSampleReport {
     .Parameter Destination
     Where to copy the samples. Defaults to <user home>\ScubaGear\samples\reports
     .Example
-    Copy-ScubaSampleReport
+    Copy-SCuBASampleReport
     .Functionality
     Public
     .NOTES
@@ -581,7 +581,7 @@ function Copy-ScubaSampleReport {
     Copy-ScubaModuleFile -SourceDirectory $SourceDirectory -DestinationDirectory $DestinationDirectory -Force:$Force
 }
 
-function Copy-ScubaSampleConfigFile {
+function Copy-SCuBASampleConfigFile {
     <#
     .SYNOPSIS
     Copy sample configuration files to user defined location.
@@ -590,7 +590,7 @@ function Copy-ScubaSampleConfigFile {
     .Parameter Destination
     Where to copy the samples. Defaults to <user home>\ScubaGear\samples\config-files
     .Example
-    Copy-ScubaSampleConfigFile
+    Copy-SCuBASampleConfigFile
     .Functionality
     Public
     .NOTES
@@ -654,7 +654,7 @@ function Copy-ScubaModuleFile {
     }
 }
 
-function New-Config {
+function New-SCuBAConfig {
     <#
     .SYNOPSIS
     Generate a config file for the ScubaGear tool
@@ -961,11 +961,11 @@ function New-Config {
 }
 
 Export-ModuleMember -Function @(
-    'Copy-ScubaBaselineDocument',
-    'Install-OPA',
+    'Copy-SCuBABaselineDocument',
+    'Install-OPAforSCuBA',
     'Initialize-SCuBA',
     'Debug-SCuBA',
-    'Copy-ScubaSampleReport',
-    'Copy-ScubaSampleConfigFile',
-    'New-Config'
+    'Copy-SCuBASampleReport',
+    'Copy-SCuBASampleConfigFile',
+    'New-SCuBAConfig'
 )

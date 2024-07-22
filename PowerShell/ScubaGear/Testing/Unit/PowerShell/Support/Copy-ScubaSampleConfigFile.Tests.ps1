@@ -9,13 +9,13 @@ InModuleScope Support {
                 Remove-Item -Path $SampleConfigCopyFolder -Recurse -Force
             }
         }
-        It "Call Copy-ScubaSampleConfigFile with bad destination" {
-            {Copy-ScubaSampleConfigFile -Destination "$SampleConfigCopyFolder\`tInvalid-"} |
+        It "Call Copy-SCuBASampleConfigFile with bad destination" {
+            {Copy-SCuBASampleConfigFile -Destination "$SampleConfigCopyFolder\`tInvalid-"} |
                 Should -Throw -Because "directory does not exist."
         }
-        It "Call Copy-ScubaSampleConfigFile with good destination"{
+        It "Call Copy-SCuBASampleConfigFile with good destination"{
             Test-Path -Path $SampleConfigCopyFolder -PathType Container | Should -Not -BeTrue
-            {Copy-ScubaSampleConfigFile -Destination $SampleConfigCopyFolder} |
+            {Copy-SCuBASampleConfigFile -Destination $SampleConfigCopyFolder} |
                 Should -Not -Throw
         }
         It "Top level sample file, <_>, is copied" -ForEach $SampleFiles {
@@ -26,18 +26,18 @@ InModuleScope Support {
             $ItemPath = Join-Path -Path $SampleConfigCopyFolder -ChildPath $_
             Get-Item -Path $ItemPath | Select-Object IsReadyOnly | Should -BeTrue
         }
-        It "Call Copy-ScubaSampleConfigFile already exists - Not Force update"{
+        It "Call Copy-SCuBASampleConfigFile already exists - Not Force update"{
             $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
             Test-Path -Path $SampleConfigCopyFolder -PathType Container | Should -BeTrue
-            {Copy-ScubaSampleConfigFile -Destination $SampleConfigCopyFolder} |
+            {Copy-SCuBASampleConfigFile -Destination $SampleConfigCopyFolder} |
                 Should -Throw -ExpectedMessage "Scuba copy module files failed."
             $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
             $PreviousCreateTime -eq $CurrentCreateTime | Should -BeTrue
         }
-        It "Call Copy-ScubaSampleConfigFile already exists -  Force Update"{
+        It "Call Copy-SCuBASampleConfigFile already exists -  Force Update"{
             $PreviousCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
             Test-Path -Path $SampleConfigCopyFolder -PathType Container | Should -BeTrue
-            {Copy-ScubaSampleConfigFile -Destination $SampleConfigCopyFolder -Force} |
+            {Copy-SCuBASampleConfigFile -Destination $SampleConfigCopyFolder -Force} |
                 Should -Not -Throw
             $CurrentCreateTime = [System.DateTime](Get-Item -Path (Join-Path -Path $SampleConfigCopyFolder -ChildPath "aad-config.yaml")).CreationTime
             ($CurrentCreateTime -ge $PreviousCreateTime) | Should -BeTrue -Because "$($CurrentCreateTime) vs $($PreviousCreateTime)"
