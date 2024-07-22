@@ -4,7 +4,9 @@
 
 1) DO NOT push any changes
 2) DO NOT merge this branch into main
-3) DO ask questions
+3) DO NOT look at the code in the other branches to solve the challenges
+4) DO ask questions
+5) Look at the Training Ground README!
 
 ## Table of Contents
 
@@ -13,7 +15,7 @@
 - [Rego Cheat Sheet](docs/training/cheatsheet.md)
 - [Rego Policy Creation](docs/training//rego_rules.md)
 - [Rego Unit Tests](docs/training/unit_test.md)
-- [ReadMe for Training Ground](docs/training/training_ground.md)
+- [README for Training Ground](docs/training/training_ground.md)
 
 ## Overview
 

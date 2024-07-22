@@ -58,19 +58,26 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 
 # Basic test that has anticipated string for Report Details
 TestResult(PolicyId, Output, ReportDetailStr, Status) := true  if {
+    # Comprehension that filters for the tests rule set result for the policy that we care about. See MS.SHAREPOINT.1.1v1 or training videos for
+    # more explination about comprehensions.
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
 
     # regal ignore: print-or-trace-call
     print("\n** Checking if only one test result **")
+    # Checks that there was actualy a result returned (tests for undefined)
     assert.NotEmpty(RuleOutput)
+    # Checks for only one result returned (Concern for improperly coded Not-Implemented/Not Applicable checks)
     assert.Equals(1, count(RuleOutput))
 
     # regal ignore: print-or-trace-call
     print("** Checking RequirementMet **")
+    # Checks that requrement met is true or false as indicated by the variable passed
     assert.Equals(Status, RuleOutput[0].RequirementMet)
 
     # regal ignore: print-or-trace-call
     print("** Checking ReportDetails **")
+    # Checks if report details is an EXACT match, can be thrown by extra spaces, wrong letter caps, and different plurals. Most fails are cause by
+    # human error in the test, not incorrect logic
     assert.Equals(ReportDetailStr, RuleOutput[0].ReportDetails)
 } else := false
 
