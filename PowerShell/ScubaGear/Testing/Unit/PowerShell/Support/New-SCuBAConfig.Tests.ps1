@@ -53,7 +53,7 @@ InModuleScope Support {
                 # Should warn once to for the reminder to manually add the rationales
                 $OmitArgs = $CMDArgs
                 $OmitArgs['OmitPolicy'] = @("MS.DEFENDER.1.1v1", "MS.DEFENDER.1.2v1")
-                { New-Config @OmitArgs } | Should -Not -Throw
+                { New-SCuBAConfig @OmitArgs } | Should -Not -Throw
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
                 Test-Path -Path "$($TestPath)/SampleConfig.yaml" -PathType leaf | Should -Be $true
             }
@@ -63,7 +63,7 @@ InModuleScope Support {
                 # format and give an additional warning for this
                 $OmitArgs = $CMDArgs
                 $OmitArgs['OmitPolicy'] = @("MS.DEFENDER1.1v1")
-                { New-Config @OmitArgs } | Should -Not -Throw
+                { New-SCuBAConfig @OmitArgs } | Should -Not -Throw
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 2
                 Test-Path -Path "$($TestPath)/SampleConfig.yaml" -PathType leaf | Should -Be $true
             }
@@ -73,7 +73,7 @@ InModuleScope Support {
                 # and give an additional warning for this
                 $OmitArgs = $CMDArgs
                 $OmitArgs['OmitPolicy'] = @("MS.EXAMPLE.1.1v1", "MS.DEFENDER.1.2v1")
-                { New-Config @OmitArgs } | Should -Not -Throw
+                { New-SCuBAConfig @OmitArgs } | Should -Not -Throw
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 2
                 Test-Path -Path "$($TestPath)/SampleConfig.yaml" -PathType leaf | Should -Be $true
             }
