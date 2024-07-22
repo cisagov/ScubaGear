@@ -374,8 +374,6 @@ tests contains {
 # MS.SHAREPOINT.3.2v1
 #--
 
-# This policy is only applicable if
-# Both link types must be 1 & OneDrive_PnP_Flag must be false for policy to pass
 # Sharepoint Rego Challenge
 #
 # Policy logic: If external sharing is set to "Anyone", OneDrive_PnP_Flag is not set, and File And Folder Link Permission is set to view,
@@ -494,14 +492,14 @@ tests contains {
 # Sharepoint Rego Challenge
 #
 # Policy logic: If users are preventedfrom running custom script on self-service created sites, the policy should pass.
+# 1 == Allow users to run custom script on self-service created sites
+# 2 == Prevent users from running custom script on self-service created sites
 #
 # Level 1: Easy
 #
 # Code Note: Try MS.SHAREPOINT.1.2v1 first. This uses a different input key `SPO_site`. I left in the some in loop, in the case like `SPO_tenant`
 # there is only one item, but this key is only used once. So we did not create a additonal variable to hold the item & opted for a loop instead.
 # Look at json key `DenyAddAndCustomizePages`.
-# 1 == Allow users to run custom script on self-service created sites
-# 2 == Prevent users from running custom script on self-service created sites
 #
 tests contains {
     "PolicyId": "MS.SHAREPOINT.4.2v1",

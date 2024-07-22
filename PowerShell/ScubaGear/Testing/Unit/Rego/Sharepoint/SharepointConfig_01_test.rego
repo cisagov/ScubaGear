@@ -18,7 +18,7 @@ import data.utils.key.PASS
 # Policy MS.SHAREPOINT.1.1v1
 #--
 
-# Sharepoint Rego Example
+# Sharepoint Rego Unit Test Example
 #
 # Code logic: test_ MUST start each unit test name (rule set). _Correct ends the unit test name if the case results in a requirements met. _Incorrect
 # ends the unit test if the case results in a requirements not met. The key values that are altered during the unit test should be the middle of the
@@ -91,6 +91,7 @@ test_SharingCapability_Incorrect_V2 if {
 # Level 1: Easy
 #
 # Code Note: I have left the tests mostly fleshed out, only need to add the json. Look at the example above if you need help.
+#
 test_OneDriveSharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input as {}
 
@@ -137,6 +138,7 @@ test_OneDriveSharingCapability_Incorrect_V2 if {
 # Level 1: Easy
 #
 # Code Note: Try previous challenge first
+#
 test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
     Output := sharepoint.tests with input as {}
 
@@ -200,6 +202,7 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
 # Level 1: Easy
 #
 # Code Note: Try previous challenge first
+#
 test_SameAccount_NotApplicable_V1 if {
     Output := sharepoint.tests with input as {}
 
