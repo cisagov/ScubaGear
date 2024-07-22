@@ -109,6 +109,7 @@ test_SharingCapability_NewExistingGuests_NotApplicable_V2 if {
 # Policy MS.SHAREPOINT.3.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Unit Test Challenge
 #
 # Policy logic: If external sharing is set to "Anyone", OneDrive_PnP_Flag is not set, and File And Folder Link Permission is set to view,

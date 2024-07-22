@@ -84,6 +84,7 @@ test_SharingCapability_Incorrect_V2 if {
 # Policy MS.SHAREPOINT.1.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Unit Test Challenge
 #
 # Policy logic: If OneDriveSharingCapability is set to Only People In Organization OR Existing Guests, the policy should pass.

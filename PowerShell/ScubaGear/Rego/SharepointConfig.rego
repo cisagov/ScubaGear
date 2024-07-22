@@ -150,6 +150,7 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Challenge
 #
 # Policy logic: If OneDriveSharingCapability is set to Only People In Organization OR Existing Guests, the policy should pass.
@@ -374,6 +375,7 @@ tests contains {
 # MS.SHAREPOINT.3.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Challenge
 #
 # Policy logic: If external sharing is set to "Anyone", OneDrive_PnP_Flag is not set, and File And Folder Link Permission is set to view,
@@ -467,6 +469,7 @@ tests contains {
 # MS.SHAREPOINT.4.1v1
 #--
 
+#** Target **#
 # Sharepoint Rego Challenge
 #
 # Policy logic: # At this time we are unable to test for running custom scripts on personal sites because we have yet to find the setting to check
@@ -489,6 +492,7 @@ tests contains {
 # MS.SHAREPOINT.4.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Challenge
 #
 # Policy logic: If users are preventedfrom running custom script on self-service created sites, the policy should pass.

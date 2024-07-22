@@ -11,6 +11,7 @@ import data.utils.key.PASS
 # Policy MS.SHAREPOINT.4.1v1
 #--
 
+#** Target **#
 # Sharepoint Rego Unit Test Example
 #
 # Policy logic: Not Implemented
@@ -30,6 +31,7 @@ test_NotImplemented_Correct if {
 # Policy MS.SHAREPOINT.4.2v1
 #--
 
+#** Target **#
 # Sharepoint Rego Unit Test Challenge
 #
 # Policy logic: If users are preventedfrom running custom script on self-service created sites, the policy should pass.
