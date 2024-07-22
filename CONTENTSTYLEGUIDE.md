@@ -21,7 +21,7 @@ The project is adopting the following public Rego [style guide](https://docs.sty
 
 Test names will use the syntax `test_mainVar_In/correct_*V#` to support brevity in naming that highlights the primary variable being tested. Furthermore, for tests with more than one version, the first test will also include a version as `_V1`. Consistent use of a version number promotes clarity and signals the presence of multiple test versions to reviewers. Version numbers are not used if there is only a single test of a given variable and type (Correct/Incorrect)
 
-```
+```Rego
 test_ExampleVar_Correct_V1 if {
     Output := <Product>.tests with input as {
         "example_policies" : [
@@ -79,7 +79,7 @@ If the policy is untestable at this time, use the templates below.
 
 The first one directs the user to the baseline document for manual checking. The second instructs the user to run a different script because the test is in another version. However, if they are unable to run the other script, they are also directed to the baseline like in the first template.
 
-```
+```Rego
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
@@ -91,7 +91,7 @@ tests contains {
 }
 ```
 
-```
+```Rego
 # At this time we are unable to test for X because of Y
 tests contains {
     "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>,
@@ -102,9 +102,10 @@ tests contains {
     "RequirementMet": false,
 }
 ```
+
 #### Testing
 
-```
+```Rego
 test_NotImplemented_Correct if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
@@ -113,7 +114,8 @@ test_NotImplemented_Correct if {
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 ```
-```
+
+```Rego
 test_3rdParty_Correct_V1 if {
     PolicyId := "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>"
 
@@ -127,7 +129,7 @@ test_3rdParty_Correct_V1 if {
 
 PascalCase - capitalize the first letter of each word. This is the same naming convention that is used for PowerShell.
 
-```
+```Rego
 ExampleVariable := true
 ```
 
@@ -135,7 +137,7 @@ ExampleVariable := true
 
 One True Brace - requires that every braceable statement should have the opening brace on the end of a line, and the closing brace at the beginning of a line. This is the same bracket style that is used for PowerShell.
 
-```
+```Rego
 test_Example_Correct if {
     Output := <Product>.tests with input as {
         "example_tag" : {
@@ -155,7 +157,7 @@ Indentation will be set at 4 spaces, make sure your Tabs == 4 spaces. We are wor
 
 1) A blank line between each major variable: references & rules
 
-```
+```Rego
 Example contains Example.Id if {
     Example := input.ExampleVar[_]
     Example.State == "Enabled"
@@ -180,7 +182,7 @@ tests {
 
 2) Two blank lines between subsections
 
-```
+```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
@@ -204,14 +206,15 @@ tests contains {
 
 1) Indicate beginning of every policy: 1, 2, etc.
 
-```
+```Rego
 ###################
 # MS.<Product>.1  #
 ###################
 ```
+
 2) Indicate the beginning of every policy.
 
-```
+```Rego
 #
 # MS.<Product>.<Policy Group #>.<Policy #>v<Version #>
 #--
@@ -219,13 +222,13 @@ tests contains {
 
 3) Indicate the end of every policy.
 
-```
+```Rego
 #--
 ```
 
 4) Indicate why placeholder test is blank/untestable
 
-```
+```REgo
 # At this time we are unable to test for X because of Y
 ```
 
@@ -233,9 +236,9 @@ tests contains {
 
 In the interest of consistency across policy tests and human readability of the test, boolean-valued variables should be set via a comparison test against a boolean constant (true/false) for variables.
 
-#### Correct
+**Correct**
 
-```
+```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
@@ -261,9 +264,9 @@ tests contains {
 }
 ```
 
-#### Incorrect
+**Incorrect**
 
-```
+```Rego
 tests contains {
     ...
 } if {
@@ -281,10 +284,10 @@ tests contains {
 
 Because methods can return undefined, use `not` instead of false comparison when dealing with booleans. `not` will still pass if the you want the false result, i.e. `== false`, but will also pass if the result is undefined. This is important because the default keyword does not work for methods, only variables. So you write your methods for the true cases & treat false/undefined results as failing cases.
 
-#### Correct
+**Correct**
 
 
-```
+```Rego
 ExampleVariable contains SomeVariable.DisplayName if {
     some X
     SomeVariable := input.example_key[X]
@@ -292,9 +295,9 @@ ExampleVariable contains SomeVariable.DisplayName if {
 }
 ```
 
-#### Incorrect
+**Incorrect**
 
-```
+```Rego
 ExampleVariable contains SomeVariable.DisplayName if {
     some X
     SomeVariable := input.example_key[X]
@@ -304,16 +307,17 @@ ExampleVariable contains SomeVariable.DisplayName if {
 
 Opa will use implicit true in some cases. For example, if the variable contained a true/false boolean, you did not need `== true` to check if the boolean contained is true. This is also true in method returns. Opa assumes methods return true/false & if not specified, will return true. For readability purposes, we enforce explicitly stating `:= true`.
 
-#### Correct
-```
+**Correct**
+
+```Rego
 ExampleMethod(Variable) := true if {
     count({x | some x in Variable}) == 0
 }
 ```
 
-#### Incorrect
+**Incorrect**
 
-```
+```Rego
 ExampleMethod(Variable) if {
     count({x | some x in Variable}) == 0
 }
@@ -323,7 +327,7 @@ ExampleMethod(Variable) if {
 
 We will always store the input in a variable first thing. It can sometimes be easier to only use `input.ExampleVar` repeatedly, but for consistency this is best practice. the `some var in` is added to the end for when you are anticipating an array, so the program has to loop through the input. There are other ways to take in input, but OPA Documents states `input.VariableName` is recommended. As such we will only use this method for consistency. If there is a problem, it can be taken up on a case by case basis for discussion.
 
-```
+```Rego
 tests contains {
     ...
 } if {
@@ -350,8 +354,9 @@ tests contains {
 
 It can be tempting to put the status variable in the ActualValue spot when you are anticipating a boolean. DON'T! For consistency and as best practice put `ExampleVar.ExampleSetting`.
 
-#### Incorrect
-```
+**Incorrect**
+
+```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
@@ -365,8 +370,9 @@ tests contains {
 }
 ```
 
-#### Correct
-```
+**Correct**
+
+```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
@@ -386,7 +392,8 @@ For the most part warnings can and should be fixed. However, there are times whe
 add a comment indicating to ignore the specific linter warning.
 
 #### Example
-```
+
+```Rego
 ExampleArray contains OtherVar.name if {
     # regal ignore:<rule_name>
     some Var in input.some_key[_].value
@@ -395,35 +402,44 @@ ExampleArray contains OtherVar.name if {
 ```
 
 ## PowerShell
+
 [PoshCode's The PowerShell Best Practices and Style Guide](https://github.com/PoshCode/PowerShellPracticeAndStyle)
 
 ## README Formatting
+
 This section is for standardizing how to format the README and it's table of contents (toc) for legibility.
 The formatting guidelines described in the sections below take formatting syntax from the VSCode [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one) extension into account. The extension is not required for ScubaGear development but is used as the basis of this guide.
 To keep the README as a consistently formatted and compact resource for users, please follow the guidelines below.
 
 ### Character Limit
+
 If the section header is at a level 2 or level 3 i.e.`## Getting Started` `### Download the Latest Release` keep the section header to at most around 55 characters.
 
 This is to limit text stretching in the toc in the README.
 
 ### Omit the Section Headers Including and Above the Table of Contents
+
 Add the ` <!-- omit in toc -->` comment to the `## Table of Contents` and `# ScubaGear` headers.
 
 **Example**
-```
+
+```Markdown
  # ScubaGear <!-- omit in toc -->
 ```
+
 These sections are located above the table of contents and are thus unnecessary.
 The comment will prevent the Markdown All in One extension from auto formatting the README with these headers.
 This should already be implemented in the current README but this guideline is to reinforce the decision.
 
 ### Omit the Section Headers Level 4+
+
 If the section header is a level 4+ header i.e `#### Power Platform App Registration` add a omit comment.
 
 **Example**
-```
+
+```Markdown
 #### Power Platform App Registration <!-- omit in toc -->
 ```
+
 This is to prevent the depth of the table of contents in the README from becoming too deeply nested.
 Deeply nested sections disrupt legibility of the toc and should be avoided.
