@@ -21,8 +21,8 @@ test_PasswordValidityPeriodInDays_Correct if {
 
 test_PasswordValidityPeriodInDays_Incorrect if {
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 0},
-        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 0},
+        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
+        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 5},
         {"op": "add", "path": "4/IsVerified", "value": false}
     ])
 
@@ -34,8 +34,8 @@ test_PasswordValidityPeriodInDays_Incorrect if {
 
 test_IsVerified_Correct if {
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 0},
-        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 0},
+        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
+        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 5},
         {"op": "add", "path": "0/IsVerified", "value": null},
         {"op": "add", "path": "1/IsVerified", "value": false},
         {"op": "add", "path": "2/IsVerified", "value": false},
@@ -66,7 +66,7 @@ test_AuthenticationType_Correct if {
 
 test_PasswordValidityPeriodInDays__ExcludeFederatedDomains_Incorrect if {
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 0},
+        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
         {"op": "add", "path": "1/AuthenticationType", "value": "Federated"},
         {"op": "add", "path": "2/AuthenticationType", "value": "Federated"},
         {"op": "add", "path": "3/AuthenticationType", "value": "Federated"},

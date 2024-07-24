@@ -172,11 +172,17 @@ HasAcceptableMFA(Policy) := true if {
 # Report formatting functions for MS.AAD.6.1v1                             #
 ############################################################################
 
+FederatedDomainWarningString := concat(" ", [
+    "ScubaGear is unable to read the user password expiration settings for federated",
+    "domains because it is controlled in a system external to the tenant.",
+    "Check with your identity provider on how to configure this policy in a federated context.",
+])
+
 FailureString := "domain(s) failed"
 
 FederatedDomainWarning(domains) := concat("<br/><br/>", [
     ReportFullDetailsArray(domains, "federated domain(s) present"),
-    "Check with your identity provider on how to configure in a federated context."
+    FederatedDomainWarningString
 ])
 
 # Case 1: Pass; no user passwords set to expire, no federated domains 

@@ -825,11 +825,11 @@ TestPlan:
               updates:
                 domain_settings:
                   - Id: test.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test2.url.com
@@ -837,7 +837,7 @@ TestPlan:
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test3.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test4.url.com
@@ -852,11 +852,11 @@ TestPlan:
               updates:
                 domain_settings:
                   - Id: test.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: null
                     AuthenticationType: "Managed"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: false
                     AuthenticationType: "Managed"
                   - Id: test2.url.com
@@ -906,11 +906,11 @@ TestPlan:
                     IsVerified: false
                     AuthenticationType: "Federated"
                   - Id: test2.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test3.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
                     AuthenticationType: "Managed"
                   - Id: test4.url.com
