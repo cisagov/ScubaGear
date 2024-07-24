@@ -313,17 +313,6 @@ This section provides policies for restricting custom scripts execution.
 
 ### Policies
 
-#### MS.SHAREPOINT.4.1v1
-Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
-
-<!--Policy: MS.SHAREPOINT.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Scripts in OneDrive folders run in the context of user visiting the site and have access to everything users can access. By preventing custom scripts on personal sites, administrators block a path for potentially malicious code execution.
-- _Last modified:_ June 2023
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1027: Obfuscated Files or Information](https://attack.mitre.org/techniques/T1027/)
-  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
-
 #### MS.SHAREPOINT.4.2v1
 Users SHALL be prevented from running custom scripts on self-service created sites.
 
@@ -345,19 +334,6 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 
 ### Implementation
 
-#### MS.SHAREPOINT.4.1v1 Instructions
-
-1.  Sign in to the **SharePoint admin center**.
-
-2.  Select **Settings**.
-
-3.  Scroll down and select **classic settings page**.
-
-4.  Scroll to the **Custom Script** section.
-
-5.  Select **Prevent users from running custom script on personal sites**.
-
-6.  Select **OK**.
 
 #### MS.SHAREPOINT.4.2v1 Instructions
 
