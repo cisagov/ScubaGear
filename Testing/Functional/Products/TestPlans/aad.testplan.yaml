@@ -804,12 +804,18 @@ TestPlan:
                   - Id: test.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test4.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
@@ -819,14 +825,24 @@ TestPlan:
               updates:
                 domain_settings:
                   - Id: test.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: true
+                    AuthenticationType: "Managed"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test3.url.com
+                    PasswordValidityPeriodInDays: 5
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test4.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
@@ -836,16 +852,72 @@ TestPlan:
               updates:
                 domain_settings:
                   - Id: test.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: null
+                    AuthenticationType: "Managed"
                   - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 0
+                    PasswordValidityPeriodInDays: 5
                     IsVerified: false
+                    AuthenticationType: "Managed"
                   - Id: test2.url.com
                     PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                  - Id: test3.url.com
+                    PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test4.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Compliant case - Domains are valid and federated domains are excluded
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                domain_settings:
+                  - Id: test.url.com
+                    IsVerified: null
+                    AuthenticationType: "Federated"
+                  - Id: test1.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
+                  - Id: test2.url.com
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                  - Id: test3.url.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - Domains are invalid and federated domains are excluded
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                domain_settings:
+                  - Id: test.url.com
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                  - Id: test1.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
+                  - Id: test2.url.com
+                    PasswordValidityPeriodInDays: 5
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test3.url.com
+                    PasswordValidityPeriodInDays: 5
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                  - Id: test4.url.com
+                    IsVerified: false
+                    AuthenticationType: "Federated"
+        Postconditions: []
+        ExpectedResult: false
 
   - PolicyId: MS.AAD.7.1v1
     TestDriver: RunCached

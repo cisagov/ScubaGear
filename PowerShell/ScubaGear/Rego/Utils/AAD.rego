@@ -169,15 +169,50 @@ HasAcceptableMFA(Policy) := true if {
 
 
 ############################################################################
-# The report formatting functions below are for the MS.AAD.6.1v1 policy    #
+# Report formatting functions for MS.AAD.6.1v1                             #
 ############################################################################
 
-DomainReportDetails(Status, _, _) := Description if {
-    Status == true
-    Description := PASS
-}
+FederatedDomainWarningString := concat(" ", [
+    "ScubaGear is unable to read the user password expiration settings for federated",
+    "domains because it is controlled in a system external to the tenant.",
+    "Check with your identity provider on how to configure this policy in a federated context.",
+])
 
-DomainReportDetails(Status, Array, DescriptionString) := Description if {
+FailureString := "domain(s) failed"
+
+FederatedDomainWarning(domains) := concat("<br/><br/>", [
+    ReportFullDetailsArray(domains, "federated domain(s) present"),
+    FederatedDomainWarningString
+])
+
+# Case 1: Pass; no user passwords set to expire, no federated domains 
+# Case 2: Pass; no user passwords set to expire, federated domains 
+# Case 3: Fail; user passwords set to expire, no federated domains 
+# Case 4: Fail; user passwords set to expire, federated domains 
+# Default: Fail
+
+DomainReportDetails(Status, Metadata) := PASS if {
+    Status == true
+    count(Metadata.FederatedDomains) == 0
+} else := Description if {
+    Status == true
+    count(Metadata.FederatedDomains) > 0
+    Description := concat("", [
+        PASS, 
+        "; however, there are ", 
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
+} else := Description if {
     Status == false
-    Description := ReportFullDetailsArray(Array, DescriptionString)
-}
+    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.FederatedDomains) == 0
+    Description := ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString)
+} else := Description if {
+    Status == false
+    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.FederatedDomains) > 0
+    Description := concat("<br/><br/>", [
+        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString),
+        FederatedDomainWarning(Metadata.FederatedDomains)
+    ])
+} else := FAIL

@@ -721,27 +721,51 @@ UserPasswordsSetToNotExpire contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.PasswordValidityPeriodInDays == INT_MAX
     Domain.IsVerified == true
+
+    # Ignore federated domains
+    Domain.AuthenticationType == "Managed"
 }
 
 UserPasswordsSetToExpire contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.PasswordValidityPeriodInDays != INT_MAX
     Domain.IsVerified == true
+
+    # Ignore federated domains
+    Domain.AuthenticationType == "Managed"
+}
+
+FederatedDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
+    Domain.AuthenticationType == "Federated"
 }
 
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
-    "ActualValue": { UserPasswordsSetToExpire, UserPasswordsSetToNotExpire },
-    "ReportDetails": DomainReportDetails(Status, UserPasswordsSetToExpire, DescriptionString),
+    # Track invalid/valid/federated domains for use in TestResults.json
+    "ActualValue": { 
+        "invalid_domains": UserPasswordsSetToExpire, 
+        "valid_domains": UserPasswordsSetToNotExpire,
+        "federated_domains": FederatedDomains
+    },
+    "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
-    # For the rule to pass, the user passwords for all domains shall not expire
+    # For the rule to pass:
+    # User passwords for all domains shall not expire
     # Then check if at least 1 or more domains with user passwords set to expire exist
-    DescriptionString := "domain(s) failed"
-    Conditions := [count(UserPasswordsSetToExpire) == 0, count(UserPasswordsSetToNotExpire) > 0]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Conditions := [
+        count(UserPasswordsSetToExpire) == 0, 
+        count(UserPasswordsSetToNotExpire) > 0
+    ]
+    Status := count(FilterArray(Conditions, true)) == 2
+    Metadata := {
+        "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
+        "FederatedDomains": FederatedDomains
+    }
 }
 #--
 
