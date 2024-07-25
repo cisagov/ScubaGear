@@ -75,7 +75,7 @@ test_ExampleVar_UnknownReportString_Incorrect if {
 
 If the policy is untestable at this time, use the templates below.
 
-#### Config
+#### Config <!-- omit in toc -->
 
 The first one directs the user to the baseline document for manual checking. The second instructs the user to run a different script because the test is in another version. However, if they are unable to run the other script, they are also directed to the baseline like in the first template.
 
@@ -103,7 +103,7 @@ tests contains {
 }
 ```
 
-#### Testing
+#### Testing <!-- omit in toc -->
 
 ```Rego
 test_NotImplemented_Correct if {
@@ -157,93 +157,93 @@ Indentation will be set at 4 spaces, make sure your Tabs == 4 spaces. We are wor
 
 1) A blank line between each major variable: references & rules
 
-```Rego
-Example contains Example.Id if {
-    Example := input.ExampleVar[_]
-    Example.State == "Enabled"
-}
+    ```Rego
+    Example contains Example.Id if {
+        Example := input.ExampleVar[_]
+        Example.State == "Enabled"
+    }
 
-tests contains {
-    "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
-    "Criticality" : "Shall",
-    "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-} if {
-    ExampleVar := input.ExampleVar
-    Status := ExampleVar == 15
-}
+    tests contains {
+        "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
+        "Criticality" : "Shall",
+        "Commandlet" : "Example-Command",
+        "ActualValue" : [ExampleVar.ExampleSetting],
+        "ReportDetails" : ReportDetailsBoolean(Status),
+        "RequirementMet" : Status
+    } if {
+        ExampleVar := input.ExampleVar
+        Status := ExampleVar == 15
+    }
 
-tests {
-    "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
-...
-```
+    tests {
+        "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
+    ...
+    ```
 
 2) Two blank lines between subsections
 
-```Rego
-tests contains {
-    "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
-    "Criticality" : "Should",
-    "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
-    "ReportDetails" : ReportDetailsBoolean(Status),
-    "RequirementMet" : Status
-} if {
-    ExampleVar := input.ExampleVar
-    Status := ExampleVar == 15
-}
+    ```Rego
+    tests contains {
+        "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
+        "Criticality" : "Should",
+        "Commandlet" : "Example-Command",
+        "ActualValue" : [ExampleVar.ExampleSetting],
+        "ReportDetails" : ReportDetailsBoolean(Status),
+        "RequirementMet" : Status
+    } if {
+        ExampleVar := input.ExampleVar
+        Status := ExampleVar == 15
+    }
 
 
-################
-# Baseline 2.2 #
-################
-...
-```
+    ################
+    # Baseline 2.2 #
+    ################
+    ...
+    ```
 
 ### Comments
 
 1) Indicate beginning of every policy: 1, 2, etc.
 
-```Rego
-###################
-# MS.<Product>.1  #
-###################
-```
+    ```Rego
+    ###################
+    # MS.<Product>.1  #
+    ###################
+    ```
 
 2) Indicate the beginning of every policy.
 
-```Rego
-#
-# MS.<Product>.<Policy Group #>.<Policy #>v<Version #>
-#--
-```
+    ```Rego
+    #
+    # MS.<Product>.<Policy Group #>.<Policy #>v<Version #>
+    #--
+    ```
 
 3) Indicate the end of every policy.
 
-```Rego
-#--
-```
+    ```Rego
+    #--
+    ```
 
 4) Indicate why placeholder test is blank/untestable
 
-```REgo
-# At this time we are unable to test for X because of Y
-```
+    ```Rego
+    # At this time we are unable to test for X because of Y
+    ```
 
 ### Booleans
 
 In the interest of consistency across policy tests and human readability of the test, boolean-valued variables should be set via a comparison test against a boolean constant (true/false) for variables.
 
-**Correct**
+#### Correct Booleans <!-- omit in toc -->
 
 ```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : [ExampleVar.ExampleSetting],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 } if {
@@ -255,7 +255,7 @@ tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : [ExampleVar.ExampleSetting],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 } if {
@@ -264,7 +264,7 @@ tests contains {
 }
 ```
 
-**Incorrect**
+#### Incorrect Booleans <!-- omit in toc -->
 
 ```Rego
 tests contains {
@@ -284,8 +284,7 @@ tests contains {
 
 Because methods can return undefined, use `not` instead of false comparison when dealing with booleans. `not` will still pass if the you want the false result, i.e. `== false`, but will also pass if the result is undefined. This is important because the default keyword does not work for methods, only variables. So you write your methods for the true cases & treat false/undefined results as failing cases.
 
-**Correct**
-
+#### Correct not Keyword <!-- omit in toc -->
 
 ```Rego
 ExampleVariable contains SomeVariable.DisplayName if {
@@ -295,7 +294,7 @@ ExampleVariable contains SomeVariable.DisplayName if {
 }
 ```
 
-**Incorrect**
+#### Incorrect not Keyword <!-- omit in toc -->
 
 ```Rego
 ExampleVariable contains SomeVariable.DisplayName if {
@@ -307,7 +306,7 @@ ExampleVariable contains SomeVariable.DisplayName if {
 
 Opa will use implicit true in some cases. For example, if the variable contained a true/false boolean, you did not need `== true` to check if the boolean contained is true. This is also true in method returns. Opa assumes methods return true/false & if not specified, will return true. For readability purposes, we enforce explicitly stating `:= true`.
 
-**Correct**
+#### Correct Rule Set  <!-- omit in toc -->
 
 ```Rego
 ExampleMethod(Variable) := true if {
@@ -315,7 +314,7 @@ ExampleMethod(Variable) := true if {
 }
 ```
 
-**Incorrect**
+#### Incorrect Rule Set Return <!-- omit in toc -->
 
 ```Rego
 ExampleMethod(Variable) if {
@@ -354,14 +353,14 @@ tests contains {
 
 It can be tempting to put the status variable in the ActualValue spot when you are anticipating a boolean. DON'T! For consistency and as best practice put `ExampleVar.ExampleSetting`.
 
-**Incorrect**
+#### Incorrect ActualValue <!-- omit in toc -->
 
 ```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : Status,
+    "ActualValue" : [Status],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 } if {
@@ -370,14 +369,14 @@ tests contains {
 }
 ```
 
-**Correct**
+#### Correct ActualValue <!-- omit in toc -->
 
 ```Rego
 tests contains {
     "PolicyId" : "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",,
     "Criticality" : "Should",
     "Commandlet" : "Example-Command",
-    "ActualValue" : ExampleVar.ExampleSetting,
+    "ActualValue" : [ExampleVar.ExampleSetting],
     "ReportDetails" : ReportDetailsBoolean(Status),
     "RequirementMet" : Status
 } if {
@@ -391,7 +390,7 @@ tests contains {
 For the most part warnings can and should be fixed. However, there are times where the fix would make the code more difficult to maintain and understand. In these rare cases,
 add a comment indicating to ignore the specific linter warning.
 
-#### Example
+#### Example Linter Warnings <!-- omit in toc -->
 
 ```Rego
 ExampleArray contains OtherVar.name if {
@@ -419,9 +418,9 @@ This is to limit text stretching in the toc in the README.
 
 ### Omit the Section Headers Including and Above the Table of Contents
 
-Add the ` <!-- omit in toc -->` comment to the `## Table of Contents` and `# ScubaGear` headers.
+Add the `<!-- omit in toc -->` comment to the `## Table of Contents` and `# ScubaGear` headers.
 
-**Example**
+#### Example for Omit <!-- omit in toc -->
 
 ```Markdown
  # ScubaGear <!-- omit in toc -->
@@ -435,7 +434,7 @@ This should already be implemented in the current README but this guideline is t
 
 If the section header is a level 4+ header i.e `#### Power Platform App Registration` add a omit comment.
 
-**Example**
+#### Example for Level Omit <!-- omit in toc -->
 
 ```Markdown
 #### Power Platform App Registration <!-- omit in toc -->
