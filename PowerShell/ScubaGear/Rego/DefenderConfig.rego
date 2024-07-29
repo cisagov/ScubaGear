@@ -11,9 +11,11 @@ import data.utils.defender.SensitiveAccountsSetting
 import data.utils.key.FilterArray
 import data.utils.key.PASS
 import data.utils.report.NotCheckedDetails
+import data.utils.report.PolicyLink
 import data.utils.report.ReportDetailsArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
+
 import rego.v1
 
 #################
@@ -878,17 +880,51 @@ tests contains {
 # MS.DEFENDER.6.2v1
 #--
 
-# Turns out audit logging is non-trivial to implement and test for.
-# Would require looping through all users. See discussion in GitHub
-# issue #200.
+# Requires Graph connection to get the user counts
+# default to negative value to indicate no data or error
+default UnlicensedUserCount := -1
+
+UnlicensedUserCount := Count if {
+    Count := input.total_users_without_advanced_audit
+}
+
+LicensedUserMessage := ErrorMessage if {
+    UnlicensedUserCount == -1
+    ErrorMessage := concat(" ", [
+        "Requirement not met. Error retrieving license information from tenant. ",
+        "**NOTE: M365 Advanced Auditing feature requires E5/G5 or add-on licensing.**"
+    ])
+}
+
+LicensedUserMessage := ErrorMessage if {
+    UnlicensedUserCount == 0
+    ErrorMessage := "Requirement met"
+}
+
+LicensedUserMessage := ErrorMessage if {
+    UnlicensedUserCount > 0
+    ErrorDetails := concat(" ", ["Requirement not met.", format_int(UnlicensedUserCount, 10),
+    "tenant users without M365 Advanced Auditing feature assigned.",
+    "To review and assign users the Microsoft 365 Advanced Auditing feature, see %v.",
+    "To get a list of all users without the license feature run the following:",
+    "Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')\"",
+    "-ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName"
+    ])
+
+    ErrorMessage := sprintf(ErrorDetails, [PolicyLink("MS.DEFENDER.6.2v1")])
+}
+
 tests contains {
     "PolicyId": "MS.DEFENDER.6.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.DEFENDER.6.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaUser"],
+    "ActualValue": UnlicensedUserCount,
+    "ReportDetails": ReportDetailsString(Status, LicensedUserMessage),
+    "RequirementMet": Status
+} if {
+    Status := UnlicensedUserCount == 0
 }
+
 #--
 
 #
