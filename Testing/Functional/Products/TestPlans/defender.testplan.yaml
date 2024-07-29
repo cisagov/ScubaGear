@@ -119,7 +119,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.4.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Advanced Rule
         Preconditions:
@@ -525,7 +525,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.4.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.4.2v1 Compliant case - Advanced Rule
         Preconditions:
@@ -977,7 +977,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.4.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.4.3v1 Compliant case - Advanced Rule
         Preconditions:
@@ -1137,7 +1137,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.4.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.4.4v1 Compliant case - Advanced Rule
         Preconditions:
@@ -1211,7 +1211,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.5.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.5.1v1 Compliant case
         Preconditions:

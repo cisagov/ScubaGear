@@ -1,7 +1,7 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.1.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.1.1v1 Non-Compliant case - missing client app type exchangeActiveSync
         Preconditions:
@@ -90,7 +90,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.3.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.1v1 Non-Compliant case - Bad Authentication Strength included
         Preconditions:
@@ -144,7 +144,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.2v1 Non-Compliant case - Report Only
         ### This test disables the standard non-specific MFA policy from the tenant
@@ -198,7 +198,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Enforced MS Auth Enabled
         Preconditions:
@@ -296,7 +296,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.4v1 Non-compliant case - preMigration
         Preconditions:
@@ -316,7 +316,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.5v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.5v1 Not-applicable case - preMigration but auth methods disabled
         Preconditions:
@@ -396,7 +396,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.6v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.6v1 Non-Compliant case - Bad Authentication Strength included
         ### This test injects an authentication strength of password,sms which is non-compliant
@@ -467,7 +467,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.7v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.7v1 Non-Compliant case - require both compliant and domain joined device only for specific user
         Preconditions:
@@ -589,7 +589,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.3.8v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.3.8v1 Non-Compliant case - Managed device to register MFA only for a specific user
         Preconditions:
@@ -652,7 +652,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.5.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.5.1v1 Non-Compliant case - Allow users to register apps
         Preconditions:
@@ -672,7 +672,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to apps
         Preconditions:
@@ -717,7 +717,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.5.3v1 Non-Compliant case - Empty Consent workflow configured
         Preconditions:
@@ -757,7 +757,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
         Preconditions:
@@ -793,7 +793,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.6.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords for all domains are set to not expire
         Preconditions:
@@ -920,7 +920,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.1v1 Non-Compliant case - Too many Global Admins
         Preconditions:
@@ -1046,7 +1046,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.2v1 Non-Compliant case - Too many Global Admins
         Preconditions:
@@ -1212,7 +1212,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.3v1 Non-Compliant case - Three on-prem admins
         Preconditions:
@@ -1272,7 +1272,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.8.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.8.1v1 Non-Compliant - Guest users have the same access as members
         Preconditions:
@@ -1300,7 +1300,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.8.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.8.2v1 Non-Compliant - Anyone in the organization can invite guest users
         Preconditions:

@@ -55,7 +55,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.POWERPLATFORM.2.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - subsequent environments without DLP policies
         Preconditions:
