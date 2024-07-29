@@ -249,8 +249,9 @@ Describe "Policy Checks for <ProductName>"{
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            elseif ('SCuBACached' -eq $TestDriver){
-                Write-Debug "Driver: SCuBACached"
+            # Cmdlet names should match Test Plan drivers e.g. Driver should be ScubaCached instead of RunCached to be aligned with the refactor of Scuba specific Cmdlets
+            elseif ('ScubaCached' -eq $TestDriver){
+                Write-Debug "Driver: ScubaCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
