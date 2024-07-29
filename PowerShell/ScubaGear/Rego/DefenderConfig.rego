@@ -883,10 +883,7 @@ tests contains {
 # Requires Graph connection to get the user counts
 # default to negative value to indicate no data or error
 default UnlicensedUserCount := -1
-
-UnlicensedUserCount := Count if {
-    Count := input.total_users_without_advanced_audit
-}
+UnlicensedUserCount := input.total_users_without_advanced_audit
 
 LicensedUserMessage := ErrorMessage if {
     UnlicensedUserCount == -1
