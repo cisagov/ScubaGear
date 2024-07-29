@@ -82,6 +82,10 @@ InModuleScope -ModuleName ExportDefenderProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-MgBetaUser" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }
@@ -135,6 +139,9 @@ InModuleScope -ModuleName ExportDefenderProvider {
             Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy {}
             function Get-AtpPolicyForO365 {throw 'this will be mocked'}
             Mock -ModuleName ExportDefenderProvider Get-AtpPolicyForO365 {}
+            function Get-MgBetaUser {}
+            Mock -ModuleName ExportDefenderProvider Get-MgBetaUser {}
+
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
