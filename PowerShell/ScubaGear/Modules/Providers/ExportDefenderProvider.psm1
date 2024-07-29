@@ -152,7 +152,7 @@ function Export-DefenderProvider {
 
     $Tracker.TryCommand("Get-MgBetaUser", $UserParameters) | Out-Null
 
-    if(-Not $UsersWithoutAdvancedAuditCount -is [int]) {
+    if(-Not $UsersWithoutAdvancedAuditCount -Or (-Not $UsersWithoutAdvancedAuditCount -is [int])) {
         $UsersWithoutAdvancedAuditCount = "-1"
     }
 
