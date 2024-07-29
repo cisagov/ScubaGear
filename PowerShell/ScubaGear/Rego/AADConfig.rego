@@ -689,8 +689,9 @@ BadConsentSettings contains {
     lower(Setting.Value) == "true"
 }
 
-# If there are no bad settings & more than 1
+# If there are no bad settings & more than 0
 # good setting, pass
+# 0 good settings condition occurs when the setting is discontinued and no longer exists
 tests contains {
     "PolicyId": "MS.AAD.5.4v1",
     "Criticality": "Shall",
@@ -701,7 +702,7 @@ tests contains {
 } if {
     Conditions := [
         count(BadConsentSettings) == 0,
-        count(GoodConsentSettings) > 0
+        count(GoodConsentSettings) >= 0
     ]
     Status := count(FilterArray(Conditions, false)) == 0
 }
