@@ -9,8 +9,8 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-MgGraph {throw 'this will be mocked'}
-            Mock Connect-MgGraph -MockWith {}
+            function Connect-GraphHelper {throw 'this will be mocked'}
+            Mock Connect-GraphHelper -MockWith {}
             function Connect-PnPOnline {throw 'this will be mocked'}
             function Connect-PnPOnline {throw 'this will be mocked'}
             Mock Connect-PnPOnline -MockWith {}
@@ -44,16 +44,16 @@ InModuleScope Connection {
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
-            @{ProductNames = "aad"; Services = @('Connect-MgGraph')}
-            @{ProductNames = "defender"; Services = @('Connect-EXOHelper')}
+            @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
+            @{ProductNames = "defender"; Services = @('Connect-EXOHelper', 'Connect-GraphHelper')}
             @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "powerplatform"; Services = @('Add-PowerAppsAccount')}
-            @{ProductNames = "sharepoint"; Services = @('Connect-MgGraph', 'Connect-PnPOnline')}
+            @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper', 'Connect-PnPOnline')}
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
             @{
                 ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
-                    'Connect-MgGraph',
+                    'Connect-GraphHelper',
                     'Connect-EXOHelper',
                     'Add-PowerAppsAccount',
                     'Connect-PnPOnline',
