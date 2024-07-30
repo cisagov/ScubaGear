@@ -94,7 +94,7 @@ tests contains {
 ```Rego
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>,
+    "PolicyId": "MS.<Product>.<Policy Group #>.<Policy #>v<Version #>",
     "Criticality": "Shall/3rd Party",
     "Commandlet": [],
     "ActualValue": [],
