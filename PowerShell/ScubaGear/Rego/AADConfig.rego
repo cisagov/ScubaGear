@@ -15,7 +15,7 @@ import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
-import data.utils.aad.HasAcceptableMFA
+import data.utils.aad.IsPhishingResistantMFA
 import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
@@ -188,7 +188,7 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
 
-    HasAcceptableMFA(CAPolicy) == true
+    IsPhishingResistantMFA(CAPolicy) == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -210,11 +210,11 @@ tests contains {
 #--
 
 # Save all policy names if PhishingResistantMFAPolicies exist
-AllMFA := AlternativeMFA | PhishingResistantMFAPolicies
+AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-AlternativeMFA contains CAPolicy.DisplayName if {
+NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
@@ -398,7 +398,7 @@ tests contains {
 # privliged roles are included in policy & not excluded.
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-PhishingResistantMFA contains CAPolicy.DisplayName if {
+PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     CAPolicy.State == "enabled"
@@ -418,7 +418,7 @@ PhishingResistantMFA contains CAPolicy.DisplayName if {
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 
     # Policy has only acceptable MFA
-    HasAcceptableMFA(CAPolicy) == true
+    IsPhishingResistantMFA(CAPolicy) == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -426,12 +426,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.6v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": PhishingResistantMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFA, DescriptionString), CAPLINK]),
+    "ActualValue": PhishingResistantMFAPrivilegedRoles,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(PhishingResistantMFA) > 0
+    Status := count(PhishingResistantMFAPrivilegedRoles) > 0
 }
 #--
 
