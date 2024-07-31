@@ -1418,7 +1418,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.6.2v1 Compliant Case
         Preconditions:
@@ -1430,7 +1430,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.6.2v1 Non-Compliant Case
         Preconditions:
@@ -1442,7 +1442,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.6.2v1 Non-Compliant Case
         Preconditions:
