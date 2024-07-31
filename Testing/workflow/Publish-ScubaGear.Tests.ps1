@@ -13,7 +13,7 @@ BeforeAll {
 }
 
 Describe "Copy-ModuleToTempLocation" {
-  It "copies the ScubaGear module to a temp location" {
+  It "copies the ScubaGear module to the specified location" {
     $Location = Get-Location
     $ModuleSourcePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear"
     Write-Warning "The module location is $ModuleSourcePath"
@@ -34,7 +34,7 @@ Describe "Copy-ModuleToTempLocation" {
 }
 
 Describe "Edit-ManifestFile" {
-  It "updates the manifest file with valid data" {
+  It "updates the manifest file with the specified, valid data" {
     Write-Warning "The module destination path is $global:ModuleDestinationPath"
     ForEach ($FilePath in $global:ModuleDestinationPath) {
       Write-Warning "File path is $FilePath"
@@ -85,7 +85,7 @@ Describe "Edit-ManifestFile" {
 }
 
 Describe "New-ArrayOfFilePaths" {
-  It "should have all the files in it" {
+  It "should copy of the files paths into the array" {
     # Pick any location, doesn't matter.
     $Location = Get-Location
     $SourcePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear/Modules/Connection"
@@ -101,7 +101,7 @@ Describe "New-ArrayOfFilePaths" {
 }
 
 Describe "New-FileList" {
-  It "should have all the files in it" {
+  It "add all of the file paths in the array into the filelist" {
     # Pick any location, doesn't matter.  For now, get current location.
     $Location = Get-Location
     # For this location, get all the MarkDown files at the base of the repo.
