@@ -432,22 +432,6 @@ tests contains {
 ###################
 
 #
-# MS.SHAREPOINT.4.1v1
-#--
-
-# At this time we are unable to test for running custom scripts on personal sites
-# because we have yet to find the setting to check
-tests contains {
-    "PolicyId": "MS.SHAREPOINT.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SHAREPOINT.4.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
 # MS.SHAREPOINT.4.2v1
 #--
 

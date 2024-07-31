@@ -387,15 +387,6 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.SHAREPOINT.4.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.AAD.4.1v1 Not Checked
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-
   - PolicyId: MS.SHAREPOINT.4.2v1
     TestDriver: RunScuba
     Tests:

@@ -61,4 +61,8 @@ N/A
 
 ### Removed Policies 
 
-N/A
+#### MS.SHAREPOINT.4.1v1
+Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
+- _Removal date:_ July 2024
+- _Removal rationale:_ The option to enable and disable custom scripting on personal sites (aka OneDrive) found in policy MS.SHAREPOINT.4.1v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.  Furthermore, it is no longer possible to allow custom scripts on personal sites.
+
