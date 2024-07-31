@@ -1,7 +1,6 @@
 package sharepoint_test
 import rego.v1
 import data.sharepoint
-import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
