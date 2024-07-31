@@ -12,9 +12,14 @@ Install-Module -Name ScubaGear
 To install a specific version of ScubaGear, use the `-RequiredVersion` parameter:
 
 ```powershell
+<<<<<<< HEAD
 # Install ScubaGear 1.4.0
 Install-Module -Name ScubaGear `
   -RequiredVersion 1.4.0
+=======
+# Install ScubaGear 1.3.0
+Install-Module -Name ScubaGear -RequiredVersion 1.3.0
+>>>>>>> 45cf379a (save current progress)
 ```
 
 The set of published versions can be found on [PSGallery](https://www.powershellgallery.com/packages/ScubaGear/).
