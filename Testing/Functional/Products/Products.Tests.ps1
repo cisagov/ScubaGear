@@ -219,7 +219,8 @@ BeforeAll{
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
-
+            # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
+            # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
                 $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ProductName/$PolicyId/$ConfigFileName"
 
@@ -244,13 +245,15 @@ Describe "Policy Checks for <ProductName>"{
                 SetConditions -Conditions $Preconditions.ToArray()
                 Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet
             }
+            # Ensure case matches driver in test plan
             elseif ('RunScuba' -eq $TestDriver){
                 Write-Debug "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            elseif ('SCuBACached' -eq $TestDriver){
-                Write-Debug "Driver: SCuBACached"
+            # Ensure case matches driver in test plan
+            elseif ('ScubaCached' -eq $TestDriver){
+                Write-Debug "Driver: ScubaCached"
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name

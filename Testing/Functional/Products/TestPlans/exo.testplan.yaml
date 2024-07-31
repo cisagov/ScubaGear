@@ -15,7 +15,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.2.2v2
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.2.2v2 Non-Compliant case - SPF policy is missing for one of the domains
         Preconditions:
@@ -50,7 +50,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.3.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.3.1v1 Non-Compliant case - DKIM is missing for one of the domains
         Preconditions:
@@ -98,7 +98,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.1v1 Non-Compliant case - DMARC is missing for one of the domains
         Preconditions:
@@ -129,7 +129,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.2v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.2v1 Non-Compliant case - DMARC p=reject is missing for one of the domains
         Preconditions:
@@ -161,7 +161,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.3v1 Non-Compliant case - DMARC DHS rua point of contact is in the wrong field for one of the domains
         Preconditions:
@@ -193,7 +193,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.4.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.4.4v1 Non-Compliant case - DMARC DHS rua and ruf point of contact is in the wrong field for one of the domains
         Preconditions:

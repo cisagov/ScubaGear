@@ -1,7 +1,7 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.2.1v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.2.1v1 Non-Compliant case - low risk users are blocked
         Preconditions:
@@ -53,7 +53,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.2.3v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.2.3v1 Non-Compliant case - low risk sign ins are blocked
         Preconditions:
@@ -105,7 +105,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.4v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.4v1 Non-Compliant case - User with permanent active assignment
         #### This test case guarantees that at least one privileged role assignment has an endDateTime of null
@@ -146,7 +146,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.5v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.5v1 Non-Compliant case - User assigned outside of PIM
         #### This test case guarantees that at least one privileged role assignment has an startDateTime of null
@@ -190,7 +190,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.6v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.6v1 Non-Compliant case - Global admin activation does not require approval (role)
         Preconditions:
@@ -298,7 +298,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.7v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.7v1 Non-Compliant case - Roles with Eligible Active assignments without alert (role)
         Preconditions:
@@ -496,7 +496,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.8v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.8v1 Non-Compliant case - activation Global Admin no alert (role)
         Preconditions:
@@ -621,7 +621,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.7.9v1
-    TestDriver: RunCached
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.9v1 Non-Compliant case - activation other roles do NOT trigger alert (role)
         Preconditions:
