@@ -485,21 +485,21 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.AAD.5.1v1 Instructions
 
-1.  In **Microsoft Entra admin center** , under **Manage**, select **Users**.
+1.  In **Microsoft Entra admin center**, under **Manage**, select **Users**.
 
 2. Select **User settings**.
 
-3. For **Users can register applications**, select **No.**
+3. For **Users can register applications**, select **No**.
 
 4. Click **Save**.
 
 #### MS.AAD.5.2v1 Instructions
 
-1.  In **Microsoft Entra admin center**  under **Manage**, select **Enterprise Applications.**
+1.  In **Microsoft Entra admin center**  under **Manage**, select **Enterprise Applications**.
 
-2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
+2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
 
-3. Under **User consent for applications**, select **Do not allow user consent.**
+3. Under **User consent for applications**, select **Do not allow user consent**.
 
 4. Click **Save**.
 
@@ -507,7 +507,7 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 1.  In **Microsoft Entra admin center**  create a new Microsoft Entra ID Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then in **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications.**
+2. Then in **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.
 
 3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
@@ -519,11 +519,11 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 #### MS.AAD.5.4v1 Instructions
 
-1.  In **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications.**
+1.  In **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.
 
-2. Under **Security**, select **Consent and permissions.** Then select **User Consent Settings.**
+2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
 
-3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent.**
+3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent**.
 
 4. Click **Save**.
 
@@ -724,7 +724,7 @@ This policy is based on the ratio below:
 
 1. In **Microsoft Entra admin center**  select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Select the **Global administrator role.**
+2. Select the **Global administrator role**.
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
@@ -739,17 +739,17 @@ Exception cases:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Microsoft Entra admin center**  select **Roles and administrators.**
+2. In **Microsoft Entra admin center**  select **Roles and administrators**.
 
-3. Select the **Global administrator role.**
+3. Select the **Global administrator role**.
 
-4. Under **Manage**, select **Assignments.** and click the **Active assignments** tab.
+4. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
 5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra ID PIM. If the role was assigned outside of Microsoft Entra ID PIM, delete the assignment and recreate it using Microsoft Entra ID PIM.
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles**.
+1. In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -763,13 +763,13 @@ Exception cases:
 
 #### MS.AAD.7.7v1 Instructions
 
-1.  In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles.**
+1.  In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 3. Click the **Global Administrator** role.
 
-4. Click **Settings** and then click **Edit.**
+4. Click **Settings** and then click **Edit**.
 
 5. Click the **Notification** tab.
 
@@ -783,13 +783,13 @@ Exception cases:
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In ** Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select ** Microsoft Entra roles.**
+1. In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
 3. Click the **Global Administrator** role.
 
-4. Click **Settings** and then click **Edit.**
+4. Click **Settings** and then click **Edit**.
 
 5. Click the **Notification** tab.
 
