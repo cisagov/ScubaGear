@@ -95,5 +95,4 @@ jobs:
       - name: Print Scuba Version
         run: |
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
-          # Import-Module -Name ScubaGear
           Invoke-SCuBA -Version
