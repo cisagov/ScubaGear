@@ -2,7 +2,7 @@ Description: |
   YAML Typical Configuration File ( multiple products )
   Some names are commented out but for completeness are left in to show all product options
   This example includes the following design choices for illustrative purposes:
-  - Use of Pascal case convention for varible names
+  - Use of Pascal case convention for variable names
 ProductNames:
   - teams
   # - exo
