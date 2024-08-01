@@ -101,6 +101,8 @@ jobs:
       # This is a manual test that simply writes the version to the console
       - name: Test Scuba Version
         run: |
+          # Give PSGallery a chance to publish the pre-release to its API
+          Start-Sleep -Seconds 30
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
