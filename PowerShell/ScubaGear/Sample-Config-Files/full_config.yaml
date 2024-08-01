@@ -1,6 +1,6 @@
 Description: |
   YAML Configuration file with all parameters
-  This config file does not include any custom variables or any per product namespace variables
+  This config file does not include any custom variables or any per product namespace variables.  The file shows all global configuration file variables with their default values .  Users can override these values as needed.  Global variables can be omitted from the file if the default is desired.  Global variables specified in the configuration file can also be overridden if given as command line parameters.
   For more specifc per product config variables please refer to the sample config associated with that product
   This example includes the following design choices for illustrative purposes:
   - Use of Pascal case convention for variable names
