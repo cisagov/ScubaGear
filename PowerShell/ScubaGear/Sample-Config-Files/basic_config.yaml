@@ -1,6 +1,6 @@
 Description: |
   YAML Basic Configuration file ( one product )
   This example includes the following design choice for illustrative purposes:
-  - Use of Pascal case convention for varible names
+  - Use of Pascal case convention for variable names
 ProductNames: teams
 M365Environment: gcc
