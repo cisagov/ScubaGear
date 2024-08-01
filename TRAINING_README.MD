@@ -29,3 +29,7 @@ a long time to finish all the challenges. So for the challengers that have limit
 ```Rego
 #** Target **#
 ```
+
+### Where to Start
+
+Keep in mind the Table of Contents has links to resources you will need in this training ground. To get started, look at [SharepointConfig.rego](PowerShell\ScubaGear\Rego\SharepointConfig.rego)
