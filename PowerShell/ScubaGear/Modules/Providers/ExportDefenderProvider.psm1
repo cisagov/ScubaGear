@@ -144,6 +144,9 @@ function Export-DefenderProvider {
     }
 
     # Run commands to get count of users with Advanced auditing enabled
+    # GUID below is service plan ID for M365_ADVANCED_AUDITING as defined
+    # on Microsoft Licensing Reference shown here:
+    # https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
     $UserParameters = @{ConsistencyLevel = 'eventual'
                         Count = 'UsersWithoutAdvancedAuditCount'
                         All = $true
