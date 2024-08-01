@@ -3,8 +3,8 @@ Description: |
   This example includes the following design choices for illustrative purposes:
   - Use of Pascal case convention for variable names
 ProductNames:
-  - teams
   - aad
+  - teams
 M365Environment: commercial
 Organization: abcdef.example.com
 AppID: 0123456789abcdef01234566789abcde
