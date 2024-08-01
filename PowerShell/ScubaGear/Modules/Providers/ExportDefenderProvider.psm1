@@ -2,7 +2,7 @@ function Export-DefenderProvider {
     <#
     .Description
     Gets the Microsoft 365 Defender settings that are relevant
-    to the SCuBA Microsft 365 Defender baselines using the EXO PowerShell Module
+    to the SCuBA Microsoft 365 Defender baselines using the Graph and EXO PowerShell Modules
     .Functionality
     Internal
     #>
@@ -143,6 +143,22 @@ function Export-DefenderProvider {
         $DLPLicense = ConvertTo-Json $false
     }
 
+    # Run commands to get count of users with Advanced auditing enabled
+    # GUID below is service plan ID for M365_ADVANCED_AUDITING as defined
+    # on Microsoft Licensing Reference shown here:
+    # https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference
+    $UserParameters = @{ConsistencyLevel = 'eventual'
+                        Count = 'UsersWithoutAdvancedAuditCount'
+                        All = $true
+                        Filter = "not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')"
+                       }
+
+    $Tracker.TryCommand("Get-MgBetaUser", $UserParameters) | Out-Null
+
+    if(-Not $UsersWithoutAdvancedAuditCount -Or (-Not $UsersWithoutAdvancedAuditCount -is [int])) {
+        $UsersWithoutAdvancedAuditCount = "-1"
+    }
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -156,6 +172,7 @@ function Export-DefenderProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "total_users_without_advanced_audit": $UsersWithoutAdvancedAuditCount,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
     "defender_successful_commands": $SuccessfulCommands,
