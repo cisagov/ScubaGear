@@ -55,13 +55,19 @@ jobs:
             dotnet --version
             dotnet tool install --global AzureSignTool --version 4.0.1
             $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-            . repo/utils/DeployUtils.ps1
+            . repo/utils/workflow/Publish-ScubaGear.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
-            SignScubaGearModule `
+            Write-Output "Creating an array of the files to sign..."
+              $ArrayOfFilePaths = New-ArrayOfFilePaths `
+              -ModuleDestinationPath repo
+              Write-Output "Creating a file with a list of the files to sign..."
+              $FileListFileName = New-FileList `
+              -ArrayOfFilePaths $ArrayOfFilePaths
+            Use-AzureSignTool `
               -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
               -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
-              -ModulePath 'repo'
+              -FileList $FileListFileName
             Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
             Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
           azPSVersion: "latest"
