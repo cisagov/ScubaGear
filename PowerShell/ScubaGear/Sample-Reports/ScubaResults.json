@@ -1,4 +1,1340 @@
-{
+﻿{
+    "MetaData": {
+    "TenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
+    "DisplayName":  "tqhjy",
+    "DomainName":  "tqhjy.onmicrosoft.com",
+    "ProductSuite":  "Microsoft 365",
+    "ProductsAssessed":  [
+                             "Azure Active Directory",
+                             "Microsoft 365 Defender",
+                             "Exchange Online",
+                             "Microsoft Power Platform",
+                             "SharePoint Online",
+                             "Microsoft Teams"
+                         ],
+    "ProductAbbreviationMapping":  {
+                                       "Microsoft 365 Defender":  "Defender",
+                                       "SharePoint Online":  "SharePoint",
+                                       "Azure Active Directory":  "AAD",
+                                       "Microsoft Power Platform":  "PowerPlatform",
+                                       "Microsoft Teams":  "Teams",
+                                       "Exchange Online":  "EXO"
+                                   },
+    "Tool":  "ScubaGear",
+    "ToolVersion":  "1.4.0",
+    "TimestampZulu":  "2024-08-02T19:25:11.166Z"
+},
+    "Summary": {
+    "AAD":  {
+                "Failures":  12,
+                "Errors":  0,
+                "Passes":  11,
+                "Warnings":  3,
+                "Manual":  4,
+                "Omits":  0
+            },
+    "Defender":  {
+                     "Failures":  3,
+                     "Errors":  0,
+                     "Passes":  10,
+                     "Warnings":  3,
+                     "Manual":  4,
+                     "Omits":  0
+                 },
+    "EXO":  {
+                "Failures":  3,
+                "Errors":  0,
+                "Passes":  9,
+                "Warnings":  2,
+                "Manual":  27,
+                "Omits":  0
+            },
+    "PowerPlatform":  {
+                          "Failures":  0,
+                          "Errors":  0,
+                          "Passes":  5,
+                          "Warnings":  1,
+                          "Manual":  2,
+                          "Omits":  0
+                      },
+    "SharePoint":  {
+                       "Failures":  0,
+                       "Errors":  0,
+                       "Passes":  5,
+                       "Warnings":  0,
+                       "Manual":  5,
+                       "Omits":  0
+                   },
+    "Teams":  {
+                  "Failures":  0,
+                  "Errors":  0,
+                  "Passes":  15,
+                  "Warnings":  0,
+                  "Manual":  6,
+                  "Omits":  0
+              }
+},
+    "Results": {
+    "AAD":  [
+                {
+                    "GroupName":  "Legacy Authentication",
+                    "GroupNumber":  "1",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#1-legacy-authentication",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.1.1v1",
+                                         "Requirement":  "Legacy authentication SHALL be blocked.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.1.1v1 Legacy authentication SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Risk Based Policies",
+                    "GroupNumber":  "2",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#2-risk-based-policies",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.2.1v1",
+                                         "Requirement":  "Users detected as high risk SHALL be blocked.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.1v1 Users detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.2.2v1",
+                                         "Requirement":  "A notification SHOULD be sent to the administrator when high-risk users are detected.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/Not-Implemented",
+                                         "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.2.3v1",
+                                         "Requirement":  "Sign-ins detected as high risk SHALL be blocked.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Strong Authentication and a Secure Registration Process",
+                    "GroupNumber":  "3",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#3-strong-authentication-and-a-secure-registration-process",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.3.1v1",
+                                         "Requirement":  "Phishing-resistant MFA SHALL be enforced for all users.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.2v1",
+                                         "Requirement":  "If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users. <a href='#caps'>View all CA policies</a>."
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.3v1",
+                                         "Requirement":  "If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.4v1",
+                                         "Requirement":  "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement not met"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.5v1",
+                                         "Requirement":  "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/Not-Implemented",
+                                         "Details":  "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.6v1",
+                                         "Requirement":  "Phishing-resistant MFA SHALL be required for highly privileged roles.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.7v1",
+                                         "Requirement":  "Managed devices SHOULD be required for authentication.",
+                                         "Result":  "Warning",
+                                         "Criticality":  "Should",
+                                         "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.3.8v1",
+                                         "Requirement":  "Managed Devices SHOULD be required to register MFA.",
+                                         "Result":  "Warning",
+                                         "Criticality":  "Should",
+                                         "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Centralized Log Collection",
+                    "GroupNumber":  "4",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#4-centralized-log-collection",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.4.1v1",
+                                         "Requirement":  "Security logs SHALL be sent to the agency's security operations center for monitoring.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/Not-Implemented",
+                                         "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Application Registration and Consent",
+                    "GroupNumber":  "5",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#5-application-registration-and-consent",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.5.1v1",
+                                         "Requirement":  "Only administrators SHALL be allowed to register applications.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "0 authorization policies found that allow non-admin users to register third-party applications"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.5.2v1",
+                                         "Requirement":  "Only administrators SHALL be allowed to consent to applications.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.5.3v1",
+                                         "Requirement":  "An admin consent workflow SHALL be configured for applications.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement not met"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.5.4v1",
+                                         "Requirement":  "Group owners SHALL NOT be allowed to consent to applications.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement not met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Passwords",
+                    "GroupNumber":  "6",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#6-passwords",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.6.1v1",
+                                         "Requirement":  "User passwords SHALL NOT expire.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement not met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Highly Privileged User Access",
+                    "GroupNumber":  "7",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#7-highly-privileged-user-access",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.7.1v1",
+                                         "Requirement":  "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "2 global admin(s) found:<br/>Jane Doe, John Public"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.2v1",
+                                         "Requirement":  "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.3v1",
+                                         "Requirement":  "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "0 admin(s) that are not cloud-only found"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.4v1",
+                                         "Requirement":  "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "6 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.5v1",
+                                         "Requirement":  "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "4 role(s) assigned to users outside of PIM:<br/>Application Administrator, Global Administrator, Privileged Role Administrator, User Administrator"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.6v1",
+                                         "Requirement":  "Activation of the Global Administrator role SHALL require approval.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "1 role(s) or group(s) allowing activation without approval found:<br/>Global Administrator(Directory Role)"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.7v1",
+                                         "Requirement":  "Eligible and Active highly privileged role assignments SHALL trigger an alert.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "6 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Global Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.8v1",
+                                         "Requirement":  "User activation of the Global Administrator role SHALL trigger an alert.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.7.9v1",
+                                         "Requirement":  "User activation of other highly privileged roles SHOULD trigger an alert.",
+                                         "Result":  "Warning",
+                                         "Criticality":  "Should",
+                                         "Details":  "5 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Guest User Access",
+                    "GroupNumber":  "8",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#8-guest-user-access",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.AAD.8.1v1",
+                                         "Requirement":  "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Should",
+                                         "Details":  "Permission level set to \"Limited access\" (authorizationPolicy)"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.8.2v1",
+                                         "Requirement":  "Only users with the Guest Inviter role SHOULD be able to invite guest users.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Should",
+                                         "Details":  "Permission level set to \"adminsAndGuestInviters\" (authorizationPolicy)"
+                                     },
+                                     {
+                                         "Control ID":  "MS.AAD.8.3v1",
+                                         "Requirement":  "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/Not-Implemented",
+                                         "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                     }
+                                 ]
+                }
+            ],
+    "Defender":  [
+                     {
+                         "GroupName":  "Preset Security Profiles",
+                         "GroupNumber":  "1",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#1-preset-security-profiles",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.1.1v1",
+                                              "Requirement":  "The standard and strict preset security policies SHALL be enabled.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.1.2v1",
+                                              "Requirement":  "All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.1.3v1",
+                                              "Requirement":  "All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.1.4v1",
+                                              "Requirement":  "Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.",
+                                              "Result":  "Fail",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement not met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.1.5v1",
+                                              "Requirement":  "Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          }
+                                      ]
+                     },
+                     {
+                         "GroupName":  "Impersonation Protection",
+                         "GroupNumber":  "2",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#2-impersonation-protection",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.2.1v1",
+                                              "Requirement":  "User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Should",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.2.2v1",
+                                              "Requirement":  "Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.",
+                                              "Result":  "Warning",
+                                              "Criticality":  "Should",
+                                              "Details":  "Not all agency domains are included for targeted protection in Strict or Standard policy."
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.2.3v1",
+                                              "Requirement":  "Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.",
+                                              "Result":  "Warning",
+                                              "Criticality":  "Should",
+                                              "Details":  "Not all partner domains are included for targeted protection in Strict or Standard policy."
+                                          }
+                                      ]
+                     },
+                     {
+                         "GroupName":  "Safe Attachments",
+                         "GroupNumber":  "3",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#3-safe-attachments",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.3.1v1",
+                                              "Requirement":  "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Should",
+                                              "Details":  "Requirement met"
+                                          }
+                                      ]
+                     },
+                     {
+                         "GroupName":  "Data Loss Prevention",
+                         "GroupNumber":  "4",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#4-data-loss-prevention",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.1v1",
+                                              "Requirement":  "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) SHALL be blocked.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.2v1",
+                                              "Requirement":  "The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.",
+                                              "Result":  "Warning",
+                                              "Criticality":  "Should",
+                                              "Details":  "DLP custom policy applied to the following locations: Exchange, OneDrive, SharePoint, Teams. Custom policy protecting sensitive info types NOT applied to: Devices. Devices location requires DLP for Endpoint licensing and at least one registered device. For full policy details, see the ActualValue field in the results file: ./TestResults.json"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.3v1",
+                                              "Requirement":  "The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Should",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.4v1",
+                                              "Requirement":  "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Should",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.5v1",
+                                              "Requirement":  "A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.",
+                                              "Result":  "N/A",
+                                              "Criticality":  "Should/Not-Implemented",
+                                              "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.4.6v1",
+                                              "Requirement":  "The custom policy SHOULD include an action to block access to sensitive information by restricted apps and unwanted Bluetooth applications.",
+                                              "Result":  "N/A",
+                                              "Criticality":  "Should/Not-Implemented",
+                                              "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                          }
+                                      ]
+                     },
+                     {
+                         "GroupName":  "Alerts",
+                         "GroupNumber":  "5",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#5-alerts",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.5.1v1",
+                                              "Requirement":  "At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.",
+                                              "Result":  "Pass",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.5.2v1",
+                                              "Requirement":  "The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.",
+                                              "Result":  "N/A",
+                                              "Criticality":  "Should/Not-Implemented",
+                                              "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                          }
+                                      ]
+                     },
+                     {
+                         "GroupName":  "Audit Logging",
+                         "GroupNumber":  "6",
+                         "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#6-audit-logging",
+                         "Controls":  [
+                                          {
+                                              "Control ID":  "MS.DEFENDER.6.1v1",
+                                              "Requirement":  "Microsoft Purview Audit (Standard) logging SHALL be enabled.",
+                                              "Result":  "Fail",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement not met"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.6.2v1",
+                                              "Requirement":  "Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.",
+                                              "Result":  "Fail",
+                                              "Criticality":  "Shall",
+                                              "Details":  "Requirement not met. 70 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1\" target=\"_blank\">Secure Configuration Baseline policy</a>. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName"
+                                          },
+                                          {
+                                              "Control ID":  "MS.DEFENDER.6.3v1",
+                                              "Requirement":  "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.",
+                                              "Result":  "N/A",
+                                              "Criticality":  "Shall/Not-Implemented",
+                                              "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                          }
+                                      ]
+                     }
+                 ],
+    "EXO":  [
+                {
+                    "GroupName":  "Automatic Forwarding to External Domains",
+                    "GroupNumber":  "1",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#1-automatic-forwarding-to-external-domains",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.1.1v1",
+                                         "Requirement":  "Automatic forwarding to external domains SHALL be disabled.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Sender Policy Framework",
+                    "GroupNumber":  "2",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#2-sender-policy-framework",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.2.2v2",
+                                         "Requirement":  "An SPF policy SHALL be published for each domain that fails all non-approved senders.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "DomainKeys Identified Mail",
+                    "GroupNumber":  "3",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#3-domainkeys-identified-mail",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.3.1v1",
+                                         "Requirement":  "DKIM SHOULD be enabled for all domains.",
+                                         "Result":  "Warning",
+                                         "Criticality":  "Should",
+                                         "Details":  "1 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)",
+                    "GroupNumber":  "4",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#4-domain-based-message-authentication,-reporting,-and-conformance-(dmarc)",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.4.1v1",
+                                         "Requirement":  "A DMARC policy SHALL be published for every second-level domain.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "2 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com, tqhjy.onmicrosoft.com"
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.4.2v1",
+                                         "Requirement":  "The DMARC message rejection option SHALL be p=reject.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "2 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com, tqhjy.onmicrosoft.com"
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.4.3v1",
+                                         "Requirement":  "The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.",
+                                         "Result":  "Fail",
+                                         "Criticality":  "Shall",
+                                         "Details":  "2 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com, tqhjy.onmicrosoft.com"
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.4.4v1",
+                                         "Requirement":  "An agency point of contact SHOULD be included for aggregate and failure reports.",
+                                         "Result":  "Warning",
+                                         "Criticality":  "Should",
+                                         "Details":  "2 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com, tqhjy.onmicrosoft.com"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Simple Mail Transfer Protocol Authentication",
+                    "GroupNumber":  "5",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#5-simple-mail-transfer-protocol-authentication",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.5.1v1",
+                                         "Requirement":  "SMTP AUTH SHALL be disabled.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Calendar and Contact Sharing",
+                    "GroupNumber":  "6",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#6-calendar-and-contact-sharing",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.6.1v1",
+                                         "Requirement":  "Contact folders SHALL NOT be shared with all domains.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.6.2v1",
+                                         "Requirement":  "Calendar details SHALL NOT be shared with all domains.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "External Sender Warnings",
+                    "GroupNumber":  "7",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#7-external-sender-warnings",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.7.1v1",
+                                         "Requirement":  "External sender warnings SHALL be implemented.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Data Loss Prevention Solutions",
+                    "GroupNumber":  "8",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#8-data-loss-prevention-solutions",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.8.1v2",
+                                         "Requirement":  "A DLP solution SHALL be used.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo81v2\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.8.2v2",
+                                         "Requirement":  "The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo82v2\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.8.3v1",
+                                         "Requirement":  "The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.8.4v1",
+                                         "Requirement":  "At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo84v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Attachment File Type",
+                    "GroupNumber":  "9",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#9-attachment-file-type",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.9.1v2",
+                                         "Requirement":  "Emails SHALL be filtered by attachment file types.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo91v2\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.9.2v1",
+                                         "Requirement":  "The attachment filter SHOULD attempt to determine the true file type and assess the file extension.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo92v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.9.3v2",
+                                         "Requirement":  "Disallowed file types SHALL be determined and enforced.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo93v2\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.9.4v1",
+                                         "Requirement":  "Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo94v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.9.5v1",
+                                         "Requirement":  "At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo95v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Malware Scanning",
+                    "GroupNumber":  "10",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#10-malware-scanning",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.10.1v1",
+                                         "Requirement":  "Emails SHALL be scanned for malware.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo101v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.10.2v1",
+                                         "Requirement":  "Emails identified as containing malware SHALL be quarantined or dropped.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo102v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.10.3v1",
+                                         "Requirement":  "Email scanning SHALL be capable of reviewing emails after delivery.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo103v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Phishing Protections",
+                    "GroupNumber":  "11",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#11-phishing-protections",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.11.1v1",
+                                         "Requirement":  "Impersonation protection checks SHOULD be used.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo111v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.11.2v1",
+                                         "Requirement":  "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo112v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.11.3v1",
+                                         "Requirement":  "The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo113v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "IP Allow Lists",
+                    "GroupNumber":  "12",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#12-ip-allow-lists",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.12.1v1",
+                                         "Requirement":  "IP allow lists SHOULD NOT be created.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Should",
+                                         "Details":  "Requirement met"
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.12.2v1",
+                                         "Requirement":  "Safe lists SHOULD NOT be enabled.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Should",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Mailbox Auditing",
+                    "GroupNumber":  "13",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#13-mailbox-auditing",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.13.1v1",
+                                         "Requirement":  "Mailbox auditing SHALL be enabled.",
+                                         "Result":  "Pass",
+                                         "Criticality":  "Shall",
+                                         "Details":  "Requirement met"
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Inbound Anti-Spam Protections",
+                    "GroupNumber":  "14",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#14-inbound-anti-spam-protections",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.14.1v2",
+                                         "Requirement":  "A spam filter SHALL be enabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo141v2\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.14.2v1",
+                                         "Requirement":  "Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo142v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.14.3v1",
+                                         "Requirement":  "Allowed domains SHALL NOT be added to inbound anti-spam protection policies.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo143v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.14.4v1",
+                                         "Requirement":  "If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo144v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Link Protection",
+                    "GroupNumber":  "15",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#15-link-protection",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.15.1v1",
+                                         "Requirement":  "URL comparison with a block-list SHOULD be enabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo151v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.15.2v1",
+                                         "Requirement":  "Direct download links SHOULD be scanned for malware.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo152v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.15.3v1",
+                                         "Requirement":  "User click tracking SHOULD be enabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo153v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Alerts",
+                    "GroupNumber":  "16",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#16-alerts",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.16.1v1",
+                                         "Requirement":  "At a minimum, the following alerts SHALL be enabled:\na. <b>Suspicious email sending patterns detected.</b>\nb. <b>Suspicious Connector Activity.</b>\nc. <b>Suspicious Email Forwarding Activity.</b>\nd. <b>Messages have been delayed.</b>\ne. <b>Tenant restricted from sending unprovisioned email.</b>\nf. <b>Tenant restricted from sending email.</b>\ng. <b>A potentially malicious URL click was detected.</b>\n<!--Policy: MS.EXO.16.1v1; Criticality: SHALL -->",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo161v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.16.2v1",
+                                         "Requirement":  "The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Should/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo162v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                },
+                {
+                    "GroupName":  "Audit Logging",
+                    "GroupNumber":  "17",
+                    "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#17-audit-logging",
+                    "Controls":  [
+                                     {
+                                         "Control ID":  "MS.EXO.17.1v1",
+                                         "Requirement":  "Microsoft Purview Audit (Standard) logging SHALL be enabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.17.2v1",
+                                         "Requirement":  "Microsoft Purview Audit (Premium) logging SHALL be enabled.",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo172v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     },
+                                     {
+                                         "Control ID":  "MS.EXO.17.3v1",
+                                         "Requirement":  "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).",
+                                         "Result":  "N/A",
+                                         "Criticality":  "Shall/3rd Party",
+                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/exo.md#msexo173v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                     }
+                                 ]
+                }
+            ],
+    "PowerPlatform":  [
+                          {
+                              "GroupName":  "Creation of Power Platform Environments",
+                              "GroupNumber":  "1",
+                              "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#1-creation-of-power-platform-environments",
+                              "Controls":  [
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.1.1v1",
+                                                   "Requirement":  "The ability to create production and sandbox environments SHALL be restricted to admins.",
+                                                   "Result":  "Pass",
+                                                   "Criticality":  "Shall",
+                                                   "Details":  "Requirement met"
+                                               },
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.1.2v1",
+                                                   "Requirement":  "The ability to create trial environments SHALL be restricted to admins.",
+                                                   "Result":  "Pass",
+                                                   "Criticality":  "Shall",
+                                                   "Details":  "Requirement met"
+                                               }
+                                           ]
+                          },
+                          {
+                              "GroupName":  "Power Platform Data Loss Prevention Policies",
+                              "GroupNumber":  "2",
+                              "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#2-power-platform-data-loss-prevention-policies",
+                              "Controls":  [
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.2.1v1",
+                                                   "Requirement":  "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.",
+                                                   "Result":  "Pass",
+                                                   "Criticality":  "Shall",
+                                                   "Details":  "Requirement met"
+                                               },
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.2.2v1",
+                                                   "Requirement":  "Non-default environments SHOULD have at least one DLP policy affecting them.",
+                                                   "Result":  "Warning",
+                                                   "Criticality":  "Should",
+                                                   "Details":  "1 Subsequent environments without DLP policies: 407cbeff-b477-e3b4-9ca7-097888a9ec4e"
+                                               }
+                                           ]
+                          },
+                          {
+                              "GroupName":  "Power Platform Tenant Isolation",
+                              "GroupNumber":  "3",
+                              "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#3-power-platform-tenant-isolation",
+                              "Controls":  [
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.3.1v1",
+                                                   "Requirement":  "Power Platform tenant isolation SHALL be enabled.",
+                                                   "Result":  "Pass",
+                                                   "Criticality":  "Shall",
+                                                   "Details":  "Requirement met"
+                                               },
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.3.2v1",
+                                                   "Requirement":  "An inbound/outbound connection allowlist SHOULD be configured.",
+                                                   "Result":  "N/A",
+                                                   "Criticality":  "Should/Not-Implemented",
+                                                   "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                               }
+                                           ]
+                          },
+                          {
+                              "GroupName":  "Power Apps Content Security Policy",
+                              "GroupNumber":  "4",
+                              "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#4-power-apps-content-security-policy",
+                              "Controls":  [
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.4.1v1",
+                                                   "Requirement":  "Content Security Policy SHALL be enforced for model-driven and canvas Power Apps.",
+                                                   "Result":  "N/A",
+                                                   "Criticality":  "Shall/Not-Implemented",
+                                                   "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                               }
+                                           ]
+                          },
+                          {
+                              "GroupName":  "Power Pages Creation",
+                              "GroupNumber":  "5",
+                              "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/powerplatform.md#5-power-pages-creation",
+                              "Controls":  [
+                                               {
+                                                   "Control ID":  "MS.POWERPLATFORM.5.1v1",
+                                                   "Requirement":  "The ability to create Power Pages sites SHOULD be restricted to admins.",
+                                                   "Result":  "Pass",
+                                                   "Criticality":  "Should",
+                                                   "Details":  "Requirement met"
+                                               }
+                                           ]
+                          }
+                      ],
+    "SharePoint":  [
+                       {
+                           "GroupName":  "External Sharing",
+                           "GroupNumber":  "1",
+                           "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#1-external-sharing",
+                           "Controls":  [
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.1.1v1",
+                                                "Requirement":  "External sharing for SharePoint SHALL be limited to Existing guests or Only People in your organization.",
+                                                "Result":  "Pass",
+                                                "Criticality":  "Shall",
+                                                "Details":  "Requirement met"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.1.2v1",
+                                                "Requirement":  "External sharing for OneDrive SHALL be limited to Existing guests or Only People in your organization.",
+                                                "Result":  "Pass",
+                                                "Criticality":  "Shall",
+                                                "Details":  "Requirement met"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.1.3v1",
+                                                "Requirement":  "External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.",
+                                                "Result":  "N/A",
+                                                "Criticality":  "Shall/Not-Implemented",
+                                                "Details":  "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint13v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.1.4v1",
+                                                "Requirement":  "Guest access SHALL be limited to the email the invitation was sent to.",
+                                                "Result":  "N/A",
+                                                "Criticality":  "Shall/Not-Implemented",
+                                                "Details":  "This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint14v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                            }
+                                        ]
+                       },
+                       {
+                           "GroupName":  "File and Folder Default Sharing Settings",
+                           "GroupNumber":  "2",
+                           "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#2-file-and-folder-default-sharing-settings",
+                           "Controls":  [
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.2.1v1",
+                                                "Requirement":  "File and folder default sharing scope SHALL be set to Specific people (only the people the user specifies).",
+                                                "Result":  "Pass",
+                                                "Criticality":  "Shall",
+                                                "Details":  "Requirement met"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.2.2v1",
+                                                "Requirement":  "File and folder default sharing permissions SHALL be set to View.",
+                                                "Result":  "Pass",
+                                                "Criticality":  "Shall",
+                                                "Details":  "Requirement met"
+                                            }
+                                        ]
+                       },
+                       {
+                           "GroupName":  "Securing Anyone Links and Verification Code Users",
+                           "GroupNumber":  "3",
+                           "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#3-securing-anyone-links-and-verification-code-users",
+                           "Controls":  [
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.3.1v1",
+                                                "Requirement":  "Expiration days for Anyone links SHALL be set to 30 days or less.",
+                                                "Result":  "N/A",
+                                                "Criticality":  "Shall/Not-Implemented",
+                                                "Details":  "This policy is only applicable if External Sharing is set to any value other than Anyone. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint31v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.3.2v1",
+                                                "Requirement":  "The allowable file and folder permissions for links SHALL be set to View only.",
+                                                "Result":  "N/A",
+                                                "Criticality":  "Shall/Not-Implemented",
+                                                "Details":  "This policy is only applicable if External Sharing is set to any value other than Anyone. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint32v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                            },
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.3.3v1",
+                                                "Requirement":  "Reauthentication days for people who use a verification code SHALL be set to 30 days or less.",
+                                                "Result":  "N/A",
+                                                "Criticality":  "Shall/Not-Implemented",
+                                                "Details":  "External Sharing is set to Only People In Your Organization. This policy is only applicable if External Sharing is set to any value other than Only People In Your Organization or Existing Guests. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint33v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                            }
+                                        ]
+                       },
+                       {
+                           "GroupName":  "Custom Scripts",
+                           "GroupNumber":  "4",
+                           "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/sharepoint.md#4-custom-scripts",
+                           "Controls":  [
+                                            {
+                                                "Control ID":  "MS.SHAREPOINT.4.2v1",
+                                                "Requirement":  "Users SHALL be prevented from running custom scripts on self-service created sites.",
+                                                "Result":  "Pass",
+                                                "Criticality":  "Shall",
+                                                "Details":  "Requirement met"
+                                            }
+                                        ]
+                       }
+                   ],
+    "Teams":  [
+                  {
+                      "GroupName":  "Meeting Policies",
+                      "GroupNumber":  "1",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#1-meeting-policies",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.1v1",
+                                           "Requirement":  "External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.2v1",
+                                           "Requirement":  "Anonymous users SHALL NOT be enabled to start meetings.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Shall",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.3v1",
+                                           "Requirement":  "Anonymous users and dial-in callers SHOULD NOT be admitted automatically.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.4v1",
+                                           "Requirement":  "Internal users SHOULD be admitted automatically.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.5v1",
+                                           "Requirement":  "Dial-in users SHOULD NOT be enabled to bypass the lobby.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.6v1",
+                                           "Requirement":  "Meeting recording SHOULD be disabled.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.1.7v1",
+                                           "Requirement":  "Record an event SHOULD be set to Organizer can record.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "External User Access",
+                      "GroupNumber":  "2",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#2-external-user-access",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.2.1v1",
+                                           "Requirement":  "External access for users SHALL only be enabled on a per-domain basis.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Shall",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.2.2v1",
+                                           "Requirement":  "Unmanaged users SHALL NOT be enabled to initiate contact with internal users.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Shall",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.2.3v1",
+                                           "Requirement":  "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "Skype Users",
+                      "GroupNumber":  "3",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#3-skype-users",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.3.1v1",
+                                           "Requirement":  "Contact with Skype users SHALL be blocked.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Shall",
+                                           "Details":  "Requirement met"
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "Teams Email Integration",
+                      "GroupNumber":  "4",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#4-teams-email-integration",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.4.1v1",
+                                           "Requirement":  "Teams email integration SHALL be disabled.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Shall",
+                                           "Details":  "N/A: Feature is unavailable in GCC environments"
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "App Management",
+                      "GroupNumber":  "5",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#5-app-management",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.5.1v1",
+                                           "Requirement":  "Agencies SHOULD only allow installation of Microsoft apps approved by the agency.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.5.2v1",
+                                           "Requirement":  "Agencies SHOULD only allow installation of third-party apps approved by the agency.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.5.3v1",
+                                           "Requirement":  "Agencies SHOULD only allow installation of custom apps approved by the agency.",
+                                           "Result":  "Pass",
+                                           "Criticality":  "Should",
+                                           "Details":  "Requirement met"
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "Data Loss Prevention",
+                      "GroupNumber":  "6",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#6-data-loss-prevention",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.6.1v1",
+                                           "Requirement":  "A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Shall/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams61v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.6.2v1",
+                                           "Requirement":  "The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs), and Social Security numbers (SSNs) via email SHALL be restricted.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Shall/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams62v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "Malware Scanning",
+                      "GroupNumber":  "7",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#7-malware-scanning",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.7.1v1",
+                                           "Requirement":  "Attachments included with Teams messages SHOULD be scanned for malware.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Should/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams71v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.7.2v1",
+                                           "Requirement":  "Users SHOULD be prevented from opening or downloading files detected as malware.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Should/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams72v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       }
+                                   ]
+                  },
+                  {
+                      "GroupName":  "Link Protection",
+                      "GroupNumber":  "8",
+                      "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#8-link-protection",
+                      "Controls":  [
+                                       {
+                                           "Control ID":  "MS.TEAMS.8.1v1",
+                                           "Requirement":  "URL comparison with a blocklist SHOULD be enabled.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Should/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams81v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       },
+                                       {
+                                           "Control ID":  "MS.TEAMS.8.2v1",
+                                           "Requirement":  "User click tracking SHOULD be enabled.",
+                                           "Result":  "N/A",
+                                           "Criticality":  "Should/3rd Party",
+                                           "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/teams.md#msteams82v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on a manual check."
+                                       }
+                                   ]
+                  }
+              ]
+},
+    "Raw": {
     "baseline_version":  "1",
     "module_version":  "1.4.0",
     "date":  "08/02/2024 14:25:11 Central Daylight Time",
@@ -8068,7 +9404,7 @@
                                                                                                                                                               "85203421-48f9-4355-9bc8-8a53846e5083"
                                                                                                                                                           ]
                                                                                                                                           },
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027Fido2\u0027)/microsoft.graph.fido2AuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Fido2')/microsoft.graph.fido2AuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8153,7 +9489,7 @@
                                                                                                                                                                                                                 }
                                                                                                                                                                                           }
                                                                                                                                           },
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('MicrosoftAuthenticator')/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8172,7 +9508,7 @@
                                                                                          "State":  "disabled",
                                                                                          "AdditionalProperties":  {
                                                                                                                       "@odata.type":  "#microsoft.graph.smsAuthenticationMethodConfiguration",
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027Sms\u0027)/microsoft.graph.smsAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Sms')/microsoft.graph.smsAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "user",
@@ -8196,7 +9532,7 @@
                                                                                                                       "minimumLifetimeInMinutes":  10,
                                                                                                                       "maximumLifetimeInMinutes":  120,
                                                                                                                       "isUsableOnce":  true,
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027TemporaryAccessPass\u0027)/microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('TemporaryAccessPass')/microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8214,7 +9550,7 @@
                                                                                          "State":  "disabled",
                                                                                          "AdditionalProperties":  {
                                                                                                                       "@odata.type":  "#microsoft.graph.hardwareOathAuthenticationMethodConfiguration",
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027HardwareOath\u0027)/microsoft.graph.hardwareOathAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('HardwareOath')/microsoft.graph.hardwareOathAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8232,7 +9568,7 @@
                                                                                          "State":  "disabled",
                                                                                          "AdditionalProperties":  {
                                                                                                                       "@odata.type":  "#microsoft.graph.softwareOathAuthenticationMethodConfiguration",
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027SoftwareOath\u0027)/microsoft.graph.softwareOathAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('SoftwareOath')/microsoft.graph.softwareOathAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8252,7 +9588,7 @@
                                                                                                                       "@odata.type":  "#microsoft.graph.voiceAuthenticationMethodConfiguration",
                                                                                                                       "isOfficePhoneAllowed":  false,
                                                                                                                       "isCustomGreetingEnabled":  false,
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027Voice\u0027)/microsoft.graph.voiceAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Voice')/microsoft.graph.voiceAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -8271,7 +9607,7 @@
                                                                                          "AdditionalProperties":  {
                                                                                                                       "@odata.type":  "#microsoft.graph.emailAuthenticationMethodConfiguration",
                                                                                                                       "allowExternalIdToUseEmailOtp":  "disabled",
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027Email\u0027)/microsoft.graph.emailAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Email')/microsoft.graph.emailAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
 
                                                                                                                                          ]
@@ -8313,7 +9649,7 @@
 
                                                                                                                                                                                                                  ]
                                                                                                                                                      },
-                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027X509Certificate\u0027)/microsoft.graph.x509CertificateAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('X509Certificate')/microsoft.graph.x509CertificateAuthenticationMethodConfiguration/includeTargets",
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
@@ -13892,7 +15228,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "-not (Activity.User.Tags -like \u0027hve\u0027)",
+                                  "Filter":  "-not (Activity.User.Tags -like 'hve')",
                                   "Operation":  [
                                                     "CompromisedWarningAccount"
                                                 ],
@@ -13968,7 +15304,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and (Mail.IsGenericZapped -eq 1) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027PhishEdu\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027SecOps\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027ThirdPartyFiltering\u0027)",
+                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and (Mail.IsGenericZapped -eq 1) -and (Mail.TenantPolicyFinalVerdictSource -ne 'PhishEdu') -and (Mail.TenantPolicyFinalVerdictSource -ne 'SecOps') -and (Mail.TenantPolicyFinalVerdictSource -ne 'ThirdPartyFiltering')",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  false,
@@ -14042,7 +15378,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsCampaignZapped -eq 1 -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027PhishEdu\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027SecOps\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027ThirdPartyFiltering\u0027)",
+                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsCampaignZapped -eq 1 -and (Mail.TenantPolicyFinalVerdictSource -ne 'PhishEdu') -and (Mail.TenantPolicyFinalVerdictSource -ne 'SecOps') -and (Mail.TenantPolicyFinalVerdictSource -ne 'ThirdPartyFiltering')",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  false,
@@ -14116,7 +15452,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.AirItemType -eq \u0027User\u0027",
+                                  "Filter":  "Activity.AirItemType -eq 'User'",
                                   "Operation":  [
                                                     "AirManualInvestigation"
                                                 ],
@@ -14494,7 +15830,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Message.Verdict -eq \u0027Block\u0027",
+                                  "Filter":  "Message.Verdict -eq 'Block'",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -14568,7 +15904,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Mail.IsSystemZappedMalware -eq 1 -and (-not (Mail.Recipients.Tags -like \u0027hve\u0027)) -and (-not (Mail.Sender.Tags -like \u0027hve\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027)) -and ((Mail.IsGenericZapped -ne 1) -and (Mail.IsGenericZapped -ne 0)) -and ((Mail.IsCampaignZapped -ne 1) -and (Mail.IsCampaignZapped -ne 0))",
+                                  "Filter":  "Mail.IsSystemZappedMalware -eq 1 -and (-not (Mail.Recipients.Tags -like 'hve')) -and (-not (Mail.Sender.Tags -like 'hve')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering')) -and ((Mail.IsGenericZapped -ne 1) -and (Mail.IsGenericZapped -ne 0)) -and ((Mail.IsCampaignZapped -ne 1) -and (Mail.IsCampaignZapped -ne 0))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -14642,7 +15978,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsSystemZappedByURLs -eq 1 -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027)) -and (Mail.IsCampaignZapped -ne 1)",
+                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsSystemZappedByURLs -eq 1 -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering')) -and (Mail.IsCampaignZapped -ne 1)",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -14792,7 +16128,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Activity.SubmissionType -eq \u0027Phish\u0027) -or (Activity.SubmissionType -eq \u0027Malware\u0027)",
+                                  "Filter":  "(Activity.SubmissionType -eq 'Phish') -or (Activity.SubmissionType -eq 'Malware')",
                                   "Operation":  [
                                                     "UserSubmission"
                                                 ],
@@ -14944,7 +16280,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.AirItemType -eq \u0027Email\u0027",
+                                  "Filter":  "Activity.AirItemType -eq 'Email'",
                                   "Operation":  [
                                                     "AirManualInvestigation"
                                                 ],
@@ -15172,7 +16508,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsSystemZappedByFiles -eq 1 -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027)) -and (Mail.IsCampaignZapped -ne 1)",
+                                  "Filter":  "(Mail.IsMailZAPSuccessful -eq 1) -and Mail.IsSystemZappedByFiles -eq 1 -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering')) -and (Mail.IsCampaignZapped -ne 1)",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -15246,7 +16582,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.Operation -eq \u0027MSTICNationStateNotification\u0027",
+                                  "Filter":  "Activity.Operation -eq 'MSTICNationStateNotification'",
                                   "Operation":  [
                                                     "MSTICNationStateNotification"
                                                 ],
@@ -15398,7 +16734,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Activity.AirAdminActionType -eq \u0027MailAction\u0027 -or Activity.AirAdminActionType -eq \u0027BlockUrlAction\u0027 -or Activity.AirAdminActionType -eq \u0027BlockSenderAction\u0027)",
+                                  "Filter":  "(Activity.AirAdminActionType -eq 'MailAction' -or Activity.AirAdminActionType -eq 'BlockUrlAction' -or Activity.AirAdminActionType -eq 'BlockSenderAction')",
                                   "Operation":  [
                                                     "AirAdminActionInvestigation"
                                                 ],
@@ -15550,7 +16886,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "-not (Activity.User.Tags -like \u0027hve\u0027)",
+                                  "Filter":  "-not (Activity.User.Tags -like 'hve')",
                                   "Operation":  [
                                                     "CompromisedAccount"
                                                 ],
@@ -15626,7 +16962,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.EventId -eq \u002712\u0027",
+                                  "Filter":  "Activity.EventId -eq '12'",
                                   "Operation":  [
                                                     "TenantAllowBlockListItemRemoved"
                                                 ],
@@ -15702,7 +17038,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.SubmissionType -eq \u0027Junk\u0027",
+                                  "Filter":  "Activity.SubmissionType -eq 'Junk'",
                                   "Operation":  [
                                                     "UserSubmission"
                                                 ],
@@ -15778,7 +17114,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.IsMailZAPFailed -eq 1) -and ((((Mail.IsSystemZappedByFiles -eq 1) -or (Mail.IsSystemZappedByURLs -eq 1)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027)) -and (Mail.IsCampaignZapped -ne 1)) -or (((Mail.IsGenericZapped -eq 1) -or(Mail.IsCampaignZapped -eq 1)) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027PhishEdu\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027SecOps\u0027) -and (Mail.TenantPolicyFinalVerdictSource -ne \u0027ThirdPartyFiltering\u0027)))",
+                                  "Filter":  "(Mail.IsMailZAPFailed -eq 1) -and ((((Mail.IsSystemZappedByFiles -eq 1) -or (Mail.IsSystemZappedByURLs -eq 1)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering')) -and (Mail.IsCampaignZapped -ne 1)) -or (((Mail.IsGenericZapped -eq 1) -or(Mail.IsCampaignZapped -eq 1)) -and (Mail.TenantPolicyFinalVerdictSource -ne 'PhishEdu') -and (Mail.TenantPolicyFinalVerdictSource -ne 'SecOps') -and (Mail.TenantPolicyFinalVerdictSource -ne 'ThirdPartyFiltering')))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16082,7 +17418,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.SubmissionType -eq \u0027SecurityRisk\u0027",
+                                  "Filter":  "Activity.SubmissionType -eq 'SecurityRisk'",
                                   "Operation":  [
                                                     "UserSubmission"
                                                 ],
@@ -16158,7 +17494,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.DeliveryStatus -eq \u0027Delivered\u0027) -and (Mail.Direction -eq \u0027Inbound\u0027 -or Mail.AntispamDirection -eq \u0027ToInternalRecipient\u0027) -and (Mail.IsOriginalDelivery -eq 1) -and (Mail.PhishConfidence -eq \u0027High\u0027) -and (Mail.FinalVerdictSource -eq \u0027Tenant\u0027) -and (Mail.TenantPolicyFinalVerdict -eq \u0027Allow\u0027) -and (Mail.TenantPolicyFinalVerdictSource -eq \u0027ETR\u0027 -or Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027))",
+                                  "Filter":  "(Mail.DeliveryStatus -eq 'Delivered') -and (Mail.Direction -eq 'Inbound' -or Mail.AntispamDirection -eq 'ToInternalRecipient') -and (Mail.IsOriginalDelivery -eq 1) -and (Mail.PhishConfidence -eq 'High') -and (Mail.FinalVerdictSource -eq 'Tenant') -and (Mail.TenantPolicyFinalVerdict -eq 'Allow') -and (Mail.TenantPolicyFinalVerdictSource -eq 'ETR' -or Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering') -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps'))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16232,7 +17568,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Mail.TimeTravelResult -eq \u0027AdminPolicy_ZapDisabled\u0027 -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027))",
+                                  "Filter":  "Mail.TimeTravelResult -eq 'AdminPolicy_ZapDisabled' -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering'))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16382,7 +17718,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Mail.IsSystemZappedPhish -eq 1 -and (-not (Mail.Recipients.Tags -like \u0027hve\u0027)) -and (-not (Mail.Sender.Tags -like \u0027hve\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027)) -and ((Mail.IsGenericZapped -ne 1) -and (Mail.IsGenericZapped -ne 0)) -and ((Mail.IsCampaignZapped -ne 1) -and (Mail.IsCampaignZapped -ne 0))",
+                                  "Filter":  "Mail.IsSystemZappedPhish -eq 1 -and (-not (Mail.Recipients.Tags -like 'hve')) -and (-not (Mail.Sender.Tags -like 'hve')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering')) -and ((Mail.IsGenericZapped -ne 1) -and (Mail.IsGenericZapped -ne 0)) -and ((Mail.IsCampaignZapped -ne 1) -and (Mail.IsCampaignZapped -ne 0))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16456,7 +17792,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "MessagesQueued.QueuedType -eq \u0027ConnectorBasedMessagesQueued\u0027",
+                                  "Filter":  "MessagesQueued.QueuedType -eq 'ConnectorBasedMessagesQueued'",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16501,7 +17837,7 @@
                                   "Priority":  0,
                                   "Workload":  "AuditAlerting",
                                   "Policy":  "ba52bbe8-d298-494f-893f-b1e9a4c18b86",
-                                  "Comment":  "When Office 365 can\u0027t deliver a message to your on-premises or partner servers via a connector, the message is queued in Office 365. This alert is triggered when the number of queued messages exceeds the policy threshold and have been queued for more than an hour. -V1.0.0.0",
+                                  "Comment":  "When Office 365 can't deliver a message to your on-premises or partner servers via a connector, the message is queued in Office 365. This alert is triggered when the number of queued messages exceeds the policy threshold and have been queued for more than an hour. -V1.0.0.0",
                                   "Disabled":  false,
                                   "Mode":  "Enforce",
                                   "ObjectVersion":  "0ffd792e-cb1d-4ae7-6444-08d6bdf1012f",
@@ -16834,7 +18170,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "Activity.SubmissionType -eq \u0027NotJunk\u0027",
+                                  "Filter":  "Activity.SubmissionType -eq 'NotJunk'",
                                   "Operation":  [
                                                     "UserSubmission"
                                                 ],
@@ -16910,7 +18246,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.DeliveryStatus -eq \u0027Delivered\u0027) -and (Mail.Direction -eq \u0027Inbound\u0027 -or Mail.AntispamDirection -eq \u0027ToInternalRecipient\u0027) -and (Mail.IsOriginalDelivery -eq 1) -and (Mail.PhishConfidence -eq \u0027High\u0027) -and (Mail.FinalVerdictSource -eq \u0027Tenant\u0027) -and (Mail.TenantPolicyFinalVerdict -eq \u0027Allow\u0027) -and (Mail.TenantPolicyFinalVerdictSource -eq \u0027ConnPolicy\u0027) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027))",
+                                  "Filter":  "(Mail.DeliveryStatus -eq 'Delivered') -and (Mail.Direction -eq 'Inbound' -or Mail.AntispamDirection -eq 'ToInternalRecipient') -and (Mail.IsOriginalDelivery -eq 1) -and (Mail.PhishConfidence -eq 'High') -and (Mail.FinalVerdictSource -eq 'Tenant') -and (Mail.TenantPolicyFinalVerdict -eq 'Allow') -and (Mail.TenantPolicyFinalVerdictSource -eq 'ConnPolicy') -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering'))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -16984,7 +18320,7 @@
                                   "ObjectState":  "New"
                               },
                               {
-                                  "Filter":  "(Mail.TimeTravelResult -eq \u0027AdminPolicy_ZapDisabled\u0027) -and (Mail.PhishConfidence -eq \u0027High\u0027) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027PhishEdu\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027SecOps\u0027)) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq \u0027ThirdPartyFiltering\u0027))",
+                                  "Filter":  "(Mail.TimeTravelResult -eq 'AdminPolicy_ZapDisabled') -and (Mail.PhishConfidence -eq 'High') -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'PhishEdu')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'SecOps')) -and (-not (Mail.TenantPolicyFinalVerdictSource -eq 'ThirdPartyFiltering'))",
                                   "Operation":  null,
                                   "LogicalOperationName":  null,
                                   "NotificationEnabled":  true,
@@ -17807,7 +19143,7 @@
                                  "InternalSMTPServers":  [
 
                                                          ],
-                                 "JournalingReportNdrTo":  "\u003c\u003e",
+                                 "JournalingReportNdrTo":  "<>",
                                  "OrganizationFederatedMailbox":  "johndoe@example.com",
                                  "MaxDumpsterSizePerDatabase":  "18 MB (18,874,368 bytes)",
                                  "MaxDumpsterTime":  "7.00:00:00",
@@ -17963,7 +19299,7 @@
                                "ManuallyModified":  false,
                                "ActivationDate":  null,
                                "ExpiryDate":  null,
-                               "Description":  "If the message:\r\n\tIs received from \u0027Outside the organization\u0027\r\nTake the following actions:\r\n\tPrepend the subject with \u0027[External]\u0027\r\n",
+                               "Description":  "If the message:\r\n\tIs received from 'Outside the organization'\r\nTake the following actions:\r\n\tPrepend the subject with '[External]'\r\n",
                                "RuleVersion":  {
                                                    "Major":  14,
                                                    "Minor":  0,
@@ -18173,7 +19509,7 @@
                                "ManuallyModified":  false,
                                "ActivationDate":  null,
                                "ExpiryDate":  null,
-                               "Description":  "If the message:\r\n\tIs received from \u0027Outside the organization\u0027\r\nTake the following actions:\r\n\tPrepend the subject with \u0027[External]\u0027\r\n",
+                               "Description":  "If the message:\r\n\tIs received from 'Outside the organization'\r\nTake the following actions:\r\n\tPrepend the subject with '[External]'\r\n",
                                "RuleVersion":  {
                                                    "Major":  14,
                                                    "Minor":  0,
@@ -19981,4 +21317,6 @@
     "teams_unsuccessful_commands":  [
 
                                     ]
+}
+
 }
