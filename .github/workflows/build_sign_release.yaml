@@ -55,6 +55,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
       - name: Get Key Vault info
+        id: key-vault-info
         env:
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
@@ -74,9 +75,11 @@ jobs:
             $FileListFileName = New-FileList `
               -ArrayOfFilePaths $ArrayOfFilePaths
             Write-Output "Calling AzureSignTool function to sign scripts, manifest, and modules..."
+            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
             Use-AzureSignTool `
-              -AzureKeyVaultUrl $($KeyVaultInfo.KeyVault.URL) `
-              -CertificateName $($KeyVaultInfo.KeyVault.CertificateName) `
+              -AzureKeyVaultUrl $AzureKeyVaultUrl `
+              -CertificateName $CertificateName `
               -FileList $FileListFileName
             Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
             Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
