@@ -75,8 +75,8 @@ jobs:
             $FileListFileName = New-FileList `
               -ArrayOfFilePaths $ArrayOfFilePaths
             Write-Output "Calling AzureSignTool function to sign scripts, manifest, and modules..."
-            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
-            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+            $AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+            $CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
             Use-AzureSignTool `
               -AzureKeyVaultUrl $AzureKeyVaultUrl `
               -CertificateName $CertificateName `
