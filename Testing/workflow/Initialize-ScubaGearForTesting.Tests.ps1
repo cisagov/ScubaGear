@@ -7,6 +7,7 @@ param()
 
 BeforeDiscovery {
   Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
+  Import-Module -Name .\PowerShell\ScubaGear
   Initialize-ScubaGearForTesting
 }
 
