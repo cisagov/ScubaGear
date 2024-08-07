@@ -115,13 +115,9 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
-    $CurrentLocation = Get-Location
-    Write-Information 'Current location is...'
-    Write-Information $CurrentLocation
-    Write-Information 'The PSSCriptRoot location is...'
-    Write-Information $PSScriptRoot
+    $ModulePath = (Get-Item $PSScriptRoot).parent.parent
     Write-Information 'Importing module...'
-    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
+    Import-Module (Join-Path -Path $ModulePath -ChildPath 'PowerShell/ScubaGear' -Resolve) -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
