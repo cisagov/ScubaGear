@@ -328,7 +328,7 @@ function Get-PrivilegedUser {
                 if ($TenantHasPremiumLicense) {
                     # Get the users that are assigned to the PIM group as Eligible members
                     $graphArgs = @{
-                        "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" 
+                        "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
                         "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
                         "M365Environment" = $M365Environment }
                     $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
@@ -356,7 +356,7 @@ function Get-PrivilegedUser {
     if ($TenantHasPremiumLicense) {
         # Get a list of all the users and groups that have Eligible assignments
         $graphArgs = @{
-            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" 
+            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
             "M365Environment" = $M365Environment }
         $AllPIMRoleAssignments = Invoke-GraphDirectly @graphArgs
 
@@ -612,7 +612,7 @@ function Get-PrivilegedRole {
 
         # Get ALL the roles and users actively assigned to them
         $graphArgs = @{
-            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" 
+            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
             "M365Environment" = $M365Environment }
         $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
 
