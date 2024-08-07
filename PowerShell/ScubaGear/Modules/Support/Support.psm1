@@ -118,7 +118,6 @@ function Initialize-SCuBA {
     # Need to determine where module is so we can get required versions info
     $ParentPath = Split-Path -parent $PSScriptRoot
     $ModulePath = Split-Path -parent $ParentPath
-    Write-Information "The module path is $ModulePath"
     # Why do we need to import this function in the middle of the function?
     # We don't know.  But it's required.
     Import-Module $ModulePath -Function Initialize-Scuba
