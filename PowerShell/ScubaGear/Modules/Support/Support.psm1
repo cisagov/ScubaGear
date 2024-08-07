@@ -114,8 +114,9 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
+    $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
-        ($RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath ../../RequiredVersions.ps1) *> $null
+        ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
     }
     catch {
