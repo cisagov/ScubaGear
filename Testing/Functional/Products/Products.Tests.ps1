@@ -105,7 +105,7 @@ Import-Module $ConnectionModule
 Import-Module Selenium
 
 BeforeDiscovery{
-
+    Import-Module -Name .\PowerShell\ScubaGear
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
     }
