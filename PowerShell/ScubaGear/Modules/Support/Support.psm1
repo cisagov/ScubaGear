@@ -114,10 +114,13 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
+    Write-Information 'Importing module...'
     # Need to determine where module is so we can get required versions info
     $ModulePath = (Get-Item $PSScriptRoot).parent.parent
-    Write-Information 'Importing module...'
-    Import-Module (Join-Path -Path $ModulePath -ChildPath 'PowerShell/ScubaGear' -Resolve) -Function Initialize-Scuba
+    Write-Information "The module path is $ModulePath"
+    # Why do we need to import this function in the middle of the function?
+    # We don't know.  But it's required.
+    Import-Module $ModulePath -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
