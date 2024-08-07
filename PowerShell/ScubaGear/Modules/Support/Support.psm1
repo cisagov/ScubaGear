@@ -116,7 +116,8 @@ function Initialize-SCuBA {
 
     Write-Information 'Importing module...'
     # Need to determine where module is so we can get required versions info
-    $ModulePath = (Get-Item $PSScriptRoot).parent.parent
+    $ParentPath = Split-Path -parent $PSScriptRoot
+    $ModulePath = Split-Path -parent $ParentPath
     Write-Information "The module path is $ModulePath"
     # Why do we need to import this function in the middle of the function?
     # We don't know.  But it's required.
