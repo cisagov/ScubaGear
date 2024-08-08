@@ -44,6 +44,13 @@ NotCheckedDetails(PolicyId) := sprintf(
     [PolicyLink(PolicyId)]
 )
 
+# Use this when you need to make a policy not-implemented because of deprecation
+NotCheckedDeprecation(PolicyId) :=
+    concat(" ", [
+    "This configuration setting has been deprecated and we are in the process of removing it from the baseline."
+    ])
+
+
 # Note: Reason must include %v to reference policy in document.
 CheckedSkippedDetails(PolicyId, Reason) := sprintf(
     concat(" ", [Reason]), [PolicyLink(PolicyId)]
