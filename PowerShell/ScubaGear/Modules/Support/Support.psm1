@@ -117,10 +117,10 @@ function Initialize-SCuBA {
     # Need to determine where module is so we can get required versions info
     $ParentPath = Split-Path -parent $PSScriptRoot
     $ModulePath = Split-Path -parent $ParentPath
-    # Why do we need to import this function in the middle of the function?
-    # Two possibilities:
-    # 1) importing the function restricts the import so only that function is exported
-    # 2) imported functions take precedence over imported modules
+    # Removing the import below causes issues with testing, let it be.  
+    # Import module magic may be helping by:
+    #   * restricting the import so only that only function is exported
+    #   * imported function takes precedence over imported modules w/ function
     Import-Module $ModulePath -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
