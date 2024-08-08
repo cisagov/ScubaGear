@@ -117,7 +117,7 @@ function Initialize-SCuBA {
     # Need to determine where module is so we can get required versions info
     $ParentPath = Split-Path -parent $PSScriptRoot
     $ModulePath = Split-Path -parent $ParentPath
-    # Removing the import below causes issues with testing, let it be.  
+    # Removing the import below causes issues with testing, let it be.
     # Import module magic may be helping by:
     #   * restricting the import so only that only function is exported
     #   * imported function takes precedence over imported modules w/ function
