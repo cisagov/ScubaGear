@@ -114,7 +114,6 @@ function Initialize-SCuBA {
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-    Write-Information 'Importing module...'
     # Need to determine where module is so we can get required versions info
     $ParentPath = Split-Path -parent $PSScriptRoot
     $ModulePath = Split-Path -parent $ParentPath
