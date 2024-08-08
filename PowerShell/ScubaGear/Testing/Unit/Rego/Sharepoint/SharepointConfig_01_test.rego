@@ -2,6 +2,7 @@ package sharepoint_test
 import rego.v1
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
+import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
@@ -195,51 +196,11 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
 #
 # Policy MS.SHAREPOINT.1.4v1
 #--
-test_SameAccount_NotApplicable_V1 if {
+test_RequireAcceptingAccountMatchInvitedAccount_NotImplemented_V1 if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
 
     Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People In Your Organization.",
-        "See %v for more info"
-        ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
-}
-
-test_SameAccount_NotApplicable_V2 if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": true}])
-
-    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People In Your Organization.",
-        "See %v for more info"
-        ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
-}
-
-test_SameAccount_Correct_V1 if {
-    Tenant := json.patch(SPOTenant,
-                [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": true},
-                {"op": "add", "path": "SharingCapability", "value": 1}])
-
-    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-
-    TestResult("MS.SHAREPOINT.1.4v1", Output, PASS, true) == true
-}
-
-test_SameAccount_Incorrect if {
-    Tenant := json.patch(SPOTenant,
-                [{"op": "add", "path": "RequireAcceptingAccountMatchInvitedAccount", "value": false},
-                {"op": "add", "path": "SharingCapability", "value": 1}])
-
-    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-
-    TestResult("MS.SHAREPOINT.1.4v1", Output, FAIL, false) == true
+    TestResult(PolicyId, Output, NotCheckedDeprecation(PolicyId), false) == true
 }
 #--
