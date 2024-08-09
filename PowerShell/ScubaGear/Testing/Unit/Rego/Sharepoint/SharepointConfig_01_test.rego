@@ -201,6 +201,6 @@ test_RequireAcceptingAccountMatchInvitedAccount_NotImplemented_V1 if {
 
     Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
-    TestResult(PolicyId, Output, NotCheckedDeprecation(PolicyId), false) == true
+    TestResult(PolicyId, Output, NotCheckedDeprecation, false) == true
 }
 #--

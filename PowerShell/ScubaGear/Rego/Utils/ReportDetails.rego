@@ -45,7 +45,7 @@ NotCheckedDetails(PolicyId) := sprintf(
 )
 
 # Use this when you need to make a policy not-implemented because of deprecation
-NotCheckedDeprecation(PolicyId) :=
+NotCheckedDeprecation :=
     concat(" ", [
     "This configuration setting has been deprecated and we are in the process of removing it from the baseline."
     ])

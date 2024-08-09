@@ -177,7 +177,7 @@ tests contains {
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDeprecation(PolicyId),
+    "ReportDetails": NotCheckedDeprecation,
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.1.4v1"
