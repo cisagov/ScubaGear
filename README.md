@@ -2,7 +2,7 @@
 
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
-[![CI Pipeline Workflow][github-cicd-workflow-img]][github-cicd-workflow]
+[[CI Pipeline Workflow](https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml/badge.svg)
 ![Functional Tests Workflow](https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml/badge.svg)
 [![GitHub License][github-license-img]][license]
 [![GitHub Downloads][github-downloads-img]][release]
