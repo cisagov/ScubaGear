@@ -1,6 +1,6 @@
 # ScubaGear Execution
 
-ScubaGear is executed with the `Invoke-SCuBA` command on a Windows computer, and it can be invoked interactively or non-interactively. Both modes require the appropriate [permissions](../prerequisites/permissions.md) to be configured and the [dependencies](../prerequisites/dependencies.md) to be installed. Additionally, if ScubaGear was downloaded from GitHub, the module must be imported.
+ScubaGear is executed with the `Invoke-SCuBA` command on a Windows computer, and it can be invoked interactively or non-interactively. Both modes require the appropriate [permissions](../prerequisites/permissions.md) to be configured and the [dependencies](../prerequisites/dependencies.md) to be installed.  Additionally, if ScubaGear was downloaded from GitHub, the module must be imported.
 
 ## Import Module
 
@@ -9,6 +9,15 @@ If ScubaGear was installed by [downloading from GitHub](../installation/github.m
 ```powershell
 # Import the module into the session
 Import-Module -Name .\PowerShell\ScubaGear 
+```
+
+## Install Dependencies
+
+ScubaGear requires a number of dependencies to be installed before it can be invoked.  To install the dependencies:
+
+```powershell
+# Install the minimum required dependencies
+Initialize-SCuBA 
 ```
 
 ## Interactive Mode
