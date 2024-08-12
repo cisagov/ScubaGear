@@ -3,7 +3,7 @@
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
 [![CI Pipeline Workflow][github-cicd-workflow-img]][github-cicd-workflow]
-![Functional Tests Workflow](https://github.com/github/docs/actions/workflows/test_production_function.yml/badge.svg)
+![Functional Tests Workflow](https://github.com/cisagov/ScubaGear/blob/main/.github/workflows/test_production_function.yaml/badge.svg)
 [![GitHub License][github-license-img]][license]
 [![GitHub Downloads][github-downloads-img]][release]
 [![PSGallery Downloads][psgallery-downloads-img]][psgallery]
