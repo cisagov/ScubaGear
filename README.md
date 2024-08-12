@@ -2,7 +2,8 @@
 
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
-[![GitHub CICD Workflow][github-cicd-workflow-img]][github-cicd-workflow]
+[![CI Pipeline Workflow][github-cicd-workflow-img]][github-cicd-workflow]
+![Functional Tests Workflow](https://github.com/github/docs/actions/workflows/test_production_function.yml/badge.svg)
 [![GitHub License][github-license-img]][license]
 [![GitHub Downloads][github-downloads-img]][release]
 [![PSGallery Downloads][psgallery-downloads-img]][psgallery]
