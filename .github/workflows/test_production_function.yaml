@@ -24,6 +24,7 @@ jobs:
   build-matrix:
     name: Build Matrix
     runs-on: windows-latest
+    environment: Development
     defaults:
       run:
         shell: powershell
@@ -209,3 +210,19 @@ jobs:
           }
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      - name: Notify on Failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          subject: Nightly functional tests for ${{ matrix.product }} failed
+          # email body as text
+          body: Repository = ${{ github.repository }}\nJob = ${{ github.job }}\nStatus = ${{ job.status }}
+          # comma-separated string, send email to
+          to: jgarriss@mitre.org
+          # from email name
+          from: ScubaGear Notifier
+          
