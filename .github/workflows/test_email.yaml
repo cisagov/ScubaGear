@@ -4,6 +4,7 @@ on:
 jobs:
   notify:
     name: Notify Me
+    environment: Development
     runs-on: ubuntu-latest
     steps:
       - name: Send mail
