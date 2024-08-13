@@ -715,18 +715,6 @@ function Invoke-RunRego {
             $FileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).json" -ErrorAction 'Stop'
             $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
-            foreach ($Product in $TestResults) {
-                foreach ($Test in $Product) {
-                    # ConvertTo-Csv struggles with the nested nature of the ActualValue
-                    # and Commandlet fields. Explicitly convert these to json strings before
-                    # calling ConvertTo-Csv
-                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress -ErrorAction 'Stop'
-                    $Test.Commandlet = $Test.Commandlet -Join ", "
-                }
-            }
-            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation -ErrorAction 'Stop'
-            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv" -ErrorAction 'Stop'
-            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
             $ProdRegoFailed
         }
         catch {
