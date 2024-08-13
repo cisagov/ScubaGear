@@ -216,6 +216,6 @@ jobs:
           subject: Nightly functional test failure
           body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           # comma-separated string, send email to
-          to: "${{ steps.test-product.emails.thumbprint }}"
+          to: "${{ steps.test-product.outputs.emails }}"
           # from email name
           from: ScubaGear Notifier
