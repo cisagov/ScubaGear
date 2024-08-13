@@ -175,7 +175,7 @@ jobs:
               }
               elseif($key.ToLower() -eq "emails")
               {
-                $emails = $attribute
+                $emails = $value
                 # Pass emails to later job.
                 echo emails=$emails >> $env:GITHUB_OUTPUT
               }
