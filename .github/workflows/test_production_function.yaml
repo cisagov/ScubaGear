@@ -110,18 +110,6 @@ jobs:
         shell: pwsh # -Password flag requires PS 6+
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # Selenium is an interface that allows for
-      # the programmatic control of web browsers
-      # - name: Install Selenium & Update Webdriver
-      #   run: |
-      #     Install-Module -Name Selenium -Scope CurrentUser -Force
-      #     Import-Module -Name Selenium
-      #     ./Testing/Functional/SmokeTest/UpdateSelenium.ps1
-      #     # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-      #     Import-Module -Name .\PowerShell\ScubaGear
-      #     Initialize-SCuBA
-      #     # Workaround for Selenium. Loading psm1 instead of psd1
-      #     Import-Module -Name (Get-Module -Name Selenium -ListAvailable).Path -Force
       - name: Install Selenium
         run: |
           Import-Module -Name .\utils\workflow\Install-SeleniumForTesting
@@ -218,9 +206,8 @@ jobs:
           server_port: 465
           username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
           password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-          subject: Nightly functional tests for ${{ matrix.product }} failed
-          # email body as text
-          body: Repository = ${{ github.repository }}\nJob = ${{ github.job }}\nStatus = ${{ job.status }}
+          subject: Nightly functional test failure
+          body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.  
           # comma-separated string, send email to
           to: jgarriss@mitre.org
           # from email name
