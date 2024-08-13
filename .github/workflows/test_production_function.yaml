@@ -23,6 +23,7 @@ jobs:
   # Build a matrix of aliases for testing.
   build-matrix:
     name: Build Matrix
+    environment: Development
     runs-on: windows-latest
     defaults:
       run:
