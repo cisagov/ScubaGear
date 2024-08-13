@@ -35,7 +35,10 @@ jobs:
       - name: Generate Matrix
         id: generate-matrix
         run: |
+          $teststring = "hello world"
+          echo $teststring.Length
           $params = $env:TestParams
+          echo $params.Length
           # Powershell doesn't build arrays in the format that a matrix
           # wants, so this builds it using a string instead.  It's ugly.
           $aliases = "["
@@ -43,7 +46,6 @@ jobs:
           $products = $params.split("|")
           foreach ($product in $products)
           {
-            echo $product
             $attributes = $product.split(",")
             foreach ($attribute in $attributes)
             {
