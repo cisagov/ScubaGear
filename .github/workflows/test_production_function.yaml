@@ -24,7 +24,6 @@ jobs:
   build-matrix:
     name: Build Matrix
     runs-on: windows-latest
-    environment: Development
     defaults:
       run:
         shell: powershell
@@ -72,6 +71,7 @@ jobs:
   # This job runs once per alias in the matrix.
   test-products:
     name: Test
+    environment: Development
     runs-on: windows-latest
     defaults:
       run:
