@@ -35,8 +35,6 @@ jobs:
       - name: Generate Matrix
         id: generate-matrix
         run: |
-          $teststring = "hello world"
-          echo $teststring.Length
           $params = $env:TestParams
           echo $params.Length
           # Powershell doesn't build arrays in the format that a matrix
@@ -67,7 +65,7 @@ jobs:
           echo $aliases
           echo aliases=$aliases >> $env:GITHUB_OUTPUT
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAM_DEV }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
     outputs:
       aliases: ${{ steps.generate-matrix.outputs.aliases }}
   # Use ScubaGear to test each service.
