@@ -72,6 +72,9 @@ function Invoke-SCuBA {
     .Parameter OutJsonFileName
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
+    .Parameter OutCsvFileName
+    If MergeJson is set, the name of the consolidated CSV created in the folder
+    created in OutPath. Defaults to "ScubaResults".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -213,6 +216,12 @@ function Invoke-SCuBA {
         [string]
         $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
+
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
         [ValidateScript({
@@ -270,6 +279,7 @@ function Invoke-SCuBA {
                 'OutReportName' = $OutReportName
                 'MergeJson' = $MergeJson
                 'OutJsonFileName' = $OutJsonFileName
+                'OutCsvFileName' = $OutCsvFileName
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -409,6 +419,13 @@ function Invoke-SCuBA {
                     'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
                 }
                 Merge-JsonOutput @JsonParams
+
+                $CsvParams = @{
+                    'OutFolderPath' = $OutFolderPath;
+                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                    'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+                }
+                ConvertTo-ResultsCsv @CsvParams
             }
         }
         finally {
@@ -756,6 +773,57 @@ function Pluralize {
         }
         else {
             $SingularNoun
+        }
+    }
+}
+
+function ConvertTo-ResultsCsv {
+    <#
+    .Description
+    This function converts the controls inside the Results section of the json output to a csv.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderPath,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName
+    )
+    process {
+        try {
+            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName.json"
+            $ScubaResults = Get-Content $ScubaResultsFileName | ConvertFrom-Json
+            $ScubaResultsCsv = @()
+            foreach ($Product in $ScubaResults.Results.PSObject.Properties) {
+                foreach ($Group in $Product.Value) {
+                    foreach ($Control in $Group.Controls) {
+                        # Multi-line requirement strings (e.g., MS.EXO.16.1v1) need to be merged into a single
+                        # line, otherwise the single control will be split into multiple rows in the CSV output
+                        $Control.Requirement = $Control.Requirement.Replace("`n", " ")
+                        $ScubaResultsCsv += $Control
+                    }
+                }
+            }
+            $CsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
+            $Encoding = Get-FileEncoding
+            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $CsvFileName -Encoding $Encoding
+        }
+        catch {
+            $Warning = "Error involving the creation of CSV version of output. "
+            $Warning += "See the exception message for more details: $($_)"
+            Write-Warning $Warning
         }
     }
 }
@@ -1398,6 +1466,9 @@ function Invoke-SCuBACached {
     .Parameter OutJsonFileName
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
+    .Parameter OutCsvFileName
+    If MergeJson is set, the name of the consolidated CSV created in the folder
+    created in OutPath. Defaults to "ScubaResults".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
@@ -1505,6 +1576,11 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [switch]
         $Quiet,
@@ -1608,6 +1684,13 @@ function Invoke-SCuBACached {
                     'OutJsonFileName' = $OutJsonFileName;
                 }
                 Merge-JsonOutput @JsonParams
+
+                $CsvParams = @{
+                    'OutFolderPath' = $OutFolderPath;
+                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                    'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+                }
+                ConvertTo-ResultsCsv @CsvParams
             }
         }
     }
