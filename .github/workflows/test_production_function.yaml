@@ -64,7 +64,7 @@ jobs:
           echo $aliases
           echo aliases=$aliases >> $env:GITHUB_OUTPUT
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAM_DEV }}
     outputs:
       aliases: ${{ steps.generate-matrix.outputs.aliases }}
   # Use ScubaGear to test each service.
@@ -136,6 +136,7 @@ jobs:
             [String]$productname = ""
             [String]$variant = ""
             [String]$m365 = ""
+            [String]$emails = ""
             $paramsAsHashTable = @{}
             $attributes = $product.split(",")
             foreach ($attribute in $attributes)
@@ -172,6 +173,12 @@ jobs:
               {
                 $m365 = $attribute
               }
+              elseif($key.ToLower() -eq "emails")
+              {
+                $emails = $attribute
+                # Pass emails to later job.
+                echo emails=$emails >> $env:GITHUB_OUTPUT
+              }
             }
             if($alias -eq "${{ matrix.product }}")
             {
@@ -197,7 +204,7 @@ jobs:
             }
           }
         env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       - name: Notify on Failure
         if: failure()
         uses: dawidd6/action-send-mail@v3
@@ -207,8 +214,8 @@ jobs:
           username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
           password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
           subject: Nightly functional test failure
-          body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.  
+          body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           # comma-separated string, send email to
-          to: jgarriss@mitre.org
+          to: "${{ steps.test-product.emails.thumbprint }}"
           # from email name
           from: ScubaGear Notifier
