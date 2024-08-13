@@ -1,0 +1,25 @@
+name: Test the Emails
+on:
+  push
+jobs:
+  notify:
+    name: Notify Me
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # mail server settings
+          server_address: smtp.gmail.com
+          server_port: 465
+          # user credentials
+          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          # email subject
+          subject: Email Notification Test
+          # email body as text
+          body: ${{ github.job }} job in worflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}
+          # comma-separated string, send email to
+          to: jgarriss@mitre.org
+          # from email name
+          from: ScubaGear Notifier
