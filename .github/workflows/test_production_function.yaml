@@ -176,8 +176,6 @@ jobs:
               elseif($key.ToLower() -eq "emails")
               {
                 $emails = $value
-                # Pass emails to later job.
-                echo emails=$emails >> $env:GITHUB_OUTPUT
               }
             }
             if($alias -eq "${{ matrix.product }}")
@@ -201,6 +199,8 @@ jobs:
               $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
               # Test the product
               ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+              # Pass emails to later job for notification.
+              echo emails=$emails >> $env:GITHUB_OUTPUT
             }
           }
         env:
