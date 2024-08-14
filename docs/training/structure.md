@@ -46,9 +46,9 @@ Contains a sample output of SCuBA. This is for our users and is updated when the
 
 - Testing
 Contains additional scripts for testing. For the training ground, RunUnitTests.pst will be used most often.
-![alt text](images\UnitTestDefault.png)
-![alt text](images\UnitTestFiltered.png)
-![alt text](images\UnitTestFail.png)
+![alt text](/docs/images/UnitTestHelp.png)
+![alt text](/docs/images/UnitTestControlGroup.png)
+![alt text](/docs/images/UnitTestVerbose.png)
 
 - utils
 TODO
