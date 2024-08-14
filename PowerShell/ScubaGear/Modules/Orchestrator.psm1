@@ -777,6 +777,54 @@ function Pluralize {
     }
 }
 
+function Format-PlainText {
+    <#
+    .Description
+    This function sanitizes a given string so that it will render properly in Excel (e.g., remove HTML tags).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $RawString
+    )
+    process {
+        $CleanString = $RawString
+        # Multi-line strings (e.g., the requirment string for MS.EXO.16.1v1) need to be merged into a single
+        # line, otherwise the single control will be split into multiple rows in the CSV output
+        $CleanString = $CleanString.Replace("`n", " ")
+        # The "View all CA policies" link needs to be removed from the spreadsheet as what it links to
+        # does not exist in the spreadsheet
+        $CleanString = $CleanString.Replace("<a href='#caps'>View all CA policies</a>.", "")
+        # Remove HTML tags that won't render properly in the spreadsheet and whose removal won't affect the
+        # overall meaning of the string
+        $CleanString = $CleanString.Replace("<br/>", " ")
+        $CleanString = $CleanString.Replace("<b>", "")
+        $CleanString = $CleanString.Replace("</b>", "")
+        # Strip out HTML comments
+        $CleanString = $CleanString -replace '(.*)(<!--)(.*)(-->)(.*)', '$1$5'
+        # The following regex looks for a string with an anchor tag. If it finds an anchor tag, it reformats
+        # the string so that the anchor is removed. For example:
+        # 'See <a href="https://example.com" target="_blank">this example</a> for more details.'
+        # becomes
+        # 'See this example, https://example.com for more details.'
+        # In-depth interpretation:
+        # Group 1: '(.*)' Matches any number of characters before the opening anchor tag
+        # Group 2: '<a href="' Matches the opening anchor tag, up to and including the opening quote of the href
+        # Group 3: '([\w/\.:#\?]+)' Matches the href string
+        # Group 4: '(".*>)' Matches the last half of the opening anchor tag
+        # Group 5: '(.*)' Matches the anchor inner html, i.e., the link's display text
+        # Group 6: '(</a>)' Matches the closing anchor tag
+        # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
+        $CleanString = $CleanString -replace '(.*)(<a href=")([\w/\.:#\?]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
+
+        $CleanString
+    }
+}
+
 function ConvertTo-ResultsCsv {
     <#
     .Description
@@ -809,9 +857,8 @@ function ConvertTo-ResultsCsv {
             foreach ($Product in $ScubaResults.Results.PSObject.Properties) {
                 foreach ($Group in $Product.Value) {
                     foreach ($Control in $Group.Controls) {
-                        # Multi-line requirement strings (e.g., MS.EXO.16.1v1) need to be merged into a single
-                        # line, otherwise the single control will be split into multiple rows in the CSV output
-                        $Control.Requirement = $Control.Requirement.Replace("`n", " ")
+                        $Control.Requirement = Format-PlainText -RawString $Control.Requirement
+                        $Control.Details = Format-PlainText -RawString $Control.Details
                         $ScubaResultsCsv += $Control
                     }
                 }
