@@ -43,6 +43,10 @@ TestPlan:
               Confirm: false
           # yamllint disable-line rule:line-length
           - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
                       Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: true
