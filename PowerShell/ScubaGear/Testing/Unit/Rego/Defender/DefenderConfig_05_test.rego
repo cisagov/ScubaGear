@@ -10,182 +10,32 @@ import data.utils.key.PASS
 # Policy MS.DEFENDER.5.1v1
 #--
 test_Disabled_Correct_V1 if {
-    Output := defender.tests with input as {
-        "protection_alerts": [
-            {
-                "Name": "Suspicious email sending patterns detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Unusual increase in email reported as phish",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious Email Forwarding Activity",
-                "Disabled": false
-            },
-            {
-                "Name": "Messages have been delayed",
-                "Disabled": false
-            },
-            {
-                "Name": "Tenant restricted from sending unprovisioned email",
-                "Disabled": false
-            },
-            {
-                "Name": "User restricted from sending email",
-                "Disabled": false
-            },
-            {
-                "Name": "Malware campaign detected after delivery",
-                "Disabled": false
-            },
-            {
-                "Name": "A potentially malicious URL click was detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious connector activity",
-                "Disabled": false
-            }
-        ]
-    }
+    Output := defender.tests with input.protection_alerts as ProtectionAlerts
 
     TestResult("MS.DEFENDER.5.1v1", Output, PASS, true) == true
 }
 
 test_Disabled_Correct_V2 if {
-    Output := defender.tests with input as {
-        "protection_alerts": [
-            {
-                "Name": "Suspicious email sending patterns detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Unusual increase in email reported as phish",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious Email Forwarding Activity",
-                "Disabled": false
-            },
-            {
-                "Name": "Messages have been delayed",
-                "Disabled": false
-            },
-            {
-                "Name": "Tenant restricted from sending unprovisioned email",
-                "Disabled": false
-            },
-            {
-                "Name": "User restricted from sending email",
-                "Disabled": false
-            },
-            {
-                "Name": "Malware campaign detected after delivery",
-                "Disabled": false
-            },
-            {
-                "Name": "A potentially malicious URL click was detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious connector activity",
-                "Disabled": false
-            },
-            {
-                "Name": "Successful exact data match upload",
-                "Disabled": false
-            }
-        ]
-    }
+    Alerts := json.patch(ProtectionAlerts, [{"op": "add", "path": "9", "value": {
+                "Disabled": false,
+                "Name": "Successful exact data match upload"
+                }}])
+    Output := defender.tests with input.protection_alerts as Alerts
 
     TestResult("MS.DEFENDER.5.1v1", Output, PASS, true) == true
 }
 
 test_Disabled_Incorrect_V1 if {
-    Output := defender.tests with input as {
-        "protection_alerts": [
-            {
-                "Name": "Suspicious email sending patterns detected",
-                "Disabled": true
-            },
-            {
-                "Name": "Unusual increase in email reported as phish",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious Email Forwarding Activity",
-                "Disabled": false
-            },
-            {
-                "Name": "Messages have been delayed",
-                "Disabled": false
-            },
-            {
-                "Name": "Tenant restricted from sending unprovisioned email",
-                "Disabled": false
-            },
-            {
-                "Name": "User restricted from sending email",
-                "Disabled": false
-            },
-            {
-                "Name": "Malware campaign detected after delivery",
-                "Disabled": false
-            },
-            {
-                "Name": "A potentially malicious URL click was detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious connector activity",
-                "Disabled": false
-            }
-        ]
-    }
+    Alerts := json.patch(ProtectionAlerts, [{"op": "add", "path": "0/Disabled", "value": true}])
+    Output := defender.tests with input.protection_alerts as Alerts
 
     ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
     TestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Disabled_Incorrect_V2 if {
-    Output := defender.tests with input as {
-        "protection_alerts": [
-            {
-                "Name": "Unusual increase in email reported as phish",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious Email Forwarding Activity",
-                "Disabled": false
-            },
-            {
-                "Name": "Messages have been delayed",
-                "Disabled": false
-            },
-            {
-                "Name": "Tenant restricted from sending unprovisioned email",
-                "Disabled": false
-            },
-            {
-                "Name": "User restricted from sending email",
-                "Disabled": false
-            },
-            {
-                "Name": "Malware campaign detected after delivery",
-                "Disabled": false
-            },
-            {
-                "Name": "A potentially malicious URL click was detected",
-                "Disabled": false
-            },
-            {
-                "Name": "Suspicious connector activity",
-                "Disabled": false
-            }
-        ]
-    }
+    Alerts := json.patch(ProtectionAlerts, [{"op": "remove", "path": "0"}])
+    Output := defender.tests with input.protection_alerts as Alerts
 
     ReportDetailString := "1 disabled required alert(s) found: Suspicious email sending patterns detected"
     TestResult("MS.DEFENDER.5.1v1", Output, ReportDetailString, false) == true
