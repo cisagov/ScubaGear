@@ -1427,21 +1427,24 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
+  # Use cached run for 6.1 tests since audit changes can take 60 minutes to take effect
   - PolicyId: MS.DEFENDER.6.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.6.1v1 Compliant case
         Preconditions:
-          - Command: Set-AdminAuditLogConfig
+          - Command: UpdateProviderExport
             Splat:
-              UnifiedAuditLogIngestionEnabled: true
+              updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: true
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.6.1v1 Not-Compliant case
         Preconditions:
-          - Command: Set-AdminAuditLogConfig
+          - Command: UpdateProviderExport
             Splat:
-              UnifiedAuditLogIngestionEnabled: false
+              updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: false
         Postconditions: []
         ExpectedResult: false
 
