@@ -132,3 +132,8 @@ ProtectionAlerts := [
         "Disabled": false
     }
 ]
+
+AdminAuditLogConfig := {
+    "Identity": "Admin Audit Log Settings",
+    "UnifiedAuditLogIngestionEnabled": true
+}
