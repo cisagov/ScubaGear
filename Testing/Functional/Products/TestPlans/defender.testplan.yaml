@@ -87,6 +87,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -103,6 +104,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -119,6 +121,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -135,14 +138,9 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
-          - Command: Set-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              SentTo: null
-              SentToMemberOf: null
-              RecipientDomainIs:
-                - badpeople.r.us
-              Confirm: false
+              ErrorAction: Continue
+          - Command: |
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $null -SentToMemberOf $null -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: true
 
