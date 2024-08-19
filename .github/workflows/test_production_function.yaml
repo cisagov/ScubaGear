@@ -12,10 +12,16 @@ on:
   schedule:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
+    inputs:
+      email-on-failure:
+        description: Check to send an email on failure
+        type: boolean
+        required: true
+        default: false
   # For debugging only
-  push:
-    paths:
-      - ".github/workflows/test_production_function.yaml"
+  # push:
+  #   paths:
+  #     - ".github/workflows/test_production_function.yaml"
 
 permissions: read-all
 
@@ -206,7 +212,11 @@ jobs:
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       - name: Notify on Failure
-        if: failure()
+        # Send an email only if the previous step failed and if either:
+        # - This workflow was run manually and the input was checked 
+        # - OR
+        # - This workflow was run on a schedule.
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
