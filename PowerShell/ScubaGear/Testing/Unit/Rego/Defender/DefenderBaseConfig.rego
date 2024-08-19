@@ -62,6 +62,18 @@ ScubaConfig := {
                 "John Doe;jdoe@someemail.com",
                 "Jane Doe;jadoe@someemail.com"
             ]
+        },
+        "MS.DEFENDER.2.2v1": {
+            "AgencyDomains": [
+                "random.mail.example.com",
+                "random.example.com"
+            ]
+        },
+        "MS.DEFENDER.2.3v1": {
+            "PartnerDomains": [
+                "random.mail.example.com",
+                "random.example.com"
+            ]
         }
     }
 }
@@ -75,7 +87,13 @@ AntiPhishPolicies := [
             "John Doe;jdoe@someemail.com",
             "Jane Doe;jadoe@someemail.com"
         ],
-        "TargetedUserProtectionAction": "Quarantine"
+        "TargetedUserProtectionAction": "Quarantine",
+        "EnableTargetedDomainsProtection": true,
+        "TargetedDomainsToProtect": [
+            "random.mail.example.com",
+            "random.example.com"
+        ],
+        "TargetedDomainProtectionAction": "Quarantine"
     },
     {
         "Identity": "Strict Preset Security Policy1659535429826",
@@ -85,7 +103,13 @@ AntiPhishPolicies := [
             "John Doe;jdoe@someemail.com",
             "Jane Doe;jadoe@someemail.com"
         ],
-        "TargetedUserProtectionAction": "Quarantine"
+        "TargetedUserProtectionAction": "Quarantine",
+        "EnableTargetedDomainsProtection": true,
+        "TargetedDomainsToProtect": [
+            "random.mail.example.com",
+            "random.example.com"
+        ],
+        "TargetedDomainProtectionAction": "Quarantine"
     }
 ]
 
