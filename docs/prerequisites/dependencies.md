@@ -50,6 +50,6 @@ To verify that OPA is working, use the following command to check the version:
 .\opa_windows_amd64.exe version
 ```
 
-> **Note**: If ScubaGear is having trouble finding the OPA executable, you are able to place the executable in the directory you are executing `Invoke-SCuBA` in. ScubaGear will also look in the current executing directory for the OPA executable.
+> **Note**: If ScubaGear is having trouble finding the OPA executable, place the OPA executable in the directory from which you are executing `Invoke-SCuBA`. ScubaGear will also look in the current working directory for the OPA executable.
 
 Once the dependencies have been installed, you are ready to set the [permissions](permissions.md).
