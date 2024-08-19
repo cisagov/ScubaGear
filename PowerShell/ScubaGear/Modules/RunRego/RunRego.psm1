@@ -41,7 +41,7 @@ function Invoke-Rego {
 
         # See if the OPA executable is in the current executing directory
         if (-not (Test-Path $Cmd)) {
-            throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and the directory it should be placed."
+            throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
         }
 
         # Load Utils
