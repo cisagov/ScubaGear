@@ -30,7 +30,7 @@ function Invoke-Rego {
         $OPAPath = $PSScriptRoot
     )
     try {
-        # For MacOS/Linux give OPA exeucte permissions: chmod 755 ./opa
+        # For MacOS/Linux give OPA execute permissions: chmod 755 ./opa
         $OPAFileName = if ("Windows_NT" -eq $Env:OS) {"opa_windows_amd64.exe"} else {"opa"}
         $Cmd = Join-Path -Path $OPAPath -ChildPath $OPAFileName  -ErrorAction 'Stop'
 
