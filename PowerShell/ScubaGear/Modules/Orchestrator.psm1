@@ -814,12 +814,12 @@ function Format-PlainText {
         # In-depth interpretation:
         # Group 1: '(.*)' Matches any number of characters before the opening anchor tag
         # Group 2: '<a href="' Matches the opening anchor tag, up to and including the opening quote of the href
-        # Group 3: '([\w/\.:#\?]+)' Matches the href string
+        # Group 3: '([\w#./=&?%\-+:;$@,]+)' Matches the href string
         # Group 4: '(".*>)' Matches the last half of the opening anchor tag
         # Group 5: '(.*)' Matches the anchor inner html, i.e., the link's display text
         # Group 6: '(</a>)' Matches the closing anchor tag
         # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
-        $CleanString = $CleanString -replace '(.*)(<a href=")([\w/\.:#\?]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
+        $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
 
         $CleanString
     }
