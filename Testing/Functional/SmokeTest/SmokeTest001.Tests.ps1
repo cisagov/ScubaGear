@@ -66,7 +66,6 @@ Describe "Smoke Test: Generate Output" {
         It "Item, <Item>, exists" -ForEach @(
             @{Item = 'BaselineReports.html'; ItemType = 'Leaf'},
             @{Item = 'TestResults.json'; ItemType = 'Leaf'},
-            @{Item = 'TestResults.csv'; ItemType = 'Leaf'},
             @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports'; ItemType = 'Container'},
             @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
