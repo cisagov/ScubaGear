@@ -58,6 +58,8 @@ AtpPolicyRules := [
 ]
 
 ScubaConfig := {
+    "OutPath": ".",
+    "OutRegoFileName": "TestResults",
     "Defender": {
         "MS.DEFENDER.1.4v1": {
             "SensitiveAccounts": {
@@ -182,4 +184,36 @@ ProtectionAlerts := [
 AdminAuditLogConfig := {
     "Identity": "Admin Audit Log Settings",
     "UnifiedAuditLogIngestionEnabled": true
+}
+
+DlpComplianceRules := {
+    "ContentContainsSensitiveInformation": [
+        {"name": "U.S. Social Security Number (SSN)"},
+        {"name": "U.S. Individual Taxpayer Identification Number (ITIN)"},
+        {"name": "Credit Card Number"}
+    ],
+    "Name": "Baseline Rule",
+    "Disabled": false,
+    "ParentPolicyName": "Default Office 365 DLP policy",
+    "BlockAccess": true,
+    "BlockAccessScope": "All",
+    "NotifyUser": [
+        "SiteAdmin",
+        "LastModifier",
+        "Owner"
+    ],
+    "NotifyUserType": "NotSet",
+    "IsAdvancedRule": false
+}
+
+DlpCompliancePolicies := {
+    "ExchangeLocation": ["All"],
+    "SharePointLocation": ["All"],
+    "TeamsLocation": ["All"],
+    "EndpointDlpLocation": ["All"],
+    "OneDriveLocation": ["All"],
+    "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+    "Name": "Default Office 365 DLP policy",
+    "Mode": "Enable",
+    "Enabled": true
 }
