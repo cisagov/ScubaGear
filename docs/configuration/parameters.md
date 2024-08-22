@@ -296,7 +296,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutRegoFileName
 
-**OutRegoFileName** is the name of the test results file in JSON and CSV that are created in the output folder.
+**OutRegoFileName** is the name of the JSON test results file that is created in the output folder, containing the raw Rego output.
 
 | Parameter   | Value         |
 |-------------|---------------|
@@ -311,7 +311,7 @@ Invoke-SCuBA -ProductNames teams `
   -OutRegoFileName mytestresults
 ```
 
-> **Note**: ScubaGear will automatically add the `.csv` and the `.json` respectively to these filenames.
+> **Note**: ScubaGear will automatically add the the `.json` to this filename.
 
 ## OutReportName
 
