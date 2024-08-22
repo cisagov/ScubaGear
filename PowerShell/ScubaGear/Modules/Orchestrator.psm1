@@ -73,8 +73,8 @@ function Invoke-SCuBA {
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
     .Parameter OutCsvFileName
-    If MergeJson is set, the name of the consolidated CSV created in the folder
-    created in OutPath. Defaults to "ScubaResults".
+    The CSV created in the folder created in OutPath that contains the CSV version of the test results.
+    Defaults to "ScubaResults".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -1537,8 +1537,8 @@ function Invoke-SCuBACached {
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
     .Parameter OutCsvFileName
-    If MergeJson is set, the name of the consolidated CSV created in the folder
-    created in OutPath. Defaults to "ScubaResults".
+    The CSV created in the folder created in OutPath that contains the CSV version of the test results.
+    Defaults to "ScubaResults".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
