@@ -256,6 +256,24 @@ Invoke-SCuBA -ProductNames teams `
   -MergeJson
 ```
 
+## OutCsvFileName
+
+**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | String             |
+| Default     | `ScubaResults.csv` |
+| Config File | No                 |  
+
+
+```powershell
+# Change the output CSV file
+Invoke-SCuBA -ProductNames teams `
+  -OutCsvFileName myresults `
+```
+
 ## OutPath
 
 **OutPath** is the folder path where the [report files](../execution/reports.md) will be created. The folder will be created if it does not exist.
