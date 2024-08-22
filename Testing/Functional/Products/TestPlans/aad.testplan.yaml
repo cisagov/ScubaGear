@@ -161,7 +161,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
         Postconditions: []
@@ -469,7 +469,7 @@ TestPlan:
   - PolicyId: MS.AAD.3.7v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.7v1 Non-Compliant case - require both compliant and domain joined device only for specific user
+      - TestDescription: MS.AAD.3.7v1 Non-Compliant case - require compliant or domain joined device only for specific user
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -479,7 +479,7 @@ TestPlan:
                 GrantControls.BuiltInControls:
                   - "compliantDevice"
                   - "domainJoinedDevice"
-                GrantControls.Operator: AND
+                GrantControls.Operator: OR
                 Conditions:
                   Users:
                     IncludeUsers: ["e897fa07-cfcc-4aeb-9b61-afbf173fb9df"]
@@ -493,77 +493,7 @@ TestPlan:
                     ExcludeApplications: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.7v1 Compliant case - require both compliant and domain joined device for everyone
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-                GrantControls.BuiltInControls:
-                  - "compliantDevice"
-                  - "domainJoinedDevice"
-                GrantControls.Operator: AND
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeRoles: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - only compliant Device required
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-                GrantControls.BuiltInControls:
-                  - "compliantDevice"
-                GrantControls.Operator: OR
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeRoles: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - only domain Joined Device required
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-                GrantControls.BuiltInControls:
-                  - "domainJoinedDevice"
-                GrantControls.Operator: OR
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeRoles: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.3.7v1 Compliant case - compliant or domain joined device required
+      - TestDescription: MS.AAD.3.7v1 Compliant case - require compliant or domain joined device for everyone
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:

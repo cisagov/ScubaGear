@@ -105,7 +105,6 @@ Import-Module $ConnectionModule
 Import-Module Selenium
 
 BeforeDiscovery{
-
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
     }

@@ -159,7 +159,7 @@ PolicyConditionsMatch(Policy) := true if {
 # Save the Allowed MFA items as a set, check if there are any MFA
 # items allowed besides the acceptable ones & if there is at least
 # 1 MFA item allowed. Return true
-HasAcceptableMFA(Policy) := true if {
+IsPhishingResistantMFA(Policy) := true if {
     # Strength must be at least one of acceptable with no unacceptable strengths
     Strengths := ConvertToSet(Policy.GrantControls.AuthenticationStrength.AllowedCombinations)
     AcceptableMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}

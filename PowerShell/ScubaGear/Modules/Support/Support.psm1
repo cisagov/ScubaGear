@@ -115,9 +115,13 @@ function Initialize-SCuBA {
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
     # Need to determine where module is so we can get required versions info
-    $CurrentLocation = Get-Location
-    Write-Information 'Importing module...'
-    Import-Module (Join-Path -Path $CurrentLocation -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
+    $ParentPath = Split-Path -parent $PSScriptRoot
+    $ModulePath = Split-Path -parent $ParentPath
+    # Removing the import below causes issues with testing, let it be.
+    # Import module magic may be helping by:
+    #   * restricting the import so only that only function is exported
+    #   * imported function takes precedence over imported modules w/ function
+    Import-Module $ModulePath -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
         ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null

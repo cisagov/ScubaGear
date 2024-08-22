@@ -12,7 +12,7 @@ on:
   # push:
   #   paths:
   #     - ".github/workflows/publish_private_package.yaml"
-  #     - "utils/DeployUtils.ps1"
+  #     - "utils/workflow/Publish-ScubaGear.ps1"
 
 permissions: read-all
 
@@ -38,7 +38,7 @@ jobs:
       - name: Install Azure Signing Tool
         run: |
           dotnet --version
-          dotnet tool install --global AzureSignTool --version 4.0.1
+          dotnet tool install --global AzureSignTool --version 5.0.0
       # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       - name: Login to Azure
         uses: azure/login@v2
@@ -47,11 +47,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Create Private Gallery
-        run: |
-          cd repo
-          . utils/DeployUtils.ps1
-          New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Get Key Vault Info
         id: key-vault-info
         env:
@@ -60,24 +55,27 @@ jobs:
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+      - name: Create Private Gallery
+        run: |
+          # Source the deploy utilities so the functions in it can be called.
+          . repo/utils/workflow/Publish-ScubaGear.ps1
+          cd repo
+          New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
-        uses: azure/powershell@v1
-        with:
-          inlineScript: |
+        run: |
             # Source the deploy utilities so the functions in it can be called.
-            . repo/utils/DeployUtils.ps1
+            . repo/utils/workflow/Publish-ScubaGear.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
             # Setup the parameters
             $Parameters = @{
               AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
               CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
-              ModulePath = 'repo/PowerShell/ScubaGear'
+              ModuleSourcePath = 'repo/PowerShell/ScubaGear'
               GalleryName = $env:GalleryName
             }
             # This publishes to a private gallery.
             Publish-ScubaGearModule @Parameters
-          azPSVersion: "latest"
       - name: Test Module Publish
         run: |
           Get-Location
@@ -93,9 +91,8 @@ jobs:
           }
           $Config = New-PesterConfiguration -Hashtable $PesterConfig
           Invoke-Pester -Configuration $Config
-      # This is a manual test that writes the version to the console.
+      # This is a manual test that simply writes the version to the console.
       - name: Print Scuba Version
         run: |
-          Install-Module -Name ScubaGear -SkipPublisherCheck
-          # Import-Module -Name ScubaGear
+          Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
           Invoke-SCuBA -Version

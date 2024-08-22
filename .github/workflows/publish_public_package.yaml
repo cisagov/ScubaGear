@@ -1,5 +1,5 @@
 # Purpose: Publish on demand to the real gallery (PSGallery).
-# Note: If the published package is pre-release, then all 3 of the manual inputs, the module version, the pre-release boolean, and the tag, should be entered.
+# Note: If the published package is pre-release, then all 3 of the manual inputs (the module version, the pre-release boolean, and the tag) should be entered.
 
 name: Publish Public Package
 
@@ -24,7 +24,7 @@ on:
   # push:
   #   paths:
   #     - ".github/workflows/publish_public_package.yaml"
-  #     - "utils/DeployUtils.ps1"
+  #     - "utils/workflow/Publish-ScubaGear.ps1"
 
 permissions: read-all
 
@@ -67,7 +67,7 @@ jobs:
       - name: Sign and Publish Module
         run: |
           # Source the deploy utilities so the functions in it can be called.
-          . repo/utils/DeployUtils.ps1
+          . repo/utils/workflow/Publish-ScubaGear.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
           # Extract the API key used to publish to PSGallery
@@ -80,7 +80,7 @@ jobs:
           $Parameters = @{
             AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
             CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
-            ModulePath = 'repo/PowerShell/ScubaGear'
+            ModuleSourcePath = 'repo/PowerShell/ScubaGear'
             GalleryName = 'PSGallery'
             NuGetApiKey = $ApiKey
           }
@@ -101,6 +101,8 @@ jobs:
       # This is a manual test that simply writes the version to the console
       - name: Test Scuba Version
         run: |
+          # Give PSGallery a chance to publish the pre-release to its API
+          Start-Sleep -Seconds 30
           if ('true' -eq '${{ inputs.IsPrerelease }}')
           {
             $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'

@@ -1,6 +1,7 @@
 package sharepoint
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsBooleanWarning
@@ -167,35 +168,19 @@ tests contains {
 # MS.SHAREPOINT.1.4v1
 #--
 
-# If SharingCapability is set to Only People In Organization
-# OR require account login to be the one on the invite enabled,
-# the policy should pass.
-tests contains {
-    "PolicyId": "MS.SHAREPOINT.1.4v1",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [
-        Tenant.RequireAcceptingAccountMatchInvitedAccount,
-        SharingCapability
-    ],
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    SharingCapability != ONLYPEOPLEINORG
-    Status := Tenant.RequireAcceptingAccountMatchInvitedAccount == true
-}
-
+# Based on the fact that Microsoft has removed the setting from the admin center
+# and you cannot set the value RequireAcceptingAccountMatchInvitedAccount from Set-SPOTenant anymore, 
+# we are setting this policy to not-implemented
+# and will likely remove it from the baseline in the next version.
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "ReportDetails": NotCheckedDeprecation,
     "RequirementMet": false
 } if {
-    SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.4v1"
-    Reason := NAString(SliderSettings(0))
 }
 #--
 
@@ -430,22 +415,6 @@ tests contains {
 ###################
 # MS.SHAREPOINT.4 #
 ###################
-
-#
-# MS.SHAREPOINT.4.1v1
-#--
-
-# At this time we are unable to test for running custom scripts on personal sites
-# because we have yet to find the setting to check
-tests contains {
-    "PolicyId": "MS.SHAREPOINT.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SHAREPOINT.4.1v1"),
-    "RequirementMet": false
-}
-#--
 
 #
 # MS.SHAREPOINT.4.2v1
