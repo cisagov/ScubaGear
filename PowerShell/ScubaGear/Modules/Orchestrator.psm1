@@ -419,14 +419,15 @@ function Invoke-SCuBA {
                     'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
                 }
                 Merge-JsonOutput @JsonParams
-
-                $CsvParams = @{
-                    'OutFolderPath' = $OutFolderPath;
-                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
-                    'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
-                }
-                ConvertTo-ResultsCsv @CsvParams
             }
+            # Craft the csv version of just the results
+            $CsvParams = @{
+                'ProductNames' = $ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+            }
+            ConvertTo-ResultsCsv @CsvParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -836,6 +837,12 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutFolderPath,
 
@@ -852,7 +859,23 @@ function ConvertTo-ResultsCsv {
     process {
         try {
             $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName.json"
-            $ScubaResults = Get-Content $ScubaResultsFileName | ConvertFrom-Json
+            if (Test-Path $ScubaResultsFileName -PathType Leaf) {
+                # The ScubaResults file exists, no need to look for the individual json files
+                $ScubaResults = Get-Content $ScubaResultsFileName | ConvertFrom-Json
+            }
+            else {
+                # The ScubaResults file does not exists, so we need to look inside the IndividualReports
+                # folder for the json file specific to each product
+                $ScubaResults = @{"Results" = [PSCustomObject]@{}}
+                $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
+                foreach ($Product in $ProductNames) {
+                    $BaselineName = $ArgToProd[$Product]
+                    $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
+                    $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+                    $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
+                        -NotePropertyValue $IndividualResults.Results
+                }
+            }
             $ScubaResultsCsv = @()
             foreach ($Product in $ScubaResults.Results.PSObject.Properties) {
                 foreach ($Group in $Product.Value) {
@@ -1731,14 +1754,16 @@ function Invoke-SCuBACached {
                     'OutJsonFileName' = $OutJsonFileName;
                 }
                 Merge-JsonOutput @JsonParams
-
-                $CsvParams = @{
-                    'OutFolderPath' = $OutFolderPath;
-                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
-                    'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
-                }
-                ConvertTo-ResultsCsv @CsvParams
             }
+            # Craft the csv version of just the results
+            $CsvParams = @{
+                'ProductNames' = $ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutJsonFileName' = $OutJsonFileName;
+                'OutCsvFileName' = $OutCsvFileName;
+            }
+            ConvertTo-ResultsCsv @CsvParams
+
         }
     }
 

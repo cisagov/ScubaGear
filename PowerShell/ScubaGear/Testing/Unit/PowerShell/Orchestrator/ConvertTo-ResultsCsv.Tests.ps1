@@ -5,6 +5,7 @@ InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Merge-JsonOutput' {
         BeforeAll {
             Mock -CommandName Join-Path { "." }
+            Mock -CommandName Test-Path { $true }
             Mock -CommandName Out-File {}
             Mock -CommandName Set-Content {}
             Mock -CommandName Remove-Item {}
@@ -55,6 +56,7 @@ InModuleScope Orchestrator {
                 }}
             }
             $CsvParameters = @{
+                ProductNames = @("exo", "aad");
                 OutFolderPath = ".";
                 OutJsonFileName = "ScubaResults";
                 OutCsvFileName = "ScubaResults"
@@ -71,6 +73,7 @@ InModuleScope Orchestrator {
             Mock -CommandName ConvertFrom-Json {}
             Mock -CommandName Get-Content { throw "File not found" }
             $CsvParameters = @{
+                ProductNames = @("exo", "aad");
                 OutFolderPath = ".";
                 OutJsonFileName = "ScubaResults";
                 OutCsvFileName = "ScubaResults"
