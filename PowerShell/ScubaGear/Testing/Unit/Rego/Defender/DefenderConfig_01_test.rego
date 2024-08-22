@@ -124,8 +124,8 @@ test_AllEOP_Incorrect_V1 if {
 
 test_AllEOP_Incorrect_V2 if {
     ProtectionPolicies := json.patch(ProtectionPolicyRules,
-                                [{"op": "remove", "path": "0"},
-                                {"op": "add", "path": "0/SentTo", "value": ["user@example.com"]}])
+                                [{"op": "add", "path": "1/SentTo", "value": ["user@example.com"]},
+                                {"op": "remove", "path": "0"}])
 
     Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
                             with input.defender_license as true
@@ -306,7 +306,7 @@ test_SensitiveEOP_Correct_V6 if {
 test_SensitiveEOP_Correct_V7 if {
     ProtectionPolicies := json.patch(ProtectionPolicyRules,
                                 [{"op": "add", "path": "1/SentToMemberOf", "value": ["Dune"]},
-                                {"op": "add", "path": "1/Exceptions", "value": ["Rules.Tasks"]},
+                                {"op": "add", "path": "1/Conditions", "value": ["Rules.Tasks"]},
                                 {"op": "remove", "path": "0"}])
 
     Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
@@ -322,7 +322,7 @@ test_SensitiveEOP_Correct_V8 if {
                                                                                         "Dune",
                                                                                         "Dune12"
                                                                                     ]},
-                                {"op": "add", "path": "1/Exceptions", "value": ["Rules.Tasks"]},
+                                {"op": "add", "path": "1/Conditions", "value": ["Rules.Tasks"]},
                                 {"op": "remove", "path": "0"}])
 
     Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
@@ -434,14 +434,14 @@ test_SensitiveEOP_Correct_V14 if {
 test_SensitiveEOP_Correct_V15 if {
     ProtectionPolicies := json.patch(ProtectionPolicyRules,
                                 [{"op": "add", "path": "1/SentTo", "value": ["johndoe@random.example.com"]},
-                                {"op": "add", "path": "1/ExceptIfSentTo", "value": ["johndoe@random.example.com"]},
+                                {"op": "add", "path": "1/ExceptIfSentTo", "value": ["janedoe@random.example.com"]},
                                 {"op": "add", "path": "1/Conditions", "value": ["Rules.Tasks"]},
                                 {"op": "add", "path": "1/Exceptions", "value": ["Rules.Tasks"]},
                                 {"op": "remove", "path": "0"}])
 
     Output := defender.tests with input.protection_policy_rules as ProtectionPolicies
                             with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts.IncludedUsers as ["johndoe@random.example.com"]
-                            with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts.ExcludedUsers as ["johndoe@random.example.com"]
+                            with input.scuba_config.Defender["MS.DEFENDER.1.4v1"].SensitiveAccounts.ExcludedUsers as ["janedoe@random.example.com"]
                             with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.4v1", Output, PASS, true) == true
@@ -1018,7 +1018,7 @@ test_SensitiveATP_Correct_V20 if {
 test_SensitiveATP_Correct_V21 if {
     AtpPolicies := json.patch(AtpPolicyRules,
                                 [{"op": "add", "path": "1/SentTo", "value": ["johndoe@random.example.com"]},
-                                {"op": "add", "path": "1/ExceptIfRecipientDomainIs", "value": ["random.example.com"]},
+                                {"op": "add", "path": "1/ExceptIfRecipientDomainIs", "value": ["random.mail.example.com"]},
                                 {"op": "add", "path": "1/ExceptIfSentTo", "value": ["janedoe@random.example.com"]},
                                 {"op": "add", "path": "1/Conditions", "value": ["Rules.Tasks"]},
                                 {"op": "add", "path": "1/Exceptions", "value": ["Rules.Tasks"]},
@@ -1028,7 +1028,7 @@ test_SensitiveATP_Correct_V21 if {
                             with input.scuba_config as ScubaConfig
                             with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.IncludedUsers as ["johndoe@random.example.com"]
                             with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedUsers as ["janedoe@random.example.com"]
-                            with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedDomains as ["random.example.com"]
+                            with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedDomains as ["random.mail.example.com"]
                             with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
@@ -1056,7 +1056,7 @@ test_SensitiveATP_Correct_V22 if {
 test_SensitiveATP_Correct_V23 if {
     AtpPolicies := json.patch(AtpPolicyRules,
                                 [{"op": "add", "path": "1/SentToMemberOf", "value": ["Dune"]},
-                                {"op": "add", "path": "1/ExceptIfRecipientDomainIs", "value": ["random.example.com"]},
+                                {"op": "add", "path": "1/ExceptIfRecipientDomainIs", "value": ["random.mail.example.com"]},
                                 {"op": "add", "path": "1/ExceptIfSentToMemberOf", "value": ["Dune12"]},
                                 {"op": "add", "path": "1/Conditions", "value": ["Rules.Tasks"]},
                                 {"op": "add", "path": "1/Exceptions", "value": ["Rules.Tasks"]},
@@ -1066,7 +1066,7 @@ test_SensitiveATP_Correct_V23 if {
                             with input.scuba_config as ScubaConfig
                             with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.IncludedGroups as ["Dune"]
                             with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedGroups as ["Dune12"]
-                            with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedDomains as ["random.example.com"]
+                            with input.scuba_config.Defender["MS.DEFENDER.1.5v1"].SensitiveAccounts.ExcludedDomains as ["random.mail.example.com"]
                             with input.defender_license as true
 
     TestResult("MS.DEFENDER.1.5v1", Output, PASS, true) == true
