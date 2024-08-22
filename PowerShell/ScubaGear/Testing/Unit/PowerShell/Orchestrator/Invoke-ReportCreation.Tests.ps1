@@ -23,95 +23,112 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
-                $ProviderParameters = @{
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConfigParameters')]
+                $ConfigParameters = @{
+                    OutProviderFileName = "ProviderSettingsExport";
+                    OutRegoFileName     = "TestResults";
+                    OutReportName       = "BaselineReports";
+                }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ReportParameters')]
+                $ReportParameters = @{
+                    ScubaConfig = @{}
                     TenantDetails       = '{"DisplayName": "displayName"}';
                     DarkMode            = $false;
                     ModuleVersion       = '1.0';
                     OutFolderPath       = "./"
-                    OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName     = "TestResults"
-                    OutReportName       = "BaselineReports"
                 }
             }
             It 'Do it quietly (Do not automatically show report)' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("aad")
                 }
-                { Invoke-ReportCreation @ProviderParameters -Quiet} | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+
+                { Invoke-ReportCreation @ReportParameters -Quiet} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 0
-                $ProviderParameters.ProductNames = @()
             }
             It 'Show report' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("aad")
                 }
-                { Invoke-ReportCreation @ProviderParameters} | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter {-Not [string]::IsNullOrEmpty($Path) }
-                $ProviderParameters.ProductNames = @()
             }
             It 'With -ProductNames "aad", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("aad")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With -ProductNames "defender", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("defender")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With -ProductNames "exo", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("exo")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With -ProductNames "powerplatform", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("powerplatform")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With -ProductNames "sharepoint", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("sharepoint")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With -ProductNames "teams", should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("teams")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
             It 'With all products, should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
         }
         Context 'When creating the reports with -Quiet True' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
-                $ProviderParameters = @{
+
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConfigPrams')]
+                $ConfigParameters = @{
+                    OutProviderFileName = "ProviderSettingsExport";
+                    OutRegoFileName     = "TestResults";
+                    OutReportName       = "BaselineReports";
+                }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ReportParameters')]
+                $ReportParameters = @{
                     DarkMode            = $false;
                     TenantDetails       = '{"DisplayName": "displayName"}';
                     ModuleVersion       = '1.0';
                     OutFolderPath       = "./"
-                    OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName     = "TestResults"
-                    OutReportName       = "BaselineReports"
                     Quiet               = $true
                 }
             }
             It 'With all products, should not throw' {
-                $ProviderParameters += @{
+                $ConfigParameters += @{
                     ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ReportParameters['ScubaConfig'] = (New-Object -Type PSObject -Property $ConfigParameters)
+                { Invoke-ReportCreation @ReportParameters } | Should -Not -Throw
             }
         }
     }
