@@ -882,6 +882,21 @@ function ConvertTo-ResultsCsv {
                     foreach ($Control in $Group.Controls) {
                         $Control.Requirement = Format-PlainText -RawString $Control.Requirement
                         $Control.Details = Format-PlainText -RawString $Control.Details
+                        # Add blank fields where users can document reasons for failures and timelines
+                        # for remediation if they so choose
+                        $Reason = ""
+                        $RemediationDate = ""
+                        $Justification = ""
+                        if ($Control.Result -eq "Pass") {
+                            # No need to fill out those fields if passing
+                            $Reason = "N/A"
+                            $RemediationDate = "N/A"
+                            $Justification = "N/A"
+                        }
+                        $Control | Add-Member -NotePropertyName "Non-Compliance Reason" -NotePropertyValue $Reason
+                        $Control | Add-Member -NotePropertyName "Remediation Completion Date" `
+                            -NotePropertyValue $RemediationDate
+                        $Control | Add-Member -NotePropertyName "Justification" -NotePropertyValue $Justification
                         $ScubaResultsCsv += $Control
                     }
                 }
