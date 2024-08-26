@@ -1,8 +1,8 @@
 $OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function Merge-JsonOutput -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function ConvertTo-ResultsCsv -Force
 
 InModuleScope Orchestrator {
-    Describe -Tag 'Orchestrator' -Name 'Merge-JsonOutput' {
+    Describe -Tag 'Orchestrator' -Name 'ConvertTo-ResultsCsv' {
         BeforeAll {
             Mock -CommandName Join-Path { "." }
             Mock -CommandName Test-Path { $true }
