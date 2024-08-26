@@ -5,6 +5,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
         Preconditions:
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
                       $Domain = '@' + $Domain
@@ -16,6 +17,7 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Non-null Strict Null
         Preconditions:
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -41,6 +43,7 @@ TestPlan:
               SentToMemberOf: null
               RecipientDomainIs: null
               Confirm: false
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -88,6 +91,7 @@ TestPlan:
               Identity: Strict Preset Security Policy
               Confirm: false
               ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -105,6 +109,7 @@ TestPlan:
               Identity: Strict Preset Security Policy
               Confirm: false
               ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
@@ -122,6 +127,7 @@ TestPlan:
               Identity: Strict Preset Security Policy
               Confirm: false
               ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id

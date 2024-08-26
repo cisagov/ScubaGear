@@ -361,6 +361,7 @@ TestPlan:
     Tests:
       - TestDescription: MS.DEFENDER.1.3v1 Non-compliant -- std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
         Preconditions:
+          # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
                       $Domain = '@' + $Domain
@@ -408,6 +409,7 @@ TestPlan:
               Identity: Strict Preset Security Policy
               Confirm: false
               ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
                       $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
                       $Domain = '@' + $Domain
