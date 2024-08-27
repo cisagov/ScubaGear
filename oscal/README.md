@@ -19,12 +19,12 @@ TODO
 TODO
 
 ## Assessment Plan Model
-The [convert_to_oscal.py](/oscal/convert_to_oscal.py) script takes as input the json file output by ScubaGear and
+The [convert_to_oscal.py](/oscal/convert_to_oscal.py) script takes as input the json file output by ScubaGear (assuming ScubaGear was run with the `-MergeJson` [flag](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#mergejson)) and
 produces a security assessment plan model (saved as sap.json). Note that there is significant hand-waving here, as in
 reality you can't have an assessment plan model without implementing all the preceeding layers.
 
 ## Assessment Plan Model
-The [convert_to_oscal.py](/oscal/convert_to_oscal.py) script takes as input the json file output by ScubaGear and
+The [convert_to_oscal.py](/oscal/convert_to_oscal.py) script takes as input the json file output by ScubaGear (assuming ScubaGear was run with the `-MergeJson` [flag](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#mergejson)) and
 produces a security assessment results model (saved as sar.json). Note that there is significant hand-waving here, as in
 reality you can't have an assessment plan model without implementing all the preceeding layers.
 
