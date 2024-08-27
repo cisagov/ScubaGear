@@ -81,7 +81,7 @@ profile['profile']['back-matter']['resources'].append({
         "Security and Privacy Controls for Federal Information Systems and Organizations",
     "rlinks": [
         {
-            "href": "./NIST_SP-800-53_rev5_catalog.json",
+            "href": "https://raw.githubusercontent.com/usnistgov/oscal-content/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json",
             "media-type": "application/oscal.catalog+json"
         },
     ]
