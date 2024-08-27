@@ -1,3 +1,20 @@
+"""
+OSCAL Models:
++Catalog
++Profile
+Component
+System Security Plan
+*Asssessment Plan
+*Assessment Results
+Plan of Actions and Milestones
+
++ models created by a different script
+* models created by this script
+
+
+All other models are TODO
+"""
+
 # Refer to https://pages.nist.gov/OSCAL-Reference/models/v1.1.2/assessment-results/json-reference/
 # and https://pages.nist.gov/OSCAL-Reference/models/v1.1.2/assessment-plan/json-reference/
 #
@@ -12,6 +29,8 @@
 # java -jar "SaxonHE12-5J\saxon-he-12.5.jar" -xsl:"oscal_assessment-results_json-to-xml-converter.xsl" -o:"sar.xml" -it:from-json file="sar.json"
 # download the jar here: https://www.saxonica.com/download/java.xml
 
+# TODO document where xsl file is
+
 import os
 import json
 import uuid
@@ -19,7 +38,7 @@ import argparse
 from datetime import datetime
 
 parser = argparse.ArgumentParser()
-parser.add_argument("input")
+parser.add_argument("input") # ScubaResults.json
 args = parser.parse_args()
 
 with open(args.input, 'r', encoding='utf-8-sig') as f:
