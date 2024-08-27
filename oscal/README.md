@@ -35,7 +35,7 @@ TODO
 See [How to Validate OSCAL](https://github.com/usnistgov/OSCAL/blob/main/README_validations.md) for the offical
 instructions on validating OSCAL. Some pointers:
 - The schemas can be hard to find. Some of them are included here in the [schemas folder](/oscal/schemas) for
-convenience.
+convenience. See [Other Resources](#other-resources) for the sources.
 - NIST recommends using [ajv-cli](https://github.com/ajv-validator/ajv-cli) to validate json version of OSCAL models
 - ajv relies on node.
 - If you don't already have node installed, see [Download Node.js](https://nodejs.org/en/download/package-manager).
@@ -53,7 +53,7 @@ NIST only publishes a [tool](https://pages.nist.gov/oscal-tools/demos/csx/format
 
 See [Converting OSCAL JSON Content to XML](https://github.com/usnistgov/OSCAL/tree/4f02dac6f698efda387cc5f55bc99581eaf494b6/build#converting-oscal-json-content-to-xml) for the official instructions on how to convert any model from JSON to XML. Some pointers:
 - You can download the jar for saxon here: https://www.saxonica.com/download/java.xml. Select SaxonJ-HE 12.5.
-- The XSL files are hard to find. The XSL files for the assessment plan and assessment results are included here in the [xsl](/oscal/xsl) folder for convenience.
+- The XSL files are hard to find. The XSL files for the assessment plan and assessment results are included here in the [xsl](/oscal/xsl) folder for convenience. See [Other Resources](#other-resources) for the sources.
 
 Example usage:
 ```
