@@ -345,6 +345,7 @@ test_CustomDomains_Incorrect_V7 if {
 test_CustomDomains_Incorrect_V8 if {
     Output := defender.tests with input.anti_phish_policies as AntiPhishPolicies
                             with input.scuba_config as ScubaConfig
+                            with input.scuba_config.Defender["MS.DEFENDER.2.3v1"] as {}
                             with input.defender_license as false
 
     ReportDetailString := concat(" ", [
