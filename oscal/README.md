@@ -8,7 +8,7 @@ The SCuBA baselines can also be expressed as an OSCAL catalog. See https://githu
 proof of concept.
 
 ## Profile
-The [create_profile.py] script creates a SCuBA profile of the NIST SP 800-53; essentially, this lists the subset of the
+The [create_profile.py](/oscal/create_profile.py) script creates a SCuBA profile of the NIST SP 800-53; essentially, this lists the subset of the
 NIST SP 800-53 controls that map to SCuBA controls. Note that this is just a proof of concept and relies on an
 incomplete [NIST to SCuBA mapping](/oscal/scuba_mapping.json).
 
