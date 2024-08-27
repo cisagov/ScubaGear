@@ -18,7 +18,7 @@ test_AdminAuditLogEnabled_Correct if {
 
 test_AdminAuditLogEnabled_Incorrect if {
     AdminAudit := json.patch(AdminAuditLogConfig, [{"op": "add", "path": "UnifiedAuditLogIngestionEnabled", "value": false}])
-    Output := defender.tests with input.admin_audit_log_config as AdminAudit
+    Output := defender.tests with input.admin_audit_log_config as [AdminAudit]
 
     TestResult("MS.DEFENDER.6.1v1", Output, FAIL, false) == true
 }
