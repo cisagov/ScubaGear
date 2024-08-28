@@ -487,6 +487,14 @@ function Out-Utf8NoBom {
     Using the .NET framework, save the provided input as a UTF-8 file without the byte-order marking (BOM).
     .Functionality
     Internal
+    .Parameter Content
+    The content to save to the file.
+    .Parameter Location
+    The location to save the file to. Note that it MUST already exist and that the name of the file you want to save
+    should not be included in this string.
+    .Parameter FileName
+    The name of the file you want to save. Note this should not include the full path, i.e., use "Example.json" instead
+    of "./examplefolder/Example.json"
     #>
     [CmdletBinding()]
     param(
@@ -498,12 +506,20 @@ function Out-Utf8NoBom {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Path
+        $Location,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $FileName
     )
     process {
+        # Need to insure the location is an absolute path, otherwise you can get some inconsistent behavior.
+        $ResolvedPath = Resolve-Path $Location
+        $FinalPath = Join-Path -Path $ResolvedPath -ChildPath $FileName -ErrorAction 'Stop'
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        [System.IO.File]::WriteAllLines($Path, $Content, $Utf8NoBomEncoding)
+        [System.IO.File]::WriteAllLines($FinalPath, $Content, $Utf8NoBomEncoding)
     }
 }
 
@@ -654,18 +670,17 @@ function Invoke-ProviderList {
         }
 "@
 
-            $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
-            Out-Utf8NoBom -Content $BaselineSettingsExport -Path $FinalPath
+            Out-Utf8NoBom -Content $BaselineSettingsExport -Location $OutFolderPath -FileName "$OutProviderFileName.json"
 
             $ProdProviderFailed
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. See the exception message for more details: $($_.ScriptStackTrace)"
             throw $InvokeProviderListErrorMessage
         }
     }
