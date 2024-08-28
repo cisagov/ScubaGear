@@ -629,7 +629,7 @@ function Invoke-ProviderList {
 "@
 
             $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
-
+            Write-Warning $FinalPath
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. We can save a UTF-8 file without the BOM by utilizing
