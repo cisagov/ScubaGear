@@ -481,6 +481,32 @@ function Get-FileEncoding{
     return $Encoding
 }
 
+function Out-Utf8NoBom {
+    <#
+    .Description
+    Using the .NET framework, save the provided input as a UTF-8 file without the byte-order marking (BOM).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Content,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path
+    )
+    process {
+        # The $false in the next line indicates that the BOM should not be used.
+        $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+        [System.IO.File]::WriteAllLines($Path, $Content, $Utf8NoBomEncoding)
+    }
+}
+
 function Invoke-ProviderList {
     <#
     .Description
@@ -629,13 +655,11 @@ function Invoke-ProviderList {
 "@
 
             $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
-            Write-Warning $FinalPath
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
-            # in the "unable to parse input: yaml" error message. We can save a UTF-8 file without the BOM by utilizing
-            # the .NET framework. The $false in the next line indicates that the BOM should not be used.
-            $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-            [System.IO.File]::WriteAllLines($FinalPath, $BaselineSettingsExport, $Utf8NoBomEncoding)
+            # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
+            # the BOM
+            Out-Utf8NoBom -Content $BaselineSettingsExport -Path $FinalPath
 
             $ProdProviderFailed
         }

@@ -23,6 +23,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -CommandName Join-Path {"."}
         Mock -CommandName Set-Content {}
         Mock -CommandName Get-TimeZone {}
+        Mock -CommandName Out-Utf8NoBom {}
     }
     Context 'When running the providers on commercial tenants' {
         BeforeAll {
