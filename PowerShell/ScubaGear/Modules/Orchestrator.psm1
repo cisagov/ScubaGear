@@ -628,15 +628,15 @@ function Invoke-ProviderList {
         }
 "@
 
-            # Strip the character sequences that Rego tries to interpret as escape sequences,
-            # resulting in the error "unable to parse input: yaml: line x: found unknown escape character"
-            # "\/", ex: "\/Date(1705651200000)\/"
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\/", "")
-            # "\B", ex: "Removed an entry in Tenant Allow\Block List"
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\B", "/B")
-
             $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
-            $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+
+            # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA appears to not
+            # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
+            # in the "unable to parse input: yaml" error message. We can save a UTF-8 file without the BOM by utilizing
+            # the .NET framework. The $false in the next line indicates that the BOM should not be used.
+            $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+            [System.IO.File]::WriteAllLines($FinalPath, $BaselineSettingsExport, $Utf8NoBomEncoding)
+
             $ProdProviderFailed
         }
         catch {
