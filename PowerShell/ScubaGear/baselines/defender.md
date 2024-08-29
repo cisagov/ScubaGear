@@ -86,7 +86,7 @@ The standard and strict preset security policies SHALL be enabled.
 
 
 #### MS.DEFENDER.1.2v1
-All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
+All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
@@ -483,7 +483,8 @@ Notifications to inform users and help educate them on the proper use of sensiti
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
-
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
@@ -718,10 +719,10 @@ At a minimum, the alerts required by the CISA M365 Security Configuration Baseli
     - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
 
 #### MS.DEFENDER.5.2v1
-The alerts SHOULD be sent to a monitored address or incorporated into a SIEM.
+The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
-- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or Security Information and Event Management (SIEM) system helps ensure events are acted upon in a timely manner to limit overall impact.
+- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
@@ -828,7 +829,7 @@ Microsoft Purview Audit (Standard) logging SHALL be enabled.
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
+- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ June 2023
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
