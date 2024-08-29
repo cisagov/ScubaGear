@@ -9,33 +9,15 @@ import data.utils.key.PASS
 # Policy MS.EXO.6.1v1
 #--
 test_Domains_Contacts_Correct if {
-    Output := exo.tests with input as {
-        "sharing_policy": [
-            {
-                "Domains": [
-                    "domain1",
-                    "domain2"
-                ],
-                "Name": "A"
-            }
-        ]
-    }
+    Output := exo.tests with input.sharing_policy as [SharingPolicy]
 
     TestResult("MS.EXO.6.1v1", Output, PASS, true) == true
 }
 
 test_Domains_Contacts_Incorrect if {
-    Output := exo.tests with input as {
-        "sharing_policy": [
-            {
-                "Domains": [
-                    "*:ContactsSharing",
-                    "domain1:CalendarSharingFreeBusyDetail"
-                ],
-                "Name": "A"
-            }
-        ]
-    }
+    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", "value":["*:ContactsSharing", "domain1:CalendarSharingFreeBusyDetail"]}])
+
+    Output := exo.tests with input.sharing_policy as [SharingPolicy1]
 
     ReportDetailString := "1 sharing polic(ies) are sharing contacts folders with all domains by default: A"
     TestResult("MS.EXO.6.1v1", Output, ReportDetailString, false) == true
@@ -52,33 +34,15 @@ test_Domains_Contacts_Incorrect if {
 # Policy MS.EXO.6.2v1
 #--
 test_Domains_Calendar_Correct if {
-    Output := exo.tests with input as {
-        "sharing_policy": [
-            {
-                "Domains": [
-                    "domain1",
-                    "domain2"
-                ],
-                "Name": "A"
-            }
-        ]
-    }
+    Output := exo.tests with input.sharing_policy as [SharingPolicy]
 
     TestResult("MS.EXO.6.2v1", Output, PASS, true) == true
 }
 
 test_Domains_Calendar_Incorrect if {
-    Output := exo.tests with input as {
-        "sharing_policy": [
-            {
-                "Domains": [
-                    "*:CalendarSharingFreeBusyDetail",
-                    "domain1:ContactsSharing"
-                ],
-                "Name": "A"
-            }
-        ]
-    }
+    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", "value":["*:CalendarSharingFreeBusyDetail", "domain1:ContactsSharing"]}])
+
+    Output := exo.tests with input.sharing_policy as [SharingPolicy1]
 
     ReportDetailString := "1 sharing polic(ies) are sharing calendar details with all domains by default: A"
     TestResult("MS.EXO.6.2v1", Output, ReportDetailString, false) == true

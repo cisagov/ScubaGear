@@ -9,285 +9,117 @@ import data.utils.key.PASS
 # Policy MS.EXO.3.1v1
 #--
 test_Enabled_Correct_V1 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            }
-        ]
-    }
+    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+    Output := exo.tests with input.spf_records as [Record]
+                        with input.dkim_config as [DkimConfig]
+                        with input.dkim_records as [DkimRecords]
 
     TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test with correct default domain
 test_Enabled_Correct_V2 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            },
-            {
-                "Enabled": true,
-                "Domain": "example.onmicrosoft.com"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "example.onmicrosoft.com"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "example.onmicrosoft.com"
-            }
-        ]
-    }
+    
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "example.onmicrosoft.com"}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "example.onmicrosoft.com"}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+    SPFRecord1 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "example.onmicrosoft.com"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord, SPFRecord1]
+                        with input.dkim_config as [DkimConfig, DkimConfig1]
+                        with input.dkim_records as [DkimRecords, DkimRecord1]
 
     TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test for multiple custom domains
 test_Enabled_Correct_V3 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            },
-            {
-                "Enabled": true,
-                "Domain": "test2.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test2.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test2.name"
-            }
-        ]
-    }
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "test2.name"}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "test2.name"}])
+    
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+    SPFRecord1 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test2.name"}])
+    Output := exo.tests with input.spf_records as [SPFRecord, SPFRecord1]
+                        with input.dkim_config as [DkimConfig, DkimConfig1]
+                        with input.dkim_records as [DkimRecords, DkimRecord1]
+
 
     TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 # Test for no custom domains, just the default domain
 test_Enabled_Correct_V4 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "example.onmicrosoft.com"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "example.onmicrosoft.com"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "example.onmicrosoft.com"
-            }
-        ]
-    }
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "example.onmicrosoft.com"}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "example.onmicrosoft.com"}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "example.onmicrosoft.com"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord]
+                        with input.dkim_config as [DkimConfig1]
+                        with input.dkim_records as [DkimRecord1]
+
 
     TestResult("MS.EXO.3.1v1", Output, PASS, true) == true
 }
 
 test_Enabled_Incorrect if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": false,
-                "Domain": "test.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            }
-        ]
-    }
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Enabled", "value": false}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord]
+                        with input.dkim_config as [DkimConfig1]
+                        with input.dkim_records as [DkimRecords]
+
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V1 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [],
-                "domain": "test.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            }
-        ]
-    }
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "rdata", "value": []}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord]
+                        with input.dkim_config as [DkimConfig]
+                        with input.dkim_records as [DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "Hello World"
-                ],
-                "domain": "test.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            }
-        ]
-    }
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "rdata", "value": ["hello world"]}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord]
+                        with input.dkim_config as [DkimConfig]
+                        with input.dkim_records as [DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
 }
 
 test_Enabled_Incorrect_V3 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            },
-            {
-                "Enabled": false,
-                "Domain": "test2.name"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test2.name"
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test2.name"
-            }
-        ]
-    }
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "test2.name"},
+                                            {"op": "add", "path": "Enabled", "value": false}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "test2.name"}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+    SPFRecord2 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test2.name"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord, SPFRecord2]
+                        with input.dkim_config as [DkimConfig, DkimConfig1]
+                        with input.dkim_records as [DkimRecords, DkimRecord1]
+
 
     ReportDetailString := "1 agency domain(s) found in violation: test2.name"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
@@ -295,44 +127,18 @@ test_Enabled_Incorrect_V3 if {
 
 # Test with incorrect default domain
 test_Enabled_Incorrect_V4 if {
-    Output := exo.tests with input as {
-        "dkim_config": [
-            {
-                "Enabled": true,
-                "Domain": "test.name"
-            },
-            {
-                "Enabled": false,
-                "Domain": "example.onmicrosoft.com"
-            }
-        ],
-        "dkim_records": [
-            {
-                "rdata": [
-                    "v=DKIM1;"
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [],
-                "domain": "example.onmicrosoft.com" # this should fail
-            }
-        ],
-        "spf_records": [
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "test.name"
-            },
-            {
-                "rdata": [
-                    "spf1 "
-                ],
-                "domain": "example.onmicrosoft.com"
-            }
-        ]
-    }
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "example.onmicrosoft.com"},
+                                            {"op": "add", "path": "Enabled", "value": false}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "example.onmicrosoft.com"},
+                                            {"op": "add", "path": "rdata", "value": []}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "test.name"}])
+    SPFRecord2 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "example.onmicrosoft.com"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord, SPFRecord2]
+                        with input.dkim_config as [DkimConfig, DkimConfig1]
+                        with input.dkim_records as [DkimRecords, DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: example.onmicrosoft.com"
     TestResult("MS.EXO.3.1v1", Output, ReportDetailString, false) == true
