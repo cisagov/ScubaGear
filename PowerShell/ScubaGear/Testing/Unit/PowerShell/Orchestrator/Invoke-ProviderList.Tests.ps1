@@ -24,6 +24,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -CommandName Set-Content {}
         Mock -CommandName Get-TimeZone {}
         Mock -CommandName Out-Utf8NoBom {}
+        Mock -CommandName Write-Debug {}
     }
     Context 'When running the providers on commercial tenants' {
         BeforeAll {
