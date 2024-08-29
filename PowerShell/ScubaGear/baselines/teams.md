@@ -61,6 +61,8 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 - _Rationale:_ An external participant with control of a shared screen could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.TEAMS.1.2v1
 Anonymous users SHALL NOT be enabled to start meetings.
@@ -80,6 +82,8 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
 - _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility. For example, B2B guest users and trusted partner members may be admitted automatically into meetings organized by authorized users.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
@@ -88,6 +92,8 @@ Internal users SHOULD be admitted automatically.
 - _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.TEAMS.1.5v1
 Dial-in users SHOULD NOT be enabled to bypass the lobby.
@@ -96,6 +102,8 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 - _Rationale:_ Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.  
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.TEAMS.1.6v1
 Meeting recording SHOULD be disabled.
@@ -104,6 +112,8 @@ Meeting recording SHOULD be disabled.
 - _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.TEAMS.1.7v1
 Record an event SHOULD be set to Organizer can record.
@@ -112,6 +122,8 @@ Record an event SHOULD be set to Organizer can record.
 - _Rationale:_ The security risk of the default settings for Live Events is Live Events can be recorded by all participants by default. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 ### Resources
 
