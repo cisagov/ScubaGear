@@ -5,16 +5,26 @@ TestPlan:
     Tests:
       - TestDescription: MS.DEFENDER.1.2v1 Non-compliant - std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
         Preconditions:
-          # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
-          # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.2v1 Compliant - Std Non-null Strict Null
         Preconditions:
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
           - Command: Set-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
@@ -33,8 +43,14 @@ TestPlan:
               SentToMemberOf: null
               RecipientDomainIs: null
               Confirm: false
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.1.2v1 Compliant - std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
@@ -74,8 +90,15 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched User
@@ -85,8 +108,15 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.4v1 Non-compliant Mismatched Group
@@ -96,8 +126,15 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and first group, then add that user/group to the preset policies
           # yamllint disable-line rule:line-length
-          - Command: 'Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo (Get-MailUser)[0].UserPrincipalName -SentToMemberOf (Get-UnifiedGroup)[0].alias -RecipientDomainIs badpeople.r.us -Confirm:$false'
+          - Command: |
+                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
+                      $Domain = '@' + $Domain
+                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.4v1 Compliant Matched Recipient Domains
@@ -107,14 +144,9 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
-          - Command: Set-EOPProtectionPolicyRule
-            Splat:
-              Identity: Strict Preset Security Policy
-              SentTo: null
-              SentToMemberOf: null
-              RecipientDomainIs:
-                - badpeople.r.us
-              Confirm: false
+              ErrorAction: Continue
+          - Command: |
+                      Set-EOPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $null -SentToMemberOf $null -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: true
 
@@ -1399,21 +1431,24 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
+  # Use cached run for 6.1 tests since audit changes can take 60 minutes to take effect
   - PolicyId: MS.DEFENDER.6.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.DEFENDER.6.1v1 Compliant case
         Preconditions:
-          - Command: Set-AdminAuditLogConfig
+          - Command: UpdateProviderExport
             Splat:
-              UnifiedAuditLogIngestionEnabled: true
+              updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: true
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.DEFENDER.6.1v1 Not-Compliant case
         Preconditions:
-          - Command: Set-AdminAuditLogConfig
+          - Command: UpdateProviderExport
             Splat:
-              UnifiedAuditLogIngestionEnabled: false
+              updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: false
         Postconditions: []
         ExpectedResult: false
 
