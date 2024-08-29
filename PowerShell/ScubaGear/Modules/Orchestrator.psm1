@@ -519,7 +519,46 @@ function Out-Utf8NoBom {
         $FinalPath = Join-Path -Path $ResolvedPath -ChildPath $FileName -ErrorAction 'Stop'
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        [System.IO.File]::WriteAllLines($FinalPath, $Content, $Utf8NoBomEncoding)
+        Invoke-WriteAllLines($FinalPath, $Content, $Utf8NoBomEncoding)
+        return $FinalPath  # Used to test path construction more easily
+    }
+}
+
+function Invoke-WriteAllLines {
+    <#
+    .Description
+    Using the .NET framework, save the provided content to the file
+    path provided using the given encoding.
+    .Functionality
+    Internal
+    .Parameter Content
+    The content to save to the file.
+    .Parameter Path
+    The full file path to the file being written.
+    .Parameter Encoding
+    An object of type System.Text.Encoding that determines how the
+    content is encoded for output to file.
+    Default: UTF-8 without BOM encoding used
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Content,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [System.Text.Encoding]
+        $Encoding = (New-Object System.Text.UTF8Encoding $False)
+    )
+    process {
+        [System.IO.File]::WriteAllLines($Path, $Content, $Encoding)
     }
 }
 
