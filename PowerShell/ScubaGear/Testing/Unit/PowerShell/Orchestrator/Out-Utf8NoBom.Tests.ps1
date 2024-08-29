@@ -13,8 +13,6 @@ InModuleScope Orchestrator {
             New-Item -ItemType Directory './shared/a/b' -Force -ErrorAction Ignore
             New-Item -ItemType Directory './shared/c' -Force -ErrorAction Ignore
             # New-SmbShare -Name "Shared" -Path ".\shared" -ReadAccess "Everyone"
-
-            $pwd = Get-Location
         }
 
         Context 'local file' {
