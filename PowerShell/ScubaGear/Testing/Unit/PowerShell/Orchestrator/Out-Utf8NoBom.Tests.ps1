@@ -30,7 +30,7 @@ InModuleScope Orchestrator {
         # # Requires ability to create SMB shares on your box to run
         # Context 'UNC path' {
         #     It 'Write to shared UNC path' {
-        #                         Out-Utf8NoBom -Content "test" -Location "$env:COMPUTERNAME\Shared" -FileName "output.json" `
+        #                         Out-Utf8NoBom -Content "test" -Location "\\$env:COMPUTERNAME\Shared" -FileName "output.json" `
         #         | Should -Be "\\$env:COMPUTERNAME\Shared\output.json"
         #     }
         # }

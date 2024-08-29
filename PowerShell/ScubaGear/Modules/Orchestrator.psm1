@@ -515,12 +515,12 @@ function Out-Utf8NoBom {
     )
     process {
         # Need to insure the location is an absolute path, otherwise you can get some inconsistent behavior.
-        $ResolvedPath = Resolve-Path $Location
+        $ResolvedPath = $(Resolve-Path $Location).ProviderPath
         $FinalPath = Join-Path -Path $ResolvedPath -ChildPath $FileName -ErrorAction 'Stop'
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        Invoke-WriteAllLines($FinalPath, $Content, $Utf8NoBomEncoding)
-        return $FinalPath  # Used to test path construction more easily
+        Invoke-WriteAllLines -Content $Content -Path $FinalPath -Encoding $Utf8NoBomEncoding
+        $FinalPath  # Used to test path construction more easily
     }
 }
 
@@ -713,13 +713,15 @@ function Invoke-ProviderList {
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
-            Out-Utf8NoBom -Content $BaselineSettingsExport -Location $OutFolderPath -FileName "$OutProviderFileName.json"
+            $ActualSavedLocation = Out-Utf8NoBom -Content $BaselineSettingsExport `
+                -Location $OutFolderPath -FileName "$OutProviderFileName.json"
+            Write-Debug $ActualSavedLocation
 
             $ProdProviderFailed
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
-            Ending ScubaGear execution. See the exception message for more details: $($_.ScriptStackTrace)"
+            Ending ScubaGear execution. See the exception message for more details: $($_)`n$($_.ScriptStackTrace)"
             throw $InvokeProviderListErrorMessage
         }
     }
