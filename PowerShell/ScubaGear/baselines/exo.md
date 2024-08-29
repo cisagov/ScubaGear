@@ -963,6 +963,8 @@ IP allow lists SHOULD NOT be created.
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
 security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 #### MS.EXO.12.2v1
 Safe lists SHOULD NOT be enabled.
@@ -976,6 +978,8 @@ blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ June 2023
 - _Note:_ A connection filter MAY be implemented to create an IP block list.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 ### Resources
 
@@ -1414,7 +1418,7 @@ by offloading the logs out of the cloud environment or natively through
 Microsoft by creating an [audit log retention
 policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 
-OMB M-21-13 also requires Advanced Audit be configured in M365. Advanced Audit,
+OMB M-21-31 also requires Advanced Audit be configured in M365. Advanced Audit,
 now Microsoft Purview Audit (Premium), adds additional event types to the
 Unified Audit Log.
 
@@ -1449,7 +1453,7 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled.
 - _Rationale:_ Standard logging may not include relevant details necessary for
 visibility into user actions during an incident. Enabling Microsoft Purview Audit
 (Premium) captures additional event types not included with Standard.
-Furthermore, it is required for government agencies by OMB M-21-13 (referred to therein by its former name, Unified Audit Logs w/Advanced Features).
+Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ June 2023
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
@@ -1471,6 +1475,8 @@ gives an agency the necessary visibility to investigate incidents that occurred
 some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
 Audit Logs in the Cloud Azure log category.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - None
 
 ### Resources
 
