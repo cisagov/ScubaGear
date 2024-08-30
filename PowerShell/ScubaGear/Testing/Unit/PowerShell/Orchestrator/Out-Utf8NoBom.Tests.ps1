@@ -12,7 +12,7 @@ InModuleScope Orchestrator {
             New-Item -ItemType Directory './c' -Force -ErrorAction Ignore
             New-Item -ItemType Directory './shared/a/b' -Force -ErrorAction Ignore
             New-Item -ItemType Directory './shared/c' -Force -ErrorAction Ignore
-            # New-SmbShare -Name "Shared" -Path ".\shared" -ReadAccess "Everyone"
+            #New-SmbShare -Name "Shared" -Path ".\shared" -ReadAccess "Everyone"
         }
 
         Context 'local file' {
@@ -27,20 +27,17 @@ InModuleScope Orchestrator {
             }
         }
 
-        # # Requires ability to create SMB shares on your box to run
-        # Context 'UNC path' {
-        #     It 'Write to shared UNC path' {
-        #                         Out-Utf8NoBom -Content "test" -Location "\\$env:COMPUTERNAME\Shared" -FileName "output.json" `
-        #         | Should -Be "\\$env:COMPUTERNAME\Shared\output.json"
-        #     }
-        # }
+        # Requires ability to create SMB shares on your box to run
+        Context 'UNC path' {
+            It 'Write to shared UNC path' {
+                Out-Utf8NoBom -Content "test" -Location "\\$env:COMPUTERNAME\C$" -FileName "output.json" `
+                | Should -Be "\\$env:COMPUTERNAME\C$\output.json"
+            }
+        }
+        AfterAll {
+            Remove-Module Orchestrator -ErrorAction SilentlyContinue
+            Remove-Item -Path "./c" -Force -ErrorAction Ignore
+            Remove-Item -Path "./a" -Recurse -Force -ErrorAction Ignore
+        }
     }
-}
-
-AfterAll {
-    Remove-Module Orchestrator -ErrorAction SilentlyContinue
-    Remove-SmbShare -Name Shared -ErrorAction Ignore
-    Remove-Item -Path "./c" -Force -ErrorAction Ignore
-    Remove-Item -Path "./a" -Recurse -Force -ErrorAction Ignore
-    Remove-Item -Path "./shared" -Recurse -Force -ErrorAction Ignore
 }
