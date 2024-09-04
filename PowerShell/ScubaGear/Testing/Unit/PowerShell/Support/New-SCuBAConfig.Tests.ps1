@@ -20,7 +20,7 @@ InModuleScope Support {
             function ConvertTo-Yaml {throw 'this will be mocked'}
             Mock -ModuleName Support -CommandName ConvertTo-Yaml { $args[0] }
 
-            $TestPath = New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "SampleConfig") -Name "CreateSampleConfigFolder" -ItemType Directory
+            $TestPath = New-Item -Path (Join-Path -Path $TestDrive -ChildPath "SampleConfig") -Name "CreateSampleConfigFolder" -ItemType Directory
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CMDArgs')]
             $CMDArgs = @{
