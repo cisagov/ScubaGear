@@ -7,7 +7,8 @@ runs:
         New-Item -ItemType file -Path ./key.txt
         Set-Content -Path ./key.txt -Value $env:PfxBase64
         certutil -decode ./key.txt ./key.pfx
+        cat ./key.txt
         # Import FPX
         # Pipe to Out-Null to hide the thumbprint
-        Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx # | Out-Null
+        Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       shell: powershell
