@@ -1,0 +1,6 @@
+name: Import PFX
+runs:
+  using: "composite"
+  # Pipe to Out-Null to hide the thumbprint
+  steps:
+    - run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null

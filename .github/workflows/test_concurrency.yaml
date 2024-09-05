@@ -25,10 +25,12 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Say Hello
-        uses: ./.github/actions/say-hello
       - name: Import PFX
         uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      - name: Create PFX
+        uses: ./.github/action/import-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   Ent_Tenant2_G3:
@@ -45,6 +47,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+      - name: Import PFX
+        uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   Def_Tenant1:
     name: Test Def_Tenant1
     runs-on: windows-latest
@@ -57,6 +63,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+      - name: Import PFX
+        uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   Def_Tenant2_G3:
     name: Test Def_Tenant2_G3
     runs-on: windows-latest
@@ -71,3 +81,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+      - name: Import PFX
+        uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
