@@ -25,11 +25,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Import PFX
+      - name: Create PFX
         uses: ./.github/actions/create-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      - name: Create PFX
+      - name: Import PFX
         uses: ./.github/actions/import-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}

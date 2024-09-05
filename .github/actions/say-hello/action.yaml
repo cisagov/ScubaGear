@@ -1,6 +1,0 @@
-name: Say hello
-runs:
-  using: "composite"
-  steps:
-    - run: echo "Hello"
-      shell: powershell
