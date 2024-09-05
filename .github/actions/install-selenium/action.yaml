@@ -1,8 +1,0 @@
-name: Install Selenium
-runs:
-  using: "composite"
-  steps:
-    - run: |
-        Import-Module -Name .\utils\workflow\Install-SeleniumForTesting
-          Install-SeleniumForTesting
-      shell: powershell
