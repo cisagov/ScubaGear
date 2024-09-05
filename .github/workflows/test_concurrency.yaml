@@ -1,0 +1,39 @@
+# Purpose:  Test a solution to the concurrency issues for the nightly production functional tests
+# NOTE:  This is intended to be a temporary workflow
+
+name: Test Concurrency with Nightly Functional Tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/test_concurrency.yaml"
+
+permissions: read-all
+
+jobs:
+  Ent_Tenant1:
+    name: Test Ent_Tenant1
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    concurrency:
+      group: aad
+      cancel-in-progress: true
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+  Ent_Tenant2_G3:
+    name: Test Ent_Tenant2_G3
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    concurrency:
+      group: aad
+      cancel-in-progress: true
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        
