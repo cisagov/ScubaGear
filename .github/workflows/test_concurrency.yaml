@@ -37,6 +37,8 @@ jobs:
         uses: ./.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      - name: Install Selenium
+        uses: ./.github/actions/install-selenium
   # Ent_Tenant2_G3:
   #   name: Test Ent_Tenant2_G3
   #   runs-on: windows-latest
