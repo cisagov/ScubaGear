@@ -16,9 +16,9 @@ jobs:
   Ent_Tenant1:
     name: Test Ent_Tenant1
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: powershell
+    # defaults:
+    #   run:
+    #     shell: powershell
     concurrency:
       group: aad
       cancel-in-progress: false
