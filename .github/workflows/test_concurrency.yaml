@@ -33,6 +33,10 @@ jobs:
         uses: ./.github/actions/import-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      - name: Get Thumbprint
+        uses: ./.github/actions/get-thumbprint
+        env:
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
   Ent_Tenant2_G3:
     name: Test Ent_Tenant2_G3
     runs-on: windows-latest
