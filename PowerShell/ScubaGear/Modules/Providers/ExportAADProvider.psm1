@@ -372,7 +372,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
                 throw $_
             }
         }
-        
+
         $Objecttype = $DirectoryObject.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
     }
 
@@ -381,7 +381,8 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $ObjectId
             $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
-Write-Warning "Processing role: $($Role.DisplayName) User: $($AADUser.DisplayName)"
+# Write-Warning "Processing role: $($Role.DisplayName) User: $($AADUser.DisplayName)"
+Write-Debug "Processing role: $($Role.DisplayName) User: $($AADUser.DisplayName)"
         }
         # If the current role has not already been added to the user's roles array then add the role
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $Role.DisplayName) {
