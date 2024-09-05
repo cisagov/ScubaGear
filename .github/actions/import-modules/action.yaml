@@ -1,8 +1,12 @@
-name: Setup ScubaGear
+name: Import Modules
 runs:
   using: "composite"
   steps:
     - run: |
+        # Install Selenium
+        Import-Module -Name .\utils\workflow\Install-SeleniumForTesting
+          Install-SeleniumForTesting
+        # Setup ScubaGear
         Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
           Initialize-ScubaGearForTesting
       shell: powershell

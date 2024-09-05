@@ -25,10 +25,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Create PFX
-        uses: ./.github/actions/create-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      # - name: Create PFX
+      #   uses: ./.github/actions/create-pfx
+      #   env:
+      #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       - name: Import PFX
         uses: ./.github/actions/import-pfx
         env:
@@ -37,10 +37,12 @@ jobs:
         uses: ./.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Install Selenium
-        uses: ./.github/actions/install-selenium
-      - name: Setup ScubaGear
-        uses: ./.github/actions/setup-scubagear
+      # - name: Install Selenium
+      #   uses: ./.github/actions/install-selenium
+      # - name: Setup ScubaGear
+      #   uses: ./.github/actions/setup-scubagear
+      - name: Import Modules
+        uses: ./.github/actions/import-modules
   # Ent_Tenant2_G3:
   #   name: Test Ent_Tenant2_G3
   #   runs-on: windows-latest
