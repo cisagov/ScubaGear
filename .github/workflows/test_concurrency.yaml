@@ -20,7 +20,7 @@ jobs:
         shell: powershell
     concurrency:
       group: aad
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
         shell: powershell
     concurrency:
       group: aad
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
