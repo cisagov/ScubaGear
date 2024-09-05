@@ -7,6 +7,8 @@ runs:
         $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
         $Thumbprint = $x509.ThumbPrint
         # Pass thumbprint to later job.
+        echo "The tp is"
+        echo tp
         echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
       # -Password flag requires PS 6+
       shell: pwsh
