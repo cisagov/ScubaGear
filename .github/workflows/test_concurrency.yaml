@@ -30,7 +30,7 @@ jobs:
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       - name: Create PFX
-        uses: ./.github/action/import-pfx
+        uses: ./.github/actions/import-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   Ent_Tenant2_G3:
