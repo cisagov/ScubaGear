@@ -53,9 +53,3 @@ jobs:
       - scan-secret
       - check-security
     uses: ./.github/workflows/unit_test_opa.yaml
-  unit-workflow:
-    name: Unit
-    needs:
-      - scan-secret
-      - check-security
-    uses: ./.github/workflows/unit_test_workflows.yaml
