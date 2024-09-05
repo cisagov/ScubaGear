@@ -309,7 +309,7 @@ tests contains {
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    input.OneDrive_PnP_Flag == false
+    #input.OneDrive_PnP_Flag == false
     SharingCapability == ANYONE
 
     FileLinkType := Tenant.FileAnonymousLinkType
@@ -331,22 +331,22 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
-    input.OneDrive_PnP_Flag == false
+    #input.OneDrive_PnP_Flag == false
     SharingCapability != ANYONE
     Reason := NAString(SliderSettings(2))
 }
 
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails(PolicyId),
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-    input.OneDrive_PnP_Flag == true
-}
+#tests contains {
+#    "PolicyId": PolicyId,
+#    "Criticality": "Shall/Not-Implemented",
+#    "Commandlet": [],
+#    "ActualValue": [],
+#    "ReportDetails": NotCheckedDetails(PolicyId),
+#    "RequirementMet": false
+#} if {
+#    PolicyId := "MS.SHAREPOINT.3.2v1"
+#    input.OneDrive_PnP_Flag == true
+#}
 #--
 
 #
