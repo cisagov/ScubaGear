@@ -2,10 +2,10 @@ name: Get Thumbprint
 runs:
   using: "composite"
   steps:
-    run: |
-      $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
-      $Thumbprint = $x509.ThumbPrint
-      # Pass thumbprint to later job.
-      echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
-    # -Password flag requires PS 6+
-    shell: pwsh
+    - run: |
+        $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+        $Thumbprint = $x509.ThumbPrint
+        # Pass thumbprint to later job.
+        echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
+      # -Password flag requires PS 6+
+      shell: pwsh
