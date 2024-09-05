@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - uses: ./.github/actions/
+      - uses: ./.github/actions/say-hello
   Ent_Tenant2_G3:
     name: Test Ent_Tenant2_G3
     runs-on: windows-latest
@@ -61,7 +61,7 @@ jobs:
       group: defender
       cancel-in-progress: false
     needs:
-      - Ent_Tenant1
+      - Def_Tenant1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
