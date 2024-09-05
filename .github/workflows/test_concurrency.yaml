@@ -26,6 +26,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Say Hello
         uses: ./.github/actions/say-hello
+      - name: Import PFX
+        uses: ./.github/actions/create-pfx
   Ent_Tenant2_G3:
     name: Test Ent_Tenant2_G3
     runs-on: windows-latest
