@@ -32,6 +32,7 @@ jobs:
       - name: Import PFX
         uses: ./.github/actions/import-pfx
         env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
         uses: ./.github/actions/get-thumbprint
