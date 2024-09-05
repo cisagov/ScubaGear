@@ -29,6 +29,8 @@ jobs:
         uses: ./.github/actions/say-hello
       - name: Import PFX
         uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   Ent_Tenant2_G3:
     name: Test Ent_Tenant2_G3
     runs-on: windows-latest

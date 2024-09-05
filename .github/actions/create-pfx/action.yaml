@@ -7,5 +7,3 @@ runs:
         Set-Content -Path ./key.txt -Value $env:PfxBase64
         certutil -decode ./key.txt ./key.pfx
       shell: powershell
-      env:
-        PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
