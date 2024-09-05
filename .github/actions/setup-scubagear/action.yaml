@@ -1,0 +1,8 @@
+name: Setup ScubaGear
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
+          Initialize-ScubaGearForTesting
+      shell: powershell
