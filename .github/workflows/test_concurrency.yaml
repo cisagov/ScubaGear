@@ -38,3 +38,29 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+  Def_Tenant1:
+    name: Test Def_Tenant1
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    concurrency:
+      group: defender
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+  Def_Tenant2_G3:
+    name: Test Def_Tenant2_G3
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    concurrency:
+      group: defender
+      cancel-in-progress: false
+    needs:
+      - Ent_Tenant1
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
