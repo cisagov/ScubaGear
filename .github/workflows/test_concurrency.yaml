@@ -1,5 +1,5 @@
 # Purpose:  Test a solution to the concurrency issues for the nightly production functional tests
-# NOTE:  This is intended to be a temporary workflow
+# NOTE:  This is intended to be a temporary workflow.
 
 name: Test Concurrency with Nightly Functional Tests
 
@@ -33,17 +33,17 @@ jobs:
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./.github/actions/get-thumbprint
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      # - name: Get Thumbprint
+      #   id: get-thumbprint
+      #   uses: ./.github/actions/get-thumbprint
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       # - name: Import Modules
       #   uses: ./.github/actions/import-modules
-      - name: Test Product
-        uses: ./.github/actions/test-product
-        env:
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      # - name: Test Product
+      #   uses: ./.github/actions/test-product
+      #   env:
+      #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
   # Ent_Tenant2_G3:
   #   name: Test Ent_Tenant2_G3
   #   runs-on: windows-latest
