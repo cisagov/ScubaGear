@@ -3,7 +3,11 @@ runs:
   using: "composite"
   steps:
     - run: |
+        Write-Host "files"
+        dir
         $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+        Write-Host "x"
+        Write-Host $x509
         $Thumbprint = $x509.ThumbPrint
         # Pass thumbprint to later job.
         echo "The tp is"
