@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - ".github/workflows/test_concurrency.yaml"
+      - ".github/actions"
 
 permissions: read-all
 
