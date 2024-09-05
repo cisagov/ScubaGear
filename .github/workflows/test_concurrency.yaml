@@ -33,6 +33,8 @@ jobs:
     concurrency:
       group: aad
       cancel-in-progress: false
+    needs:
+      - Ent_Tenant1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
