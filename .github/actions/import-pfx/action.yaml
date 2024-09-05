@@ -3,10 +3,11 @@ runs:
   using: "composite"
   steps:
     - run: |
-        Write-Host $env:PfxBase64
         # Create PFX
         New-Item -ItemType file -Path ./key.txt
         Set-Content -Path ./key.txt -Value $env:PfxBase64
+        Write-Host "files"
+        dir
         certutil -decode ./key.txt ./key.pfx
         # Import FPX
         # Pipe to Out-Null to hide the thumbprint
