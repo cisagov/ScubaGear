@@ -29,69 +29,69 @@ jobs:
         uses: ./.github/actions/create-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      # - name: Import PFX
-      #   uses: ./.github/actions/import-pfx
-      #   env:
-      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       - name: Import PFX
-        # Pipe to Out-Null to hide the thumbprint
-        run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+        uses: ./.github/actions/import-pfx
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-        shell: powershell
+      # - name: Import PFX
+      #   # Pipe to Out-Null to hide the thumbprint
+      #   run: Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+      #   env:
+      #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      #   shell: powershell
       - name: Get Thumbprint
         uses: ./.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  Ent_Tenant2_G3:
-    name: Test Ent_Tenant2_G3
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: powershell
-    concurrency:
-      group: aad
-      cancel-in-progress: false
-    needs:
-      - Ent_Tenant1
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Create PFX
-        uses: ./.github/actions/create-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  Def_Tenant1:
-    name: Test Def_Tenant1
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: powershell
-    concurrency:
-      group: defender
-      cancel-in-progress: false
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Create PFX
-        uses: ./.github/actions/create-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  Def_Tenant2_G3:
-    name: Test Def_Tenant2_G3
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: powershell
-    concurrency:
-      group: defender
-      cancel-in-progress: false
-    needs:
-      - Def_Tenant1
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Create PFX
-        uses: ./.github/actions/create-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  # Ent_Tenant2_G3:
+  #   name: Test Ent_Tenant2_G3
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       shell: powershell
+  #   concurrency:
+  #     group: aad
+  #     cancel-in-progress: false
+  #   needs:
+  #     - Ent_Tenant1
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Create PFX
+  #       uses: ./.github/actions/create-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  # Def_Tenant1:
+  #   name: Test Def_Tenant1
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       shell: powershell
+  #   concurrency:
+  #     group: defender
+  #     cancel-in-progress: false
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Create PFX
+  #       uses: ./.github/actions/create-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  # Def_Tenant2_G3:
+  #   name: Test Def_Tenant2_G3
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       shell: powershell
+  #   concurrency:
+  #     group: defender
+  #     cancel-in-progress: false
+  #   needs:
+  #     - Def_Tenant1
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Create PFX
+  #       uses: ./.github/actions/create-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
