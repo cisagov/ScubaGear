@@ -24,7 +24,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - uses: ./.github/actions/say-hello
+      - name: Say Hello
+        uses: ./.github/actions/say-hello
   Ent_Tenant2_G3:
     name: Test Ent_Tenant2_G3
     runs-on: windows-latest
