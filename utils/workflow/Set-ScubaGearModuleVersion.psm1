@@ -1,7 +1,11 @@
 function Set-ScubaGearVersionManifest {
-    #
-    # Replace ScubaGear module version in the ScubaGear.psd1 manifest.
-    #
+    <#
+    .Description
+    Replace ScubaGear module version in the ScubaGear.psd1 manifest.
+    Output will be stored as a ProviderSettingsExport.json in the OutPath Folder
+    .Functionality
+    Internal
+    #>
     $ManifestPath = '.\PowerShell\ScubaGear\ScubaGear.psd1'
     $VersionRegex = "\'\d+\.\d+\.\d+\'"
     $PreviousVersion = ''
@@ -21,11 +25,14 @@ function Set-ScubaGearVersionManifest {
 }
 
 function Set-ScubaGearVersionDoc {
-    #
-    # Replace ScubaGear module version in
-    # ./docs/installation/github
-    # ./docs/installation/psgallery
-    #
+    <#
+    .Description
+    Replace ScubaGear module version in
+    ./docs/installation/github
+    ./docs/installation/psgallery
+    .Functionality
+    Internal
+    #>
     $GitHubDocPath = './docs/installation/github.md'
     $ZipRegex = "ScubaGear-v\d+\.\d+\.\d+"
     $ZipVerReplace = "ScubaGear-v${env:NEW_VERSION_NUMBER}"
@@ -54,9 +61,14 @@ function Set-ScubaGearVersionDoc {
 }
 
 function New-PRBody {
-    #
-    # Create the Pull Request body
-    #
+    <#
+    .Description
+    Replace ScubaGear module version in
+    ./docs/installation/github
+    ./docs/installation/psgallery
+    .Functionality
+    Internal
+    #>
     $PRTemplatePath = '.\.github\pull_request_template.md'
 
     $Description = '<!-- Describe the "what" of your changes in detail. -->'
@@ -94,7 +106,10 @@ function New-PRBody {
 }
 function Set-ScubaGearModuleVersion {
     <#
-    This function
+    .Description
+    This main function t
+    .Functionality
+    Internal
     #>
 
     $PreviousVersion = Set-ScubaGearVersionManifest
