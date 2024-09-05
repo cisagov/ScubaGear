@@ -1,74 +1,69 @@
 $UtilityPath = '../../../../Modules/Utility/Utility.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 'Set-Utf8NoBom' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 'Get-Utf8NoBom' -Force
 
 InModuleScope Utility {
-    Describe -Tag 'Utility' -Name 'Set-Utf8NoBom Pathing' {
+    Describe -Tag 'Utility' -Name 'Get-Utf8NoBom Pathing' {
         BeforeAll {
-            function Invoke-WriteAllLines {}
-            Mock -ModuleName Utility Invoke-WriteAllLines
+            Mock -ModuleName Utility Invoke-ReadAllLines { return "Pass"}
 
             # Setup test directories for testing
             Push-Location $TestDrive
             New-Item -ItemType Directory "$TestDrive\a\b" -Force -ErrorAction Ignore
             New-Item -ItemType Directory "$TestDrive\c" -Force -ErrorAction Ignore
+
+            $Content = Invoke-ReadAllLines -Path "$TestDrive\a"
+            Write-Host "Invoke-ReadAllLines: $Content"
         }
 
         Context 'local file' {
             It 'Set to root drive path' {
-                Set-Utf8NoBom -Content "test" -Location "C:\" -FileName "output.json" `
-                | Should -Be "C:\output.json"
+                Get-Utf8NoBom -FilePath "C:\output.json" | Should -Be "Pass"
             }
 
             It 'Set to absolute subdirectory path' {
-                Set-Utf8NoBom -Content "test" -Location "$TestDrive\a" -FileName "output.json" `
-                | Should -Be "$TestDrive\a\output.json"
+                Get-Utf8NoBom -FilePath "$TestDrive\a\output.json" | Should -Be "Pass"
             }
         }
 
         Context 'relative paths' {
             It 'Set to subdirectory relative path' {
-                Set-Utf8NoBom -Content "test" -Location "a" -FileName "output.json" `
-                | Should -Be "$TestDrive\a\output.json"
+                Get-Utf8NoBom -FilePath "a\output.json" | Should -Be "Pass"
             }
 
             It 'Set to subdirectory local relative path' {
-                Set-Utf8NoBom -Content "test" -Location ".\a" -FileName "output.json" `
-                | Should -Be "$TestDrive\a\output.json"
+                Get-Utf8NoBom -FilePath ".\a\output.json" | Should -Be "Pass"
             }
 
             It 'Set to subdirectory processing .. and .' {
-                Set-Utf8NoBom -Content "test" -Location "a\b\..\..\c\." -FileName "output.json" `
-                | Should -Be "$TestDrive\c\output.json"
+                Get-Utf8NoBom -FilePath "a\b\..\..\c\.\output.json" | Should -Be "Pass"
             }
         }
 
         Context 'Check for re-root in path' {
             It 'Does not re-root subdirectory' {
-                Set-Utf8NoBom -Content "test" -Location "a\d\..\b\." -FileName "output.json" `
-                | Should -Be "$TestDrive\a\b\output.json"
+                Get-Utf8NoBom -FilePath "a\d\..\b\.\output.json" | Should -Be "Pass"
             }
 
             It 'Does not re-root subdirectory rooted at local' {
-                Set-Utf8NoBom -Content "test" -Location ".\a\d\..\b\." -FileName "output.json" `
-                | Should -Be "$TestDrive\a\b\output.json"
+                Get-Utf8NoBom -FilePath ".\a\d\..\b\.\output.json" | Should -Be "Pass"
             }
 
             It 'Does not re-root parent' {
-                Set-Utf8NoBom -Content "test" -Location "..\$((Get-Item .).Name)\a\d\..\b\." -FileName "output.json" `
-                | Should -Be "$TestDrive\a\b\output.json"
+                Get-Utf8NoBom -FilePath "..\$((Get-Item .).Name)\a\d\..\b\.\output.json" `
+                | Should -Be "Pass"
             }
         }
 
         # Uses default C$ share to test building UNC paths that exist
         Context 'UNC path' {
             It 'Set to shared UNC path' {
-                Set-Utf8NoBom -Content "test" -Location "\\$env:COMPUTERNAME\C$" -FileName "output.json" `
-                | Should -Be "\\$env:COMPUTERNAME\C$\output.json"
+                Get-Utf8NoBom -FilePath "\\$env:COMPUTERNAME\C$\output.json" `
+                | Should -Be "Pass"
             }
 
             It 'Set to shared UNC path' {
-                Set-Utf8NoBom -Content "test" -Location "\\$env:COMPUTERNAME\C$" -FileName "output.json" `
-                | Should -Be "\\$env:COMPUTERNAME\C$\output.json"
+                Get-Utf8NoBom -FilePath "\\$env:COMPUTERNAME\C$\output.json" `
+                | Should -Be "Pass"
             }
         }
 
@@ -77,7 +72,7 @@ InModuleScope Utility {
         }
     }
 
-    Describe -Tag 'Utility' -Name 'Set-Utf8NoBom Inputs' {
+    Describe -Tag 'Utility' -Name 'Get-Utf8NoBom Inputs' {
         BeforeAll {
             Push-Location $TestDrive
         }
