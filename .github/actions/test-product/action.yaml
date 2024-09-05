@@ -55,7 +55,7 @@ runs:
               $m365 = $attribute
             }
           }
-          if($alias -eq Ent_Tenant1)
+          if($alias -eq "Ent_Tenant1")
           {
             # Split out the key and value for each parameter
             $domainKeyAndValue = $domain.split("=")
