@@ -8,7 +8,10 @@ on:
   push:
     paths:
       - ".github/workflows/test_concurrency.yaml"
-      - ".github/actions/*"
+      - ".github/actions/get-thumbprint/action.yaml"
+      - ".github/actions/import-modules/action.yaml"
+      - ".github/actions/import-pfx/action.yaml"
+      - ".github/actions/test-product/action.yaml"
 
 permissions: read-all
 
