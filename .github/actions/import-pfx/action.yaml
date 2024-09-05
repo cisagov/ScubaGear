@@ -1,7 +1,6 @@
 name: Import PFX
 runs:
   using: "composite"
-  # Pipe to Out-Null to hide the thumbprint
   steps:
     - run: |
         # Create PFX
@@ -9,5 +8,6 @@ runs:
         Set-Content -Path ./key.txt -Value $env:PfxBase64
         certutil -decode ./key.txt ./key.pfx
         # Import FPX
-        Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+        # Pipe to Out-Null to hide the thumbprint
+        Import-PfxCertificate -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx # | Out-Null
       shell: powershell

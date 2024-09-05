@@ -1,5 +1,4 @@
 name: Get Thumbprint
-id: get-thumbprint
 runs:
   using: "composite"
   steps:
