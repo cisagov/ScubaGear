@@ -25,7 +25,7 @@ jobs:
     name: Test Tms_Tenant1
     runs-on: windows-latest
     concurrency:
-      group: aad
+      group: Tms_Tenant1
       cancel-in-progress: false
     steps:
       - name: Checkout Repo
@@ -139,21 +139,45 @@ jobs:
   #       uses: ./.github/actions/create-pfx
   #       env:
   #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  # Def_Tenant2_G3:
-    # name: Test Def_Tenant2_G3
-    # runs-on: windows-latest
-    # defaults:
-    #   run:
-    #     shell: powershell
-    # concurrency:
-    #   group: defender
-    #   cancel-in-progress: false
-    # needs:
-    #   - Def_Tenant1
-    # steps:
-    #   - name: Checkout Repo
-    #     uses: actions/checkout@v4
-    #   - name: Create PFX
-    #     uses: ./.github/actions/create-pfx
-    #     env:
-    #       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  Def_Tenant2_G3:
+    name: Test Def_Tenant2_G3
+    runs-on: windows-latest
+    concurrency:
+      group: Def_Tenant2
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Import PFX
+        uses: ./.github/actions/import-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./.github/actions/get-thumbprint
+        env:
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      - name: Import Modules
+        uses: ./.github/actions/import-modules
+      - name: Test Def_Tenant2_G3
+        id: test-product
+        uses: ./.github/actions/test-product
+        env:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Def_Tenant2_G3
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      - name: Notify on Failure
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule) }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          subject: Nightly functional test failure
+          body: The Def_Tenant2_G3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          # comma-separated string, send email to
+          to: ${{ steps.test-product.outputs.emails }}
+          # from email name
+          from: ScubaGear Notifier
