@@ -131,9 +131,15 @@ jobs:
   Tms_Tenant1:
     name: Test Tms_Tenant1
     runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
     concurrency:
       group: Tms_Tenant1
       cancel-in-progress: false
+    needs:
+      - publish
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -149,6 +155,39 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Import Modules
         uses: ./.github/actions/import-modules
+      - name: Install Azure Signing Tool
+        run: |
+          dotnet --version
+          dotnet tool install --global AzureSignTool --version 5.0.0
+        shell: powershell
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      # This step verifies that the restore actually works.
+      - name: Print Scuba Version
+        run: |
+          cd repo
+          Invoke-SCuBA -Version
+        shell: powershell
       - name: Test Tms_Tenant1
         id: test-product
         uses: ./.github/actions/test-product
@@ -168,4 +207,3 @@ jobs:
           body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           to: ${{ steps.test-product.outputs.emails }}
           from: ScubaGear Notifier
- 
