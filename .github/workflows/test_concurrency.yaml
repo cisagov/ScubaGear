@@ -143,6 +143,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          path: repo
       - name: Import PFX
         uses: ./.github/actions/import-pfx
         env:
