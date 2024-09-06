@@ -25,6 +25,7 @@ TestPlan:
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, Strict EOP Disabled
@@ -33,6 +34,7 @@ TestPlan:
             Splat:
               Identity: Standard Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           - Command: Disable-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
@@ -45,10 +47,12 @@ TestPlan:
             Splat:
               Identity: Standard Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
           - Command: Enable-EOPProtectionPolicyRule
             Splat:
               Identity: Strict Preset Security Policy
               Confirm: false
+              ErrorAction: Continue
         Postconditions: []
         ExpectedResult: true
 
