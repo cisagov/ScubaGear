@@ -6,9 +6,9 @@ runs:
     - run: |
         # Read thumbprint from previous step.
         $thumbprint = $env:Thumbprint
-        echo "The tp is"
-        echo $thumbprint
-        echo "Product alias is: Ent_Tenant1"
+        $product = $env:Alias
+        echo "Product alias is:"
+        echo $product
         $params = $env:TestParams
         # Split into products
         $products = $params.split("|")
@@ -58,7 +58,7 @@ runs:
               $m365 = $attribute
             }
           }
-          if($alias -eq "Ent_Tenant1")
+          if($alias -eq $product)
           {
             # Split out the key and value for each parameter
             $domainKeyAndValue = $domain.split("=")
