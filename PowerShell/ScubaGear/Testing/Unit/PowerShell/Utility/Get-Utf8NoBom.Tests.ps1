@@ -10,8 +10,6 @@ InModuleScope Utility {
             Push-Location $TestDrive
             New-Item -ItemType Directory "$TestDrive\a\b" -Force -ErrorAction Ignore
             New-Item -ItemType Directory "$TestDrive\c" -Force -ErrorAction Ignore
-
-            $Content = Invoke-ReadAllLines -Path "$TestDrive\a"
         }
 
         Context 'local file' {
