@@ -108,6 +108,7 @@ jobs:
           Import-Module -Name ./utils/workflow/Initialize-ScubaGearForTesting
           Initialize-ScubaGearForTesting
           Invoke-SCuBA -Version
+          Test-Path -Path C:\Program Files\WindowsPowerShell\Modules\ScubaGear
       # Instead of initializing ScubaGear repeated for each of the test jobs below,
       # we cache the PowerShell modules and OPA here and then restore them for the jobs.
       # It's about a 20% performance improvement.
@@ -170,16 +171,17 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules
-          key: scubagear-directory-
+      
       - name: Restore Dependencies
         uses: actions/cache/restore@v4
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules
+          key: scubagear-directory-
       - name: Restore OPA
         uses: actions/cache/restore@v4
         with:
