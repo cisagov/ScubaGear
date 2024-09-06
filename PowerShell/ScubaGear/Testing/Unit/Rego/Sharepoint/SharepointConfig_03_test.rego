@@ -168,8 +168,8 @@ test_File_Folder_AnonymousLinkType_Incorrect if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailString := "Requirement not met: both files and folders are not limited to view for Anyone"
-    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := "Requirement not met: both files and folders are not limited to view for Anyone"
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
 test_Folder_AnonymousLinkType_Incorrect if {
@@ -179,8 +179,8 @@ test_Folder_AnonymousLinkType_Incorrect if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailString := "Requirement not met: folders are not limited to view for Anyone"
-    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := "Requirement not met: folders are not limited to view for Anyone"
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
 test_File_AnonymousLinkType_Incorrect if {
@@ -190,8 +190,8 @@ test_File_AnonymousLinkType_Incorrect if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailString := "Requirement not met: files are not limited to view for Anyone"
-    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := "Requirement not met: files are not limited to view for Anyone"
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
 test_File_Folder_AnonymousLinkType_UsingServicePrincipal_Correct if {
@@ -222,8 +222,6 @@ test_File_Folder_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
         FAIL,
         "both files and folders are not limited to view for Anyone"
     ])
-    # FAIL = Requirement not met
-    # Requirement not met: both files and folders are not limited to view for Anyone
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
@@ -364,9 +362,9 @@ test_EmailAttestationReAuthDays_Incorrect_V2 if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailString :=
+    ReportDetailsString :=
         "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationRequired_Incorrect if {
@@ -377,8 +375,8 @@ test_EmailAttestationRequired_Incorrect if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailString, false) == true
+    ReportDetailsString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
+    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
