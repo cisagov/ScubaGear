@@ -88,6 +88,8 @@ runs:
             # Test the product
             ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
             # Pass emails to later job for notification.
+            Write-Host "The emails:"
+            Write-Host $emails
             echo emails=$emails >> $env:GITHUB_OUTPUT
           }
         }
