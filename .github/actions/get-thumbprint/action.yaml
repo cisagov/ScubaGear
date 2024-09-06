@@ -7,7 +7,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        dir
+        cd repo
         $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
         $Thumbprint = $x509.ThumbPrint
         Write-Host "tp"

@@ -3,6 +3,7 @@ runs:
   using: "composite"
   steps:
     - run: |
+        cd repo
         # Create PFX
         New-Item -ItemType file -Path ./key.txt
         Set-Content -Path ./key.txt -Value $env:PfxBase64
