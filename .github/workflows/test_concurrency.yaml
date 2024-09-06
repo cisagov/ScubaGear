@@ -140,20 +140,20 @@ jobs:
   #       env:
   #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   # Def_Tenant2_G3:
-    name: Test Def_Tenant2_G3
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: powershell
-    concurrency:
-      group: defender
-      cancel-in-progress: false
-    needs:
-      - Def_Tenant1
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Create PFX
-        uses: ./.github/actions/create-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    # name: Test Def_Tenant2_G3
+    # runs-on: windows-latest
+    # defaults:
+    #   run:
+    #     shell: powershell
+    # concurrency:
+    #   group: defender
+    #   cancel-in-progress: false
+    # needs:
+    #   - Def_Tenant1
+    # steps:
+    #   - name: Checkout Repo
+    #     uses: actions/checkout@v4
+    #   - name: Create PFX
+    #     uses: ./.github/actions/create-pfx
+    #     env:
+    #       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
