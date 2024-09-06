@@ -1,4 +1,4 @@
-$UtilityPath = '../../../../Modules/Utility/Utility.psm1'
+﻿$UtilityPath = '../../../../Modules/Utility/Utility.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 'Set-Utf8NoBom' -Force
 
 InModuleScope Utility {

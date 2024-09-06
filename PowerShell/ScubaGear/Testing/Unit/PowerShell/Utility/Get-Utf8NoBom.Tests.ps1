@@ -1,4 +1,4 @@
-$UtilityPath = '../../../../Modules/Utility/Utility.psm1'
+﻿$UtilityPath = '../../../../Modules/Utility/Utility.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 'Get-Utf8NoBom' -Force
 
 InModuleScope Utility {
@@ -12,58 +12,70 @@ InModuleScope Utility {
             New-Item -ItemType Directory "$TestDrive\c" -Force -ErrorAction Ignore
 
             $Content = Invoke-ReadAllLines -Path "$TestDrive\a"
-            Write-Host "Invoke-ReadAllLines: $Content"
         }
 
         Context 'local file' {
             It 'Set to root drive path' {
-                Get-Utf8NoBom -FilePath "C:\output.json" | Should -Be "Pass"
+                $TestFile = "TestDrive:\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
 
             It 'Set to absolute subdirectory path' {
-                Get-Utf8NoBom -FilePath "$TestDrive\a\output.json" | Should -Be "Pass"
+                $TestFile = "$TestDrive\a\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
         }
 
         Context 'relative paths' {
             It 'Set to subdirectory relative path' {
-                Get-Utf8NoBom -FilePath "a\output.json" | Should -Be "Pass"
+                $TestFile = "a\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
 
             It 'Set to subdirectory local relative path' {
-                Get-Utf8NoBom -FilePath ".\a\output.json" | Should -Be "Pass"
+                $TestFile = ".\a\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
 
             It 'Set to subdirectory processing .. and .' {
-                Get-Utf8NoBom -FilePath "a\b\..\..\c\.\output.json" | Should -Be "Pass"
+                $TestFile = "a\b\..\..\c\.\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
         }
 
         Context 'Check for re-root in path' {
             It 'Does not re-root subdirectory' {
-                Get-Utf8NoBom -FilePath "a\d\..\b\.\output.json" | Should -Be "Pass"
+                $TestFile = "a\d\..\b\.\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
 
             It 'Does not re-root subdirectory rooted at local' {
-                Get-Utf8NoBom -FilePath ".\a\d\..\b\.\output.json" | Should -Be "Pass"
+                $TestFile = ".\a\d\..\b\.\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
 
             It 'Does not re-root parent' {
-                Get-Utf8NoBom -FilePath "..\$((Get-Item .).Name)\a\d\..\b\.\output.json" `
-                | Should -Be "Pass"
+                $TestFile = "..\$((Get-Item .).Name)\a\d\..\b\.\output.json"
+                New-Item -ItemType File $TestFile -Force -ErrorAction Ignore
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
         }
 
         # Uses default C$ share to test building UNC paths that exist
+        # Assumes TestDrive is on C: drive
         Context 'UNC path' {
             It 'Set to shared UNC path' {
-                Get-Utf8NoBom -FilePath "\\$env:COMPUTERNAME\C$\output.json" `
-                | Should -Be "Pass"
-            }
-
-            It 'Set to shared UNC path' {
-                Get-Utf8NoBom -FilePath "\\$env:COMPUTERNAME\C$\output.json" `
-                | Should -Be "Pass"
+                $TempFolder = $($(Resolve-Path $TestDrive).ProviderPath).Substring(2)
+                $TestFile = "\\$env:COMPUTERNAME\C$\$TempFolder\output.json"
+                New-Item -ItemType File $TestFile
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
         }
 
