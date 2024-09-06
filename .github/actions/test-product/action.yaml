@@ -91,5 +91,5 @@ runs:
         #   }
         # }
       env:
-        THUMBPRINT: ${{ inputs.thumbprint }}
+        thumbprint3: ${{ inputs.thumbprint3 }}
       shell: powershell
