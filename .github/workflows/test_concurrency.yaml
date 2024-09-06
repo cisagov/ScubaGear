@@ -5,6 +5,14 @@ name: Test Concurrency with Nightly Functional Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
+      email-on-failure:
+        description: Check to send an email on failure
+        type: boolean
+        required: true
+        default: false
+  # For debugging only
   push:
     paths:
       - ".github/workflows/test_concurrency.yaml"
@@ -35,11 +43,19 @@ jobs:
       - name: Import Modules
         uses: ./.github/actions/import-modules
       - name: Test Tms_Tenant1
+        id: test-product
         uses: ./.github/actions/test-product
         env:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      - name: Notify on Failure
+        uses: ./.github/actions/notify-on-failure
+        env:
+          Username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          Password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          Alias: Tms_Tenant1
+          Emails: ${{ steps.test-product.outputs.emails }}
   # Ent_Tenant1:
   #   name: Test Ent_Tenant1
   #   runs-on: windows-latest
