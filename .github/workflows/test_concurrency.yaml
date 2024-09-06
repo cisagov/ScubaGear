@@ -146,17 +146,17 @@ jobs:
         with:
           path: repo
       - name: Import PFX
-        uses: ./.github/actions/import-pfx
+        uses: ./repo/.github/actions/import-pfx
         env:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
         id: get-thumbprint
-        uses: ./.github/actions/get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Import Modules
-        uses: ./.github/actions/import-modules
+        uses: ./repo/.github/actions/import-modules
       - name: Install Azure Signing Tool
         run: |
           dotnet --version
@@ -192,7 +192,7 @@ jobs:
         shell: powershell
       - name: Test Tms_Tenant1
         id: test-product
-        uses: ./.github/actions/test-product
+        uses: ./repo/.github/actions/test-product
         env:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
