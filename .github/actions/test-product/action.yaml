@@ -1,10 +1,15 @@
 name: Test Product
+description: Run the Pester tests
+inputs:
+  thumbprint:
+    required:
 runs:
   using: "composite"
   steps:
     - run: |
         # Read thumbprint from previous step.
-        $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
+        # $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
+        # $thumbprint = $env:thumbprint
         echo "The tp is"
         echo $thumbprint
         # echo "Product alias is: Ent_Tenant1"
@@ -80,4 +85,6 @@ runs:
         #     ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
         #   }
         # }
+      env:
+        THUMBPRINT: ${{ inputs.thumbprint }}
       shell: powershell

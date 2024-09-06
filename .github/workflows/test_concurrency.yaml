@@ -42,6 +42,8 @@ jobs:
       #   uses: ./.github/actions/import-modules
       - name: Test Product
         uses: ./.github/actions/test-product
+        with:
+          thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
         env:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
   # Ent_Tenant2_G3:
