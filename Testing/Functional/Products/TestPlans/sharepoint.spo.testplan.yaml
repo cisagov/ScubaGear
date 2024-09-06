@@ -279,8 +279,6 @@ TestPlan:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: Disabled
-              FileAnonymousLinkType: View
-              FolderAnonymousLinkType: View
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -289,8 +287,6 @@ TestPlan:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExistingExternalUserSharingOnly
-              FileAnonymousLinkType: View
-              FolderAnonymousLinkType: View
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -299,8 +295,6 @@ TestPlan:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExternalUserSharingOnly
-              FileAnonymousLinkType: View
-              FolderAnonymousLinkType: View
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
