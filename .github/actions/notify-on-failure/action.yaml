@@ -4,18 +4,18 @@ runs:
   using: "composite"
   steps:
     uses: dawidd6/action-send-mail@v3
-      with:
-        server_address: smtp.gmail.com
-        server_port: 465
-        # username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-        username: $env:Username
-        # password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-        password: $env:Password
-        subject: Nightly functional test failure
-        # body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-        body: The $env.Alias test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-        # comma-separated string, send email to
-        # to: ${{ steps.test-product.outputs.emails }}
-        to: $env:Emails
-        # from email name
-        from: ScubaGear Notifier
+    with:
+      server_address: smtp.gmail.com
+      server_port: 465
+      # username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      username: $env:Username
+      # password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+      password: $env:Password
+      subject: Nightly functional test failure
+      # body: The ${{ matrix.product }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      body: The $env.Alias test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      # comma-separated string, send email to
+      # to: ${{ steps.test-product.outputs.emails }}
+      to: $env:Emails
+      # from email name
+      from: ScubaGear Notifier
