@@ -50,12 +50,23 @@ jobs:
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Notify on Failure
-        uses: ./.github/actions/notify-on-failure
-        env:
-          Username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-          Password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-          Alias: Tms_Tenant1
-          Emails: ${{ steps.test-product.outputs.emails }}
+        # Send an email only if the previous step failed and if either:
+        # - This workflow was run manually and the input was checked
+        # - OR
+        # - This workflow was run on a schedule.
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule) }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          subject: Nightly functional test failure
+          body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          # comma-separated string, send email to
+          to: ${{ steps.test-product.outputs.emails }}
+          # from email name
+          from: ScubaGear Notifier
   # Ent_Tenant1:
   #   name: Test Ent_Tenant1
   #   runs-on: windows-latest
@@ -129,20 +140,20 @@ jobs:
   #       env:
   #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
   # Def_Tenant2_G3:
-  #   name: Test Def_Tenant2_G3
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: powershell
-  #   concurrency:
-  #     group: defender
-  #     cancel-in-progress: false
-  #   needs:
-  #     - Def_Tenant1
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v4
-  #     - name: Create PFX
-  #       uses: ./.github/actions/create-pfx
-  #       env:
-  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    name: Test Def_Tenant2_G3
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    concurrency:
+      group: defender
+      cancel-in-progress: false
+    needs:
+      - Def_Tenant1
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Create PFX
+        uses: ./.github/actions/create-pfx
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
