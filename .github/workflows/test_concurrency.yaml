@@ -19,9 +19,6 @@ jobs:
   Ent_Tenant1:
     name: Test Ent_Tenant1
     runs-on: windows-latest
-    # defaults:
-    #   run:
-    #     shell: powershell
     concurrency:
       group: aad
       cancel-in-progress: false
@@ -34,7 +31,6 @@ jobs:
           PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
-        id: get-thumbprint
         uses: ./.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}

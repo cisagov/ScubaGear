@@ -1,5 +1,5 @@
 name: Test Product
-description: Run the Pester tests
+description: Run the Pester tests for a given product
 inputs:
   thumbprint3:
     required: true
@@ -8,9 +8,6 @@ runs:
   steps:
     - run: |
         # Read thumbprint from previous step.
-        # $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
-        # echo "The tp is"
-        # echo $thumbprint
         $thumbprint = $env:thumbprint
         echo "The tp is"
         echo $thumbprint

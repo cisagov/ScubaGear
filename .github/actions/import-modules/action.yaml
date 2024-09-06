@@ -1,4 +1,5 @@
 name: Import Modules
+description: Import the modules required to run ScubaGear
 runs:
   using: "composite"
   steps:
