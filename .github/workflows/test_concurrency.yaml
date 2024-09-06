@@ -8,16 +8,13 @@ on:
   push:
     paths:
       - ".github/workflows/test_concurrency.yaml"
-      - ".github/actions/get-thumbprint/action.yaml"
-      - ".github/actions/import-modules/action.yaml"
-      - ".github/actions/import-pfx/action.yaml"
-      - ".github/actions/test-product/action.yaml"
+      - ".github/actions/**"
 
 permissions: read-all
 
 jobs:
-  Ent_Tenant1:
-    name: Test Ent_Tenant1
+  Tms_Tenant1:
+    name: Test Tms_Tenant1
     runs-on: windows-latest
     concurrency:
       group: aad
@@ -37,41 +34,68 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Import Modules
         uses: ./.github/actions/import-modules
-      - name: Test Ent_Tenant1
+      - name: Test Tms_Tenant1
         uses: ./.github/actions/test-product
         env:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Ent_Tenant1
+          Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  Ent_Tenant2_G3:
-    name: Test Ent_Tenant2_G3
-    runs-on: windows-latest
-    concurrency:
-      group: aad
-      cancel-in-progress: false
-    needs:
-      - Ent_Tenant1
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Import PFX
-        uses: ./.github/actions/import-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./.github/actions/get-thumbprint
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Import Modules
-        uses: ./.github/actions/import-modules
-      - name: Test Ent_Tenant2_G3
-        uses: ./.github/actions/test-product
-        env:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Ent_Tenant2_G3
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+  # Ent_Tenant1:
+  #   name: Test Ent_Tenant1
+  #   runs-on: windows-latest
+  #   concurrency:
+  #     group: aad
+  #     cancel-in-progress: false
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Import PFX
+  #       uses: ./.github/actions/import-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Get Thumbprint
+  #       id: get-thumbprint
+  #       uses: ./.github/actions/get-thumbprint
+  #       env:
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Import Modules
+  #       uses: ./.github/actions/import-modules
+  #     - name: Test Ent_Tenant1
+  #       uses: ./.github/actions/test-product
+  #       env:
+  #         Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+  #         Alias: Ent_Tenant1
+  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+  # Ent_Tenant2_G3:
+  #   name: Test Ent_Tenant2_G3
+  #   runs-on: windows-latest
+  #   concurrency:
+  #     group: aad
+  #     cancel-in-progress: false
+  #   needs:
+  #     - Ent_Tenant1
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Import PFX
+  #       uses: ./.github/actions/import-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Get Thumbprint
+  #       id: get-thumbprint
+  #       uses: ./.github/actions/get-thumbprint
+  #       env:
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Import Modules
+  #       uses: ./.github/actions/import-modules
+  #     - name: Test Ent_Tenant2_G3
+  #       uses: ./.github/actions/test-product
+  #       env:
+  #         Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+  #         Alias: Ent_Tenant2_G3
+  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
   # Def_Tenant1:
   #   name: Test Def_Tenant1
   #   runs-on: windows-latest
