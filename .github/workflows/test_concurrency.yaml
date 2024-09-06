@@ -37,7 +37,7 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Import Modules
         uses: ./.github/actions/import-modules
-      - name: Test Product
+      - name: Test Ent_Tenant1
         uses: ./.github/actions/test-product
         env:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -66,7 +66,7 @@ jobs:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Import Modules
         uses: ./.github/actions/import-modules
-      - name: Test Product
+      - name: Test Ent_Tenant2_G3
         uses: ./.github/actions/test-product
         env:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
