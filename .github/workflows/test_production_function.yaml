@@ -13,6 +13,7 @@ on:
     - cron: "15 4 * * 0-4"
   workflow_dispatch:
     inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
       email-on-failure:
         description: Check to send an email on failure
         type: boolean
