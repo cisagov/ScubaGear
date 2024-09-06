@@ -213,7 +213,7 @@ jobs:
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       - name: Notify on Failure
         # Send an email only if the previous step failed and if either:
-        # - This workflow was run manually and the input was checked 
+        # - This workflow was run manually and the input was checked
         # - OR
         # - This workflow was run on a schedule.
         if: ${{ failure() && (inputs.email-on-failure || github.event.schedule) }}
