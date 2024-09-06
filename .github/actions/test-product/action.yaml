@@ -1,14 +1,11 @@
 name: Test Product
 description: Run the Pester tests for a given product
-inputs:
-  thumbprint3:
-    required: true
 runs:
   using: "composite"
   steps:
     - run: |
         # Read thumbprint from previous step.
-        $thumbprint = $env:thumbprint
+        $thumbprint = $env:Thumbprint
         echo "The tp is"
         echo $thumbprint
         echo "Product alias is: Ent_Tenant1"
@@ -80,9 +77,8 @@ runs:
               $paramsAsHashTable.Add($variantKeyAndValue[0], $variantKeyAndValue[1])
             }
             $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
-            Write-Host $paramsAsHashTable
             # Test the product
-            # ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
+            ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
           }
         }
       shell: powershell

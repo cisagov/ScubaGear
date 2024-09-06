@@ -35,12 +35,12 @@ jobs:
         uses: ./.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # - name: Import Modules
-      #   uses: ./.github/actions/import-modules
+      - name: Import Modules
+        uses: ./.github/actions/import-modules
       - name: Test Product
         uses: ./.github/actions/test-product
         env:
-          thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
   # Ent_Tenant2_G3:
   #   name: Test Ent_Tenant2_G3
