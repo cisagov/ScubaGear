@@ -238,12 +238,12 @@ test_File_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
     
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
+    # FAIL = Requirement not met
+    # ReportDetailsString = "Requirement not met: both files and folders are not limited to view for Anyone"
     ReportDetailsString := concat(": ", [
         FAIL,
         "files are not limited to view for Anyone"
     ])
-    # FAIL = Requirement not met
-    # Requirement not met: both files and folders are not limited to view for Anyone
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
@@ -262,8 +262,6 @@ test_Folder_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
         FAIL,
         "folders are not limited to view for Anyone"
     ])
-    # FAIL = Requirement not met
-    # Requirement not met: both files and folders are not limited to view for Anyone
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
