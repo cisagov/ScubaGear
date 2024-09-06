@@ -5,6 +5,7 @@ import data.utils.report.NotCheckedDetails
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.PASS
+import data.utils.key.FAIL
 
 
 #
@@ -194,19 +195,37 @@ test_File_AnonymousLinkType_Incorrect if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
 }
 
-test_AnonymousLinkType_UsingServicePrincipal if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-
+test_AnonymousLinkType_UsingServicePrincipal_Correct if {
     # SharingCapability value of 2 equals "Anyone"
     # FileAnonymousLinkType value of 1 equals "View"
+    # FolderAnonymousLinkType value of 1 equals "View"
     Tenant := json.patch(SPOTenant,
                 [{"op": "add", "path": "SharingCapability", "value": 2},
                 {"op": "add", "path": "FileAnonymousLinkType", "value": 1},
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 1}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+    TestResult("MS.SHAREPOINT.3.2v1", Output, PASS, true) == true
+}
 
-    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
+test_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
+    # SharingCapability value of 2 equals "Anyone"
+    # FileAnonymousLinkType value of 2 equals "Edit"
+    # FolderAnonymousLinkType value of 2 equals "Edit"
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "FileAnonymousLinkType", "value": 2},
+                {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
+    
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := concat(": ", [
+        FAIL,
+        "both files and folders are not limited to view for Anyone"
+    ])
+    # FAIL = Requirement not met
+    # Requirement not met: both files and folders are not limited to view for Anyone
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
 test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
