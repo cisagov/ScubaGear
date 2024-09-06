@@ -300,7 +300,7 @@ FileAndFolderLinkPermission(2, 1) := concat(": ", [
 ])
 
 # This policy is only applicable if external sharing is set to "Anyone"
-# Both link types must be 1 & OneDrive_PnP_Flag must be false for policy to pass
+# Both link types must be 1 for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Shall",
@@ -309,7 +309,6 @@ tests contains {
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    #input.OneDrive_PnP_Flag == false
     SharingCapability == ANYONE
 
     FileLinkType := Tenant.FileAnonymousLinkType
@@ -331,23 +330,11 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
-    #input.OneDrive_PnP_Flag == false
     SharingCapability != ANYONE
     Reason := NAString(SliderSettings(2))
 }
-
-#tests contains {
-#    "PolicyId": PolicyId,
-#    "Criticality": "Shall/Not-Implemented",
-#    "Commandlet": [],
-#    "ActualValue": [],
-#    "ReportDetails": NotCheckedDetails(PolicyId),
-#    "RequirementMet": false
-#} if {
-#    PolicyId := "MS.SHAREPOINT.3.2v1"
-#    input.OneDrive_PnP_Flag == true
-#}
 #--
+
 
 #
 # MS.SHAREPOINT.3.3v1

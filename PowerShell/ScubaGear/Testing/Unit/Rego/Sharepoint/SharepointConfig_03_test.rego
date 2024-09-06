@@ -156,7 +156,6 @@ test_File_Folder_AnonymousLinkType_Correct if {
     Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.3.2v1", Output, PASS, true) == true
 }
@@ -168,7 +167,6 @@ test_File_Folder_AnonymousLinkType_Incorrect if {
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailString := "Requirement not met: both files and folders are not limited to view for Anyone"
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
@@ -180,7 +178,6 @@ test_Folder_AnonymousLinkType_Incorrect if {
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailString := "Requirement not met: folders are not limited to view for Anyone"
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
@@ -192,7 +189,6 @@ test_File_AnonymousLinkType_Incorrect if {
                 {"op": "add", "path": "FileAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailString := "Requirement not met: files are not limited to view for Anyone"
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailString, false) == true
@@ -201,12 +197,14 @@ test_File_AnonymousLinkType_Incorrect if {
 test_AnonymousLinkType_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 
+    # SharingCapability value of 2 equals "Anyone"
+    # FileAnonymousLinkType value of 1 equals "View"
     Tenant := json.patch(SPOTenant,
                 [{"op": "add", "path": "SharingCapability", "value": 2},
-                {"op": "add", "path": "FileAnonymousLinkType", "value": 2}])
+                {"op": "add", "path": "FileAnonymousLinkType", "value": 1},
+                {"op": "add", "path": "FolderAnonymousLinkType", "value": 1}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as true
 
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
@@ -219,7 +217,6 @@ test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicab
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing is set to any value other than Anyone.",
@@ -237,7 +234,6 @@ test_File_Folder_AnonymousLinkType_SharingCapability_ExistingGuests_NotApplicabl
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing is set to any value other than Anyone.",
@@ -255,7 +251,6 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
                 {"op": "add", "path": "FolderAnonymousLinkType", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.OneDrive_PnP_Flag as false
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if External Sharing is set to any value other than Anyone.",
