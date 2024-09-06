@@ -166,7 +166,7 @@ jobs:
           Alias: Def_Tenant2_G3
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule) }}
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
