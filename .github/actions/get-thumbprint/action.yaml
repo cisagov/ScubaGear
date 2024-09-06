@@ -1,5 +1,5 @@
 name: Get Thumbprint
-id: get-thumbprint
+description: Extract the thumbprint from the x509 certificate
 runs:
   using: "composite"
   steps:
