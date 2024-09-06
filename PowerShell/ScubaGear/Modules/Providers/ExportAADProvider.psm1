@@ -355,8 +355,17 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         # This describes the type of Entra Id object that the parameter ObjectId is referencing.
         # Valid values are "user", "group". If this is not passed, the function will call Graph to dynamically determine the object type.
         [Parameter()]
-        [string]$Objecttype = ""
+        [string]$Objecttype = "",
+
+        [Parameter()]
+        [int]$Recursioncount = 0
     )
+
+    # We support group nesting up to 2 levels deep. 
+    # Safeguard: Also protects against infinite loop attacks if there is a circular group assignment in PIM.
+    if ($recursioncount -gt 2) {
+        return
+    }
 
     if ($Objecttype -eq "") {
         try {
@@ -426,7 +435,8 @@ Write-Warning "Processing role: $($Role.DisplayName) PIM group Eligible member: 
                 if ($GroupMember.AccessId -ne "member") { continue }
                 $PIMEligibleUserId = $GroupMember.PrincipalId
 
-                LoadObjectDataIntoPrivilegedUserHashtable -Role $Role -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense
+                $Recursioncount++
+                LoadObjectDataIntoPrivilegedUserHashtable -Role $Role -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -Recursioncount $Recursioncount
             }
         }
     }
