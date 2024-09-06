@@ -48,11 +48,11 @@ SharingString := concat("", [
 ])
 
 NAString(SharingSetting) := concat("", [
-        "This policy is only applicable if External Sharing is set to any value other than ",
-        SharingSetting,
-        ". ",
-        "See %v for more info"
-    ])
+    "This policy is only applicable if External Sharing is set to any value other than ",
+    SharingSetting,
+    ". ",
+    "See %v for more info"
+])
 
 
 ###################
