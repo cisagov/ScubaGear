@@ -43,10 +43,8 @@ jobs:
       - name: Test Product
         uses: ./.github/actions/test-product
         env:
-          thumbprint2: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-        with:
-          thumbprint3: ${{ steps.get-thumbprint.outputs.thumbprint }}
   # Ent_Tenant2_G3:
   #   name: Test Ent_Tenant2_G3
   #   runs-on: windows-latest

@@ -8,15 +8,12 @@ runs:
   steps:
     - run: |
         # Read thumbprint from previous step.
-        $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
+        # $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
+        # echo "The tp is"
+        # echo $thumbprint
+        $thumbprint = $env:thumbprint
         echo "The tp is"
         echo $thumbprint
-        $thumbprint2 = $env:thumbprint2
-        echo "The tp2 is"
-        echo $thumbprint2
-        $thumbprint3 = thumbprint3
-        echo "The tp3 is"
-        echo $thumbprint3
         echo "Product alias is: Ent_Tenant1"
         # $params = $env:TestParams
         # Split into products
@@ -90,6 +87,4 @@ runs:
         #     ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
         #   }
         # }
-      env:
-        thumbprint3: ${{ inputs.thumbprint3 }}
       shell: powershell
