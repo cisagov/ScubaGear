@@ -2,7 +2,7 @@ name: Get Thumbprint
 description: Extract the thumbprint from the x509 certificate
 outputs:
   thumbprint:
-    value: ${{ steps.get-thumbprint.outputs.thumbprint }}
+    value: ${{ steps.thumbprint-output.outputs.thumbprint }}
 runs:
   using: "composite"
   steps:
@@ -14,6 +14,6 @@ runs:
         Write-Host $Thumbprint
         # Pass thumbprint to later job.
         echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
-      id: get-thumbprint
+      id: thumbprint-output
       # -Password flag requires PS 6+
       shell: pwsh
