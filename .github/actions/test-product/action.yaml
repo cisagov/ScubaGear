@@ -1,18 +1,24 @@
 name: Test Product
 description: Run the Pester tests
+inputs:
+  thumbprint3:
+    required: true
 runs:
   using: "composite"
   steps:
     - run: |
         # Read thumbprint from previous step.
-        # $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
-        $thumbprint = $env:thumbprint
+        $thumbprint = "${{ steps.get-thumbprint.outputs.thumbprint }}"
         echo "The tp is"
         echo $thumbprint
+        $thumbprint2 = $env:thumbprint2
+        echo "The tp2 is"
+        echo $thumbprint2
+        $thumbprint3 = thumbprint3
+        echo "The tp3 is"
+        echo $thumbprint3
         echo "Product alias is: Ent_Tenant1"
-        $params = $env:TestParams
-        echo "The params are"
-        echo $params
+        # $params = $env:TestParams
         # Split into products
         $products = $params.split("|")
         # foreach ($product in $products)
