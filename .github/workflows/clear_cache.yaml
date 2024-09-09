@@ -8,8 +8,11 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
       - name: Cleanup
         run: |
+          sudo apt install gh -y
           gh extension install actions/gh-actions-cache
           cacheKeys=$(gh actions-cache list)
           set +e
