@@ -130,9 +130,9 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"
-      - run: Get-ChildItem -Path C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-      - run: Get-ChildItem -Path C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-      - run: Get-ChildItem -Path C:\Users\runneradmin\.scubagear\Tools
+      - run: Get-ChildItem -Path 'C:\Program Files\WindowsPowerShell\Modules\ScubaGear'
+      - run: Get-ChildItem -Path 'C:\Users\runneradmin\Documents\WindowsPowerShell\Modules'
+      - run: Get-ChildItem -Path 'C:\Users\runneradmin\.scubagear\Tools'
   Tms_Tenant1:
     name: Test Tms_Tenant1
     runs-on: windows-latest
@@ -187,9 +187,9 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
-      - run: Get-ChildItem -Path C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-      - run: Get-ChildItem -Path C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-      - run: Get-ChildItem -Path C:\Users\runneradmin\.scubagear\Tools
+      - run: Get-ChildItem -Path 'C:\Program Files\WindowsPowerShell\Modules\ScubaGear'
+      - run: Get-ChildItem -Path 'C:\Users\runneradmin\Documents\WindowsPowerShell\Modules'
+      - run: Get-ChildItem -Path 'C:\Users\runneradmin\.scubagear\Tools'
       # This step verifies that the restore actually works.
       - name: Print Scuba Version
         run: |
