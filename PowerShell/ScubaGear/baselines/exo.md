@@ -373,6 +373,8 @@ SMTP AUTH SHALL be disabled.
 Therefore, disabling it as the global default conforms to the principle of
 least functionality.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - N/A
 
 ### Resources
 
@@ -476,6 +478,8 @@ External sender warnings SHALL be implemented.
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
 - _Rationale:_ Phishing is an ever-present threat. Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
 - _Last modified:_ June 2023
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
 ### Resources
 
