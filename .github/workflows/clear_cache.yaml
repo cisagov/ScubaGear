@@ -21,7 +21,7 @@ jobs:
           set +e
           for cacheKey in $cacheKeys
           do
-            echo "Listing..."
+            echo "Deleting..."
             gh actions-cache delete $cacheKey --confirm
           done
         env:
