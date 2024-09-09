@@ -196,6 +196,8 @@ jobs:
           cd repo
           Invoke-SCuBA -Version
         shell: powershell
+      - run: Import-Module -Name Selenium
+        shell: powershell
       - name: Test Tms_Tenant1
         id: test-product
         uses: ./repo/.github/actions/test-product
