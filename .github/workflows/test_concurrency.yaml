@@ -82,7 +82,7 @@ jobs:
               GalleryName = $env:GalleryName
             }
             # This publishes to a private gallery, from which we will pull in a future step.
-            # This step helps us verify that ScubaGear is in a step where it can be
+            # This step helps us verify that ScubaGear is in a state where it can be
             # published to PSGallery.
             Publish-ScubaGearModule @Parameters
       - name: Test Module Publish
