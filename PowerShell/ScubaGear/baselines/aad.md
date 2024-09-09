@@ -238,7 +238,7 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 - _Rationale:_ To disable the legacy authentication methods screen for the tenant, configure the Manage Migration feature to Migration Complete. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and potential security misconfigurations.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - N/A
+  - None
 
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
@@ -541,7 +541,7 @@ User passwords SHALL NOT expire.
 - _Rationale:_ The National Institute of Standards and Technology (NIST), OMB, and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. For example, OMB-22-09 states, "Password policies must not require use of special characters or regular rotation."
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - N/A
+  - None
 
 ### Resources
 
