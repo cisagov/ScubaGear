@@ -12,12 +12,16 @@ jobs:
         uses: actions/checkout@v4
       - name: Cleanup
         run: |
-          sudo apt install gh -y
+          # sudo apt install gh -y
+          echo "Installing..."
           gh extension install actions/gh-actions-cache
+          echo "Listing..."
+          gh actions-cache list
           cacheKeys=$(gh actions-cache list)
           set +e
           for cacheKey in $cacheKeys
           do
+            echo "Listing..."
             gh actions-cache delete $cacheKey --confirm
           done
         env:
