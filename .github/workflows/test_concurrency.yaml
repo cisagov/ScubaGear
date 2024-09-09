@@ -172,8 +172,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - run: New-Item -Path "C:\Program Files\WindowsPowerShell\" -Name "Modules" -ItemType "directory" 
-        shell: powershell
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
