@@ -1,6 +1,11 @@
+# Purpose:  The purpose of this workflow is to delete all caches in the repo, as it has limited total cache storage.
+
+name: Delete all workflow caches
+
+# This is a reusable workflow called by the pipeline.
 on:
+  workflow_call:
   workflow_dispatch:
-  push:
 
 permissions: read-all
 
@@ -13,16 +18,12 @@ jobs:
         uses: actions/checkout@v4
       - name: Cleanup
         run: |
-          # sudo apt install gh -y
-          echo "Installing..."
           gh extension install actions/gh-actions-cache
-          echo "Listing..."
           gh actions-cache list
           cacheKeys=$(gh actions-cache list -R $REPO)
           set +e
           for cacheKey in $cacheKeys
           do
-            echo "Deleting..."
             gh actions-cache delete $cacheKey --confirm
           done
         env:
