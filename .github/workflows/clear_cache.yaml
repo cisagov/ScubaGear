@@ -17,3 +17,5 @@ jobs:
           do
             gh actions-cache delete $cacheKey --confirm
           done
+        env:
+          GH_TOKEN: ${{ github.token }}
