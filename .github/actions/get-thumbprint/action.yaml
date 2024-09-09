@@ -10,8 +10,6 @@ runs:
         cd repo
         $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
         $Thumbprint = $x509.ThumbPrint
-        Write-Host "tp"
-        Write-Host $Thumbprint
         # Pass thumbprint to later job.
         echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT
       id: thumbprint-output
