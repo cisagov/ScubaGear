@@ -137,3 +137,8 @@ function Invoke-ReadAllLines {
         return $Content
     }
 }
+
+Export-ModuleMember -Function @(
+    'Get-Utf8NoBom',
+    'Set-Utf8NoBom'
+)
