@@ -1,0 +1,37 @@
+on:
+  push:
+    paths:
+      - ".github/workflows/test_cache.yaml"
+permissions: read-all
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Cache ScubaGear
+        id: scubagear-directory
+        uses: actions/cache/save@v4
+        with:
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules"
+          key: "scubagear-directory-${{ github.run_id }}"
+  Tms_Tenant1:
+    name: Test Tms_Tenant1
+    runs-on: windows-latest
+    needs:
+      - publish
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules"
+          key: "scubagear-directory-${{ github.run_id }}"
+          fail-on-cache-miss: true
