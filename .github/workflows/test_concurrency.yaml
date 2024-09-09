@@ -176,19 +176,19 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: C:\Program Files\WindowsPowerShell\Modules
-          key: scubagear-directory-
+          key: "scubagear-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       - name: Restore Dependencies
         uses: actions/cache/restore@v4
         with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: "powershell-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       - name: Restore OPA
         uses: actions/cache/restore@v4
         with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: "opa-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       # This step verifies that the restore actually works.
       - name: Print Scuba Version
