@@ -124,12 +124,12 @@ jobs:
         with:
           path: 'C:\Users\runneradmin\.scubagear\Tools'
           key: "opa-directory-${{ github.run_id }}"
-      # - name: Cache ScubaGear
-      #   id: scubagear-directory
-      #   uses: actions/cache/save@v4
-      #   with:
-      #     path: "C:\\Program Files\\WindowsPowerShell\\Modules"
-      #     key: "scubagear-directory-${{ github.run_id }}"
+      - name: Cache ScubaGear
+        id: scubagear-directory
+        uses: actions/cache/save@v4
+        with:
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules\\ScubaGear"
+          key: "scubagear-directory-${{ github.run_id }}"
   Tms_Tenant1:
     name: Test Tms_Tenant1
     runs-on: windows-latest
@@ -183,12 +183,12 @@ jobs:
           fail-on-cache-miss: true
       - run: | 
           Get-ChildItem -Path "C:\\Program Files\\WindowsPowerShell\\Modules"
-      # - name: Restore ScubaGear
-      #   uses: actions/cache/restore@v4
-      #   with:
-      #     path: "C:\\Program Files\\WindowsPowerShell\\Modules"
-      #     key: "scubagear-directory-${{ github.run_id }}"
-      #     fail-on-cache-miss: true
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules\\ScubaGear"
+          key: "scubagear-directory-${{ github.run_id }}"
+          fail-on-cache-miss: true
       # This step verifies that the restore actually works.
       - name: Print Scuba Version
         run: |
