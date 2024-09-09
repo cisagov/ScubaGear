@@ -116,19 +116,19 @@ jobs:
         id: powershell-directory
         uses: actions/cache/save@v4
         with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          path: 'C:\Users\runneradmin\Documents\WindowsPowerShell\Modules'
           key: "powershell-directory-${{ github.run_id }}"
       - name: Cache OPA
         id: opa-directory
         uses: actions/cache/save@v4
         with:
-          path: C:\Users\runneradmin\.scubagear\Tools
+          path: 'C:\Users\runneradmin\.scubagear\Tools'
           key: "opa-directory-${{ github.run_id }}"
       - name: Cache ScubaGear
         id: scubagear-directory
         uses: actions/cache/save@v4
         with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          path: 'C:\Program Files\WindowsPowerShell\Modules\ScubaGear'
           key: "scubagear-directory-${{ github.run_id }}"
   Tms_Tenant1:
     name: Test Tms_Tenant1
@@ -175,19 +175,19 @@ jobs:
       - name: Restore Dependencies
         uses: actions/cache/restore@v4
         with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          path: 'C:\Users\runneradmin\Documents\WindowsPowerShell\Modules'
           key: "powershell-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       - name: Restore OPA
         uses: actions/cache/restore@v4
         with:
-          path: C:\Users\runneradmin\.scubagear\Tools
+          path: 'C:\Users\runneradmin\.scubagear\Tools'
           key: "opa-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
-          path: C:\Program Files\WindowsPowerShell\Modules
+          path: 'C:\Program Files\WindowsPowerShell\Modules'
           key: "scubagear-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       # This step verifies that the restore actually works.
