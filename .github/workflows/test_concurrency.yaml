@@ -181,6 +181,8 @@ jobs:
           path: 'C:\Users\runneradmin\.scubagear\Tools'
           key: "opa-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
+      - run: | 
+          Get-ChildItem -Path "C:\\Program Files\\WindowsPowerShell\\Modules"
       # - name: Restore ScubaGear
       #   uses: actions/cache/restore@v4
       #   with:
