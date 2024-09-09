@@ -128,7 +128,7 @@ jobs:
         id: scubagear-directory
         uses: actions/cache/save@v4
         with:
-          path: 'C:\Program Files\WindowsPowerShell\Modules\ScubaGear'
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules"
           key: "scubagear-directory-${{ github.run_id }}"
   Tms_Tenant1:
     name: Test Tms_Tenant1
@@ -157,9 +157,6 @@ jobs:
         uses: ./repo/.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      # I don't think I need this step, b/c restore cache
-      # - name: Import Modules
-      #   uses: ./repo/.github/actions/import-modules
       - name: Install Azure Signing Tool
         run: |
           dotnet --version
@@ -187,7 +184,7 @@ jobs:
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
-          path: 'C:\Program Files\WindowsPowerShell\Modules'
+          path: "C:\\Program Files\\WindowsPowerShell\\Modules"
           key: "scubagear-directory-${{ github.run_id }}"
           fail-on-cache-miss: true
       # This step verifies that the restore actually works.
