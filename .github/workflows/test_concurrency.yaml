@@ -113,11 +113,11 @@ jobs:
       # we cache the PowerShell modules and OPA here and then restore them for the jobs.
       # It's about a 20% performance improvement.
       - name: Cache ScubaGear
-        id: scubagear-directory
+        id: scubagear-modules
         uses: actions/cache/save@v4
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: "scubagear-directory-${{ github.run_id }}"
+          key: "scubagear-modules-${{ github.run_id }}"
       - name: Cache Dependencies
         id: powershell-directory
         uses: actions/cache/save@v4
@@ -157,8 +157,9 @@ jobs:
         uses: ./repo/.github/actions/get-thumbprint
         env:
           PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Import Modules
-        uses: ./repo/.github/actions/import-modules
+      # I don't think I need this step, b/c restore cache
+      # - name: Import Modules
+      #   uses: ./repo/.github/actions/import-modules
       - name: Install Azure Signing Tool
         run: |
           dotnet --version
@@ -171,17 +172,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules
+          key: scubagear-modules-
       - name: Restore Dependencies
         uses: actions/cache/restore@v4
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules
-          key: scubagear-directory-
       - name: Restore OPA
         uses: actions/cache/restore@v4
         with:

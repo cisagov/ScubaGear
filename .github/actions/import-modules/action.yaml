@@ -6,8 +6,8 @@ runs:
     - run: |
         # Install Selenium
         Import-Module -Name .\repo\utils\workflow\Install-SeleniumForTesting
-          Install-SeleniumForTesting
+        Install-SeleniumForTesting
         # Setup ScubaGear
         Import-Module -Name .\repo\utils\workflow\Initialize-ScubaGearForTesting
-          Initialize-ScubaGearForTesting
+        Initialize-ScubaGearForTesting
       shell: powershell
