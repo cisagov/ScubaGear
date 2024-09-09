@@ -113,11 +113,11 @@ jobs:
       # we cache the PowerShell modules and OPA here and then restore them for the jobs.
       # It's about a 20% performance improvement.
       - name: Cache ScubaGear
-        id: scubagear-modules
+        id: scubagear-directory
         uses: actions/cache/save@v4
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: "scubagear-modules-${{ github.run_id }}"
+          key: "scubagear-directory-${{ github.run_id }}"
       - name: Cache Dependencies
         id: powershell-directory
         uses: actions/cache/save@v4
@@ -172,21 +172,26 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
+      - run: New-Item -Path "C:\Program Files\WindowsPowerShell\" -Name "Modules" -ItemType "directory" 
+        shell: powershell
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
           path: C:\Program Files\WindowsPowerShell\Modules
-          key: scubagear-modules-
+          key: scubagear-directory-
+          fail-on-cache-miss: true
       - name: Restore Dependencies
         uses: actions/cache/restore@v4
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
+          fail-on-cache-miss: true
       - name: Restore OPA
         uses: actions/cache/restore@v4
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: powershell-directory-
+          fail-on-cache-miss: true
       # This step verifies that the restore actually works.
       - name: Print Scuba Version
         run: |
