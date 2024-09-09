@@ -109,6 +109,10 @@ jobs:
           Initialize-ScubaGearForTesting
           Invoke-SCuBA -Version
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+      - name: Install Selenium
+        run: |
+          Import-Module -Name .\repo\utils\workflow\Install-SeleniumForTesting
+          Install-SeleniumForTesting
       # Instead of initializing ScubaGear repeated for each of the test jobs below,
       # we cache the PowerShell modules and OPA here and then restore them for the jobs.
       # It's about a 20% performance improvement.
