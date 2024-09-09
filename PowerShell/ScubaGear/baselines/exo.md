@@ -374,7 +374,7 @@ Therefore, disabling it as the global default conforms to the principle of
 least functionality.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - N/A
+  - None
 
 ### Resources
 
