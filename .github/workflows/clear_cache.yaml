@@ -17,7 +17,7 @@ jobs:
           gh extension install actions/gh-actions-cache
           echo "Listing..."
           gh actions-cache list
-          cacheKeys=$(gh actions-cache list)
+          cacheKeys=$(gh actions-cache list -R $REPO)
           set +e
           for cacheKey in $cacheKeys
           do
@@ -26,3 +26,4 @@ jobs:
           done
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
