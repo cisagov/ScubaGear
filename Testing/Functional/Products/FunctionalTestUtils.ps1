@@ -1,5 +1,5 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
 
 # Helper functions for functional test
 function IsEquivalence{
