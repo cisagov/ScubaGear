@@ -43,7 +43,6 @@ jobs:
         id: generate-matrix
         run: |
           $params = $env:TestParams
-          echo $params.Length
           # Powershell doesn't build arrays in the format that a matrix
           # wants, so this builds it using a string instead.  It's ugly.
           $aliases = "["
