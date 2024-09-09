@@ -1,0 +1,19 @@
+on:
+  workflow_dispatch:
+  push:
+
+permissions: read-all
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup
+        run: |
+          gh extension install actions/gh-actions-cache
+          cacheKeys=$(gh actions-cache list)
+          set +e
+          for cacheKey in $cacheKeys
+          do
+            gh actions-cache delete $cacheKey --confirm
+          done
