@@ -269,20 +269,17 @@ jobs:
         uses: actions/checkout@v4
       - name: Cleanup
         run: |
-          echo "Installing actions-cache"
           gh extension install actions/gh-actions-cache
-          echo "Creating keys"
           keys=(
             scubagear-directory-${{ github.run_id }} powershell-directory-${{ github.run_id }} opa-directory-${{ github.run_id }}
           )
-          echo "Looping"
           for key in $keys
           do
-            echo $key
             cacheKeys=$(gh actions-cache list -R $REPO --key $key)
             set +e
-            for $cacheKey in $cacheKeys
+            for cacheKey in $cacheKeys
             do
+              echo "Deleting" $cacheKey 
               gh actions-cache delete $cacheKey --confirm
             done
           done
