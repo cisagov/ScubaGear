@@ -3,7 +3,6 @@
 
 name: Clear all Caches
 
-# This is a reusable workflow called by the pipeline.
 on:
   workflow_call:
   workflow_dispatch:
