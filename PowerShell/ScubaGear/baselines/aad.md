@@ -92,6 +92,16 @@ Legacy authentication SHALL be blocked.
 
 - Create a [Conditional Access policy to block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy).
 
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+
+  Conditions > Client apps > Configure > Yes > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
+
+  Access controls > Grant > <b>Block Access</b>
+</pre>
+
 ## 2. Risk Based Policies
 
 This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.
