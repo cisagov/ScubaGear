@@ -351,7 +351,6 @@ jobs:
           set +e
           for cacheKey in $cacheKeys
           do
-            echo "Cache key is" $cacheKey
             if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
             then
               echo "Deleting" $cacheKey 
