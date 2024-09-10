@@ -332,7 +332,7 @@ jobs:
     needs:
       - publish
       - Tms_Tenant1
-      - Exc_Tenant1
+      # - Exc_Tenant1
       - Pwr_Tenant1
     steps:
       - name: Checkout Repo
