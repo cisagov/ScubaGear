@@ -192,6 +192,8 @@ BeforeAll{
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
             try {
+                Write-Host "The Script Block is"
+                Write-Host $ScriptBlock
                 $ScriptBlock.Invoke()
             }
             catch {
