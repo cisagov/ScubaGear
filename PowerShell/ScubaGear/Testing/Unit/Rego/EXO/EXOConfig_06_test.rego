@@ -15,7 +15,8 @@ test_Domains_Contacts_Correct if {
 }
 
 test_Domains_Contacts_Incorrect if {
-    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", "value":["*:ContactsSharing", "domain1:CalendarSharingFreeBusyDetail"]}])
+    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", 
+                                                    "value":["*:ContactsSharing", "domain1:CalendarSharingFreeBusyDetail"]}])
 
     Output := exo.tests with input.sharing_policy as [SharingPolicy1]
 
