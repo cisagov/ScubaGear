@@ -161,6 +161,7 @@ function UpdateProviderExport{
       $OutputFolder
   )
 
+  Write-Host "Calling LoadProviderExport..."
   $ProviderExport = LoadProviderExport($OutputFolder)
 
   $Updates.Keys | ForEach-Object{
