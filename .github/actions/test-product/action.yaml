@@ -7,6 +7,7 @@ runs:
   using: "composite"
   steps:
     - run: |
+        Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.
         $thumbprint = $env:Thumbprint
