@@ -270,9 +270,7 @@ jobs:
       - name: Cleanup
         run: |
           gh extension install actions/gh-actions-cache
-          # These are the caches to delete.
-          # They are from the publish job.
-          $keys = "scubagear-directory-${{ github.run_id }}", "powershell-directory-${{ github.run_id }}", "opa-directory-${{ github.run_id }}"
+          $keys = 'scubagear-directory-' + ${{ github.run_id }}, 'powershell-directory-' + ${{ github.run_id }}, 'opa-directory-' + ${{ github.run_id }}
           for $key in $keys
           do
             echo $key
