@@ -167,6 +167,10 @@ BeforeAll{
     # Dot source utility functions
     Write-Host "Source the utility functions"
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
+    $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
+    Write-Host "The Utility Module Path is still"
+    Write-Host $UtilityModulePath
+    Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
 
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
@@ -182,8 +186,6 @@ BeforeAll{
         )
 
         ForEach($Condition in $Conditions){
-            Write-Host "The condition is"
-            Write-Host $Condition
             $Splat = $Condition.Splat
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
                 $Splat.Add("OutputFolder", [string]$OutputFolder)

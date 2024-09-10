@@ -2,7 +2,6 @@ $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShe
 Write-Host "The Utility Module Path is"
 Write-Host $UtilityModulePath
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
-Get-Command -Module $UtilityModulePath
 
 # Helper functions for functional test
 function IsEquivalence{
