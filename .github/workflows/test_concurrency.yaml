@@ -184,7 +184,7 @@ jobs:
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Extract Email
-        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant1
@@ -340,10 +340,11 @@ jobs:
       - name: Cleanup
         run: |
           gh extension install actions/gh-actions-cache
-          cacheKeys=$(gh actions-cache list -R $REPO --key $key)
+          cacheKeys=$(gh actions-cache list -R $REPO)
           set +e
           for cacheKey in $cacheKeys
           do
+            echo "Cache key is" $cacheKey
             if [[ $cacheKey == scubagear-directory-* ]] ||[[ $cacheKey == powershell-directory-* ]] || [[ $cacheKey == opa-directory-* ]]
             then
               echo "Deleting" $cacheKey 
