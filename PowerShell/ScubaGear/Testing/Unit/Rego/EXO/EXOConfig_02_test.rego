@@ -63,7 +63,8 @@ test_Rdata_Incorrect_V3 if {
 }
 
 test_Rdata_Multiple_Correct_V1 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["v=spf1 -all", "extra stuff that shouldn't matter"]},
+    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
+                                        "value": ["v=spf1 -all", "extra stuff that shouldn't matter"]},
                                         {"op": "add", "path": "domain", "value": "good.com"}])
 
     Output := exo.tests with input.spf_records as [Record]
@@ -72,7 +73,8 @@ test_Rdata_Multiple_Correct_V1 if {
 }
 
 test_Rdata_Multiple_Correct_V2 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["extra stuff that shouldn't matter", "v=spf1 -all"]},
+    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
+                                        "value": ["extra stuff that shouldn't matter", "v=spf1 -all"]},
                                         {"op": "add", "path": "domain", "value": "good.com"}])
 
     Output := exo.tests with input.spf_records as [Record]
@@ -92,7 +94,8 @@ test_Rdata_Multiple_Correct_V3 if {
 }
 
 test_Rdata_Multiple_Incorrect if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["extra stuff that shouldn't matter", "hello world"]},
+    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
+                                        "value": ["extra stuff that shouldn't matter", "hello world"]},
                                         {"op": "add", "path": "domain", "value": "bad.com"}])
 
     Output := exo.tests with input.spf_records as [Record]

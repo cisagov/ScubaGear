@@ -40,7 +40,8 @@ test_Domains_Calendar_Correct if {
 }
 
 test_Domains_Calendar_Incorrect if {
-    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", "value":["*:CalendarSharingFreeBusyDetail", "domain1:ContactsSharing"]}])
+    SharingPolicy1 := json.patch(SharingPolicy, [{"op": "add", "path": "Domains", "value":
+                                                    ["*:CalendarSharingFreeBusyDetail", "domain1:ContactsSharing"]}])
 
     Output := exo.tests with input.sharing_policy as [SharingPolicy1]
 
