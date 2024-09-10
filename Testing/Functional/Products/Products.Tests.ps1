@@ -165,12 +165,7 @@ BeforeAll{
     }
 
     # Dot source utility functions
-    Write-Host "Source the utility functions"
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
-    $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-    Write-Host "The Utility Module Path is still"
-    Write-Host $UtilityModulePath
-    Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
 
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
