@@ -183,13 +183,15 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-      - name: Get Email
+      - name: Extract Email
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ success() }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -198,7 +200,8 @@ jobs:
           password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
           subject: Nightly functional test failure
           body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.test-product.outputs.emails }}
+          # to: ${{ steps.test-product.outputs.emails }}
+          to: jgarriss@mitre.org
           from: ScubaGear Notifier
   Exc_Tenant1:
     name: Test Exchange on Tenant 1
@@ -337,18 +340,15 @@ jobs:
       - name: Cleanup
         run: |
           gh extension install actions/gh-actions-cache
-          keys=(
-            scubagear-directory-${{ github.run_id }} powershell-directory-${{ github.run_id }} opa-directory-${{ github.run_id }}
-          )
-          for key in $keys
+          cacheKeys=$(gh actions-cache list -R $REPO --key $key)
+          set +e
+          for cacheKey in $cacheKeys
           do
-            cacheKeys=$(gh actions-cache list -R $REPO --key $key)
-            set +e
-            for cacheKey in $cacheKeys
-            do
+            if [[ $cacheKey == scubagear-directory-* ]] ||[[ $cacheKey == powershell-directory-* ]] || [[ $cacheKey == opa-directory-* ]]
+            then
               echo "Deleting" $cacheKey 
               gh actions-cache delete $cacheKey --confirm
-            done
+            fi
           done
         env:
           GH_TOKEN: ${{ github.token }}

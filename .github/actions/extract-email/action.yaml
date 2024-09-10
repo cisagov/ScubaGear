@@ -7,11 +7,16 @@ runs:
   using: "composite"
   steps:
     - run: |
+        Write-Host "Extracting email..."
         $productAlias = $env:Alias
+        Write-Host "The product alias is"
+        Write-Host $productAlias
         $params = $env:TestParams
         $products = $params.split("|")
         foreach ($product in $products)
         {
+          Write-Host "The product is"
+          Write-Host $product
           [String]$emails = ""
           $attributes = $product.split(",")
           foreach ($attribute in $attributes)
@@ -22,6 +27,7 @@ runs:
             $value = $keyAndValue[1]
             if($key.ToLower() -eq "emails")
             {
+              Write-Host "Found the emails"
               $emails = $value
             }
           }
