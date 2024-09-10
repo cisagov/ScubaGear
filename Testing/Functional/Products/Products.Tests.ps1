@@ -194,6 +194,12 @@ BeforeAll{
             try {
                 Write-Host "The Script Block is"
                 Write-Host $ScriptBlock
+                Write-Host "PSSCriptRoot is"
+                Write-Host $PSScriptRoot
+                $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
+                Write-Host "The Utility Module Path is"
+                Write-Host $UtilityModulePath
+                Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
                 $ScriptBlock.Invoke()
             }
             catch {
