@@ -261,8 +261,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     # needs:
-    #   - Ent_Tenant1
-    #   - Tms_Tenant1
+    #   - publish
+      # - Ent_Tenant1
+      # - Tms_Tenant1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -271,11 +272,7 @@ jobs:
           gh extension install actions/gh-actions-cache
           # These are the caches to delete.
           # They are from the publish job.
-          $keys = @(
-            "scubagear-directory-${{ github.run_id }}" 
-            "powershell-directory-${{ github.run_id }}" 
-            "opa-directory-${{ github.run_id }}"
-          )
+          $keys = "scubagear-directory-${{ github.run_id }}", "powershell-directory-${{ github.run_id }}", "opa-directory-${{ github.run_id }}"
           for $key in $keys
           do
             echo $key
