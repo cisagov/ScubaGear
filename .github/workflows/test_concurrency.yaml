@@ -198,6 +198,8 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     permissions: write-all
+    needs:
+      - Tms_Tenant1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
