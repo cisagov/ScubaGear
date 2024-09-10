@@ -90,7 +90,7 @@ Legacy authentication SHALL be blocked.
 
 - [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.
 
-- Create a [Conditional Access policy to block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy).
+- Create a Conditional Access policy to block legacy authentication
 
 <pre>
   Users > Include > <b>All users</b>
