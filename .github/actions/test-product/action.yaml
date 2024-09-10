@@ -1,8 +1,8 @@
 name: Test Product
 description: Run the Pester tests for a given product
-outputs:
-  emails:
-    value: ${{ steps.emails-output.outputs.emails }}
+# outputs:
+#   emails:
+#     value: ${{ steps.emails-output.outputs.emails }}
 runs:
   using: "composite"
   steps:
@@ -92,8 +92,8 @@ runs:
             # Pass emails to later job for notification.
             Write-Host "The emails:"
             Write-Host $emails
-            echo emails=$emails >> $env:GITHUB_OUTPUT
+            # echo emails=$emails >> $env:GITHUB_OUTPUT
           }
         }
-      id: emails-output
+      # id: emails-output
       shell: powershell

@@ -183,6 +183,11 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      - name: Get Email
+        uses: ./repo/.github/actions/extract-email
+        env:
+          Alias: Tms_Tenant1
+          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: dawidd6/action-send-mail@v3
