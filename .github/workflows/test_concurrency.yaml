@@ -272,7 +272,10 @@ jobs:
           echo "Installing actions-cache"
           gh extension install actions/gh-actions-cache
           echo "Creating keys"
-          $keys = 'scubagear-directory-' + ${{ github.run_id }}, 'powershell-directory-' + ${{ github.run_id }}, 'opa-directory-' + ${{ github.run_id }}
+          $keys=@(
+            'scubagear-directory-' + ${{ github.run_id }} 'powershell-directory-' + ${{ github.run_id }}'opa-directory-' + ${{ github.run_id }}
+          )
+          echo "Looping"
           for $key in $keys
           do
             echo $key
