@@ -176,14 +176,6 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
-      # This step verifies that the restore actually works.
-      # - name: Print Scuba Version
-      #   run: |
-      #     cd repo
-      #     Invoke-SCuBA -Version
-      #   shell: powershell
-      # - run: Import-Module -Name Selenium
-      #   shell: powershell
       - name: Test Tms_Tenant1
         id: test-product
         uses: ./repo/.github/actions/test-product
@@ -203,3 +195,22 @@ jobs:
           body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           to: ${{ steps.test-product.outputs.emails }}
           from: ScubaGear Notifier
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Cleanup
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache list
+          cacheKeys=$(gh actions-cache list -R $REPO --key scubagear-directory-${{ github.run_id }})
+          set +e
+          for cacheKey in $cacheKeys
+          do
+            gh actions-cache delete $cacheKey --confirm
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
