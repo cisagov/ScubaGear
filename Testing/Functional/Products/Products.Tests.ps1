@@ -181,27 +181,23 @@ BeforeAll{
         )
 
         ForEach($Condition in $Conditions){
-
+            Write-Output "The condition is"
+            Write-Output $Condition
             $Splat = $Condition.Splat
-
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
                 $Splat.Add("OutputFolder", [string]$OutputFolder)
             }
-
-            if ($Splat ) {
+            if ($Splat) {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
             }
             else {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
-
-
             try {
                 $ScriptBlock.Invoke()
             }
             catch {
                 Write-Error "Exception: SetConditions failed. $_"
-
             }
         }
     }
