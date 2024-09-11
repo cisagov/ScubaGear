@@ -10,29 +10,15 @@ import data.utils.key.PASS
 # Policy MS.EXO.13.1v1
 #--
 test_AuditDisabled_Correct if {
-    Output := exo.tests with input as {
-        "org_config": [
-            {
-                "AuditDisabled": false,
-                "Identity": "Test name",
-                "Name": "A"
-            }
-        ]
-    }
+    Output := exo.tests with input.org_config as [OrgConfig]
 
     TestResult("MS.EXO.13.1v1", Output, PASS, true) == true
 }
 
 test_AuditDisabled_Incorrect if {
-    Output := exo.tests with input as {
-        "org_config": [
-            {
-                "AuditDisabled": true,
-                "Identity": "Test name",
-                "Name": "A"
-            }
-        ]
-    }
+    OrgConfig1 := json.patch(OrgConfig, [{"op": "add", "path": "AuditDisabled", "value": true}])
+
+    Output := exo.tests with input.org_config as [OrgConfig1]
 
     TestResult("MS.EXO.13.1v1", Output, FAIL, false) == true
 }
