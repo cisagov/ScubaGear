@@ -42,6 +42,7 @@ runs:
             Write-Host $emails
             echo emails=$emails >> $env:GITHUB_OUTPUT
           }
+          break
         }
       id: emails-output
       shell: powershell
