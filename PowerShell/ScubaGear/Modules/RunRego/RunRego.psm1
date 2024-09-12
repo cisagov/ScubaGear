@@ -30,13 +30,18 @@ function Invoke-Rego {
         $OPAPath = $PSScriptRoot
     )
     try {
-        # PowerShell 5.1 compatible Windows OS check
-        if ("Windows_NT" -eq $Env:OS) {
-            $Cmd = Join-Path -Path $OPAPath -ChildPath "opa_windows_amd64.exe" -ErrorAction 'Stop'
+        # For MacOS/Linux give OPA execute permissions: chmod 755 ./opa
+        $OPAFileName = if ("Windows_NT" -eq $Env:OS) {"opa_windows_amd64.exe"} else {"opa"}
+        $Cmd = Join-Path -Path $OPAPath -ChildPath $OPAFileName  -ErrorAction 'Stop'
+
+        # Set backup execution path to be current directory if ScubaTools path fails
+        if (-not (Test-Path $Cmd -PathType Leaf)) {
+            $Cmd = Join-Path -Path (Get-Location | Select-Object -ExpandProperty Path) -ChildPath $OPAFileName -ErrorAction 'Stop'
         }
-        else {
-            # Permissions: chmod 755 ./opa
-            $Cmd = Join-Path -Path $OPAPath -ChildPath "opa" -ErrorAction 'Stop'
+
+        # See if the OPA executable is in the current executing directory
+        if (-not (Test-Path $Cmd)) {
+            throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
         }
 
         # Load Utils

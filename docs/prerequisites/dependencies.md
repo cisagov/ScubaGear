@@ -4,7 +4,7 @@ Before [executing](../execution/execution.md) ScubaGear, its dependencies must b
 
 ```powershell
 # Install the minimum required dependencies
-Initialize-SCuBA 
+Initialize-SCuBA
 ```
 
 > **Note**: ScubaGear utilizes several libraries from Microsoft to read data about their product configurations.  At least one of these libraries is tied to PowerShell 5.  Until Microsoft updates their library, ScubaGear will continue to use PowerShell 5.  As this version is only available on Windows, ScubaGear will only run on Windows.
@@ -32,7 +32,7 @@ If that fails, you can manually download the OPA executable.
 
 ![version](../images/opa_version.png)
 
-> **Note**: To find the default supported version, go to the [ScubaConfig](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1) file, look for the variable `$ScubaDefaults`, and find its parameter `DefaultOPAVersion`.  
+> **Note**: To find the default supported version, go to the [ScubaConfig](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1) file, look for the variable `$ScubaDefaults`, and find its parameter `DefaultOPAVersion`.
 
 > **Note**: To find older supported versions, go to the [Support](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/Support/Support.psm1) file, and find the constant named `$ACCEPTABLEVERSIONS`.
 
@@ -49,5 +49,7 @@ To verify that OPA is working, use the following command to check the version:
 # Check the OPA version
 .\opa_windows_amd64.exe version
 ```
+
+> **Note**: If ScubaGear is having trouble finding the OPA executable in the `Tools` folder, place the OPA executable in the directory from which you are executing `Invoke-SCuBA`. ScubaGear will also attempt to look in the current executing directory for the OPA executable.
 
 Once the dependencies have been installed, you are ready to set the [permissions](permissions.md).
