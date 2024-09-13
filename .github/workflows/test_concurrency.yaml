@@ -269,31 +269,31 @@ jobs:
   #         # to: ${{ steps.test-product.outputs.emails }}
   #         to: jgarriss@mitre.org
   #         from: ScubaGear Notifier
-  cleanup:
-    name: Clear Caches
-    runs-on: ubuntu-latest
-    permissions: write-all
-    needs:
-      - publish
-      # - Exc_Tenant1
-      - Tms_Tenant1
-      # - Pwr_Tenant1
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Clear Caches
-        run: |
-          gh extension install actions/gh-actions-cache
-          cacheKeys=$(gh actions-cache list -R $REPO)
-          set +e
-          for cacheKey in $cacheKeys
-          do
-            if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
-            then
-              echo "Deleting" $cacheKey 
-              gh actions-cache delete $cacheKey --confirm
-            fi
-          done
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+  # cleanup:
+  #   name: Clear Caches
+  #   runs-on: ubuntu-latest
+  #   permissions: write-all
+  #   needs:
+  #     - publish
+  #     # - Exc_Tenant1
+  #     - Tms_Tenant1
+  #     # - Pwr_Tenant1
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Clear Caches
+  #       run: |
+  #         gh extension install actions/gh-actions-cache
+  #         cacheKeys=$(gh actions-cache list -R $REPO)
+  #         set +e
+  #         for cacheKey in $cacheKeys
+  #         do
+  #           if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
+  #           then
+  #             echo "Deleting" $cacheKey 
+  #             gh actions-cache delete $cacheKey --confirm
+  #           fi
+  #         done
+  #       env:
+  #         GH_TOKEN: ${{ github.token }}
+  #         REPO: ${{ github.repository }}
