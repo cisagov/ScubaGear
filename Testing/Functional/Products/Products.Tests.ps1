@@ -149,7 +149,6 @@ BeforeDiscovery {
 
 BeforeAll {
     # Shared Data for functional test
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
@@ -157,6 +156,7 @@ BeforeAll {
     Import-Module $ConnectionModule
     Import-Module Selenium
 
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ProductDetails = @{
         aad = "Azure Active Directory"
         defender = "Microsoft 365 Defender"
