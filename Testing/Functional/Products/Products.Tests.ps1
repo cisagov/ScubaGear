@@ -97,16 +97,11 @@ param (
     $Variant = [string]::Empty
 )
 
-$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-$ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-$ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-$UtilityModule = Join-Path -Path $ScubaModulePath -ChildPath "Utility/Utility.psm1"
-Import-Module $ScubaModule
-Import-Module $ConnectionModule
-Import-Module $UtilityModule
-Import-Module Selenium
+BeforeDiscovery {
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    Import-Module $ScubaModule
 
-BeforeDiscovery{
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
     }
@@ -152,9 +147,16 @@ BeforeDiscovery{
     }
 }
 
-BeforeAll{
+BeforeAll {
     # Shared Data for functional test
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    Import-Module $ScubaModule
+    Import-Module $ConnectionModule
+    Import-Module Selenium
+
     $ProductDetails = @{
         aad = "Azure Active Directory"
         defender = "Microsoft 365 Defender"
@@ -165,7 +167,7 @@ BeforeAll{
     }
 
     # Dot source utility functions
-    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
+#    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
@@ -192,14 +194,6 @@ BeforeAll{
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
             try {
-                Write-Host "The Script Block is"
-                Write-Host $ScriptBlock
-                Write-Host "PSSCriptRoot is"
-                Write-Host $PSScriptRoot
-                $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-                Write-Host "The Utility Module Path is"
-                Write-Host $UtilityModulePath
-                Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
                 $ScriptBlock.Invoke()
             }
             catch {
@@ -222,6 +216,7 @@ BeforeAll{
 Describe "Policy Checks for <ProductName>"{
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
         BeforeEach{
+            . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
