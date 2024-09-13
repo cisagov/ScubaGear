@@ -114,7 +114,7 @@ function Invoke-ReadAllLines {
     .Functionality
     Internal
     .Parameter Path
-    The full file path to the file being written.
+    The full file path to the file being read.
     .Parameter Encoding
     An object of type System.Text.Encoding that determines how the
     content is encoded for output to file.
