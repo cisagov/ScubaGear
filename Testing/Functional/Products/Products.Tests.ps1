@@ -167,7 +167,7 @@ BeforeAll {
     }
 
     # Dot source utility functions
-#    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
+    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
