@@ -134,75 +134,11 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"
-  # Tms_Tenant1:
-  #   name: Test Teams on Tenant 1
-  #   runs-on: windows-latest
-  #   environment: Development
-  #   permissions:
-  #     id-token: write
-  #     contents: write
-  #   concurrency:
-  #     group: Tms_Tenant1
-  #     cancel-in-progress: false
-  #   needs:
-  #     - publish
-  #   steps:
-  #     - name: Checkout Repo
-  #       uses: actions/checkout@v4
-  #       with:
-  #         path: repo
-  #     - name: Import PFX
-  #       uses: ./repo/.github/actions/import-pfx
-  #       env:
-  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     - name: Get Thumbprint
-  #       id: get-thumbprint
-  #       uses: ./repo/.github/actions/get-thumbprint
-  #       env:
-  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     - name: Restore ScubaGear
-  #       uses: actions/cache/restore@v4
-  #       with:
-  #         path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-  #         key: scubagear-directory-
-  #     - name: Restore Dependencies
-  #       uses: actions/cache/restore@v4
-  #       with:
-  #         path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-  #         key: powershell-directory-
-  #     - name: Restore OPA
-  #       uses: actions/cache/restore@v4
-  #       with:
-  #         path: C:\Users\runneradmin\.scubagear\Tools
-  #         key: opa-directory-
-  #     - name: Test
-  #       id: test-product
-  #       uses: ./repo/.github/actions/test-product
-  #       env:
-  #         Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-  #         Alias: Tms_Tenant1
-  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     - name: Extract Email
-  #       # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
-  #       uses: ./repo/.github/actions/extract-email
-  #       env:
-  #         Alias: Tms_Tenant1
-  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     - name: Notify on Failure
-  #       # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
-  #       if: ${{ success() }}
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.gmail.com
-  #         server_port: 465
-  #         username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #         password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #         subject: Nightly functional test failure
-  #         body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-  #         # to: ${{ steps.test-product.outputs.emails }}
-  #         to: jgarriss@mitre.org
-  #         from: ScubaGear Notifier
+  Tms_Tenant1:
+    name: Test Teams on Tenant 1
+    uses: ./.github/workflows/function_test_teams.yaml
+    needs:
+      - publish
   # Exc_Tenant1:
   #   name: Test Exchange on Tenant 1
   #   runs-on: windows-latest
@@ -264,74 +200,74 @@ jobs:
   #         body: The Exc_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
   #         to: ${{ steps.test-product.outputs.emails }}
   #         from: ScubaGear Notifier
-  Pwr_Tenant1:
-    name: Test Power on Tenant 1
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    concurrency:
-      group: Pwr_Tenant1
-      cancel-in-progress: false
-    needs:
-      - publish
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: scubagear-directory-
-      - name: Restore Dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
-      - name: Restore OPA
-        uses: actions/cache/restore@v4
-        with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
-      - name: Test
-        id: test-product
-        uses: ./repo/.github/actions/test-product
-        env:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Pwr_Tenant1
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-      - name: Extract Email
-        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Tms_Tenant1
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-      - name: Notify on Failure
-        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-          subject: Nightly functional test failure
-          body: The Pwr_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          # to: ${{ steps.test-product.outputs.emails }}
-          to: jgarriss@mitre.org
-          from: ScubaGear Notifier
+  # Pwr_Tenant1:
+  #   name: Test Power on Tenant 1
+  #   runs-on: windows-latest
+  #   environment: Development
+  #   permissions:
+  #     id-token: write
+  #     contents: write
+  #   concurrency:
+  #     group: Pwr_Tenant1
+  #     cancel-in-progress: false
+  #   needs:
+  #     - publish
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         path: repo
+  #     - name: Import PFX
+  #       uses: ./repo/.github/actions/import-pfx
+  #       env:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Get Thumbprint
+  #       id: get-thumbprint
+  #       uses: ./repo/.github/actions/get-thumbprint
+  #       env:
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Restore ScubaGear
+  #       uses: actions/cache/restore@v4
+  #       with:
+  #         path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+  #         key: scubagear-directory-
+  #     - name: Restore Dependencies
+  #       uses: actions/cache/restore@v4
+  #       with:
+  #         path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+  #         key: powershell-directory-
+  #     - name: Restore OPA
+  #       uses: actions/cache/restore@v4
+  #       with:
+  #         path: C:\Users\runneradmin\.scubagear\Tools
+  #         key: opa-directory-
+  #     - name: Test
+  #       id: test-product
+  #       uses: ./repo/.github/actions/test-product
+  #       env:
+  #         Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+  #         Alias: Pwr_Tenant1
+  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+  #     - name: Extract Email
+  #       # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+  #       uses: ./repo/.github/actions/extract-email
+  #       env:
+  #         Alias: Tms_Tenant1
+  #         TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+  #     - name: Notify on Failure
+  #       # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+  #       uses: dawidd6/action-send-mail@v3
+  #       with:
+  #         server_address: smtp.gmail.com
+  #         server_port: 465
+  #         username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+  #         password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+  #         subject: Nightly functional test failure
+  #         body: The Pwr_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+  #         # to: ${{ steps.test-product.outputs.emails }}
+  #         to: jgarriss@mitre.org
+  #         from: ScubaGear Notifier
   cleanup:
     name: Clear Caches
     runs-on: ubuntu-latest
@@ -339,8 +275,8 @@ jobs:
     needs:
       - publish
       # - Exc_Tenant1
-      # - Tms_Tenant1
-      - Pwr_Tenant1
+      - Tms_Tenant1
+      # - Pwr_Tenant1
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
