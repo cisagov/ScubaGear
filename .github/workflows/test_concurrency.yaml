@@ -138,6 +138,8 @@ jobs:
   Test_Teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
+    needs:
+      - publish
   cleanup:
     name: Clear Caches
     runs-on: ubuntu-latest
