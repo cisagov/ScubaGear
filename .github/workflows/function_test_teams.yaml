@@ -11,7 +11,7 @@ on:
 
 jobs:
   Tms_Tenant1:
-    name: Test
+    name: Tms_Tenant1
     runs-on: windows-latest
     environment: Development
     permissions:
