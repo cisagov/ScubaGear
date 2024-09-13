@@ -1,7 +1,5 @@
-# $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-# Write-Host "The Utility Module Path is"
-# Write-Host $UtilityModulePath
-# Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom -Scope Global
+$UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
 # Helper functions for functional test
 function IsEquivalence{
@@ -97,8 +95,6 @@ function LoadProviderExport() {
 
   # $ProviderExport = $(Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json" | Out-String).Trim() | ConvertFrom-Json
   $content = Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json"
-  Write-Host "The content is"
-  Write-Host $content
   $stringContent = $content | Out-String
   $stringContentTrimmed = $stringContent.Trim()
   $ProviderExport = $stringContentTrimmed | ConvertFrom-Json
@@ -161,7 +157,6 @@ function UpdateProviderExport{
       $OutputFolder
   )
 
-  Write-Host "Calling LoadProviderExport..."
   $ProviderExport = LoadProviderExport($OutputFolder)
 
   $Updates.Keys | ForEach-Object{
