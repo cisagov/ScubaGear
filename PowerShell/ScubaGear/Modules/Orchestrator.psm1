@@ -1465,8 +1465,6 @@ function Remove-Resources {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
 
-    Remove-Module "Utility" -ErrorAction "SilentlyContinue"
-    Remove-Module "Support" -ErrorAction "SilentlyContinue"
     Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
