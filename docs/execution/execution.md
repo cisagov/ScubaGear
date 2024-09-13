@@ -11,6 +11,15 @@ If ScubaGear was installed by [downloading from GitHub](../installation/github.m
 Import-Module -Name .\PowerShell\ScubaGear 
 ```
 
+## Install Dependencies
+
+ScubaGear requires a number of dependencies to be installed before it can be invoked.  To install the dependencies:
+
+```powershell
+# Install the minimum required dependencies
+Initialize-SCuBA 
+```
+
 ## Interactive Mode
 
 Interactive mode simply means that the user will be prompted for their credentials that are required to authenticate to the tenant. A prompt may popup for the user to select their profile **for each product being tested** but the user should only have to enter their credentials once.
