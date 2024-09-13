@@ -214,9 +214,9 @@ BeforeAll {
 }
 
 Describe "Policy Checks for <ProductName>"{
+
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
-        BeforeEach{
-            . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
+        BeforeEach {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
