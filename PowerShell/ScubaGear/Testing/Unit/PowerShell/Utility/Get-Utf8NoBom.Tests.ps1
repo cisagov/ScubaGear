@@ -4,7 +4,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 
 InModuleScope Utility {
     Describe -Tag 'Utility' -Name 'Get-Utf8NoBom Pathing' {
         BeforeAll {
-            Mock -ModuleName Utility Invoke-ReadAllLines { return "Pass"}
+            Mock -ModuleName Utility Invoke-ReadAllText { return "Pass"}
 
             # Setup test directories for testing
             Push-Location $TestDrive
@@ -91,36 +91,31 @@ InModuleScope Utility {
                 It 'Backslashes properly escaped' {
                     $OrigString = "This string has \ in it." | ConvertTo-Json
                     $FilePath = Set-Utf8NoBom -Content $OrigString -Location $TestDrive -FileName output.txt
-                    $RestoredString = Get-Utf8NoBom -FilePath $FilePath | Out-String
-                    $RestoredString.Trim() | Should -Be $OrigString
+                    Get-Utf8NoBom -FilePath $FilePath | Should -Be $OrigString
                 }
 
                 It 'Escaped sequences properly escaped' {
                     $OrigString = "This string has \r\n in it." | ConvertTo-Json
                     $FilePath = Set-Utf8NoBom -Content $OrigString -Location $TestDrive -FileName output.txt
-                    $RestoredString = Get-Utf8NoBom -FilePath $FilePath | Out-String
-                    $RestoredString.Trim() | Should -Be $OrigString
+                    Get-Utf8NoBom -FilePath $FilePath | Should -Be $OrigString
                 }
 
                 It 'HTML escaped characters back converted properly' {
                     $OrigString = "This string has <, >, and ' in it." | ConvertTo-Json
                     $FilePath = Set-Utf8NoBom -Content $OrigString -Location $TestDrive -FileName output.txt
-                    $RestoredString = Get-Utf8NoBom -FilePath $FilePath | Out-String
-                    $RestoredString.Trim() | Should -Be $OrigString
+                    Get-Utf8NoBom -FilePath $FilePath | Should -Be $OrigString
                 }
 
                 It 'Non-ASCII unicode characters back converted properly' {
                     $OrigString = "This string has º, ¢, ∞,¢, and £ in it." | ConvertTo-Json
                     $FilePath = Set-Utf8NoBom -Content $OrigString -Location $TestDrive -FileName output.txt
-                    $RestoredString = Get-Utf8NoBom -FilePath $FilePath | Out-String
-                    $RestoredString.Trim() | Should -Be $OrigString
+                    Get-Utf8NoBom -FilePath $FilePath | Should -Be $OrigString
                 }
 
                 It 'DateTime string with backslash passes' {
                     $OrigString = $(Get-Date).Date | ConvertTo-JSON
                     $FilePath = Set-Utf8NoBom -Content $OrigString -Location $TestDrive -FileName output.txt
-                    $RestoredString = Get-Utf8NoBom -FilePath $FilePath | Out-String
-                    $RestoredString.Trim() | Should -Be "$OrigString"
+                    Get-Utf8NoBom -FilePath $FilePath | Should -Be "$OrigString"
                 }
         }
 

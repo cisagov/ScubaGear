@@ -93,11 +93,8 @@ function LoadProviderExport() {
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
 
-  # $ProviderExport = $(Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json" | Out-String).Trim() | ConvertFrom-Json
-  $content = Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json"
-  $stringContent = $content | Out-String
-  $stringContentTrimmed = $stringContent.Trim()
-  $ProviderExport = $stringContentTrimmed | ConvertFrom-Json
+  $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json"
+  $ProviderExport = $Content | ConvertFrom-Json
   $ProviderExport
 }
 
@@ -133,7 +130,6 @@ function PublishProviderExport() {
       $Export
   )
   $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
-  #Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
   Set-Utf8NoBom -Content $Json -Location "$OutputFolder" -FileName "ModifiedProviderSettingsExport.json"
 }
 

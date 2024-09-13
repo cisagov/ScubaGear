@@ -37,7 +37,7 @@ function Set-Utf8NoBom {
         $FinalPath = Join-Path -Path $ResolvedPath -ChildPath $FileName -ErrorAction 'Stop'
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
-        Invoke-WriteAllLines -Content $Content -Path $FinalPath -Encoding $Utf8NoBomEncoding
+        Invoke-WriteAllText -Content $Content -Path $FinalPath -Encoding $Utf8NoBomEncoding
         $FinalPath  # Used to test path construction more easily
     }
 }
@@ -63,12 +63,12 @@ function Get-Utf8NoBom {
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
         $ResolvedPath = $(Resolve-Path $FilePath).ProviderPath
-        $Content = Invoke-ReadAllLines -Path $ResolvedPath -Encoding $Utf8NoBomEncoding
+        $Content = Invoke-ReadAllText -Path $ResolvedPath -Encoding $Utf8NoBomEncoding
         return $Content
     }
 }
 
-function Invoke-WriteAllLines {
+function Invoke-WriteAllText {
     <#
     .Description
     Using the .NET framework, save the provided content to the file
@@ -102,11 +102,11 @@ function Invoke-WriteAllLines {
         $Encoding = (New-Object System.Text.UTF8Encoding $False)
     )
     process {
-        [System.IO.File]::WriteAllLines($Path, $Content, $Encoding)
+        [System.IO.File]::WriteAllText($Path, $Content, $Encoding)
     }
 }
 
-function Invoke-ReadAllLines {
+function Invoke-ReadAllText {
     <#
     .Description
     Using the .NET framework, read content from the file
@@ -133,7 +133,7 @@ function Invoke-ReadAllLines {
         $Encoding = (New-Object System.Text.UTF8Encoding $False)
     )
     process {
-        $Content = [System.IO.File]::ReadAllLines($Path, $Encoding)
+        $Content = [System.IO.File]::ReadAllText($Path, $Encoding)
         return $Content
     }
 }
