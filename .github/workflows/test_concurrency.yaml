@@ -147,6 +147,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    needs:
+      - publish
     concurrency:
       group: Tms_Tenant1
       cancel-in-progress: false
