@@ -31,3 +31,6 @@ jobs:
   Tms_Tenant1:
     name: Test Teams on Tenant 1
     uses: ./.github/workflows/function_test_teams.yaml
+    permissions:
+      id-token: write
+      contents: write
