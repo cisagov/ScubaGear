@@ -19,6 +19,7 @@ on:
   push:
     paths:
       - ".github/workflows/test_concurrency.yaml"
+      - ".github/workflows/function_test_teams.yaml"
       - ".github/actions/**"
 
 permissions: read-all
