@@ -628,7 +628,7 @@ function Invoke-ProviderList {
         }
 "@
 
-            # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA appears to not
+            # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA (as of 0.68) appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
