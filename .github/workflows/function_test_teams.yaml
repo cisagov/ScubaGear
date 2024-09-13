@@ -10,7 +10,7 @@ on:
 permissions: read-all
 
 jobs:
-  Tms_Tenant1:
+  Test_Teams_Tenant1:
     name: Test Teams on Tenant 1
     runs-on: windows-latest
     environment: Development
