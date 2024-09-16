@@ -1674,7 +1674,6 @@ function Invoke-SCuBACached {
         $DarkMode
         )
         process {
-            Write-Host "why are my messages not printing"
             $ParentPath = Split-Path $PSScriptRoot -Parent
             $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve)
             $ModuleVersion = $ScubaManifest.ModuleVersion
@@ -1768,8 +1767,6 @@ function Invoke-SCuBACached {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
 
-            Write-HOST DEBUG MEPLEASE
-            Write-Output $KeepIndividualJSON
             if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
