@@ -64,7 +64,7 @@ function Get-Utf8NoBom {
 
         $ResolvedPath = $(Resolve-Path $FilePath).ProviderPath
         $Content = Invoke-ReadAllText -Path $ResolvedPath -Encoding $Utf8NoBomEncoding
-        return $Content
+        $Content
     }
 }
 
