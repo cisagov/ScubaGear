@@ -67,8 +67,8 @@ function Invoke-SCuBA {
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
     .Parameter KeepIndividualJSON
-    Keeps ScubaGear legacy output where files are not merge into all in one JSON.
-    This parameter is for backwards compatibility for those working with the older output result files.
+    Keeps ScubaGear legacy output where files are not merged into an all in one JSON.
+    This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
     If KeepIndividualJSON is not set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
@@ -1545,8 +1545,8 @@ function Invoke-SCuBACached {
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
     .Parameter KeepIndividualJSON
-    Keeps ScubaGear legacy output where files are not merge into all in one JSON.
-    This parameter is for backwards compatibility for those working with the older output result files.
+    Keeps ScubaGear legacy output where files are not merged into an all in one JSON.
+    This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
     If KeepIndividualJSON is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
