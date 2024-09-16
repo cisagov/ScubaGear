@@ -66,12 +66,13 @@ InModuleScope Utility {
             }
         }
 
-        # Uses default C$ share to test building UNC paths that exist
-        # Assumes TestDrive is on C: drive
+        # Uses default system drive share to test building UNC paths that exist
+        # Assumes TestDrive is on system drive
         Context 'UNC path' {
             It 'Set to shared UNC path' {
                 $TempFolder = $($(Resolve-Path $TestDrive).ProviderPath).Substring(2)
-                $TestFile = "\\$env:COMPUTERNAME\C$\$TempFolder\output.json"
+                $ShareName = $env:SYSTEMDRIVE.Trim(':')
+                $TestFile = "\\$env:COMPUTERNAME\$ShareName$\$TempFolder\output.json"
                 New-Item -ItemType File $TestFile
                 Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
             }
