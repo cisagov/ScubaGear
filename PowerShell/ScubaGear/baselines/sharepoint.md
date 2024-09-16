@@ -30,7 +30,7 @@ This section helps reduce security risks related to sharing files with users ext
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing for SharePoint SHALL be limited to Existing guests or Only People in your organization.
+External sharing for SharePoint SHALL be limited to Existing guests or Only people in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
@@ -41,7 +41,7 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only Peop
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
 
 #### MS.SHAREPOINT.1.2v1
-External sharing for OneDrive SHALL be limited to Existing guests or Only People in your organization.
+External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
@@ -58,7 +58,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only people in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
