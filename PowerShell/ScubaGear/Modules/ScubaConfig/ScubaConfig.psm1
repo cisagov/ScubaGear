@@ -29,6 +29,7 @@ class ScubaConfig {
         DefaultOutRegoFileName = "TestResults"
         DefaultOutReportName = "BaselineReports"
         DefaultOutJsonFileName = "ScubaResults"
+        DefaultOutCsvFileName = "ScubaResults"
         DefaultPrivilegedRoles = @(
             "Global Administrator",
             "Privileged Role Administrator",
@@ -144,6 +145,10 @@ class ScubaConfig {
 
         if (-Not $this.Configuration.OutJsonFileName){
             $this.Configuration.OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName')
+        }
+
+        if (-Not $this.Configuration.OutCsvFileName){
+            $this.Configuration.OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName')
         }
 
         return

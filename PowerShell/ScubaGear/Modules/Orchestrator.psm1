@@ -72,6 +72,9 @@ function Invoke-SCuBA {
     .Parameter OutJsonFileName
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
+    .Parameter OutCsvFileName
+    The CSV created in the folder created in OutPath that contains the CSV version of the test results.
+    Defaults to "ScubaResults".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -213,6 +216,12 @@ function Invoke-SCuBA {
         [string]
         $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
+
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
         [ValidateScript({
@@ -270,6 +279,7 @@ function Invoke-SCuBA {
                 'OutReportName' = $OutReportName
                 'MergeJson' = $MergeJson
                 'OutJsonFileName' = $OutJsonFileName
+                'OutCsvFileName' = $OutCsvFileName
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -410,6 +420,14 @@ function Invoke-SCuBA {
                 }
                 Merge-JsonOutput @JsonParams
             }
+            # Craft the csv version of just the results
+            $CsvParams = @{
+                'ProductNames' = $ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+            }
+            ConvertTo-ResultsCsv @CsvParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -715,18 +733,6 @@ function Invoke-RunRego {
             $FileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).json" -ErrorAction 'Stop'
             $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
-            foreach ($Product in $TestResults) {
-                foreach ($Test in $Product) {
-                    # ConvertTo-Csv struggles with the nested nature of the ActualValue
-                    # and Commandlet fields. Explicitly convert these to json strings before
-                    # calling ConvertTo-Csv
-                    $Test.ActualValue = $Test.ActualValue | ConvertTo-Json -Depth 3 -Compress -ErrorAction 'Stop'
-                    $Test.Commandlet = $Test.Commandlet -Join ", "
-                }
-            }
-            $TestResultsCsv = $TestResults | ConvertTo-Csv -NoTypeInformation -ErrorAction 'Stop'
-            $CSVFileName = Join-Path -Path $OutFolderPath "$($OutRegoFileName).csv" -ErrorAction 'Stop'
-            $TestResultsCsv | Set-Content -Path $CSVFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
             $ProdRegoFailed
         }
         catch {
@@ -768,6 +774,141 @@ function Pluralize {
         }
         else {
             $SingularNoun
+        }
+    }
+}
+
+function Format-PlainText {
+    <#
+    .Description
+    This function sanitizes a given string so that it will render properly in Excel (e.g., remove HTML tags).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $RawString
+    )
+    process {
+        $CleanString = $RawString
+        # Multi-line strings (e.g., the requirment string for MS.EXO.16.1v1) need to be merged into a single
+        # line, otherwise the single control will be split into multiple rows in the CSV output
+        $CleanString = $CleanString.Replace("`n", " ")
+        # The "View all CA policies" link needs to be removed from the spreadsheet as what it links to
+        # does not exist in the spreadsheet
+        $CleanString = $CleanString.Replace("<a href='#caps'>View all CA policies</a>.", "")
+        # Remove HTML tags that won't render properly in the spreadsheet and whose removal won't affect the
+        # overall meaning of the string
+        $CleanString = $CleanString.Replace("<br/>", " ")
+        $CleanString = $CleanString.Replace("<b>", "")
+        $CleanString = $CleanString.Replace("</b>", "")
+        # Strip out HTML comments
+        $CleanString = $CleanString -replace '(.*)(<!--)(.*)(-->)(.*)', '$1$5'
+        # The following regex looks for a string with an anchor tag. If it finds an anchor tag, it reformats
+        # the string so that the anchor is removed. For example:
+        # 'See <a href="https://example.com" target="_blank">this example</a> for more details.'
+        # becomes
+        # 'See this example, https://example.com for more details.'
+        # In-depth interpretation:
+        # Group 1: '(.*)' Matches any number of characters before the opening anchor tag
+        # Group 2: '<a href="' Matches the opening anchor tag, up to and including the opening quote of the href
+        # Group 3: '([\w#./=&?%\-+:;$@,]+)' Matches the href string
+        # Group 4: '(".*>)' Matches the last half of the opening anchor tag
+        # Group 5: '(.*)' Matches the anchor inner html, i.e., the link's display text
+        # Group 6: '(</a>)' Matches the closing anchor tag
+        # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
+        $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
+
+        $CleanString
+    }
+}
+
+function ConvertTo-ResultsCsv {
+    <#
+    .Description
+    This function converts the controls inside the Results section of the json output to a csv.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderPath,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName
+    )
+    process {
+        try {
+            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName.json"
+            if (Test-Path $ScubaResultsFileName -PathType Leaf) {
+                # The ScubaResults file exists, no need to look for the individual json files
+                $ScubaResults = Get-Content $ScubaResultsFileName | ConvertFrom-Json
+            }
+            else {
+                # The ScubaResults file does not exists, so we need to look inside the IndividualReports
+                # folder for the json file specific to each product
+                $ScubaResults = @{"Results" = [PSCustomObject]@{}}
+                $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
+                foreach ($Product in $ProductNames) {
+                    $BaselineName = $ArgToProd[$Product]
+                    $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
+                    $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+                    $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
+                        -NotePropertyValue $IndividualResults.Results
+                }
+            }
+            $ScubaResultsCsv = @()
+            foreach ($Product in $ScubaResults.Results.PSObject.Properties) {
+                foreach ($Group in $Product.Value) {
+                    foreach ($Control in $Group.Controls) {
+                        $Control.Requirement = Format-PlainText -RawString $Control.Requirement
+                        $Control.Details = Format-PlainText -RawString $Control.Details
+                        # Add blank fields where users can document reasons for failures and timelines
+                        # for remediation if they so choose
+                        $Reason = ""
+                        $RemediationDate = ""
+                        $Justification = ""
+                        if ($Control.Result -eq "Pass") {
+                            # No need to fill out those fields if passing
+                            $Reason = "N/A"
+                            $RemediationDate = "N/A"
+                            $Justification = "N/A"
+                        }
+                        $Control | Add-Member -NotePropertyName "Non-Compliance Reason" -NotePropertyValue $Reason
+                        $Control | Add-Member -NotePropertyName "Remediation Completion Date" `
+                            -NotePropertyValue $RemediationDate
+                        $Control | Add-Member -NotePropertyName "Justification" -NotePropertyValue $Justification
+                        $ScubaResultsCsv += $Control
+                    }
+                }
+            }
+            $CsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
+            $Encoding = Get-FileEncoding
+            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $CsvFileName -Encoding $Encoding
+        }
+        catch {
+            $Warning = "Error involving the creation of CSV version of output. "
+            $Warning += "See the exception message for more details: $($_)"
+            Write-Warning $Warning
         }
     }
 }
@@ -1410,6 +1551,9 @@ function Invoke-SCuBACached {
     .Parameter OutJsonFileName
     If MergeJson is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
+    .Parameter OutCsvFileName
+    The CSV created in the folder created in OutPath that contains the CSV version of the test results.
+    Defaults to "ScubaResults".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
@@ -1517,6 +1661,11 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [switch]
         $Quiet,
@@ -1621,6 +1770,15 @@ function Invoke-SCuBACached {
                 }
                 Merge-JsonOutput @JsonParams
             }
+            # Craft the csv version of just the results
+            $CsvParams = @{
+                'ProductNames' = $ProductNames;
+                'OutFolderPath' = $OutFolderPath;
+                'OutJsonFileName' = $OutJsonFileName;
+                'OutCsvFileName' = $OutCsvFileName;
+            }
+            ConvertTo-ResultsCsv @CsvParams
+
         }
     }
 

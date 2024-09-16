@@ -256,6 +256,24 @@ Invoke-SCuBA -ProductNames teams `
   -MergeJson
 ```
 
+## OutCsvFileName
+
+**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | String             |
+| Default     | `ScubaResults.csv` |
+| Config File | No                 |  
+
+
+```powershell
+# Change the output CSV file
+Invoke-SCuBA -ProductNames teams `
+  -OutCsvFileName myresults `
+```
+
 ## OutPath
 
 **OutPath** is the folder path where the [report files](../execution/reports.md) will be created. The folder will be created if it does not exist.
@@ -296,7 +314,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutRegoFileName
 
-**OutRegoFileName** is the name of the test results file in JSON and CSV that are created in the output folder.
+**OutRegoFileName** is the name of the JSON test results file that is created in the output folder, containing the raw Rego output.
 
 | Parameter   | Value         |
 |-------------|---------------|
@@ -311,7 +329,7 @@ Invoke-SCuBA -ProductNames teams `
   -OutRegoFileName mytestresults
 ```
 
-> **Note**: ScubaGear will automatically add the `.csv` and the `.json` respectively to these filenames.
+> **Note**: ScubaGear will automatically add the the `.json` to this filename.
 
 ## OutReportName
 
