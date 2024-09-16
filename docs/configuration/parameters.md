@@ -160,9 +160,9 @@ The list of acceptable values are:
 | Government cloud tenants (high) | gcchigh    |
 | Department of Defense tenants   | dod        |
 
-## MergeJson
+## KeepIndividualJSON
 
-**MergeJson** combines the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder together with the `ProviderSettingsExport.json` into an uber JSON file named `ScubaResults.json`. The individual JSON files are deleted.
+**KeepIndividualJSON** Keeps the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
 
 | Parameter   | Value  |
 |-------------|--------|

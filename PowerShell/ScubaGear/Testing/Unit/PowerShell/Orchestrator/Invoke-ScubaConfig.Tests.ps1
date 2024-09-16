@@ -35,6 +35,8 @@ InModuleScope Orchestrator {
                 Mock -ModuleName Orchestrator Merge-JsonOutput {
                     $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)
                 }
+                function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+                Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
                 function Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
@@ -65,8 +67,7 @@ InModuleScope Orchestrator {
                     }
                 }
                 [ScubaConfig]::ResetInstance()
-                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")`
-                    -MergeJson
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
@@ -100,7 +101,6 @@ InModuleScope Orchestrator {
                   -OutFolderName "MyReports" `
                   -OutProviderFileName "MySettingsExport" `
                   -OutRegoFileName "RegoResults" `
-                  -MergeJson:$true `
                   -OutReportName "MyReport" `
                   -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `

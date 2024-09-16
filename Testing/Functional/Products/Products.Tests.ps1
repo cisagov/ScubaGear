@@ -205,10 +205,10 @@ BeforeAll {
     function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
     }
 }
@@ -256,7 +256,7 @@ Describe "Policy Checks for <ProductName>"{
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $OutputFolder = $ReportFolders[0].Name
                 SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
             }
             else {
                 Write-Debug "Driver: $TestDriver"
