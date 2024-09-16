@@ -134,7 +134,7 @@ function Invoke-ReadAllText {
     )
     process {
         $Content = [System.IO.File]::ReadAllText($Path, $Encoding)
-        return $Content
+        $Content
     }
 }
 
