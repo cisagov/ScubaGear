@@ -1741,6 +1741,8 @@ function Invoke-SCuBACached {
                 # can execute as normal.
                 $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
                 $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
+
+                # Immediate TODO: Change this to the custom UTF8 NoBOM function when available
                 $SettingsExport | ConvertTo-Json -Depth 20 | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
             }
             $SettingsExport = Get-Content $FileName | ConvertFrom-Json
