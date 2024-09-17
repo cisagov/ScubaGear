@@ -10,11 +10,6 @@ runs:
   using: "composite"
   steps:
     - run: |
-        echo "64:"
-        echo ${{ inputs.ThisPfxBase64 }}
-        new64 = ${{ inputs.ThisPfxBase64 }}
-        echo "new64:"
-        echo $new64
         cd repo
         # Create PFX
         New-Item -ItemType file -Path ./key.txt
