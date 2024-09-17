@@ -135,11 +135,16 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"
+  
   teams:
     name: Teams
     uses: ./.github/workflows/function_test_teams.yaml
     needs:
       - publish
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+
   # Tms_Tenant1:
   #   name: Tms_Tenant1
   #   runs-on: windows-latest
