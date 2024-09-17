@@ -292,14 +292,14 @@ function Get-PrivilegedUser {
                 $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
 
                 if ($Objecttype -eq "user") {
-                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -Objecttype "user"
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
                 }
                 elseif ($Objecttype -eq "group") {
                     # In this context $User.Id is a group identifier
                     $GroupId = $User.Id
 
                     # Process all of the group members that are transitively assigned to the current role as Active via group membership
-                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -Objecttype "group"
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
                 }
             }
         }
@@ -320,7 +320,7 @@ function Get-PrivilegedUser {
 
                 foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
                     $UserObjectId = $PIMRoleAssignment.PrincipalId
-                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $UserObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $UserObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
                 }
             }
         }
@@ -352,6 +352,10 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         [ValidateNotNullOrEmpty()]
         [bool]$TenantHasPremiumLicense,
 
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$M365Environment,
+
         # This describes the type of Entra Id object that the parameter ObjectId is referencing.
         # Valid values are "user", "group". If this is not passed, the function will call Graph to dynamically determine the object type.
         [Parameter()]
@@ -360,10 +364,10 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         [Parameter()]
         [int]$Recursioncount = 0
     )
-
-    # We support group nesting up to 2 levels deep. 
+Write-Warning "Recursion level: $recursioncount"
+    # We support group nesting up to 2 levels deep (allows levels 0 and 1). 
     # Safeguard: Also protects against infinite loop attacks if there is a circular group assignment in PIM.
-    if ($recursioncount -gt 2) {
+    if ($recursioncount -ge 2) {
         return
     }
 
@@ -435,8 +439,8 @@ Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($Group
                 if ($GroupMember.AccessId -ne "member") { continue }
                 $PIMEligibleUserId = $GroupMember.PrincipalId
 
-                $Recursioncount++
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -Recursioncount $Recursioncount
+                $LoopIterationRecursioncount = $Recursioncount + 1
+                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Recursioncount $LoopIterationRecursioncount
             }
         }
     }
