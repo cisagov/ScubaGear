@@ -136,35 +136,35 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"
 
-  thumbprint:
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    outputs:
-      Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        with:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        with:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  # thumbprint:
+  #   runs-on: windows-latest
+  #   environment: Development
+  #   permissions:
+  #     id-token: write
+  #     contents: write
+  #   outputs:
+  #     Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         path: repo
+  #     - name: Import PFX
+  #       uses: ./repo/.github/actions/import-pfx
+  #       with:
+  #         PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+  #     - name: Get Thumbprint
+  #       id: get-thumbprint
+  #       uses: ./repo/.github/actions/get-thumbprint
+  #       with:
+  #         PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
 
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
     secrets:
-      Thumbprint: ${{ needs.thumbprint.outputs.Thumbprint }}
+      # Thumbprint: ${{ needs.thumbprint.outputs.Thumbprint }}
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
@@ -173,7 +173,7 @@ jobs:
       NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
     needs:
       - publish
-      - thumbprint
+      # - thumbprint
 
   # Tms_Tenant1:
   #   name: Tms_Tenant1

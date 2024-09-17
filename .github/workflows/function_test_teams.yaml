@@ -6,8 +6,8 @@ name: Function Test Teams
 on:
   workflow_call:
     secrets:
-      Thumbprint:
-        required: true
+      # Thumbprint:
+      #   required: true
       PfxBase64:
         required: true
       PfxPassword:
@@ -40,16 +40,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: repo
-      # - name: Import PFX
-      #   uses: ./repo/.github/actions/import-pfx
-      #   with:
-      #     PfxBase64: ${{ secrets.PfxBase64 }}
-      #     PfxPassword: ${{ secrets.PfxPassword }}
-      # - name: Get Thumbprint
-      #   id: get-thumbprint
-      #   uses: ./repo/.github/actions/get-thumbprint
-      #   with:
-      #     PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+        outputs:
+          Thumbprint: ${{  }}
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
@@ -71,7 +73,8 @@ jobs:
         # env:
         #   Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
         with:
-          Thumbprint: ${{ secrets.Thumbprint }}
+          # Thumbprint: ${{ secrets.Thumbprint }}
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
