@@ -38,8 +38,8 @@ jobs:
       - name: Get Thumbprint
         id: get-thumbprint
         uses: ./repo/.github/actions/get-thumbprint
-        env:
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:

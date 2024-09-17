@@ -1,5 +1,9 @@
 name: Get Thumbprint
 description: Extract the thumbprint from the x509 certificate
+inputs:
+  PfxPassword:
+    required: true
+    description: "The PFX password"
 outputs:
   thumbprint:
     value: ${{ steps.thumbprint-output.outputs.thumbprint }}
@@ -8,7 +12,7 @@ runs:
   steps:
     - run: |
         cd repo
-        $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String $env:PfxPassword -AsPlainText -Force)
+        $x509 = Get-PfxCertificate -FilePath ./key.pfx -Password (ConvertTo-SecureString -String "${{ inputs.PfxPassword }}" -AsPlainText -Force)
         $Thumbprint = $x509.ThumbPrint
         # Pass thumbprint to later job.
         echo thumbprint=$Thumbprint >> $env:GITHUB_OUTPUT

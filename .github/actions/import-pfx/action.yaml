@@ -1,11 +1,12 @@
 name: Import PFX
+description: Create and import the PFX certificate
 inputs:
   PfxBase64:
     required: true
-    description: "The base64 PFX"
+    description: "The PFX as base64"
   PfxPassword:
     required: true
-    description: "The password PFX"
+    description: "The PFX password"
 runs:
   using: "composite"
   steps:
