@@ -15,7 +15,9 @@ on:
       KeyVaultInfo:
         required: true
 
-permissions: read-all
+permissions:
+  id-token: write
+  contents: write
 
 env:
   GalleryName: PrivateScubaGearGallery
