@@ -10,6 +10,14 @@ on:
         required: true
       PfxPassword:
         required: true
+      TestParams:
+        required: true
+      TestParamsDev:
+        required: true
+      NotifierUsername:
+        required: true
+      NotifierPassword:
+        required: true
   workflow_dispatch:
 
 # permissions: read-all
@@ -58,16 +66,16 @@ jobs:
       - name: Test
         id: test-product
         uses: ./repo/.github/actions/test-product
-        env:
+        with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant1
-          TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+          TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         if: ${{ success() }}
@@ -75,8 +83,8 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
           body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           # to: ${{ steps.test-product.outputs.emails }}

@@ -1,8 +1,15 @@
 name: Test Product
 description: Run the Pester tests for a given product
-# outputs:
-#   emails:
-#     value: ${{ steps.emails-output.outputs.emails }}
+inputs:
+  Thumbprint:
+    required: true
+    description: "The certificate thumbprint"
+  Alias:
+    required: true
+    description: "The alias of the product being tested"
+  TestParams:
+    required: true
+    description: "The set of parameters used to defined the test"
 runs:
   using: "composite"
   steps:
@@ -26,7 +33,6 @@ runs:
           [String]$productname = ""
           [String]$variant = ""
           [String]$m365 = ""
-          [String]$emails = ""
           $paramsAsHashTable = @{}
           $attributes = $product.split(",")
           foreach ($attribute in $attributes)
@@ -63,10 +69,6 @@ runs:
             {
               $m365 = $attribute
             }
-            elseif($key.ToLower() -eq "emails")
-            {
-              $emails = $value
-            }
           }
           if($alias -eq $productAlias)
           {
@@ -89,11 +91,6 @@ runs:
             $paramsAsHashTable.Add($m365KeyAndValue[0], $m365KeyAndValue[1])
             # Test the product
             ./Testing/Functional/Products/Tests/CallProductTests.ps1 -params $paramsAsHashTable -thumbprint $thumbprint
-            # Pass emails to later job for notification.
-            Write-Host "The emails:"
-            Write-Host $emails
-            # echo emails=$emails >> $env:GITHUB_OUTPUT
           }
         }
-      # id: emails-output
       shell: powershell
