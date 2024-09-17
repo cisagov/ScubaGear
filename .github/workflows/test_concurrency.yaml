@@ -135,7 +135,7 @@ jobs:
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"
-  
+
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
@@ -144,7 +144,7 @@ jobs:
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     needs:
       - publish
-    
+
   # Tms_Tenant1:
   #   name: Tms_Tenant1
   #   runs-on: windows-latest
@@ -235,7 +235,7 @@ jobs:
           do
             if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
             then
-              echo "Deleting" $cacheKey 
+              echo "Deleting" $cacheKey
               gh actions-cache delete $cacheKey --confirm
             fi
           done

@@ -12,3 +12,4 @@ rules:
   document-start: disable
   truthy: disable
   comments-indentation: disable
+  max-spaces-inside: disable
