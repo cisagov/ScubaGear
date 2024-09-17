@@ -1,5 +1,5 @@
 name: Import PFX
-secrets:
+inputs:
   ThisPfxBase64:
     required: true
   ThisPfxPassword:
@@ -11,12 +11,9 @@ runs:
         cd repo
         # Create PFX
         New-Item -ItemType file -Path ./key.txt
-        Set-Content -Path ./key.txt -Value PfxBase64
+        Set-Content -Path ./key.txt -Value ${{ inputs.ThisPfxBase64 }}
         certutil -decode ./key.txt ./key.pfx
         # Import FPX
         # Pipe to Out-Null to hide the thumbprint
-        Import-PfxCertificate -Password (ConvertTo-SecureString -String PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+        Import-PfxCertificate -Password (ConvertTo-SecureString -String ${{ inputs.ThisPfxPassword }} -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       shell: powershell
-      env:
-        PfxBase64: ${{ secrets.ThisPfxBase64 }}
-        PfxPassword: ${{ secrets.ThisPfxPassword }}
