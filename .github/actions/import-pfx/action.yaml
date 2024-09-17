@@ -18,5 +18,5 @@ runs:
         Import-PfxCertificate -Password (ConvertTo-SecureString -String PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       shell: powershell
       with:
-        PfxBase64: {{ secrets.ThisPfxBase64 }}
+        PfxBase64: ${{ secrets.ThisPfxBase64 }}
         PfxPassword: ${{ secrets.ThisPfxPassword }}
