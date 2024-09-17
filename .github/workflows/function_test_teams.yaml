@@ -6,8 +6,6 @@ name: Function Test Teams
 on:
   workflow_call:
     secrets:
-      # Thumbprint:
-      #   required: true
       PfxBase64:
         required: true
       PfxPassword:
@@ -22,7 +20,7 @@ on:
         required: true
   workflow_dispatch:
 
-# permissions: read-all
+permissions: read-all
 
 jobs:
   Tms_Tenant1:
@@ -68,10 +66,7 @@ jobs:
       - name: Test
         id: test-product
         uses: ./repo/.github/actions/test-product
-        # env:
-        #   Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
         with:
-          # Thumbprint: ${{ secrets.Thumbprint }}
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.TestParams }}
