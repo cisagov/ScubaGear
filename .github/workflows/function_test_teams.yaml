@@ -5,11 +5,11 @@ name: Function Test Teams
 # This is a reusable workflow called by the pipeline.
 on:
   workflow_call:
-    secrets:
-      PfxBase64:
-        required: true
-      PfxPassword:
-        required: true
+    # secrets:
+    #   PfxBase64:
+    #     required: true
+    #   PfxPassword:
+    #     required: true
   workflow_dispatch:
 
 # permissions: read-all

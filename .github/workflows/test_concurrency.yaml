@@ -139,9 +139,9 @@ jobs:
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
-    secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+    # secrets:
+    #   PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+    #   PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
     # needs:
     #   - publish
 
