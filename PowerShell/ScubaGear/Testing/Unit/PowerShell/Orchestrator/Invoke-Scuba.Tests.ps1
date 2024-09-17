@@ -28,9 +28,6 @@ InModuleScope Orchestrator {
             function ConvertTo-ResultsCsv {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
 
-            function Invoke-RunRego {throw 'this will be mocked'}
-            Mock -ModuleName Orchestrator Invoke-RunRego {}
-
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
         }

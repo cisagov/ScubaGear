@@ -241,7 +241,7 @@ Describe "Policy Checks for <ProductName>"{
 
                 Set-Content -Path $TestConfigFilePath -Value ($ScubaConfig | ConvertTo-Yaml)
                 SetConditions -Conditions $Preconditions.ToArray()
-                Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet
+                Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet -KeepIndividualJSON
             }
             # Ensure case matches driver in test plan
             elseif ('RunScuba' -eq $TestDriver){
