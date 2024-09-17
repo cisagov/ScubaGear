@@ -4,7 +4,7 @@
 # Pipes separate products, and commas separate key/value pairs.
 # key1=value1,key2=value2|key3=value3,key4=value4...
 
-name: Nightly Product Functional Tests
+name: Functional Tests
 
 # Run this workflow at 12:15 am
 # on every Sun to Thr (b/c GMT -5)
