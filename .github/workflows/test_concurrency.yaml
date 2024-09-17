@@ -173,6 +173,7 @@ jobs:
       NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
     needs:
       - publish
+      - thumbprint
 
   # Tms_Tenant1:
   #   name: Tms_Tenant1
