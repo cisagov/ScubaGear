@@ -66,8 +66,8 @@ jobs:
       - name: Test
         id: test-product
         uses: ./repo/.github/actions/test-product
-        # env:
-        #   Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+        env:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
         with:
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.TestParams }}
