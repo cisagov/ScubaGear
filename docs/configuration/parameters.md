@@ -162,7 +162,7 @@ The list of acceptable values are:
 
 ## KeepIndividualJSON
 
-**KeepIndividualJSON** Keeps the individual JSON files (named `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
+**KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
 
 | Parameter   | Value  |
 |-------------|--------|
