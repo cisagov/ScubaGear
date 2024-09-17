@@ -20,6 +20,7 @@ on:
     paths:
       - ".github/workflows/test_concurrency.yaml"
       - ".github/workflows/function_test_teams.yaml"
+      - ".github/workflows/publish_private_package.yaml"
       - ".github/actions/**"
 
 permissions:
