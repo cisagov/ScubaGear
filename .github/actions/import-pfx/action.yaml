@@ -12,14 +12,12 @@ runs:
     - run: |
         echo "64"
         echo "${{ inputs.PfxBase64 }}"
-        echo "642"
-        echo $"{{ inputs.PfxBase64 }}"
         cd repo
         # Create PFX
         New-Item -ItemType file -Path ./key.txt
-        Set-Content -Path ./key.txt -Value "${{ inputs.PfxBase64 }}""
+        Set-Content -Path ./key.txt -Value "${{ inputs.PfxBase64 }}"
         certutil -decode ./key.txt ./key.pfx
         # Import FPX
         # Pipe to Out-Null to hide the thumbprint
-        Import-PfxCertificate -Password (ConvertTo-SecureString -String ${{ inputs.PfxPassword }} -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+        Import-PfxCertificate -Password (ConvertTo-SecureString -String "${{ inputs.PfxPassword }}" -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       shell: powershell
