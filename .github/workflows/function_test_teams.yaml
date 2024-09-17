@@ -5,12 +5,9 @@ name: Function Test Teams
 # This is a reusable workflow called by the pipeline.
 on:
   workflow_call:
-    inputs:
+    secrets:
       Thumbprint:
         required: true
-        description: "The certificate thumbprint"
-        type: string
-    secrets:
       PfxBase64:
         required: true
       PfxPassword:
@@ -74,7 +71,7 @@ jobs:
         # env:
         #   Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
         with:
-          Thumbprint: ${{ inputs.Thumbprint }}
+          Thumbprint: ${{ secrets.Thumbprint }}
           Alias: Tms_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Extract Email

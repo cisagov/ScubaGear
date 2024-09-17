@@ -142,6 +142,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    outputs:
+      Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -161,9 +163,8 @@ jobs:
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
-    with:
-      Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
     secrets:
+      Thumbprint: ${{ needs.publish.outputs.Thumbprint }}
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
