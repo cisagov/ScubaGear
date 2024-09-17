@@ -17,17 +17,17 @@ runs:
         echo "thmb"
         echo $env::Thumbprint
         echo "alis"
-        echo "${{ inputs:Alias }}"
+        echo "${{ inputs.Alias }}"
         echo "params"
-        echo "${{ inputs:TestParams }}"
+        echo "${{ inputs.TestParams }}"
         Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.
         $thumbprint = $env::Thumbprint
-        $productAlias = "${{ inputs:Alias }}"
+        $productAlias = "${{ inputs.Alias }}"
         echo "Product alias is:"
         echo $productAlias
-        $params = "${{ inputs:TestParams }}"
+        $params = "${{ inputs.TestParams }}"
         # Split into products
         $products = $params.split("|")
         foreach ($product in $products)
