@@ -140,7 +140,7 @@ env:
 
 jobs:
   publish:
-    name: Publish and Cache
+    name: Pub & Cache
     uses: ./.github/workflows/publish_private_package.yaml
     secrets:
       ClientId: ${{ secrets.AZURE_CLIENT_ID }}
@@ -162,28 +162,35 @@ jobs:
       - publish
 
   cleanup:
-    name: Clear Caches
-    runs-on: ubuntu-latest
-    permissions: write-all
+    name: Cleanup
+    uses: ./.github/workflows/clear_cache.yaml
     needs:
       - publish
       - test_teams
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Clear Caches
-        run: |
-          gh extension install actions/gh-actions-cache
-          cacheKeys=$(gh actions-cache list -R $REPO)
-          set +e
-          for cacheKey in $cacheKeys
-          do
-            if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
-            then
-              echo "Deleting" $cacheKey
-              gh actions-cache delete $cacheKey --confirm
-            fi
-          done
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+
+  # cleanup:
+  #   name: Clear Caches
+  #   runs-on: ubuntu-latest
+  #   permissions: write-all
+  #   needs:
+  #     - publish
+  #     - test_teams
+  #   steps:
+  #     - name: Checkout Repo
+  #       uses: actions/checkout@v4
+  #     - name: Clear Caches
+  #       run: |
+  #         gh extension install actions/gh-actions-cache
+  #         cacheKeys=$(gh actions-cache list -R $REPO)
+  #         set +e
+  #         for cacheKey in $cacheKeys
+  #         do
+  #           if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
+  #           then
+  #             echo "Deleting" $cacheKey
+  #             gh actions-cache delete $cacheKey --confirm
+  #           fi
+  #         done
+  #       env:
+  #         GH_TOKEN: ${{ github.token }}
+  #         REPO: ${{ github.repository }}

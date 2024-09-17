@@ -24,7 +24,7 @@ env:
 
 jobs:
   publish:
-    name: Publish to Private Gallery
+    name: Pub to Private
     runs-on: windows-latest
     environment: Development
     permissions:
