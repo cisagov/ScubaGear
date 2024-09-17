@@ -164,7 +164,7 @@ jobs:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
     secrets:
-      Thumbprint: ${{ needs.publish.outputs.Thumbprint }}
+      Thumbprint: ${{ needs.thumbprint.outputs.Thumbprint }}
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
