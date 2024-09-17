@@ -22,7 +22,9 @@ on:
       - ".github/workflows/function_test_teams.yaml"
       - ".github/actions/**"
 
-permissions: read-all
+permissions:
+  id-token: write
+  contents: write
 
 env:
   GalleryName: PrivateScubaGearGallery
