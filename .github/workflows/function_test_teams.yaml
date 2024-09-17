@@ -33,7 +33,8 @@ jobs:
       - name: Import PFX
         uses: ./repo/.github/actions/import-pfx
         with:
-          ThisPfxBase64: ${{ secrets.PfxBase64 }}
+          # ThisPfxBase64: ${{ secrets.PfxBase64 }}
+          ThisPfxBase64: "dogfood"
           ThisPfxPassword: ${{ secrets.PfxPassword }}
       - name: Get Thumbprint
         id: get-thumbprint
