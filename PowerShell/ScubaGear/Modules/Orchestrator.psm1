@@ -1737,7 +1737,7 @@ function Invoke-SCuBACached {
             if (-not (Test-Path $FileName)) {
                 # When running Invoke-ScubaCached, the provider output might not exist as a stand-alone
                 # file depending on what version of ScubaGear created the output. If the provider output
-                # does not exist as a stand-alone file, create it from the ScubaRestuls file so the other functions
+                # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
                 # can execute as normal.
                 $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
                 $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
