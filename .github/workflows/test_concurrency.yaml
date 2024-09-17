@@ -24,9 +24,7 @@ on:
       - ".github/workflows/clear_cache.yaml"
       - ".github/actions/**"
 
-permissions:
-  id-token: write
-  contents: write
+permissions: write-all
 
 env:
   GalleryName: PrivateScubaGearGallery
