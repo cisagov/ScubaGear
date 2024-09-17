@@ -17,6 +17,6 @@ runs:
         # Pipe to Out-Null to hide the thumbprint
         Import-PfxCertificate -Password (ConvertTo-SecureString -String PfxPassword -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
       shell: powershell
-      with:
+      env:
         PfxBase64: ${{ secrets.ThisPfxBase64 }}
         PfxPassword: ${{ secrets.ThisPfxPassword }}
