@@ -21,6 +21,7 @@ on:
       - ".github/workflows/test_concurrency.yaml"
       - ".github/workflows/function_test_teams.yaml"
       - ".github/workflows/publish_private_package.yaml"
+      - ".github/workflows/clear_cache.yaml"
       - ".github/actions/**"
 
 permissions:
