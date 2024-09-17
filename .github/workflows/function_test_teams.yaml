@@ -5,11 +5,11 @@ name: Function Test Teams
 # This is a reusable workflow called by the pipeline.
 on:
   workflow_call:
-    # secrets:
-    #   PfxBase64:
-    #     required: true
-    #   PfxPassword:
-    #     required: true
+    secrets:
+      PfxBase64:
+        required: true
+      PfxPassword:
+        required: true
   workflow_dispatch:
 
 # permissions: read-all
@@ -32,9 +32,9 @@ jobs:
           path: repo
       - name: Import PFX
         uses: ./repo/.github/actions/import-pfx
-        env:
-          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
       - name: Get Thumbprint
         id: get-thumbprint
         uses: ./repo/.github/actions/get-thumbprint
