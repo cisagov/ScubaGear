@@ -32,9 +32,9 @@ jobs:
           path: repo
       - name: Import PFX
         uses: ./repo/.github/actions/import-pfx
-        with:
-          ThisPfxBase64: ${{ secrets.PfxBase64 }}
-          ThisPfxPassword: ${{ secrets.PfxPassword }}
+        env:
+          PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+          PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
       - name: Get Thumbprint
         id: get-thumbprint
         uses: ./repo/.github/actions/get-thumbprint
