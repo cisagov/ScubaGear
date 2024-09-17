@@ -1,9 +1,9 @@
 name: Test Product
 description: Run the Pester tests for a given product
 inputs:
-  Thumbprint:
-    required: true
-    description: "The certificate thumbprint"
+  # Thumbprint:
+  #   required: true
+  #   description: "The certificate thumbprint"
   Alias:
     required: true
     description: "The alias of the product being tested"
@@ -15,7 +15,7 @@ runs:
   steps:
     - run: |
         echo "thmb"
-        echo "${{ inputs:Thumbprint }}"
+        echo $env::Thumbprint
         echo "alis"
         echo "${{ inputs:Alias }}"
         echo "params"
@@ -23,7 +23,7 @@ runs:
         Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.
-        $thumbprint = "${{ inputs:Thumbprint }}"
+        $thumbprint = $env::Thumbprint
         $productAlias = "${{ inputs:Alias }}"
         echo "Product alias is:"
         echo $productAlias
@@ -100,3 +100,5 @@ runs:
           }
         }
       shell: powershell
+      env:
+        Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
