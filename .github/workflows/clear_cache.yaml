@@ -7,12 +7,16 @@ on:
   workflow_call:
   workflow_dispatch:
 
-permissions: read-all
+# permissions: read-all
+permissions:
+  contents: write
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    permissions: write-all
+    # permissions: write-all
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
