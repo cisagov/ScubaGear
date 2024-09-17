@@ -50,8 +50,6 @@ jobs:
         uses: ./repo/.github/actions/get-thumbprint
         with:
           PfxPassword: ${{ secrets.PfxPassword }}
-        outputs:
-          Thumbprint: ${{  }}
       - name: Restore ScubaGear
         uses: actions/cache/restore@v4
         with:
