@@ -277,7 +277,7 @@ function Invoke-SCuBA {
                 'OutProviderFileName' = $OutProviderFileName
                 'OutRegoFileName' = $OutRegoFileName
                 'OutReportName' = $OutReportName
-                'MergeJson' = $MergeJson
+                'KeepIndividualJSON' = $KeepIndividualJSON
                 'OutJsonFileName' = $OutJsonFileName
                 'OutCsvFileName' = $OutCsvFileName
             }

@@ -172,9 +172,9 @@ The list of acceptable values are:
 | Config File | No     |  
 
 ```powershell
-# Create a merged JSON file
+# Outputs legacy ScubaGear individual JSON output 
 Invoke-SCuBA -ProductNames teams `
-  -MergeJson
+  -KeepIndividualJSON
 ```
 
 ## OPAPath
@@ -238,7 +238,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutJsonFileName
 
-**OutJsonFileName** renames the uber JSON file that is created if the [MergeJson](#mergejson) parameter is used. This should only be the base file name, as the extension `.json` will automatically be added. 
+**OutJsonFileName** renames the uber output JSON file that is created after a ScubaGear run. This should only be the base file name, as the extension `.json` will automatically be added. 
 
 | Parameter   | Value              |
 |-------------|--------------------|
@@ -247,13 +247,12 @@ Invoke-SCuBA -ProductNames teams `
 | Default     | `ScubaResults.json` |
 | Config File | No                 |  
 
-> **Note**: This parameter does not work if the `-MergeJson` parameter is not present.
+> **Note**: This parameter does not work if the `-KeepIndividualJSON` parameter is present.
 
 ```powershell
 # Change the output JSON file
 Invoke-SCuBA -ProductNames teams `
-  -OutJsonFileName myresults `
-  -MergeJson
+  -OutJsonFileName myresults
 ```
 
 ## OutCsvFileName
