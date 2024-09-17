@@ -5,13 +5,9 @@ name: Function Test Teams
 # This is a reusable workflow called by the pipeline.
 on:
   workflow_call:
-    inputs:
+    secrets:
       Thumbprint:
         required: true
-        type: string
-    secrets:
-      # Thumbprint:
-      #   required: true
       PfxBase64:
         required: true
       PfxPassword:

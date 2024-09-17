@@ -23,10 +23,8 @@ runs:
         Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.
-        $thumbprint = $env::Thumbprint
+        $thumbprint = "${{ inputs.Thumbprint }}"
         $productAlias = "${{ inputs.Alias }}"
-        echo "Product alias is:"
-        echo $productAlias
         $params = "${{ inputs.TestParams }}"
         # Split into products
         $products = $params.split("|")
@@ -100,5 +98,3 @@ runs:
           }
         }
       shell: powershell
-      env:
-        Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
