@@ -9,6 +9,7 @@ on:
       Thumbprint:
         required: true
         description: "The certificate thumbprint"
+        type: string
     secrets:
       PfxBase64:
         required: true
