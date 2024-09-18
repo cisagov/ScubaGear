@@ -15,6 +15,9 @@ jobs:
     name: Clear Cache
     runs-on: ubuntu-latest
     permissions: write-all
+    # Run even if one of the functional tests have failed
+    # We always want to clean up the caches that we create
+    if: always()
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4

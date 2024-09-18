@@ -120,5 +120,8 @@ jobs:
     uses: ./.github/workflows/clear_cache.yaml
     needs:
       - publish
-      - test_teams
+      - test_defender
+      - test_exchange
+      - test_power_platform
       - test_sharepoint
+      - test_teams
