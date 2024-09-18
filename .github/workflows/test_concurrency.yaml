@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       # checkov:skip=CKV_GHA_7:Manual inputs are desired.
-      email-on-failure:
+      EmailOnFailure:
         description: Check to send an email on failure
         type: boolean
         required: true
@@ -24,6 +24,7 @@ on:
       - ".github/workflows/clear_cache.yaml"
       - ".github/actions/**"
 
+# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 permissions: write-all
 
 env:
@@ -42,6 +43,23 @@ jobs:
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
+  
+  test_sharepoint:
+    name: Test Sharepoint
+    uses: ./.github/workflows/function_test_sharepoint.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -58,3 +76,4 @@ jobs:
     needs:
       - publish
       - test_teams
+      - test_sharepoint

@@ -7,6 +7,7 @@ on:
   workflow_call:
   workflow_dispatch:
 
+# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 permissions: write-all
 
 jobs:
