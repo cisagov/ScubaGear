@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   Tms_Tenant1:
-    name: Tms_Tenant1
+    name: ${{ github.job }}
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -70,13 +70,13 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Tms_Tenant1
-          TestParams: ${{ secrets.TestParams }}
+          Alias: ${{ github.job }}
+          TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
-          Alias: Tms_Tenant1
+          Alias: ${{ github.job }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
@@ -88,7 +88,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The ${{ github.job }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           # to: ${{ steps.test-product.outputs.emails }}
           to: jgarriss@mitre.org
           from: ScubaGear Notifier

@@ -24,7 +24,7 @@ env:
 
 jobs:
   publish:
-    name: Pub to Private
+    name: Private Repo
     runs-on: windows-latest
     environment: Development
     permissions:
