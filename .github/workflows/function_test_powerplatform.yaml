@@ -1,6 +1,6 @@
-# Run functional tests for Teams
+# Run functional tests for Power Platform
 
-name: Function Test Teams
+name: Function Test Power Platform
 
 # This is a reusable workflow called by the pipeline.
 on:
@@ -30,7 +30,7 @@ permissions:
   contents: write
 
 jobs:
-  Tms_Tenant1:
+  Pwr_Tenant1:
     name: ${{ github.job }}
     runs-on: windows-latest
     environment: Development
@@ -38,7 +38,7 @@ jobs:
       id-token: write
       contents: write
     concurrency:
-      group: Teams_Tenant1
+      group: Power_Tenant1
       cancel-in-progress: false
     steps:
       - name: Checkout Repo
@@ -78,13 +78,14 @@ jobs:
           Alias: ${{ github.job }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ github.job }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ success() }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com

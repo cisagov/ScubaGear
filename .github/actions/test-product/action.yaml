@@ -14,12 +14,8 @@ runs:
   using: "composite"
   steps:
     - run: |
-        echo "thmb"
-        echo "${{ inputs.Thumbprint }}"
-        echo "alis"
+        echo "The alias is:"
         echo "${{ inputs.Alias }}"
-        echo "params"
-        echo "${{ inputs.TestParams }}"
         Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.

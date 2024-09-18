@@ -1,6 +1,6 @@
-# Run functional tests for Teams
+# Run functional tests for Exchange
 
-name: Function Test Teams
+name: Function Test Exchange
 
 # This is a reusable workflow called by the pipeline.
 on:
@@ -30,7 +30,7 @@ permissions:
   contents: write
 
 jobs:
-  Tms_Tenant1:
+  Exc_Tenant1:
     name: ${{ github.job }}
     runs-on: windows-latest
     environment: Development
@@ -38,7 +38,7 @@ jobs:
       id-token: write
       contents: write
     concurrency:
-      group: Teams_Tenant1
+      group: Exchange_Tenant1
       cancel-in-progress: false
     steps:
       - name: Checkout Repo
