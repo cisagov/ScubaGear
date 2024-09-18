@@ -4,7 +4,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function 
 InModuleScope Utility {
     Describe -Tag 'Utility' -Name 'Set-Utf8NoBom Pathing' {
         BeforeAll {
-            function Invoke-WriteAllText {}
+            function Invoke-WriteAllText { return "Pass" }
             Mock -ModuleName Utility Invoke-WriteAllText
 
             # Setup test directories for testing
