@@ -55,6 +55,21 @@ jobs:
     needs:
       - publish
 
+  test_entra:
+    name: Test Defender
+    uses: ./.github/workflows/function_test_entra.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
+
   test_exchange:
     name: Test Exchange
     uses: ./.github/workflows/function_test_exchange.yaml
@@ -85,9 +100,9 @@ jobs:
     needs:
       - publish
 
-  test_teams:
-    name: Test Teams
-    uses: ./.github/workflows/function_test_teams.yaml
+  test_sharepoint:
+    name: Test Sharepoint
+    uses: ./.github/workflows/function_test_sharepoint.yaml
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
     secrets:
@@ -100,9 +115,9 @@ jobs:
     needs:
       - publish
 
-  test_sharepoint:
-    name: Test Sharepoint
-    uses: ./.github/workflows/function_test_sharepoint.yaml
+  test_teams:
+    name: Test Teams
+    uses: ./.github/workflows/function_test_teams.yaml
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
     secrets:
@@ -119,8 +134,8 @@ jobs:
     name: Clean
     uses: ./.github/workflows/clear_cache.yaml
     needs:
-      - publish
       - test_defender
+      - test_entra
       - test_exchange
       - test_power_platform
       - test_sharepoint
