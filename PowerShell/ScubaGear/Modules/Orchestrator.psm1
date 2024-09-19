@@ -1733,8 +1733,8 @@ function Invoke-SCuBACached {
                 Invoke-ProviderList @ProviderParams
             }
 
-            $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
-            if (-not (Test-Path $FileName)) {
+            $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+            if (-not (Test-Path $ProviderJSONFilePath)) {
                 # When running Invoke-ScubaCached, the provider output might not exist as a stand-alone
                 # file depending on what version of ScubaGear created the output. If the provider output
                 # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
@@ -1742,10 +1742,13 @@ function Invoke-SCuBACached {
                 $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
                 $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
 
-                # Immediate TODO: Change this to the custom UTF8 NoBOM function when available
-                $SettingsExport | ConvertTo-Json -Depth 20 | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+                # Uses the custom UTF8 NoBOM function when available
+                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
+                -Location $ProviderJSONFilePath -FileName "$OutProviderFileName.json"
+                Write-Debug $ActualSavedLocation
             }
-            $SettingsExport = Get-Content $FileName | ConvertFrom-Json
+            $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
                 'ProductNames' = $ProductNames;
