@@ -40,11 +40,7 @@ function Invoke-GraphDirectly {
     }
 
     if ($queryParams) {
-        <#
-          If query params are passed in, we need to augment the endpoint URI to include the params. Paperwork below.
-          We can't use string formatting easily because the graph API expects parameters
-          that are prefixed with the dollar symbol. Maybe someone smarter than me can figure that out.
-        #>
+        # If query params are passed in, we augment the endpoint URI to include the params.
         $q = [System.Web.HttpUtility]::ParseQueryString([string]::Empty)
         foreach ($item in $queryParams.GetEnumerator()) {
             $q.Add($item.Key, $item.Value)
@@ -79,18 +75,12 @@ function Export-AADProvider {
     Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
     $Tracker = Get-CommandTracker
 
-    # The below cmdlet covers the following baselines
-    # - 1.1
-    # - 2.1
-    # - 3.1
-    # - 4.2
-    # - 3.7
+    # The below cmdlet covers ~ 8 policy checks that inspect conditional access policies
     $AllPolicies = $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy")
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
-    $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # pre-processed version of the CAPs used in generating
-    # the CAP html in the report
+    $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # Used in generating the CAP html in the report
 
     if ($CapTableData -eq "") {
         # Quick sanity check, did ExportCapPolicies return something?
@@ -121,31 +111,25 @@ function Export-AADProvider {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
 
-        # Get-PrivilegedUser provides a list of privileged users and their role assignments. Used for 2.11 and 2.12
+        # Get-PrivilegedUser provides a list of privileged users and their role assignments.
         if ($RequiredServicePlan) {
-            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
+            # If the tenant has the premium license then we also include calls to PIM APIs
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
         }
         else{
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
         }
-        $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
-        # The above Converto-Json call doesn't need to have the input wrapped in an
+        # The Converto-Json call below doesn't need to have the input wrapped in an
         # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
-        # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries
-        # like it does arrays (just observe the difference in output between
-        # "@{} | ConvertTo-Json" and
-        # "@() | ConvertTo-Json" )
-        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries like it does arrays
+        $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
         # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary. The if/else
-        # above corrects the $null ConvertTo-Json would return in that case to an empty
-        # dictionary
-
-        # Get-PrivilegedRole provides a list of privileged roles referenced in 2.13 when checking if MFA is required for those roles
-        # Get-PrivilegedRole provides data for 2.14 - 2.16, policies that evaluate conditions related to Azure AD PIM
+        # on error, $TryCommand returns an empty list, not a dictionary.
+        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        
+        # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
-            # If the tenant has the premium license then we want to also include PIM Eligible role assignments - otherwise we don't to avoid an API error
+            # If the tenant has the premium license then we also include calls to PIM APIs
             $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
         }
         else {
@@ -162,20 +146,19 @@ function Export-AADProvider {
     }
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
-    # Checking to ensure command runs successfully
     $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
-
+    # Ensure we successfully got a count of users
     if(-Not $UserCount -is [int]) {
         $UserCount = "NaN"
     }
 
-    # 5.1, 5.2, 8.1 & 8.3
+    # Provides data for policies such as user consent and guest user access
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
 
-    # 5.3, 5.4
+    # Provides data for admin consent workflow
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting"))
 
-    ##### This block of code below supports 3.3, 3.4, 3.5
+    ##### This block supports policies that need data on the tenant's authentication methods
     $AuthenticationMethodPolicyRootObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy")
 
     $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
@@ -193,7 +176,7 @@ function Export-AADProvider {
     $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
     ##### End block
 
-   # 6.1
+    # Provides data on the password expiration policy
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -219,9 +202,6 @@ function Export-AADProvider {
     $json
 }
 
-    #"authentication_method_policy": $AuthenticationMethodPolicy,
-    #"authentication_method_configuration":  $AuthenticationMethodConfiguration,
-    #"authentication_method_feature_settings": $AuthenticationMethodFeatureSettings,
 function Get-AADTenantDetail {
     <#
     .Description
@@ -260,7 +240,7 @@ function Get-AADTenantDetail {
 function Get-PrivilegedUser {
     <#
     .Description
-    Gets the array of the highly privileged users
+    Returns a hashtable of privileged users and their respective roles
     .Functionality
     Internal
     #>
@@ -333,6 +313,13 @@ function Get-PrivilegedUser {
 }
 
 function LoadObjectDataIntoPrivilegedUserHashtable {
+    <#
+    .Description
+    Takes an object Id (either a user or group) and loads metadata about the object in the provided privileged user hashtable.
+    If the object is a group, this function will iterate the group members and load metadata about each member.
+    .Functionality
+    Internal
+    #>
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -341,9 +328,8 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         [Parameter(Mandatory=$true)]
         [hashtable]$PrivilegedUsers,
 
-        # The Entra Id unique identifiter for an object in the directory.
-        # Metadata about this object will be loaded into the PrivilegedUsers hashtable.
-        # If this refers to a group, this function will iterate through the group and load the metadata for each member into the hashtable.
+        # The Entra Id unique identifiter for an object (either a user or a group) in the directory.
+        # Metadata about this object will be loaded into the PrivilegedUsers hashtable which is passed as a parameter.
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$ObjectId,
@@ -365,12 +351,13 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         [int]$Recursioncount = 0
     )
 Write-Warning "Recursion level: $recursioncount"
-    # We support group nesting up to 2 levels deep (allows levels 0 and 1). 
-    # Safeguard: Also protects against infinite loop attacks if there is a circular group assignment in PIM.
+    # We support group nesting up to 2 levels deep (stops after processing levels 0 and 1). 
+    # Safeguard: Also protects against infinite loops if there is a circular group assignment in PIM.
     if ($recursioncount -ge 2) {
         return
     }
 
+    # If the object type was not supplied we need to determine whether it is a user or a group.
     if ($Objecttype -eq "") {
         try {
             $DirectoryObject = Get-MgBetaDirectoryObject -ErrorAction Stop -DirectoryObjectId $ObjectId
@@ -386,11 +373,12 @@ Write-Warning "Recursion level: $recursioncount"
             }
         }
 
+        # Extract what type of object this is.
         $Objecttype = $DirectoryObject.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
     }
 
     if ($Objecttype -eq "user") {
-        # If the user's data has not been fetched from graph, go get it
+        # If the user's data has not been fetched from graph, go get it and add it to the hashtable
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $ObjectId
             $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
@@ -403,7 +391,7 @@ Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
     }
 
     elseif ($Objecttype -eq "group") {
-        # In this context $ObjectId is a group identifier
+        # In this context $ObjectId is a group identifier so we need to iterate the group members
         $GroupId = $ObjectId
         # Get all of the group members that are transitively assigned to the current role via group membership
         $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $GroupId
@@ -412,7 +400,7 @@ Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
         foreach ($GroupMember in $GroupMembers) {
             $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
             if ($Membertype -eq "user") {
-                # If the user's data has not been fetched from graph, go get it
+                # If the user's data has not been fetched from graph, go get it and add it to the hashtable
                 if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                     $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $GroupMember.Id
                     $PrivilegedUsers[$GroupMember.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
@@ -424,7 +412,7 @@ Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
             }
         }
 
-        # Since this is a group, we need to also process assignments in PIM
+        # Since this is a group, we need to also process assignments in PIM in case it is in PIM for Groups
         # If the premium license for PIM is there, process the users that are "member" of the PIM group as Eligible
         if ($TenantHasPremiumLicense) {
             # Get the users that are assigned to the PIM group as Eligible members
@@ -439,6 +427,7 @@ Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($Group
                 if ($GroupMember.AccessId -ne "member") { continue }
                 $PIMEligibleUserId = $GroupMember.PrincipalId
 
+                # Recursively call this function to process the group member that was found
                 $LoopIterationRecursioncount = $Recursioncount + 1
                 LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Recursioncount $LoopIterationRecursioncount
             }
@@ -482,7 +471,7 @@ function GetConfigurationsForPimGroups{
     param (
         [ValidateNotNullOrEmpty()]
         [array]
-        $PrivilegedRoleHashtable,
+        $PrivilegedRoleArray,
 
         [ValidateNotNullOrEmpty()]
         [array]
@@ -503,7 +492,7 @@ function GetConfigurationsForPimGroups{
     foreach ($RoleAssignment in $AllRoleAssignments){
 
         # Check if the assignment in current loop iteration is assigned to a privileged role
-        $Role = $PrivilegedRoleHashtable | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
+        $Role = $PrivilegedRoleArray | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
 
         # If this is a privileged role
         if ($Role){
@@ -529,7 +518,7 @@ function GetConfigurationsForPimGroups{
             $PolicyAssignment = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'" |
                 Select-Object -Property PolicyId
 
-            # Add each configuration rule to the hashtable. There are usually about 17 configurations for a group.
+            # Add each configuration rule to the array. There are usually about 17 configurations for a group.
             # Get the detailed configuration settings
             $MemberPolicyRules = Get-MgBetaPolicyRoleManagementPolicyRule -All -ErrorAction Stop -UnifiedRoleManagementPolicyId $PolicyAssignment.PolicyId
             # Filter for the PIM group so we can grab its name
@@ -554,7 +543,7 @@ function GetConfigurationsForRoles{
     param (
         [ValidateNotNullOrEmpty()]
         [array]
-        $PrivilegedRoleHashtable,
+        $PrivilegedRoleArray,
 
         [ValidateNotNullOrEmpty()]
         [array]
@@ -564,7 +553,7 @@ function GetConfigurationsForRoles{
     # Get all the configuration settings (aka rules) for all the roles in the tenant
     $RolePolicyAssignments = Get-MgBetaPolicyRoleManagementPolicyAssignment -All -ErrorAction Stop -Filter "scopeId eq '/' and scopeType eq 'DirectoryRole'"
 
-    foreach ($Role in $PrivilegedRoleHashtable) {
+    foreach ($Role in $PrivilegedRoleArray) {
         $RolePolicies = @()
         $RoleTemplateId = $Role.RoleTemplateId
 
@@ -577,7 +566,7 @@ function GetConfigurationsForRoles{
         # Get a list of the users / groups assigned to this role
         $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
 
-        # Store the data that we retrieved in the Role object which is part of the hashtable that will be returned from this function
+        # Store the data that we retrieved in the Role object which is part of the privileged role array
         $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
 
         $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
@@ -594,7 +583,7 @@ function GetConfigurationsForRoles{
 function Get-PrivilegedRole {
     <#
     .Description
-    Creates an array of the highly privileged roles along with the users assigned to the role and the security policies (aka rules) applied to it
+    Returns an array of the highly privileged roles along with the users actively assigned to the role and the security configurations applied to the role
     .Functionality
     Internal
     #>
@@ -612,7 +601,7 @@ function Get-PrivilegedRole {
         $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
         # Get a list of the RoleTemplateId values for the privileged roles in the list above.
         # The RoleTemplateId value is passed to other cmdlets to retrieve role/group security configuration rules and user/group assignments.
-        $PrivilegedRoleHashtable = Get-MgBetaDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
+        $PrivilegedRoleArray = Get-MgBetaDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
 
         # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
         if ($TenantHasPremiumLicense) {
@@ -625,11 +614,11 @@ function Get-PrivilegedRole {
                 "M365Environment" = $M365Environment }
             $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
 
-            # Each of the helper functions below add configuration settings (aka rules) to the role hashtable.
+            # Each of the helper functions below add configuration settings (aka rules) to the role array.
             # Get the PIM configurations for the roles
-            GetConfigurationsForRoles -PrivilegedRoleHashtable $PrivilegedRoleHashtable -AllRoleAssignments $AllRoleAssignments
+            GetConfigurationsForRoles -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments
             # Get the PIM configurations for the groups
-            GetConfigurationsForPimGroups -PrivilegedRoleHashtable $PrivilegedRoleHashtable -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
+            GetConfigurationsForPimGroups -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
         }
     } catch {
         Write-Warning "An error occurred in Get-PrivilegedRole: $($_.Exception.Message)"
@@ -637,7 +626,7 @@ function Get-PrivilegedRole {
         throw $_
     }
 
-    # Return the hashtable
-    $PrivilegedRoleHashtable
+    # Return the array
+    $PrivilegedRoleArray
 }
 
