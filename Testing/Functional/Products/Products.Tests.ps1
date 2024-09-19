@@ -97,14 +97,11 @@ param (
     $Variant = [string]::Empty
 )
 
-$ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-$ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-$ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-Import-Module $ScubaModule
-Import-Module $ConnectionModule
-Import-Module Selenium
+BeforeDiscovery {
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    Import-Module $ScubaModule
 
-BeforeDiscovery{
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
     }
@@ -150,8 +147,15 @@ BeforeDiscovery{
     }
 }
 
-BeforeAll{
+BeforeAll {
     # Shared Data for functional test
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    Import-Module $ScubaModule
+    Import-Module $ConnectionModule
+    Import-Module Selenium
+
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
     $ProductDetails = @{
         aad = "Azure Active Directory"
@@ -179,27 +183,21 @@ BeforeAll{
         )
 
         ForEach($Condition in $Conditions){
-
             $Splat = $Condition.Splat
-
             if ('Cached' -eq $PSCmdlet.ParameterSetName){
                 $Splat.Add("OutputFolder", [string]$OutputFolder)
             }
-
-            if ($Splat ) {
+            if ($Splat) {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command) @Splat")
             }
             else {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
-
-
             try {
                 $ScriptBlock.Invoke()
             }
             catch {
                 Write-Error "Exception: SetConditions failed. $_"
-
             }
         }
     }
@@ -216,8 +214,9 @@ BeforeAll{
 }
 
 Describe "Policy Checks for <ProductName>"{
+
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
-        BeforeEach{
+        BeforeEach {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){

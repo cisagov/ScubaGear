@@ -1,3 +1,6 @@
+$UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
+
 # Helper functions for functional test
 function IsEquivalence{
   <#
@@ -90,7 +93,8 @@ function LoadProviderExport() {
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
 
-  $ProviderExport = Get-Content -Raw "$OutputFolder/ModifiedProviderSettingsExport.json" | ConvertFrom-Json
+  $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json"
+  $ProviderExport = $Content | ConvertFrom-Json
   $ProviderExport
 }
 
@@ -126,7 +130,7 @@ function PublishProviderExport() {
       $Export
   )
   $Json = $Export | ConvertTo-Json -Depth 10 | Out-String
-  Set-Content -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -Value $Json
+  Set-Utf8NoBom -Content $Json -Location "$OutputFolder" -FileName "ModifiedProviderSettingsExport.json"
 }
 
 function UpdateProviderExport{

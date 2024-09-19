@@ -1,3 +1,5 @@
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
+
 function New-Report {
      <#
     .Description
@@ -60,11 +62,11 @@ function New-Report {
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
-    $SettingsExport =  Get-Content $FileName | ConvertFrom-Json
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json" -Resolve
+    $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
-    $TestResults =  Get-Content $FileName | ConvertFrom-Json
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
+    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 

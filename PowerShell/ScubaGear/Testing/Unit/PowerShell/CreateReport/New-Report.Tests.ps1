@@ -5,9 +5,9 @@ InModuleScope CreateReport {
         BeforeAll {
             Mock -CommandName Write-Warning {}
 
-            New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs") -Name "CreateReportUnitFolder" -ItemType Directory
-            New-Item -Path (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
-            $TestOutPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs")
+            New-Item -Path (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs") -Name "CreateReportUnitFolder" -ItemType Directory
+            New-Item -Path (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
+            $TestOutPath = (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs")
             Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "CreateReportStubs/*") -Destination $TestOutPath -Recurse
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
@@ -30,7 +30,7 @@ InModuleScope CreateReport {
             }
         }
         BeforeEach {
-            $IndividualReportPath = (Join-Path -Path "TestDrive:" -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports")
+            $IndividualReportPath = (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports")
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CreateReportParams')]
             $CreateReportParams = @{
                 'IndividualReportPath' = $IndividualReportPath

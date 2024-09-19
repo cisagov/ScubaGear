@@ -628,20 +628,19 @@ function Invoke-ProviderList {
         }
 "@
 
-            # Strip the character sequences that Rego tries to interpret as escape sequences,
-            # resulting in the error "unable to parse input: yaml: line x: found unknown escape character"
-            # "\/", ex: "\/Date(1705651200000)\/"
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\/", "")
-            # "\B", ex: "Removed an entry in Tenant Allow\Block List"
-            $BaselineSettingsExport = $BaselineSettingsExport.replace("\B", "/B")
+            # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA (as of 0.68) appears to not
+            # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
+            # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
+            # the BOM
+            $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+                -Location $OutFolderPath -FileName "$OutProviderFileName.json"
+            Write-Debug $ActualSavedLocation
 
-            $FinalPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -ErrorAction 'Stop'
-            $BaselineSettingsExport | Set-Content -Path $FinalPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
             $ProdProviderFailed
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. See the exception message for more details: $($_)`n$($_.ScriptStackTrace)"
             throw $InvokeProviderListErrorMessage
         }
     }
@@ -1438,7 +1437,7 @@ function Import-Resources {
             Import-Module $ModulePath
         }
 
-        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support') | ForEach-Object {
+        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support', 'Utility') | ForEach-Object {
             $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
             Write-Debug "Importing $_ module"
             Import-Module -Name $ModulePath
@@ -1697,7 +1696,7 @@ function Invoke-SCuBACached {
             $ProductNames = $ProductNames | Sort-Object -Unique
 
             Remove-Resources
-            Import-Resources # Imports Providers, RunRego, CreateReport, Connection
+            Import-Resources # Imports Providers, RunRego, CreateReport, Connection, Support, Utility
 
             # Authenticate
             $ConnectionParams = @{
