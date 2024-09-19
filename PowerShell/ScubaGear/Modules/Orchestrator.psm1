@@ -1742,7 +1742,7 @@ function Invoke-SCuBACached {
                 $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
                 $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
 
-                # Uses the custom UTF8 NoBOM function when available
+                # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
                 $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
                 $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
                 -Location $ProviderJSONFilePath -FileName "$OutProviderFileName.json"
