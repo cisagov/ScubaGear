@@ -22,6 +22,12 @@ on:
       - ".github/workflows/function_test_teams.yaml"
       - ".github/workflows/publish_private_package.yaml"
       - ".github/workflows/clear_cache.yaml"
+      - ".github/workflows/function_test_defender.yaml"
+      - ".github/workflows/function_test_entra.yaml"
+      - ".github/workflows/function_test_exchange.yaml"
+      - ".github/workflows/function_test_powerplatform.yaml"
+      - ".github/workflows/function_test_sharepoint.yaml"
+      - ".github/workflows/function_test_teams.yaml"
       - ".github/actions/**"
 
 # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
@@ -38,7 +44,7 @@ jobs:
       ClientId: ${{ secrets.AZURE_CLIENT_ID }}
       TenantId: ${{ secrets.AZURE_TENANT_ID }}
       SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}   
+      KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
   test_defender:
     name: Test Defender
     uses: ./.github/workflows/function_test_defender.yaml
