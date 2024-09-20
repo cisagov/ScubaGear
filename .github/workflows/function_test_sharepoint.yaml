@@ -45,6 +45,7 @@ jobs:
       group: Sharepoint_Tenant1
       cancel-in-progress: false
     steps:
+      - run: echo ${{ inputs.GitHubJob }}
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
@@ -82,14 +83,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        # if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
-        if: ${{ success() }}
+        if: ${{ failure() && (inputs.email-on-failure || github.event.schedule || github.event_name == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com

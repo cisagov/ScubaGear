@@ -14,6 +14,14 @@ on:
         description: "The GitHub job ID"
         required: true
         type: string
+      GitHubEventSchedule:
+        description: "A type of GitHub event"
+        required: true
+        type: string
+      GitHubEventName:
+        description: "The name of a GitHub event"
+        required: true
+        type: string
     secrets:
       PfxBase64:
         required: true
@@ -82,13 +90,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -149,13 +157,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -214,13 +222,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -281,13 +289,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -346,13 +354,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -413,13 +421,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -478,13 +486,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -545,13 +553,13 @@ jobs:
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
-        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        # if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: ${{ inputs.GitHubJob }}
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || github.event_name == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
