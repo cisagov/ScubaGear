@@ -142,8 +142,8 @@ jobs:
     uses: ./.github/workflows/clear_cache.yaml
     needs:
       - test_defender
-      - test_entra
-      - test_exchange
-      - test_power_platform
-      - test_sharepoint
-      - test_teams
+      # - test_entra
+      # - test_exchange
+      # - test_power_platform
+      # - test_sharepoint
+      # - test_teams
