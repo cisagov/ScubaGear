@@ -50,7 +50,6 @@ jobs:
     uses: ./.github/workflows/function_test_defender.yaml
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
-      GitHubJob: ${{ github.job }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
