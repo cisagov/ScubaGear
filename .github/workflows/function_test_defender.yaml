@@ -43,7 +43,7 @@ permissions:
 
 jobs:
   Def_Tenant1:
-    name: ${{ inputs.GitHubJob }}
+    name: Def_Tenant1
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -86,14 +86,14 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: ${{ inputs.GitHubJob }}
+          Alias: Def_Tenant1
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Extract Email
         id: extract-email
         # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: ./repo/.github/actions/extract-email
         env:
-          Alias: ${{ inputs.GitHubJob }}
+          Alias: Def_Tenant1
           TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || github.event.schedule || inputs.GitHubEventName == 'push') }}
@@ -104,7 +104,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The ${{ inputs.GitHubJob }} test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Def_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Def_Tenant1_G5:
