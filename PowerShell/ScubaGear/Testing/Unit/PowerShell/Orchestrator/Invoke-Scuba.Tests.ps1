@@ -22,6 +22,12 @@ InModuleScope Orchestrator {
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
 
+            function Merge-JsonOutput {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator Merge-JsonOutput {}
+
+            function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
+
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
         }
@@ -30,6 +36,7 @@ InModuleScope Orchestrator {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]
                 $SplatParams = @{
                     M365Environment = 'commercial';
+                    KeepIndividualJSON = $true;
                 }
             }
             It 'Do it quietly (Do not automatically show report)' {

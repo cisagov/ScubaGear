@@ -21,6 +21,10 @@ InModuleScope Orchestrator {
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
 
+            function Set-Utf8NoBom {}
+            Mock -ModuleName Orchestrator Set-Utf8NoBom
+
+            Mock -CommandName Write-Debug {}
             Mock -CommandName New-Item {}
             Mock -CommandName Get-Content {}
         }

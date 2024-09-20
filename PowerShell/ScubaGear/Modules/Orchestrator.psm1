@@ -66,11 +66,11 @@ function Invoke-SCuBA {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
-    .Parameter MergeJson
-    Set switch to merge all json output into a single file and delete the individual files
-    after merging.
+    .Parameter KeepIndividualJSON
+    Keeps ScubaGear legacy output where files are not merged into an all in one JSON.
+    This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
-    If MergeJson is set, the name of the consolidated json created in the folder
+    If KeepIndividualJSON is not set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
@@ -208,7 +208,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [switch]
-        $MergeJson,
+        $KeepIndividualJSON,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
@@ -277,7 +277,7 @@ function Invoke-SCuBA {
                 'OutProviderFileName' = $OutProviderFileName
                 'OutRegoFileName' = $OutRegoFileName
                 'OutReportName' = $OutReportName
-                'MergeJson' = $MergeJson
+                'KeepIndividualJSON' = $KeepIndividualJSON
                 'OutJsonFileName' = $OutJsonFileName
                 'OutCsvFileName' = $OutCsvFileName
             }
@@ -408,7 +408,7 @@ function Invoke-SCuBA {
             }
             Invoke-ReportCreation @ReportParams
 
-            if ($MergeJson) {
+            if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
                     'ProductNames' = $ScubaConfig.ProductNames;
@@ -1544,11 +1544,11 @@ function Invoke-SCuBACached {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
-    .Parameter MergeJson
-    Set switch to merge all json output into a single file and delete the individual files
-    after merging.
+    .Parameter KeepIndividualJSON
+    Keeps ScubaGear legacy output where files are not merged into an all in one JSON.
+    This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
-    If MergeJson is set, the name of the consolidated json created in the folder
+    If KeepIndividualJSON is set, the name of the consolidated json created in the folder
     created in OutPath. Defaults to "ScubaResults".
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
@@ -1651,7 +1651,7 @@ function Invoke-SCuBACached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [switch]
-        $MergeJson,
+        $KeepIndividualJSON,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1732,8 +1732,23 @@ function Invoke-SCuBACached {
                 }
                 Invoke-ProviderList @ProviderParams
             }
-            $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
-            $SettingsExport = Get-Content $FileName | ConvertFrom-Json
+
+            $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+            if (-not (Test-Path $ProviderJSONFilePath)) {
+                # When running Invoke-ScubaCached, the provider output might not exist as a stand-alone
+                # file depending on what version of ScubaGear created the output. If the provider output
+                # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
+                # can execute as normal.
+                $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
+                $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
+
+                # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
+                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
+                -Location $ProviderJSONFilePath -FileName "$OutProviderFileName.json"
+                Write-Debug $ActualSavedLocation
+            }
+            $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
                 'ProductNames' = $ProductNames;
@@ -1757,7 +1772,7 @@ function Invoke-SCuBACached {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
 
-            if ($MergeJson) {
+            if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
                     'ProductNames' = $ProductNames;
