@@ -2,8 +2,8 @@
 
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
-![CI Pipeline](https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml/badge.svg)
-![Functional Tests](https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml/badge.svg)
+[![CI Pipeline][ci-pipeline-img]][ci-pipeline]
+[![Functional Tests][functional-test-img]][functional-test]
 [![GitHub License][github-license-img]][license]
 [![GitHub Downloads][github-downloads-img]][release]
 [![PSGallery Downloads][psgallery-downloads-img]][psgallery]
@@ -111,6 +111,10 @@ Unless otherwise noted, this project is distributed under the Creative Commons Z
 [github-license-img]: https://img.shields.io/github/license/cisagov/ScubaGear
 [github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=GitHub&logo=github
 [psgallery-release-img]: https://img.shields.io/powershellgallery/v/ScubaGear?logo=powershell&label=PSGallery
+[ci-pipeline]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml
+[ci-pipeline-img]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml/badge.svg
+[functional-test]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml
+[functional-test-img]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml/badge.svg
 [github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.yaml?logo=github
 [github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
 [psgallery-downloads-img]: https://img.shields.io/powershellgallery/dt/ScubaGear?logo=powershell
