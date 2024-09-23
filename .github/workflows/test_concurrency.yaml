@@ -30,8 +30,8 @@ on:
       - ".github/workflows/function_test_teams.yaml"
       - ".github/actions/**"
 
-# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 permissions: write-all
+# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 
 env:
   GalleryName: PrivateScubaGearGallery

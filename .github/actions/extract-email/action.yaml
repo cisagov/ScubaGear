@@ -7,16 +7,11 @@ runs:
   using: "composite"
   steps:
     - run: |
-        # Write-Host "Extracting email..."
         $productAlias = $env:Alias
-        # Write-Host "The product alias is"
-        # Write-Host $productAlias
         $params = $env:TestParams
         $products = $params.split("|")
         foreach ($product in $products)
         {
-          # Write-Host "The product is"
-          # Write-Host $product
           [String]$emails = ""
           $attributes = $product.split(",")
           foreach ($attribute in $attributes)
@@ -31,15 +26,12 @@ runs:
             }
             elseif($key.ToLower() -eq "emails")
             {
-              # Write-Host "Found the emails"
               $emails = $value
             }
           }
           if($alias -eq $productAlias)
           {
             # Pass emails to later job for notification.
-            # Write-Host "The emails:"
-            # Write-Host $emails
             echo emails=$emails >> $env:GITHUB_OUTPUT
             break
           }
