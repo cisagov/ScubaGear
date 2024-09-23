@@ -9,14 +9,14 @@ runs:
     - run: |
         Write-Host "Extracting email..."
         $productAlias = $env:Alias
-        Write-Host "The product alias is"
-        Write-Host $productAlias
+        # Write-Host "The product alias is"
+        # Write-Host $productAlias
         $params = $env:TestParams
         $products = $params.split("|")
         foreach ($product in $products)
         {
-          Write-Host "The product is"
-          Write-Host $product
+          # Write-Host "The product is"
+          # Write-Host $product
           [String]$emails = ""
           $attributes = $product.split(",")
           foreach ($attribute in $attributes)
@@ -38,8 +38,8 @@ runs:
           if($alias -eq $productAlias)
           {
             # Pass emails to later job for notification.
-            Write-Host "The emails:"
-            Write-Host $emails
+            # Write-Host "The emails:"
+            # Write-Host $emails
             echo emails=$emails >> $env:GITHUB_OUTPUT
             break
           }

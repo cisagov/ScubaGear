@@ -80,69 +80,73 @@ jobs:
     needs:
       - publish
 
-  # test_exchange:
-  #   name: Test Exchange
-  #   uses: ./.github/workflows/function_test_exchange.yaml
-  #   with:
-  #     EmailOnFailure: ${{ inputs.EmailOnFailure }}
-  #     GitHubJob: ${{ github.job }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_exchange:
+    name: Test Exchange
+    uses: ./.github/workflows/function_test_exchange.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
-  # test_power_platform:
-  #   name: Test Power Platform
-  #   uses: ./.github/workflows/function_test_powerplatform.yaml
-  #   with:
-  #     EmailOnFailure: ${{ inputs.EmailOnFailure }}
-  #     GitHubJob: ${{ github.job }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_power_platform:
+    name: Test Power Platform
+    uses: ./.github/workflows/function_test_powerplatform.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
-  # test_sharepoint:
-  #   name: Test Sharepoint
-  #   uses: ./.github/workflows/function_test_sharepoint.yaml
-  #   with:
-  #     EmailOnFailure: ${{ inputs.EmailOnFailure }}
-  #     GitHubJob: ${{ github.job }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_sharepoint:
+    name: Test Sharepoint
+    uses: ./.github/workflows/function_test_sharepoint.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
-  # test_teams:
-  #   name: Test Teams
-  #   uses: ./.github/workflows/function_test_teams.yaml
-  #   with:
-  #     EmailOnFailure: ${{ inputs.EmailOnFailure }}
-  #     GitHubJob: ${{ github.job }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_teams:
+    name: Test Teams
+    uses: ./.github/workflows/function_test_teams.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
   cleanup:
     name: Clean
@@ -151,7 +155,7 @@ jobs:
     needs:
       - test_defender
       - test_entra
-      # - test_exchange
-      # - test_power_platform
-      # - test_sharepoint
-      # - test_teams
+      - test_exchange
+      - test_power_platform
+      - test_sharepoint
+      - test_teams
