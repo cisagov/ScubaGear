@@ -7,7 +7,7 @@ runs:
   using: "composite"
   steps:
     - run: |
-        Write-Host "Extracting email..."
+        # Write-Host "Extracting email..."
         $productAlias = $env:Alias
         # Write-Host "The product alias is"
         # Write-Host $productAlias
