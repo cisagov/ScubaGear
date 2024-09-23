@@ -45,6 +45,7 @@ jobs:
       TenantId: ${{ secrets.AZURE_TENANT_ID }}
       SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
+  
   test_defender:
     name: Test Defender
     uses: ./.github/workflows/function_test_defender.yaml
@@ -62,21 +63,21 @@ jobs:
     needs:
       - publish
 
-  # test_entra:
-  #   name: Test Entra
-  #   uses: ./.github/workflows/function_test_entra.yaml
-  #   with:
-  #     EmailOnFailure: ${{ inputs.EmailOnFailure }}
-  #     GitHubJob: ${{ github.job }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_entra:
+    name: Test Entra
+    uses: ./.github/workflows/function_test_entra.yaml
+    with:
+      EmailOnFailure: ${{ inputs.EmailOnFailure }}
+      GitHubJob: ${{ github.job }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
   # test_exchange:
   #   name: Test Exchange
