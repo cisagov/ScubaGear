@@ -1,27 +1,30 @@
-# Purpose: Publish nightly to a a private gallery just to make
-# sure that the code can be published.  This is like a
-# smoke test.
+# Purpose: Publishes ScubaGear to a private repo and caches ScubaGear modules and OPA for reuse.
 
 name: Publish Private Package
 
+# This is a reusable workflow called by the pipeline.
 on:
-  schedule:
-    - cron: "23 0 * * *" # Execute each day at 00:23 UTC
-  workflow_dispatch:
-  # for testing
-  # push:
-  #   paths:
-  #     - ".github/workflows/publish_private_package.yaml"
-  #     - "utils/workflow/Publish-ScubaGear.ps1"
+  workflow_call:
+    secrets:
+      ClientId:
+        required: true
+      TenantId:
+        required: true
+      SubscriptionId:
+        required: true
+      KeyVaultInfo:
+        required: true
 
-permissions: read-all
+permissions:
+  id-token: write
+  contents: write
 
 env:
   GalleryName: PrivateScubaGearGallery
 
 jobs:
   publish:
-    name: Publish to Private Gallery
+    name: Private Repo
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -43,14 +46,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ClientId }}
+          tenant-id: ${{ secrets.TenantId }}
+          subscription-id: ${{ secrets.SubscriptionId }}
           enable-AzPSSession: true
       - name: Get Key Vault Info
         id: key-vault-info
         env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
+          KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
@@ -74,7 +77,9 @@ jobs:
               ModuleSourcePath = 'repo/PowerShell/ScubaGear'
               GalleryName = $env:GalleryName
             }
-            # This publishes to a private gallery.
+            # This publishes to a private gallery, from which we will pull in a future step.
+            # This step helps us verify that ScubaGear is in a state where it can be
+            # published to PSGallery.
             Publish-ScubaGearModule @Parameters
       - name: Test Module Publish
         run: |
@@ -94,5 +99,34 @@ jobs:
       # This is a manual test that simply writes the version to the console.
       - name: Print Scuba Version
         run: |
+          cd repo
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
+          Import-Module -Name ./utils/workflow/Initialize-ScubaGearForTesting
+          Initialize-ScubaGearForTesting
           Invoke-SCuBA -Version
+          Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+      - name: Install Selenium
+        run: |
+          Import-Module -Name .\repo\utils\workflow\Install-SeleniumForTesting
+          Install-SeleniumForTesting
+      # Instead of initializing ScubaGear repeated for each of the test jobs below,
+      # we cache the PowerShell modules and OPA here and then restore them for the jobs.
+      # It's about a 20% performance improvement.
+      - name: Cache ScubaGear
+        id: scubagear-directory
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: "scubagear-directory-${{ github.run_id }}"
+      - name: Cache Dependencies
+        id: powershell-directory
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: "powershell-directory-${{ github.run_id }}"
+      - name: Cache OPA
+        id: opa-directory
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: "opa-directory-${{ github.run_id }}"

@@ -6,9 +6,10 @@ name: CI Pipeline
 on:
   push:
     paths-ignore:
-      - '.github/workflows/*'
-      - 'Testing/workflow/*'
-      - 'utils/workflow/*'
+      - '.github/workflows/**'
+      - '.github/actions/**'
+      - 'Testing/workflow/**'
+      - 'utils/workflow/**'
   pull_request:
   workflow_dispatch:
 

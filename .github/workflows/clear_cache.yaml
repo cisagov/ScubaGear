@@ -1,0 +1,41 @@
+# Purpose: The purpose of this workflow is to delete all caches in the repo, as it has limited total cache storage.
+# Warning: This can disrupt other workflows that are using caches. Run with caution.
+
+name: Clear Caches
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+# NOTE: This skip is not honored by Checkov.
+# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
+permissions: write-all
+
+jobs:
+  cleanup:
+    name: Clear Cache
+    runs-on: ubuntu-latest
+    # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
+    permissions: write-all
+    # Run even if one of the functional tests have failed
+    # We always want to clean up the caches that we create
+    if: always()
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Cleanup
+        run: |
+          gh extension install actions/gh-actions-cache
+          cacheKeys=$(gh actions-cache list -R $REPO)
+          set +e
+          for cacheKey in $cacheKeys
+          do
+            if [[ $cacheKey == scubagear-directory-${{ github.run_id }} ]] ||[[ $cacheKey == powershell-directory-${{ github.run_id }} ]] || [[ $cacheKey == opa-directory-${{ github.run_id }} ]]
+            then
+              echo "Deleting" $cacheKey
+              gh actions-cache delete $cacheKey --confirm
+            fi
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}

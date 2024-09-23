@@ -1,0 +1,300 @@
+# Run functional tests for Sharepoint
+
+name: Function Test Sharepoint
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+    inputs:
+      EmailOnFailure:
+        description: "The email address to send if workflow fails."
+        required: true
+        type: string
+      GitHubEventSchedule:
+        description: "A type of GitHub event"
+        required: true
+        type: string
+      GitHubEventName:
+        description: "The name of a GitHub event"
+        required: true
+        type: string
+    secrets:
+      PfxBase64:
+        required: true
+      PfxPassword:
+        required: true
+      TestParams:
+        required: true
+      TestParamsDev:
+        required: true
+      NotifierUsername:
+        required: true
+      NotifierPassword:
+        required: true
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  Shr_Tenant1_PNP:
+    name: Shr_Tenant1_PNP
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: Sharepoint_Tenant1
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Shr_Tenant1_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Extract Email
+        id: extract-email
+        if: ${{ always() }}
+        uses: ./repo/.github/actions/extract-email
+        env:
+          Alias: Shr_Tenant1_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Notify on Failure
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
+          subject: Nightly functional test failure
+          body: The Shr_Tenant1_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          to: ${{ steps.extract-email.outputs.emails }}
+          from: ScubaGear Notifier
+  Shr_Tenant2_PNP:
+    name: Shr_Tenant2_PNP
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: Sharepoint_Tenant2
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Shr_Tenant2_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Extract Email
+        id: extract-email
+        if: ${{ always() }}
+        uses: ./repo/.github/actions/extract-email
+        env:
+          Alias: Shr_Tenant2_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Notify on Failure
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
+          subject: Nightly functional test failure
+          body: The Shr_Tenant2_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          to: ${{ steps.extract-email.outputs.emails }}
+          from: ScubaGear Notifier
+  Shr_Tenant3_PNP:
+    name: Shr_Tenant3_PNP
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: Sharepoint_Tenant3
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Shr_Tenant3_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Extract Email
+        id: extract-email
+        if: ${{ always() }}
+        uses: ./repo/.github/actions/extract-email
+        env:
+          Alias: Shr_Tenant3_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Notify on Failure
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
+          subject: Nightly functional test failure
+          body: The Shr_Tenant3_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          to: ${{ steps.extract-email.outputs.emails }}
+          from: ScubaGear Notifier
+  Shr_Tenant6_PNP:
+    name: Shr_Tenant6_PNP
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: Sharepoint_Tenant6
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Shr_Tenant6_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Extract Email
+        id: extract-email
+        if: ${{ always() }}
+        uses: ./repo/.github/actions/extract-email
+        env:
+          Alias: Shr_Tenant6_PNP
+          TestParams: ${{ secrets.TestParams }}
+      - name: Notify on Failure
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
+          subject: Nightly functional test failure
+          body: The Shr_Tenant6_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          to: ${{ steps.extract-email.outputs.emails }}
+          from: ScubaGear Notifier
