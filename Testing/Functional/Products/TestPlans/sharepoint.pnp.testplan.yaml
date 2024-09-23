@@ -404,13 +404,8 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.4.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages disabled
-        Preconditions:
-          - Command: "Set-PnPTenantSite -Identity $((Get-PnPTenantInstance).PortalUrl) -DenyAddAndCustomizePages:$false"
+      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages Not-Implemented
+        Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.4.2v1 Compliant DenyAddAndCustomizePages enabled
-        Preconditions:
-          - Command: "Set-PnPTenantSite -Identity $((Get-PnPTenantInstance).PortalUrl) -DenyAddAndCustomizePages"
-        Postconditions: []
-        ExpectedResult: true

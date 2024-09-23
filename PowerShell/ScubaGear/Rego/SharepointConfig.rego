@@ -414,17 +414,17 @@ tests contains {
 # MS.SHAREPOINT.4.2v1
 #--
 
-# 1 == Allow users to run custom script on self-service created sites
-# 2 == Prevent users from running custom script on self-service created sites
+# Microsoft has planned to remove the custom scripting configuration option
+# from SharePoint and OneDrive. We are setting this policy to not-implemented
+# and will likely remove it from the baseline in the next version.
 tests contains {
-    "PolicyId": "MS.SHAREPOINT.4.2v1",
-    "Criticality": "Shall",
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-SPOSite", "Get-PnPTenantSite"],
-    "ActualValue": [SitePolicy.DenyAddAndCustomizePages],
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDeprecation,
+    "RequirementMet": false
 } if {
-    some SitePolicy in input.SPO_site
-    Status := SitePolicy.DenyAddAndCustomizePages == 2
+    PolicyId := "MS.SHAREPOINT.4.2v1"
 }
 #--
