@@ -45,7 +45,7 @@ jobs:
       TenantId: ${{ secrets.AZURE_TENANT_ID }}
       SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
-  
+
   test_defender:
     name: Test Defender
     uses: ./.github/workflows/function_test_defender.yaml
@@ -68,7 +68,8 @@ jobs:
     uses: ./.github/workflows/function_test_entra.yaml
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
-      GitHubJob: ${{ github.job }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
