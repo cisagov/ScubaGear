@@ -41,18 +41,19 @@ Tenant := input.SPO_tenant[0] if {
 
 SharingCapability := Tenant.SharingCapability
 
-SharingString := concat("", [
-    "External Sharing is set to ",
-    SliderSettings(SharingCapability),
-    "."
-])
-
-NAString(SharingSetting) := concat("", [
-    "This policy is only applicable if External Sharing is set to any value other than ",
+NAString(SharingSetting, Negation) := concat("", [
+    "This policy is only applicable if the external sharing slider on the admin page is set to ",
     SharingSetting,
     ". ",
     "See %v for more info"
-])
+]) if Negation == false
+else := concat("", [
+    "This policy is only applicable if the external sharing slider on the admin page is not set to ",
+    SharingSetting,
+    ". ",
+    "See %v for more info"
+]) if Negation == true
+
 
 
 ###################
@@ -160,7 +161,7 @@ tests contains {
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
-    Reason := NAString(SliderSettings(0))
+    Reason := NAString(SliderSettings(0), true)
 }
 #--
 
@@ -237,9 +238,7 @@ tests contains {
 
 ErrStr := concat(" ", [
     "Requirement not met:",
-    "External Sharing is set to",
-    SliderSettings(SharingCapability),
-    "and expiration date is not set to 30 days or less."
+    "total expiration days are not set to 30 days or less"
 ])
 
 # Standard test to compare against baseline
@@ -274,7 +273,7 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
     SharingCapability != ANYONE
-    Reason := NAString(SliderSettings(2))
+    Reason := NAString(SliderSettings(2), false)
 }
 #--
 
@@ -335,7 +334,7 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     SharingCapability != ANYONE
-    Reason := NAString(SliderSettings(2))
+    Reason := NAString(SliderSettings(2), false)
 }
 #--
 
@@ -396,10 +395,14 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
     not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
-    Reason := concat(" ", [
-        SharingString,
-        NAString(concat(" ", [SliderSettings(0), "or", SliderSettings(3)]))
-        ])
+    Reason := NAString(
+        concat(" ", [
+            SliderSettings(2), 
+            "or", 
+            SliderSettings(1)
+        ]),
+        false
+    )
 }
 #--
 
