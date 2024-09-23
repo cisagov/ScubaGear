@@ -11,7 +11,9 @@ import data.utils.key.FAIL
 # Policy MS.SHAREPOINT.3.1v1
 #--
 test_SharingCapability_Anyone_LinkExpirationValid_Correct_V1 if {
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 2}])
+    Tenant := json.patch(SPOTenant, 
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "RequireAnonymousLinksExpireInDays", "value": 30}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
@@ -28,10 +30,26 @@ test_SharingCapability_Anyone_LinkExpirationValid_Correct_V2 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, PASS, true) == true
 }
 
-test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect if {
+test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect_V1 if {
     Tenant := json.patch(SPOTenant,
                 [{"op": "add", "path": "SharingCapability", "value": 2},
                 {"op": "add", "path": "RequireAnonymousLinksExpireInDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := concat(" ", [
+        "Requirement not met:",
+        "External Sharing is set to",
+        "Anyone",
+        "and expiration date is not set to 30 days or less."
+    ])
+    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
+}
+
+test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect_V2 if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "RequireAnonymousLinksExpireInDays", "value": -1}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 

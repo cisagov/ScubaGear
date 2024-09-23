@@ -256,7 +256,11 @@ tests contains {
     "RequirementMet": Status
 } if {
     SharingCapability == ANYONE
-    Status := Tenant.RequireAnonymousLinksExpireInDays <= 30
+    Conditions := [
+        Tenant.RequireAnonymousLinksExpireInDays >= 1,
+        Tenant.RequireAnonymousLinksExpireInDays <= 30
+    ]
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 
 # Test for N/A case
