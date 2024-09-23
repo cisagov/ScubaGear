@@ -31,7 +31,7 @@ runs:
             }
             elseif($key.ToLower() -eq "emails")
             {
-              Write-Host "Found the emails"
+              # Write-Host "Found the emails"
               $emails = $value
             }
           }
