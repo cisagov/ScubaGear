@@ -145,10 +145,11 @@ jobs:
 
   cleanup:
     name: Clean
+    if: ${{ always() }}
     uses: ./.github/workflows/clear_cache.yaml
     needs:
       - test_defender
-      # - test_entra
+      - test_entra
       # - test_exchange
       # - test_power_platform
       # - test_sharepoint
