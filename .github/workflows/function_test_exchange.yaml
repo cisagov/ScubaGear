@@ -234,7 +234,7 @@ jobs:
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Exc_Tenant6:
-    name: $Exc_Tenant6
+    name: Exc_Tenant6
     runs-on: windows-latest
     environment: Development
     permissions:
