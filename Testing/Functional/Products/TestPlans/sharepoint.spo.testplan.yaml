@@ -209,6 +209,14 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 0 (Anyone links in unchecked state)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              RequireAnonymousLinksExpireInDays: 0
+              SharingCapability: ExternalUserAndGuestSharing
+        Postconditions: []
+        ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant

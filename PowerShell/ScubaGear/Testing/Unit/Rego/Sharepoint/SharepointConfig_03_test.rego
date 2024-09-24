@@ -58,6 +58,22 @@ test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect_V2 if {
     TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
 }
 
+test_SharingCapability_Anyone_LinkExpirationInvalid_Incorrect_V3 if {
+    # If "RequireAnonymousLinksExpireInDays" == 0, Anyone links is unchecked,
+    # the policy must indicate a fail for this case.
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "RequireAnonymousLinksExpireInDays", "value": 0}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := concat(" ", [
+        "Requirement not met:",
+        "total expiration days are not set to 30 days or less"
+    ])
+    TestResult("MS.SHAREPOINT.3.1v1", Output, ReportDetailsString, false) == true
+}
+
 # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
 # The result must be N/A because the policy is not applicable unless external sharing is set to "Anyone".
 test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V1 if {
