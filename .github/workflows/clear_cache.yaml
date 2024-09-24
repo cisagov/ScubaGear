@@ -1,7 +1,6 @@
 # Purpose: The purpose of this workflow is to delete all caches in the repo, as it has limited total cache storage.
 # Warning: This can disrupt other workflows that are using caches. Run with caution.
 
-# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 name: Clear Caches
 
 on:
@@ -9,7 +8,7 @@ on:
   workflow_dispatch:
 
 # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
-permissions: write-all
+# permissions: write-all
 
 jobs:
   cleanup:
