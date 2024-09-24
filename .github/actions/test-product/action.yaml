@@ -14,8 +14,6 @@ runs:
   using: "composite"
   steps:
     - run: |
-        echo "The alias is:"
-        echo "${{ inputs.Alias }}"
         Import-Module -Name Selenium
         cd repo
         # Read thumbprint from previous step.

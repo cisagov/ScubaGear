@@ -83,14 +83,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Pwr_Tenant1
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Pwr_Tenant1
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -148,14 +148,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Pwr_Tenant2
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Pwr_Tenant2
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -213,14 +213,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Pwr_Tenant3
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Pwr_Tenant3
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -278,14 +278,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Pwr_Tenant6
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Pwr_Tenant6
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3

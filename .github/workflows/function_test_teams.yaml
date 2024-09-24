@@ -83,14 +83,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: $Tms_Tenant1
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -150,14 +150,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant1_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -215,14 +215,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant2
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant2
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -282,14 +282,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant2_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant2_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -347,14 +347,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant3
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant3
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -414,14 +414,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant3_EX
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant3_EX
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -479,14 +479,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant6
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant6
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
@@ -546,14 +546,14 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant6_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Extract Email
         id: extract-email
         if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
           Alias: Tms_Tenant6_GCC
-          TestParams: ${{ secrets.TestParamsDev }}
+          TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
         uses: dawidd6/action-send-mail@v3
