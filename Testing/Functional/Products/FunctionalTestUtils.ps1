@@ -93,7 +93,7 @@ function LoadProviderExport() {
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
 
-  $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ProviderSettingsExport.json"
+  $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ModifiedProviderSettingsExport.json"
   $ProviderExport = $Content | ConvertFrom-Json
   $ProviderExport
 }
