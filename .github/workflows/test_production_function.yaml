@@ -39,6 +39,7 @@ on:
       - ".github/actions/import-pfx/action.yaml"
       - ".github/actions/test-product/action.yaml"
 
+# NOTE: This skip is not honored by Checkov.
 # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
 permissions: write-all
 

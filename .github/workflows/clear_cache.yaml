@@ -7,8 +7,9 @@ on:
   workflow_call:
   workflow_dispatch:
 
+# NOTE: This skip is not honored by Checkov.
 # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
-# permissions: write-all
+permissions: write-all
 
 jobs:
   cleanup:
