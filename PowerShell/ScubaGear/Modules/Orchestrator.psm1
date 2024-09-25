@@ -422,7 +422,7 @@ function Invoke-SCuBA {
             }
             # Craft the csv version of just the results
             $CsvParams = @{
-                'ProductNames' = $ProductNames;
+                'ProductNames' = $ScubaConfig.ProductNames;
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
                 'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
@@ -1745,7 +1745,7 @@ function Invoke-SCuBACached {
                 # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
                 $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
                 $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
-                -Location $ProviderJSONFilePath -FileName "$OutProviderFileName.json"
+                -Location $OutPath -FileName "$OutProviderFileName.json"
                 Write-Debug $ActualSavedLocation
             }
             $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
