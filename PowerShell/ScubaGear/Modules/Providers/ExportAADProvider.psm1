@@ -350,7 +350,8 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         [Parameter()]
         [int]$Recursioncount = 0
     )
-Write-Warning "Recursion level: $recursioncount"
+    # Write-Warning "Recursion level: $recursioncount"
+
     # We support group nesting up to 2 levels deep (stops after processing levels 0 and 1). 
     # Safeguard: Also protects against infinite loops if there is a circular group assignment in PIM.
     if ($recursioncount -ge 2) {
@@ -382,7 +383,7 @@ Write-Warning "Recursion level: $recursioncount"
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $ObjectId
             $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
-Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
+            # Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
         }
         # If the current role has not already been added to the user's roles array then add the role
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
@@ -395,7 +396,7 @@ Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
         $GroupId = $ObjectId
         # Get all of the group members that are transitively assigned to the current role via group membership
         $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $GroupId
-Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
+        # Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
 
         foreach ($GroupMember in $GroupMembers) {
             $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
@@ -422,7 +423,8 @@ Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
                 "M365Environment" = $M365Environment }
             $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
             foreach ($GroupMember in $PIMGroupMembers) {
-Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($GroupMember.PrincipalId)"
+                # Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($GroupMember.PrincipalId)"
+                
                 # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
                 if ($GroupMember.AccessId -ne "member") { continue }
                 $PIMEligibleUserId = $GroupMember.PrincipalId

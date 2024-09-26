@@ -16,7 +16,6 @@ InModuleScope ExportAADProvider {
 
             # Simulate the "Request_ResourceNotFound" exception
             Mock Get-MgBetaDirectoryObject {
-                # Write-Host "Inside Get-MgBetaDirectoryObject"
                 throw [System.Exception]::new("Request_ResourceNotFound")
             }
 
