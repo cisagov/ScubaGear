@@ -15,12 +15,13 @@ InModuleScope ExportAADProvider {
             $M365Environment = "commercial"
 
             # Simulate the "Request_ResourceNotFound" exception
+            function  Get-MgBetaDirectoryObject { }
             Mock Get-MgBetaDirectoryObject {
                 throw [System.Exception]::new("Request_ResourceNotFound")
             }
 
             # Track warnings using Assert-MockCalled further down
-            Mock Write-Warning
+            Mock Write-Warning { }
 
             # Call the function under test
             LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
@@ -41,6 +42,7 @@ InModuleScope ExportAADProvider {
             $M365Environment = "commercial"
 
             # Mock Get-MgBetaDirectoryObject to return a user-type object
+            function  Get-MgBetaDirectoryObject { }
             Mock Get-MgBetaDirectoryObject {
                 [PSCustomObject]@{
                     AdditionalProperties = @{
@@ -50,6 +52,7 @@ InModuleScope ExportAADProvider {
             }
 
             # Mock Get-MgBetaUser to return a user with DisplayName and OnPremisesImmutableId
+            function Get-MgBetaUser { }
             Mock Get-MgBetaUser {
                 [PSCustomObject]@{
                     DisplayName            = "John Doe"
@@ -75,7 +78,6 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
         }
 
-
         It 'Objecttype is a group' {
             # Set up the parameters for the test
             $RoleName = "Global Administrator"  # Mock role
@@ -85,6 +87,7 @@ InModuleScope ExportAADProvider {
             $M365Environment = "commercial"
 
             # Mock Get-MgBetaDirectoryObject to return a group-type object
+            function  Get-MgBetaDirectoryObject { }
             Mock Get-MgBetaDirectoryObject {
                 [PSCustomObject]@{
                     AdditionalProperties = @{
@@ -94,6 +97,7 @@ InModuleScope ExportAADProvider {
             }
 
             # Mock Get-MgBetaGroupMember to return two group members (users)
+            function Get-MgBetaGroupMember { }
             Mock Get-MgBetaGroupMember {
                 @(
                     [PSCustomObject]@{
@@ -112,6 +116,7 @@ InModuleScope ExportAADProvider {
             }
 
             # Mock Get-MgBetaUser to return a user object with DisplayName and OnPremisesImmutableId for both users
+            function Get-MgBetaUser { }
             Mock Get-MgBetaUser {
                 param ($UserId)
                 [PSCustomObject]@{
@@ -121,6 +126,7 @@ InModuleScope ExportAADProvider {
             }
 
             # Mock Invoke-GraphDirectly to return no PIM eligible members
+            function Invoke-GraphDirectly { }
             Mock Invoke-GraphDirectly {
                 @()  # Returns an empty array
             }
