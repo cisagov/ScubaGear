@@ -26,6 +26,7 @@ $ModuleList = @(
     "Microsoft.Graph.Beta.Identity.DirectoryManagement",
     "Microsoft.Graph.Beta.Identity.SignIns",
     "Microsoft.Graph.Beta.Users",
+    "Microsoft.Graph.Beta.DirectoryObjects",
     "powershell-yaml"
     )
 
