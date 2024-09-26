@@ -110,6 +110,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: ${{ always() }}
     needs:
       - Tms_Tenant1
     concurrency:
@@ -242,6 +243,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: ${{ always() }}
     needs:
       - Tms_Tenant2
     concurrency:
@@ -374,6 +376,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: ${{ always() }}
     needs:
       - Tms_Tenant3
     concurrency:
@@ -506,6 +509,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: ${{ always() }}
     needs:
       - Tms_Tenant6
     concurrency:
