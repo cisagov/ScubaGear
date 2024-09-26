@@ -126,7 +126,7 @@ function Export-AADProvider {
         # While ConvertTo-Json won't mess up a dict as described in the above comment,
         # on error, $TryCommand returns an empty list, not a dictionary.
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        
+
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we also include calls to PIM APIs
@@ -352,7 +352,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
     )
     # Write-Warning "Recursion level: $recursioncount"
 
-    # We support group nesting up to 2 levels deep (stops after processing levels 0 and 1). 
+    # We support group nesting up to 2 levels deep (stops after processing levels 0 and 1).
     # Safeguard: Also protects against infinite loops if there is a circular group assignment in PIM.
     if ($recursioncount -ge 2) {
         return
@@ -424,7 +424,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
             $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
             foreach ($GroupMember in $PIMGroupMembers) {
                 # Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($GroupMember.PrincipalId)"
-                
+
                 # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
                 if ($GroupMember.AccessId -ne "member") { continue }
                 $PIMEligibleUserId = $GroupMember.PrincipalId
