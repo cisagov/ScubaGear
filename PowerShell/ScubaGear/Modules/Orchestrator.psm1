@@ -623,7 +623,7 @@ function Invoke-ProviderList {
                 "timestamp_zulu": "$($TimestampZulu)",
                 "tenant_details": $($TenantDetails),
                 "scuba_config": $($ConfigDetails),
-
+                "report_uuid": "$(New-Guid)",
                 $ProviderJSON
         }
 "@
@@ -961,7 +961,9 @@ function Merge-JsonOutput {
             $SettingsExportPath = Join-Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
             $DeletionList += $SettingsExportPath
             $SettingsExport =  Get-Content $SettingsExportPath -Raw
-            $TimestampZulu = $(ConvertFrom-Json $SettingsExport).timestamp_zulu
+            $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
+            $TimestampZulu = $SettingsExportObject.timestamp_zulu
+            $ReportUuid = $SettingsExportObject.report_uuid
 
             # Get a list and abbreviation mapping of the products assessed
             $FullNames = @()
@@ -985,6 +987,7 @@ function Merge-JsonOutput {
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
+                "ReportGuid" = $ReportUuid;
             }
 
 
@@ -1749,6 +1752,14 @@ function Invoke-SCuBACached {
                 Write-Debug $ActualSavedLocation
             }
             $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
+
+            # Generate a new UUID for this new run of ScubaGear
+            $SettingsExport | Add-Member -Name 'report_uuid' -Value "$(New-Guid)" -Type NoteProperty -Force
+            $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
+                -Location $OutPath -FileName "$OutProviderFileName.json"
+                Write-Debug $ActualSavedLocation
+
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
                 'ProductNames' = $ProductNames;
