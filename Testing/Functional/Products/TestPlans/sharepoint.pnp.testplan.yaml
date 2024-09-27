@@ -123,6 +123,8 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               SharingCapability: ExternalUserAndGuestSharing
+          - Command: Set-PnPTenant
+            Splat:
               DefaultSharingLinkType: AnonymousAccess
         Postconditions: []
         ExpectedResult: false
@@ -131,6 +133,8 @@ TestPlan:
           - Command: Set-PnPTenant
             Splat:
               SharingCapability: Disabled
+          - Command: Set-PnPTenant
+            Splat:
               DefaultSharingLinkType: Direct
         Postconditions: []
         ExpectedResult: true
