@@ -987,7 +987,7 @@ function Merge-JsonOutput {
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
-                "ReportGuid" = $ReportUuid;
+                "ReportUuid" = $ReportUuid;
             }
 
 
@@ -1753,12 +1753,14 @@ function Invoke-SCuBACached {
             }
             $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
 
-            # Generate a new UUID for this new run of ScubaGear
-            $SettingsExport | Add-Member -Name 'report_uuid' -Value "$(New-Guid)" -Type NoteProperty -Force
-            $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+            # Generate a new UUID if the original data doesn't have one
+            if (-Not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
+                $SettingsExport | Add-Member -Name 'report_uuid' -Value "$(New-Guid)" -Type NoteProperty
+                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
                 $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
                 -Location $OutPath -FileName "$OutProviderFileName.json"
                 Write-Debug $ActualSavedLocation
+            }
 
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
