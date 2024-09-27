@@ -27,6 +27,7 @@ InModuleScope Orchestrator {
             Mock -CommandName Write-Debug {}
             Mock -CommandName New-Item {}
             Mock -CommandName Get-Content {}
+            Mock -CommandName Get-Member {}
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
