@@ -1,8 +1,9 @@
 $OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
 $CreateReportPath = '../../../../Modules/CreateReport/CreateReport.psm1'
+$UtilityPath = '../../../../Modules/Utility/Utility.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function Invoke-ReportCreation -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $CreateReportPath) -Function New-Report, Import-SecureBaseline -Force
-
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath $UtilityPath) -Function Get-Utf8NoBom -Force
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-ReportCreation' {
         BeforeAll {
@@ -19,7 +20,8 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-Content {}
             Mock -CommandName Add-Type {}
             Mock -CommandName Invoke-Item {}
-
+            Mock -CommandName Get-Utf8NoBom {}
+            Mock -CommandName ConvertFrom-Json { @{ "report_uuid"="" } }
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {

@@ -1209,10 +1209,14 @@ function Invoke-ReportCreation {
             $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
             $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
+            $FileName = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -Resolve
+            $ReportUuid = $(Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json).report_uuid
+
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
+            $ReportHTML = $ReportHTML.Replace("{REPORT_UUID}", $ReportUuid)
             $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
             $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
