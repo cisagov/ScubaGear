@@ -119,15 +119,15 @@ InModuleScope Orchestrator {
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
             It 'Given an existing UUID should not generate a new one' {
-                # Get-Member was mocked above to return True so the as far as the
+                # Get-Member was mocked above to return True so as far as the
                 # provider can tell, the existing output already has a UUID
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
                 Should -Invoke -CommandName New-Guid -Exactly -Times 0
             }
             It 'Given output without a UUID should generate a new one' {
                 Mock -CommandName Get-Member { $false }
-                # Now Get-Member will return False so the as far as the
-                # provider can tell, the existing output does not have a UUID
+                # Now Get-Member will return False so as far as the provider
+                # can tell, the existing output does not have a UUID
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
                 Should -Invoke -CommandName New-Guid -Exactly -Times 1
             }
