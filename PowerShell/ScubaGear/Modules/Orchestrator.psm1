@@ -996,7 +996,7 @@ function Merge-JsonOutput {
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
-                "ReportUuid" = $ReportUuid;
+                "ReportUUID" = $ReportUuid;
             }
 
 

@@ -17,6 +17,7 @@
     --link-color: #85B065;
     --unvisited-link-color: #0092CC;
     --text-color: black;
+    --uuid-color: #424242;
     --border-color: black;
     --toggle-height: 1.563em;
     --toggle-width: 2.875em;
@@ -39,6 +40,7 @@ html[data-theme='dark'] {
     --link-color: #85B065;
     --unvisited-link-color: #0092CC;
     --text-color: #bdbdbd;
+    --uuid-color: #999999;
     --border-color: #7b7b7b;
 }
 

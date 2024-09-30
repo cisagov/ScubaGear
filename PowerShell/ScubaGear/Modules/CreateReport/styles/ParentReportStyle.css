@@ -11,6 +11,13 @@ footer {
     width: 100%;
 }
 
+.uuid {
+    font-size: 0.7em;
+    float: right;
+    padding-right: 0.313em;
+    color: var(--uuid-color)
+}
+
 .summary {
     display: inline-block;
     padding: 0.313em;
