@@ -615,15 +615,24 @@ function Invoke-ProviderList {
             $ConfigDetails = "{}"
         }
 
+        try {
+            $Guid = New-Guid
+        }
+        catch {
+            $Guid = "00000000-0000-0000-0000-000000000000"
+            $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+            Write-Warning $Warning
+        }
+
         $BaselineSettingsExport = @"
         {
                 "baseline_version": "1",
                 "module_version": "$ModuleVersion",
                 "date": "$($CurrentDate) $($TimeZone)",
                 "timestamp_zulu": "$($TimestampZulu)",
+                "report_uuid": "$($Guid)",
                 "tenant_details": $($TenantDetails),
                 "scuba_config": $($ConfigDetails),
-                "report_uuid": "$(New-Guid)",
                 $ProviderJSON
         }
 "@
@@ -1755,7 +1764,15 @@ function Invoke-SCuBACached {
 
             # Generate a new UUID if the original data doesn't have one
             if (-Not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
-                $SettingsExport | Add-Member -Name 'report_uuid' -Value "$(New-Guid)" -Type NoteProperty
+                try {
+                    $Guid = New-Guid
+                }
+                catch {
+                    $Guid = "00000000-0000-0000-0000-000000000000"
+                    $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+                    Write-Warning $Warning
+                }
+                $SettingsExport | Add-Member -Name 'report_uuid' -Value $Guid -Type NoteProperty
                 $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
                 $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
                 -Location $OutPath -FileName "$OutProviderFileName.json"
