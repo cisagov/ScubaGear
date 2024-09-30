@@ -15,7 +15,7 @@ footer {
     font-size: 0.7em;
     float: right;
     padding-right: 0.313em;
-    color: var(--uuid-color)
+    color: var(--uuid-color);
 }
 
 .summary {
