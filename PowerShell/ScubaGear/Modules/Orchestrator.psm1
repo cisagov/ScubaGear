@@ -1209,8 +1209,8 @@ function Invoke-ReportCreation {
             $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
             $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
-            $FileName = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -Resolve
-            $ReportUuid = $(Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json).report_uuid
+            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -Resolve
+            $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
@@ -1767,7 +1767,7 @@ function Invoke-SCuBACached {
             $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
 
             # Generate a new UUID if the original data doesn't have one
-            if (-Not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
+            if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
                 try {
                     $Guid = New-Guid
                 }
