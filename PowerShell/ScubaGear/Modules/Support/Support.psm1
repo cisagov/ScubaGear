@@ -121,10 +121,10 @@ function Initialize-SCuBA {
     # Import module magic may be helping by:
     #   * restricting the import so only that only function is exported
     #   * imported function takes precedence over imported modules w/ function
-    Import-Module $ModulePath -Function Initialize-Scuba
+    # Import-Module $ModulePath -Function Initialize-Scuba
     $ModuleParentDir = Split-Path -Path (Get-Module ScubaGear).Path -Parent
     try {
-        ($RequiredModulesPath = Join-Path -Path $ModuleParentDir -ChildPath 'RequiredVersions.ps1') *> $null
+        ($RequiredModulesPath = Join-Path -Path $ModulePath -ChildPath 'RequiredVersions.ps1') *> $null
         . $RequiredModulesPath
     }
     catch {
