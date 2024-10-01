@@ -616,7 +616,7 @@ function Invoke-ProviderList {
         }
 
         try {
-            $Guid = New-Guid
+            $Guid = New-Guid -ErrorAction 'Stop'
         }
         catch {
             $Guid = "00000000-0000-0000-0000-000000000000"
@@ -1769,7 +1769,7 @@ function Invoke-SCuBACached {
             # Generate a new UUID if the original data doesn't have one
             if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
                 try {
-                    $Guid = New-Guid
+                    $Guid = New-Guid -ErrorAction 'Stop'
                 }
                 catch {
                     $Guid = "00000000-0000-0000-0000-000000000000"
