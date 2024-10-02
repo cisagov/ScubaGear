@@ -124,7 +124,7 @@ jobs:
                             # if the default version is the only acceptable version
                             # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
                             $VersionsArr = $_ -split "="
-                            $VersionsArr[0] + " = '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+                            $VersionsArr[0] + "= '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
                         }
                         else {
                             # No Splitting lines; Appending new Current OPA version to acceptable version
