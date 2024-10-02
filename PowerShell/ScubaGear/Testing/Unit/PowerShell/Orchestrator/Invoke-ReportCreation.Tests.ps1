@@ -19,7 +19,9 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-Content {}
             Mock -CommandName Add-Type {}
             Mock -CommandName Invoke-Item {}
-
+            function Get-Utf8NoBom {throw 'this will be mocked'}
+            Mock -CommandName Get-Utf8NoBom {}
+            Mock -CommandName ConvertFrom-Json { @{ "report_uuid"="" } }
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {

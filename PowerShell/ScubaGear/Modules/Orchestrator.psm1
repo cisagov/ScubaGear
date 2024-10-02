@@ -615,15 +615,24 @@ function Invoke-ProviderList {
             $ConfigDetails = "{}"
         }
 
+        try {
+            $Guid = New-Guid -ErrorAction 'Stop'
+        }
+        catch {
+            $Guid = "00000000-0000-0000-0000-000000000000"
+            $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+            Write-Warning $Warning
+        }
+
         $BaselineSettingsExport = @"
         {
                 "baseline_version": "1",
                 "module_version": "$ModuleVersion",
                 "date": "$($CurrentDate) $($TimeZone)",
                 "timestamp_zulu": "$($TimestampZulu)",
+                "report_uuid": "$($Guid)",
                 "tenant_details": $($TenantDetails),
                 "scuba_config": $($ConfigDetails),
-
                 $ProviderJSON
         }
 "@
@@ -961,7 +970,9 @@ function Merge-JsonOutput {
             $SettingsExportPath = Join-Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
             $DeletionList += $SettingsExportPath
             $SettingsExport =  Get-Content $SettingsExportPath -Raw
-            $TimestampZulu = $(ConvertFrom-Json $SettingsExport).timestamp_zulu
+            $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
+            $TimestampZulu = $SettingsExportObject.timestamp_zulu
+            $ReportUuid = $SettingsExportObject.report_uuid
 
             # Get a list and abbreviation mapping of the products assessed
             $FullNames = @()
@@ -985,6 +996,7 @@ function Merge-JsonOutput {
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
+                "ReportUUID" = $ReportUuid;
             }
 
 
@@ -1197,10 +1209,14 @@ function Invoke-ReportCreation {
             $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
             $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
+            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($OutProviderFileName).json" -Resolve
+            $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
+
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
+            $ReportHTML = $ReportHTML.Replace("{REPORT_UUID}", $ReportUuid)
             $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
             $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
@@ -1749,6 +1765,24 @@ function Invoke-SCuBACached {
                 Write-Debug $ActualSavedLocation
             }
             $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
+
+            # Generate a new UUID if the original data doesn't have one
+            if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
+                try {
+                    $Guid = New-Guid -ErrorAction 'Stop'
+                }
+                catch {
+                    $Guid = "00000000-0000-0000-0000-000000000000"
+                    $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+                    Write-Warning $Warning
+                }
+                $SettingsExport | Add-Member -Name 'report_uuid' -Value $Guid -Type NoteProperty
+                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
+                -Location $OutPath -FileName "$OutProviderFileName.json"
+                Write-Debug $ActualSavedLocation
+            }
+
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
                 'ProductNames' = $ProductNames;
