@@ -100,7 +100,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant1 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant1_GCC:
@@ -168,7 +168,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant1_GCC test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant1_GCC test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant2:
@@ -233,7 +233,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant2 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant2 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant2_GCC:
@@ -301,7 +301,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant2_GCCtest failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant2_GCCtest failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant3:
@@ -366,7 +366,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant3 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant3_EX:
@@ -434,7 +434,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant3_EX test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant3_EX test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant6:
@@ -499,7 +499,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant6 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant6 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Tms_Tenant6_GCC:
@@ -567,6 +567,6 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Tms_Tenant6_GCC test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Tms_Tenant6_GCC test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier

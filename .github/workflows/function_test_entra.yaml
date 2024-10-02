@@ -100,7 +100,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant1 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant1_G5:
@@ -168,7 +168,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant1_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant1_G5 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant2:
@@ -233,7 +233,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant2 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant2 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant2_G3:
@@ -301,7 +301,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant2_G3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant2_G3 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant3:
@@ -366,7 +366,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant3 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant3_G5:
@@ -434,7 +434,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant3_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant3_G5 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant6:
@@ -499,7 +499,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant6 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant6 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Ent_Tenant6_G5:
@@ -567,6 +567,6 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Ent_Tenant6_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Ent_Tenant6_G5 test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier

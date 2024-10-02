@@ -100,7 +100,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Shr_Tenant1_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Shr_Tenant1_PNP test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Shr_Tenant2_PNP:
@@ -165,7 +165,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Shr_Tenant2_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Shr_Tenant2_PNP test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Shr_Tenant3_PNP:
@@ -230,7 +230,7 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Shr_Tenant3_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Shr_Tenant3_PNP test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
   Shr_Tenant6_PNP:
@@ -295,6 +295,6 @@ jobs:
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
           subject: Nightly functional test failure
-          body: The Shr_Tenant6_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          body: The Shr_Tenant6_PNP test failed.  Please look at the "Functional Tests" workflow for more details.
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
