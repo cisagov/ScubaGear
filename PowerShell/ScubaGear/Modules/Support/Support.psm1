@@ -264,7 +264,7 @@ function Install-OPAforSCuBA {
     }
 
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
-        $AcceptableVersionsString = $ACCETABLEVERSIONS -join "`r`n" | Out-String
+        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
         throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
     }
 
