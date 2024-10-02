@@ -120,9 +120,9 @@ jobs:
                             ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
                             "    '$CurrentOPAVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
                         }
-                                                elseif ($VersionsLength -eq 1) {
+                        elseif ($VersionsLength -eq 1) {
                             # if the default version is the only acceptable version
-                            # Make `VariableName = CurrentVersion, Default #EndVersionComment `
+                            # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
                             $VersionsArr = $_ -split "="
                             $VersionsArr[0] + " = '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
                         }
