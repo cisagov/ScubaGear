@@ -929,7 +929,8 @@ function ConvertTo-ResultsCsv {
             $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
             if ($ActionPlanCsv.Length -eq 0) {
                 # If no tests failed, add the column names to ensure a file is still output
-                $Headers = '"Control ID","Requirement","Result","Criticality","Details",'
+                $Headers = $ScubaResultsCsv[0].psobject.Properties.Name -Join '","'
+                $Headers = "`"$Headers`""
                 $Headers += '"Non-Compliance Reason","Remediation Completion Date","Justification"'
                 $Headers | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
             }
