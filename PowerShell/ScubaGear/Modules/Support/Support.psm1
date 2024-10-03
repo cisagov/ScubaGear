@@ -244,9 +244,7 @@ function Install-OPAforSCuBA {
     )
 
     # Constants
-    $ACCEPTABLEVERSIONS = '0.59.0', '0.60.0', '0.61.0',
-    '0.62.1', '0.63.0', '0.64.1',
-    '0.65.0', '0.66.0', '0.67.1', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
+    $ACCEPTABLEVERSIONS = [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set prefernces for writing messages
@@ -266,7 +264,7 @@ function Install-OPAforSCuBA {
     }
 
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
-        $AcceptableVersionsString = $ACCETABLEVERSIONS -join "`r`n" | Out-String
+        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
         throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
     }
 
