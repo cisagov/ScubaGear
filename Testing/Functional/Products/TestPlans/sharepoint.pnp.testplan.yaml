@@ -184,6 +184,14 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 0 (Anyone links in unchecked state)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              RequireAnonymousLinksExpireInDays: 0
+              SharingCapability: ExternalUserAndGuestSharing
+        Postconditions: []
+        ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
@@ -242,8 +250,63 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.3.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SHAREPOINT.3.2v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+              FileAnonymousLinkType: View
+              FolderAnonymousLinkType: View
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = View
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+              FileAnonymousLinkType: Edit
+              FolderAnonymousLinkType: View
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = Edit
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+              FileAnonymousLinkType: View
+              FolderAnonymousLinkType: Edit
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserAndGuestSharing
+              FileAnonymousLinkType: Edit
+              FolderAnonymousLinkType: Edit
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: Disabled
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExistingExternalUserSharingOnly
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests)
+        Preconditions:
+          - Command: Set-PnPTenant
+            Splat:
+              SharingCapability: ExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -349,13 +412,8 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.4.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages disabled
-        Preconditions:
-          - Command: "Set-PnPTenantSite -Identity $((Get-PnPTenantInstance).PortalUrl) -DenyAddAndCustomizePages:$false"
+      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages Not-Implemented
+        Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.4.2v1 Compliant DenyAddAndCustomizePages enabled
-        Preconditions:
-          - Command: "Set-PnPTenantSite -Identity $((Get-PnPTenantInstance).PortalUrl) -DenyAddAndCustomizePages"
-        Postconditions: []
-        ExpectedResult: true

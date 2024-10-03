@@ -101,8 +101,8 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
     Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
 
     ReportDetailsString := concat(" ", [
-        "This policy is only applicable if External Sharing",
-        "is set to any value other than Only People In Your Organization.",
+        "This policy is only applicable if the external sharing slider",
+        "on the admin page is not set to Only People In Your Organization.",
         "See %v for more info"
         ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true

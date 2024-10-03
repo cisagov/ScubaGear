@@ -41,18 +41,19 @@ Tenant := input.SPO_tenant[0] if {
 
 SharingCapability := Tenant.SharingCapability
 
-SharingString := concat("", [
-    "External Sharing is set to ",
-    SliderSettings(SharingCapability),
-    "."
-])
+NAString(SharingSetting, Negation) := concat("", [
+    "This policy is only applicable if the external sharing slider on the admin page is set to ",
+    SharingSetting,
+    ". ",
+    "See %v for more info"
+]) if Negation == false
+else := concat("", [
+    "This policy is only applicable if the external sharing slider on the admin page is not set to ",
+    SharingSetting,
+    ". ",
+    "See %v for more info"
+]) if Negation == true
 
-NAString(SharingSetting) := concat("", [
-        "This policy is only applicable if External Sharing is set to any value other than ",
-        SharingSetting,
-        ". ",
-        "See %v for more info"
-    ])
 
 
 ###################
@@ -160,7 +161,7 @@ tests contains {
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
-    Reason := NAString(SliderSettings(0))
+    Reason := NAString(SliderSettings(0), true)
 }
 #--
 
@@ -237,9 +238,7 @@ tests contains {
 
 ErrStr := concat(" ", [
     "Requirement not met:",
-    "External Sharing is set to",
-    SliderSettings(SharingCapability),
-    "and expiration date is not set to 30 days or less."
+    "total expiration days are not set to 30 days or less"
 ])
 
 # Standard test to compare against baseline
@@ -256,7 +255,11 @@ tests contains {
     "RequirementMet": Status
 } if {
     SharingCapability == ANYONE
-    Status := Tenant.RequireAnonymousLinksExpireInDays <= 30
+    Conditions := [
+        Tenant.RequireAnonymousLinksExpireInDays >= 1,
+        Tenant.RequireAnonymousLinksExpireInDays <= 30
+    ]
+    Status := count(FilterArray(Conditions, true)) == 2
 }
 
 # Test for N/A case
@@ -270,7 +273,7 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
     SharingCapability != ANYONE
-    Reason := NAString(SliderSettings(2))
+    Reason := NAString(SliderSettings(2), false)
 }
 #--
 
@@ -300,7 +303,7 @@ FileAndFolderLinkPermission(2, 1) := concat(": ", [
 ])
 
 # This policy is only applicable if external sharing is set to "Anyone"
-# Both link types must be 1 & OneDrive_PnP_Flag must be false for policy to pass
+# Both link types must be 1 for policy to pass
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Shall",
@@ -309,7 +312,6 @@ tests contains {
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
 } if {
-    input.OneDrive_PnP_Flag == false
     SharingCapability == ANYONE
 
     FileLinkType := Tenant.FileAnonymousLinkType
@@ -331,23 +333,11 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
-    input.OneDrive_PnP_Flag == false
     SharingCapability != ANYONE
-    Reason := NAString(SliderSettings(2))
-}
-
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails(PolicyId),
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.SHAREPOINT.3.2v1"
-    input.OneDrive_PnP_Flag == true
+    Reason := NAString(SliderSettings(2), false)
 }
 #--
+
 
 #
 # MS.SHAREPOINT.3.3v1
@@ -405,10 +395,14 @@ tests contains {
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
     not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
-    Reason := concat(" ", [
-        SharingString,
-        NAString(concat(" ", [SliderSettings(0), "or", SliderSettings(3)]))
-        ])
+    Reason := NAString(
+        concat(" ", [
+            SliderSettings(2), 
+            "or", 
+            SliderSettings(1)
+        ]),
+        false
+    )
 }
 #--
 
@@ -420,17 +414,17 @@ tests contains {
 # MS.SHAREPOINT.4.2v1
 #--
 
-# 1 == Allow users to run custom script on self-service created sites
-# 2 == Prevent users from running custom script on self-service created sites
+# Microsoft has planned to remove the custom scripting configuration option
+# from SharePoint and OneDrive. We are setting this policy to not-implemented
+# and will likely remove it from the baseline in the next version.
 tests contains {
-    "PolicyId": "MS.SHAREPOINT.4.2v1",
-    "Criticality": "Shall",
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-SPOSite", "Get-PnPTenantSite"],
-    "ActualValue": [SitePolicy.DenyAddAndCustomizePages],
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDeprecation,
+    "RequirementMet": false
 } if {
-    some SitePolicy in input.SPO_site
-    Status := SitePolicy.DenyAddAndCustomizePages == 2
+    PolicyId := "MS.SHAREPOINT.4.2v1"
 }
 #--

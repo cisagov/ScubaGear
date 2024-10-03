@@ -13,7 +13,3 @@ SPOTenant := {
     "EmailAttestationRequired": true,
     "EmailAttestationReAuthDays": 30
 }
-
-SPOSite := {
-    "DenyAddAndCustomizePages": 2
-}
