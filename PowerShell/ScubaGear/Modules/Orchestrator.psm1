@@ -927,7 +927,15 @@ function ConvertTo-ResultsCsv {
             $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutPlanFileName.csv"
             $Encoding = Get-FileEncoding
             $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
-            $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+            if ($ActionPlanCsv.Length -eq 0) {
+                # If no tests failed, add the column names to ensure a file is still output
+                $Headers = '"Control ID","Requirement","Result","Criticality","Details",'
+                $Headers += '"Non-Compliance Reason","Remediation Completion Date","Justification"'
+                $Headers | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+            }
+            else {
+                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+            }
         }
         catch {
             $Warning = "Error involving the creation of CSV version of output. "
