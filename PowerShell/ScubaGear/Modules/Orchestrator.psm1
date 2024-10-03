@@ -911,9 +911,11 @@ function ConvertTo-ResultsCsv {
                         if ($Control.Result -eq "Fail") {
                             # Add blank fields where users can document reasons for failures and timelines
                             # for remediation if they so choose
-                            $Reason = ""
-                            $RemediationDate = ""
-                            $Justification = ""
+                            # The space " " instead of empty string makes it so that output from the cells to the
+                            # left won't automatically overlap into the space for these columns in Excel
+                            $Reason = " "
+                            $RemediationDate = " "
+                            $Justification = " "
                             $Control | Add-Member -NotePropertyName "Non-Compliance Reason" -NotePropertyValue $Reason
                             $Control | Add-Member -NotePropertyName "Remediation Completion Date" `
                             -NotePropertyValue $RemediationDate
