@@ -264,13 +264,31 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes                |
 | Datatype    | String             |
 | Default     | `ScubaResults.csv` |
-| Config File | No                 |  
+| Config File | Yes                |  
 
 
 ```powershell
 # Change the output CSV file
 Invoke-SCuBA -ProductNames teams `
   -OutCsvFileName myresults `
+```
+
+## OutPlanFileName
+
+**OutPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | String             |
+| Default     | `ActionPlan.csv`   |
+| Config File | Yes                |  
+
+
+```powershell
+# Change the output action plan file
+Invoke-SCuBA -ProductNames teams `
+  -OutPlanFileName myplan `
 ```
 
 ## OutPath
