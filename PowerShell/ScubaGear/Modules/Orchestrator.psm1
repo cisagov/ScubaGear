@@ -343,6 +343,12 @@ function Invoke-SCuBA {
             }
         }
 
+        if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutPlanFileName) {
+            $ErrorMessage = "OutCsvFileName and OutPlanFileName cannot be equal to each other. "
+            $ErrorMessage += "Both are set to $($ScubaConfig.OutCsvFileName). Stopping execution."
+            throw $ErrorMessage
+        }
+
         # Creates the output folder
         $Date = Get-Date -ErrorAction 'Stop'
         $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
@@ -1736,6 +1742,12 @@ function Invoke-SCuBACached {
 
             if ($ProductNames -eq '*'){
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+            }
+
+            if ($OutCsvFileName -eq $OutPlanFileName) {
+                $ErrorMessage = "OutCsvFileName and OutPlanFileName cannot be equal to each other. "
+                $ErrorMessage += "Both are set to $($OutCsvFileName). Stopping execution."
+                throw $ErrorMessage
             }
 
             # Create outpath if $Outpath does not exist
