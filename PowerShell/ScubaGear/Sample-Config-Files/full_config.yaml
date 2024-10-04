@@ -22,3 +22,6 @@ OutReportName: BaselineReports
 Organization: abcdef.example.com
 AppID: 0123456789abcdef01234566789abcde
 CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
+OutJsonFileName: ScubaResults
+OutCsvFileName: ScubaResults
+OutPlanFileName: ActionPlan
