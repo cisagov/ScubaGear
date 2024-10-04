@@ -281,7 +281,7 @@ Invoke-SCuBA -ProductNames teams `
 |-------------|--------------------|
 | Optional    | Yes                |
 | Datatype    | String             |
-| Default     | `ActionPlan.csv`   |
+| Default     | `ActionPlan`   |
 | Config File | Yes                |  
 
 
