@@ -20,7 +20,7 @@ OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
-OutPlanFileName: ActionPlan
+OutActionPlanFileName: ActionPlan
 OutReportName: BaselineReports
 AnObject:
   name: MyObjectName

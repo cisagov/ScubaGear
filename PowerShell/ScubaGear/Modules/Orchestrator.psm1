@@ -75,7 +75,7 @@ function Invoke-SCuBA {
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".
-    .Parameter OutPlanFileName
+    .Parameter OutActionPlanFileName
     The CSV created in the folder created in OutPath that contains a CSV template prepopulated with the failed
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DisconnectOnExit
@@ -229,7 +229,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutPlanFileName'),
+        $OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName'),
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
@@ -289,7 +289,7 @@ function Invoke-SCuBA {
                 'KeepIndividualJSON' = $KeepIndividualJSON
                 'OutJsonFileName' = $OutJsonFileName
                 'OutCsvFileName' = $OutCsvFileName
-                'OutPlanFileName' = $OutPlanFileName
+                'OutActionPlanFileName' = $OutActionPlanFileName
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -343,8 +343,8 @@ function Invoke-SCuBA {
             }
         }
 
-        if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutPlanFileName) {
-            $ErrorMessage = "OutCsvFileName and OutPlanFileName cannot be equal to each other. "
+        if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutActionPlanFileName) {
+            $ErrorMessage = "OutCsvFileName and OutActionPlanFileName cannot be equal to each other. "
             $ErrorMessage += "Both are set to $($ScubaConfig.OutCsvFileName). Stopping execution."
             throw $ErrorMessage
         }
@@ -442,7 +442,7 @@ function Invoke-SCuBA {
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
                 'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
-                'OutPlanFileName' = $ScubaConfig.OutPlanFileName;
+                'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
         }
@@ -884,7 +884,7 @@ function ConvertTo-ResultsCsv {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutPlanFileName
+        $OutActionPlanFileName
     )
     process {
         try {
@@ -932,7 +932,7 @@ function ConvertTo-ResultsCsv {
                 }
             }
             $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
-            $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutPlanFileName.csv"
+            $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
             $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
             if ($ActionPlanCsv.Length -eq 0) {
@@ -1602,7 +1602,7 @@ function Invoke-SCuBACached {
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".
-    .Parameter OutPlanFileName
+    .Parameter OutActionPlanFileName
     The CSV created in the folder created in OutPath that contains a CSV template prepopulated with the failed
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DarkMode
@@ -1718,7 +1718,7 @@ function Invoke-SCuBACached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutPlanFileName'),
+        $OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1744,8 +1744,8 @@ function Invoke-SCuBACached {
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
             }
 
-            if ($OutCsvFileName -eq $OutPlanFileName) {
-                $ErrorMessage = "OutCsvFileName and OutPlanFileName cannot be equal to each other. "
+            if ($OutCsvFileName -eq $OutActionPlanFileName) {
+                $ErrorMessage = "OutCsvFileName and OutActionPlanFileName cannot be equal to each other. "
                 $ErrorMessage += "Both are set to $($OutCsvFileName). Stopping execution."
                 throw $ErrorMessage
             }
@@ -1871,7 +1871,7 @@ function Invoke-SCuBACached {
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $OutJsonFileName;
                 'OutCsvFileName' = $OutCsvFileName;
-                'OutPlanFileName' = $OutPlanFileName;
+                'OutActionPlanFileName' = $OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
 

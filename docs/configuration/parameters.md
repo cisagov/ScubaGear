@@ -273,9 +273,9 @@ Invoke-SCuBA -ProductNames teams `
   -OutCsvFileName myresults `
 ```
 
-## OutPlanFileName
+## OutActionPlanFileName
 
-**OutPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+**OutActionPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
 
 | Parameter   | Value              |
 |-------------|--------------------|
@@ -288,7 +288,7 @@ Invoke-SCuBA -ProductNames teams `
 ```powershell
 # Change the output action plan file
 Invoke-SCuBA -ProductNames teams `
-  -OutPlanFileName myplan `
+  -OutActionPlanFileName myplan `
 ```
 
 ## OutPath

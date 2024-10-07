@@ -60,7 +60,7 @@ InModuleScope Orchestrator {
                 OutFolderPath = ".";
                 OutJsonFileName = "ScubaResults";
                 OutCsvFileName = "ScubaResults";
-                OutPlanFileName = "ActionPlan";
+                OutActionPlanFileName = "ActionPlan";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName ConvertFrom-Json -Exactly -Times 1
@@ -78,7 +78,7 @@ InModuleScope Orchestrator {
                 OutFolderPath = ".";
                 OutJsonFileName = "ScubaResults";
                 OutCsvFileName = "ScubaResults";
-                OutPlanFileName = "ActionPlan";
+                OutActionPlanFileName = "ActionPlan";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
