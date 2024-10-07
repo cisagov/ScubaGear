@@ -137,6 +137,34 @@ InModuleScope Orchestrator {
                 {Invoke-SCuBACached -Version} | Should -Not -Throw
             }
         }
+        Context 'When modifying the CSV output files names' {
+            It 'Given -OutCsvFileName should not throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                }
+                {Invoke-SCuBACached -Version} | Should -Not -Throw
+            }
+            It 'Given -OutActionPlanFileName should not throw' {
+                $SplatParams += @{
+                    OutActionPlanFileName = "a"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
+            }
+            It 'Given both -OutCsvFileName and -OutActionPlanFileName should not throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                    OutActionPlanFileName = "b"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
+            }
+            It 'Given -OutCsvFileName and -OutActionPlanFileName equal should throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                    OutActionPlanFileName = "a"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Throw
+            }
+        }
     }
 }
 
