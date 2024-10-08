@@ -284,6 +284,24 @@ Invoke-SCuBA -ProductNames teams `
   -OutCsvFileName myresults
 ```
 
+## OutActionPlanFileName
+
+**OutActionPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | String             |
+| Default     | `ActionPlan`   |
+| Config File | Yes                |  
+
+
+```powershell
+# Change the output action plan file
+Invoke-SCuBA -ProductNames teams `
+  -OutActionPlanFileName myplan `
+```
+
 ## OutFolderName
 
 **OutFolderName** is the first half of the name of the folder where the [report files](../execution/reports.md) will be created. The second half is a timedate stamp. The location of this folder is determined by the [OutPath](#outpath) parameter.
