@@ -75,6 +75,9 @@ function Invoke-SCuBA {
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".
+    .Parameter OutActionPlanFileName
+    The CSV created in the folder created in OutPath that contains a CSV template prepopulated with the failed
+    SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigFilePath
@@ -222,6 +225,12 @@ function Invoke-SCuBA {
         [string]
         $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
 
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName'),
+
         [Parameter(Mandatory = $true, ParameterSetName = 'Configuration')]
         [ValidateNotNullOrEmpty()]
         [ValidateScript({
@@ -280,6 +289,7 @@ function Invoke-SCuBA {
                 'KeepIndividualJSON' = $KeepIndividualJSON
                 'OutJsonFileName' = $OutJsonFileName
                 'OutCsvFileName' = $OutCsvFileName
+                'OutActionPlanFileName' = $OutActionPlanFileName
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -331,6 +341,12 @@ function Invoke-SCuBA {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
             }
+        }
+
+        if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutActionPlanFileName) {
+            $ErrorMessage = "OutCsvFileName and OutActionPlanFileName cannot be equal to each other. "
+            $ErrorMessage += "Both are set to $($ScubaConfig.OutCsvFileName). Stopping execution."
+            throw $ErrorMessage
         }
 
         # Creates the output folder
@@ -426,6 +442,7 @@ function Invoke-SCuBA {
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
                 'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+                'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
         }
@@ -862,7 +879,12 @@ function ConvertTo-ResultsCsv {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutCsvFileName
+        $OutCsvFileName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutActionPlanFileName
     )
     process {
         try {
@@ -884,34 +906,45 @@ function ConvertTo-ResultsCsv {
                         -NotePropertyValue $IndividualResults.Results
                 }
             }
+            $ActionPlanCsv = @()
             $ScubaResultsCsv = @()
             foreach ($Product in $ScubaResults.Results.PSObject.Properties) {
                 foreach ($Group in $Product.Value) {
                     foreach ($Control in $Group.Controls) {
                         $Control.Requirement = Format-PlainText -RawString $Control.Requirement
                         $Control.Details = Format-PlainText -RawString $Control.Details
-                        # Add blank fields where users can document reasons for failures and timelines
-                        # for remediation if they so choose
-                        $Reason = ""
-                        $RemediationDate = ""
-                        $Justification = ""
-                        if ($Control.Result -eq "Pass") {
-                            # No need to fill out those fields if passing
-                            $Reason = "N/A"
-                            $RemediationDate = "N/A"
-                            $Justification = "N/A"
-                        }
-                        $Control | Add-Member -NotePropertyName "Non-Compliance Reason" -NotePropertyValue $Reason
-                        $Control | Add-Member -NotePropertyName "Remediation Completion Date" `
-                            -NotePropertyValue $RemediationDate
-                        $Control | Add-Member -NotePropertyName "Justification" -NotePropertyValue $Justification
                         $ScubaResultsCsv += $Control
+                        if ($Control.Result -eq "Fail") {
+                            # Add blank fields where users can document reasons for failures and timelines
+                            # for remediation if they so choose
+                            # The space " " instead of empty string makes it so that output from the cells to the
+                            # left won't automatically overlap into the space for these columns in Excel
+                            $Reason = " "
+                            $RemediationDate = " "
+                            $Justification = " "
+                            $Control | Add-Member -NotePropertyName "Non-Compliance Reason" -NotePropertyValue $Reason
+                            $Control | Add-Member -NotePropertyName "Remediation Completion Date" `
+                            -NotePropertyValue $RemediationDate
+                            $Control | Add-Member -NotePropertyName "Justification" -NotePropertyValue $Justification
+                            $ActionPlanCsv += $Control
+                        }
                     }
                 }
             }
-            $CsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
+            $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
+            $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
-            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $CsvFileName -Encoding $Encoding
+            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
+            if ($ActionPlanCsv.Length -eq 0) {
+                # If no tests failed, add the column names to ensure a file is still output
+                $Headers = $ScubaResultsCsv[0].psobject.Properties.Name -Join '","'
+                $Headers = "`"$Headers`""
+                $Headers += '"Non-Compliance Reason","Remediation Completion Date","Justification"'
+                $Headers | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+            }
+            else {
+                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+            }
         }
         catch {
             $Warning = "Error involving the creation of CSV version of output. "
@@ -1569,6 +1602,9 @@ function Invoke-SCuBACached {
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".
+    .Parameter OutActionPlanFileName
+    The CSV created in the folder created in OutPath that contains a CSV template prepopulated with the failed
+    SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Example
@@ -1681,6 +1717,11 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        [string]
+        $OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [switch]
         $Quiet,
@@ -1701,6 +1742,12 @@ function Invoke-SCuBACached {
 
             if ($ProductNames -eq '*'){
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+            }
+
+            if ($OutCsvFileName -eq $OutActionPlanFileName) {
+                $ErrorMessage = "OutCsvFileName and OutActionPlanFileName cannot be equal to each other. "
+                $ErrorMessage += "Both are set to $($OutCsvFileName). Stopping execution."
+                throw $ErrorMessage
             }
 
             # Create outpath if $Outpath does not exist
@@ -1824,6 +1871,7 @@ function Invoke-SCuBACached {
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $OutJsonFileName;
                 'OutCsvFileName' = $OutCsvFileName;
+                'OutActionPlanFileName' = $OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
 

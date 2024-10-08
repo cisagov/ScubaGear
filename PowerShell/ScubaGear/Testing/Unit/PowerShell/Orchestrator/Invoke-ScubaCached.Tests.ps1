@@ -20,7 +20,8 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Merge-JsonOutput {}
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
-
+            function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
             function Set-Utf8NoBom {}
             Mock -ModuleName Orchestrator Set-Utf8NoBom
 
@@ -135,6 +136,34 @@ InModuleScope Orchestrator {
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
                 {Invoke-SCuBACached -Version} | Should -Not -Throw
+            }
+        }
+        Context 'When modifying the CSV output files names' {
+            It 'Given -OutCsvFileName should not throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                }
+                {Invoke-SCuBACached -Version} | Should -Not -Throw
+            }
+            It 'Given -OutActionPlanFileName should not throw' {
+                $SplatParams += @{
+                    OutActionPlanFileName = "a"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
+            }
+            It 'Given both -OutCsvFileName and -OutActionPlanFileName should not throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                    OutActionPlanFileName = "b"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
+            }
+            It 'Given -OutCsvFileName and -OutActionPlanFileName equal should throw' {
+                $SplatParams += @{
+                    OutCsvFileName = "a"
+                    OutActionPlanFileName = "a"
+                }
+                {Invoke-SCuBACached @SplatParams} | Should -Throw
             }
         }
     }

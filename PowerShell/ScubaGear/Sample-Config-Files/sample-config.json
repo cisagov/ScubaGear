@@ -16,6 +16,7 @@
     "OutFolderName":"M365BaselineConformance",
     "OutProviderFileName":"ProviderSettingsExport",
     "OutRegoFileName":"TestResults",
+    "OutActionPlanFileName":"ActionPlan",
     "OutReportName":"BaselineReports",
     "AnObject": {
       "name": "MyObjectName"
