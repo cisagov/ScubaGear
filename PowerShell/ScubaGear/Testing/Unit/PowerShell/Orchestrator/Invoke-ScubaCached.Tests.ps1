@@ -20,7 +20,8 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Merge-JsonOutput {}
             function Disconnect-SCuBATenant {}
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
-
+            function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
             function Set-Utf8NoBom {}
             Mock -ModuleName Orchestrator Set-Utf8NoBom
 
