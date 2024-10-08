@@ -1,0 +1,14 @@
+# This config file is used to define global checks that Checkov should skip.
+quiet: true
+skip-check:
+  # This is not good.  This rule checks that top-level privs in a workflow are limited.
+  # In order to clear the caches after running the nightly tests, more privs are required.
+  # This can be seen in:
+  # * test_production_function.yaml
+  # * clear_cache.yaml
+  # This should be set at the workflow level (not globally), and it is, but this skip is
+  # broken, as verified by the vendor (https://github.com/bridgecrewio/checkov/issues/6216).
+  # The only way to keep tests from failing is to set it here.
+  # If vendor ever fixes their bug (it's been around for at least 6 months as of Fall 2024)
+  # this skip should be removed.
+  - CKV2_GHA_1
