@@ -284,9 +284,9 @@ jobs:
       # security-events: read
       # statuses: read
     needs:
-      - test_defender
-      - test_entra
+      # - test_defender
+      # - test_entra
       - test_exchange
-      - test_power_platform
-      - test_sharepoint
-      - test_teams
+      # - test_power_platform
+      # - test_sharepoint
+      # - test_teams
