@@ -169,7 +169,7 @@ jobs:
       checks: read
       contents: write
       deployments: read
-      id-token: none
+      id-token: write
       issues: read
       discussions: read
       packages: read
