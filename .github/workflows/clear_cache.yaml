@@ -1,5 +1,4 @@
-# Purpose: The purpose of this workflow is to delete all caches in the repo, as it has limited total cache storage.
-# Warning: This can disrupt other workflows that are using caches. Run with caution.
+# Purpose: The purpose of this workflow is to delete all caches for a specific run.
 
 name: Clear Caches
 
