@@ -51,6 +51,21 @@ jobs:
   publish:
     name: Pub
     uses: ./.github/workflows/publish_private_package.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     secrets:
       ClientId: ${{ secrets.AZURE_CLIENT_ID }}
       TenantId: ${{ secrets.AZURE_TENANT_ID }}
