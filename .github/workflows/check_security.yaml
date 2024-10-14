@@ -23,5 +23,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-security.yml .mega-linter.yml
+      - name: Setup Checkov File
+        run: cp Testing/Linting/MegaLinter/.checkov.yml .checkov.yml
       - name: Check Security
         uses: oxsecurity/megalinter/flavors/security@latest

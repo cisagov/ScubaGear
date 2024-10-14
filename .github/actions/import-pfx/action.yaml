@@ -1,0 +1,22 @@
+name: Import PFX
+description: Create and import the PFX certificate
+inputs:
+  PfxBase64:
+    required: true
+    description: "The PFX as base64"
+  PfxPassword:
+    required: true
+    description: "The PFX password"
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        cd repo
+        # Create PFX
+        New-Item -ItemType file -Path ./key.txt
+        Set-Content -Path ./key.txt -Value "${{ inputs.PfxBase64 }}"
+        certutil -decode ./key.txt ./key.pfx
+        # Import PFX
+        # Pipe to Out-Null to hide the thumbprint
+        Import-PfxCertificate -Password (ConvertTo-SecureString -String "${{ inputs.PfxPassword }}" -AsPlainText -Force) -CertStoreLocation Cert:\CurrentUser\My -FilePath ./key.pfx | Out-Null
+      shell: powershell
