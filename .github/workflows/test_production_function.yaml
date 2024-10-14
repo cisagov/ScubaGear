@@ -27,7 +27,6 @@ on:
       - ".github/workflows/test_production_function.yaml"
       - ".github/workflows/function_test_teams.yaml"
       - ".github/workflows/publish_private_package.yaml"
-      - ".github/workflows/clear_cache.yaml"
       - ".github/workflows/function_test_defender.yaml"
       - ".github/workflows/function_test_entra.yaml"
       - ".github/workflows/function_test_exchange.yaml"
@@ -46,7 +45,7 @@ env:
 
 jobs:
   publish:
-    name: Pub
+    name: Publish Package
     uses: ./.github/workflows/publish_private_package.yaml
     permissions:
       contents: write
