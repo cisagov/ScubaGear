@@ -92,7 +92,9 @@ jobs:
           Alias: Def_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -160,7 +162,9 @@ jobs:
           Alias: Def_Tenant1_G5
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -225,7 +229,9 @@ jobs:
           Alias: Def_Tenant2
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -293,7 +299,9 @@ jobs:
           Alias: Def_Tenant2_G3
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -358,7 +366,9 @@ jobs:
           Alias: Def_Tenant3
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -426,7 +436,9 @@ jobs:
           Alias: Def_Tenant3_G5
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        # Debugging
+        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule) }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
