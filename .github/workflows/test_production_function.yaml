@@ -75,6 +75,21 @@ jobs:
   test_defender:
     name: Test Defender
     uses: ./.github/workflows/function_test_defender.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
@@ -92,6 +107,21 @@ jobs:
   test_entra:
     name: Test Entra
     uses: ./.github/workflows/function_test_entra.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
@@ -109,6 +139,21 @@ jobs:
   test_exchange:
     name: Test Exchange
     uses: ./.github/workflows/function_test_exchange.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
@@ -126,6 +171,21 @@ jobs:
   test_power_platform:
     name: Test Power Platform
     uses: ./.github/workflows/function_test_powerplatform.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
@@ -143,6 +203,21 @@ jobs:
   test_sharepoint:
     name: Test Sharepoint
     uses: ./.github/workflows/function_test_sharepoint.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
@@ -160,6 +235,21 @@ jobs:
   test_teams:
     name: Test Teams
     uses: ./.github/workflows/function_test_teams.yaml
+    permissions:
+      actions: read
+      attestations: read
+      checks: read
+      contents: write
+      deployments: read
+      id-token: write
+      issues: read
+      discussions: read
+      packages: read
+      pages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     with:
       EmailOnFailure: ${{ inputs.EmailOnFailure }}
       GitHubEventSchedule: ${{ github.event.schedule }}
