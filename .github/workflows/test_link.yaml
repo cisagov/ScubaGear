@@ -10,14 +10,16 @@ permissions: read-all
 jobs:
   pass-job:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     steps:
       - run: |
-          exit 0
+          exit 1
   fail-job:
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     steps:
       - run: |
-          exit 0
+          exit 1
   write-email:
     name: Write Email
     runs-on: ubuntu-latest
