@@ -30,6 +30,6 @@ jobs:
           username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
           password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
           subject: Nightly functional test failure
-          body: 'This workflow just ran: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: ${{ steps.extract-email.outputs.emails }}'
+          to: jgarriss@mitre.org
           from: ScubaGear Notifier
+          body: This workflow just ran: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
