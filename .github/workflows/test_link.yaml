@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          exit 1
+          exit 0
   write-email:
     name: Write Email
     runs-on: ubuntu-latest
