@@ -8,20 +8,24 @@ on:
 permissions: read-all
 
 jobs:
+  pass-job:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          exit 0
+  fail-job:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          exit 1
   write-email:
     name: Write Email
     runs-on: ubuntu-latest
+    needs:
+      - pass-job
+      - fail-job
+    if: ${{ failure() }}
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-      - name: Write components
-        run: |
-          echo ${{ github.server_url }}
-          echo ${{ github.repository }}
-          echo ${{ github.run_id }}
-      - name: Create link
-        run: |
-          echo ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       - name: Notify
         uses: dawidd6/action-send-mail@v3
         with:
@@ -32,4 +36,4 @@ jobs:
           subject: Nightly functional test failure
           to: jgarriss@mitre.org
           from: ScubaGear Notifier
-          body: This workflow just ran ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          body: This workflow just failed ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
