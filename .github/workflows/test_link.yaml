@@ -10,11 +10,11 @@ permissions: read-all
 jobs:
   write-email:
     name: Write Email
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Write email to log
-        runs-on: Ubuntu-latest
         run: |
           echo ${{ github.server_url }}
           echo ${{ github.repository }}
