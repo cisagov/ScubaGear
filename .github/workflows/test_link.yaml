@@ -32,4 +32,4 @@ jobs:
           subject: Nightly functional test failure
           to: jgarriss@mitre.org
           from: ScubaGear Notifier
-          body: This workflow just ran: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          body: This workflow just ran ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
