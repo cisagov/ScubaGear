@@ -14,8 +14,11 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - name: Write email to log
+      - name: Write components
         run: |
           echo ${{ github.server_url }}
           echo ${{ github.repository }}
           echo ${{ github.run_id }}
+      - name: Create link
+        run: |
+          echo ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
