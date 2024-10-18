@@ -6,31 +6,13 @@ on:
   workflow_call:
   workflow_dispatch:
 
-# NOTE: This skip is not honored by Checkov.
-# checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
-# permissions: write-all
-
 jobs:
   cleanup:
     name: Clear Cache
     runs-on: ubuntu-latest
-    # checkov:skip=CKV2_GHA_1:Write permissions required to clear cache.
-    # permissions: write-all
     permissions:
-      # actions: read
-      # attestations: read
-      # checks: read
       contents: write
-      # deployments: read
       id-token: write
-      # issues: read
-      # discussions: read
-      # packages: read
-      # pages: read
-      # pull-requests: read
-      # repository-projects: read
-      # security-events: read
-      # statuses: read
     # Run even if one of the functional tests have failed
     # We always want to clean up the caches that we create
     if: always()
