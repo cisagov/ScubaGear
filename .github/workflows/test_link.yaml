@@ -1,0 +1,21 @@
+name: Test Link in Email
+
+on:
+  push:
+    paths:
+      - ".github/workflows/test_link.yaml"
+
+permissions: read-all
+
+jobs:
+  write-email:
+    name: Write Email
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Write email to log
+        runs-on: Ubuntu-latest
+        run: |
+          echo ${{ github.server_url }}
+          echo ${{ github.repository }}
+          echo ${{ github.run_id }}
