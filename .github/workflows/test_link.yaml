@@ -27,9 +27,9 @@ jobs:
         with:
           server_address: smtp.gmail.com
           server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
+          username: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+          password: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
           subject: Nightly functional test failure
-          body: This workflow just ran: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          to: ${{ steps.extract-email.outputs.emails }}
+          body: 'This workflow just ran: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: ${{ steps.extract-email.outputs.emails }}'
           from: ScubaGear Notifier
