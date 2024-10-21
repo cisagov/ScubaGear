@@ -9,7 +9,7 @@ on:
       EmailOnFailure:
         description: "The email address to send if workflow fails."
         required: true
-        type: string
+        type: boolean
       GitHubEventSchedule:
         description: "A type of GitHub event"
         required: true
