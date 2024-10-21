@@ -31,7 +31,7 @@ jobs:
         uses: devblackops/github-action-psscriptanalyzer@master
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          settingsPath: powershell-psscriptanalyzer.psd1
+          settingsPath: ../../powershell-psscriptanalyzer.psd1
           sendComment: true
           failOnErrors: true
           failOnWarnings: true
