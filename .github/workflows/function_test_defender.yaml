@@ -7,7 +7,7 @@ on:
   workflow_call:
     inputs:
       EmailOnFailure:
-        description: "The email address to send if workflow fails."
+        description: "True if an email should be sent when the workflow fails."
         required: true
         type: boolean
       GitHubEventSchedule:
