@@ -91,12 +91,6 @@ jobs:
         env:
           Alias: Shr_Tenant1_PNP
           TestParams: ${{ secrets.TestParams }}
-      - name: Print Values
-        run: |
-          Write-Host 'EmailOnFailure'
-          Write-Host ${{ inputs.EmailOnFailure }}
-          Write-Host 'GitHubEventSchedule'
-          Write-Host ${{ inputs.GitHubEventSchedule }}
       - name: Notify on Failure
         # Debugging
         # inputs.GitHubEventName == 'push'
