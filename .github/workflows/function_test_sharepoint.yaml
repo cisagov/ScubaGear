@@ -100,7 +100,8 @@ jobs:
       - name: Notify on Failure
         # Debugging
         # inputs.GitHubEventName == 'push'
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule == '') }}
+        # inputs.GitHubEventName == 'schedule'
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -165,9 +166,7 @@ jobs:
           Alias: Shr_Tenant2_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        # Debugging
-        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule == '') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -232,9 +231,7 @@ jobs:
           Alias: Shr_Tenant3_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        # Debugging
-        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule == '') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -299,9 +296,7 @@ jobs:
           Alias: Shr_Tenant6_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        # Debugging
-        # if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule || inputs.GitHubEventName == 'push') }}
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventSchedule == '') }}
+        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
