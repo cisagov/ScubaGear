@@ -23,7 +23,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
       - name: Setup PSScriptAnalyzer settings
-        run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .github/workspace/powershell-psscriptanalyzer.psd1
+        run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .github/workflows/powershell-psscriptanalyzer.psd1
       # - name: Run PSScriptAnalyzer on PowerShell Scripts
       #   run: |
       #     Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Warning -EnableExit -Profile .powershell-psscriptanalyzer.psd1
