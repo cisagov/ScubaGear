@@ -2,7 +2,6 @@ function Set-ScubaGearVersionManifest {
     <#
     .Description
     Replace ScubaGear module version in the ScubaGear.psd1 manifest.
-    Output will be stored as a ProviderSettingsExport.json in the OutPath Folder
     .Functionality
     Internal
     #>
@@ -107,16 +106,22 @@ function New-PRBody {
 function Set-ScubaGearModuleVersion {
     <#
     .Description
-    This main function t
+    This main function to bump ScubaGear's module version
     .Functionality
     Internal
     #>
 
+    # Replace the module version in the manifest
     $PreviousVersion = Set-ScubaGearVersionManifest
+
+    # Replace the module version in the documentation
     Set-ScubaGearVersionDoc
+
+    # Create the GitHub Pull Request 
     $PRTemplateContent = New-PRBody
 
-    # Create the PR
+    # Create the PR 
+    # We abstract this out into a reusable function in the future.
     $ScubaGearVersionBumpBranch = "scubagear-version-bump-${env:NEW_VERSION_NUMBER}"
     git config --global user.email "action@github.com"
     git config --global user.name "GitHub Action"
