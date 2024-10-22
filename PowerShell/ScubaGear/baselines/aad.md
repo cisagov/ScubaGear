@@ -97,7 +97,7 @@ Legacy authentication SHALL be blocked.
 
   Target resources > Cloud apps >  Include > <b>All cloud apps</b>
 
-  Conditions > Client apps > Configure > Yes > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
+  Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
 
   Access controls > Grant > <b>Block Access</b>
 </pre>
