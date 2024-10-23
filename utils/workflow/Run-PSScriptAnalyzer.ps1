@@ -2,8 +2,8 @@
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
-# Get all relevant PowerShell files
-$psFiles = Get-ChildItem -Path ./* -Include *.ps1,*.psm1 -Recurse
+# Get all possible PowerShell files
+$psFiles = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
 # Run PSSA
 $issues = foreach ($i in $psFiles.FullName) {
