@@ -3,48 +3,49 @@ Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
 # Get all possible PowerShell files
-$psFiles = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
+$PsFiles = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
-# Run PSSA
-$issues = foreach ($i in $psFiles.FullName) {
-	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1
+# Run PSSA for each file
+$Issues = foreach ($i in $PsFiles.FullName) {
+  Write-Output "Testing $($PsFiles.FullName)..."
+	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 }
 
 # init and set variables
-$errors = $warnings = $infos = $unknowns = 0
+$Errors = $Warnings = $Infos = $Unknowns = 0
 
 # Get results, types and report to GitHub Actions
-foreach ($i in $issues) {
-	switch ($i.Severity) {
+foreach ($Issue in $Issues) {
+	switch ($Issue.Severity) {
 		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
-			Write-Output "::error file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-			$errors++
+			Write-Output "::error file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($issue.Message)"
+			$Errors++
 		}
 		{$_ -eq 'Warning'} {
-			Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-			$warnings++
+			Write-Output "::warning file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
+			$Warnings++
 		}
 		{$_ -eq 'Information'} {
-			Write-Output "::warning file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-			$infos++
+			Write-Output "::warning file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
+			$Infos++
 		}
 		Default {
-			Write-Output "::debug file=$($i.ScriptName),line=$($i.Line),col=$($i.Column)::$($i.RuleName) - $($i.Message)"
-			$unknowns++
+			Write-Output "::debug file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
+			$Unknowns++
 		}
 	}
 }
 
 # Report summary to GitHub Actions
-If ($unknowns -gt 0) {
-	Write-Output "There were $errors errors, $warnings warnings, $infos infos, and $unknowns unknowns in total."
+If ($Unknowns -gt 0) {
+	Write-Output "There were $Errors errors, $Warnings warnings, $Infos infos, and $Unknowns unknowns in total."
 }
 Else {
-	Write-Output "There were $errors errors, $warnings warnings, and $infos infos in total."
+	Write-Output "There were $Errors errors, $Warnings warnings, and $Infos infos in total."
 }
 
 # Exit with error if any PSSA errors
-If ($errors -gt 0) {
+If ($Errors -gt 0) {
 	exit 1
 }
 
