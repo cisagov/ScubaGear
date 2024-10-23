@@ -7,7 +7,7 @@ $psFiles = Get-ChildItem -Path ./* -Include *.ps1,*.psm1 -Recurse
 
 # Run PSSA
 $issues = foreach ($i in $psFiles.FullName) {
-	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./.github/scripts/pssa-settings.psd1
+	Invoke-ScriptAnalyzer -Path $i -Recurse -Settings ./Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1
 }
 
 # init and set variables
