@@ -2,11 +2,6 @@
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
-Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
-
-# Intentionally blank line.
-Write-Output ""
-
 # Get all relevant PowerShell files
 $psFiles = Get-ChildItem -Path ./* -Include *.ps1,*.psm1 -Recurse
 
@@ -41,7 +36,7 @@ foreach ($i in $issues) {
 }
 
 # Intentionally blank line.
-Write-Output ""
+Write-Output "`n`n"
 
 # Report summary to GitHub Actions
 If ($unknowns -gt 0) {
@@ -55,6 +50,14 @@ Else {
 If ($errors -gt 0) {
 	exit 1
 }
+
+# Intentionally blank line.
+Write-Output "`n`n"
+
+Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
+
+# Intentionally blank line.
+Write-Output "`n`n"
 
 # Credit
 # Code taken from this archived repo and modified:
