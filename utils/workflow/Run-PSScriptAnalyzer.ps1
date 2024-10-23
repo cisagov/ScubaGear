@@ -35,9 +35,6 @@ foreach ($i in $issues) {
 	}
 }
 
-# Intentionally blank line.
-Write-Output "`n`n"
-
 # Report summary to GitHub Actions
 If ($unknowns -gt 0) {
 	Write-Output "There were $errors errors, $warnings warnings, $infos infos, and $unknowns unknowns in total."
@@ -51,13 +48,8 @@ If ($errors -gt 0) {
 	exit 1
 }
 
-# Intentionally blank line.
-Write-Output "`n`n"
-
+# List version of PSSA used.
 Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
-
-# Intentionally blank line.
-Write-Output "`n`n"
 
 # Credit
 # Code taken from this archived repo and modified:
