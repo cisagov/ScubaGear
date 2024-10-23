@@ -50,3 +50,7 @@ Else {
 If ($errors -gt 0) {
 	exit 1
 }
+
+# Credit
+# Code taken from this archived repo and modified:
+# https://github.com/tigattack/VeeamDiscordNotifications
