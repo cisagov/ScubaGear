@@ -3,7 +3,7 @@ Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
 Write-Output "PSScriptAnalyzer Version:"
-Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | $_.Version
+Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
 
 # Intentionally blank line.
 Write-Output ""
