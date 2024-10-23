@@ -3,11 +3,12 @@ Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
 # Get all possible PowerShell files
-$PsFiles = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
+$Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
+
+Write-Output $Files
 
 # Run PSSA for each file
-$Issues = foreach ($File in $PsFiles.FullName) {
-  Write-Output "Testing $File..."
+$Issues = foreach ($File in $Files.FullName) {
 	Invoke-ScriptAnalyzer -Path $File -Recurse -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 }
 
