@@ -11,8 +11,6 @@ on:
   # on every Sun to Thr (b/c GMT -5)
   schedule:
     - cron: "15 4 * * 0-4"
-  # This allows someone to run tests manual and enter their own email,
-  # thus not spamming TCOs with failures while testing/debugging.
   workflow_dispatch:
     inputs:
       # checkov:skip=CKV_GHA_7:Manual inputs are desired.
