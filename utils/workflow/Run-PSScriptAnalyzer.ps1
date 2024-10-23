@@ -13,6 +13,8 @@ $issues = foreach ($i in $psFiles.FullName) {
 # init and set variables
 $errors = $warnings = $infos = $unknowns = 0
 
+Write-Host "I am doing something evil."
+
 # Get results, types and report to GitHub Actions
 foreach ($i in $issues) {
 	switch ($i.Severity) {
