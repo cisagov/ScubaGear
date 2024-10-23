@@ -2,6 +2,11 @@
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
+Write-Output ">>> Get-Module -ListAvailable"
+Get-Module -ListAvailable
+Write-Output ">>> Get-Module"
+Get-Module
+
 # Print PSSA version
 $moduleVersion = (Get-Module PSScriptAnalyzer).Version
 Write-Output "PSScriptAnalyzer Version:" $moduleVersion
