@@ -3,7 +3,11 @@ Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module PSScriptAnalyzer -ErrorAction Stop
 
 # Print PSSA version
-Get-InstalledModule -Name PSScriptAnalyzer
+$moduleVersion = (Get-InstalledModule PSScriptAnalyzer).Version
+Write-Output "PSScriptAnalyzer Version:" $moduleVersion
+
+# Intentionally blank line.
+Write-Output ""
 
 # Get all relevant PowerShell files
 $psFiles = Get-ChildItem -Path ./* -Include *.ps1,*.psm1 -Recurse
