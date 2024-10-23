@@ -181,12 +181,12 @@ Invoke-SCuBA -ProductNames teams `
 
 **OPAPath** is the location of the folder that contains the Open Policy Agent (OPA) policy engine executable file. The executable must be named `opa_windows_amd64.exe`. For most cases, this parameter should not be used.
 
-| Parameter   | Value                                  |
-|-------------|----------------------------------------|
-| Optional    | Yes                                    |
-| Datatype    | String                                 |
+| Parameter   | Value                               |
+|-------------|-------------------------------------|
+| Optional    | Yes                                 |
+| Datatype    | String                              |
 | Default     | `C:\Users\johndoe\.scubagear\Tools` |
-| Config File | Yes                                    |
+| Config File | Yes                                 |
 
 ```powershell
 # Change the directory that contains the OPA exe
@@ -223,18 +223,36 @@ Invoke-SCuBA -ProductNames teams `
 
 **OutActionPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
 
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ActionPlan`   |
-| Config File | Yes                |  
+| Parameter   | Value        |
+|-------------|--------------|
+| Optional    | Yes          |
+| Datatype    | String       |
+| Default     | `ActionPlan` |
+| Config File | Yes          |  
 
 
 ```powershell
 # Change the output action plan file
 Invoke-SCuBA -ProductNames teams `
-  -OutActionPlanFileName myplan `
+  -OutActionPlanFileName myplan
+```
+
+## OutCsvFileName
+
+**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value          |
+|-------------|----------------|
+| Optional    | Yes            |
+| Datatype    | String         |
+| Default     | `ScubaResults` |
+| Config File | Yes            |  
+
+
+```powershell
+# Change the output CSV file
+Invoke-SCuBA -ProductNames teams `
+  -OutCsvFileName myresults
 ```
 
 ## OutFolderName
@@ -258,12 +276,12 @@ Invoke-SCuBA -ProductNames teams `
 
 **OutJsonFileName** renames the uber output JSON file that is created after a ScubaGear run. This should only be the base file name, as the extension `.json` will automatically be added. 
 
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ScubaResults.json` |
-| Config File | No                 |  
+| Parameter   | Value          |
+|-------------|----------------|
+| Optional    | Yes            |
+| Datatype    | String         |
+| Default     | `ScubaResults` |
+| Config File | Yes            |  
 
 > **Note**: This parameter does not work if the `-KeepIndividualJSON` parameter is present.
 
@@ -271,24 +289,6 @@ Invoke-SCuBA -ProductNames teams `
 # Change the output JSON file
 Invoke-SCuBA -ProductNames teams `
   -OutJsonFileName myresults
-```
-
-## OutCsvFileName
-
-**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
-
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ScubaResults.csv` |
-| Config File | Yes                |  
-
-
-```powershell
-# Change the output CSV file
-Invoke-SCuBA -ProductNames teams `
-  -OutCsvFileName myresults `
 ```
 
 ## OutPath
