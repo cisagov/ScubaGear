@@ -5,7 +5,8 @@ Install-Module PSScriptAnalyzer -ErrorAction Stop
 # Get all possible PowerShell files
 $Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
-Write-Output $Files
+# For debugging, if you want to know what files are being tested, uncomment next line.
+# Write-Output $Files
 
 # Run PSSA for each file
 $Issues = foreach ($File in $Files.FullName) {
@@ -19,7 +20,7 @@ $Errors = $Warnings = $Infos = $Unknowns = 0
 foreach ($Issue in $Issues) {
 	switch ($Issue.Severity) {
 		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
-			Write-Output "::error file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($issue.Message)"
+			Write-Output "::error file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
 			$Errors++
 		}
 		{$_ -eq 'Warning'} {
@@ -49,6 +50,8 @@ Else {
 If ($Errors -gt 0) {
 	exit 1
 }
+
+Write-Output "`n"
 
 # List version of PSSA used.
 Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
