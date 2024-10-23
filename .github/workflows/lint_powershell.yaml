@@ -11,8 +11,7 @@ permissions: read-all
 
 jobs:
   powershell-lint-check:
-    name: MegaLint PowerShell Check
-    # runs-on: ubuntu-latest
+    name: PowerShell Check
     runs-on: windows-latest
     # This condition prevents duplicate runs.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
@@ -22,13 +21,5 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      # Use MegaLinter
-      # This version was experiencing some problems.
-      # - name: Setup PSScriptAnalyzer settings
-      #   run: cp Testing/Linting/MegaLinter/.powershell-psscriptanalyzer.psd1 .powershell-psscriptanalyzer.psd1
-      # - name: Run PSScriptAnalyzer on PowerShell Scripts
-      #   run: |
-      #     Invoke-ScriptAnalyzer -Path ./ -Recurse -Severity Warning -EnableExit -Profile .powershell-psscriptanalyzer.psd1
-      # Use a local script
       - name: Run PSScriptAnalyzer
         run: ./utils/workflow/Run-PSScriptAnalyzer.ps1
