@@ -6,7 +6,7 @@ Install-Module PSScriptAnalyzer -ErrorAction Stop
 $Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
 # If you want to know what files are being tested, set to $true.
-$DebuggingMode = $false
+$DebuggingMode = $true
 if ($DebuggingMode) {
   Write-Output $Files
 }
@@ -49,16 +49,16 @@ Else {
 	Write-Output "There were $Errors errors, $Warnings warnings, and $Infos infos in total."
 }
 
+Write-Output "`n`n"
+
+# List version of PSSA used.
+Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
+
 # Exit with error if any PSSA errors
 If ($Errors -gt 0) {
 	exit 1
 }
 
-Write-Output "`n"
-
-# List version of PSSA used.
-Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Select-Object -Property Name, Version
-
 # Credit
-# Code taken from this archived repo and modified:
+# Code taken from this archived repo and then modified:
 # https://github.com/tigattack/VeeamDiscordNotifications
