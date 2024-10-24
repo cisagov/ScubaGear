@@ -6,7 +6,7 @@ Install-Module PSScriptAnalyzer -ErrorAction Stop
 $Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
 # If you want to know what files are being tested, set to $true.
-$DebuggingMode = $true
+$DebuggingMode = $false
 if ($DebuggingMode) {
   Write-Output $Files
 }
@@ -40,6 +40,8 @@ foreach ($Issue in $Issues) {
 		}
 	}
 }
+
+Write-Output "`n`n"
 
 # Report summary to GitHub Actions
 If ($Unknowns -gt 0) {
