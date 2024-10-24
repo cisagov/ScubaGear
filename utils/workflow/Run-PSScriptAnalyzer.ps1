@@ -5,8 +5,11 @@ Install-Module PSScriptAnalyzer -ErrorAction Stop
 # Get all possible PowerShell files
 $Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
-# For debugging, if you want to know what files are being tested, uncomment next line.
-# Write-Output $Files
+# If you want to know what files are being tested, set to $true.
+$DebuggingMode = $false
+if ($DebuggingMode) {
+  Write-Output $Files
+}
 
 # Run PSSA for each file
 $Issues = foreach ($File in $Files.FullName) {
