@@ -111,6 +111,7 @@ Users detected as high risk SHALL be blocked.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+- _NIST SP 800-53 Rev. 5 Mapping:_ XX-1, XX-2
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -121,6 +122,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+- _NIST SP 800-53 Rev. 5 Mapping:_ XX-1, XX-2(1), XX-2(2)
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
@@ -131,6 +133,10 @@ Sign-ins detected as high risk SHALL be blocked.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+- _NIST SP 800-53 Rev. 5 Mapping:_
+  - XX-1 Example text
+  - XX-2(1) Secure stuff
+  - XX-2(2) More text
 
 ### Resources
 
