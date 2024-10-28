@@ -13,39 +13,33 @@ $Results = foreach ($PsFile in $PsFiles) {
 }
 
 # Report results
-if ($Results) {
-	$HasWarnings = $false
-	$HasErrors = $false
-	$results | ForEach-Object {
-		Write-Output "File: $($_.ScriptPath)"
-		Write-Output "Line: $($_.Line)"
-		Write-Output "Severity: $($_.Severity)"
-		Write-Output "Message: $($_.Message)"
-		Write-Output "RuleName: $($_.RuleName)"
-		Write-Output "--------------------------"
+$HasWarnings = $false
+$HasErrors = $false
+$results | ForEach-Object {
+	Write-Output "File: $($_.ScriptPath)"
+	Write-Output "Line: $($_.Line)"
+	Write-Output "Severity: $($_.Severity)"
+	Write-Output "Message: $($_.Message)"
+	Write-Output "RuleName: $($_.RuleName)"
+	Write-Output "--------------------------"
+	if ($_.Severity -eq 'Warning') {
+		$HasWarnings = $true
+	}
+	elseif ($_.Severity -eq 'Error') {
+		$HasErrors = $true
+	}
+}
 
-		if ($_.Severity -eq 'Warning') {
-			$HasWarnings = $true
-		}
-		elseif ($_.Severity -eq 'Error') {
-			$HasErrors = $true
-		}
-	}
-	if ($HasWarnings -or $HasErrors) {
-		Write-Output "Warnings and/or errors were found in the PowerShell scripts." -ForegroundColor Red
-		exit 1
-	}
+# List version of PSSA used.
+Write-Output "`n`n"
+Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
+
+# Exit 1 if warnings or errors
+Write-Output "`n`n"
+if ($HasWarnings -or $HasErrors) {
+	Write-Output "Warnings and/or errors were found in the PowerShell scripts." -fore red
+	exit 1
 }
 else {
 	Write-Output "No warnings or errors were found in the PowerShell scripts."
-}
-
-Write-Output "`n`n"
-
-# List version of PSSA used.
-Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
-
-# Exit with error if any PSSA errors
-If ($Errors -gt 0) {
-	exit 1
 }
