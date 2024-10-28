@@ -38,7 +38,7 @@ Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Se
 Write-Output "`n`n"
 if ($HasWarnings -or $HasErrors) {
 	$host.UI.RawUI.ForegroundColor = red
-	Write-Output "Warnings and/or errors were found in the PowerShell scripts." -fore red
+	Write-Output "Warnings and/or errors were found in the PowerShell scripts."
 	exit 1
 }
 else {
