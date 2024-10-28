@@ -13,35 +13,49 @@ $Results = foreach ($PsFile in $PsFiles) {
 }
 
 # Report results
-$HasWarnings = $false
-$HasErrors = $false
-$results | ForEach-Object {
-	Write-Output "File: $($_.ScriptPath)"
-	Write-Output "Line: $($_.Line)"
-	Write-Output "Severity: $($_.Severity)"
-	Write-Output "Message: $($_.Message)"
-	Write-Output "RuleName: $($_.RuleName)"
+$InfoCount = 0
+$WarningCount = 0
+$ErrorCount = 0
+foreach ($Result in $Results) {
+	Write-Output "File:     $($Result.ScriptPath)"
+	Write-Output "Line:     $($Result.Line)"
+	Write-Output "Severity: $($Result.Severity)"
+	Write-Output "Message:  $($Result.Message)"
+	Write-Output "RuleName: $($Result.RuleName)"
 	Write-Output "--------------------------"
-	if ($_.Severity -eq 'Warning') {
-		$HasWarnings = $true
+	if ($Result.Severity -eq 'Information') {
+		$InfoCount++
 	}
-	elseif ($_.Severity -eq 'Error') {
-		$HasErrors = $true
+	elseif ($Result.Severity -eq 'Warning') {
+		$WarningCount++
+	}
+	elseif ($Result.Severity -eq 'Error') {
+		$ErrorCount++
 	}
 }
 
-# List version of PSSA used.
-Write-Output "`n`n"
-Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
+# Summarize results
+Write-Output "Summary"
+Write-Output "Informations: $InfoCount"
+Write-Output "Warnings:     $WarningCount"
+Write-Output "Errors:       $ErrorCount"
 
 # Exit 1 if warnings or errors
 Write-Output "`n`n"
-if ($HasWarnings -or $HasErrors) {
-	$host.UI.RawUI.ForegroundColor = red
-	Write-Output "Warnings and/or errors were found in the PowerShell scripts."
+if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
+	$host.UI.RawUI.ForegroundColor = Red
+	Write-Output "Problems were found in the PowerShell scripts."
 	exit 1
 }
 else {
-	$host.UI.RawUI.ForegroundColor = green
-	Write-Output "No warnings or errors were found in the PowerShell scripts."
+	$host.UI.RawUI.ForegroundColor = Green
+	Write-Output "No problems were found in the PowerShell scripts."
+}
+
+# If it's important to verify the version of PSSA that is used,
+# set debugging to true.
+# This is not run every time because it's a bit slow.
+$DebuggingMode = $true
+if ($DebuggingMode) {
+	Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 }
