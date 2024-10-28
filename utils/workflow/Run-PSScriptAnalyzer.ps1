@@ -1,8 +1,12 @@
+Write-Host "Testing PowerShell code with PSScript Analyzer..."
+
 # Install PSScriptAnalyzer
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
 # Import the PSScriptAnalyzer module
 # Import-Module PSScriptAnalyzer
+
+
 
 # Get all PowerShell script files in the repository
 $PsFiles = Get-ChildItem -Path ./*  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
@@ -43,12 +47,12 @@ Write-Output "Errors:       $ErrorCount"
 # Exit 1 if warnings or errors
 Write-Output "`n`n"
 if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
-	$host.UI.RawUI.ForegroundColor = Red
+	$host.UI.RawUI.ForegroundColor = "Red"
 	Write-Output "Problems were found in the PowerShell scripts."
 	exit 1
 }
 else {
-	$host.UI.RawUI.ForegroundColor = Green
+	$host.UI.RawUI.ForegroundColor = "Green"
 	Write-Output "No problems were found in the PowerShell scripts."
 }
 
