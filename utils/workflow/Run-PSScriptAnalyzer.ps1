@@ -2,7 +2,7 @@
 Set-PSRepository PSGallery -InstallationPolicy Trusted
 Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
 # Import the PSScriptAnalyzer module
-Import-Module PSScriptAnalyzer
+# Import-Module PSScriptAnalyzer
 
 # Get all PowerShell script files in the repository
 $PsFiles = Get-ChildItem -Path ./*  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
@@ -37,9 +37,11 @@ Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Se
 # Exit 1 if warnings or errors
 Write-Output "`n`n"
 if ($HasWarnings -or $HasErrors) {
+	$host.UI.RawUI.ForegroundColor = red
 	Write-Output "Warnings and/or errors were found in the PowerShell scripts." -fore red
 	exit 1
 }
 else {
+	$host.UI.RawUI.ForegroundColor = green
 	Write-Output "No warnings or errors were found in the PowerShell scripts."
 }
