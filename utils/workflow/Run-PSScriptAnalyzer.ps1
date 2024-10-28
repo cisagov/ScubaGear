@@ -31,7 +31,7 @@ if ($Results) {
 			$HasErrors = $true
 		}
 	}
-	if ($HasWarnings == $true or $HasErrors == $true) {
+	if ($HasWarnings -or $HasErrors) {
 		Write-Output "Warnings and/or errors were found in the PowerShell scripts." -ForegroundColor Red
 		exit 1
 	}
