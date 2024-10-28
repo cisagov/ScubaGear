@@ -2,9 +2,7 @@ Write-Host "Testing PowerShell code with PSScript Analyzer..."
 
 # Install PSScriptAnalyzer
 Set-PSRepository PSGallery -InstallationPolicy Trusted
-Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
-# Import the PSScriptAnalyzer module
-# Import-Module PSScriptAnalyzer
+Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 
 # Get all PowerShell script files in the repository
 $PsFiles = Get-ChildItem -Path ./*  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
