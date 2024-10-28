@@ -60,6 +60,7 @@ Uncomment this section if a screenshot is needed.
   Use `Rebase branch` button below or use [this](https://www.digitalocean.com/community/tutorials/how-to-rebase-and-update-a-pull-request) reference to rebase from the command line.
 - [ ] Resolved all merge conflicts on branch
 - [ ] Notified merge coordinator that PR is ready for merge via comment mention
+- [ ] Formally demo the changes to the team for questions and comments. This needs to be done on any issue that is medium or higher.
 
 ## ✅ Post-merge checklist ##
 
