@@ -1,0 +1,482 @@
+﻿[
+    {
+        "ActualValue":  "Alex Wilber",
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.3v1",
+        "ReportDetails":  "1 admin(s) that are not cloud-only found:\u003cbr/\u003eAlex Wilber",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.AAD.4.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.AAD.2.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.AAD.8.3v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.4.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "migrationComplete"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthenticationMethodPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.4v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            [
+                                {
+                                    "Id":  "Email",
+                                    "State":  "disabled"
+                                },
+                                {
+                                    "Id":  "Sms",
+                                    "State":  "disabled"
+                                },
+                                {
+                                    "Id":  "Voice",
+                                    "State":  "disabled"
+                                }
+                            ]
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthenticationMethodPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.5v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "AdditionalProperties":  {
+                                                         "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+                                                         "featureSettings":  {
+                                                                                 "companionAppAllowedState":  {
+                                                                                                                  "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
+                                                                                                                  "includeTarget":  "@{id=all_users; targetType=group}",
+                                                                                                                  "state":  "default"
+                                                                                                              },
+                                                                                 "displayAppInformationRequiredState":  {
+                                                                                                                            "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
+                                                                                                                            "includeTarget":  "@{id=all_users; targetType=group}",
+                                                                                                                            "state":  "enabled"
+                                                                                                                        },
+                                                                                 "displayLocationInformationRequiredState":  {
+                                                                                                                                 "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
+                                                                                                                                 "includeTarget":  "@{id=all_users; targetType=group}",
+                                                                                                                                 "state":  "enabled"
+                                                                                                                             },
+                                                                                 "numberMatchingRequiredState":  {
+                                                                                                                     "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
+                                                                                                                     "includeTarget":  "@{id=all_users; targetType=group}",
+                                                                                                                     "state":  "enabled"
+                                                                                                                 }
+                                                                             },
+                                                         "includeTargets":  [
+                                                                                {
+                                                                                    "authenticationMode":  "any",
+                                                                                    "id":  "all_users",
+                                                                                    "isRegistrationRequired":  false,
+                                                                                    "targetType":  "group"
+                                                                                }
+                                                                            ],
+                                                         "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                                                         "isSoftwareOathEnabled":  false
+                                                     },
+                            "ExcludeTargets":  [
+
+                                               ],
+                            "Id":  "MicrosoftAuthenticator",
+                            "State":  "enabled"
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthenticationMethodPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.3v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_admin_consent_policies":  [
+                                                               {
+                                                                   "Name":  "EnableAdminConsentRequests",
+                                                                   "SettingsGroup":  "Consent Policy Settings",
+                                                                   "Value":  "true"
+                                                               }
+                                                           ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaDirectorySetting"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.5.3v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_allow_invite_values":  [
+                                                            {
+                                                                "AllowInvitesFromValue":  "adminsAndGuestInviters",
+                                                                "PolicyId":  "authorizationPolicy"
+                                                            }
+                                                        ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthorizationPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.8.2v1",
+        "ReportDetails":  "Permission level set to \"adminsAndGuestInviters\" (authorizationPolicy)",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_allowed_create_values":  [
+                                                              {
+                                                                  "DefaultUser_AllowedToCreateApps":  false,
+                                                                  "PolicyId":  "authorizationPolicy"
+                                                              }
+                                                          ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthorizationPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.5.1v1",
+        "ReportDetails":  "0 authorization policies found that allow non-admin users to register third-party applications",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_grant_policy_values":  [
+                                                            {
+                                                                "DefaultUser_DefaultGrantPolicy":  [
+                                                                                                       "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+                                                                                                       "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team"
+                                                                                                   ],
+                                                                "PolicyId":  "authorizationPolicy"
+                                                            }
+                                                        ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthorizationPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.5.2v1",
+        "ReportDetails":  "0 authorization policies found that allow non-admin users to consent to third-party applications",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "all_roleid_values":  [
+                                                      {
+                                                          "GuestUserRoleId":  "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+                                                          "GuestUserRoleIdString":  "Limited access",
+                                                          "Id":  "authorizationPolicy"
+                                                      }
+                                                  ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaPolicyAuthorizationPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.8.1v1",
+        "ReportDetails":  "Permission level set to \"Limited access\" (authorizationPolicy)",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "federated_domains":  [
+
+                                                  ],
+                            "invalid_domains":  [
+
+                                                ],
+                            "valid_domains":  [
+                                                  "y2zj1.onmicrosoft.com"
+                                              ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaDomain"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.6.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaDirectorySetting"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.5.4v1",
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.1v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.6v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.3.7v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.3.8v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.6v1",
+        "ReportDetails":  "0 role(s) or group(s) allowing activation without approval found",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Addam Schroll",
+                            "Nanda Katikaneni",
+                            "Ted Kolovos",
+                            "Thomas Comeau"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.1v1",
+        "ReportDetails":  "4 global admin(s) found:\u003cbr/\u003eAddam Schroll, Nanda Katikaneni, Ted Kolovos, Thomas Comeau",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Addam Schroll",
+                            "Nanda Katikaneni",
+                            "Ted Kolovos",
+                            "Thomas Comeau"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedUser"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.2v1",
+        "ReportDetails":  "Requirement met: Least Privilege Score = 0.21 (should be 1 or less)",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.5v1",
+        "ReportDetails":  "6 role(s) assigned to users outside of PIM:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Application Administrator",
+                            "Cloud Application Administrator",
+                            "Exchange Administrator",
+                            "Global Administrator",
+                            "Hybrid Identity Administrator",
+                            "Privileged Role Administrator",
+                            "SharePoint Administrator",
+                            "User Administrator"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.4v1",
+        "ReportDetails":  "8 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, Hybrid Identity Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global Administrator(Directory Role)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.8v1",
+        "ReportDetails":  "1 role(s) or group(s) without notification e-mail configured for Global Administrator activations found:\u003cbr/\u003eGlobal Administrator(Directory Role)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global Administrator(Directory Role)",
+                            "Shanti Test PIM Group(PIM Group)",
+                            "Ted\u0027s PIM Test Group(PIM Group)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.7v1",
+        "ReportDetails":  "3 role(s) or group(s) without notification e-mail configured for role assignments found:\u003cbr/\u003eGlobal Administrator(Directory Role), Shanti Test PIM Group(PIM Group), Ted\u0027s PIM Test Group(PIM Group)",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "MS.AAD.1.1v1 Legacy authentication SHALL be blocked"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.1.1v1",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eMS.AAD.1.1v1 Legacy authentication SHALL be blocked. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "MS.AAD.2.1v1 Users detected as high risk SHALL be blocked"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.2.1v1",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eMS.AAD.2.1v1 Users detected as high risk SHALL be blocked. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.2.3v1",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eMS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.3.2v1",
+        "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eMS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "Privileged Role Administrator(Directory Role)",
+                            "SharePoint Administrator(Directory Role)",
+                            "Ted\u0027s PIM Group 2(PIM Group)",
+                            "Ted\u0027s PIM Test Group(PIM Group)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.7.9v1",
+        "ReportDetails":  "4 role(s) or group(s) without notification e-mail configured for role activations found:\u003cbr/\u003ePrivileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role), Ted\u0027s PIM Group 2(PIM Group), Ted\u0027s PIM Test Group(PIM Group)",
+        "RequirementMet":  false
+    }
+]

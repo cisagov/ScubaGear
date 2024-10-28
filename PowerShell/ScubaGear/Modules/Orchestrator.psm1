@@ -849,7 +849,8 @@ function Format-PlainText {
         # overall meaning of the string
         $CleanString = $CleanString.Replace("<br/>", " ")
         $CleanString = $CleanString.Replace("<b>", "")
-        $CleanString = $CleanString.Replace("</b>", "")
+        $CleanString = $CleanString.Replace("</b>", "")        
+
         # Strip out HTML comments
         $CleanString = $CleanString -replace '(.*)(<!--)(.*)(-->)(.*)', '$1$5'
         # The following regex looks for a string with an anchor tag. If it finds an anchor tag, it reformats
@@ -866,7 +867,9 @@ function Format-PlainText {
         # Group 6: '(</a>)' Matches the closing anchor tag
         # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
         $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
-
+        $CleanString = $CleanString.Replace("<", "&lt;")
+        $CleanString = $CleanString.Replace(">", "&gt;")
+        $CleanString = $CleanString.Replace("&", "&amp;")
         $CleanString
     }
 }
@@ -1114,16 +1117,25 @@ function Merge-JsonOutput {
                     -NotePropertyValue $IndividualResults.Results
 
                 # The date is listed under the metadata, no need to include it in the summary as well
-                $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
-
+                $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')                
                 $Summary | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.ReportSummary
+            }
+            foreach ($Product in $Results.PSObject.Properties) {
+                foreach ($Group in $Product.Value) {
+                    foreach ($Control in $Group.Controls) {
+                        $Control.Requirement = Format-PlainText -RawString $Control.Requirement
+                        $Control.Details = Format-PlainText -RawString $Control.Details            
+                    }
+                }
             }
 
             # Convert the output a json string
             $MetaData = ConvertTo-Json $MetaData -Depth 3
             $Results = ConvertTo-Json $Results -Depth 5
+           # Loop through each property
             $Summary = ConvertTo-Json $Summary -Depth 3
+            
             $ReportJson = @"
 {
     "MetaData": $MetaData,
@@ -1138,6 +1150,7 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003c", "<")
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
+            $ReportJson = $ReportJson.replace("\u0026", "&")
 
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName -ErrorAction 'Stop'
             $ReportJson | Set-Content -Path $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
