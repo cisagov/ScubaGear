@@ -829,7 +829,7 @@ function Format-PlainText {
         # overall meaning of the string
         $CleanString = $CleanString.Replace("<br/>", " ")
         $CleanString = $CleanString.Replace("<b>", "")
-        $CleanString = $CleanString.Replace("</b>", "")        
+        $CleanString = $CleanString.Replace("</b>", "")
 
         # Strip out HTML comments
         $CleanString = $CleanString -replace '(.*)(<!--)(.*)(-->)(.*)', '$1$5'
@@ -1048,7 +1048,7 @@ function Merge-JsonOutput {
                     -NotePropertyValue $IndividualResults.Results
 
                 # The date is listed under the metadata, no need to include it in the summary as well
-                $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')                
+                $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
                 $Summary | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.ReportSummary
             }
@@ -1056,7 +1056,7 @@ function Merge-JsonOutput {
                 foreach ($Group in $Product.Value) {
                     foreach ($Control in $Group.Controls) {
                         $Control.Requirement = Format-PlainText -RawString $Control.Requirement
-                        $Control.Details = Format-PlainText -RawString $Control.Details            
+                        $Control.Details = Format-PlainText -RawString $Control.Details
                     }
                 }
             }
@@ -1066,7 +1066,6 @@ function Merge-JsonOutput {
             $Results = ConvertTo-Json $Results -Depth 5
            # Loop through each property
             $Summary = ConvertTo-Json $Summary -Depth 3
-            
             $ReportJson = @"
 {
     "MetaData": $MetaData,
