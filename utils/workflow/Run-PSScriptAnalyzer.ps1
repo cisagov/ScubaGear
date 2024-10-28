@@ -1,4 +1,4 @@
-Write-Host "Testing PowerShell code with PSScript Analyzer..."
+Write-Output "Testing PowerShell code with PSScript Analyzer..."
 
 # Install PSScriptAnalyzer
 Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -42,7 +42,7 @@ Write-Output "Errors:       $ErrorCount"
 
 # If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 # This is not run every time because it's slow.
-$DebuggingMode = $true
+$DebuggingMode = $false
 if ($DebuggingMode) {
 	Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 }
