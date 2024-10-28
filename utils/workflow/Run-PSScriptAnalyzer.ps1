@@ -6,8 +6,6 @@ Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
 # Import the PSScriptAnalyzer module
 # Import-Module PSScriptAnalyzer
 
-
-
 # Get all PowerShell script files in the repository
 $PsFiles = Get-ChildItem -Path ./*  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
 
@@ -44,22 +42,18 @@ Write-Output "Informations: $InfoCount"
 Write-Output "Warnings:     $WarningCount"
 Write-Output "Errors:       $ErrorCount"
 
+# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
+# This is not run every time because it's slow.
+$DebuggingMode = $true
+if ($DebuggingMode) {
+	Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
+}
+
 # Exit 1 if warnings or errors
-Write-Output "`n`n"
 if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
-	$host.UI.RawUI.ForegroundColor = "Red"
 	Write-Output "Problems were found in the PowerShell scripts."
 	exit 1
 }
 else {
-	$host.UI.RawUI.ForegroundColor = "Green"
 	Write-Output "No problems were found in the PowerShell scripts."
-}
-
-# If it's important to verify the version of PSSA that is used,
-# set debugging to true.
-# This is not run every time because it's a bit slow.
-$DebuggingMode = $true
-if ($DebuggingMode) {
-	Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 }
