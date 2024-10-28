@@ -1,0 +1,202 @@
+{
+    "ScubaGearGraphScopes": [
+        {
+            "description": "This section contains the needed Microsoft Graph permissions if aad is selected when running ScubaGear for the ProductName parameter",
+            "url": "https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/interactive.md#application-permissions",
+            "Product": "aad",
+            "Permission": [
+                "RoleManagementPolicy.Read.AzureADGroup",
+                "RoleManagement.Read.Directory",
+                "Directory.Read.All",
+                "User.Read.All",
+                "GroupMember.Read.All",
+                "PrivilegedAccess.Read.AzureADGroup",
+                "Organization.Read.All",
+                "Policy.Read.All",
+                "PrivilegedEligibilitySchedule.Read.AzureADGroup"
+            ]
+        },
+        {
+            "description": "This section contains the needed Microsoft Graph permissions if exo or defender are selected when running ScubaGear for the ProductName parameter",
+            "url": "https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/interactive.md#application-permissions",
+            "Product": ["exo", "defender"],
+            "Permission": [
+                "User.Read.All"
+            ]
+        }
+    ],
+    "GraphCmdLetPermissions": [
+        {
+            "description": "This section contains the least Privileged permissions required for each Microsoft Graph cmdlet used in ScubaGear codebase",
+            "Permission": "Policy.Read.All",
+            "cmdlet": [
+                "Get-MgBetaIdentityConditionalAccessPolicy",
+                "Get-MgBetaPolicyAuthorizationPolicy"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "Organization.Read.All",
+            "cmdlet": [
+                "Get-MgBetaSubscribedSku"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "User.ReadBasic.All",
+            "cmdlet": [
+                "Get-MgBetaUserCount",
+                "Get-MgBetaUser"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "Directory.Read.All",
+            "cmdlet": [
+                "Get-MgBetaDirectorySetting",
+                "Get-MgBetaDirectoryObject"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "Policy.ReadWrite.AuthenticationMethod",
+            "cmdlet": [
+                "Get-MgPolicyAuthenticationMethodPolicy"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "Domain.Read.All",
+            "cmdlet": [
+                "Get-MgBetaDomain"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "RoleEligibilitySchedule.Read.Directory",
+            "cmdlet": [
+                "Get-MgRoleManagementDirectoryRoleEligibilityScheduleInstance"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "RoleAssignmentSchedule.Read.Directory",
+            "cmdlet": [
+                "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+            "cmdlet": [
+                "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "AccessReview.Read.All",
+            "cmdlet": [
+                "Get-MgBetaPrivilegedAccessResource"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "Organization.Read.All",
+            "cmdlet": [
+                "Get-MgBetaOrganization"
+            ],
+            "runtype": [
+                "application"
+            ]
+        },
+        {
+            "Permission": "User.Read",
+            "cmdlet": [
+                "Get-MgBetaOrganization"
+            ],
+            "runtype": [
+                "delegated"
+            ]
+        },
+        {
+            "Permission": "RoleManagement.Read.Directory",
+            "cmdlet": [
+                "Get-MgBetaDirectoryRole",
+                "Get-MgBetaDirectoryRoleMember"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "RoleManagement.Read.Directory",
+            "cmdlet": [
+                "Get-MgBetaPolicyRoleManagementPolicyRule"
+            ],
+            "runtype": [
+                "application"
+            ]
+        },
+        {
+            "Permission": "RoleManagementPolicy.Read.Directory",
+            "cmdlet": [
+                "Get-MgBetaPolicyRoleManagementPolicyRule",
+                "Get-MgBetaPolicyRoleManagementPolicyAssignment"
+            ],
+            "runtype": [
+                "Delegated"
+            ]
+        },
+        {
+            "Permission": "GroupMember.Read.All",
+            "cmdlet": [
+                "Get-MgBetaGroupMember",
+                "Get-MgBetaGroup"
+            ],
+            "runtype": [
+                "delegated",
+                "application"
+            ]
+        },
+        {
+            "Permission": "RoleManagement.Read.All",
+            "cmdlet": [
+                "Get-MgBetaPolicyRoleManagementPolicyAssignment"
+            ],
+            "runtype": [
+                "application"
+            ]
+        }
+    ]
+}
