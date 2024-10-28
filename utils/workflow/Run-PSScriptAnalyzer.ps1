@@ -1,54 +1,39 @@
-# Install PSSA module
+# Install PSScriptAnalyzer
 Set-PSRepository PSGallery -InstallationPolicy Trusted
-Install-Module PSScriptAnalyzer -ErrorAction Stop
+Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+# Import the PSScriptAnalyzer module
+Import-Module PSScriptAnalyzer
 
-# Get all possible PowerShell files
-$Files = Get-ChildItem -Path ./* -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
+# Get all PowerShell script files in the repository
+$psFiles = Get-ChildItem -Path ./*  -Include *.ps1,*ps1xml,*.psc1,*.psd1,*.psm1,*.pssc,*.psrc,*.cdxml -Recurse
 
-# If you want to know what files are being tested, set to $true.
-$DebuggingMode = $false
-if ($DebuggingMode) {
-  Write-Output $Files
+# Analyze each file and collect results
+$results = foreach ($file in $psFiles) {
+    Invoke-ScriptAnalyzer -Path $file.FullName -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 }
 
-# Run PSSA for each file
-$Issues = foreach ($File in $Files.FullName) {
-	Invoke-ScriptAnalyzer -Path $File -Recurse -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
-}
+# Report results
+if ($results) {
+    $hasErrors = $false
+    $results | ForEach-Object {
+        Write-Host "File: $($_.ScriptPath)"
+        Write-Host "Line: $($_.Line)"
+        Write-Host "Severity: $($_.Severity)"
+        Write-Host "Message: $($_.Message)"
+        Write-Host "RuleName: $($_.RuleName)"
+        Write-Host "--------------------------"
 
-# init and set variables
-$Errors = $Warnings = $Infos = $Unknowns = 0
+        if ($_.Severity -eq 'Error') {
+            $hasErrors = $true
+        }
+    }
 
-# Get results, types and report to GitHub Actions
-foreach ($Issue in $Issues) {
-	switch ($Issue.Severity) {
-		{$_ -eq 'Error' -or $_ -eq 'ParseError'} {
-			Write-Output "::error file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
-			$Errors++
-		}
-		{$_ -eq 'Warning'} {
-			Write-Output "::warning file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
-			$Warnings++
-		}
-		{$_ -eq 'Information'} {
-			Write-Output "::warning file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
-			$Infos++
-		}
-		Default {
-			Write-Output "::debug file=$($Issue.ScriptName),line=$($Issue.Line),col=$($Issue.Column)::$($Issue.RuleName) - $($Issue.Message)"
-			$Unknowns++
-		}
-	}
-}
-
-Write-Output "`n`n"
-
-# Report summary to GitHub Actions
-If ($Unknowns -gt 0) {
-	Write-Output "There were $Errors errors, $Warnings warnings, $Infos infos, and $Unknowns unknowns in total."
-}
-Else {
-	Write-Output "There were $Errors errors, $Warnings warnings, and $Infos infos in total."
+    if ($hasErrors) {
+        Write-Host "Errors were found in the PowerShell scripts." -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "No issues found in the PowerShell scripts."
 }
 
 Write-Output "`n`n"
@@ -60,7 +45,3 @@ Get-Module -ListAvailable | Where-Object {$_.Name -eq "PSScriptAnalyzer"} | Sele
 If ($Errors -gt 0) {
 	exit 1
 }
-
-# Credit
-# Code taken from this archived repo and then modified:
-# https://github.com/tigattack/VeeamDiscordNotifications
