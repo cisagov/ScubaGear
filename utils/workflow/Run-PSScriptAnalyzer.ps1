@@ -20,7 +20,7 @@ foreach ($Result in $Results) {
 	Write-Output "File:     $($Result.ScriptPath)"
 	Write-Output "Line:     $($Result.Line)"
 	Write-Output "Severity: $($Result.Severity)"
-	Write-Output "Message:  ::error::$($Result.Message)"
+	Write-Output "::error::Message:  $($Result.Message)"
 	Write-Output "RuleName: $($Result.RuleName)"
 	Write-Output "--------------------------"
 	if ($Result.Severity -eq 'Information') {
