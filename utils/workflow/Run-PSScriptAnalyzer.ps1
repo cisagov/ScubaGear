@@ -49,7 +49,7 @@ if ($DebuggingMode) {
 
 # Exit 1 if warnings or errors
 if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
-	Write-Output "Problems were found in the PowerShell scripts."
+	Write-Output "::error::Problems were found in the PowerShell scripts."
 	exit 1
 }
 else {
