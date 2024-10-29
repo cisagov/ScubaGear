@@ -20,18 +20,21 @@ foreach ($Result in $Results) {
 	Write-Output "File:     $($Result.ScriptPath)"
 	Write-Output "Line:     $($Result.Line)"
 	Write-Output "Severity: $($Result.Severity)"
-	Write-Output "::error::Message:  $($Result.Message)"
-	Write-Output "RuleName: $($Result.RuleName)"
-	Write-Output "--------------------------"
+	# Only create GitHub workflow annotation if warning or error
 	if ($Result.Severity -eq 'Information') {
+		Write-Output "Message:  $($Result.Message)"
 		$InfoCount++
 	}
 	elseif ($Result.Severity -eq 'Warning') {
+		Write-Output "::error::Message:  $($Result.Message)"
 		$WarningCount++
 	}
 	elseif ($Result.Severity -eq 'Error') {
+		Write-Output "::error::Message:  $($Result.Message)"
 		$ErrorCount++
 	}
+	Write-Output "RuleName: $($Result.RuleName)"
+	Write-Output "--------------------------"
 }
 
 # Summarize results
