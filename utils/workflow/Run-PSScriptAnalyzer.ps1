@@ -1,4 +1,4 @@
-Write-Host "Testing PowerShell code with PSScript Analyzer..."
+Write-Output "Testing PowerShell code with PSScript Analyzer..."
 
 # Install PSScriptAnalyzer
 Set-PSRepository PSGallery -InstallationPolicy Trusted
