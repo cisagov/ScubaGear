@@ -1,3 +1,4 @@
+using module '../Error/Error.psm1'
 # Many of the commandlets can be replaced with direct API access, but we are starting the transition with the ones
 # below because they have slow imports that affect performance more than the others. Some commandlets are fast
 # and there is no obvoius performance advantage to using the API beyond maybe batching.
@@ -26,6 +27,7 @@ function Invoke-GraphDirectly {
     try {
         $endpoint = $GraphEndpoints[$commandlet]
     } catch {
+		Resolve-Error($_)
         Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
@@ -92,6 +94,7 @@ function Export-AADProvider {
         ConvertFrom-Json $CapTableData -ErrorAction "Stop" | Out-Null
     }
     catch {
+	Resolve-Error($_)
         # Display error message but do not stop execution
         Write-Warning "ConvertFrom-Json failed to parse CAP data received from ExportCapPolicies: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $CapTableData = "[]"
@@ -226,6 +229,7 @@ function Get-AADTenantDetail {
         $AADTenantInfo
     }
     catch {
+	Resolve-Error($_)
         Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $AADTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
@@ -255,31 +259,186 @@ function Get-PrivilegedUser {
         $M365Environment
     )
 
-    # A hashtable of privileged users
-    $PrivilegedUsers = @{}
-    $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
-    # Get a list of the Id values for the privileged roles in the list above.
-    # The Id value is passed to other cmdlets to construct a list of users assigned to privileged roles.
-    $AADRoles = Get-MgBetaDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
+    try {
+        # A hashtable of privileged users
+        $PrivilegedUsers = @{}
+        $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
+        # Get a list of the Id values for the privileged roles in the list above.
+        # The Id value is passed to other cmdlets to construct a list of users assigned to privileged roles.
+        $AADRoles = Get-MgBetaDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
 
-    # Construct a list of privileged users based on the Active role assignments
-    foreach ($Role in $AADRoles) {
+        # Construct a list of privileged users based on the Active role assignments
+        foreach ($Role in $AADRoles) {
 
-        # Get a list of all the users and groups Actively assigned to this role
-        $UsersAssignedRole = Get-MgBetaDirectoryRoleMember -All -ErrorAction Stop -DirectoryRoleId $Role.Id
+            # Get a list of all the users and groups Actively assigned to this role
+            $UsersAssignedRole = Get-MgBetaDirectoryRoleMember -All -ErrorAction Stop -DirectoryRoleId $Role.Id
 
-        foreach ($User in $UsersAssignedRole) {
-            $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
+            foreach ($User in $UsersAssignedRole) {
+                $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
 
-            if ($Objecttype -eq "user") {
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
+                if ($Objecttype -eq "user") {
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
+                }
+                elseif ($Objecttype -eq "group") {
+                    # In this context $User.Id is a group identifier
+                    $GroupId = $User.Id
+
+                    # Process all of the group members that are transitively assigned to the current role as Active via group membership
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
+                }
             }
-            elseif ($Objecttype -eq "group") {
-                # In this context $User.Id is a group identifier
-                $GroupId = $User.Id
+        }
 
-                # Process all of the group members that are transitively assigned to the current role as Active via group membership
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
+        # Process the Eligible role assignments if the premium license for PIM is there
+        if ($TenantHasPremiumLicense) {
+            # Get a list of all the users and groups that have Eligible assignments
+            $graphArgs = @{
+                "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
+                "M365Environment" = $M365Environment }
+            $AllPIMRoleAssignments = Invoke-GraphDirectly @graphArgs
+
+            # Add to the list of privileged users based on Eligible assignments
+            foreach ($Role in $AADRoles) {
+                $PrivRoleId = $Role.RoleTemplateId
+                # Get a list of all the users and groups Eligible assigned to this role
+                $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
+
+                foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
+                    $UserObjectId = $PIMRoleAssignment.PrincipalId
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $UserObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+                }
+            }
+        }
+    } catch {
+        Write-Warning "An error occurred in Get-PrivilegedUser: $($_.Exception.Message)"
+		Resolve-Error($_)
+        #Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_ #TODO DO I WANT TO THROW AN ERROR HERE? OR IN RESOLVE ERROR FOR THIS CASE?
+    }
+    $PrivilegedUsers
+}
+
+function LoadObjectDataIntoPrivilegedUserHashtable {
+    <#
+    .Description
+    Takes an object Id (either a user or group) and loads metadata about the object in the provided privileged user hashtable.
+    If the object is a group, this function will iterate the group members and load metadata about each member.
+    .Functionality
+    Internal
+    #>
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$RoleName,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]$PrivilegedUsers,
+
+        # The Entra Id unique identifiter for an object (either a user or a group) in the directory.
+        # Metadata about this object will be loaded into the PrivilegedUsers hashtable which is passed as a parameter.
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ObjectId,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [bool]$TenantHasPremiumLicense,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$M365Environment,
+
+        # This describes the type of Entra Id object that the parameter ObjectId is referencing.
+        # Valid values are "user", "group". If this is not passed, the function will call Graph to dynamically determine the object type.
+        [Parameter()]
+        [string]$Objecttype = "",
+
+        [Parameter()]
+        [int]$Recursioncount = 0
+    )
+    # Write-Warning "Recursion level: $recursioncount"
+
+    # We support group nesting up to 2 levels deep (stops after processing levels 0 and 1).
+    # Safeguard: Also protects against infinite loops if there is a circular group assignment in PIM.
+    if ($recursioncount -ge 2) {
+        return
+    }
+
+    # If the object type was not supplied we need to determine whether it is a user or a group.
+    if ($Objecttype -eq "") {
+        try {
+            $DirectoryObject = Get-MgBetaDirectoryObject -ErrorAction Stop -DirectoryObjectId $ObjectId
+        } catch {
+			Resolve-Error($_)
+            # If the object was probably recently deleted from the directory we ignore it. Otherwise an unhandled 404 causes the tool to crash.
+            if ($_.Exception.Message -match "Request_ResourceNotFound") {
+                Write-Warning "Processing privileged users. Resource $ObjectId may have been recently deleted from the directory because it was not found."
+                return  # Exit the function to ignore this resource and keep the flow going.
+            }
+            # If it is a different error, rethrow the error to let the calling function handle it.
+            else {
+                throw $_ #TODO still throw this even if error is handled here? or handle this error in calling function only?
+            }
+        }
+
+        # Extract what type of object this is.
+        $Objecttype = $DirectoryObject.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
+    }
+
+    if ($Objecttype -eq "user") {
+        # If the user's data has not been fetched from graph, go get it and add it to the hashtable
+        if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
+            $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $ObjectId
+            $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+            # Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
+        }
+        # If the current role has not already been added to the user's roles array then add the role
+        if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
+            $PrivilegedUsers[$ObjectId].roles += $RoleName
+        }
+    }
+
+    elseif ($Objecttype -eq "group") {
+        # In this context $ObjectId is a group identifier so we need to iterate the group members
+        $GroupId = $ObjectId
+        # Get all of the group members that are transitively assigned to the current role via group membership
+        $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $GroupId
+        # Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
+
+        foreach ($GroupMember in $GroupMembers) {
+            $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
+            if ($Membertype -eq "user") {
+                # If the user's data has not been fetched from graph, go get it and add it to the hashtable
+                if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
+                    $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $GroupMember.Id
+                    $PrivilegedUsers[$GroupMember.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+                }
+                # If the current role has not already been added to the user's roles array then add the role
+                if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $RoleName) {
+                    $PrivilegedUsers[$GroupMember.Id].roles += $RoleName
+                }
+            }
+        }
+
+        # Since this is a group, we need to also process assignments in PIM in case it is in PIM for Groups
+        # If the premium license for PIM is there, process the users that are "member" of the PIM group as Eligible
+        if ($TenantHasPremiumLicense) {
+            # Get the users that are assigned to the PIM group as Eligible members
+            $graphArgs = @{
+                "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
+                "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
+                "M365Environment" = $M365Environment }
+            $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
+            foreach ($GroupMember in $PIMGroupMembers) {
+                # Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($GroupMember.PrincipalId)"
+
+                # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
+                if ($GroupMember.AccessId -ne "member") { continue }
+                $PIMEligibleUserId = $GroupMember.PrincipalId
+
+                # Recursively call this function to process the group member that was found
+                $LoopIterationRecursioncount = $Recursioncount + 1
+                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Recursioncount $LoopIterationRecursioncount
             }
         }
     }
@@ -601,16 +760,16 @@ function Get-PrivilegedRole {
     # The RoleTemplateId value is passed to other cmdlets to retrieve role/group security configuration rules and user/group assignments.
     $PrivilegedRoleArray = Get-MgBetaDirectoryRoleTemplate -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
 
-    # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
-    if ($TenantHasPremiumLicense) {
-        # Clear the cache of already processed PIM groups because this is a static variable
-        [GroupTypeCache]::CheckedGroups.Clear()
+        # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
+        if ($TenantHasPremiumLicense) {
+            # Clear the cache of already processed PIM groups because this is a static variable
+            [GroupTypeCache]::CheckedGroups.Clear()
 
-        # Get ALL the roles and users actively assigned to them
-        $graphArgs = @{
-            "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
-            "M365Environment" = $M365Environment }
-        $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
+            # Get ALL the roles and users actively assigned to them
+            $graphArgs = @{
+                "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"
+                "M365Environment" = $M365Environment }
+            $AllRoleAssignments = Invoke-GraphDirectly @graphArgs
 
         # Each of the helper functions below add configuration settings (aka rules) to the role array.
         # Get the PIM configurations for the roles

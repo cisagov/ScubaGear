@@ -1,4 +1,5 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
+using module 'Error/Error.psm1'
 
 function Invoke-SCuBA {
     <#
@@ -638,6 +639,7 @@ function Invoke-ProviderList {
                     $ProviderJSON += $RetVal
                 }
                 catch {
+                    Resolve-Error($_)
                     Write-Warning "Error with the $($BaselineName) Provider: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
                     $ProdProviderFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
@@ -685,6 +687,7 @@ function Invoke-ProviderList {
             $ProdProviderFailed
         }
         catch {
+            Resolve-Error($_)
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`
             `n$($_.ScriptStackTrace)"
@@ -769,6 +772,7 @@ function Invoke-RunRego {
                     $TestResults += $RetVal
                 }
                 catch {
+                    Resolve-Error($_)
                     Write-Warning "Error with the $($BaselineName) Rego invocation: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
                     $ProdRegoFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above"
@@ -782,6 +786,7 @@ function Invoke-RunRego {
             $ProdRegoFailed
         }
         catch {
+            Resolve-Error($_)
             $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`
             `n$($_.ScriptStackTrace)"
@@ -1014,6 +1019,7 @@ function ConvertTo-ResultsCsv {
             }
         }
         catch {
+            Resolve-Error($_)
             Write-Warning "Error creating CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
@@ -1166,6 +1172,7 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
             else {
+		Resolve-Error($_)
                 $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
                 Ending ScubaGear execution. Error: $($_.Exception.Message) `
                 Stacktrace: $($_.ScriptStackTrace)"
@@ -1365,6 +1372,7 @@ function Invoke-ReportCreation {
             }
         }
         catch {
+            Resolve-Error($_)
             $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`
             `n$($_.ScriptStackTrace)"
@@ -1582,6 +1590,7 @@ function Import-Resources {
         }
     }
     catch {
+        Resolve-Error($_)
         $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
             Ending ScubaGear execution. Error: $($_.Exception.Message) `
             `n$($_.ScriptStackTrace)"

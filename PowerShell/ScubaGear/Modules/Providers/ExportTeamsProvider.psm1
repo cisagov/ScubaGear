@@ -1,3 +1,4 @@
+using modules '../Error/Error.psm1'
 function Export-TeamsProvider {
     <#
     .Description
@@ -82,6 +83,7 @@ function Get-TeamsTenantDetail {
         $TeamsTenantInfo
     }
     catch {
+        Resolve-Error($_)
         Write-Warning "Error retrieving Tenant details in Get-TeamsTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $TeamsTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";

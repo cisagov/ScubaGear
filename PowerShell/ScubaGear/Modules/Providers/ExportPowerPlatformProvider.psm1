@@ -1,3 +1,4 @@
+using module '../Error/Error.psm1'
 function Export-PowerPlatformProvider {
     <#
     .Description
@@ -54,6 +55,7 @@ function Export-PowerPlatformProvider {
         $TenantIdConfig = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction "Stop").Content
     }
     catch {
+        Resolve-Error($_)
         $EnvCheckWarning = @"
     Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report.
     See the 'Running the Script Behind Some Proxies' in the README.md for a possible solution to this warning.
@@ -112,7 +114,7 @@ function Export-PowerPlatformProvider {
         }
     }
     catch {
-
+        #TODO resolve error here? or 
         $FullEnvErrorMessage = @"
 $($_)
         ---------------------------------------
@@ -160,7 +162,8 @@ $($_)
         }
     }
     catch {
-        Write-Warning "Error running Get-DlpPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+        Resolve-Error($_)
+        Write-Warning "Error running Get-DlpPolicy: $($_.Exception.Message). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator" #TODO message only?
     }
 
     # MS.POWERPLATFORM.3.1v1
@@ -181,7 +184,8 @@ $($_)
         }
     }
     catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+        Resolve-Error($_)
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_.Exception.Message). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator" #TODO message only?
     }
 
     # MS.POWERPLATFORM.3.2v1 currently has no corresponding PowerShell Cmdlet
@@ -252,6 +256,7 @@ function Get-PowerPlatformTenantDetail {
         $PowerTenantInfo
     }
     catch {
+        Resolve-Error($_)
         Write-Warning "Error retrieving Tenant details using Get-PowerPlatformTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $PowerTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";

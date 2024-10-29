@@ -1,3 +1,4 @@
+using module '../Error/Error.psm1'
 function Export-SharePointProvider {
     <#
     .Description

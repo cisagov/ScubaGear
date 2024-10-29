@@ -1,4 +1,5 @@
 using module '..\ScubaConfig\ScubaConfig.psm1'
+using module '../Error/Error.psm1'
 
 function Copy-SCuBABaselineDocument {
     <#
@@ -142,6 +143,7 @@ function Initialize-SCuBA {
         . $RequiredModulesPath
     }
     catch {
+        Resolve-Error($_)
         throw "Unable to find RequiredVersions.ps1 in expected directory:`n`t$ScubaModuleDir"
     }
 
@@ -210,7 +212,8 @@ function Initialize-SCuBA {
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
-            $Error[0] | Format-List -Property * -Force | Out-Host
+            Resolve-Error($_)
+            #$Error[0] | Format-List -Property * -Force | Out-Host #TODO any reason to do it like this? will I need to address that in my error handling?
         }
     }
 
@@ -341,8 +344,9 @@ function Get-OPAFile {
         Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OutFile}" | Out-Host
     }
     catch {
-        $Error[0] | Format-List -Property * -Force | Out-Host
-        throw "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
+        Resolve-Error($_)
+        #$Error[0] | Format-List -Property * -Force | Out-Host
+        throw "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host #TODO throw error?
     }
 }
 
@@ -369,8 +373,9 @@ function Get-ExeHash {
         $WebClient.DownloadFile($InstallUrl, $OutFile)
     }
     catch {
-        $Error[0] | Format-List -Property * -Force | Out-Host
-        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
+        Resolve-Error($_)
+        #$Error[0] | Format-List -Property * -Force | Out-Host
+        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host #TODO write new error too?
     }
     finally {
         $WebClient.Dispose()
@@ -491,7 +496,8 @@ function Debug-SCuBA {
         Write-Debug "Created new environment info file at $($EnvFile.FullName)"
     }
     catch {
-        Write-Error "ERRROR: Could not create diagnostics directory and/or files."
+        Resolve-Error($_)
+        Write-Error "ERRROR: Could not create diagnostics directory and/or files." #TODO write error?
     }
 
     ## Get environment information
@@ -509,9 +515,11 @@ function Debug-SCuBA {
             $allowBasic = Get-ItemPropertyValue -Path $regPath -Name $regKey
         }
         catch [System.Management.Automation.PSArgumentException]{
+            Resolve-Error($_)
             "Key, $regKey, was not found`n" >> $EnvFile
         }
         catch{
+            Resolve-Error($_)
             "Unexpected error occured attempting to get registry key, $regKey.`n" >> $EnvFile
         }
 
@@ -666,7 +674,8 @@ function Copy-ScubaModuleFile {
         Get-ChildItem -Path $DestinationDirectory -File -Recurse | ForEach-Object {$_.IsReadOnly = $true}
     }
     catch {
-        throw "Scuba copy module files failed."
+        Resolve-Error($_)
+        throw "Scuba copy module files failed." #TODO throw error?
     }
 }
 

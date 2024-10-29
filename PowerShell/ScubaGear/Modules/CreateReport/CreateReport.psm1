@@ -1,4 +1,5 @@
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
+using module '../Error/Error.psm1'
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility") #TODO why this vs "using module"?
 
 function New-Report {
      <#
@@ -352,6 +353,7 @@ function Get-OmissionState {
                         }
                     }
                     catch {
+                        Resolve-Error($_)
                         # Malformed date, don't omit the policy
                         $Warning = "Config file indicates omitting $($ControlId), but the provided "
                         $Warning += "expiration date, $ExpirationString, is malformed. The expected "
@@ -481,6 +483,7 @@ function Import-SecureBaseline{
                         $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted; MalformedDescription=$IsMalformedDescription}
                     }
                     catch {
+                        Resolve-Error($_)
                         Write-Error "Error parsing for policies in Group $($Group.GroupNumber). $($Group.GroupName)"
                     }
                 }
@@ -489,6 +492,7 @@ function Import-SecureBaseline{
             }
         }
         catch {
+            Resolve-Error($_)
             Write-Error -RecommendedAction "Check validity of $Product secure baseline markdown at $ProductPath" `
                 -Message "Failed to parse $ProductName secure baseline markdown."
         }
