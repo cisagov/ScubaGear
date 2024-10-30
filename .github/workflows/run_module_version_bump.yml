@@ -8,6 +8,9 @@ on:
         description: "New Version number (e.g., 1.2.4)"
         required: true
         type: string
+
+permissions: read-all
+
 jobs:
   module-version-bump:
     runs-on: windows-latest
