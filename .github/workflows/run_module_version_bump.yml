@@ -8,9 +8,6 @@ on:
         description: "New Version number (e.g., 1.2.4)"
         required: true
         type: string
-
-permissions: read-all
-
 jobs:
   module-version-bump:
     runs-on: windows-latest
@@ -22,6 +19,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Check if input is valid
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Set the repository owner and name as environment variables to access from the PowerShell module
+          $env:REPO = "${{ github.repository }}"
+          Import-Module ./utils/workflow/Set-ScubaGearModuleVersion.psm1 -Function Test-ScubaGearVersionWorkflowInput
+          Test-ScubaGearVersionWorkflowInput
 
       - name: Bump ScubaGear Version Number
         env:

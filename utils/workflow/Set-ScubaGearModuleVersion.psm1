@@ -102,6 +102,76 @@ function New-PRBody {
     }
     $PRTemplateContent
 }
+
+function Test-ScubaGearVersionWorkflowInput {
+    <#
+    .Description
+    This function does input validation for the module version bump workflow
+    .Functionality
+    Internal
+    #>
+
+    # Check if input is valid SemVer
+    # fail workflow if input is not
+    $SemVerPattern = '^(0|[1-9]\d*)(\.(0|[1-9]\d*)){2}(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+    $ValidVersion = $false
+    if ($env:NEW_VERSION_NUMBER -match $semverPattern) {
+        $ValidVersion = $true
+    }
+
+    # Separate from above conditional for easier debugging
+    if (-not $ValidVersion) {
+        Write-Output "Invalid Semantic Version: $($env:NEW_VERSION_NUMBER) does not conform to SemVer standards."
+        exit 1
+    }
+    Write-Output "Past Version Validation"
+
+    #
+    # delete the branch if it already exists
+    #
+    $ScubaGearVersionBumpBranch = "scubagear-version-bump-${env:NEW_VERSION_NUMBER}"
+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Temp')]
+    $Temp = git ls-remote --exit-code --heads origin $ScubaGearVersionBumpBranch
+
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '$VersionBranchExists')]
+    $VersionBranchExists = $false
+    if ($LASTEXITCODE -eq 0) {
+        $VersionBranchExists = $true
+    }
+    if ($VersionBranchExists) {
+        git push origin --delete $ScubaGearVersionBumpBranch
+        Write-Output "Branch '$ScubaGearVersionBumpBranch' deleted."
+    }
+    Write-Output "Past Branch Existance Check"
+
+    #
+    # Check if version bump label exists
+    # Create one if it does not
+    $LabelName = "version bump"
+    $Repo = "$env:REPO" # This environment variable was set from the workflow yaml file
+
+    # Check if the label exists otherwise create it
+    $Labels = gh api repos/$REPO/labels | ConvertFrom-Json
+    $LabelExists = $Labels | Where-Object { $_.name -eq $LabelName }
+
+    if (-not $LabelExists) {
+        $LabelColor = "d4c5f9"
+        # Create the label
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '$SuppressMessage')]
+        $SuppressMessage = gh api repos/$Repo/labels -X POST -f name="$($LabelName)" -f color="$($LabelColor)"
+        Write-Host "Label '$LabelName' did not exist, so it was created."
+    }
+    Write-Output "Past Label Existance Check"
+
+    if ($ValidVersion) {
+        # Note that git-ls will always fail with exit code 1 when the branch does not exist.
+        # Setting exit 0 (success) at the end of this workflow to prevent that error
+        Write-Output "Input validation successful moving to next step"
+        exit 0
+    }
+}
+
 function Set-ScubaGearModuleVersion {
     <#
     .Description
@@ -137,5 +207,6 @@ function Set-ScubaGearModuleVersion {
 }
 
 Export-ModuleMember -Function @(
-    'Set-ScubaGearModuleVersion'
+    'Set-ScubaGearModuleVersion',
+    'Test-ScubaGearVersionWorkflowInput'
 )
