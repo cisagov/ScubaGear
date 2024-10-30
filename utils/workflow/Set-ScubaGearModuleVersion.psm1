@@ -160,7 +160,7 @@ function Test-ScubaGearVersionWorkflowInput {
         # Create the label
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '$SuppressMessage')]
         $SuppressMessage = gh api repos/$Repo/labels -X POST -f name="$($LabelName)" -f color="$($LabelColor)"
-        Write-Host "Label '$LabelName' did not exist, so it was created."
+        Write-Output "Label '$LabelName' did not exist, so it was created."
     }
     Write-Output "Past Label Existance Check"
 
