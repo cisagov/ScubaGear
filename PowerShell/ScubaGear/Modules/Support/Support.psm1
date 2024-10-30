@@ -50,6 +50,9 @@ function Initialize-SCuBA {
         existing module will not be updated to th latest version.
     .EXAMPLE
         Initialize-SCuBA
+    .EXAMPLE
+        Initalize-SCuBA -Scope AllUsers
+        Install all dependent PowerShell modules in a location that's accessible to all users of the computer.
     .NOTES
         Executing the script with no switches set will install the latest
         version of a module if not already installed.
