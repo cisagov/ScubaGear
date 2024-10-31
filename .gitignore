@@ -9,6 +9,7 @@
 *.cer
 *.exe
 *.cat
+/FunctionalTesting*
 /M365/*.xml
 /PowerShell/output
 /PowerShell/example
