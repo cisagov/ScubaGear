@@ -120,9 +120,12 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.2.1v1 Non-compliant - DefaultSharingLinkType = AnonymousAccess
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing "
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               DefaultSharingLinkType: AnonymousAccess
