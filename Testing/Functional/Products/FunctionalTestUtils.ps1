@@ -264,49 +264,49 @@ function UpdateConditionalAccessPolicyByName{
   }
 }
 
-function UpdateCachedConditionalAccessPolicyByName{
-      <#
-    .SYNOPSIS
-      Wrapper function to locate a given conditional access policy by name for update within an provider setting export.
-    .PARAMETER DisplayName
-      The DisplayName of the Directory Setting to be updated.
-    .PARAMETER Updates
-      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
-    .PARAMETER OutputFolder
-      The folder containing the original and updated provider settings exports.
-    .NOTES
-      If more than one conditional access policy has the same DisplayName then only the first is updated.
-  #>
+function UpdateCachedConditionalAccessPolicyByName {
+  <#
+.SYNOPSIS
+  Wrapper function to locate a given conditional access policy by name for update within an provider setting export.
+.PARAMETER DisplayName
+  The DisplayName of the Directory Setting to be updated.
+.PARAMETER Updates
+  A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
+.PARAMETER OutputFolder
+  The folder containing the original and updated provider settings exports.
+.NOTES
+  If more than one conditional access policy has the same DisplayName then only the first is updated.
+#>
   [CmdletBinding()]
   param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $DisplayName,
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [hashtable]
-      $Updates,
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $OutputFolder
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $DisplayName,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [hashtable]
+    $Updates,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $OutputFolder
   )
 
   $ProviderExport = LoadProviderExport($OutputFolder)
 
   $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
-  $Index = $ConditionalAccessPolicies.indexof($($ConditionalAccessPolicies.Where{$_.DisplayName -eq $DisplayName}))
+  $Index = $ConditionalAccessPolicies.indexof($($ConditionalAccessPolicies.Where{ $_.DisplayName -eq $DisplayName }))
 
-  if (-1 -ne $Index){
-    $Updates.Keys | ForEach-Object{
+  if (-1 -ne $Index) {
+    $Updates.Keys | ForEach-Object {
       try {
-          $Update = $Updates.Item($_)
-          $Policy = $ConditionalAccessPolicies[$Index]
-          Set-NestedMemberValue -InputObject $Policy -MemberPath $_  -Value $Update
+        $Update = $Updates.Item($_)
+        $Policy = $ConditionalAccessPolicies[$Index]
+        Set-NestedMemberValue -InputObject $Policy -MemberPath $_  -Value $Update
       }
       catch {
-          Write-Error "Exception:  UpdateCachedConditionalAccessPolicyByName failed"
+        Write-Error "Exception:  UpdateCachedConditionalAccessPolicyByName failed"
       }
     }
 
@@ -333,4 +333,61 @@ function LoadTestResults() {
   )
   $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
   $IntermediateTestResults
+}
+
+function SetAndCheckTenantSetting {
+<#
+    .SYNOPSIS
+      Function executes one script block until the second registers it as successful or timeout occurs.
+    .PARAMETER SetBlock
+      Script block used to set the tenant setting value
+    .PARAMETER CheckBlock
+      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
+    .PARAMETER Retries
+      Number of times to retry the set block before failing (0 - 10)
+    .PARAMETER WaitInterval
+      Number of seconds to wait before each check (0 - 3600)
+    .NOTES
+      If the check block does not return true after the last retry, function will throw an error.
+#>
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $SetBlock,
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $CheckBlock,
+    [Parameter(Mandatory = $false)]
+    [ValidateRange(0,10)]
+    [int]
+    $Retries = 3,
+    [Parameter(Mandatory = $false)]
+    [ValidateRange(0,3600)]
+    [int]
+    $WaitInterval = 10
+)
+    $SetAttempts = 0
+
+    try {
+        $SetFunc = [ScriptBlock]::Create($SetBlock)
+        $CheckFunc = [ScriptBlock]::Create($CheckBlock)
+        do {
+
+            Invoke-Command -ScriptBlock $SetFunc
+            Start-Sleep $WaitInterval
+            $CheckSucceeded = Invoke-Command -ScriptBlock $CheckFunc
+            Write-Host("Tenant value changed?: $CheckSucceeded")
+            ++$SetAttempts
+        } while(-not $CheckSucceeded -and $SetAttempts -lt $Retries)
+
+        if(-not $CheckSucceeded) {
+          throw "Unable to set value after $SetAttempts attempts."
+        }
+    } catch {
+        throw "Error executing script blocks., $_.StackTrace"
+    }
+
 }
