@@ -75,26 +75,26 @@ jobs:
     needs:
       - publish
 
-  # test_entra:
-  #   name: Test Entra
-  #   uses: ./.github/workflows/function_test_entra.yaml
-  #   permissions:
-  #     contents: write
-  #     id-token: write
-  #   with:
-  #     # Default to true when running on a schedule and the input is missing
-  #     EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
-  #     GitHubEventSchedule: ${{ github.event.schedule }}
-  #     GitHubEventName: ${{ github.event_name }}
-  #   secrets:
-  #     PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-  #     PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
-  #     TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
-  #     TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
-  #     NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
-  #     NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
-  #   needs:
-  #     - publish
+  test_entra:
+    name: Test Entra
+    uses: ./.github/workflows/function_test_entra.yaml
+    permissions:
+      contents: write
+      id-token: write
+    with:
+      # Default to true when running on a schedule and the input is missing
+      EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
 
   # test_exchange:
   #   name: Test Exchange
