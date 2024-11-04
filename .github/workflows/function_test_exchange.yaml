@@ -303,7 +303,7 @@ jobs:
       #     from: ScubaGear Notifier
   email:
     name: Email
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs:
       - Exc_Tenant1
       - Exc_Tenant2

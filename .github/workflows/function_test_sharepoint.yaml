@@ -303,7 +303,7 @@ jobs:
       #     from: ScubaGear Notifier
   email:
     name: Email
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs:
       - Shr_Tenant1_PNP
       - Shr_Tenant2_PNP

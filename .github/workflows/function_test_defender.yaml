@@ -575,7 +575,7 @@ jobs:
       #     from: ScubaGear Notifier
   email:
     name: Email
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs:
       - Def_Tenant1
       - Def_Tenant1_G5
