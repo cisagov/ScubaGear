@@ -20,21 +20,21 @@ on:
         required: true
         default: false
   # For testing only
-  push:
-    paths:
-      - ".github/workflows/test_production_function.yaml"
-      - ".github/workflows/function_test_teams.yaml"
-      - ".github/workflows/publish_private_package.yaml"
-      - ".github/workflows/function_test_defender.yaml"
-      - ".github/workflows/function_test_entra.yaml"
-      - ".github/workflows/function_test_exchange.yaml"
-      - ".github/workflows/function_test_powerplatform.yaml"
-      - ".github/workflows/function_test_sharepoint.yaml"
-      - ".github/workflows/function_test_teams.yaml"
-      - ".github/actions/extract-email/action.yaml"
-      - ".github/actions/get-thumbprint/action.yaml"
-      - ".github/actions/import-pfx/action.yaml"
-      - ".github/actions/test-product/action.yaml"
+  # push:
+  #   paths:
+  #     - ".github/workflows/test_production_function.yaml"
+  #     - ".github/workflows/function_test_teams.yaml"
+  #     - ".github/workflows/publish_private_package.yaml"
+  #     - ".github/workflows/function_test_defender.yaml"
+  #     - ".github/workflows/function_test_entra.yaml"
+  #     - ".github/workflows/function_test_exchange.yaml"
+  #     - ".github/workflows/function_test_powerplatform.yaml"
+  #     - ".github/workflows/function_test_sharepoint.yaml"
+  #     - ".github/workflows/function_test_teams.yaml"
+  #     - ".github/actions/extract-email/action.yaml"
+  #     - ".github/actions/get-thumbprint/action.yaml"
+  #     - ".github/actions/import-pfx/action.yaml"
+  #     - ".github/actions/test-product/action.yaml"
 
 permissions: read-all
 
