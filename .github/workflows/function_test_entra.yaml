@@ -587,6 +587,8 @@ jobs:
       - Ent_Tenant6_G5
     if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
       - name: Extract Email
         id: extract-email
         uses: ./repo/.github/actions/extract-email
