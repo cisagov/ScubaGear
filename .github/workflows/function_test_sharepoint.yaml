@@ -315,7 +315,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Extract Email
         id: extract-email
-        uses: .github/actions/extract-email
+        uses: ./.github/actions/extract-email
         env:
           # Could use any of previous jobs as the alias
           Alias: Shr_Tenant1_PNP
