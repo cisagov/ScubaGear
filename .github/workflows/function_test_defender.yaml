@@ -84,28 +84,28 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant1
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant1
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        # Debugging
-        # inputs.GitHubEventName == 'push'
-        # inputs.GitHubEventName == 'schedule'
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant1
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   # Debugging
+      #   # inputs.GitHubEventName == 'push'
+      #   # inputs.GitHubEventName == 'schedule'
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant1 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant1_G5:
     name: Def_Tenant1_G5
     runs-on: windows-latest
@@ -155,25 +155,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant1_G5
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant1_G5
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant1_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant1_G5
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant1_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant2:
     name: Def_Tenant2
     runs-on: windows-latest
@@ -220,25 +220,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant2
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant2
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant2 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant2
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant2 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant2_G3:
     name: Def_Tenant2_G3
     runs-on: windows-latest
@@ -288,25 +288,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant2_G3
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant2_G3
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant2_G3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant2_G3
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant2_G3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant3:
     name: Def_Tenant3
     runs-on: windows-latest
@@ -353,25 +353,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant3
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant3
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant3
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant3 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant3_G5:
     name: Def_Tenant3_G5
     runs-on: windows-latest
@@ -421,25 +421,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant3_G5
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant3_G5
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant3_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant3_G5
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant3_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant6:
     name: Def_Tenant6
     runs-on: windows-latest
@@ -486,25 +486,25 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant6
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Def_Tenant6
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant6 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant6
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant6 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
   Def_Tenant6_G5:
     name: Def_Tenant6_G5
     runs-on: windows-latest
@@ -554,22 +554,54 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Def_Tenant6_G5
           TestParams: ${{ secrets.TestParams }}
+      # - name: Extract Email
+      #   id: extract-email
+      #   if: ${{ always() }}
+      #   uses: ./repo/.github/actions/extract-email
+      #   env:
+      #     Alias: Def_Tenant6_G5
+      #     TestParams: ${{ secrets.TestParams }}
+      # - name: Notify on Failure
+      #   if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: smtp.gmail.com
+      #     server_port: 465
+      #     username: ${{ secrets.NotifierUsername }}
+      #     password: ${{ secrets.NotifierPassword }}
+      #     subject: Nightly functional test failure
+      #     body: The Def_Tenant6_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+      #     to: ${{ steps.extract-email.outputs.emails }}
+      #     from: ScubaGear Notifier
+  email:
+    name: Email
+    runs-on: ubuntu-latest
+    needs:
+      - Def_Tenant1
+      - Def_Tenant1_G5
+      - Def_Tenant2
+      - Def_Tenant2_G3
+      - Def_Tenant3
+      - Def_Tenant3_G5
+      - Def_Tenant6
+      - Def_Tenant6_G5
+    if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+    steps:
       - name: Extract Email
         id: extract-email
-        if: ${{ always() }}
         uses: ./repo/.github/actions/extract-email
         env:
-          Alias: Def_Tenant6_G5
+          # Could use any of previous jobs as the alias
+          Alias: Def_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Def_Tenant6_G5 test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          subject: ScubaGear Functional Test Failure
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
+          body: This workflow failed ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
