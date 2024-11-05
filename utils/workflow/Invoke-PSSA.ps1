@@ -57,20 +57,22 @@ function Invoke-PSSA {
 			}
 			Write-Output " "
 		}
-		Write-Output "--------------------------"
 	}
 
 	# Summarize results
+	Write-Output "--------------------------"
 	Write-Output "Summary"
-	Write-Output "Informations: $InfoCount"
-	Write-Output "Warnings:     $WarningCount"
-	Write-Output "Errors:       $ErrorCount"
+	Write-Output "  Informations: $InfoCount"
+	Write-Output "  Warnings:     $WarningCount"
+	Write-Output "  Errors:       $ErrorCount"
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# This is not run every time because it takes too long.
 	if ($DebuggingMode) {
 		Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 	}
+
+	Write-Output " "
 
 	# Exit 1 if warnings or errors
 	if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
