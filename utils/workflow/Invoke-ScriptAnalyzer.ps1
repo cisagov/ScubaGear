@@ -33,7 +33,9 @@ function Invoke-ScriptAnalyzer {
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
 		Write-Host $PsFile
+		Write-Output "before"
 		Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
+		Write-Output "after"
 	}
 
 	Write-Output "test3"
