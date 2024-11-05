@@ -1,5 +1,11 @@
 {
-    "permissions": {
+    "resources": {
+        "00000003-0000-0000-c000-000000000000": "Microsoft Graph",
+        "00000002-0000-0ff1-ce00-000000000000": "Office 365 Exchange Online",
+        "00000003-0000-0ff1-ce00-000000000000": "SharePoint",
+        "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs"
+    },
+    "permissions": { 
         "Microsoft Graph": {
             "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9": "Application.ReadWrite.All",
             "06b708a9-e830-4db3-a914-8e69da51d44f": "AppRoleAssignment.ReadWrite.All",
@@ -34,10 +40,17 @@
             "01d4889c-1287-42c6-ac1f-5d1e02578ef6": "Files.Read.All",
             "75359482-378d-4052-8f01-80520e7db3cd": "Files.ReadWrite.All",
             "9492366f-7969-46a4-8d15-ed1a20078fff": "Sites.ReadWrite.All",
+            "a82116e5-55eb-4c41-a434-62fe8a61c773": "Sites.FullControl.All",
             "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess"
         },
         "Office 365 Management APIs": {
 
+        },
+        "Office 365 Exchange Online": {
+            "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app"
+        },
+        "SharePoint": {
+            "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All"
         }
     }
 }
