@@ -27,4 +27,4 @@ jobs:
         run: |
           # Source the function
           . repo/utils/workflow/Invoke-ScriptAnalyzer.ps1
-          Invoke-ScriptAnalyzer -DebuggingMode $false -RepoPath repo
+          Invoke-ScriptAnalyzer -DebuggingMode $false -RepoPath 'repo'
