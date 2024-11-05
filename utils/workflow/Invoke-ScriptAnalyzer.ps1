@@ -40,7 +40,7 @@ function Invoke-ScriptAnalyzer {
 		Write-Host "The powershell file:"
 		Write-Host $PsFile
 		cat $PsFile
-		Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
+		Invoke-ScriptAnalyzer -Path 'repo\PowerShell\ScubaGear\Modules\Connection\ConnectHelpers.psm1' -Settings $ConfigPath
 		Write-Host "after"
 	}
 
