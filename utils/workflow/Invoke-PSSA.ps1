@@ -32,41 +32,36 @@ function Invoke-PSSA {
 	# Write-Host $ConfigPath
 	# cat $ConfigPath
 
-	# Analyze each file and collect results
-	$Results = foreach ($PsFile in $PsFiles) {
-		Write-Host "PsFile"
-		Write-Host $PsFile.FullName
-		cat $PsFile
-		Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
-		Write-Host "after"
-	}
-
-	Write-Output "test3"
-
 	# Report results
 	$InfoCount = 0
 	$WarningCount = 0
 	$ErrorCount = 0
-	foreach ($Result in $Results) {
-		Write-Output "File:     $($Result.ScriptPath)"
-		Write-Output "Line:     $($Result.Line)"
-		Write-Output "Severity: $($Result.Severity)"
-		# Only create GitHub workflow annotation if warning or error
-		# The ::error:: notation is how a workflow annotation is created
-		if ($Result.Severity -eq 'Information') {
-			Write-Output "Message:  $($Result.Message)"
-			$InfoCount++
-		}
-		elseif ($Result.Severity -eq 'Warning') {
-			Write-Output "::error::Message:  $($Result.Message)"
-			$WarningCount++
-		}
-		elseif ($Result.Severity -eq 'Error') {
-			Write-Output "::error::Message:  $($Result.Message)"
-			$ErrorCount++
-		}
-		Write-Output "RuleName: $($Result.RuleName)"
-		Write-Output "--------------------------"
+	
+	# Analyze each file and collect results
+	foreach ($PsFile in $PsFiles) {
+		Write-Host "PsFile"
+		Write-Host $PsFile.FullName
+		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
+		foreach ($Result in $Results) {
+			Write-Output "File:     $($Result.ScriptPath)"
+			Write-Output "Line:     $($Result.Line)"
+			Write-Output "Severity: $($Result.Severity)"
+			# Only create GitHub workflow annotation if warning or error
+			# The ::error:: notation is how a workflow annotation is created
+			if ($Result.Severity -eq 'Information') {
+				Write-Output "Message:  $($Result.Message)"
+				$InfoCount++
+			}
+			elseif ($Result.Severity -eq 'Warning') {
+				Write-Output "::error::Message:  $($Result.Message)"
+				$WarningCount++
+			}
+			elseif ($Result.Severity -eq 'Error') {
+				Write-Output "::error::Message:  $($Result.Message)"
+				$ErrorCount++
+			}
+			Write-Output "RuleName: $($Result.RuleName)"
+			Write-Output "--------------------------"
 	}
 
 	# Summarize results
