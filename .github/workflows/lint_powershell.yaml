@@ -25,4 +25,4 @@ jobs:
         run: |
           # Source the function
           . ./utils/workflow/Run-PSScriptAnalyzer.ps1
-          ./utils/workflow/Run-PSScriptAnalyzer.ps1 -DebuggingMode $false
+          Invoke-ScriptAnalyzer -DebuggingMode $false
