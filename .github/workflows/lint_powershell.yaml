@@ -21,8 +21,10 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          path: repo
       - name: Run PSScriptAnalyzer
         run: |
           # Source the function
-          . ./utils/workflow/Run-PSScriptAnalyzer.ps1
+          . repo/utils/workflow/Run-PSScriptAnalyzer.ps1
           Invoke-ScriptAnalyzer -DebuggingMode $false
