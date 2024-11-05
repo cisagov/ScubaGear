@@ -1,6 +1,6 @@
 # Run functional tests for Exchange
 
-name: Function Test Exchange
+name: Functional Tests Exchange
 
 # This is a reusable workflow called by the pipeline.
 on:

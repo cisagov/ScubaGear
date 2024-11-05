@@ -1,6 +1,6 @@
 # Run functional tests for Entra ID
 
-name: Function Test Entra ID
+name: Functional Tests Entra ID
 
 # This is a reusable workflow called by the pipeline.
 on:

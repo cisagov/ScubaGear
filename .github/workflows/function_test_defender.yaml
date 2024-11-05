@@ -1,6 +1,6 @@
 # Run functional tests for Defender
 
-name: Function Test Defender
+name: Functional Tests Defender
 
 # This is a reusable workflow called by the pipeline.
 on:

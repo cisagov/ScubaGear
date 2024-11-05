@@ -1,6 +1,6 @@
 # Run functional tests for Power Platform
 
-name: Function Test Power Platform
+name: Functional Tests Power Platform
 
 # This is a reusable workflow called by the pipeline.
 on:

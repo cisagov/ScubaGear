@@ -1,6 +1,6 @@
 # Run functional tests for Sharepoint
 
-name: Function Test Sharepoint
+name: Functional Tests Sharepoint
 
 # This is a reusable workflow called by the pipeline.
 on:

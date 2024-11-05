@@ -1,6 +1,6 @@
 # Run functional tests for Teams
 
-name: Function Test Teams
+name: Functional Tests Teams
 
 # This is a reusable workflow called by the pipeline.
 on:
