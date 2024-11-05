@@ -1,5 +1,21 @@
 Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All"
 
+function Map-RiskyPermissions {
+    param (
+        [PSCustomObject]$json,
+        [Object[]]$map,
+        [string]$resource,
+        [string]$id
+    )
+
+    $riskyPermissions = $json.permissions.$resource.PSObject.Properties.Name
+    if ($riskyPermissions -contains $id) {
+        $map += $json.permissions.$resource.$id
+    }
+
+    return $map
+}
+
 $permissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
 $servicePrincipalResults = @()
 $servicePrincipals = Get-MgServicePrincipal -All
@@ -8,14 +24,11 @@ foreach ($servicePrincipal in $servicePrincipals) {
     if ($servicePrincipal.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a") {
         $appRoleAssignments = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $servicePrincipal.Id
         $mappedPermissions = @()
+
         foreach ($role in $appRoleAssignments) {
             $resourceDisplayName = $role.ResourceDisplayName
             $roleId = $role.AppRoleId
-
-            $riskyPermissions = $permissionsJson.permissions.$resourceDisplayName.PSObject.Properties.Name
-            if ($riskyPermissions -contains $roleId) {
-                $mappedPermissions += $permissionsJson.permissions.$resourceDisplayName.$roleId
-            }
+            $mappedPermissions = Map-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
         }
 
         ## Disregard entries without risky permissions
@@ -58,11 +71,7 @@ foreach ($app in $applications) {
         foreach($role in $roles) {
             $resourceDisplayName = $permissionsJson.resources.$resourceAppId
             $roleId = $role.Id
-            
-            $riskyPermissions = $permissionsJson.permissions.$resourceDisplayName.PSObject.Properties.Name
-            if ($riskyPermissions -contains $roleId) {
-                $mappedPermissions += $permissionsJson.permissions.$resourceDisplayName.$roleId
-            }
+            $mappedPermissions = Map-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
         }
     }
 
