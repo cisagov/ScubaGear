@@ -24,17 +24,14 @@ function Invoke-ScriptAnalyzer {
 	Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 
 	# Get all PowerShell script files in the repository
-	Write-Host "RepoPath"
-	Write-Host $RepoPath
-	$ModifiedRepoPath = Join-Path -Path $RepoPath -ChildPath *
-	Write-Host "ModifiedRepoPath"
-	Write-Host $ModifiedRepoPath
-
-	$PsFiles = Get-ChildItem -Path $ModifiedRepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
 
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 
+	Write-Host '1'
+	Invoke-ScriptAnalyzer -Path 'PowerShell\ScubaGear\Modules\Connection\ConnectHelpers.psm1'
+	
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
 		Write-Host "The powershell file:"
