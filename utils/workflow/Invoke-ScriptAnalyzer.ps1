@@ -26,7 +26,7 @@ function Invoke-ScriptAnalyzer {
 	Write-Output "test1"
 
 	# Get all PowerShell script files in the repository
-	$PsFiles = Get-ChildItem -Recurse -Path $RepoPath  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+	$PsFiles = Get-ChildItem -Path $RepoPath  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
 
 	Write-Output "test2"
 
