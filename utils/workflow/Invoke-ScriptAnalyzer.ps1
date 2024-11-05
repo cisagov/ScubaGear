@@ -32,8 +32,11 @@ function Invoke-ScriptAnalyzer {
 
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
+		Write-Host $PsFile
 		Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 	}
+
+	Write-Output "test3"
 
 	# Report results
 	$InfoCount = 0
