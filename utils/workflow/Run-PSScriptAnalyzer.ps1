@@ -34,6 +34,7 @@ function Invoke-ScriptAnalyzer {
 		Write-Output "Line:     $($Result.Line)"
 		Write-Output "Severity: $($Result.Severity)"
 		# Only create GitHub workflow annotation if warning or error
+		# The ::error:: notation is how a workflow annotation is created
 		if ($Result.Severity -eq 'Information') {
 			Write-Output "Message:  $($Result.Message)"
 			$InfoCount++
@@ -57,7 +58,7 @@ function Invoke-ScriptAnalyzer {
 	Write-Output "Errors:       $ErrorCount"
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
-	# This is not run every time because it's slow.
+	# This is not run every time because it takes too long.
 	if ($DebuggingMode) {
 		Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 	}
