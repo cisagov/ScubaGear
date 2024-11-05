@@ -26,5 +26,5 @@ jobs:
       - name: Run PSScriptAnalyzer
         run: |
           # Source the function
-          . ./utils/workflow/Invoke-ScriptAnalyzer.ps1
-          Invoke-ScriptAnalyzer -DebuggingMode $false -RepoPath '.'
+          . ./utils/workflow/Invoke-PSSA.ps1
+          Invoke-PSSA -DebuggingMode $false -RepoPath '.'

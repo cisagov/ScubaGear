@@ -1,4 +1,4 @@
-function Invoke-ScriptAnalyzer {
+function Invoke-PSSA {
 	<#
 		.DESCRIPTION
 			Allows a GitHub workflow to install and use PSScriptAnalyzer (PSSA).
@@ -37,7 +37,7 @@ function Invoke-ScriptAnalyzer {
 		Write-Host "PsFile"
 		Write-Host $PsFile.FullName
 		cat $PsFile
-		# Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
+		Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		Write-Host "after"
 	}
 
