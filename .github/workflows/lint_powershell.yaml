@@ -26,5 +26,5 @@ jobs:
       - name: Run PSScriptAnalyzer
         run: |
           # Source the function
-          . repo/utils/workflow/Run-PSScriptAnalyzer.ps1
-          Invoke-ScriptAnalyzer -DebuggingMode $false
+          . repo/utils/workflow/Invoke-ScriptAnalyzer.ps1
+          Invoke-ScriptAnalyzer -DebuggingMode $false -$RepoPath repo

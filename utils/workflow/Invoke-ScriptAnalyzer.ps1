@@ -1,24 +1,34 @@
 function Invoke-ScriptAnalyzer {
 	<#
-		.SYNOPSIS
-			The purpose of this function is to allow a GitHub workflow to install and use PSScriptAnalyzer (PSSA).
+		.DESCRIPTION
+			Allows a GitHub workflow to install and use PSScriptAnalyzer (PSSA).
 		.PARAMETER DebuggingMode
 			When the debug parameter is true, extra debugging information is available.
+		.PARAMETER RepoPath
+			The path to the repo where PowerShell files will be found and analyzed.
 	#>
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory = $true)]
 		[boolean]
-		$DebuggingMode
+		$DebuggingMode,
+		[Parameter(Mandatory = $true)]
+		[string]
+		$RepoPath
 	)
+	
 	Write-Host "Testing PowerShell code with PSScript Analyzer..."
 
 	# Install PSScriptAnalyzer
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
 	Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 
+	Write-Output "test1"
+
 	# Get all PowerShell script files in the repository
-	$PsFiles = Get-ChildItem -Path ./*  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+	$PsFiles = Get-ChildItem -Recurse -Path $RepoPath  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+
+	Write-Output "test2"
 
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
