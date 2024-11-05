@@ -62,6 +62,7 @@ function Invoke-PSSA {
 			}
 			Write-Output "RuleName: $($Result.RuleName)"
 			Write-Output "--------------------------"
+		}
 	}
 
 	# Summarize results
