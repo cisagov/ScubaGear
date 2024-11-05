@@ -23,4 +23,6 @@ jobs:
         uses: actions/checkout@v4
       - name: Run PSScriptAnalyzer
         run: |
+          # Source the function
+          . ./utils/workflow/Run-PSScriptAnalyzer.ps1
           ./utils/workflow/Run-PSScriptAnalyzer.ps1 -DebuggingMode $false
