@@ -25,27 +25,22 @@ function Invoke-PSSA {
 
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
-
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
-	# Write-Host "ConfigPath"
-	# Write-Host $ConfigPath
-	# cat $ConfigPath
 
-	# Report results
+	# Summary report results
 	$InfoCount = 0
 	$WarningCount = 0
 	$ErrorCount = 0
 	
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
-		Write-Host "PsFile"
-		Write-Host $PsFile.FullName
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		foreach ($Result in $Results) {
 			Write-Output "File:     $($Result.ScriptPath)"
 			Write-Output "Line:     $($Result.Line)"
 			Write-Output "Severity: $($Result.Severity)"
+			Write-Output "RuleName: $($Result.RuleName)"
 			# Only create GitHub workflow annotation if warning or error
 			# The ::error:: notation is how a workflow annotation is created
 			if ($Result.Severity -eq 'Information') {
@@ -60,9 +55,9 @@ function Invoke-PSSA {
 				Write-Output "::error::Message:  $($Result.Message)"
 				$ErrorCount++
 			}
-			Write-Output "RuleName: $($Result.RuleName)"
-			Write-Output "--------------------------"
+			Write-Output " "
 		}
+		Write-Output "--------------------------"
 	}
 
 	# Summarize results
