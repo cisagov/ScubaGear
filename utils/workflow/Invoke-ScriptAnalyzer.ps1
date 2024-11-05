@@ -29,8 +29,8 @@ function Invoke-ScriptAnalyzer {
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 
-	Write-Host '1'
-	Invoke-ScriptAnalyzer -Path '.\PowerShell\ScubaGear\Modules\Connection\ConnectHelpers.psm1'
+	Write-Host 'Test Path'
+	Invoke-ScriptAnalyzer -Path './PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1'
 	
 	# # Analyze each file and collect results
 	# $Results = foreach ($PsFile in $PsFiles) {
