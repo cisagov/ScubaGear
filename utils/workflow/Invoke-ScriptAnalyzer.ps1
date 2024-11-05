@@ -26,14 +26,18 @@ function Invoke-ScriptAnalyzer {
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath  -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
 
-	Write-Output "test2"
+	# Find the PSScriptAnalyzer config file
+	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
+
+	Write-Host "ConfigPath"
+	Write-Host $ConfigPath
 
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
 		Write-Host "The powershell file:"
 		Write-Host $PsFile
 		Write-Host "before"
-		Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings ./Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
+		Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		Write-Host "after"
 	}
 
