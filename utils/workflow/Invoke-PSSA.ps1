@@ -17,7 +17,8 @@ function Invoke-PSSA {
 		$RepoPath
 	)
 	
-	Write-Host "Testing PowerShell code with PSScript Analyzer..."
+	Write-Host "Testing PowerShell files with PSScript Analyzer..."
+	Write-Output " "
 
 	# Install PSScriptAnalyzer
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -60,11 +61,10 @@ function Invoke-PSSA {
 	}
 
 	# Summarize results
-	Write-Output "--------------------------"
 	Write-Output "Summary"
-	Write-Output "  Informations: $InfoCount"
-	Write-Output "  Warnings:     $WarningCount"
 	Write-Output "  Errors:       $ErrorCount"
+	Write-Output "  Warnings:     $WarningCount"
+	Write-Output "  Informations: $InfoCount"	
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# This is not run every time because it takes too long.
