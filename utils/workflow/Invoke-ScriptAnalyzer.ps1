@@ -31,12 +31,13 @@ function Invoke-ScriptAnalyzer {
 
 	Write-Host "ConfigPath"
 	Write-Host $ConfigPath
+	cat $ConfigPath
 
 	# Analyze each file and collect results
 	$Results = foreach ($PsFile in $PsFiles) {
 		Write-Host "The powershell file:"
 		Write-Host $PsFile
-		Write-Host "before"
+		cat $PsFile
 		Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		Write-Host "after"
 	}
