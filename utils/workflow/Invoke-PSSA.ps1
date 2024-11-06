@@ -16,7 +16,7 @@ function Invoke-PSSA {
 		[string]
 		$RepoPath
 	)
-	
+
 	Write-Output "Testing PowerShell files with PSScriptAnalyzer..."
 	Write-Output " "
 
@@ -33,7 +33,7 @@ function Invoke-PSSA {
 	$InfoCount = 0
 	$WarningCount = 0
 	$ErrorCount = 0
-	
+
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
@@ -64,7 +64,7 @@ function Invoke-PSSA {
 	Write-Output "Summary"
 	Write-Output "  Errors:       $ErrorCount"
 	Write-Output "  Warnings:     $WarningCount"
-	Write-Output "  Informations: $InfoCount"	
+	Write-Output "  Informations: $InfoCount"
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# This is not run every time because it takes too long.
