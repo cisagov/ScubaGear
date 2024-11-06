@@ -1505,9 +1505,7 @@ Audit Logs in the Cloud Azure log category.
 - Additionally, maintaining logs in the M365 environment for longer than one
   year requires an add-on license. For more information, see
   [Licensing requirements \| Microsoft
-  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/auditing-solutions-overview?view=o365-worldwide#licensing-requirements).
-
--	However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
+  Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/auditing-solutions-overview?view=o365-worldwide#licensing-requirements). However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
 
 ### Implementation
 
