@@ -64,7 +64,7 @@ function Invoke-PSSA {
 	Write-Output "Summary"
 	Write-Output "  Errors:       $ErrorCount"
 	Write-Output "  Warnings:     $WarningCount"
-	Write-Output "  Informations: $InfoCount"
+	Write-Output "  Information:  $InfoCount"
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# This is not run every time because it takes too long.
