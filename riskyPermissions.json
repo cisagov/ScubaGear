@@ -18,9 +18,9 @@
             "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
             "df021288-bdef-4463-88db-98f22de89214": "User.Read.All",
             "405a51b5-8d8d-430b-9842-8be4b0e9f324": "User.Export.All",
-            "5b567255-7703-4780-807c-7be8301ae99b": "Group.Read.All",
+            "5b567255-7703-4780-807c-7be8301ae99b": "Group.Read.All", 
             "62a82d76-70ea-41e2-9197-370581804d09": "Group.ReadWrite.All",
-            "98830695-27a2-44f7-8c18-0c3ebc9698f6": "Group.Read.All",
+            "98830695-27a2-44f7-8c18-0c3ebc9698f6": "GroupMember.Read.All",
             "dbaae8cf-10b5-4b86-a4a1-f871c94c6695": "GroupMember.ReadWrite.All",
             "658aa5d8-239f-45c4-aa12-864f4fc7e490": "Member.Read.Hidden",
             "89c8469c-83ad-45f7-8ff2-6e3d4285709e": "ServicePrincipalEndpoint.ReadWrite.All",
@@ -44,9 +44,11 @@
             "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess"
         },
         "Office 365 Management APIs": {
-
+            "594c1fb6-4f81-4475-ae41-0c394909246c": "ActivityFeed.Read",
+            "4807a72c-ad38-4250-94c9-4eabfe26cd55": "ActivityFeed.ReadDlp"
         },
         "Office 365 Exchange Online": {
+            "dc50a0fb-09a3-484d-be87-e023b12c6440": "Exchange.ManageAsApp",
             "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app"
         },
         "SharePoint": {
