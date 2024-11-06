@@ -1490,6 +1490,12 @@ Audit Logs in the Cloud Azure log category.
 - [Expanding cloud logging to give customers deeper security visibility \|
   Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
 
+- [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records)
+
+- [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
+
+- [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)
+
 ### License Requirements
 
 - Microsoft Purview Audit (Premium) logging capabilities, including creating
@@ -1500,6 +1506,8 @@ Audit Logs in the Cloud Azure log category.
   year requires an add-on license. For more information, see
   [Licensing requirements \| Microsoft
   Docs](https://docs.microsoft.com/en-us/microsoft-365/compliance/auditing-solutions-overview?view=o365-worldwide#licensing-requirements).
+
+-	However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
 
 ### Implementation
 
