@@ -851,6 +851,11 @@ Related to Cybersecurity Incidents \| Office of Management and
 - [Expanding cloud logging to give customers deeper security visibility \|
   Microsoft Security Blog](https://www.microsoft.com/en-us/security/blog/2023/07/19/expanding-cloud-logging-to-give-customers-deeper-security-visibility/)
 
+- [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records)
+
+- [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
+
+- [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)
 
 ### License Requirements
 
@@ -860,8 +865,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
-  [Licensing requirements \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/purview/audit-solutions-overview?view=o365-worldwide#licensing-requirements).
+  [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)
 
 ### Implementation
 
@@ -885,7 +889,9 @@ Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-
 
 #### MS.DEFENDER.6.3v1 Instructions
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
-Ensure the duration selected in the retention policies is at least one year,
-in accordance with OMB M-21-31.
+Ensure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. 
+
+As noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/defender.md#license-requirements-1) section above, the creation of a custom audit log retention policy and its retention in the M365 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses, a E3/G3 license can view and export logs. To view and export
+auit logs follow [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records) and/or [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
 
 **`TLP:CLEAR`**
