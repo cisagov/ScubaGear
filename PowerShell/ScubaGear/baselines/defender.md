@@ -865,9 +865,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
-  [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)
-
-- However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
+  [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy). However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
 
 ### Implementation
 
