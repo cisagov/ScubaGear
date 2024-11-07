@@ -132,7 +132,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 
 ### License Requirements
 
-- Defender for Office 365 capabilities require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3.
+- Defender for Office 365 capabilities require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3. However, third-party solutions can be used to meet this requirement. If a third-party solution is used, then a Defender for Office 365 Plan 1 or 2, E5, and G5 license is not required for the respective policies.
 
 ### Implementation
 
@@ -520,13 +520,15 @@ information by restricted apps and unwanted Bluetooth applications.
 
 - DLP for Teams requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft
   Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
-  for more information.
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+
 
 - DLP for Endpoint requires an E5 or G5 license. See [Get started with
   Endpoint data loss prevention - Microsoft Purview (compliance) \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
-  for more information.
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+
 
 ### Implementation
 
