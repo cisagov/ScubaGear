@@ -49,7 +49,18 @@
         },
         "Office 365 Exchange Online": {
             "dc50a0fb-09a3-484d-be87-e023b12c6440": "Exchange.ManageAsApp",
-            "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app"
+            "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app",
+            "798ee544-9d2d-430c-a058-570e29e34338": "Calendars.Read",
+            "2dfdc6dc-2fa7-4a2c-a922-dbd4f85d17be": "Calendars.Read.All",
+            "ef54d2bf-783f-4e0f-bca1-3210c0444d99": "Calendars.ReadWrite.All",
+            "089fe4d0-434a-44c5-8827-41ba8a0b17f5": "Contacts.Read",
+            "6918b873-d17a-4dc1-b314-35f528134491": "Contacts.ReadWrite",
+            "e2a3a72e-5f79-4c64-b1b1-878b674786c9": "Mail.ReadWrite",
+            "b633e1c5-b582-4048-a93e-9f11b44c7e96": "Mail.Send",
+            "d45fa9f8-36e5-4cd2-b601-b063c7cf9ac2": "MailboxSettings.Read",
+            "f9156939-25cd-4ba8-abfe-7fabcf003749": "MailboxSettings.ReadWrite",
+            "bf24470f-10c1-436d-8d53-7b997eb473be": "User.Read.All",
+            "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
         },
         "SharePoint": {
             "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All"
