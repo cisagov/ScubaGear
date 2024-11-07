@@ -621,14 +621,14 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 #### MS.EXO.8.2v2 Instructions
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.
 
 #### MS.EXO.8.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 
 #### MS.EXO.8.4v1 Instructions
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.
 
 ## 9. Attachment File Type
 
@@ -1075,7 +1075,7 @@ Mailbox auditing SHALL be enabled.
     - [T1586.002: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)
   - [T1564: Hide Artifacts](https://attack.mitre.org/techniques/T1564/)
   - [T1564.008: Email Hiding Rules](https://attack.mitre.org/techniques/T1564/008/)
-    
+
 ### Resources
 
 - [Manage mailbox auditing in Office 365 \| Microsoft
