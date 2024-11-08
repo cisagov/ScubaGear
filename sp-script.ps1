@@ -30,12 +30,14 @@ function Check-CredentialExpiry {
 
 $permissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
 $servicePrincipalResults = @()
-$servicePrincipals = Get-MgServicePrincipal -All
+$servicePrincipals = Get-MgBetaServicePrincipal -All
 foreach ($servicePrincipal in $servicePrincipals) {
     # Exclude Microsoft-published service principals 
     if ($servicePrincipal.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a") {
-        $appRoleAssignments = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $servicePrincipal.Id
+        $appRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -ServicePrincipalId $servicePrincipal.Id
         $mappedPermissions = @()
+
+        Write-Output $servicePrincipal.AppRoles | Format-List
 
         foreach ($role in $appRoleAssignments) {
             $resourceDisplayName = $role.ResourceDisplayName
@@ -61,7 +63,7 @@ foreach ($servicePrincipal in $servicePrincipals) {
 $servicePrincipalResults | ConvertTo-Json -Depth 3 > finalSPResults.json
 
 
-$applications = Get-MgApplication -All
+$applications = Get-MgBetaApplication -All
 $applicationResults = @()
 foreach ($app in $applications) {
 
@@ -80,7 +82,7 @@ foreach ($app in $applications) {
     }
 
     # Get federated credentials
-    $federatedCredentials = Get-MgApplicationFederatedIdentityCredential -ApplicationId $app.Id -All
+    $federatedCredentials = Get-MgBetaApplicationFederatedIdentityCredential -ApplicationId $app.Id -All
     $federatedCredentialsResults = @()
 
     # Reformat only if a credential exists
