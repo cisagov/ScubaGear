@@ -37,8 +37,6 @@ foreach ($servicePrincipal in $servicePrincipals) {
         $appRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -ServicePrincipalId $servicePrincipal.Id
         $mappedPermissions = @()
 
-        Write-Output $servicePrincipal.AppRoles | Format-List
-
         foreach ($role in $appRoleAssignments) {
             $resourceDisplayName = $role.ResourceDisplayName
             $roleId = $role.AppRoleId
