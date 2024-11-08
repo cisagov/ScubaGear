@@ -41,7 +41,8 @@
             "75359482-378d-4052-8f01-80520e7db3cd": "Files.ReadWrite.All",
             "9492366f-7969-46a4-8d15-ed1a20078fff": "Sites.ReadWrite.All",
             "a82116e5-55eb-4c41-a434-62fe8a61c773": "Sites.FullControl.All",
-            "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess"
+            "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess",
+            "246dd0d5-5bd0-4def-940b-0421030a5b68": "Policy.Read.All"
         },
         "Office 365 Management APIs": {
             "594c1fb6-4f81-4475-ae41-0c394909246c": "ActivityFeed.Read",
