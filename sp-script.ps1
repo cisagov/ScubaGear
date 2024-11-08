@@ -1,6 +1,6 @@
 Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All"
 
-function Map-RiskyPermissions {
+function Initialize-RiskyPermissions {
     param (
         [PSCustomObject]$json,
         [Object[]]$map,
@@ -16,7 +16,7 @@ function Map-RiskyPermissions {
     return $map
 }
 
-function Check-CredentialExpiry {
+function Get-ValidCredentials {
     param(
         [Array[]]$credentials
     )
@@ -25,14 +25,14 @@ function Check-CredentialExpiry {
     foreach ($credential in $credentials) {
         if ($credential.EndDateTime -gt (Get-Date)) { $validCredentials += $credential }
     }
-    return $validCredentials 
+    return $validCredentials
 }
 
 $permissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
 $servicePrincipalResults = @()
 $servicePrincipals = Get-MgBetaServicePrincipal -All
 foreach ($servicePrincipal in $servicePrincipals) {
-    # Exclude Microsoft-published service principals 
+    # Exclude Microsoft-published service principals
     if ($servicePrincipal.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a") {
         $appRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -ServicePrincipalId $servicePrincipal.Id
         $mappedPermissions = @()
@@ -40,7 +40,7 @@ foreach ($servicePrincipal in $servicePrincipals) {
         foreach ($role in $appRoleAssignments) {
             $resourceDisplayName = $role.ResourceDisplayName
             $roleId = $role.AppRoleId
-            $mappedPermissions = Map-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
+            $mappedPermissions = Initialize-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
         }
 
         # Disregard entries without risky permissions
@@ -49,8 +49,8 @@ foreach ($servicePrincipal in $servicePrincipals) {
                 'Object ID' = $servicePrincipal.Id
                 'App ID' = $servicePrincipal.AppId
                 'Display Name' = $servicePrincipal.DisplayName
-                'Key Credentials' = Check-CredentialExpiry -credentials $servicePrincipal.KeyCredentials
-                'Password Credentials' = Check-CredentialExpiry -credentials $servicePrincipal.PasswordCredentials
+                'Key Credentials' = Get-ValidCredentials -credentials $servicePrincipal.KeyCredentials
+                'Password Credentials' = Get-ValidCredentials -credentials $servicePrincipal.PasswordCredentials
                 'Risky Permissions' = $mappedPermissions
             }
         }
@@ -75,7 +75,7 @@ foreach ($app in $applications) {
         foreach($role in $roles) {
             $resourceDisplayName = $permissionsJson.resources.$resourceAppId
             $roleId = $role.Id
-            $mappedPermissions = Map-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
+            $mappedPermissions = Initialize-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
         }
     }
 
@@ -84,7 +84,7 @@ foreach ($app in $applications) {
     $federatedCredentialsResults = @()
 
     # Reformat only if a credential exists
-    if ($federatedCredentials -ne $null) {
+    if ($null -ne $federatedCredentials) {
         foreach ($federatedCredential in $federatedCredentials) {
             $federatedCredentialsResults += [PSCustomObject]@{
                 'Id' = $federatedCredential.Id
@@ -103,8 +103,8 @@ foreach ($app in $applications) {
             'Object ID' = $app.Id
             'App ID' = $app.AppId
             'Display Name' = $app.DisplayName
-            'Key Credentials' = Check-CredentialExpiry -credentials $app.KeyCredentials
-            'Password Credentials' = Check-CredentialExpiry -credentials $app.PasswordCredentials
+            'Key Credentials' = Get-ValidCredentials -credentials $app.KeyCredentials
+            'Password Credentials' = Get-ValidCredentials -credentials $app.PasswordCredentials
             'Federated Credentials' = $federatedCredentials
             'Risky Permissions' = $mappedPermissions
         }
