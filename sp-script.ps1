@@ -16,6 +16,18 @@ function Map-RiskyPermissions {
     return $map
 }
 
+function Check-CredentialExpiry {
+    param(
+        [Array[]]$credentials
+    )
+
+    $validCredentials = @()
+    foreach ($credential in $credentials) {
+        if ($credential.EndDateTime -gt (Get-Date)) { $validCredentials += $credential }
+    }
+    return $validCredentials 
+}
+
 $permissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
 $servicePrincipalResults = @()
 $servicePrincipals = Get-MgServicePrincipal -All
@@ -31,30 +43,22 @@ foreach ($servicePrincipal in $servicePrincipals) {
             $mappedPermissions = Map-RiskyPermissions -json $permissionsJson -map $mappedPermissions -resource $resourceDisplayName -id $roleId
         }
 
-        ## Disregard entries without risky permissions
-        #if ($mappedPermissions.Count -gt 0) {
-        #    $riskyServicePrincipals += [PSCustomObject]@{
-        #        'Object ID' = $servicePrincipal.Id
-        #        'App ID' = $servicePrincipal.AppId
-        #        'Display Name' = $servicePrincipal.DisplayName
-        #        'Key Credentials' = $servicePrincipal.KeyCredentials
-        #        'Password Credentials' = $servicePrincipal.PasswordCredentials
-        #        'Risky Permissions' = $mappedPermissions
-        #    }
-        #}
-        $servicePrincipalResults += [PSCustomObject]@{
-            'Object ID' = $servicePrincipal.Id
-            'App ID' = $servicePrincipal.AppId
-            'Display Name' = $servicePrincipal.DisplayName
-            'Key Credentials' = $servicePrincipal.KeyCredentials
-            'Password Credentials' = $servicePrincipal.PasswordCredentials
-            'Risky Permissions' = $mappedPermissions
+        # Disregard entries without risky permissions
+        if ($mappedPermissions.Count -gt 0) {
+            $servicePrincipalResults += [PSCustomObject]@{
+                'Object ID' = $servicePrincipal.Id
+                'App ID' = $servicePrincipal.AppId
+                'Display Name' = $servicePrincipal.DisplayName
+                'Key Credentials' = Check-CredentialExpiry -credentials $servicePrincipal.KeyCredentials
+                'Password Credentials' = Check-CredentialExpiry -credentials $servicePrincipal.PasswordCredentials
+                'Risky Permissions' = $mappedPermissions
+            }
         }
     }
 }
 
-$servicePrincipalResults = $servicePrincipalResults | Where-Object { $_."Risky Permissions".Count -gt 0 }
-$servicePrincipalResults | Format-List > finalSPResults.txt
+#$servicePrincipalResults = $servicePrincipalResults | Where-Object { $_."Risky Permissions".Count -gt 0 }
+$servicePrincipalResults | ConvertTo-Json -Depth 3 > finalSPResults.json
 
 
 $applications = Get-MgApplication -All
@@ -76,31 +80,35 @@ foreach ($app in $applications) {
     }
 
     # Get federated credentials
-    $federatedCredentials = Get-MgApplicationFederatedIdentityCredential -ApplicationId $app.Id
+    $federatedCredentials = Get-MgApplicationFederatedIdentityCredential -ApplicationId $app.Id -All
+    $federatedCredentialsResults = @()
 
     # Reformat only if a credential exists
     if ($federatedCredentials -ne $null) {
-        $federatedCredentials = [PSCustomObject]@{
-            'Id' = $federatedCredentials.Id
-            'Name' = $federatedCredentials.Name
-            'Description' = $federatedCredentials.Description
-            'Issuer' = $federatedCredentials.Issuer
-            'Subject' = $federatedCredentials.Subject
-            'Audiences' = $federatedCredentials.Audiences | Out-String
+        foreach ($federatedCredential in $federatedCredentials) {
+            $federatedCredentialsResults += [PSCustomObject]@{
+                'Id' = $federatedCredential.Id
+                'Name' = $federatedCredential.Name
+                'Description' = $federatedCredential.Description
+                'Issuer' = $federatedCredential.Issuer
+                'Subject' = $federatedCredential.Subject
+                'Audiences' = $federatedCredential.Audiences | Out-String
+            }
         }
-    } else {
-        $federatedCredentials = @{}
     }
 
-    $applicationResults += [PSCustomObject]@{
-        'Object ID' = $app.Id
-        'App ID' = $app.AppId
-        'Display Name' = $app.DisplayName
-        'Key Credentials' = $app.KeyCredentials
-        'Password Credentials' = $app.PasswordCredentials
-        'Federated Credentials' = $federatedCredentials
-        'Risky Permissions' = $mappedPermissions
+    # Disregard entries without risky permissions
+    if ($mappedPermissions.Count -gt 0) {
+        $applicationResults += [PSCustomObject]@{
+            'Object ID' = $app.Id
+            'App ID' = $app.AppId
+            'Display Name' = $app.DisplayName
+            'Key Credentials' = Check-CredentialExpiry -credentials $app.KeyCredentials
+            'Password Credentials' = Check-CredentialExpiry -credentials $app.PasswordCredentials
+            'Federated Credentials' = $federatedCredentials
+            'Risky Permissions' = $mappedPermissions
+        }
     }
 }
 
-$applicationResults | Format-List > finalAppResults.txt
+$applicationResults | ConvertTo-Json -Depth 3 > finalAppResults.json
