@@ -8,7 +8,7 @@ The recommended way to install ScubaGear is from [PSGallery](psgallery.md), but 
 
 ## Import Module
 
-When ScubaGear is installed by downloading (or cloning) from GitHub, it must be imported into every new PowerShell terminal session before it can be executed. To import the module, open a PowerShell 5.1 terminal, navigate to the repository folder, and run this command:
+When ScubaGear is installed by downloading from GitHub, it must be imported into every new PowerShell terminal session before it can be executed. To import the module, open a PowerShell 5.1 terminal, navigate to the repository folder, and run this command:
 
 ```powershell
 # Import the module into the session
