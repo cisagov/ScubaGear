@@ -88,9 +88,19 @@ Legacy authentication SHALL be blocked.
 
 #### MS.AAD.1.1v1 Instructions
 
-- [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.
+1. [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.
 
-- Create a [Conditional Access policy to block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy).
+2. Create a Conditional Access policy to block legacy authentication
+
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+
+  Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
+
+  Access controls > Grant > <b>Block Access</b>
+</pre>
 
 ## 2. Risk Based Policies
 
