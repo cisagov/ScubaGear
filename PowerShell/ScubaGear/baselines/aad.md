@@ -72,7 +72,7 @@ Legacy authentication SHALL be blocked.
     - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 ### Resources
 
@@ -110,7 +110,7 @@ Users detected as high risk SHALL be blocked.
 - _Note:_ Users identified as high risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -120,7 +120,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
@@ -130,7 +130,7 @@ Sign-ins detected as high risk SHALL be blocked.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 ### Resources
 
@@ -264,7 +264,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
@@ -274,7 +274,7 @@ Managed devices SHOULD be required for authentication.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
@@ -284,7 +284,7 @@ Managed Devices SHOULD be required to register MFA.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T078/004/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
 
