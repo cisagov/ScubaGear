@@ -8,8 +8,10 @@ If ScubaGear was installed by [downloading from GitHub](../installation/github.m
 
 ```powershell
 # Import the module into the session
-Import-Module -Name .\PowerShell\ScubaGear 
+Import-Module .\PowerShell\ScubaGear 
 ```
+
+> **Note**: Do not add a \ to the end of the `Import-Module`.
 
 ## Install Dependencies
 
