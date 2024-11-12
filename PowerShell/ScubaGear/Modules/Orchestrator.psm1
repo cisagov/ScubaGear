@@ -82,7 +82,7 @@ function Invoke-SCuBA {
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter DisableVersionCheck
-    Set switch to disable checking PSGaller or Github for newer ScubaGear releases.
+    Set switch to disable checking PSGallery or Github for newer ScubaGear releases.
     .Parameter ConfigFilePath
     Local file path to a JSON or YAML formatted configuration file.
     Configuration file parameters can be used in place of command-line
