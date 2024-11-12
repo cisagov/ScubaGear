@@ -849,7 +849,7 @@ function Format-PlainText {
         $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
         $CleanString = $CleanString.Replace("<", "&lt;")
         $CleanString = $CleanString.Replace(">", "&gt;")
-        $CleanString = $CleanString.Replace("&", "&amp;")
+        #$CleanString = $CleanString.Replace("&", "&amp;")
         $CleanString
     }
 }
@@ -1064,7 +1064,6 @@ function Merge-JsonOutput {
             # Convert the output a json string
             $MetaData = ConvertTo-Json $MetaData -Depth 3
             $Results = ConvertTo-Json $Results -Depth 5
-           # Loop through each property
             $Summary = ConvertTo-Json $Summary -Depth 3
             $ReportJson = @"
 {
@@ -1080,7 +1079,7 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003c", "<")
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
-            $ReportJson = $ReportJson.replace("\u0026", "&")
+            $ReportJson = $ReportJson.replace("$amp;", "&")
 
             # Save the file
             $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'

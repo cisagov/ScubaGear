@@ -34,7 +34,7 @@ InModuleScope Orchestrator {
             }
             It 'Reformats links with special symbols' {
                 $Output = Format-PlainText 'See <a href="https://example.com#anchor?p1=v1&p2=v2" target="_blank">this example</a> for more details.'
-                $Output | Should -Be "See this example, https://example.com#anchor?p1=v1&amp;p2=v2 for more details."
+                $Output | Should -Be "See this example, https://example.com#anchor?p1=v1&p2=v2 for more details."
             }
             It 'Reformats links without target' {
                 $Output = Format-PlainText 'See <a href="example.com">this example</a> for more details.'
@@ -42,7 +42,7 @@ InModuleScope Orchestrator {
             }
             It 'Reformats links when there is no trailing content' {
                 $Output = Format-PlainText 'See <a href="https://example.com#anchor?p1=v1&p2=v2" target="_blank">this example</a>.'
-                $Output | Should -Be "See this example, https://example.com#anchor?p1=v1&amp;p2=v2."
+                $Output | Should -Be "See this example, https://example.com#anchor?p1=v1&p2=v2."
             }
         }
     }
