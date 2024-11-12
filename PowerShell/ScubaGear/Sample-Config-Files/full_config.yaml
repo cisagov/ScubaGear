@@ -25,3 +25,4 @@ CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
 OutJsonFileName: ScubaResults
 OutCsvFileName: ScubaResults
 OutActionPlanFileName: ActionPlan
+DisableVersionCheck: false

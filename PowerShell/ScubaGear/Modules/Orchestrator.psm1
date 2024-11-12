@@ -1,4 +1,5 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
+using module 'Utility\CheckVersion.psm1'
 
 function Invoke-SCuBA {
     <#
@@ -80,6 +81,8 @@ function Invoke-SCuBA {
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter DisableVersionCheck
+    Set switch to disable checking PSGaller or Github for newer ScubaGear releases.
     .Parameter ConfigFilePath
     Local file path to a JSON or YAML formatted configuration file.
     Configuration file parameters can be used in place of command-line
@@ -156,6 +159,12 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [switch]
         $DisconnectOnExit,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [switch]
+        $DisableVersionCheck = [ScubaConfig]::ScubaDefault('DisableVersionCheck'),
 
         [Parameter(ParameterSetName = 'VersionOnly')]
         [ValidateNotNullOrEmpty()]
@@ -291,6 +300,7 @@ function Invoke-SCuBA {
                 'OPAPath' = $OPAPath
                 'LogIn' = $LogIn
                 'DisconnectOnExit' = $DisconnectOnExit
+                'DisableVersionCheck' = $DisableVersionCheck
                 'OutPath' = $OutPath
                 'OutFolderName' = $OutFolderName
                 'OutProviderFileName' = $OutProviderFileName
@@ -352,6 +362,11 @@ function Invoke-SCuBA {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
             }
+        }
+
+        # Check for newer versions of Scuba.
+        if (!$ScubaConfig["DisableVersionCheck"]) {
+            Invoke-CheckVersions
         }
 
         if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutActionPlanFileName) {
