@@ -71,7 +71,7 @@ function Invoke-SCuBA {
     This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
     If KeepIndividualJSON is not set, the name of the consolidated json created in the folder
-    created in OutPath. Defaults to "ScubaResults".
+    created in OutPath. Defaults to "ScubaResults". The report UUID will be appended to this.
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".
@@ -1602,7 +1602,7 @@ function Invoke-SCuBACached {
     This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
     If KeepIndividualJSON is set, the name of the consolidated json created in the folder
-    created in OutPath. Defaults to "ScubaResults".
+    created in OutPath. Defaults to "ScubaResults". The report UUID will be appended to this.
     .Parameter OutCsvFileName
     The CSV created in the folder created in OutPath that contains the CSV version of the test results.
     Defaults to "ScubaResults".

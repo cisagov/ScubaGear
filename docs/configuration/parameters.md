@@ -274,7 +274,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutJsonFileName
 
-**OutJsonFileName** renames the uber output JSON file that is created after a ScubaGear run. This should only be the base file name, as the extension `.json` will automatically be added. 
+**OutJsonFileName** specifies the base file name the uber output JSON file that is created after a ScubaGear run. This should only be the base file name; the report UUID as well as the extension, `.json`, will automatically be added. 
 
 | Parameter   | Value          |
 |-------------|----------------|
@@ -290,6 +290,7 @@ Invoke-SCuBA -ProductNames teams `
 Invoke-SCuBA -ProductNames teams `
   -OutJsonFileName myresults
 ```
+In the above example, the resulting JSON file name would be `myresults_21189b0e-f045-43ee-b9ba-653b32744e45.json` (substituting in the actual report UUID.)
 
 ## OutPath
 

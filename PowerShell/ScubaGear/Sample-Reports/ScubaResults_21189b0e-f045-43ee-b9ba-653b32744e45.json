@@ -22,7 +22,8 @@
                                    },
     "Tool":  "ScubaGear",
     "ToolVersion":  "1.4.0",
-    "TimestampZulu":  "2024-08-02T19:25:11.166Z"
+    "TimestampZulu":  "2024-08-02T19:25:11.166Z",
+    "ReportUUID": "21189b0e-f045-43ee-b9ba-653b32744e45"
 },
     "Summary": {
     "AAD":  {
@@ -1339,6 +1340,7 @@
     "module_version":  "1.4.0",
     "date":  "08/02/2024 14:25:11 Central Daylight Time",
     "timestamp_zulu":  "2024-08-02T19:25:11.166Z",
+    "report_uuid": "21189b0e-f045-43ee-b9ba-653b32744e45",
     "tenant_details":  [
                            {
                                "AADAdditionalData":  {
