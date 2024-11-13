@@ -38,10 +38,7 @@ function Invoke-CheckScubaGearVersionPSGallery {
 
     if ($currentVersion -lt $latestVersion) {
         Write-Warning "A new version of ScubaGear ($latestVersion) is available on PowerShell Gallery."
-    } else {
-        Write-Warning "Installed version of ScubaGear ($currentVersion) is the latest version."
     }
-
 
     # Store the current time in the file to mark the last check time
     (Get-Date).ToString() | Set-Content $versionCheckFile
