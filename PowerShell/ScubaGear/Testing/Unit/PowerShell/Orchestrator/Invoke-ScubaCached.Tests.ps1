@@ -30,6 +30,7 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-Content {}
             Mock -CommandName Get-Member { $true }
             Mock -CommandName New-Guid { "00000000-0000-0000-0000-000000000000" }
+            Mock -CommandName Get-ChildItem { @{"FullName"="ScubaResults.json"; "CreationTime"=$(Get-Date)} }
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {

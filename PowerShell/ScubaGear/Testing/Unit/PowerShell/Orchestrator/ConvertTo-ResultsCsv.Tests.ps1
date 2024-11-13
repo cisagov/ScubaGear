@@ -15,6 +15,7 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-FileEncoding
             Mock -CommandName ConvertTo-Csv { "" }
             Mock -CommandName Write-Warning {}
+            Mock -CommandName Get-ChildItem { @{"FullName"="ScubaResults.json"; "CreationTime"=$(Get-Date)} }
         }
 
         It 'Handles multiple products, control groups, and controls' {
