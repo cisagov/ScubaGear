@@ -416,10 +416,9 @@ If you are trying to run the test orchestrator as a service principal and your c
 
 ![service-principal-error](/images/service-principal.png)
 
-### Additional resources for admins
+### Setup Documentation for Sys Admins
 The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.) for functional testing of ScubaGear. 
 
-- [How to setup the permissions required to execute the automated functional test orchestrator](https://github.com/cisagov/ScubaGear/issues/589)
+- [How to setup the permissions required to execute the automated functional test orchestrator](./docs/SetupFunctionalTestOrchestratorServicePrincipalAndAssociatedPermissions.md)
 
-- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](https://github.com/cisagov/ScubaGear/issues/591) 
-
+- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](./docs/SettingUpTenantForTestingAADConditionalAccessPolicies.md) 
