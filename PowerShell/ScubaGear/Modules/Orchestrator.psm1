@@ -894,7 +894,7 @@ function ConvertTo-ResultsCsv {
                 # The ScubaResults file exists, no need to look for the individual json files
                 # As there is the possibility that the wildcard will match multiple files,
                 # select the one that was created last if there are multiple.
-                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName
+                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
