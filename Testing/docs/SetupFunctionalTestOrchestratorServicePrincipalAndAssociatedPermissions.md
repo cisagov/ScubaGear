@@ -1,4 +1,5 @@
-### Setup the Functional Test Orchestrator service principal and associated permissions
+# Setup Functional Test Orchestrator service principal
+
 This section describes how to setup an AAD application in the tenant when you want to run the test orchestrator using a **service principal (non interactive login)**. Setup for user interactive login is documented in a separate section.
 
 Go to Azure AD > App Registrations and click New registration
@@ -16,7 +17,8 @@ Click Add a permission then select Microsoft Graph in the popup page. Note some 
 
 Select Application permissions and then add all of the required permissions in the list below which are required for AAD. Once you have selected all of the permissions, click the Add permissions button.
 
-#### Microsoft Graph API permissions
+## Microsoft Graph API permissions
+
 - Directory.Read.All
 - GroupMember.Read.All
 - Organization.Read.All
@@ -27,10 +29,11 @@ Select Application permissions and then add all of the required permissions in t
 - PrivilegedAccess.Read.AzureADGroup
 - RoleManagementPolicy.Read.AzureADGroup
 
-#### Office 365 Exchange Online API permissions (select from APIs my organization users)
+## Office 365 Exchange Online API permissions (select from APIs my organization users)
+
 - Exchange.ManageAsApp (so the application can run cmdlets in Exchange Online)
 
-#### Sharepoint API permissions (select from Microsoft APIs)
+## Sharepoint API permissions (select from Microsoft APIs)
 
 - Sites.FullControl.All (so the application can update Sharepoint settings)
 
@@ -47,10 +50,11 @@ Click the Grant admin consent button on the API permissions page and click Yes i
 The permissions page should now show that admin consent was granted for each of the permissions
 ![image](https://github.com/cisagov/ScubaGear/assets/107076927/6065fcba-f3c3-4a37-944f-f19c4c7e0e7a)
 
-### Assigning user roles to the Scuba Functional Test Orchestrator application
+## Assigning user roles to the Scuba Functional Test Orchestrator application
+
 Some of the products also need an AAD user role assigned to the application in order for it to be able to update the tenant settings when executing the functional tests.
 
-#### Assign the following user roles to the "Scuba Functional Test Orchestrator" application using the AAD role assignments page.  Note that these should be active assignments in tenants that include PIM.
+## Assign the following user roles to the "Scuba Functional Test Orchestrator" application using the AAD role assignments page.  Note that these should be active assignments in tenants that include PIM
 
 - Exchange Administrator (for EXO and most of the Defender cmdlets except for the compliance ones)
 - Compliance Data Administrator (for Defender since it uses Purview compliance center cmdlets such as Set-DlpCompliancePolicy, Set-DlpComplianceRule, Set-ProtectionAlert)
@@ -62,8 +66,6 @@ Here is an example screenshot that shows the service principal assigned to the E
 
 To complete the setup for PowerPlatform you must also execute the code below to register the service principal with Power Platform:
 
-```
+``` PowerShell
 Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
 New-PowerAppManagementApp -ApplicationId $appId
-
-```
