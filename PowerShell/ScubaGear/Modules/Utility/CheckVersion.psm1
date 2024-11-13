@@ -72,7 +72,7 @@ function Invoke-CheckScubaGearVersionGit {
             }
             else {
                 # If we are here, the command is not running inside a git repo. Probably not installed from git.
-                Write-Warning "ScubaGear is not currently at a GitHub tagged release. Consider using the latest tagged release. You can disable this warning using DisableScubaGearVersionCheck in the config file or the DisableVersionCheck CLI flag."
+                Write-Warning "ScubaGear is not currently at a GitHub tagged release. Consider using the latest tagged release. You can disable this warning using DisableVersionCheck in the config file or the DisableVersionCheck CLI flag."
             }
         }
     }
