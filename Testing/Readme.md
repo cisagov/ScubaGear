@@ -421,4 +421,4 @@ The following resources are for M365 tenant admins to provide additional informa
 
 - [How to setup the permissions required to execute the automated functional test orchestrator](./docs/SetupFunctionalTestOrchestratorServicePrincipalAndAssociatedPermissions.md)
 
-- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](./docs/SettingUpTenantForTestingAADConditionalAccessPolicies.md) 
+- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](./docs/SetupTenantForTestingAADConditionalAccessPolicies.md)
