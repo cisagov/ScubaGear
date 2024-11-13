@@ -50,8 +50,7 @@ function Invoke-CheckScubaGearVersionGit {
     $gitAvailable = Get-Command git -ErrorAction SilentlyContinue
 
     if ($gitAvailable) {
-        # Assuming the module might be located in a known directory (replace this with the actual path)
-        $scubaGearPath = "."  # Set the actual path to ScubaGear
+        $scubaGearPath = "."
 
         if (Test-Path $scubaGearPath) {
             # Check if it's a git repo
@@ -61,7 +60,6 @@ function Invoke-CheckScubaGearVersionGit {
             if ($gitTag) {
                 # Remove leading "v" from the tag
                 $currentVersion = $gitTag.TrimStart("v")
-                Write-Warning "Current version from GitHub repository: $currentVersion"
 
                 # Fetch the latest release info from GitHub API
                 $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest"
@@ -70,8 +68,6 @@ function Invoke-CheckScubaGearVersionGit {
                 # Compare the versions
                 if ([System.Version]$currentVersion -lt [System.Version]$latestVersion) {
                     Write-Warning "A new version of ScubaGear ($latestVersion) is available. Please consider updating at: https://github.com/cisagov/ScubaGear/releases"
-                } else {
-                    Write-Warning "You are running the latest version of ScubaGear ($currentVersion)."
                 }
             }
             else {
