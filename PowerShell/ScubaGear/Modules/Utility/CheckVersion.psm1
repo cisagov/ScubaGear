@@ -25,8 +25,6 @@ function Invoke-CheckScubaGearVersionPSGallery {
 
     # Retrieve the installed version of ScubaGear from the system
     $installedModule = Get-Module -Name ScubaGear -ListAvailable
-    write-host "cow: $installedModule"
-    write-host $installedModule
     if ($installedModule) {
         $currentVersion = [System.Version]$installedModule.Version
     } else {
