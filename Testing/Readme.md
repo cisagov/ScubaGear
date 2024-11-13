@@ -115,8 +115,7 @@ The optional variant can have values like: `g5`, `e5`, `gcc`, `pnp`, `spo`, `e#`
 
 After setting up the prerequisites, define the Pester test container parameters in a test execution utility script called "RunFunctionalTest.ps1" as shown below: 
 
-
-```
+``` PowerShell
 $TestContainers = @()
 
 $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc" }
