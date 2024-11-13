@@ -888,10 +888,13 @@ function ConvertTo-ResultsCsv {
     )
     process {
         try {
-            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName.json"
+            # Wildcard * in next line is to match the UUID in the file name
+            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName*.json"
             if (Test-Path $ScubaResultsFileName -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                $ScubaResults = Get-Content $ScubaResultsFileName | ConvertFrom-Json
+                # As there is the possibility that the wildcard will match multiple files,
+                # select the one that was created last if there are multiple.
+                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -1071,7 +1074,8 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
             # Save the file
-            $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'
+            $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName)_$($ReportUuid).json" `
+                -ErrorAction 'Stop'
             $ReportJson | Set-Content -Path $JsonFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
@@ -1802,8 +1806,10 @@ function Invoke-SCuBACached {
                 # file depending on what version of ScubaGear created the output. If the provider output
                 # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
                 # can execute as normal.
-                $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName).json"
-                $SettingsExport = $(Get-Content $ScubaResultsFileName | ConvertFrom-Json).Raw
+                $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
+                # As there is the possibility that the wildcard will match multiple files,
+                # select the one that was created last if there are multiple.
+                $SettingsExport = $(Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json).Raw
 
                 # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
                 $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
