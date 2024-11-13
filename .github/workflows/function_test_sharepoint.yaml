@@ -1,6 +1,6 @@
 # Run functional tests for Sharepoint
 
-name: Function Test Sharepoint
+name: Functional Tests Sharepoint
 
 # This is a reusable workflow called by the pipeline.
 on:
@@ -84,28 +84,6 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant1_PNP
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Shr_Tenant1_PNP
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        # Debugging
-        # inputs.GitHubEventName == 'push'
-        # inputs.GitHubEventName == 'schedule'
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Shr_Tenant1_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
   Shr_Tenant2_PNP:
     name: Shr_Tenant2_PNP
     runs-on: windows-latest
@@ -152,25 +130,6 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant2_PNP
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Shr_Tenant2_PNP
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Shr_Tenant2_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
   Shr_Tenant3_PNP:
     name: Shr_Tenant3_PNP
     runs-on: windows-latest
@@ -217,25 +176,6 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant3_PNP
           TestParams: ${{ secrets.TestParams }}
-      - name: Extract Email
-        id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
-        env:
-          Alias: Shr_Tenant3_PNP
-          TestParams: ${{ secrets.TestParams }}
-      - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.NotifierUsername }}
-          password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Shr_Tenant3_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
-          to: ${{ steps.extract-email.outputs.emails }}
-          from: ScubaGear Notifier
   Shr_Tenant6_PNP:
     name: Shr_Tenant6_PNP
     runs-on: windows-latest
@@ -282,22 +222,33 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant6_PNP
           TestParams: ${{ secrets.TestParams }}
+  email:
+    name: Email
+    runs-on: windows-latest
+    needs:
+      - Shr_Tenant1_PNP
+      - Shr_Tenant2_PNP
+      - Shr_Tenant3_PNP
+      - Shr_Tenant6_PNP
+    if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
       - name: Extract Email
         id: extract-email
-        if: ${{ always() }}
-        uses: ./repo/.github/actions/extract-email
+        uses: ./.github/actions/extract-email
         env:
-          Alias: Shr_Tenant6_PNP
+          # Could use any of previous jobs as the alias
+          Alias: Shr_Tenant1_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: Nightly functional test failure
-          body: The Shr_Tenant6_PNP test failed.  Please look at the "Nightly Product Functional Tests" workflow for more details.
+          subject: ScubaGear Functional Test Failure
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
+          body: This workflow failed ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
