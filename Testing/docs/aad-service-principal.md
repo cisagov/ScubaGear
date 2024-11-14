@@ -1,4 +1,4 @@
-# Setup Functional Test Orchestrator service principal
+# Setup an AAD app to run the Functional Test Orchestrator
 
 This section describes how to setup an AAD application in the tenant when you want to run the test orchestrator using a **service principal (non interactive login)**. Setup for user interactive login is documented in a separate section.
 

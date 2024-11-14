@@ -1,4 +1,4 @@
-# Setup the tenant for functional testing of AAD conditional access policies
+# Setup the Tenant for Functional Testing of AAD Conditional Access Policies
 
 Numerous test cases in the AAD functional test plan associated with conditional access rely on some dependencies in the tenant that you must setup ahead of time:
 
