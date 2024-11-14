@@ -2,20 +2,20 @@
     --background-primary: white;
     --background-secondary: #b9bec2;
     --test-pass: #d5ebd5;
-    --test-fail: #E5C7C7;
+    --test-fail: #cd2026;
     --test-warning: #fff7d6;
     --test-other: #ebebf2;
     --test-deleted-bg: #b2beb5;
     --test-deleted-color: #6f7478;
     --test-bug-color: #e80b0b;
-    --test-error-color: #DD4803;
+    --test-error-color: #ffffff;
     --cap-even: #0052882d;
     --cap-hover: #00528850;
     --header-color: #005288;
     --note-color: #ee4e04;
     --header-bottom: black;
     --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --unvisited-link-color: #00668f;
     --text-color: black;
     --uuid-color: #424242;
     --border-color: black;
@@ -232,7 +232,7 @@ th.conditions {
 }
 
 #toggle-text {
-    color: #7b7b7b;
+    color: #404040;
     margin: 0.313em 3.125em;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.875em;
