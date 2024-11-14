@@ -8,7 +8,7 @@ name: Functional Tests
 
 on:
   # Run this workflow at 12:15 (or 1:15) am
-  # on every Mon to Ffi (b/c GMT -5 or -4)
+  # on every Mon to Fri (b/c GMT -5 or -4)
   schedule:
     - cron: "15 6 * * 1-5" # in GMT
   workflow_dispatch:
