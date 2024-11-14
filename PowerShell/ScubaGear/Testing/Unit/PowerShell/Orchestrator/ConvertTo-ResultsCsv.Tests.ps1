@@ -15,7 +15,9 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-FileEncoding
             Mock -CommandName ConvertTo-Csv { "" }
             Mock -CommandName Write-Warning {}
-            Mock -CommandName Get-ChildItem { @{"FullName"="ScubaResults.json"; "CreationTime"=$(Get-Date)} }
+            Mock -CommandName Get-ChildItem {
+                [pscustomobject]@{"FullName"="ScubaResults.json"; "CreationTime"=[DateTime]"2024-01-01"}
+            }
         }
 
         It 'Handles multiple products, control groups, and controls' {
@@ -84,6 +86,34 @@ InModuleScope Orchestrator {
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
             Should -Invoke -CommandName Write-Warning -Exactly -Times 1
+        }
+
+        It 'Handles multiple ScubaResults*.json file names' {
+            # If this function is called from Invoke-ScubaCached, it's possible (but not expected) that
+            # there are multiple files matching "ScubaResults*.json". In this case, ScubaGear should
+            # choose the file created most recently.
+            Mock -CommandName Get-ChildItem { @(
+                [pscustomobject]@{"FullName"="ScubaResultsOld.json"; "CreationTime"=[DateTime]"2023-01-01"},
+                [pscustomobject]@{"FullName"="ScubaResultsNew.json"; "CreationTime"=[DateTime]"2024-01-01"},
+                [pscustomobject]@{"FullName"="ScubaResultsOldest.json"; "CreationTime"=[DateTime]"2022-01-01"}
+            ) }
+
+            Mock -CommandName Get-Content {
+                if ($Path -ne "ScubaResultsNew.json") {
+                    # Should be the new one, throw if not
+                    throw
+                }
+            }
+
+            $CsvParameters = @{
+                ProductNames = @("exo");
+                OutFolderPath = ".";
+                OutJsonFileName = "ScubaResults";
+                OutCsvFileName = "ScubaResults";
+                OutActionPlanFileName = "ActionPlan";
+            }
+            { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
+            Should -Invoke -CommandName Write-Warning -Exactly -Times 0
         }
     }
 }
