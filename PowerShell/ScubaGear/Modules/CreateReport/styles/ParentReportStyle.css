@@ -53,10 +53,10 @@ table.tenantdata tr:first-child {
     color: var(--text-color);
 }
 
-.failure { background-color: var(--test-fail); }
-.warning { background-color: var(--test-warning); }
-.pass { background-color: var(--test-pass); }
-.manual { background-color: var(--test-other); }
+.failure { background-color: var(--test-fail); color:var(--test-error-color)}
+.warning { background-color: var(--test-warning);  color:var(--test-nonerror-color) }
+.pass { background-color: var(--test-pass); color:var(--test-nonerror-color) }
+.manual { background-color: var(--test-other); color:var(--test-nonerror-color)  }
 .error {
     background-color: var(--test-fail);
     color: var(--test-error-color);
