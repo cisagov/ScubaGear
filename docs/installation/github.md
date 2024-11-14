@@ -15,7 +15,7 @@ When ScubaGear is installed by downloading from GitHub, it must be imported into
 Import-Module .\PowerShell\ScubaGear 
 ```
 
-> **Note**: Do not add a \ to the end of the `Import-Module`.
+> **Note**: Do not add a \ to the end of the `.\PowerShell\ScubaGear` path.
 
 Once ScubaGear has been downloaded and imported, the required [dependencies](../prerequisites/dependencies.md) can be installed.
 
