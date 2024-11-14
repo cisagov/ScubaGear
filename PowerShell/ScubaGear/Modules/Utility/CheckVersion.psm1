@@ -55,8 +55,14 @@ function Invoke-CheckScubaGearVersionGit {
         if (Test-Path $scubaGearPath) {
             # Check if it's a git repo
             Set-Location -Path $scubaGearPath
-            $gitTag = git describe --exact-match --tags 2>$null
-
+            try {
+                $gitTag = git describe --exact-match --tags 2>$null
+            } catch {
+                if ($_.Exception.Message -match "No names found, cannot describe anything") {
+                    # If we are here, this checkout has no tags. May be a shallow clone used for the test runner.
+                    return
+                }
+            }
             if ($gitTag) {
                 # Remove leading "v" from the tag
                 $currentVersion = $gitTag.TrimStart("v")
