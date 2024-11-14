@@ -11,7 +11,7 @@ If ScubaGear was installed by [downloading from GitHub](../installation/github.m
 Import-Module .\PowerShell\ScubaGear 
 ```
 
-> **Note**: Do not add a \ to the end of the `Import-Module`.
+> **Note**: Do not add a \ to the end of the `.\PowerShell\ScubaGear` path.
 
 ## Install Dependencies
 
