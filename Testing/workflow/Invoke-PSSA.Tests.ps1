@@ -13,4 +13,9 @@ Describe "PSSA Check" {
     $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $module | Should -Not -BeNullOrEmpty
   }
+  It "PSSA should find no results in this file" {
+    $ThisTestFile = Get-ChildItem -Path . -Include *.ps1
+    $Results = Invoke-ScriptAnalyzer -Path $ThisTestFile
+    $Results.Count | Should -BeExactly 0
+  }
 }
