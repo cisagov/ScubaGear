@@ -1,7 +1,9 @@
 # The purpose of this test is to verify that Selenium was installed.
 
 BeforeDiscovery {
-  Import-Module -Name .\utils\workflow\Install-SeleniumForTesting
+  # Source the function
+  . $PSScriptRoot/../../utils/workflow/Install-SeleniumForTesting.ps1
+  # Install Selenium
   Install-SeleniumForTesting
 }
 
