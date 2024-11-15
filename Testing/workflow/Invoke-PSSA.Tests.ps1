@@ -27,7 +27,7 @@ Describe "PSSA Check" {
   }
 }
 
-AfterAll {
-  # Cleanup
-  $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', $OriginalWriteOutput, 'All')
-}
+# AfterAll {
+#   # Cleanup
+#   $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', $OriginalWriteOutput, 'All')
+# }
