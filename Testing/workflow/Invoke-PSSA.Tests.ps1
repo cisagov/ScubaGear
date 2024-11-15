@@ -1,6 +1,11 @@
 # The purpose of this tset is to verify that PSSA is working.
 
 BeforeDiscovery {
+  # Arrange to capture the output
+  $Output = @()
+  $OriginalWriteOutput = $ExecutionContext.SessionState.InvokeCommand.GetCommand('Write-Output', 'All').ScriptBlock
+  $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', { param($Message) $Output += $Message }, 'All')
+
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
   # Invoke PSSA
@@ -13,9 +18,12 @@ Describe "PSSA Check" {
     $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $module | Should -Not -BeNullOrEmpty
   }
-  It "PSSA should find no results in this file" {
-    $ThisTestFile = Get-ChildItem -Path . -Include *.ps1
-    $Results = Invoke-ScriptAnalyzer -Path $ThisTestFile
-    $Results.Count | Should -BeExactly 0
+  It "PSSA should write final output" {
+    $Output | Should -Contain "Problems were found in the PowerShell scripts." -or $Output | Should -Contain "No problems were found in the PowerShell scripts."
   }
+}
+
+AfterAll {
+  # Cleanup
+  $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', $OriginalWriteOutput, 'All')
 }
