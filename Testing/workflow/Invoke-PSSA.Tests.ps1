@@ -4,7 +4,8 @@ BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
   # Invoke PSSA
-  Invoke-PSSA
+  $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
+  Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
 }
 
 Describe "PSSA Check" {
