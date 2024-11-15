@@ -1,14 +1,14 @@
 # The purpose of this tset is to verify that PSSA is working.
 
 # Suppress PSSA warnings here at the root of the test file.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-param()
+# [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+# param()
 
 BeforeDiscovery {
   # Arrange to capture the output
-  $Output = @()
+  # $Output = @()
   # $OriginalWriteOutput = $ExecutionContext.SessionState.InvokeCommand.GetCommand('Write-Output', 'All').ScriptBlock
-  $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', { param($Message) $Output += $Message }, 'All')
+  # $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', { param($Message) $Output += $Message }, 'All')
 
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
