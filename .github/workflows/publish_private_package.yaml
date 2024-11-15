@@ -101,13 +101,15 @@ jobs:
         run: |
           cd repo
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
-          Import-Module -Name ./utils/workflow/Initialize-ScubaGearForTesting
+          # Source the function
+          . /repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
           Invoke-SCuBA -Version
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
       - name: Install Selenium
         run: |
-          Import-Module -Name .\repo\utils\workflow\Install-SeleniumForTesting
+          # Source the function
+          . /repo/utils/workflow/Install-SeleniumForTesting.ps1
           Install-SeleniumForTesting
       # Instead of initializing ScubaGear repeated for each of the test jobs below,
       # we cache the PowerShell modules and OPA here and then restore them for the jobs.

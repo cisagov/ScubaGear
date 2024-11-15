@@ -27,7 +27,7 @@ else {
   Write-Warning 'Did NOT find list of modules!!'
 }
 
-Describe "Check for PowerShell modules" {
+Describe "PowerShell Modules Check" {
   foreach ($Module in $ModuleList) {
     $global:ModuleName = $Module.ModuleName
     It "Module $global:moduleName should be installed" {

@@ -7,7 +7,7 @@ BeforeDiscovery {
   Install-SeleniumForTesting
 }
 
-Describe "Check for Selenium" {
+Describe "Selenium Check" {
   It "Selenium should be installed" {
     $module = Get-Module -ListAvailable -Name 'Selenium'
     $module | Should -Not -BeNullOrEmpty
