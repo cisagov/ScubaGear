@@ -3,6 +3,7 @@ function Initialize-ScubaGearForTesting {
     .DESCRIPTION
       Installs
   #>
+
   Write-Output 'Initializing ScubaGear for testing...'
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
   Write-Output 'The repo root path is'
