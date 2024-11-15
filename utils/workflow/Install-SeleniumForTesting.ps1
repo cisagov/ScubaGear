@@ -3,7 +3,7 @@ function Install-SeleniumForTesting {
     .DESCRIPTION
       Installs Selenium for ScubaGear testing
   #>
-  
+
   Write-Output 'Installing Selenium for testing...'
   Install-Module -Name Selenium -Scope CurrentUser -Force
   Import-Module -Name Selenium
