@@ -6,7 +6,18 @@ The recommended way to install ScubaGear is from [PSGallery](psgallery.md), but 
 2. Under the `Assets` header, click `ScubaGear-v1.4.0.zip`to download the zip file.
 3. Extract the zip file into the folder of your choice.
 
-Once ScubaGear has been downloaded, the required [dependencies](../prerequisites/dependencies.md) can be installed.
+## Import Module
+
+When ScubaGear is installed by downloading from GitHub, it must be imported into every new PowerShell terminal session before it can be executed. To import the module, open a PowerShell 5.1 terminal, navigate to the repository folder, and run this command:
+
+```powershell
+# Import the module into the session
+Import-Module .\PowerShell\ScubaGear 
+```
+
+> **Note**: Do not add a \ to the end of the `.\PowerShell\ScubaGear` path.
+
+Once ScubaGear has been downloaded and imported, the required [dependencies](../prerequisites/dependencies.md) can be installed.
 
 ## PowerShell Execution Policy
 
