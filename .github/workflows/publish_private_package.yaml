@@ -99,7 +99,6 @@ jobs:
       # This is a manual test that simply writes the version to the console.
       - name: Print Scuba Version
         run: |
-          cd repo
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
