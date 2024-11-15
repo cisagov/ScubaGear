@@ -7,9 +7,9 @@ param()
 
 BeforeDiscovery {
   # Source the function
-  . $PSScriptRoot/../../utils/workflow/
+  . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
-  Initialize-ScubaGearForTesting.ps1
+  Initialize-ScubaGearForTesting
 }
 
 # Use Write-Warning b/c other writes don't actually write

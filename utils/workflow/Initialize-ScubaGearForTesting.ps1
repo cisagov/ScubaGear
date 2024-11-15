@@ -1,7 +1,7 @@
 function Initialize-ScubaGearForTesting {
   <#
     .DESCRIPTION
-      Installs ScubaGear for testing
+      Initializes ScubaGear for testing
   #>
 
   Write-Output 'Initializing ScubaGear for testing...'
