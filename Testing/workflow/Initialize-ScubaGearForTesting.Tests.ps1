@@ -6,9 +6,10 @@
 param()
 
 BeforeDiscovery {
-  Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
-  Import-Module -Name .\PowerShell\ScubaGear
-  Initialize-ScubaGearForTesting
+  # Source the function
+  . $PSScriptRoot/../../utils/workflow/
+  # Initialize SG
+  Initialize-ScubaGearForTesting.ps1
 }
 
 # Use Write-Warning b/c other writes don't actually write
