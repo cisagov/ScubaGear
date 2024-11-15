@@ -1,5 +1,9 @@
 # The purpose of this tset is to verify that PSSA is working.
 
+# Suppress PSSA warnings here at the root of the test file.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param()
+
 BeforeDiscovery {
   # Arrange to capture the output
   $Output = @()
