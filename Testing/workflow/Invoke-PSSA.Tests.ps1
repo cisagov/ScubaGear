@@ -15,7 +15,6 @@ Describe "PSSA Check" {
   # }
   It "PSSA should write output" {
     Mock Write-Output {}
-    Invoke-PSSA
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
     # Invoke PSSA
