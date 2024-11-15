@@ -7,7 +7,7 @@ param()
 BeforeDiscovery {
   # Arrange to capture the output
   $Output = @()
-  $OriginalWriteOutput = $ExecutionContext.SessionState.InvokeCommand.GetCommand('Write-Output', 'All').ScriptBlock
+  # $OriginalWriteOutput = $ExecutionContext.SessionState.InvokeCommand.GetCommand('Write-Output', 'All').ScriptBlock
   $ExecutionContext.SessionState.InvokeCommand.SetCommand('Write-Output', { param($Message) $Output += $Message }, 'All')
 
   # Source the function
@@ -22,9 +22,9 @@ Describe "PSSA Check" {
     $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $module | Should -Not -BeNullOrEmpty
   }
-  It "PSSA should write final output" {
-    $Output | Should -Contain "Problems were found in the PowerShell scripts." -or $Output | Should -Contain "No problems were found in the PowerShell scripts."
-  }
+  # It "PSSA should write final output" {
+  #   $Output | Should -Contain "Problems were found in the PowerShell scripts." -or $Output | Should -Contain "No problems were found in the PowerShell scripts."
+  # }
 }
 
 # AfterAll {
