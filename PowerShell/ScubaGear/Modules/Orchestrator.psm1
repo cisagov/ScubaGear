@@ -374,22 +374,34 @@ function Invoke-SCuBA {
         # Tenant Metadata for the Report
         $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
 
+        # Generate the GUID for the JSON
+        # TODO Stick the GUID within the ScubaConfig object to clean up parameter bloat
+        try {
+            $Guid = New-Guid -ErrorAction 'Stop'
+        }
+        catch {
+            $Guid = "00000000-0000-0000-0000-000000000000"
+            $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+            Write-Warning $Warning
+        }
+
         try {
             # Provider Execution
             $ProviderParams = @{
-                'ProductNames' = $ScubaConfig.ProductNames;
-                'M365Environment' = $ScubaConfig.M365Environment;
-                'TenantDetails' = $TenantDetails;
-                'ModuleVersion' = $ModuleVersion;
-                'OutFolderPath' = $OutFolderPath;
+                'ProductNames'        = $ScubaConfig.ProductNames;
+                'M365Environment'     = $ScubaConfig.M365Environment;
+                'TenantDetails'       = $TenantDetails;
+                'ModuleVersion'       = $ModuleVersion;
+                'OutFolderPath'       = $OutFolderPath;
                 'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-                'BoundParameters' = $PSBoundParameters;
+                'Guid'                = $Guid;
+                'BoundParameters'     = $PSBoundParameters;
             }
             $ProdProviderFailed = Invoke-ProviderList @ProviderParams
             if ($ProdProviderFailed.Count -gt 0) {
                 $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
-                 -ProductsFailed $ProdProviderFailed `
-                 -ExceptionMessage 'All indicated Product Providers failed to execute'
+                -ProductsFailed $ProdProviderFailed `
+                -ExceptionMessage 'All indicated Product Providers failed to execute'
             }
 
             # OPA Rego invocation
@@ -438,10 +450,11 @@ function Invoke-SCuBA {
             }
             # Craft the csv version of just the results
             $CsvParams = @{
-                'ProductNames' = $ScubaConfig.ProductNames;
-                'OutFolderPath' = $OutFolderPath;
-                'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
-                'OutCsvFileName' = $ScubaConfig.OutCsvFileName;
+                'ProductNames'          = $ScubaConfig.ProductNames;
+                'Guid'                  = $Guid;
+                'OutFolderPath'         = $OutFolderPath;
+                'OutJsonFileName'       = $ScubaConfig.OutJsonFileName;
+                'OutCsvFileName'        = $ScubaConfig.OutCsvFileName;
                 'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
@@ -541,6 +554,11 @@ function Invoke-ProviderList {
         $OutProviderFileName,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Guid,
+
+        [Parameter(Mandatory = $true)]
         [hashtable]
         $BoundParameters
     )
@@ -630,15 +648,6 @@ function Invoke-ProviderList {
         $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
         if(! $ConfigDetails) {
             $ConfigDetails = "{}"
-        }
-
-        try {
-            $Guid = New-Guid -ErrorAction 'Stop'
-        }
-        catch {
-            $Guid = "00000000-0000-0000-0000-000000000000"
-            $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
-            Write-Warning $Warning
         }
 
         $BaselineSettingsExport = @"
@@ -866,6 +875,11 @@ function ConvertTo-ResultsCsv {
         [string[]]
         $ProductNames,
 
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Guid,
+
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -888,13 +902,11 @@ function ConvertTo-ResultsCsv {
     )
     process {
         try {
-            # Wildcard * in next line is to match the UUID in the file name
-            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$OutJsonFileName*.json"
+            # Fine the ScubaResults file with UUID in the file name.
+            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($Guid).json"
             if (Test-Path $ScubaResultsFileName -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                # As there is the possibility that the wildcard will match multiple files,
-                # select the one that was created last if there are multiple.
-                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json
+                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName).FullName | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -1809,6 +1821,9 @@ function Invoke-SCuBACached {
                 $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
                 # As there is the possibility that the wildcard will match multiple files,
                 # select the one that was created last if there are multiple.
+                # By default ScubaGear will output the files into their own folder.
+                # The only case this will happen is when someone personally moves multiple files into the
+                # same folder.
                 $SettingsExport = $(Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json).Raw
 
                 # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
