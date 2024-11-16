@@ -902,7 +902,7 @@ function ConvertTo-ResultsCsv {
     )
     process {
         try {
-            # Fine the ScubaResults file with UUID in the file name.
+            # Find the ScubaResults file with UUID in the file name.
             $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($Guid).json"
             if (Test-Path $ScubaResultsFileName -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
@@ -1830,6 +1830,7 @@ function Invoke-SCuBACached {
                     'ModuleVersion' = $ModuleVersion;
                     'OutFolderPath' = $OutFolderPath;
                     'OutProviderFileName' = $OutProviderFileName;
+                    'Guid' = $Guid;
                     'BoundParameters' = $PSBoundParameters;
                 }
                 Invoke-ProviderList @ProviderParams
@@ -1863,7 +1864,7 @@ function Invoke-SCuBACached {
                     $Guid = New-Guid -ErrorAction 'Stop'
                 }
                 catch {
-                    $Guid = "00000000-0000-0000-0000-000000000000"
+                    $Guid = "00000000-0000-0000]-0000-000000000000"
                     $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
                     Write-Warning $Warning
                 }
@@ -1912,6 +1913,7 @@ function Invoke-SCuBACached {
             # Craft the csv version of just the results
             $CsvParams = @{
                 'ProductNames' = $ProductNames;
+                'Guid' = $Guid;
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $OutJsonFileName;
                 'OutCsvFileName' = $OutCsvFileName;

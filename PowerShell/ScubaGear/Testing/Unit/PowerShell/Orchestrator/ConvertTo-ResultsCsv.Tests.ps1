@@ -16,7 +16,7 @@ InModuleScope Orchestrator {
             Mock -CommandName ConvertTo-Csv { "" }
             Mock -CommandName Write-Warning {}
             Mock -CommandName Get-ChildItem {
-                [pscustomobject]@{"FullName"="ScubaResults.json"; "CreationTime"=[DateTime]"2024-01-01"}
+                [pscustomobject]@{"FullName"="ScubaResults_00000000-0000-0000-0000-000000000000.json"; "CreationTime"=[DateTime]"2024-01-01"}
             }
         }
 
@@ -59,11 +59,12 @@ InModuleScope Orchestrator {
                 }}
             }
             $CsvParameters = @{
-                ProductNames = @("exo", "aad");
-                OutFolderPath = ".";
-                OutJsonFileName = "ScubaResults";
-                OutCsvFileName = "ScubaResults";
+                ProductNames          = @("exo", "aad");
+                OutFolderPath         = ".";
+                OutJsonFileName       = "ScubaResults";
+                OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
+                Guid                  = "00000000-0000-0000-0000-000000000000";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName ConvertFrom-Json -Exactly -Times 1
@@ -77,11 +78,12 @@ InModuleScope Orchestrator {
             Mock -CommandName ConvertFrom-Json {}
             Mock -CommandName Get-Content { throw "File not found" }
             $CsvParameters = @{
-                ProductNames = @("exo", "aad");
-                OutFolderPath = ".";
-                OutJsonFileName = "ScubaResults";
-                OutCsvFileName = "ScubaResults";
+                ProductNames          = @("exo", "aad");
+                OutFolderPath         = ".";
+                OutJsonFileName       = "ScubaResults";
+                OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
+                Guid                  = "00000000-0000-0000-0000-000000000000";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
@@ -93,14 +95,12 @@ InModuleScope Orchestrator {
             # there are multiple files matching "ScubaResults*.json". In this case, ScubaGear should
             # choose the file created most recently.
             Mock -CommandName Get-ChildItem { @(
-                [pscustomobject]@{"FullName"="ScubaResultsOld.json"; "CreationTime"=[DateTime]"2023-01-01"},
-                [pscustomobject]@{"FullName"="ScubaResultsNew.json"; "CreationTime"=[DateTime]"2024-01-01"},
-                [pscustomobject]@{"FullName"="ScubaResultsOldest.json"; "CreationTime"=[DateTime]"2022-01-01"}
+                [pscustomobject]@{"FullName"="ScubaResults_00000000-0000-0000-0000-000000000000.json"; "CreationTime"=[DateTime]"2024-01-01"}
             ) }
 
             Mock -CommandName Get-Content {
-                if ($Path -ne "ScubaResultsNew.json") {
-                    # Should be the new one, throw if not
+                if ($Path -ne "ScubaResults_00000000-0000-0000-0000-000000000000.json") {
+                    # Should be the exact file name, throw if not
                     throw
                 }
             }
@@ -111,6 +111,7 @@ InModuleScope Orchestrator {
                 OutJsonFileName = "ScubaResults";
                 OutCsvFileName = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
+                Guid = "00000000-0000-0000-0000-000000000000";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Write-Warning -Exactly -Times 0
