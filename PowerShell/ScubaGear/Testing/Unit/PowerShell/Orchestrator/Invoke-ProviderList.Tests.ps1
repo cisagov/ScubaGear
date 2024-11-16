@@ -30,12 +30,13 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
             $ProviderParameters = @{
-                OutFolderPath = "./output";
-                OutProviderFileName = "ProviderSettingsExport";
-                M365Environment = "commercial";
-                TenantDetails = '{"DisplayName": "displayName"}';
-                ModuleVersion = '1.0';
-                BoundParameters = @{};
+                    OutFolderPath       = "./output";
+                    OutProviderFileName = "ProviderSettingsExport";
+                    M365Environment     = "commercial";
+                    TenantDetails       = '{"DisplayName": "displayName"}';
+                    ModuleVersion       = '1.0';
+                    BoundParameters     = @{};
+                    Guid                = "00000000-0000-0000-0000-000000000000"
             }
         }
         It 'With -ProductNames "aad", should not throw' {

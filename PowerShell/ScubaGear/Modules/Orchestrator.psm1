@@ -1864,7 +1864,7 @@ function Invoke-SCuBACached {
                     $Guid = New-Guid -ErrorAction 'Stop'
                 }
                 catch {
-                    $Guid = "00000000-0000-0000]-0000-000000000000"
+                    $Guid = "00000000-0000-0000-0000-000000000000"
                     $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
                     Write-Warning $Warning
                 }
