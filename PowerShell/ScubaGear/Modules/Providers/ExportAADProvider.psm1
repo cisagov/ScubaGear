@@ -115,17 +115,25 @@ function Export-AADProvider {
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we also include calls to PIM APIs
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+            $PrivilegedServicePrincipals = $Tracker.TryCommand("Get-PrivilegedServicePrincipal", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+
         }
         else{
             $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+            $PrivilegedServicePrincipals = $Tracker.TryCommand("Get-PrivilegedServicePrincipal", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+
         }
         # The Converto-Json call below doesn't need to have the input wrapped in an
         # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
         # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries like it does arrays
         $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
+        $PrivilegedServicePrincipals = $PrivilegedServicePrincipals | ConvertTo-Json
+
         # While ConvertTo-Json won't mess up a dict as described in the above comment,
         # on error, $TryCommand returns an empty list, not a dictionary.
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
@@ -310,6 +318,104 @@ function Get-PrivilegedUser {
         throw $_
     }
     $PrivilegedUsers
+}
+
+function Get-PrivilegedServicePrincipal {
+    <#
+    .Description
+    Returns a hashtable of privileged service principals and their respective roles
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [bool]
+        $TenantHasPremiumLicense,
+
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    try {
+        # A hashtable of privileged service principals
+        $PrivilegedServicePrincipals = @{}
+        $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
+        # Get a list of the Id values for the privileged roles in the list above.
+        # The Id value is passed to other cmdlets to construct a list of service principals assigned to privileged roles.
+        $AADRoles = Get-MgBetaDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
+
+        # Construct a list of privileged service principals based on the Active role assignments
+        foreach ($Role in $AADRoles) {
+            # Get a list of all the service principals Actively assigned to this role
+            $ServicePrincipalsAssignedRole = Get-MgBetaDirectoryRoleMember -All -ErrorAction Stop -DirectoryRoleId $Role.Id |
+                Where-Object { $_.AdditionalProperties."@odata.type" -eq "#microsoft.graph.servicePrincipal" }
+
+            foreach ($ServicePrincipal in $ServicePrincipalsAssignedRole) {
+                # If the service principal's data has not been fetched from graph, go get it and add it to the hashtable
+                if (-Not $PrivilegedServicePrincipals.ContainsKey($ServicePrincipal.Id)) {
+                    $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ServicePrincipal.Id -ErrorAction Stop
+                    $PrivilegedServicePrincipals[$ServicePrincipal.Id] = @{
+                        "DisplayName" = $AADServicePrincipal.DisplayName
+                        "AppId" = $AADServicePrincipal.AppId
+                        "roles" = @()
+                    }
+                }
+                # If the current role has not already been added to the service principal's roles array then add the role
+                if ($PrivilegedServicePrincipals[$ServicePrincipal.Id].roles -notcontains $Role.DisplayName) {
+                    $PrivilegedServicePrincipals[$ServicePrincipal.Id].roles += $Role.DisplayName
+                }
+            }
+        }
+
+        # Process the Eligible role assignments if the premium license for PIM is there
+        if ($TenantHasPremiumLicense) {
+            # Get a list of all the service principals that have Eligible assignments
+            $graphArgs = @{
+                "commandlet" = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"
+                "M365Environment" = $M365Environment }
+            $AllPIMRoleAssignments = Invoke-GraphDirectly @graphArgs
+
+            # Add to the list of privileged service principals based on Eligible assignments
+            foreach ($Role in $AADRoles) {
+                $PrivRoleId = $Role.RoleTemplateId
+                # Get a list of all the service principals Eligible assigned to this role
+                $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
+
+                foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
+                    $ServicePrincipalId = $PIMRoleAssignment.PrincipalId
+
+                    # Verify this is a service principal by attempting to get its data
+                    try {
+                        $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ServicePrincipalId -ErrorAction Stop
+                    }
+                    catch {
+                        # If not a service principal, skip to next assignment
+                        continue
+                    }
+
+                    # If the service principal's data has not been fetched from graph, add it to the hashtable
+                    if (-Not $PrivilegedServicePrincipals.ContainsKey($ServicePrincipalId)) {
+                        $PrivilegedServicePrincipals[$ServicePrincipalId] = @{
+                            "DisplayName" = $AADServicePrincipal.DisplayName
+                            "AppId" = $AADServicePrincipal.AppId
+                            "roles" = @()
+                        }
+                    }
+                    # If the current role has not already been added to the service principal's roles array then add the role
+                    if ($PrivilegedServicePrincipals[$ServicePrincipalId].roles -notcontains $Role.DisplayName) {
+                        $PrivilegedServicePrincipals[$ServicePrincipalId].roles += $Role.DisplayName
+                    }
+                }
+            }
+        }
+    }
+    catch {
+        Write-Warning "An error occurred in Get-PrivilegedServicePrincipal: $($_.Exception.Message)"
+        Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_
+    }
+    $PrivilegedServicePrincipals
 }
 
 function LoadObjectDataIntoPrivilegedUserHashtable {
