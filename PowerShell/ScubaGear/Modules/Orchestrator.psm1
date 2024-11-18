@@ -1095,15 +1095,17 @@ function Merge-JsonOutput {
             $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath (Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)")
             $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
 
+            # Throw an error if the path length is too long.
             if ($AbsoluteResultsFilePathLen -gt ($MAX_WINDOWS_PATH_LEN + $CharactersToTrim)) {
                 $PathLengthErrorMessage = "ScubaGear was executed in a location where the maximum file path length is greater than the allowable Windows File System limit `
-                Please execute ScubaGear in a location where for Window File Path limit is less than $($MAX_WINDOWS_PATH_LEN). The current length is $($AbsoluteResultsFilePathLen)"
+                Please execute ScubaGear in a directory where for Window file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
+                Your current file path length is $($AbsoluteResultsFilePathLen)"
                 throw $PathLengthErrorMessage
             }
             elseif ($AbsoluteResultsFilePathLen -gt $MAX_WINDOWS_PATH_LEN) {
                 $ReportUuid = $ReportUuid.Substring(0, $ReportUuid.Length - $CharactersToTrim)
                 $PathLengthErrorMessage = "The GUID appended to the ScubaResults file name was truncated by $CharactersToTrim `
-                because ScubaGear was executed in a location where the Windows Absolute file path was longer than $($MAX_WINDOWS_PATH_LEN)
+                because ScubaGear was executed in a location where the Windows absolute file path length was longer than $($MAX_WINDOWS_PATH_LEN)
                 This should not have affected the content of the final output but please proceed with caution when moving the file to other directories"
                 Write-Warning $PathLengthErrorMessage
             }
