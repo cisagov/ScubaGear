@@ -1116,7 +1116,7 @@ function Merge-JsonOutput {
                 -ErrorAction 'Stop'
             $ReportJson | Set-Content -Path $JsonFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
-            # Delete the now redundant files
+            # Delete the now redundant ]files
             foreach ($File in $DeletionList) {
                 Remove-Item $File
             }
