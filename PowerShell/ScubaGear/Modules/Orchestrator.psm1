@@ -1103,6 +1103,7 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
             elseif ($AbsoluteResultsFilePathLen -gt $MAX_WINDOWS_PATH_LEN) {
+                # TODO decide if we need this
                 $ReportUuid = $ReportUuid.Substring(0, $ReportUuid.Length - $CharactersToTrim)
                 $PathLengthErrorMessage = "The GUID appended to the ScubaResults file name was truncated by $CharactersToTrim `
                 because ScubaGear was executed in a location where the Windows absolute file path length was longer than $($MAX_WINDOWS_PATH_LEN)
