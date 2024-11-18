@@ -112,22 +112,40 @@ function Export-AADProvider {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
 
-        # Get-PrivilegedUser provides a list of privileged users and their role assignments.
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we also include calls to PIM APIs
-            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+            $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
         }
-        else{
-            $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+        else {
+            $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
         }
-        # The Converto-Json call below doesn't need to have the input wrapped in an
-        # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
-        # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries like it does arrays
-        $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
+
+        # # Split the objects into users and service principals
+        $PrivilegedUsers = @{}
+        $PrivilegedServicePrincipals = @{}
+
+        if ($PrivilegedObjects.Count -gt 0 -and $null -ne $PrivilegedObjects[0].Keys) {
+
+            #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable
+            foreach ($key in $PrivilegedObjects[0].Keys) {
+
+                # Check if it has ServicePrincipalId property instead of AppId
+                if ($null -ne $PrivilegedObjects[0][$key].ServicePrincipalId) {
+                    $PrivilegedServicePrincipals[$key] = $PrivilegedObjects[0][$key]
+                }
+                else {
+                    $PrivilegedUsers[$key] = $PrivilegedObjects[0][$key]
+                }
+            }
+        }
+        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
+        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+
         # While ConvertTo-Json won't mess up a dict as described in the above comment,
         # on error, $TryCommand returns an empty list, not a dictionary.
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-
+        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+    
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we also include calls to PIM APIs
@@ -208,6 +226,7 @@ function Export-AADProvider {
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
     "privileged_users": $PrivilegedUsers,
+    "privileged_service_principals": $PrivilegedServicePrincipals,
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
@@ -292,12 +311,15 @@ function Get-PrivilegedUser {
         foreach ($User in $UsersAssignedRole) {
             $Objecttype = $User.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
 
-            if ($Objecttype -eq "user") {
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
-            }
-            elseif ($Objecttype -eq "group") {
-                # In this context $User.Id is a group identifier
-                $GroupId = $User.Id
+                if ($Objecttype -eq "user") {
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
+                }
+                elseif ($Objecttype -eq "servicePrincipal") {
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "serviceprincipal"
+                }
+                elseif ($Objecttype -eq "group") {
+                    # In this context $User.Id is a group identifier
+                    $GroupId = $User.Id
 
                 # Process all of the group members that are transitively assigned to the current role as Active via group membership
                 LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
@@ -408,6 +430,23 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         }
     }
 
+    elseif ($Objecttype -eq "serviceprincipal") {
+
+        # In this section we need to add the service principal information to the "service principal" hashtable
+        if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
+            $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ObjectId -ErrorAction Stop
+            $PrivilegedUsers[$ObjectId] = @{
+                "DisplayName" = $AADServicePrincipal.DisplayName
+                "ServicePrincipalId" = $AADServicePrincipal.Id
+                "AppId" = $AADServicePrincipal.AppId
+                "roles" = @()
+            }
+        }
+        if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
+            $PrivilegedUsers[$ObjectId].roles += $RoleName
+        }
+    }
+
     elseif ($Objecttype -eq "group") {
         # In this context $ObjectId is a group identifier so we need to iterate the group members
         $GroupId = $ObjectId
@@ -424,6 +463,22 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
                     $PrivilegedUsers[$GroupMember.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                 }
                 # If the current role has not already been added to the user's roles array then add the role
+                if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $RoleName) {
+                    $PrivilegedUsers[$GroupMember.Id].roles += $RoleName
+                }
+            }
+            elseif ($Membertype -eq "serviceprincipal") {
+
+                # In this section we need to add the service principal information to the "service principal" hashtable
+                if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
+                    $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $GroupMember.Id -ErrorAction Stop
+                    $PrivilegedUsers[$GroupMember.Id] = @{
+                        "DisplayName" = $AADServicePrincipal.DisplayName
+                        "ServicePrincipalId" = $AADServicePrincipal.Id
+                        "AppId" = $AADServicePrincipal.AppId
+                        "roles" = @()
+                    }
+                }
                 if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $RoleName) {
                     $PrivilegedUsers[$GroupMember.Id].roles += $RoleName
                 }
@@ -454,7 +509,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
     }
 
 }
-
 function AddRuleSource{
     <#
         .NOTES
