@@ -920,7 +920,13 @@ function ConvertTo-ResultsCsv {
         try {
             # Find the ScubaResults file with UUID in the file name.
             $ReportUuid = $Guid.Substring(0, $Guid.Length - $NumberOfUUIDCharactersToTruncate)
-            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid).json"
+            if ($ReportUuid.Length -gt 0) {
+                $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid).json"
+            }
+            else {
+                $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName).json"
+            }
+
             if (Test-Path $ScubaResultsFileName -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
                 $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName).FullName | ConvertFrom-Json

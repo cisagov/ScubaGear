@@ -33,6 +33,7 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-ChildItem {
                 [pscustomobject]@{"FullName"="ScubaResults.json"; "CreationTime"=[DateTime]"2024-01-01"}
             }
+            Mock -CommandName Remove-Item {}
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
