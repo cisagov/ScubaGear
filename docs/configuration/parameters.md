@@ -111,6 +111,24 @@ Invoke-SCuBA -ProductNames teams `
   -DisconnectOnExit
 ```
 
+## KeepIndividualJSON
+
+**KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |
+
+```powershell
+# Outputs legacy ScubaGear individual JSON output
+Invoke-SCuBA -ProductNames teams `
+  -KeepIndividualJSON
+```
+
+
 ## LogIn
 
 **LogIn** enforces or bypasses authentication. If `$true`, ScubaGear will prompt the user to provide credentials to establish a connection to the specified M365 products in the `ProductNames` variable. If `$false`, it will use the previously issued authentication token, if it has not expired.
@@ -160,21 +178,32 @@ The list of acceptable values are:
 | Government cloud tenants (high) | gcchigh    |
 | Department of Defense tenants   | dod        |
 
-## KeepIndividualJSON
 
-**KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
+## NumberOfUUIDCharactersToTruncate
 
-| Parameter   | Value  |
-|-------------|--------|
-| Optional    | Yes    |
-| Datatype    | Switch |
-| Default     | n/a    |
-| Config File | No     |
+**NumberOfUUIDCharactersToTruncate** NumberOfUUIDCharactersToTruncate controls how many characters will be trimmed from the report UUID when appended to the end of OutJsonFileName.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | Integer            |
+| Default     | 18                 |
+| Config File | Yes                |
+
+
+The list of acceptable values are:
+
+| Description                           | Value      |
+|---------------------------------------|------------|
+| Do no truncation                      | 0          |
+| Remove one octet of the appended UUID | 13         |
+| Remove two octet of the appended UUID | 18         |
+| Remove the appended UUID completely   | 36         |
 
 ```powershell
-# Outputs legacy ScubaGear individual JSON output
-Invoke-SCuBA -ProductNames teams `
-  -KeepIndividualJSON
+# Truncate the UUID at the end of OutJsonFileName by 18 characters
+Invoke-SCuBA -ProductNames exo `
+  -NumberOfUUIDCharactersToTruncate 18
 ```
 
 ## OPAPath
@@ -412,23 +441,6 @@ Invoke-SCuBA -ProductNames teams, exo
 # Do not open the browser
 Invoke-SCuBA -ProductNames teams `
   -Quiet
-```
-
-## NumberOfUUIDCharactersToTruncate
-
-**NumberOfUUIDCharactersToTruncate** The number of characters the Report UUID appended to the end of OutJsonFileName will be truncated by.
-
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | Integer            |
-| Default     | 18                 |
-| Config File | Yes                |
-
-```powershell
-# Change the output action plan file
-Invoke-SCuBA -ProductNames exo `
-  -NumberOfUUIDCharactersToTruncate 18 `
 ```
 
 ## Version

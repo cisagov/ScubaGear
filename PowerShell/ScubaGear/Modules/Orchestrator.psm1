@@ -91,7 +91,8 @@ function Invoke-SCuBA {
     .Parameter Quiet
     Do not launch external browser for report.
     .Parameter NumberOfUUIDCharactersToTruncate
-    The number of characters the Report UUID appended to the end of OutJsonFileName will be truncated by.
+    NumberOfUUIDCharactersToTruncate controls how many characters will be trimmed from the report UUID when appended to the end of OutJsonFileName.
+    Valid values are 0, 13, 18, 36
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -1128,16 +1129,12 @@ function Merge-JsonOutput {
 
             $AbsoluteResultsFilePathLen = 0
             if ([System.IO.Path]::IsPathRooted($CurrentOutputPath)) {
-                Write-Host $CurrentOutputPath
-                Write-Host [System.IO.Path]::GetFullPath($CurrentOutputPath)
                 $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($CurrentOutputPath)).Length
             }
             else {
                 $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
                 $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath $CurrentOutputPath
                 $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
-                Write-Host $JoinedFilePath
-                Write-Host [System.IO.Path]::GetFullPath($JoinedFilePath)
             }
 
 
