@@ -920,10 +920,13 @@ function ConvertTo-ResultsCsv {
         try {
             # Find the ScubaResults file with UUID in the file name.
             $ReportUuid = $Guid.Substring(0, $Guid.Length - $NumberOfUUIDCharactersToTruncate)
+
+            # If the UUID still exists after truncation
             if ($ReportUuid.Length -gt 0) {
                 $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid).json"
             }
             else {
+                # Otherwise omit trying to find it from the resulting file name
                 $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName).json"
             }
 
@@ -1132,7 +1135,8 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
 
-            if ($ReportUuid.Length -ne 0 ) {
+            # If the UUID still exists after truncation
+            if ($ReportUuid.Length -gt 0 ) {
                 $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName)_$($ReportUuid).json" `
                 -ErrorAction 'Stop'
             }
