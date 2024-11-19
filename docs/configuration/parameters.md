@@ -425,7 +425,6 @@ Invoke-SCuBA -ProductNames teams `
 | Default     | 18                 |
 | Config File | Yes                |
 
-
 ```powershell
 # Change the output action plan file
 Invoke-SCuBA -ProductNames exo `
