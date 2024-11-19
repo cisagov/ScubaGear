@@ -299,6 +299,7 @@ function Invoke-SCuBA {
                 'OutJsonFileName' = $OutJsonFileName
                 'OutCsvFileName' = $OutCsvFileName
                 'OutActionPlanFileName' = $OutActionPlanFileName
+                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -454,7 +455,7 @@ function Invoke-SCuBA {
                     'TenantDetails' = $TenantDetails;
                     'ModuleVersion' = $ModuleVersion;
                     'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
-                    'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
+                    'NumberOfUUIDCharactersToTruncate' = $ScubaConfig.NumberOfUUIDCharactersToTruncate;
                 }
                 Merge-JsonOutput @JsonParams
             }
@@ -462,7 +463,7 @@ function Invoke-SCuBA {
             $CsvParams = @{
                 'ProductNames'                     = $ScubaConfig.ProductNames;
                 'Guid'                             = $Guid;
-                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
+                'NumberOfUUIDCharactersToTruncate' = $ScubaConfig.NumberOfUUIDCharactersToTruncate;
                 'OutFolderPath'                    = $OutFolderPath;
                 'OutJsonFileName'                  = $ScubaConfig.OutJsonFileName;
                 'OutCsvFileName'                   = $ScubaConfig.OutCsvFileName;
@@ -1123,9 +1124,22 @@ function Merge-JsonOutput {
 
             # Check if the absolute final results output path is greater than the allowable windows file Path length
             $MAX_WINDOWS_PATH_LEN = 256
-            $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
-            $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath (Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)")
-            $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
+            $CurrentOutputPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)"
+
+            $AbsoluteResultsFilePathLen = 0
+            if ([System.IO.Path]::IsPathRooted($CurrentOutputPath)) {
+                Write-Host $CurrentOutputPath
+                Write-Host [System.IO.Path]::GetFullPath($CurrentOutputPath)
+                $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($CurrentOutputPath)).Length
+            }
+            else {
+                $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
+                $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath $CurrentOutputPath
+                $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
+                Write-Host $JoinedFilePath
+                Write-Host [System.IO.Path]::GetFullPath($JoinedFilePath)
+            }
+
 
             # Throw an error if the path length is too long.
             if ($AbsoluteResultsFilePathLen -gt ($MAX_WINDOWS_PATH_LEN)) {

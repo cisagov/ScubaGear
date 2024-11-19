@@ -157,6 +157,10 @@ class ScubaConfig {
             $this.Configuration.OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName')
         }
 
+        if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
+            $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
+        }
+
         return
     }
 
