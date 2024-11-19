@@ -90,11 +90,13 @@ function Invoke-SCuBA {
     Set switch to enable report dark mode by default.
     .Parameter Quiet
     Do not launch external browser for report.
+    .Parameter NumberOfUUIDCharactersToTruncate
+    The number of characters the Report UUID appended to the end of OutJsonFileName will be truncated by.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
     Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
-    security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
+    security baselines. The output will stored in the current directory in a folder called M365BaselineConformance_*.
     .Example
     Invoke-SCuBA -Version
     This example returns the version of SCuBAGear.
@@ -254,10 +256,17 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
-        $Quiet
+        $Quiet,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet(0, 13, 18, 36)]
+        [int]
+        $NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
     )
     process {
-        # Retrive ScubaGear Module versions
+        # Retrieve ScubaGear Module versions
         $ParentPath = Split-Path $PSScriptRoot -Parent -ErrorAction 'Stop'
         $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $ParentPath -ChildPath 'ScubaGear.psd1' -Resolve) -ErrorAction 'Stop'
         $ModuleVersion = $ScubaManifest.ModuleVersion
@@ -445,17 +454,19 @@ function Invoke-SCuBA {
                     'TenantDetails' = $TenantDetails;
                     'ModuleVersion' = $ModuleVersion;
                     'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
+                    'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
                 }
                 Merge-JsonOutput @JsonParams
             }
             # Craft the csv version of just the results
             $CsvParams = @{
-                'ProductNames'          = $ScubaConfig.ProductNames;
-                'Guid'                  = $Guid;
-                'OutFolderPath'         = $OutFolderPath;
-                'OutJsonFileName'       = $ScubaConfig.OutJsonFileName;
-                'OutCsvFileName'        = $ScubaConfig.OutCsvFileName;
-                'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
+                'ProductNames'                     = $ScubaConfig.ProductNames;
+                'Guid'                             = $Guid;
+                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
+                'OutFolderPath'                    = $OutFolderPath;
+                'OutJsonFileName'                  = $ScubaConfig.OutJsonFileName;
+                'OutCsvFileName'                   = $ScubaConfig.OutCsvFileName;
+                'OutActionPlanFileName'            = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
         }
@@ -882,6 +893,11 @@ function ConvertTo-ResultsCsv {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
+        [int]
+        $NumberOfUUIDCharactersToTruncate,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $OutFolderPath,
 
@@ -903,7 +919,8 @@ function ConvertTo-ResultsCsv {
     process {
         try {
             # Find the ScubaResults file with UUID in the file name.
-            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($Guid).json"
+            $ReportUuid = $Guid.Substring(0, $Guid.Length - $NumberOfUUIDCharactersToTruncate)
+            $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid).json"
             if (Test-Path $ScubaResultsFileName -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
                 $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName).FullName | ConvertFrom-Json
@@ -1007,7 +1024,12 @@ function Merge-JsonOutput {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutJsonFileName
+        $OutJsonFileName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [int]
+        $NumberOfUUIDCharactersToTruncate
     )
     process {
         try {
@@ -1085,8 +1107,12 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
+            # Truncate the UUID at the end of the ScubaResults JSON file by the parameter value.
+            # This is is to possibly prevent Windows maximum path length errors that may occur when moving files
+            # with a large number of characters
+            $ReportUuid = $ReportUuid.Substring(0, $ReportUuid.Length - $NumberOfUUIDCharactersToTruncate)
+
             # Check if the absolute final results output path is greater than the allowable windows file Path length
-            # Trim the GUID to save some character length space if it is.
             $MAX_WINDOWS_PATH_LEN = 256
             $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
             $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath (Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)")
@@ -1100,9 +1126,16 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
 
-            # Save the file
-            $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName)_$($ReportUuid).json" `
+            if ($ReportUuid.Length -ne 0 ) {
+                $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName)_$($ReportUuid).json" `
                 -ErrorAction 'Stop'
+            }
+            else {
+                # If the user chose to truncate the entire UUID, omit it from the filename
+                $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" `
+                -ErrorAction 'Stop'
+            }
+
             $ReportJson | Set-Content -Path $JsonFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
@@ -1638,6 +1671,8 @@ function Invoke-SCuBACached {
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
+    .Parameter NumberOfUUIDCharactersToTruncate
+    The number of characters the Report UUID appended to the end of OutJsonFileName will be truncated by.
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
@@ -1759,7 +1794,14 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
-        $DarkMode
+        $DarkMode,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet(0, 13, 18, 36)]
+        [int]
+        $NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
         )
         process {
             $ParentPath = Split-Path $PSScriptRoot -Parent
@@ -1804,6 +1846,16 @@ function Invoke-SCuBACached {
             $TenantDetails = @{"DisplayName"="Rego Testing";}
             $TenantDetails = $TenantDetails | ConvertTo-Json -Depth 3
             if ($ExportProvider) {
+                # Check if there is a previous ScubaResults file
+                # delete if found
+                $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
+                if ($PreviousResultsFiles) {
+                    $PreviousResultsFiles | ForEach-Object {
+                        Remove-Item $_.FullName -Force
+                    }
+                }
+
+                # authenticate
                 $ProdAuthFailed = Invoke-Connection @ConnectionParams
                 if ($ProdAuthFailed.Count -gt 0) {
                     $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
@@ -1815,6 +1867,16 @@ function Invoke-SCuBACached {
                     }
                 }
                 $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
+
+                # A new GUID needs to be generated if the provider is run
+                try {
+                    $Guid = New-Guid -ErrorAction 'Stop'
+                }
+                catch {
+                    $Guid = "00000000-0000-0000-0000-000000000000"
+                    $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
+                    Write-Warning $Warning
+                }
                 $ProviderParams = @{
                     'ProductNames' = $ProductNames;
                     'M365Environment' = $M365Environment;
@@ -1861,11 +1923,16 @@ function Invoke-SCuBACached {
                     Write-Warning $Warning
                 }
                 $SettingsExport | Add-Member -Name 'report_uuid' -Value $Guid -Type NoteProperty
-                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
-                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
-                -Location $OutPath -FileName "$OutProviderFileName.json"
-                Write-Debug $ActualSavedLocation
             }
+            else {
+                # Otherwise grab the UUID from the JSON itself
+                $Guid = $SettingsExport.report_uuid
+            }
+
+            $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
+            $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
+            -Location $OutPath -FileName "$OutProviderFileName.json"
+            Write-Debug $ActualSavedLocation
 
             $TenantDetails = $SettingsExport.tenant_details
             $RegoParams = @{
@@ -1899,6 +1966,7 @@ function Invoke-SCuBACached {
                     'TenantDetails' = $TenantDetails;
                     'ModuleVersion' = $ModuleVersion;
                     'OutJsonFileName' = $OutJsonFileName;
+                    'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
                 }
                 Merge-JsonOutput @JsonParams
             }
@@ -1906,13 +1974,13 @@ function Invoke-SCuBACached {
             $CsvParams = @{
                 'ProductNames' = $ProductNames;
                 'Guid' = $Guid;
+                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
                 'OutFolderPath' = $OutFolderPath;
                 'OutJsonFileName' = $OutJsonFileName;
                 'OutCsvFileName' = $OutCsvFileName;
                 'OutActionPlanFileName' = $OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
-
         }
     }
 

@@ -12,6 +12,7 @@ InModuleScope Orchestrator {
                     "ReportSummary"  = @{"Date" = "" }
                     "Results"        = @();
                     "timestamp_zulu" = "";
+                    "report_uuid" = "00000000-0000-0000-0000-000000000000"
                 }
             }
             Mock -CommandName Add-Member {}
@@ -21,11 +22,12 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'JsonParameters')]
                 $JsonParameters = @{
-                    TenantDetails       = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
-                    ModuleVersion       = '1.0';
-                    OutFolderPath       = "./"
-                    OutProviderFileName = "ProviderSettingsExport"
-                    OutJsonFileName     = "ScubaResults";
+                    TenantDetails                    = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
+                    ModuleVersion                    = '1.0';
+                    OutFolderPath                    = "./"
+                    OutProviderFileName              = "ProviderSettingsExport"
+                    OutJsonFileName                  = "ScubaResults";
+                    NumberOfUUIDCharactersToTruncate = 18;
                 }
             }
             It 'Merge single result' {

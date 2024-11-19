@@ -31,6 +31,7 @@ class ScubaConfig {
         DefaultOutJsonFileName = "ScubaResults"
         DefaultOutCsvFileName = "ScubaResults"
         DefaultOutActionPlanFileName = "ActionPlan"
+        DefaultNumberOfUUIDCharactersToTruncate = 18
         DefaultPrivilegedRoles = @(
             "Global Administrator",
             "Privileged Role Administrator",

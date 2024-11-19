@@ -65,6 +65,7 @@ InModuleScope Orchestrator {
                 OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
                 Guid                  = "00000000-0000-0000-0000-000000000000";
+                NumberOfUUIDCharactersToTruncate = "18";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName ConvertFrom-Json -Exactly -Times 1
@@ -84,6 +85,7 @@ InModuleScope Orchestrator {
                 OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
                 Guid                  = "00000000-0000-0000-0000-000000000000";
+                NumberOfUUIDCharactersToTruncate = "18";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
@@ -112,6 +114,7 @@ InModuleScope Orchestrator {
                 OutCsvFileName = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
                 Guid = "00000000-0000-0000-0000-000000000000";
+                NumberOfUUIDCharactersToTruncate = "18";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Write-Warning -Exactly -Times 0
