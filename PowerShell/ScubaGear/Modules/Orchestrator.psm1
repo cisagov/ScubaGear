@@ -1129,9 +1129,11 @@ function Merge-JsonOutput {
 
             # Throw an error if the path length is too long.
             if ($AbsoluteResultsFilePathLen -gt ($MAX_WINDOWS_PATH_LEN)) {
-                $PathLengthErrorMessage = "ScubaGear was executed in a location where the maximum file path length is greater than the allowable Windows File System limit `
+                $PathLengthErrorMessage = "ScubaGear was executed in a location where the maximum file path length is greater than the allowable Windows file system limit `
                 Please execute ScubaGear in a directory where for Window file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
-                Your current file path length is $($AbsoluteResultsFilePathLen)"
+                Your current file path length is $($AbsoluteResultsFilePathLen).
+                Another option is to change the -NumberOfUUIDCharactersToTruncate, -OutJSONFileName, or -OutFolderName parameters to achieve an acceptable file path length `
+                See the Invoke-SCuBA parameters documentation for more details."
                 throw $PathLengthErrorMessage
             }
 
