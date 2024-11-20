@@ -3,7 +3,7 @@ ScubaGear repository consists of an automation suite to help test the functional
 
 This README outlines the ScubaGear software test automation and its usage. The document also contains instructions for adding new functional tests to existing automation suite.
 
-## Table of Contents <!-- omit in toc --> 
+## Table of Contents <!-- omit in toc -->
 
 - [Functional Testing Prerequisites](#functional-testing-prerequisites)
   - [Windows System with Chrome](#windows-system-with-chrome)
@@ -22,10 +22,10 @@ This README outlines the ScubaGear software test automation and its usage. The d
 - [Nightly Functional Tests](#nightly-functional-tests)
 - [Troubleshooting](#troubleshooting)
   - [Issues with installing Pester](#issues-with-installing-pester)
-  - [Iusses with Selenium](#iusses-with-selenium)
+  - [Issues with Selenium](#issues-with-selenium)
   - [Chrome browser version issue](#chrome-browser-version-issue)
   - [Service principal authentication issue](#service-principal-authentication-issue)
-  - [Additional resources for admins](#additional-resources-for-admins)
+  - [Setup Documentation for System Admins](#setup-documentation-for-system-admins)
 
 ## Functional Testing Prerequisites ##
 
@@ -115,8 +115,7 @@ The optional variant can have values like: `g5`, `e5`, `gcc`, `pnp`, `spo`, `e#`
 
 After setting up the prerequisites, define the Pester test container parameters in a test execution utility script called "RunFunctionalTest.ps1" as shown below: 
 
-
-```
+``` PowerShell
 $TestContainers = @()
 
 $TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc" }
@@ -371,7 +370,7 @@ To Resolve above issue, try the following:
   ```
 - Best practice is to install Pester and other modules as a non-admin user with either 'Current User' or 'AllUsers' scope. When modules are installed with 'AllUsers' scope, they are installed to the ``` $env:ProgramFiles\PowerShell\Modules``` location. The 'CurrentUser' scope installs modules to ``` $HOME\Documents\PowerShell\Modules``` location. 
 
-### Iusses with Selenium
+### Issues with Selenium
 We have seen issues with Selenium where test orchestrator would not run and produce random errors. If you have seen issues where error messages does not match with any other items in this troubleshooting section, try uninstalling and re-installing Selenium using following commands:
 ```
 uninstall-module Selenium
@@ -416,10 +415,9 @@ If you are trying to run the test orchestrator as a service principal and your c
 
 ![service-principal-error](/images/service-principal.png)
 
-### Additional resources for admins
-The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.) for functional testing of ScubaGear. 
+### Setup Documentation for System Admins ###
+The following resources are for M365 tenant admins to provide additional information on setting up the infrastructure (service principals, user provisioning, etc.) for functional testing of ScubaGear.
 
-- [How to setup the permissions required to execute the automated functional test orchestrator](https://github.com/cisagov/ScubaGear/issues/589)
+- How to [setup an AAD application](./docs/aad-service-principal.md) in the tenant using a service principal to run the automated functional test orchestrator
 
-- [How to setup a tenant with the necessary AAD conditional access policies to run the Automated Functional Test Orchestrator](https://github.com/cisagov/ScubaGear/issues/591) 
-
+- How to [setup a tenant](./docs/aad-tenant.md) with the necessary AAD conditional access policies to run the automated functional test orchestrator
