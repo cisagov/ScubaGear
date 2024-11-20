@@ -193,12 +193,12 @@ The list of acceptable values are:
 
 The list of acceptable values are:
 
-| Description                           | Value      |
-|---------------------------------------|------------|
-| Do no truncation                      | 0          |
-| Remove one octet of the appended UUID | 13         |
-| Remove two octet of the appended UUID | 18         |
-| Remove the appended UUID completely   | 36         |
+| Description                            | Value      |
+|----------------------------------------|------------|
+| Do no truncation of the appended UUID  | 0          |
+| Remove one octet of the appended UUID  | 13         |
+| Remove two octets of the appended UUID | 18         |
+| Remove the appended UUID completely    | 36         |
 
 ```powershell
 # Truncate the UUID at the end of OutJsonFileName by 18 characters
