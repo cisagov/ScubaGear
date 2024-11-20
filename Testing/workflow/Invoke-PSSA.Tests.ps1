@@ -2,7 +2,6 @@
 
 # BeforeDiscovery {
 #   Mock Write-Host {}
-  
 # }
 
 Describe "PSSA Install" {
