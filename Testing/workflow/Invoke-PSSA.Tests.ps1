@@ -1,4 +1,4 @@
-# The purpose of this tset is to verify that PSSA is working.
+# The purpose of this test is to verify that PSSA is working.
 
 # BeforeDiscovery {
 #   # Source the function
