@@ -27,13 +27,16 @@ InModuleScope Orchestrator {
 
             Mock -CommandName Write-Debug {}
             Mock -CommandName New-Item {}
-            Mock -CommandName Get-Content {}
+            Mock -CommandName Get-Content { "" }
             Mock -CommandName Get-Member { $true }
             Mock -CommandName New-Guid { "00000000-0000-0000-0000-000000000000" }
             Mock -CommandName Get-ChildItem {
                 [pscustomobject]@{"FullName"="ScubaResults.json"; "CreationTime"=[DateTime]"2024-01-01"}
             }
             Mock -CommandName Remove-Item {}
+            Mock -CommandName ConvertFrom-Json {
+                [PSCustomObject]@{"report_uuid"="00000000-0000-0000-0000-000000000000"}
+            }
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
@@ -130,6 +133,7 @@ InModuleScope Orchestrator {
                 Should -Invoke -CommandName New-Guid -Exactly -Times 0
             }
             It 'Given output without a UUID should generate a new one' {
+                Mock -CommandName ConvertFrom-Json { [PSCustomObject]@{} }
                 Mock -CommandName Get-Member { $false }
                 # Now Get-Member will return False so as far as the provider
                 # can tell, the existing output does not have a UUID
