@@ -14,6 +14,7 @@ Describe "PSSA Install" {
     $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $module | Should -Not -BeNullOrEmpty
   }
+}
 
 Describe "PSSA Output" {
   It "PSSA should write output" {
