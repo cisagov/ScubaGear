@@ -17,7 +17,7 @@ function Invoke-PSSA {
 		$RepoPath
 	)
 
-	Write-Host "Testing PowerShell files with PSScriptAnalyzer..."
+	Write-Output "Testing PowerShell files with PSScriptAnalyzer..."
 	Write-Output " "
 
 	# Install PSScriptAnalyzer
