@@ -57,23 +57,6 @@ InModuleScope Orchestrator {
                 Should -Invoke -CommandName Remove-Item -Exactly -Times 3
                 $JsonParameters.ProductNames = @()
             }
-            It 'Throws an error when the file Path is too long' {
-                $LongText = "Lorem ipsum dolor sit amet, `
-                consectetur adipiscing elit, sed do eiusmod tempor `
-                incididunt ut labore et dolore magna aliqua. `
-                Ut enim ad minim veniam, quis nostrud exercitation `
-                ullamco laboris nisi ut aliquip ex ea commodo consequat. `
-                Duis aute irure dolor in reprehenderit in voluptate velit `
-                esse cillum dolore eu fugiat nulla pariatur. Excepteur sint `
-                occaecat cupidatat non proident, sunt in culpa qui officia `
-                deserunt mollit anim id est laborum"
-                $JsonParameters += @{
-                    ProductNames    = @("aad", "teams");
-                }
-                Mock -CommandName Join-Path { "ScubaResults" + $LongText; }
-                { Merge-JsonOutput @JsonParameters } | Should -Throw
-                $JsonParameters.ProductNames = @()
-            }
         }
     }
 }

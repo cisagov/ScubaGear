@@ -61,7 +61,7 @@ InModuleScope Orchestrator {
             $CsvParameters = @{
                 ProductNames          = @("exo", "aad");
                 OutFolderPath         = ".";
-                OutJsonFileName       = "ScubaResults";
+                FullScubaResultsName  = "ScubaResults";
                 OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
                 Guid                  = "00000000-0000-0000-0000-000000000000";
@@ -81,10 +81,9 @@ InModuleScope Orchestrator {
             $CsvParameters = @{
                 ProductNames          = @("exo", "aad");
                 OutFolderPath         = ".";
-                OutJsonFileName       = "ScubaResults";
+                FullScubaResultsName  = "ScubaResults";
                 OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
-                Guid                  = "00000000-0000-0000-0000-000000000000";
                 NumberOfUUIDCharactersToTruncate = "18";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw

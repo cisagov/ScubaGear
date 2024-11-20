@@ -388,14 +388,7 @@ function Invoke-SCuBA {
 
         # Generate the GUID for the JSON
         # TODO Stick the GUID within the ScubaConfig object to clean up parameter bloat
-        try {
-            $Guid = New-Guid -ErrorAction 'Stop'
-        }
-        catch {
-            $Guid = "00000000-0000-0000-0000-000000000000"
-            $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
-            Write-Warning $Warning
-        }
+        $Guid = New-Guid -ErrorAction 'Stop'
 
         try {
             # Provider Execution
@@ -1156,10 +1149,20 @@ function Merge-JsonOutput {
             }
         }
         catch {
-            $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
-            Ending ScubaGear execution. See the exception message for more details: $($_) `
-            $($_.ScriptStackTrace)"
-            throw $MergeJsonErrorMessage
+            if ($_.FullyQualifiedErrorId -eq "GetContentWriterPathTooLongError,Microsoft.PowerShell.Commands.SetContentCommand") {
+                $MAX_WINDOWS_PATH_LEN = 256
+                $PathLengthErrorMessage = "ScubaGear was likely executed in a location where the maximum file path length is greater than the allowable Windows file system limit `
+                Please execute ScubaGear in a directory where for Windows file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
+                Another option is to change the -NumberOfUUIDCharactersToTruncate, -OutJSONFileName, or -OutFolderName parameters to achieve an acceptable file path length `
+                See the Invoke-SCuBA parameters documentation for more details. $($_)"
+                throw $PathLengthErrorMessage
+            }
+            else {
+                $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
+                Ending ScubaGear execution. See the exception message for more details: $($_) `
+                $($_.ScriptStackTrace)"
+                throw $MergeJsonErrorMessage
+            }
         }
     }
 }
@@ -1855,9 +1858,11 @@ function Invoke-SCuBACached {
                 'BoundParameters' = $PSBoundParameters;
             }
 
-            # In 
+            # Create a failsafe tenant metadata variable in case the
+            # provider cannot retrieve the data.
             $TenantDetails = @{"DisplayName"="Rego Testing";}
             $TenantDetails = $TenantDetails | ConvertTo-Json -Depth 3
+
             if ($ExportProvider) {
                 # Check if there is a previous ScubaResults file
                 # delete if found
@@ -1882,14 +1887,8 @@ function Invoke-SCuBACached {
                 $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
 
                 # A new GUID needs to be generated if the provider is run
-                try {
-                    $Guid = New-Guid -ErrorAction 'Stop'
-                }
-                catch {
-                    $Guid = "00000000-0000-0000-0000-000000000000"
-                    $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
-                    Write-Warning $Warning
-                }
+                $Guid = New-Guid -ErrorAction 'Stop'
+
                 $ProviderParams = @{
                     'ProductNames' = $ProductNames;
                     'M365Environment' = $M365Environment;
@@ -1927,14 +1926,7 @@ function Invoke-SCuBACached {
 
             # Generate a new UUID if the original data doesn't have one
             if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
-                try {
-                    $Guid = New-Guid -ErrorAction 'Stop'
-                }
-                catch {
-                    $Guid = "00000000-0000-0000-0000-000000000000"
-                    $Warning = "Error generating new UUID. See the exception message for more details: $($_)"
-                    Write-Warning $Warning
-                }
+                $Guid = New-Guid -ErrorAction 'Stop'
                 $SettingsExport | Add-Member -Name 'report_uuid' -Value $Guid -Type NoteProperty
             }
             else {
