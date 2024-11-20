@@ -219,6 +219,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
+        # [ValidatePattern('^[a-zA-Z0-9]+$')]
         [string]
         $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
@@ -447,28 +448,34 @@ function Invoke-SCuBA {
             }
             Invoke-ReportCreation @ReportParams
 
+            $FullNameParams = @{
+                'OutJsonFileName'                  = $ScubaConfig.OutJsonFileName;
+                'Guid'                             = $Guid;
+                'NumberOfUUIDCharactersToTruncate' = $ScubaConfig.NumberOfUUIDCharactersToTruncate;
+            }
+            $FullScubaResultsName = Get-FullOutJsonName @FullNameParams
+
             if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
-                    'ProductNames' = $ScubaConfig.ProductNames;
-                    'OutFolderPath' = $OutFolderPath;
-                    'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
-                    'TenantDetails' = $TenantDetails;
-                    'ModuleVersion' = $ModuleVersion;
-                    'OutJsonFileName' = $ScubaConfig.OutJsonFileName;
-                    'NumberOfUUIDCharactersToTruncate' = $ScubaConfig.NumberOfUUIDCharactersToTruncate;
+                    'ProductNames'         = $ScubaConfig.ProductNames;
+                    'OutFolderPath'        = $OutFolderPath;
+                    'OutProviderFileName'  = $ScubaConfig.OutProviderFileName;
+                    'TenantDetails'        = $TenantDetails;
+                    'ModuleVersion'        = $ModuleVersion;
+                    'FullScubaResultsName' = $FullScubaResultsName;
+                    'Guid'                 = $Guid;
                 }
                 Merge-JsonOutput @JsonParams
             }
+
             # Craft the csv version of just the results
             $CsvParams = @{
-                'ProductNames'                     = $ScubaConfig.ProductNames;
-                'Guid'                             = $Guid;
-                'NumberOfUUIDCharactersToTruncate' = $ScubaConfig.NumberOfUUIDCharactersToTruncate;
-                'OutFolderPath'                    = $OutFolderPath;
-                'OutJsonFileName'                  = $ScubaConfig.OutJsonFileName;
-                'OutCsvFileName'                   = $ScubaConfig.OutCsvFileName;
-                'OutActionPlanFileName'            = $ScubaConfig.OutActionPlanFileName;
+                'ProductNames'          = $ScubaConfig.ProductNames;
+                'OutFolderPath'         = $OutFolderPath;
+                'FullScubaResultsName'  = $FullScubaResultsName;
+                'OutCsvFileName'        = $ScubaConfig.OutCsvFileName;
+                'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
         }
@@ -873,6 +880,49 @@ function Format-PlainText {
     }
 }
 
+function Get-FullOutJsonName {
+    <#
+    .Description
+    This function determines the full file name of the SCuBA results file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutJsonFileName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Guid,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [int]
+        $NumberOfUUIDCharactersToTruncate
+    )
+    process {
+        # Truncate the UUID at the end of the ScubaResults JSON file by the parameter value.
+        # This is is to possibly prevent Windows maximum path length errors that may occur when moving files
+        # with a large number of characters
+        $TruncatedGuid = $Guid.Substring(0, $Guid.Length - $NumberOfUUIDCharactersToTruncate)
+
+        # If the UUID still exists after truncation
+        if ($TruncatedGuid.Length -gt 0) {
+            $ScubaResultsFileName = "$($OutJsonFileName)_$($TruncatedGuid).json"
+        }
+        else {
+            # Otherwise omit adding it to the resulting file name
+            $ScubaResultsFileName = "$($OutJsonFileName).json"
+        }
+
+        $ScubaResultsFileName
+    }
+}
+
 function ConvertTo-ResultsCsv {
     <#
     .Description
@@ -888,16 +938,6 @@ function ConvertTo-ResultsCsv {
         [string[]]
         $ProductNames,
 
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $Guid,
-
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [int]
-        $NumberOfUUIDCharactersToTruncate,
-
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -906,7 +946,7 @@ function ConvertTo-ResultsCsv {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutJsonFileName,
+        $FullScubaResultsName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -920,21 +960,11 @@ function ConvertTo-ResultsCsv {
     )
     process {
         try {
-            # Find the ScubaResults file with UUID in the file name.
-            $ReportUuid = $Guid.Substring(0, $Guid.Length - $NumberOfUUIDCharactersToTruncate)
+            $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName
 
-            # If the UUID still exists after truncation
-            if ($ReportUuid.Length -gt 0) {
-                $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid).json"
-            }
-            else {
-                # Otherwise omit trying to find it from the resulting file name
-                $ScubaResultsFileName = Join-Path $OutFolderPath -ChildPath "$($OutJsonFileName).json"
-            }
-
-            if (Test-Path $ScubaResultsFileName -PathType Leaf) {
+            if (Test-Path $ScubaResultsPath -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsFileName).FullName | ConvertFrom-Json
+                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsPath).FullName | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -1035,12 +1065,12 @@ function Merge-JsonOutput {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutJsonFileName,
+        $FullScubaResultsName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [int]
-        $NumberOfUUIDCharactersToTruncate
+        [string]
+        $Guid
     )
     process {
         try {
@@ -1053,7 +1083,6 @@ function Merge-JsonOutput {
             $SettingsExport =  Get-Content $SettingsExportPath -Raw
             $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
             $TimestampZulu = $SettingsExportObject.timestamp_zulu
-            $ReportUuid = $SettingsExportObject.report_uuid
 
             # Get a list and abbreviation mapping of the products assessed
             $FullNames = @()
@@ -1077,7 +1106,7 @@ function Merge-JsonOutput {
                 "Tool" = "ScubaGear";
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
-                "ReportUUID" = $ReportUuid;
+                "ReportUUID" = $Guid;
             }
 
 
@@ -1118,14 +1147,9 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
-            # Truncate the UUID at the end of the ScubaResults JSON file by the parameter value.
-            # This is is to possibly prevent Windows maximum path length errors that may occur when moving files
-            # with a large number of characters
-            $ReportUuid = $ReportUuid.Substring(0, $ReportUuid.Length - $NumberOfUUIDCharactersToTruncate)
-
             # Check if the absolute final results output path is greater than the allowable windows file Path length
             $MAX_WINDOWS_PATH_LEN = 256
-            $CurrentOutputPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)"
+            $CurrentOutputPath = Join-Path -Path $OutFolderPath -ChildPath $FullScubaResultsName
             $AbsoluteResultsFilePathLen = 0
             if ([System.IO.Path]::IsPathRooted($CurrentOutputPath)) {
                 # If the current output path is absolute
@@ -1149,18 +1173,8 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
 
-            # If the UUID still exists after truncation
-            if ($ReportUuid.Length -gt 0 ) {
-                $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName)_$($ReportUuid).json" `
-                -ErrorAction 'Stop'
-            }
-            else {
-                # If the user chose to truncate the entire UUID, omit it from the filename
-                $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" `
-                -ErrorAction 'Stop'
-            }
-
-            $ReportJson | Set-Content -Path $JsonFileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName -ErrorAction 'Stop'
+            $ReportJson | Set-Content -Path $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
             foreach ($File in $DeletionList) {
@@ -1169,7 +1183,8 @@ function Merge-JsonOutput {
         }
         catch {
             $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. See the exception message for more details: $($_) `
+            $($_.ScriptStackTrace)"
             throw $MergeJsonErrorMessage
         }
     }
@@ -1981,6 +1996,13 @@ function Invoke-SCuBACached {
             Invoke-RunRego @RegoParams
             Invoke-ReportCreation @ReportParams
 
+            $FullNameParams = @{
+                'OutJsonFileName'                  = $OutJsonFileName;
+                'Guid'                             = $Guid;
+                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
+            }
+            $FullScubaResultsName = Get-FullOutJsonName @FullNameParams
+
             if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
@@ -1989,18 +2011,16 @@ function Invoke-SCuBACached {
                     'OutProviderFileName' = $OutProviderFileName;
                     'TenantDetails' = $TenantDetails;
                     'ModuleVersion' = $ModuleVersion;
-                    'OutJsonFileName' = $OutJsonFileName;
-                    'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
+                    'FullScubaResultsName' = $FullScubaResultsName;
+                    'Guid' = $Guid;
                 }
                 Merge-JsonOutput @JsonParams
             }
             # Craft the csv version of just the results
             $CsvParams = @{
                 'ProductNames' = $ProductNames;
-                'Guid' = $Guid;
-                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate;
                 'OutFolderPath' = $OutFolderPath;
-                'OutJsonFileName' = $OutJsonFileName;
+                'FullScubaResultsName' = $FullScubaResultsName;
                 'OutCsvFileName' = $OutCsvFileName;
                 'OutActionPlanFileName' = $OutActionPlanFileName;
             }
