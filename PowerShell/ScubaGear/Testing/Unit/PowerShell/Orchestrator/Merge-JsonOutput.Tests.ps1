@@ -24,10 +24,10 @@ InModuleScope Orchestrator {
                 $JsonParameters = @{
                     TenantDetails                    = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
                     ModuleVersion                    = '1.0';
-                    OutFolderPath                    = "./"
-                    OutProviderFileName              = "ProviderSettingsExport"
-                    OutJsonFileName                  = "ScubaResults";
-                    NumberOfUUIDCharactersToTruncate = 18;
+                    OutFolderPath                    = "./";
+                    OutProviderFileName              = "ProviderSettingsExport";
+                    FullScubaResultsName             = "ScubaResults.json";
+                    Guid                             = "00000000-0000-0000-0000-000000000000";
                 }
             }
             It 'Merge single result' {
