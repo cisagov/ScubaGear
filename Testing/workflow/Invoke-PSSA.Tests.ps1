@@ -14,12 +14,12 @@ Describe "PSSA Check" {
   #   $module | Should -Not -BeNullOrEmpty
   # }
   It "PSSA should write output" {
-    Mock Write-Output {}
+    Mock Write-Host {}
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
     # Invoke PSSA
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    Assert-MockCalled Write-Output  -Scope It -ParameterFilter { $Object -contains "PowerShell scripts" }
+    Assert-MockCalled Write-Host -Scope It -ParameterFilter { $Object -contains "PowerShell scripts" }
   }
 }
