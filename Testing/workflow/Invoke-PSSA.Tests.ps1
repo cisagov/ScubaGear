@@ -1,25 +1,29 @@
 # The purpose of this test is to verify that PSSA is working.
 
-BeforeDiscovery {
-  Mock Write-Host {}
-  # Source the function
-  . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-  # Invoke PSSA
-  $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
-  Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-}
+# BeforeDiscovery {
+#   Mock Write-Host {}
+  
+# }
 
-Describe "PSSA Check" {
+Describe "PSSA Install" {
   It "PSSA should be installed" {
+    # Source the function
+    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    # Invoke PSSA
+    $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
+    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $module | Should -Not -BeNullOrEmpty
   }
+
+Describe "PSSA Output"
   It "PSSA should write output" {
-    # # Source the function
-    # . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-    # # Invoke PSSA
-    # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
-    # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    Assert-MockCalled Write-Host -Scope Context -ParameterFilter { $Object -contains "PowerShell scripts" }
+    Mock Write-Host {}
+    # Source the function
+    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    # Invoke PSSA
+    $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
+    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+    Assert-MockCalled Write-Host -Scope It -ParameterFilter { $Object -contains "PowerShell scripts" }
   }
 }
