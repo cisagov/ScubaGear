@@ -1126,12 +1126,13 @@ function Merge-JsonOutput {
             # Check if the absolute final results output path is greater than the allowable windows file Path length
             $MAX_WINDOWS_PATH_LEN = 256
             $CurrentOutputPath = Join-Path -Path $OutFolderPath -ChildPath "$($OutJsonFileName)_$($ReportUuid)"
-
             $AbsoluteResultsFilePathLen = 0
             if ([System.IO.Path]::IsPathRooted($CurrentOutputPath)) {
+                # If the current output path is absolute
                 $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($CurrentOutputPath)).Length
             }
             else {
+                # If the current output path is relative
                 $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
                 $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath $CurrentOutputPath
                 $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
