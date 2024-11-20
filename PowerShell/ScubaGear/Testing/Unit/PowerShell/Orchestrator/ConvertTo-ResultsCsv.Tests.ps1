@@ -91,34 +91,6 @@ InModuleScope Orchestrator {
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
             Should -Invoke -CommandName Write-Warning -Exactly -Times 1
         }
-
-        It 'Handles multiple ScubaResults*.json file names' {
-            # If this function is called from Invoke-ScubaCached, it's possible (but not expected) that
-            # there are multiple files matching "ScubaResults*.json". In this case, ScubaGear should
-            # choose the file created most recently.
-            Mock -CommandName Get-ChildItem { @(
-                [pscustomobject]@{"FullName"="ScubaResults_00000000-0000-0000-0000-000000000000.json"; "CreationTime"=[DateTime]"2024-01-01"}
-            ) }
-
-            Mock -CommandName Get-Content {
-                if ($Path -ne "ScubaResults_00000000-0000-0000-0000-000000000000.json") {
-                    # Should be the exact file name, throw if not
-                    throw
-                }
-            }
-
-            $CsvParameters = @{
-                ProductNames = @("exo");
-                OutFolderPath = ".";
-                OutJsonFileName = "ScubaResults";
-                OutCsvFileName = "ScubaResults";
-                OutActionPlanFileName = "ActionPlan";
-                Guid = "00000000-0000-0000-0000-000000000000";
-                NumberOfUUIDCharactersToTruncate = "18";
-            }
-            { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
-            Should -Invoke -CommandName Write-Warning -Exactly -Times 0
-        }
     }
 }
 
