@@ -1,0 +1,50 @@
+# Purpose: Converts the baseline Markdown files into HTML and text so that they can be ingested into Drupal.
+
+name: Convert Baseline to Text and HTML
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/convert_baselines.yaml"
+
+# permissions: read-all
+
+jobs:
+  convert:
+    name: Convert
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Convert AAD to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/aad.md
+            --output=output/text/aad.txt 
+      - name: Convert Defender to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/defender.md
+            --output=output/text/defender.txt 
+      - name: Install HTML converter
+        run: npm i markdown-to-html-cli -g
+      - name: Convert to HTML
+        run: |
+          markdown-to-html --source PowerShell/ScubaGear/baselines/aad.md --output output/html/aad.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/defender.md --output output/html/defender.html
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: output
+          path: output
