@@ -124,3 +124,7 @@ foreach ($servicePrincipal in $servicePrincipals) {
 
 #$servicePrincipalResults = $servicePrincipalResults | Where-Object { $_."Risky Permissions".Count -gt 0 }
 $servicePrincipalResults | ConvertTo-Json -Depth 3 > finalSPResults.json
+
+$aggregateResults = $applicationResults + $servicePrincipalResults
+$groupedAggregateResults = $aggregateResults | Group-Object -Property "App ID"
+$groupedAggregateResults | ConvertTo-Json > groupedAggregateResults.json
