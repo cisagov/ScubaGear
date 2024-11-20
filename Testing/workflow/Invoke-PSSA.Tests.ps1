@@ -20,6 +20,6 @@ Describe "PSSA Check" {
     # # Invoke PSSA
     # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    Assert-MockCalled Write-Host -Scope It -ParameterFilter { $Object -contains "PowerShell scripts" }
+    Assert-MockCalled Write-Host -Scope Context -ParameterFilter { $Object -contains "PowerShell scripts" }
   }
 }
