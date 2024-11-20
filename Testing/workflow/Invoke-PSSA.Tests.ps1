@@ -11,19 +11,18 @@ Describe "PSSA Install" {
     # Invoke PSSA
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    $module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
-    $module | Should -Not -BeNullOrEmpty
+    $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
+    $Module | Should -Not -BeNullOrEmpty
   }
 }
 
 Describe "PSSA Output" {
   It "PSSA should write output" {
-    Mock Write-Host {}
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
     # Invoke PSSA
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
-    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    Assert-MockCalled Write-Host -Scope It -ParameterFilter { $Object -contains "PowerShell scripts" }
+    $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+    $Output | Should -Contain "PowerShell scripts"
   }
 }
