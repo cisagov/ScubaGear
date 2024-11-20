@@ -15,7 +15,7 @@ Describe "PSSA Install" {
     $module | Should -Not -BeNullOrEmpty
   }
 
-Describe "PSSA Output"
+Describe "PSSA Output" {
   It "PSSA should write output" {
     Mock Write-Host {}
     # Source the function
