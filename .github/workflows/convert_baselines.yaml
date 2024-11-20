@@ -8,14 +8,14 @@ on:
     paths:
       - ".github/workflows/convert_baselines.yaml"
 
-# permissions: read-all
+permissions: read-all
 
 jobs:
   convert:
     name: Convert
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    # permissions:
+    #   contents: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
