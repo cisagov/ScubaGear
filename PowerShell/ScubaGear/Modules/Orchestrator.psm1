@@ -91,7 +91,7 @@ function Invoke-SCuBA {
     .Parameter Quiet
     Do not launch external browser for report.
     .Parameter NumberOfUUIDCharactersToTruncate
-    NumberOfUUIDCharactersToTruncate controls how many characters will be trimmed from the report UUID when appended to the end of OutJsonFileName.
+    NumberOfUUIDCharactersToTruncate controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
     .Example
     Invoke-SCuBA
@@ -1695,7 +1695,8 @@ function Invoke-SCuBACached {
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
     .Parameter NumberOfUUIDCharactersToTruncate
-    The number of characters the Report UUID appended to the end of OutJsonFileName will be truncated by.
+    NumberOfUUIDCharactersToTruncate controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
+    Valid values are 0, 13, 18, 36
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the

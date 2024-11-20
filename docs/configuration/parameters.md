@@ -181,7 +181,7 @@ The list of acceptable values are:
 
 ## NumberOfUUIDCharactersToTruncate
 
-**NumberOfUUIDCharactersToTruncate** NumberOfUUIDCharactersToTruncate controls how many characters will be trimmed from the report UUID when appended to the end of OutJsonFileName.
+**NumberOfUUIDCharactersToTruncate** NumberOfUUIDCharactersToTruncate controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
 
 | Parameter   | Value              |
 |-------------|--------------------|
