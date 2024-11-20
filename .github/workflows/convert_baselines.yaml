@@ -27,7 +27,7 @@ jobs:
             -f markdown
             -t plain
             PowerShell/ScubaGear/baselines/aad.md
-            --output=output/text/aad.txt 
+            --output=baselines/aad.txt
       - name: Convert Defender to Text
         uses: docker://pandoc/core:3.5
         with:
@@ -36,15 +36,15 @@ jobs:
             -f markdown
             -t plain
             PowerShell/ScubaGear/baselines/defender.md
-            --output=output/text/defender.txt 
+            --output=baselines/defender.txt
       - name: Install HTML converter
         run: npm i markdown-to-html-cli -g
       - name: Convert to HTML
         run: |
-          markdown-to-html --source PowerShell/ScubaGear/baselines/aad.md --output output/html/aad.html
-          markdown-to-html --source PowerShell/ScubaGear/baselines/defender.md --output output/html/defender.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/aad.md --output baselines/aad.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/defender.md --output baselines/defender.html
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: output
-          path: output
+          path: baselines
