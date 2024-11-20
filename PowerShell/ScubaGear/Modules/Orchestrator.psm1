@@ -1820,7 +1820,6 @@ function Invoke-SCuBACached {
         [switch]
         $DarkMode,
 
-        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet(0, 13, 18, 36)]
