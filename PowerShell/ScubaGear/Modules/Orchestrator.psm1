@@ -1147,32 +1147,6 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
-            # Check if the absolute final results output path is greater than the allowable windows file Path length
-            $MAX_WINDOWS_PATH_LEN = 256
-            $CurrentOutputPath = Join-Path -Path $OutFolderPath -ChildPath $FullScubaResultsName
-            $AbsoluteResultsFilePathLen = 0
-            if ([System.IO.Path]::IsPathRooted($CurrentOutputPath)) {
-                # If the current output path is absolute
-                $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($CurrentOutputPath)).Length
-            }
-            else {
-                # If the current output path is relative
-                $CurrentLocation = (Get-Location) | Select-Object -ExpandProperty ProviderPath
-                $JoinedFilePath = Join-Path -Path $CurrentLocation -ChildPath $CurrentOutputPath
-                $AbsoluteResultsFilePathLen = ([System.IO.Path]::GetFullPath($JoinedFilePath)).Length
-            }
-
-
-            # Throw an error if the path length is too long.
-            if ($AbsoluteResultsFilePathLen -gt ($MAX_WINDOWS_PATH_LEN)) {
-                $PathLengthErrorMessage = "ScubaGear was executed in a location where the maximum file path length is greater than the allowable Windows file system limit `
-                Please execute ScubaGear in a directory where for Window file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
-                Your current file path length is $($AbsoluteResultsFilePathLen).
-                Another option is to change the -NumberOfUUIDCharactersToTruncate, -OutJSONFileName, or -OutFolderName parameters to achieve an acceptable file path length `
-                See the Invoke-SCuBA parameters documentation for more details."
-                throw $PathLengthErrorMessage
-            }
-
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName -ErrorAction 'Stop'
             $ReportJson | Set-Content -Path $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
@@ -1881,7 +1855,7 @@ function Invoke-SCuBACached {
                 'BoundParameters' = $PSBoundParameters;
             }
 
-            # Rego Testing failsafe
+            # In 
             $TenantDetails = @{"DisplayName"="Rego Testing";}
             $TenantDetails = $TenantDetails | ConvertTo-Json -Depth 3
             if ($ExportProvider) {
