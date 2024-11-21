@@ -892,6 +892,7 @@ function Get-FullOutJsonName {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
+        [ValidateSet(0, 13, 18, 36)]
         [int]
         $NumberOfUUIDCharactersToTruncate
     )
