@@ -386,8 +386,7 @@ function Invoke-SCuBA {
         # Tenant Metadata for the Report
         $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
 
-        # Generate the GUID for the JSON
-        # TODO Stick the GUID within the ScubaConfig object to clean up parameter bloat
+        # Generate a GUID to uniquely identify the output JSON
         $Guid = New-Guid -ErrorAction 'Stop'
 
         try {
