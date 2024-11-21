@@ -1158,8 +1158,7 @@ function Merge-JsonOutput {
             }
             else {
                 $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
-                Ending ScubaGear execution. See the exception message for more details: $($_) `
-                $($_.ScriptStackTrace)"
+                Ending ScubaGear execution. See the exception message for more details: $($_)"
                 throw $MergeJsonErrorMessage
             }
         }
