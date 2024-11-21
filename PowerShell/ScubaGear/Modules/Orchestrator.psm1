@@ -219,7 +219,6 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        # [ValidatePattern('^[a-zA-Z0-9]+$')]
         [string]
         $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
 
