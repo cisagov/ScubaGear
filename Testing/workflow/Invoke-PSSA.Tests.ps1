@@ -10,7 +10,8 @@ BeforeDiscovery {
   # Source the function
   . $ScriptPath
   # Invoke PSSA, redirecting all Write-Outputs to $Output
-  $global:Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+  $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+  $global:Output = $Writes
 }
 
 Describe "PSSA Check" {
