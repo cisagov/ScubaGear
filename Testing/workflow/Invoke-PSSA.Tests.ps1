@@ -15,6 +15,5 @@ Describe "PSSA Check" {
   It "PSSA should be installed" {
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $Module | Should -Not -BeNullOrEmpty
-    
   }
 }

@@ -81,7 +81,7 @@ function Invoke-PSSA {
 	Write-Output " "
 
 	# Exit 1 if warnings or errors
-	if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
+	if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
 		Write-Output "Problems were found in the PowerShell scripts."
 		exit 1
 	}
