@@ -31,6 +31,7 @@ class ScubaConfig {
         DefaultOutJsonFileName = "ScubaResults"
         DefaultOutCsvFileName = "ScubaResults"
         DefaultOutActionPlanFileName = "ActionPlan"
+        DefaultNumberOfUUIDCharactersToTruncate = 18
         DefaultPrivilegedRoles = @(
             "Global Administrator",
             "Privileged Role Administrator",
@@ -154,6 +155,10 @@ class ScubaConfig {
 
         if (-Not $this.Configuration.OutActionPlanFileName){
             $this.Configuration.OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName')
+        }
+
+        if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
+            $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
         }
 
         return

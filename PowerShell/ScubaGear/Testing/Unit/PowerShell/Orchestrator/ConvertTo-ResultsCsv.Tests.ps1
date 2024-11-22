@@ -15,6 +15,9 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-FileEncoding
             Mock -CommandName ConvertTo-Csv { "" }
             Mock -CommandName Write-Warning {}
+            Mock -CommandName Get-ChildItem {
+                [pscustomobject]@{"FullName"="ScubaResults_00000000-0000-0000-0000-000000000000.json"; "CreationTime"=[DateTime]"2024-01-01"}
+            }
         }
 
         It 'Handles multiple products, control groups, and controls' {
@@ -56,10 +59,10 @@ InModuleScope Orchestrator {
                 }}
             }
             $CsvParameters = @{
-                ProductNames = @("exo", "aad");
-                OutFolderPath = ".";
-                OutJsonFileName = "ScubaResults";
-                OutCsvFileName = "ScubaResults";
+                ProductNames          = @("exo", "aad");
+                OutFolderPath         = ".";
+                FullScubaResultsName  = "ScubaResults";
+                OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
@@ -74,10 +77,10 @@ InModuleScope Orchestrator {
             Mock -CommandName ConvertFrom-Json {}
             Mock -CommandName Get-Content { throw "File not found" }
             $CsvParameters = @{
-                ProductNames = @("exo", "aad");
-                OutFolderPath = ".";
-                OutJsonFileName = "ScubaResults";
-                OutCsvFileName = "ScubaResults";
+                ProductNames          = @("exo", "aad");
+                OutFolderPath         = ".";
+                FullScubaResultsName  = "ScubaResults";
+                OutCsvFileName        = "ScubaResults";
                 OutActionPlanFileName = "ActionPlan";
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
