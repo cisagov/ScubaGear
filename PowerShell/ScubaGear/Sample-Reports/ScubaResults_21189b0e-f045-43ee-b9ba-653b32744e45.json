@@ -485,7 +485,7 @@
                          "Controls":  [
                                           {
                                               "Control ID":  "MS.DEFENDER.5.1v1",
-                                              "Requirement":  "At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.",
+                                              "Requirement":  "At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.",
                                               "Result":  "Pass",
                                               "Criticality":  "Shall",
                                               "Details":  "Requirement met"
