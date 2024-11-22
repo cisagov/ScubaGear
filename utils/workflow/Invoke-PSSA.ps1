@@ -81,5 +81,6 @@ function Invoke-PSSA {
 	}
 	else {
 		Write-Output "No problems were found in the PowerShell scripts."
+		exit 0
 	}
 }
