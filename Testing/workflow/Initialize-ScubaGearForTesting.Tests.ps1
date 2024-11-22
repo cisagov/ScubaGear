@@ -6,8 +6,9 @@
 param()
 
 BeforeDiscovery {
-  Import-Module -Name .\utils\workflow\Initialize-ScubaGearForTesting
-  Import-Module -Name .\PowerShell\ScubaGear
+  # Source the function
+  . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
+  # Initialize SG
   Initialize-ScubaGearForTesting
 }
 
@@ -26,7 +27,7 @@ else {
   Write-Warning 'Did NOT find list of modules!!'
 }
 
-Describe "Check for PowerShell modules" {
+Describe "PowerShell Modules Check" {
   foreach ($Module in $ModuleList) {
     $global:ModuleName = $Module.ModuleName
     It "Module $global:moduleName should be installed" {
