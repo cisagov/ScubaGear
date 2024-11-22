@@ -7,7 +7,7 @@ Describe "PSSA Check" {
     # Invoke PSSA, redirecting the outputs to $Output
     $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
-    $Module | Should -Not -BeNullOrEmpty  
+    $Module | Should -Not -BeNullOrEmpty
     $Output | Should -Not -BeNullOrEmpty
     # Note: This is a little bit fragile.  It only work as long as one of these two
     # summary statements is the final output written.
