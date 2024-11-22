@@ -23,6 +23,6 @@ Describe "PSSA Output" {
     # Invoke PSSA
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
-    $Output | Should -Contain "Problems were found in the PowerShell scripts." Or Should -Contain "No problems were found in the PowerShell scripts."
+    $Output | Should -Contain "Problems were found in the PowerShell scripts." -Or "No problems were found in the PowerShell scripts."
   }
 }
