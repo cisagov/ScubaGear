@@ -2,7 +2,7 @@
 
 The `Invoke-SCuBA` cmdlet has several command-line parameters, which are described below.
 
-> **Note**: Some parameters can also be specified in a [configuration file](configuration.md). If specified in both, command-line parameters have precedence over the config file. 
+> **Note**: Some parameters can also be specified in a [configuration file](configuration.md). If specified in both, command-line parameters have precedence over the config file.
 
 > **Note**: Parameters use the Pascal case convention, and their names are consistent with those in the configuration file.
 
@@ -15,7 +15,7 @@ The `Invoke-SCuBA` cmdlet has several command-line parameters, which are describ
 | Optional    | Yes    |
 | Datatype    | String |
 | Default     | n/a    |
-| Config File | Yes    |  
+| Config File | Yes    |
 
 Here is an example using `-AppID`:
 
@@ -27,7 +27,7 @@ Invoke-SCuBA -ProductNames teams `
   -Organization contoso.onmicrosoft.com
 ```
 
-> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
 
 ## CertificateThumbprint
 
@@ -38,7 +38,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes    |
 | Datatype    | String |
 | Default     | n/a    |
-| Config File | Yes    |  
+| Config File | Yes    |
 
 Here is an example using `-CertificateThumbprint`:
 
@@ -50,11 +50,11 @@ Invoke-SCuBA -ProductNames teams `
   -Organization contoso.onmicrosoft.com
 ```
 
-> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
 
 ## ConfigFilePath
 
-**ConfigFilePath** is the path of a [configuration file](configuration.md) that ScubaGear parses for input parameters. 
+**ConfigFilePath** is the path of a [configuration file](configuration.md) that ScubaGear parses for input parameters.
 
 | Parameter   | Value                                 |
 |-------------|---------------------------------------|
@@ -71,7 +71,7 @@ Invoke-SCuBA -ProductNames teams `
   -ConfigFilePath C:\users\johndoe\Documents\scuba\config.json
 ```
 
-If `-ConfigFilePath` is specified, default values will be used for any parameters that are not added to the config file. These default values are shown in the [full config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml).  
+If `-ConfigFilePath` is specified, default values will be used for any parameters that are not added to the config file. These default values are shown in the [full config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml).
 
 More information about the configuration file can be found on the [configuration page](configuration.md).
 
@@ -86,7 +86,7 @@ More information about the configuration file can be found on the [configuration
 | Optional    | Yes    |
 | Datatype    | Switch |
 | Default     | n/a    |
-| Config File | No     |  
+| Config File | No     |
 
 ```powershell
 # View the HTML report in dark mode
@@ -103,13 +103,31 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes    |
 | Datatype    | Switch |
 | Default     | n/a    |
-| Config File | Yes    |  
+| Config File | Yes    |
 
 ```powershell
 # Delete the auth tokens
 Invoke-SCuBA -ProductNames teams `
   -DisconnectOnExit
 ```
+
+## KeepIndividualJSON
+
+**KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |
+
+```powershell
+# Outputs legacy ScubaGear individual JSON output
+Invoke-SCuBA -ProductNames teams `
+  -KeepIndividualJSON
+```
+
 
 ## LogIn
 
@@ -122,7 +140,7 @@ Invoke-SCuBA -ProductNames teams `
 | Default     | `$true` |
 | Config File | Yes     |
 
-This variable should typically be `$true`, as a connection is established in the current PowerShell terminal session with the first authentication. If another verification is run in the same PowerShell session, then this variable can be set to false to bypass a second authenticate. 
+This variable should typically be `$true`, as a connection is established in the current PowerShell terminal session with the first authentication. If another verification is run in the same PowerShell session, then this variable can be set to false to bypass a second authenticate.
 
 ```powershell
 # Reuse previous authentication
@@ -141,7 +159,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes          |
 | Datatype    | String       |
 | Default     | `commercial` |
-| Config File | Yes          |  
+| Config File | Yes          |
 
 > **Note**: This parameter is required if authenticating to Power Platform. It is also required if executing the tool against GCC High or DoD tenants.
 
@@ -160,21 +178,32 @@ The list of acceptable values are:
 | Government cloud tenants (high) | gcchigh    |
 | Department of Defense tenants   | dod        |
 
-## KeepIndividualJSON
 
-**KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.
+## NumberOfUUIDCharactersToTruncate
 
-| Parameter   | Value  |
-|-------------|--------|
-| Optional    | Yes    |
-| Datatype    | Switch |
-| Default     | n/a    |
-| Config File | No     |  
+**NumberOfUUIDCharactersToTruncate** controls how many characters will be truncated from the report UUID when appended to the end of **OutJsonFileName**.
+
+| Parameter   | Value              |
+|-------------|--------------------|
+| Optional    | Yes                |
+| Datatype    | Integer            |
+| Default     | 18                 |
+| Config File | Yes                |
+
+
+The list of acceptable values are:
+
+| Description                            | Value      |
+|----------------------------------------|------------|
+| Do no truncation of the appended UUID  | 0          |
+| Remove one octet of the appended UUID  | 13         |
+| Remove two octets of the appended UUID | 18         |
+| Remove the appended UUID completely    | 36         |
 
 ```powershell
-# Outputs legacy ScubaGear individual JSON output 
-Invoke-SCuBA -ProductNames teams `
-  -KeepIndividualJSON
+# Truncate the UUID at the end of OutJsonFileName by 18 characters
+Invoke-SCuBA -ProductNames exo `
+  -NumberOfUUIDCharactersToTruncate 18
 ```
 
 ## OPAPath
@@ -205,7 +234,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes    |
 | Datatype    | String |
 | Default     | n/a    |
-| Config File | Yes    |  
+| Config File | Yes    |
 
 Here is an example using Organization:
 
@@ -217,36 +246,54 @@ Invoke-SCuBA -ProductNames teams `
   -Organization contoso.onmicrosoft.com
 ```
 
-> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.  
+> **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
 
 ## OutActionPlanFileName
 
 **OutActionPlanFileName** renames the file for the action plan template for the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
 
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ActionPlan`   |
-| Config File | Yes                |  
+| Parameter   | Value        |
+|-------------|--------------|
+| Optional    | Yes          |
+| Datatype    | String       |
+| Default     | `ActionPlan` |
+| Config File | Yes          |
 
 
 ```powershell
 # Change the output action plan file
 Invoke-SCuBA -ProductNames teams `
-  -OutActionPlanFileName myplan `
+  -OutActionPlanFileName myplan
+```
+
+## OutCsvFileName
+
+**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
+
+| Parameter   | Value          |
+|-------------|----------------|
+| Optional    | Yes            |
+| Datatype    | String         |
+| Default     | `ScubaResults` |
+| Config File | Yes            |
+
+
+```powershell
+# Change the output CSV file
+Invoke-SCuBA -ProductNames teams `
+  -OutCsvFileName myresults
 ```
 
 ## OutFolderName
 
-**OutFolderName** is the first half of the name of the folder where the [report files](../execution/reports.md) will be created. The second half is a timedate stamp. The location of this folder is determined by the [OutPath](#outpath) parameter. 
+**OutFolderName** is the first half of the name of the folder where the [report files](../execution/reports.md) will be created. The second half is a timedate stamp. The location of this folder is determined by the [OutPath](#outpath) parameter.
 
 | Parameter   | Value                     |
 |-------------|---------------------------|
 | Optional    | Yes                       |
 | Datatype    | String                    |
 | Default     | `M365BaselineConformance` |
-| Config File | Yes                       |  
+| Config File | Yes                       |
 
 ```powershell
 # Change the output folder
@@ -256,14 +303,14 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutJsonFileName
 
-**OutJsonFileName** renames the uber output JSON file that is created after a ScubaGear run. This should only be the base file name, as the extension `.json` will automatically be added. 
+**OutJsonFileName** specifies the base file name of the uber output JSON file that is created after a ScubaGear run. This should only be the base file name; the report UUID as well as the extension, `.json`, will automatically be added.
 
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ScubaResults.json` |
-| Config File | No                 |  
+| Parameter   | Value          |
+|-------------|----------------|
+| Optional    | Yes            |
+| Datatype    | String         |
+| Default     | `ScubaResults` |
+| Config File | Yes            |
 
 > **Note**: This parameter does not work if the `-KeepIndividualJSON` parameter is present.
 
@@ -272,24 +319,7 @@ Invoke-SCuBA -ProductNames teams `
 Invoke-SCuBA -ProductNames teams `
   -OutJsonFileName myresults
 ```
-
-## OutCsvFileName
-
-**OutCsvFileName** renames the file for the CSV version of the test results. This should only be the base file name, as the extension `.csv` will automatically be added.
-
-| Parameter   | Value              |
-|-------------|--------------------|
-| Optional    | Yes                |
-| Datatype    | String             |
-| Default     | `ScubaResults.csv` |
-| Config File | Yes                |  
-
-
-```powershell
-# Change the output CSV file
-Invoke-SCuBA -ProductNames teams `
-  -OutCsvFileName myresults `
-```
+In the above example, the resulting JSON file name would be `myresults_21189b0e-f045-43ee-b9ba-653b32744e45.json` (substituting in the actual report UUID.)
 
 ## OutPath
 
@@ -319,7 +349,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes                      |
 | Datatype    | String                   |
 | Default     | `ProviderSettingsExport` |
-| Config File | Yes                      |  
+| Config File | Yes                      |
 
 ```powershell
 # Change the provider settings file
@@ -338,7 +368,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes           |
 | Datatype    | String        |
 | Default     | `TestResults` |
-| Config File | Yes           |  
+| Config File | Yes           |
 
 ```powershell
 # Change the rego file
@@ -357,7 +387,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes               |
 | Datatype    | String            |
 | Default     | `BaselineReports` |
-| Config File | Yes               |  
+| Config File | Yes               |
 
 ```powershell
 # Change the HTML report file
@@ -376,7 +406,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes                                               |
 | Datatype    | List of Strings                                   |
 | Default     | ["aad", "defender", "exo", "sharepoint", "teams"] |
-| Config File | Yes                                               |  
+| Config File | Yes                                               |
 
 The list of acceptable values are:
 
@@ -405,7 +435,7 @@ Invoke-SCuBA -ProductNames teams, exo
 | Optional    | Yes    |
 | Datatype    | Switch |
 | Default     | n/a    |
-| Config File | No     |  
+| Config File | No     |
 
 ```powershell
 # Do not open the browser
@@ -422,7 +452,7 @@ Invoke-SCuBA -ProductNames teams `
 | Optional    | Yes    |
 | Datatype    | Switch |
 | Default     | n/a    |
-| Config File | No     |  
+| Config File | No     |
 
 ```powershell
 # Check the version
