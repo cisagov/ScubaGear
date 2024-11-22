@@ -2,7 +2,7 @@
     "resources": {
         "00000003-0000-0000-c000-000000000000": "Microsoft Graph",
         "00000002-0000-0ff1-ce00-000000000000": "Office 365 Exchange Online",
-        "00000003-0000-0ff1-ce00-000000000000": "SharePoint",
+        "00000003-0000-0ff1-ce00-000000000000": "Office 365 SharePoint Online",
         "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs"
     },
     "permissions": { 
@@ -63,7 +63,7 @@
             "bf24470f-10c1-436d-8d53-7b997eb473be": "User.Read.All",
             "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
         },
-        "SharePoint": {
+        "Office 365 SharePoint Online": {
             "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All"
         }
     }
