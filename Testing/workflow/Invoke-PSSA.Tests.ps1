@@ -1,5 +1,9 @@
 # The purpose of this test is to verify that PSSA is working.
 
+# Suppress PSSA warnings here at the root of the test file.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+param()
+
 BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
