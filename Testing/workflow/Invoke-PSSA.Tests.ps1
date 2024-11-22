@@ -3,17 +3,17 @@
 Describe "PSSA Check" {
   It "PSSA should write output" {
     $FunctionPath = Join-Path -Path $PSScriptRoot -ChildPath '\..\..\utils\workflow\Invoke-PSSA.ps1' -Resolve
-    Write-Output "The FunctionPath is"
-    Write-Output $FunctionPath
+    Write-Warning "The FunctionPath is"
+    Write-Warning $FunctionPath
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
-    Write-Output "The RepoPath is"
-    Write-Output $RepoRootPath
+    Write-Warning "The RepoPath is"
+    Write-Warning $RepoRootPath
 
     # Source the function
     # . $FunctionPath
     # Invoke PSSA, redirecting all Write-Outputs to $Output
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    Write-Output $Output
+    # Write-Warning $Output
     # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     # $Module | Should -Not -BeNullOrEmpty
     # $Output | Should -Not -BeNullOrEmpty
