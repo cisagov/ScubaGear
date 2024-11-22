@@ -4,8 +4,9 @@ Describe "PSSA Check" {
   It "PSSA should write output" {
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-    # Invoke PSSA, redirecting the outputs to $Output
-    $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+    $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
+    # Invoke PSSA, redirecting all Write-Outputs to $Output
+    $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $Module | Should -Not -BeNullOrEmpty
     $Output | Should -Not -BeNullOrEmpty
