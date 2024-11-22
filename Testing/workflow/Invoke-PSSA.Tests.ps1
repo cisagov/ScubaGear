@@ -7,6 +7,7 @@ Describe "PSSA Check" {
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     # Invoke PSSA, redirecting all Write-Outputs to $Output
     $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+    Write-Output $Output
     # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     # $Module | Should -Not -BeNullOrEmpty
     # $Output | Should -Not -BeNullOrEmpty
