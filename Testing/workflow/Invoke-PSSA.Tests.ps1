@@ -1,13 +1,23 @@
 # The purpose of this test is to verify that PSSA is working.
 
+BeforeDiscovery {
+  $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+  $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+  # Source the function
+  . $ScriptPath
+  # Invoke PSSA, redirecting all Write-Outputs to $Output
+  Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+}
+
 Describe "PSSA Check" {
   It "PSSA should write output" {
-    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
-    $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
-    # Source the function
-    . $ScriptPath
-    # Invoke PSSA, redirecting all Write-Outputs to $Output
-    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+    Write-Warning "placeholder..."
+    # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+    # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+    # # Source the function
+    # . $ScriptPath
+    # # Invoke PSSA, redirecting all Write-Outputs to $Output
+    # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
     # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
