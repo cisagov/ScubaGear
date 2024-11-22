@@ -8,7 +8,7 @@ Describe "PSSA Check" {
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
     Write-Output "The RepoPath is"
     Write-Output $RepoRootPath
-    
+
     # Source the function
     # . $FunctionPath
     # Invoke PSSA, redirecting all Write-Outputs to $Output
