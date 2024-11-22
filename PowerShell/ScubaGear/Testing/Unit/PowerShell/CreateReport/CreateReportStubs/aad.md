@@ -1,4 +1,4 @@
-# CISA M365 Security Configuration Baseline for Azure Active Directory
+# CISA M365 Secure Configuration Baseline for Azure Active Directory
 
 Azure Active Directory (AAD) is a cloud-based identity and access control service that provides security and functional capabilities to Microsoft 365. This Secure Configuration Baseline (SCB) provides specific policies to help secure AAD.
 
@@ -824,7 +824,7 @@ In addition to acknowledging the important contributions of a diverse
 team of Cybersecurity and Infrastructure Security Agency (CISA) experts,
 CISA thanks the following federal agencies and private sector
 organizations that provided input during the development of the Secure
-Business Cloud Application’s security configuration baselines in
+Business Cloud Application’s Secure Configuration Baselines in
 response to Section 3 of [Executive Order (EO) 14028, *Improving the
 Nation’s
 Cybersecurity*](https://www.federalregister.gov/documents/2021/05/17/2021-10460/improving-the-nations-cybersecurity):
