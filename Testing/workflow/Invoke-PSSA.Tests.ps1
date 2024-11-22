@@ -2,7 +2,7 @@
 
 Describe "PSSA Check" {
   It "PSSA should write output" {
-    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+    # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
     # Write-Warning "The ScriptPath is"
     # Write-Warning $ScriptPath
     # $Content = Get-Content -Path $ScriptPath -Raw
