@@ -139,11 +139,11 @@ function Get-ApplicationsWithRiskyPermissions {
         Write-Warning "Stack trace: $($_.ScriptStackTrace)"
         throw $_
     }
-    $applicationResults | ConvertTo-Json
+    $applicationResults | ConvertTo-Json -Depth 3
 }
 
-$riskyApps = Get-ApplicationsWithRiskyPermissions
-$riskyApps > finalAppResults.json
+#$riskyApps = Get-ApplicationsWithRiskyPermissions
+#$riskyApps > finalAppResults.json
 
 function Get-ServicePrincipalsWithRiskyPermissions {
     <#
@@ -156,11 +156,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     try {
         $servicePrincipalResults = @()
         $servicePrincipals = Get-MgBetaServicePrincipal -All
-        Write-Output $servicePrincipals.Count
         foreach ($servicePrincipal in $servicePrincipals) {
-            # Exclude Microsoft-published service principals
-            #if ($servicePrincipal.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a") {}
-        
             # Only retrieves permissions an admin has consented to
             $appRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -All -ServicePrincipalId $servicePrincipal.Id
             $mappedPermissions = @()
@@ -193,36 +189,65 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         Write-Warning "Stack trace: $($_.ScriptStackTrace)"
         throw $_
     }
-    $servicePrincipalResults | ConvertTo-Json
+    $servicePrincipalResults | ConvertTo-Json -Depth 3
 }
 
 #$servicePrincipalResults = $servicePrincipalResults | Where-Object { $_."Risky Permissions".Count -gt 0 }
 
-$riskySPs = Get-ServicePrincipalsWithRiskyPermissions
-$riskySPs > finalSPResults.json
+#$riskySPs = Get-ServicePrincipalsWithRiskyPermissions
+#$riskySPs > finalSPResults.json
 
-#$riskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
-#$riskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
+$riskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
+$riskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
 
-<#$aggregateResults = @()
+$aggregatedResults = @()
 foreach ($app in $riskyApps) {
     $matchedServicePrincipal = $riskySPs | Where-Object { $_.AppId -eq $app.AppId }
 
     # Merge objects if an application and service principal exist with the same AppId
     if ($matchedServicePrincipal) {
+        # iterate over app permissions
+        # if the permissions is contained in sp permission list, then change "IsAdminConsented" from false to true
+        # if not, keep set to false
+
+        # Determine if each risky permission was admin consented or not
+        foreach ($permission in $app.RiskyPermissions) {
+            $permission | Add-Member -MemberType NoteProperty -Name "IsAdminConsented" -Value $false
+            $ServicePrincipalRoleIds = $matchedServicePrincipal.RiskyPermissions | Select-Object -ExpandProperty RoleId
+            if ($ServicePrincipalRoleIds -contains $permission.RoleId) {
+                $permission.IsAdminConsented = $true
+            }
+        }
+
+        if ($matchedServicePrincipal.KeyCredentials.Count -gt 0) {
+            $mergedKeyCredentials = @($app.KeyCredentials) + @($matchedServicePrincipal.KeyCredentials)
+        }
+
+        if ($matchedServicePrincipal.PasswordCredentials.Count -gt 0) {
+            $mergedKeyCredentials = @($app.PasswordCredentials) + @($matchedServicePrincipal.PasswordCredentials)
+        }
+
         $mergedObject = [PSCustomObject]@{
-            ObjectId = $app.ObjectId
+            #ObjectId = [PSCustomerObject]@{
+            #    ApplicationObjectId = $app.ObjectId
+            #    ServicePrincipalObjectId = $matchedServicePrincipal.ObjectId
+            #}
             AppId = $app.AppId
             DisplayName = $app.DisplayName
             IsMultiTenantEnabled = $app.IsMultiTenantEnabled
-            KeyCredentials = $app.KeyCredentials
-            PasswordCredentials = $app.KeyCredentials
-            FederatedCredentials = $app.federatedCredentials
-            RiskyPermissions = $app.mappedPermissions
+            KeyCredentials = $mergedKeyCredentials
+            PasswordCredentials = $mergedPasswordCredentials
+            FederatedCredentials = $app.FederatedCredentials
+            RiskyPermissions = $app.RiskyPermissions
         }
     }
-}#>
+    else {
+        $mergedObject = $app
+    }
 
-#$aggregateResults | ConvertTo-Json > aggregatedResults.json
+    $aggregatedResults += $mergedObject
+}
+
+$aggregatedResults | ConvertTo-Json > aggregatedResults.json
 #$groupedAggregateResults = $aggregateResults | Group-Object -Property "App ID"
 #$groupedAggregateResults | ConvertTo-Json > groupedAggregateResults.json
