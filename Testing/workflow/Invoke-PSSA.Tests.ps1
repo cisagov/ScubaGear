@@ -5,7 +5,7 @@ Describe "PSSA Check" {
     $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     # Source the function
-    . $FunctionPath
+    . $ScriptPath
     # Invoke PSSA, redirecting all Write-Outputs to $Output
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
