@@ -70,6 +70,58 @@ function Get-ValidCredentials {
     return $validCredentials
 }
 
+function Merge-Credentials {
+    <#
+    .Description
+    Merge credentials from multiple resources into a single resource
+    .Functionality
+    #Internal
+    ##>
+    param (
+        [Object[]]
+        $applicationCredentials,
+
+        [Object[]]
+        $servicePrincipalCredentials
+    )
+    # if null -neq sp.credentials -and null -neq app.credentials (neither objects are null)
+    # then both objects are valid
+    # mergedResults = sp.credentials + app.credentials
+    
+    # elif null -eq sp.credentials -and null -neq app.credentials (only sp credentials are null)
+    # then only app.credentials are valid
+    # mergedResults = app.credentials
+    
+    # elif null -neq sp.credentials -and null -eq app.credentials (only app credentials are null)
+    # then only sp.credentials are valid
+    # mergedResults = sp.credentials
+    
+    # else (both are null)
+    # then no credentials are valid
+    # mergedResults = null
+    
+    # Both applications/sp objects have key and federated credentials.
+    # Conditionally merge the two together, select only application/service principal creds, or none.
+    $mergedCredentials = @()
+    # Both objects valid
+    if ($null -ne $servicePrincipalCredentials -and $null -ne $applicationCredentials) {
+        $mergedCredentials = @($servicePrincipalCredentials) + @($applicationCredentials)
+    }
+    # Only application credentials valid
+    elseif ($null -eq $servicePrincipalCredentials -and $null -ne $applicationCredentials) {
+        $mergedCredentials = @($applicationCredentials)
+    }
+    # Only service principal credentials valid
+    elseif ($null -ne $servicePrincipalCredentials -and $null -eq $applicationCredentials) {
+        $mergedCredentials = @($servicePrincipalCredentials)
+    }
+    # Neither credentials are valid
+    else {
+        $mergedCredentials = $null
+    }
+    return $mergedCredentials
+}
+
 $permissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
 
 function Get-ApplicationsWithRiskyPermissions {
@@ -151,8 +203,8 @@ function Get-ApplicationsWithRiskyPermissions {
     }
 }
 
-$riskyApps = Get-ApplicationsWithRiskyPermissions
-$riskyApps > finalAppResults.json
+#$riskyApps = Get-ApplicationsWithRiskyPermissions
+#$riskyApps > finalAppResults.json
 
 function Get-ServicePrincipalsWithRiskyPermissions {
     <#
@@ -203,8 +255,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     }
 }
 
-$riskySPs = Get-ServicePrincipalsWithRiskyPermissions
-$riskySPs > finalSPResults.json
+#$riskySPs = Get-ServicePrincipalsWithRiskyPermissions
+#$riskySPs > finalSPResults.json
 
 $riskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
 $riskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
@@ -228,13 +280,12 @@ foreach ($app in $riskyApps) {
             }
         }
 
-        if ($matchedServicePrincipal.KeyCredentials.Count -gt 0) {
-            $mergedKeyCredentials = @($app.KeyCredentials) + @($matchedServicePrincipal.KeyCredentials)
-        }
-
-        if ($matchedServicePrincipal.PasswordCredentials.Count -gt 0) {
-            $mergedKeyCredentials = @($app.PasswordCredentials) + @($matchedServicePrincipal.PasswordCredentials)
-        }
+        $mergedKeyCredentials = Merge-Credentials `
+            -applicationCredentials $app.KeyCredentials `
+            -servicePrincipalCredentials $matchedServicePrincipal.KeyCredentials
+        $mergedPasswordCredentials = Merge-Credentials `
+            -applicationCredentials $app.PasswordCredentials `
+            -servicePrincipalCredentials $matchedServicePrincipal.PasswordCredentials
 
         $mergedObject = [PSCustomObject]@{
             ApplicationObjectId = $app.ObjectId
