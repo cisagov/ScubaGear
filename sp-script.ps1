@@ -260,49 +260,64 @@ $RiskySPs > finalSPResults.json
 $RiskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
 $RiskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
 
-$AggregatedResults = @()
-foreach ($App in $RiskyApps) {
-    $MatchedServicePrincipal = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
-
-    # Merge objects if an application and service principal exist with the same AppId
-    if ($MatchedServicePrincipal) {
-        # iterate over app permissions
-        # if the permissions is contained in sp permission list, then change "IsAdminConsented" from false to true
-        # if not, keep set to false
-
-        # Determine if each risky permission was admin consented or not
-        foreach ($Permission in $App.RiskyPermissions) {
-            $ServicePrincipalRoleIds = $MatchedServicePrincipal.RiskyPermissions | Select-Object -ExpandProperty RoleId
-            if ($ServicePrincipalRoleIds -contains $Permission.RoleId) {
-                $Permission.IsAdminConsented = $true
+function Get-AggregatedRiskyServicePrincipals {
+    <#
+    .Description
+    Returns an aggregated JSON dataset, combining data from both applications and service principal objects.
+    Key/Password/Federated credentials are combined into a single object, and admin consent is reflected
+    in each object's list of associated risky permissions.
+    .Functionality
+    #Internal
+    ##>
+    process {
+        try {
+            $AggregatedResults = @()
+            foreach ($App in $RiskyApps) {
+                $MatchedServicePrincipal = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
+            
+                # Merge objects if an application and service principal exist with the same AppId
+                if ($MatchedServicePrincipal) {
+                    # Determine if each risky permission was admin consented or not
+                    foreach ($Permission in $App.RiskyPermissions) {
+                        $ServicePrincipalRoleIds = $MatchedServicePrincipal.RiskyPermissions | Select-Object -ExpandProperty RoleId
+                        if ($ServicePrincipalRoleIds -contains $Permission.RoleId) {
+                            $Permission.IsAdminConsented = $true
+                        }
+                    }
+                
+                    $MergedKeyCredentials = Merge-Credentials `
+                        -ApplicationCredentials $App.KeyCredentials `
+                        -ServicePrincipalCredentials $MatchedServicePrincipal.KeyCredentials
+                    $MergedPasswordCredentials = Merge-Credentials `
+                        -ApplicationCredentials $App.PasswordCredentials `
+                        -ServicePrincipalCredentials $MatchedServicePrincipal.PasswordCredentials
+                
+                    $MergedObject = [PSCustomObject]@{
+                        ApplicationObjectId = $App.ObjectId
+                        ServicePrincipalObjectId = $MatchedServicePrincipal.ObjectId
+                        AppId = $App.AppId
+                        DisplayName = $App.DisplayName
+                        IsMultiTenantEnabled = $App.IsMultiTenantEnabled
+                        KeyCredentials = $MergedKeyCredentials
+                        PasswordCredentials = $MergedPasswordCredentials
+                        FederatedCredentials = $App.FederatedCredentials
+                        RiskyPermissions = $App.RiskyPermissions
+                    }
+                }
+                else {
+                    $MergedObject = $App
+                }
+                $AggregatedResults += $MergedObject
             }
         }
-
-        $MergedKeyCredentials = Merge-Credentials `
-            -ApplicationCredentials $App.KeyCredentials `
-            -ServicePrincipalCredentials $MatchedServicePrincipal.KeyCredentials
-        $MergedPasswordCredentials = Merge-Credentials `
-            -ApplicationCredentials $App.PasswordCredentials `
-            -ServicePrincipalCredentials $MatchedServicePrincipal.PasswordCredentials
-
-        $MergedObject = [PSCustomObject]@{
-            ApplicationObjectId = $App.ObjectId
-            ServicePrincipalObjectId = $MatchedServicePrincipal.ObjectId
-            AppId = $App.AppId
-            DisplayName = $App.DisplayName
-            IsMultiTenantEnabled = $App.IsMultiTenantEnabled
-            KeyCredentials = $MergedKeyCredentials
-            PasswordCredentials = $MergedPasswordCredentials
-            FederatedCredentials = $App.FederatedCredentials
-            RiskyPermissions = $App.RiskyPermissions
+        catch {
+            Write-Warning "An error occurred in Get-AggregatedRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
         }
+        $AggregatedResults | ConvertTo-Json -Depth 3
     }
-    else {
-        $MergedObject = $App
-    }
-    $AggregatedResults += $MergedObject
 }
 
-$AggregatedResults | ConvertTo-Json > aggregatedResults.json
-#$groupedAggregateResults = $aggregateResults | Group-Object -Property "App ID"
-#$groupedAggregateResults | ConvertTo-Json > groupedAggregateResults.json
+$AggregatedRiskySPs = Get-AggregatedRiskyServicePrincipals
+$AggregatedRiskySPs > aggregatedResults.json
