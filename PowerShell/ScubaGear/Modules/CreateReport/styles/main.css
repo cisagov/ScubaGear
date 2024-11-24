@@ -38,7 +38,7 @@ html[data-theme='dark'] {
     --note-color: #ee4e04;
     --header-bottom: rgb(221, 221, 221);
     --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --unvisited-link-color: #E6F598;
     --text-color: #bdbdbd;
     --uuid-color: #999999;
     --border-color: #7b7b7b;
@@ -74,6 +74,23 @@ h4 {
     margin-left:20%;
     margin-right: 20%;
     margin-bottom: 0.313em;
+}
+
+h4 .aad-link {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--unvisited-link-color);
+    text-decoration: underline;
+}
+
+h4 .aad-link:visited {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+}
+
+h4 .aad-link:hover {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+    text-decoration: none;
 }
 
 
@@ -232,7 +249,7 @@ th.conditions {
 }
 
 #toggle-text {
-    color: #404040;
+    color: var(--text-color);
     margin: 0.313em 3.125em;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.875em;
