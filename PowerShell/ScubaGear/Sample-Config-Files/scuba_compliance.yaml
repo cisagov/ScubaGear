@@ -4,6 +4,8 @@ Description: |
   is required to provide specific values unique to both your organization and M365 tenant in the fields below.
   Please read and understand the full ScubaGear configuration file documentation for both adding additional fields or modifying the fields below.
   The documentation can be found here: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md
+
+# The list of M365 Product/SCuBA baselines ScubaGear will assess.
 ProductNames:
   - aad
   - defender
@@ -11,10 +13,25 @@ ProductNames:
   - powerplatform
   - sharepoint
   - teams
+
+# This parameter is used to authenticate to the different commercial/government environments.
+# See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#m365environment
+# for list of acceptable values
 M365Environment: commercial
+
+# The following fields are used to document what organization
 OrgName: Department of Example
 OrgUnitName: Subdepartment of Example
+
+# The OmitPolicy field can be used to omit policies that should be omitted from the SCuBA assessment
+# results (e.g., for controls that are met using a third party tool)
 OmitPolicy: {}
+
+# See both:
+# https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
+# https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
+# For product specific details on filling out the fields below.
+# For specifics about YAML syntax see this link: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases 
 Aad:
   MS.AAD.1.1v1: &o0
     CapExclusions:
