@@ -19,7 +19,7 @@ ProductNames:
 # for list of acceptable values
 M365Environment: commercial
 
-# The following fields are used to document what organization
+# The following fields are used to document what organization this configuration file belongs to.
 OrgName: Department of Example
 OrgUnitName: Subdepartment of Example
 
@@ -31,7 +31,7 @@ OmitPolicy: {}
 # https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
 # https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
 # For product specific details on filling out the fields below.
-# For specifics about YAML syntax see this link: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases 
+# For specifics about YAML syntax see this link: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
 Aad:
   MS.AAD.1.1v1: &o0
     CapExclusions:
