@@ -1,14 +1,32 @@
 # ScubaGear Configuration File
 
-Most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) can be placed into a configuration file in order to make execution easier. The path of the file is specified by the `-ConfigFilePath` parameter, and it contents can be formatted as YAML or JSON.
+ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Executing ScubaGear with a modified configuration file is required to pass specific ScubaGear policy checks. The configuration file also allows users to add additional fields to embed within the ScubaGear output JSON for supplemental metadata purposes.
 
-> **Note**: If a parameter is also specified in a configuration file, the command-line parameter has precedence over the config file. 
-
-> **Note**: The config files use the Pascal case convention for variables, and their names are consistent with the parameters.
+If a parameter is also specified in a configuration file, the command-line parameter has precedence over the configuration file.
+The configuration files use the Pascal case convention for variables, and their names are consistent with the parameters.
 
 ## Sample Configuration Files
 
-[Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Four of these sample config files are explained in more detail in the sections below.
+[Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
+
+## SCuBA compliance use
+The [SCuBA compliance](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
+The configuration file contains a subset of ScubaGear parameters, fields for adding conditional access policy exceptions, fields for omitting ScubaGear policy checks, and additional fields for documenting the organization running ScubaGear.
+Users are highly encourage to read all the configuration file documentation sections below to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
+
+Uniquely, this example configuration file contains the additional `OrgName` and `OrgUnitName` fields for documenting both the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
+
+```
+OrgName: Department of Example
+OrgUnitName: Subdepartment of Example
+```
+
+ScubaGear can be invoked with this config file:
+
+```powershell
+# Invoke with config file
+Invoke-SCuBA -ConfigFilePath scuba_compliance.yaml
+```
 
 ### Basic Use
 
