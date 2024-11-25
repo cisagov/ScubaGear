@@ -24,7 +24,9 @@ OrgName: Department of Example
 OrgUnitName: Subdepartment of Example
 
 # The OmitPolicy field can be used to omit policies that should be omitted from the SCuBA assessment
-# results (e.g., for controls that are met using a third party tool)
+# results (e.g., for controls that are met using a third party tool).
+# See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#omit-policies
+# for in depth details
 OmitPolicy: {}
 
 # See both:
