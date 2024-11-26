@@ -9,7 +9,7 @@ The configuration files use the Pascal case convention for variables, and their 
 
 [Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
 
-## SCuBA compliance use
+### SCuBA compliance use
 The [SCuBA compliance](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
 The configuration file contains a subset of ScubaGear parameters, fields for adding conditional access policy exceptions, fields for omitting ScubaGear policy checks, and additional fields for documenting the organization running ScubaGear.
 Users are highly encourage to read all the configuration file documentation sections below to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
