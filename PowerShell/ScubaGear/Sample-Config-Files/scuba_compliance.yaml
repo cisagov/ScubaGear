@@ -33,48 +33,48 @@ OmitPolicy: {}
 # https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
 # For specifics about YAML syntax: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
 Aad:
-  MS.AAD.1.1v1: &o0
+  MS.AAD.1.1v1: &OrgCapExclusions
     CapExclusions:
       Groups:
       - ""
       Users:
       - ""
-  MS.AAD.2.1v1: *o0
-  MS.AAD.2.3v1: *o0
-  MS.AAD.3.1v1: *o0
-  MS.AAD.3.2v1: *o0
-  MS.AAD.3.3v1: *o0
-  MS.AAD.3.6v1: *o0
-  MS.AAD.3.7v1: *o0
-  MS.AAD.3.8v1: *o0
+  MS.AAD.2.1v1: *OrgCapExclusions
+  MS.AAD.2.3v1: *OrgCapExclusions
+  MS.AAD.3.1v1: *OrgCapExclusions
+  MS.AAD.3.2v1: *OrgCapExclusions
+  MS.AAD.3.3v1: *OrgCapExclusions
+  MS.AAD.3.6v1: *OrgCapExclusions
+  MS.AAD.3.7v1: *OrgCapExclusions
+  MS.AAD.3.8v1: *OrgCapExclusions
   MS.AAD.7.4v1:
     RoleExclusions:
       Groups:
-      - ""
+        - ""
       Users:
-      - ""
+        - ""
 Defender:
-  MS.DEFENDER.1.4v1: &o1
+  MS.DEFENDER.1.4v1: &OrgSensitiveAccountFilter
     SensitiveAccounts:
       ExcludedUsers:
-      - ""
+        - ""
       IncludedGroups:
-      - ""
+        - ""
       IncludedDomains:
-      - ""
+        - ""
       ExcludedDomains:
-      - ""
+        - ""
       ExcludedGroups:
-      - ""
+        - ""
       IncludedUsers:
-      - ""
-  MS.DEFENDER.1.5v1: *o1
+        - ""
+  MS.DEFENDER.1.5v1: *OrgSensitiveAccountFilter
   MS.DEFENDER.2.1v1:
     SensitiveUsers:
-    - ""
+      - ""
   MS.DEFENDER.2.2v1:
     AgencyDomains:
-    - ""
+      - ""
   MS.DEFENDER.2.3v1:
     PartnerDomains:
-    - ""
+      - ""
