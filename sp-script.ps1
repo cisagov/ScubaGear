@@ -60,11 +60,9 @@ function Get-ValidCredentials {
 
     $ValidCredentials = @()
     foreach ($Credential in $Credentials) {
-        if ($Credential.EndDateTime -gt (Get-Date)) {
-            # $credential is of type PSCredential which is immutable, create a copy
-            $CredentialCopy = $Credential | Select-Object *, @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
-            $ValidCredentials += $CredentialCopy
-        }
+        # $credential is of type PSCredential which is immutable, create a copy
+        $CredentialCopy = $Credential | Select-Object *, @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+        $ValidCredentials += $CredentialCopy
     }
 
     if ($null -eq $Credentials -or $Credentials.Count -eq 0 -or $ValidCredentials.Count -eq 0) {
@@ -282,10 +280,14 @@ function Get-AggregatedRiskyServicePrincipals {
                             $Permission.IsAdminConsented = $true
                         }
                     }
+
+                    $ObjectIds = [PSCustomObject]@{
+                        Application      = $App.ObjectId
+                        ServicePrincipal = $MatchedServicePrincipal.ObjectId
+                    }
                 
                     $MergedObject = [PSCustomObject]@{
-                        ApplicationObjectId      = $App.ObjectId
-                        ServicePrincipalObjectId = $MatchedServicePrincipal.ObjectId
+                        ObjectId                 = $ObjectIds
                         AppId                    = $App.AppId
                         DisplayName              = $App.DisplayName
                         IsMultiTenantEnabled     = $App.IsMultiTenantEnabled
