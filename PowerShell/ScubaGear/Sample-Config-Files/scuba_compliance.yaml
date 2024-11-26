@@ -29,11 +29,9 @@ OrgUnitName: Subdepartment of Example
 # for in depth details
 OmitPolicy: {}
 
-# See both:
+# For product specific details on filling out the fields below, see:
 # https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
-# https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
-# For product specific details on filling out the fields below.
-# For specifics about YAML syntax see this link: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
+# For specifics about YAML syntax: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
 Aad:
   MS.AAD.1.1v1: &o0
     CapExclusions:
