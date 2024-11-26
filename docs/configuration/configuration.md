@@ -2,7 +2,7 @@
 
 ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Executing ScubaGear with a modified configuration file is required to pass specific ScubaGear policy checks. The configuration file also allows users to add additional fields to embed within the ScubaGear output JSON for supplemental metadata purposes.
 
-If a parameter is also specified in a configuration file, the command-line parameter has precedence over the configuration file.
+When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
 The configuration files use the Pascal case convention for variables, and their names are consistent with the parameters.
 
 ## Sample Configuration Files
