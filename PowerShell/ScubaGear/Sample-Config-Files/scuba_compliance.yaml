@@ -36,9 +36,9 @@ Aad:
   MS.AAD.1.1v1: &OrgCapExclusions
     CapExclusions:
       Groups:
-      - ""
+        - ""
       Users:
-      - ""
+        - ""
   MS.AAD.2.1v1: *OrgCapExclusions
   MS.AAD.2.3v1: *OrgCapExclusions
   MS.AAD.3.1v1: *OrgCapExclusions
