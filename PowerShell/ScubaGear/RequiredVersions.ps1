@@ -34,6 +34,11 @@ $ModuleList = @(
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
+    },,
+    @{
+        ModuleName = 'Microsoft.Graph.Beta.Applications'
+        ModuleVersion = [version] '2.0.0'
+        MaximumVersion = [version] '2.99.99999'
     },
     @{
         ModuleName = 'Microsoft.Graph.Beta.Users'
