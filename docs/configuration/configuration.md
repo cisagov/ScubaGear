@@ -1,6 +1,6 @@
 # ScubaGear Configuration File
 
-ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Important details about executing ScubaGear via a configuration file are listed below.
+ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Important details about executing ScubaGear with a configuration file are listed below.
 
 - Executing ScubaGear with a modified configuration file is required to pass or omit specific ScubaGear policy checks. See [SCuBA compliance use](https://github.com/cisagov/ScubaGear/blob/1425-update-config-file-documentation-for-ability-to-add-organizational-metadata/docs/configuration/configuration.md#scuba-compliance-use) and the associated sample configuration file for details.
 
