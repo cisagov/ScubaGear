@@ -15,18 +15,18 @@ For non-Federal users, the information in this document is being provided “as 
 
 ## License Compliance and Copyright
 
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [Microsoft 365][] and [Azure][] GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+The **License Requirements** sections of this document assume the organization is using an [M365 E3][] or [G3][] license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
 interpreted as described in
-[RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+[RFC 2119][].
 
 
 The following section summarizes the various Power Platform applications referenced in this baseline:
@@ -36,28 +36,28 @@ to create custom business applications. The apps can be developed as desktop,
 mobile, and even web apps. Three different types of Power Apps can be
 created:
 
-   1. [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag and
+   1. [**Canvas Apps**][]: These are drag and
     drop style developed apps, where
     users drag and add User Interface (UI) components to the screen.
     Users can then connect the components to data sources to display
     data in the canvas app.
 
-   2. [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are apps developed from an existing
+   2. [**Model-Driven Apps**][]: These are apps developed from an existing
     data source. They can be thought of as the inverse of a Canvas App.
     Since, you build the app from the source rather than building the UI and then connecting to the source like
     Canvas apps.
 
-   3. [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are developed to function as either internal or external facing websites.
+   3. [**Power Pages**][]: These apps that are developed to function as either internal or external facing websites.
 
-2. [**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within Microsoft 365 and add-ins used to create automated workflows between apps
+2. [**Power Automate**][]: This is an online tool within Microsoft 365 and add-ins used to create automated workflows between apps
 and services to synchronize files, get notifications, and collect data.
 
-3. [**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chat bots for use in the stand-alone Power Virtual Agents web app or in a Microsoft Teams
+3. [**Power Virtual Agents**][]: These are custom chat bots for use in the stand-alone Power Virtual Agents web app or in a Microsoft Teams
 channel.
 
-4. [**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are proxies or wrappers around an API that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
+4. [**Connectors**][]: These are proxies or wrappers around an API that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
 
-5. [**Microsoft Dataverse**](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/): This is a cloud database management system most
+5. [**Microsoft Dataverse**][]: This is a cloud database management system most
 often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
@@ -68,7 +68,7 @@ Baseline Policies in this document are targeted towards administrative controls 
 Power Platform applications at either the tenant or Power Platform
 environment level. Additional Power Platform security settings can be
 implemented at the app level, connector level, or Dataverse table level.
-Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.com/en-us/power-platform/) for those additional controls.
+Refer to [Power Platform Microsoft Learn documentation][] for those additional controls.
 
 ## 1. Creation of Power Platform Environments
 
@@ -84,8 +84,8 @@ The ability to create production and sandbox environments SHALL be restricted to
 - _Last Modified:_ June 2023
 - Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform service admins, or Delegated admin roles.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1567: Exfiltration Over Web Service][]
+  - [T1048: Exfiltration Over Alternative Protocol][]
 
 #### MS.POWERPLATFORM.1.2v1
 The ability to create trial environments SHALL be restricted to admins.
@@ -101,13 +101,13 @@ The ability to create trial environments SHALL be restricted to admins.
 
 - [Control who can create and manage environments in the Power Platform
   admin center \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/control-environment-creation)
+  Learn][]
 
 - [Power Platform \| Digital Transformation Agency of
-  Australia](https://desktop.gov.au/blueprint/office-365.html#power-platform)
+  Australia][]
 
 - [Microsoft Power Apps Documentation \| Power
-  Apps](https://learn.microsoft.com/en-us/power-apps/)
+  Apps][]
 
 ### License Requirements
 
@@ -117,7 +117,7 @@ The ability to create trial environments SHALL be restricted to admins.
 
 #### MS.POWERPLATFORM.1.1v1 Instructions
 1.  Sign in to your tenant environment's respective [Power Platform admin
-    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
+    center][].
 
 2.  In the upper-right corner of the Microsoft Power Platform site,
     select the **Gear icon** (Settings icon).
@@ -170,8 +170,8 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 - _Last Modified:_ June 2023
 - _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1567: Exfiltration Over Web Service][]
+  - [T1048: Exfiltration Over Alternative Protocol][]
 
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy affecting them.
@@ -180,23 +180,23 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 - _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last Modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+  - [T1567: Exfiltration Over Web Service][]
+  - [T1048: Exfiltration Over Alternative Protocol][]
 
 ### Resources
 
 - [Data Policies for Power Automate and Power Apps \| Digital
   Transformation Agency of
-  Australia](https://desktop.gov.au/blueprint/office-365.html#power-apps-and-power-automate)
+  Australia][]
 
 - [Create a data loss prevention (DLP) policy \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy)
+  Learn][]
 
 - [DLP connector classification \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-connector-classification?source=recommendations)
+  Learn][]
 
 - [DLP for custom connectors \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol)
+  Learn][]
   
 ### License Requirements
 
@@ -206,7 +206,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 
 #### MS.POWERPLATFORM.2.1v1 Instructions
 1.  Sign in to your tenant environment's respective [Power Platform admin
-    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
+    center][].
 
 2.  On the left pane, select **Policies** \> **Data Policies.**
 
@@ -225,7 +225,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 9.  At the bottom of the screen, select **Next** to move on.
 
 10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.
+  Learn][] for more information.
 
 11.  Click **Next**.
 
@@ -270,9 +270,9 @@ Power Platform tenant isolation SHALL be enabled.
 - _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
-  - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
+  - [T1190: Exploit Public-Facing Application][]
 
 #### MS.POWERPLATFORM.3.2v1
 An inbound/outbound connection allowlist SHOULD be configured.
@@ -287,7 +287,7 @@ An inbound/outbound connection allowlist SHOULD be configured.
 ### Resources
 
 - [Enable tenant isolation and configure allowlist \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/cross-tenant-restrictions#enable-tenant-isolation-and-configure-allowlist)
+  Learn][]
 
 ### License Requirements
 
@@ -297,7 +297,7 @@ An inbound/outbound connection allowlist SHOULD be configured.
 
 #### MS.POWERPLATFORM.3.1v1 Instructions
 1.  Sign in to your tenant environment's respective [Power Platform admin
-    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
+    center][].
 
 2.  On the left pane, select **Policies -\> Tenant Isolation**.
 
@@ -332,12 +332,12 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
 - _Last Modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+  - [T1190: Exploit Public-Facing Application][]
 
 ### Resources
 
 - [Content Security Policy \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-platform/admin/content-security-policy)
+  Learn][]
 
 ### License Requirements
 
@@ -347,7 +347,7 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 
 #### MS.POWERPLATFORM.4.1v1 Instructions
 1.  Sign in to your tenant environment's respective [Power Platform admin
-center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
+center][].
 
 2.  On the left-hand pane click on **Environments** and then select an environment from the list.
 
@@ -374,11 +374,11 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 - _Rationale:_ Users may unintentionally misconfigure their Power Pages to expose sensitive information or leave the website in a vulnerable state.
 - _Last Modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+  - [T1190: Exploit Public-Facing Application][]
 
 ### Resources
 - [Control Portal Creation \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-apps/maker/portals/control-portal-creation)
+  Learn][]
 
 ### License Requirements
 
@@ -387,10 +387,10 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 ### Implementation
 
 #### MS.POWERPLATFORM.5.1v1 Instructions
-1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+1.  This setting currently can only be enabled through the [Power Apps PowerShell modules][].
 
 2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenants Power Platform.
-Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+Discover the valid endpoint parameter [here][]. Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
 
@@ -399,3 +399,50 @@ Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/p
     ```
 
 **`TLP:CLEAR`**
+
+[Microsoft 365]: https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE
+[Azure]: https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE
+[M365 E3]: https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans
+[G3]: https://www.microsoft.com/en-us/microsoft-365/government
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[**Canvas Apps**]: https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/
+[**Model-Driven Apps**]: https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/
+[**Power Pages**]: https://learn.microsoft.com/en-us/power-pages/
+[**Power Automate**]: https://learn.microsoft.com/en-us/power-automate/
+[**Power Virtual Agents**]: https://learn.microsoft.com/en-us/power-virtual-agents/
+[**Connectors**]: https://learn.microsoft.com/en-us/connectors/connector-reference/
+[**Microsoft Dataverse**]: https://learn.microsoft.com/en-us/power-apps/maker/data-platform/
+[Power Platform Microsoft Learn documentation]: https://learn.microsoft.com/en-us/power-platform/
+[T1567: Exfiltration Over Web Service]: https://attack.mitre.org/techniques/T1567/
+[T1048: Exfiltration Over Alternative Protocol]: https://attack.mitre.org/techniques/T1048/
+[Control who can create and manage environments in the Power Platform
+  admin center \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/control-environment-creation
+[Power Platform \| Digital Transformation Agency of
+  Australia]: https://desktop.gov.au/blueprint/office-365.html#power-platform
+[Microsoft Power Apps Documentation \| Power
+  Apps]: https://learn.microsoft.com/en-us/power-apps/
+[Power Platform admin
+    center]: https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls
+[Data Policies for Power Automate and Power Apps \| Digital
+  Transformation Agency of
+  Australia]: https://desktop.gov.au/blueprint/office-365.html#power-apps-and-power-automate
+[Create a data loss prevention (DLP) policy \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/create-dlp-policy
+[DLP connector classification \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/dlp-connector-classification?source=recommendations
+[DLP for custom connectors \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol
+[T1078: Valid Accounts]: https://attack.mitre.org/techniques/T1078/
+[T1078.004: Cloud Accounts]: https://attack.mitre.org/techniques/T1078/004/
+[T1190: Exploit Public-Facing Application]: https://attack.mitre.org/techniques/T1190/
+[Enable tenant isolation and configure allowlist \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/cross-tenant-restrictions#enable-tenant-isolation-and-configure-allowlist
+[Content Security Policy \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-platform/admin/content-security-policy
+[Power Platform admin
+center]: https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls
+[Control Portal Creation \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-apps/maker/portals/control-portal-creation
+[Power Apps PowerShell modules]: https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation
+[here]: https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint

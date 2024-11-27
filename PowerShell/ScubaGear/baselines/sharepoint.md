@@ -13,13 +13,13 @@ For non-Federal users, the information in this document is being provided “as 
 
 ## License Compliance and Copyright
 
-Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [M365][] and [Azure][] GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+The **License Requirements** sections of this document assume the organization is using an [M365 E3][] or [G3][] license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 # Baseline Policies
 
@@ -36,9 +36,9 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only peop
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
 
 #### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
@@ -47,10 +47,10 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1530: Data from Cloud Storage][]
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
@@ -60,10 +60,10 @@ External sharing SHALL be restricted to approved external domains and/or users i
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only people in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1530: Data from Cloud Storage][]
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
@@ -73,16 +73,16 @@ Guest access SHALL be limited to the email the invitation was sent to.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1530: Data from Cloud Storage][]
 
 ### Resources
 
-- [Overview of external sharing in SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview)
+- [Overview of external sharing in SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents][]
 
-- [Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off)
+- [Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents][]
 
 ### License Requirements
 
@@ -160,11 +160,11 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
 
 #### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View.
@@ -173,14 +173,14 @@ File and folder default sharing permissions SHALL be set to View.
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1080: Taint Shared Content][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
 
 ### Resources
 
 - [File and folder links \| Microsoft
-  Documents](https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links)
+  Documents][]
 
 ### License Requirements
 
@@ -223,10 +223,10 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1530: Data from Cloud Storage][]
 
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
@@ -236,9 +236,9 @@ The allowable file and folder permissions for links SHALL be set to View only.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1080: Taint Shared Content][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
@@ -248,9 +248,9 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+  - [T1080: Taint Shared Content][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
 
 ### License Requirements
 
@@ -259,7 +259,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 ### Resources
 
 - [Secure external sharing recipient experience \| Microsoft
-  Documents](https://learn.microsoft.com/en-us/sharepoint/what-s-new-in-sharing-in-targeted-release)
+  Documents][]
 
 ### Implementation
 
@@ -320,13 +320,13 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 - _Rationale:_ Scripts on SharePoint sites run in the context of users visiting the site and therefore provide access to everything users can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
+  - [T1059: Command and Scripting Interpreter][]
+    - [T1059.009: Cloud API][]
 
 ### Resources
 
 - [Allow or prevent custom script \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script)
+  Documents][]
 
 ### License Requirements
 
@@ -347,3 +347,26 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 5.  Select **Prevent users from running custom script on self-service created sites**.
 
 6.  Select **OK**.
+
+[M365]: https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE
+[Azure]: https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE
+[M365 E3]: https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans
+[G3]: https://www.microsoft.com/en-us/microsoft-365/government
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[T1048: Exfiltration Over Alternative Protocol]: https://attack.mitre.org/techniques/T1048/
+[T1213: Data from Information Repositories]: https://attack.mitre.org/techniques/T1213/
+[T1213.002: Sharepoint]: https://attack.mitre.org/techniques/T1213/002/
+[T1530: Data from Cloud Storage]: https://attack.mitre.org/techniques/T1530/
+[Overview of external sharing in SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents]: https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview
+[Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \| Microsoft Documents]: https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off
+[T1565: Data Manipulation]: https://attack.mitre.org/techniques/T1565/
+[T1565.001: Stored Data Manipulation]: https://attack.mitre.org/techniques/T1565/001/
+[T1080: Taint Shared Content]: https://attack.mitre.org/techniques/T1080/
+[File and folder links \| Microsoft
+  Documents]: https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off#file-and-folder-links
+[Secure external sharing recipient experience \| Microsoft
+  Documents]: https://learn.microsoft.com/en-us/sharepoint/what-s-new-in-sharing-in-targeted-release
+[T1059: Command and Scripting Interpreter]: https://attack.mitre.org/techniques/T1059/
+[T1059.009: Cloud API]: https://attack.mitre.org/techniques/T1059/009/
+[Allow or prevent custom script \| Microsoft
+  Documents]: https://docs.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script

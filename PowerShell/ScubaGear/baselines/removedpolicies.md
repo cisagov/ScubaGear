@@ -12,17 +12,17 @@ For non-Federal users, the information in this document is being provided “as 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 Additional terminology in this document specific to their respective SCBs are to be interpreted as described in the following:
 
-1. [AAD](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
-2. [Defender](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology)
-3. [Exo](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
-4. [Power BI](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology)
-5. [PowerPlatform](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
-6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
-7. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
+1. [AAD][]
+2. [Defender][]
+3. [Exo][]
+4. [Power BI][]
+5. [PowerPlatform][]
+6. [SharePoint][]
+7. [Teams][]
 
 # Azure Active Directory / Entra ID
 
@@ -66,3 +66,12 @@ Users SHALL be prevented from running custom scripts on personal sites (aka OneD
 - _Removal date:_ July 2024
 - _Removal rationale:_ The option to enable and disable custom scripting on personal sites (aka OneDrive) found in policy MS.SHAREPOINT.4.1v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.  Furthermore, it is no longer possible to allow custom scripts on personal sites.
 
+
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[AAD]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology
+[Defender]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology
+[Exo]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology
+[Power BI]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology
+[PowerPlatform]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology
+[SharePoint]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology
+[Teams]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology

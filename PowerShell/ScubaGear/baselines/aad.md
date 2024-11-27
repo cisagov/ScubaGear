@@ -13,15 +13,15 @@ For non-Federal users, the information in this document is being provided “as 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright
-Portions of this document are adapted from documents in Microsoft’s [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [M365][] and [Azure][] GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+The **License Requirements** sections of this document assume the organization is using an [M365 E3][] or [G3][] license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
-Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in Microsoft Entra ID and [implemented strong security measures](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access#create-emergency-access-accounts) to protect the credentials of those accounts.
+Some of the policies in this baseline may link to Microsoft instruction pages which assume that an agency has created emergency access accounts in Microsoft Entra ID and [implemented strong security measures][] to protect the credentials of those accounts.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 The following are key terms and descriptions used in this document.
 
@@ -34,7 +34,7 @@ Microsoft Entra ID tenant.
 
 ## Highly Privileged Roles
 
-This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Microsoft Entra ID roles as necessary.
+This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID][]. This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Microsoft Entra ID roles as necessary.
 
 - Global Administrator
 - Privileged Role Administrator
@@ -51,7 +51,7 @@ Throughout this document, this list of highly privileged roles is referenced in 
 
 Numerous policies in this baseline rely on Microsoft Entra ID Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Microsoft Entra ID Conditional Access.
 
-As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to help prevent unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
+As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to help prevent unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool][]. Microsoft also describes [Conditional Access insights and reporting][] that can assist with testing.
 
 # Baseline Policies
 
@@ -67,18 +67,18 @@ Legacy authentication SHALL be blocked.
 - _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
-    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1110: Brute Force][]
+    - [T1110.001: Password Guessing][]
+    - [T1110.002: Password Cracking][]
+    - [T1110.003: Password Spraying][]
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 ### Resources
 
-- [Common Conditional Access policy: Block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy)
+- [Common Conditional Access policy: Block legacy authentication][]
 
-- [Five steps to securing your identity infrastructure](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)
+- [Five steps to securing your identity infrastructure][]
 
 ### License Requirements
 
@@ -88,7 +88,7 @@ Legacy authentication SHALL be blocked.
 
 #### MS.AAD.1.1v1 Instructions
 
-1. [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.
+1. [Determine if an agency’s existing applications use legacy authentication][] before blocking legacy authentication across the entire application base.
 
 2. Create a Conditional Access policy to block legacy authentication
 
@@ -106,9 +106,9 @@ Legacy authentication SHALL be blocked.
 
 This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.
 
-- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
+- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature because workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA urges organizations to [apply Conditional Access policies to workload identities][].
 
-- _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
+- _Note:_ In this section, the term ["high risk"][] denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
 
 ### Policies
 #### MS.AAD.2.1v1
@@ -119,8 +119,8 @@ Users detected as high risk SHALL be blocked.
 - _Last modified:_ June 2023
 - _Note:_ Users identified as high risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -129,8 +129,8 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 - _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
@@ -139,16 +139,16 @@ Sign-ins detected as high risk SHALL be blocked.
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 ### Resources
 
-- [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)
+- [What are risk detections?][]
 
-- [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
+- [Simulating risk detections in Identity Protection][]
 
-- [User experiences with Microsoft Entra Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
+- [User experiences with Microsoft Entra Identity Protection][]
 
 ### License Requirements
 
@@ -172,7 +172,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 #### MS.AAD.2.2v1 Instructions
 
-1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.
+1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification][] when user accounts are determined to be high risk.
 
 #### MS.AAD.2.3v1 Instructions
 
@@ -192,12 +192,12 @@ Sign-ins detected as high risk SHALL be blocked.
 
 This section provides policies that help reduce security risks related to user authentication and registration.
 
-Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), but for a variety of reasons, implementing it for all users may be challenging. This section provides additional backup security policies to mitigate risk associated with lesser forms of MFA. For example, Policy MS.AAD.3.2v1 below enforces MFA without stipulating the specific MFA method.
+Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09][], but for a variety of reasons, implementing it for all users may be challenging. This section provides additional backup security policies to mitigate risk associated with lesser forms of MFA. For example, Policy MS.AAD.3.2v1 below enforces MFA without stipulating the specific MFA method.
 
 <img src="/images/aad-mfa.png"
 alt="Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Microsoft Entra certificate-based authentication (preferred) and federated PIV card." />
 
-Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)_
+Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page][]_
 
 ### Policies
 #### MS.AAD.3.1v1
@@ -205,15 +205,15 @@ Phishing-resistant MFA SHALL be enforced for all users.
 
 The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
-If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
+If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy][].
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1566: Phishing][]
+    - [T1566.001: Spearphishing Attachment][]
+    - [T1566.002: Spearphishing Link][]
 
 #### MS.AAD.3.2v1
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
@@ -223,10 +223,10 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
-    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+  - [T1110: Brute Force][]
+    - [T1110.001: Password Guessing][]
+    - [T1110.002: Password Cracking][]
+    - [T1110.003: Password Spraying][]
     
 #### MS.AAD.3.3v1
 If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
@@ -235,10 +235,10 @@ If phishing-resistant MFA has not been enforced and Microsoft Authenticator is e
 - _Rationale:_ This stopgap security policy helps protect the tenant when phishing-resistant MFA has not been enforced and Microsoft Authenticator is used. This policy helps improve the security of Microsoft Authenticator by showing user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
-    - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
-    - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
-    - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+  - [T1110: Brute Force][]
+    - [T1110.001: Password Guessing][]
+    - [T1110.002: Password Cracking][]
+    - [T1110.003: Password Spraying][]
 
 
 #### MS.AAD.3.4v1
@@ -258,9 +258,9 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1621: Multi-Factor Authentication Request Generation][]
+  - [T1566: Phishing][]
+    - [T1566.002: Spearphishing Link][]
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
@@ -270,21 +270,21 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-    - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1566: Phishing][]
+    - [T1566.001: Spearphishing Attachment][]
+    - [T1566.002: Spearphishing Link][]
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
+- _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09][] states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
@@ -293,24 +293,24 @@ Managed Devices SHOULD be required to register MFA.
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
+  - [T1078: Valid Accounts][]
+    - [T1078.004: Cloud Accounts][]
+  - [T1098: Account Manipulation][]
+    - [T1098.005: Device Registration][]
 
 ### Resources
 
-- [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)
+- [What authentication and verification methods are available in Microsoft Entra ID?][]
 
-- [How to use additional context in Microsoft Authenticator notifications - Authentication methods policy](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
+- [How to use additional context in Microsoft Authenticator notifications - Authentication methods policy][]
 
-- [M-22-09 Federal Zero Trust Architecture Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
+- [M-22-09 Federal Zero Trust Architecture Strategy][]
 
-- [Configure Microsoft Entra hybrid join](https://learn.microsoft.com/en-us/entra/identity/devices/how-to-hybrid-join)
+- [Configure Microsoft Entra hybrid join][]
 
-- [Microsoft Entra joined devices](https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join)
+- [Microsoft Entra joined devices][]
 
-- [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
+- [Set up automatic enrollment for Windows devices (for Intune)][]
 
 ### License Requirements
 
@@ -354,8 +354,8 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
 
 
 #### MS.AAD.3.4v1 Instructions
-1. Go through the process of [How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).
-2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
+1. Go through the process of [How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID][].
+2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**][].
 
 #### MS.AAD.3.5v1 Instructions
 1. In **Microsoft Entra admin center** , click **Security > Authentication methods**
@@ -411,16 +411,16 @@ Security logs SHALL be sent to the agency's security operations center for monit
 - _Note:_ The following Microsoft Entra ID logs (configured in diagnostic settings), are required: `AuditLogs, SignInLogs, RiskyUsers, UserRiskEvents, NonInteractiveUserSignInLogs, ServicePrincipalSignInLogs, ADFSSignInLogs, RiskyServicePrincipals, ServicePrincipalRiskEvents, EnrichedOffice365AuditLogs, MicrosoftGraphActivityLogs`. If managed identities are used for Azure resources, also send the `ManagedIdentitySignInLogs` log type. If the Microsoft Entra ID Provisioning Service is used to provision users to software-as-a-service (SaaS) apps or other systems, also send the `ProvisioningLogs` log type.
 - _Note:_ Agencies can benefit from security detection capabilities offered by the CISA Cloud Log Aggregation Warehouse (CLAW) system. Agencies are urged to send the logs to CLAW. Contact CISA at cyberliason@cisa.dhs.gov to request integration instructions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
-    - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
+  - [T1562: Impair Defenses][]
+    - [T1562.008: Disable or Modify Cloud Logs][]
 
 ### Resources
 
-- [Everything you wanted to know about Security and Audit Logging in Office 365](https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/)
+- [Everything you wanted to know about Security and Audit Logging in Office 365][]
 
-- [What are Microsoft Entra sign-in logs??](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins)
+- [What are Microsoft Entra sign-in logs??][]
 
-- [National Cybersecurity Protection System-Cloud Interface Reference Architecture Volume One: General Guidance](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)
+- [National Cybersecurity Protection System-Cloud Interface Reference Architecture Volume One: General Guidance][]
 
 ### License Requirements
 
@@ -444,20 +444,20 @@ Only administrators SHALL be allowed to register applications.
 - _Rationale:_ Application access for the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections, such as MFA policies. Reduce risk of unauthorized users installing malicious applications into the tenant by ensuring that only specific privileged users can register applications.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.001: Additional Cloud Credentials][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
+- _Rationale:_ Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks][].
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.001: Additional Cloud Credentials][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.5.3v1
 An admin consent workflow SHALL be configured for applications.
@@ -466,9 +466,9 @@ An admin consent workflow SHALL be configured for applications.
 - _Rationale:_ Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.001: Additional Cloud Credentials][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
@@ -477,17 +477,17 @@ Group owners SHALL NOT be allowed to consent to applications.
 - _Rationale:_ In M365, group owners and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval workflow, risk of exposure to malicious applications is reduced.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.001: Additional Cloud Credentials][]
+    - [T1098.003: Additional Cloud Roles][]
 
 ### Resources
 
-- [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
+- [Restrict Application Registration for Non-Privileged Users][]
 
-- [Enforce Administrators to Provide Consent for Apps Before Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)
+- [Enforce Administrators to Provide Consent for Apps Before Use][]
 
-- [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)
+- [Configure the admin consent workflow][]
 
 ### License Requirements
 
@@ -555,11 +555,11 @@ User passwords SHALL NOT expire.
 
 ### Resources
 
-- [Password expiration requirements for users](https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users)
+- [Password expiration requirements for users][]
 
-- [Eliminate bad passwords using Microsoft Entra Password Protection](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad)
+- [Eliminate bad passwords using Microsoft Entra Password Protection][]
 
-- [NIST Special Publication 800-63B - Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)
+- [NIST Special Publication 800-63B - Digital Identity Guidelines][]
 
 ### License Requirements
 
@@ -569,11 +569,11 @@ User passwords SHALL NOT expire.
 
 #### MS.AAD.6.1v1 Instructions
 
-1. [Configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).
+1. [Configure the **Password expiration policy** to **Set passwords to never expire**][].
 
 ## 7. Highly Privileged User Access
 
-This section provides policies that help reduce security risks related to the usage of [highly privileged Microsoft Entra ID built-in roles](#highly-privileged-roles). Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies. Special protections are necessary to secure this level of access.
+This section provides policies that help reduce security risks related to the usage of [highly privileged Microsoft Entra ID built-in roles][]. Privileged administrative users have access to operations that can undermine the security of the tenant by changing configurations and security policies. Special protections are necessary to secure this level of access.
 
 Some of the policy implementations in this section reference specific features of the Microsoft Entra ID Privileged Identity Management (PIM) service that provides Privileged Access Management (PAM) capabilities. As an alternative to Microsoft Entra ID PIM, third-party products and services with equivalent PAM capabilities can be leveraged.
 
@@ -585,8 +585,8 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 - _Rationale:_  The Global Administrator role provides unfettered access to the tenant. Limiting the number of users with this level of access makes tenant compromise more challenging. Microsoft recommends fewer than five users in the Global Administrator role. However, additional user accounts, up to eight, may be necessary to support emergency access and some operational scenarios.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.7.2v1
 Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.
@@ -595,11 +595,11 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 - _Rationale:_ Many privileged administrative users do not need unfettered access to the tenant to perform their duties. By assigning them to roles based on least privilege, the risks associated with having their accounts compromised are reduced.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-  - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
-  - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
-    - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
+  - [T1651: Cloud Administration Command][]
+  - [T1136: Create Account][]
+    - [T1136.003: Cloud Account][]
 
 #### MS.AAD.7.3v1
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
@@ -608,8 +608,8 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 - _Rationale:_ By provisioning cloud-only Microsoft Entra ID user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1556: Modify Authentication Process](https://attack.mitre.org/techniques/T1556/)
-    - [T1556.007: Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
+  - [T1556: Modify Authentication Process][]
+    - [T1556.007: Hybrid Identity][]
 
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
@@ -621,8 +621,8 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
   - Emergency access accounts that need perpetual access to the tenant in the rare event of system degradation or other scenarios.
   - Some types of service accounts that require a user account with privileged roles; since these accounts are used by software programs, they cannot perform role activation.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
@@ -631,7 +631,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 - _Rationale:_ Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 admin center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
+  - [T1651: Cloud Administration Command][]
 
 #### MS.AAD.7.6v1
 Activation of the Global Administrator role SHALL require approval.
@@ -640,8 +640,8 @@ Activation of the Global Administrator role SHALL require approval.
 - _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.7.7v1
 Eligible and Active highly privileged role assignments SHALL trigger an alert.
@@ -650,8 +650,8 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 - _Rationale:_ Closely monitor assignment of the highest privileged roles for signs of compromise. Send assignment alerts to enable the security monitoring team to detect compromise attempts.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.7.8v1
 User activation of the Global Administrator role SHALL trigger an alert.
@@ -661,8 +661,8 @@ User activation of the Global Administrator role SHALL trigger an alert.
 - _Last modified:_ June 2023
 - _Note:_ It is recommended to prioritize user activation of Global Administrator as one of the most important events to monitor and respond to.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
@@ -671,29 +671,29 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 - _Rationale:_ Closely monitor activation of high-risk roles for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts. In some environments, activating privileged roles can generate a significant number of alerts.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-  - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
-    - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
+  - [T1136: Create Account][]
+    - [T1136.003: Cloud Account][]
 
 
 ### Resources
 
-- [Limit number of Global Administrators to less than 5](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#5-limit-the-number-of-global-administrators-to-less-than-5)
+- [Limit number of Global Administrators to less than 5][]
 
-- [Implement Privilege Access Management](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity#implement-privilege-access-management)
+- [Implement Privilege Access Management][]
 
-- [Assign Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-add-role-to-user)
+- [Assign Microsoft Entra roles in Privileged Identity Management][]
 
-- [Privileged Identity Management (PIM) for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups)
+- [Privileged Identity Management (PIM) for Groups][]
 
-- [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow)
+- [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management][]
 
-- [Configure security alerts for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts)
+- [Configure security alerts for Microsoft Entra roles in Privileged Identity Management][]
 
 ### License Requirements
 
-- Policies [MS.AAD.7.4v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad74v1), [MS.AAD.7.5v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad75v1), [MS.AAD.7.6v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad76v1), [MS.AAD.7.7v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad77v1), [MS.AAD.7.8v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad78v1), and [MS.AAD.7.9v1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad79v1) require a Microsoft Entra ID P2 license; however, a third-party Privileged Access Management (PAM) solution may also be used to satisfy the requirements. If a third-party solution is used, then a P2 license is not required for the respective policies.
+- Policies [MS.AAD.7.4v1][], [MS.AAD.7.5v1][], [MS.AAD.7.6v1][], [MS.AAD.7.7v1][], [MS.AAD.7.8v1][], and [MS.AAD.7.9v1][] require a Microsoft Entra ID P2 license; however, a third-party Privileged Access Management (PAM) solution may also be used to satisfy the requirements. If a third-party solution is used, then a P2 license is not required for the respective policies.
 ### Implementation
 
 The following implementation instructions that reference the Microsoft Entra ID PIM service will vary if using a third-party PAM system instead. 
@@ -829,10 +829,10 @@ Guest users SHOULD have limited or restricted access to Microsoft Entra ID direc
 - _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1087: Account Discovery](https://attack.mitre.org/techniques/T1087/)
-    - [T1087.003: Email Account](https://attack.mitre.org/techniques/T1087/003/)
-    - [T1087.004: Cloud Account](https://attack.mitre.org/techniques/T1087/004/)
-  - [T1526: Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)
+  - [T1087: Account Discovery][]
+    - [T1087.003: Email Account][]
+    - [T1087.004: Cloud Account][]
+  - [T1526: Cloud Service Discovery][]
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
@@ -841,8 +841,8 @@ Only users with the Guest Inviter role SHOULD be able to invite guest users.
 - _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized account creation.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
@@ -851,14 +851,14 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1078: Valid Accounts][]
+    - [T1078.001: Default Accounts][]
 
 ### Resources
 
-- [Configure external collaboration settings](https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure)
+- [Configure external collaboration settings][]
 
-- [Compare member and guest default permissions](https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions)
+- [Compare member and guest default permissions][]
 
 ### License Requirements
 
@@ -896,12 +896,98 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 # Appendix A: Microsoft Entra ID hybrid Guidance
 
-Most of this document does not focus on securing Microsoft Entra ID hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of Microsoft Entra ID hybrid infrastructure.
+Most of this document does not focus on securing Microsoft Entra ID hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture][] document addressing the unique implementation requirements of Microsoft Entra ID hybrid infrastructure.
 
 # Appendix B: Cross-tenant Access Guidance
 
 Some of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Microsoft Entra ID cross-tenant access settings.
 
-Microsoft’s [Authentication and Conditional Access for External ID](https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access) provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Microsoft Entra External ID, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview).
+Microsoft’s [Authentication and Conditional Access for External ID][] provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Microsoft Entra External ID, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID][].
 
 **`TLP:CLEAR`**
+
+[M365]: https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE
+[Azure]: https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE
+[M365 E3]: https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans
+[G3]: https://www.microsoft.com/en-us/microsoft-365/government
+[implemented strong security measures]: https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access#create-emergency-access-accounts
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[built-in roles in Microsoft Entra ID]: https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference
+[What If tool]: https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool
+[Conditional Access insights and reporting]: https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-insights-reporting
+[T1110: Brute Force]: https://attack.mitre.org/techniques/T1110/
+[T1110.001: Password Guessing]: https://attack.mitre.org/techniques/T1110/001/
+[T1110.002: Password Cracking]: https://attack.mitre.org/techniques/T1110/002/
+[T1110.003: Password Spraying]: https://attack.mitre.org/techniques/T1110/003/
+[T1078: Valid Accounts]: https://attack.mitre.org/techniques/T1078/
+[T1078.004: Cloud Accounts]: https://attack.mitre.org/techniques/T1078/004/
+[Common Conditional Access policy: Block legacy authentication]: https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy
+[Five steps to securing your identity infrastructure]: https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity
+[Determine if an agency’s existing applications use legacy authentication]: https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use
+[apply Conditional Access policies to workload identities]: https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity
+["high risk"]: https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks
+[What are risk detections?]: https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks
+[Simulating risk detections in Identity Protection]: https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk
+[User experiences with Microsoft Entra Identity Protection]: https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience
+[Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification]: https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts
+[Office of Management and Budget Memorandum 22-09]: https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf
+[Microsoft Page]: https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods
+[enforce PIV logon via Microsoft Active Directory group policy]: https://www.idmanagement.gov/implement/scl-windows/
+[T1566: Phishing]: https://attack.mitre.org/techniques/T1566/
+[T1566.001: Spearphishing Attachment]: https://attack.mitre.org/techniques/T1566/001/
+[T1566.002: Spearphishing Link]: https://attack.mitre.org/techniques/T1566/002/
+[T1621: Multi-Factor Authentication Request Generation]: https://attack.mitre.org/techniques/T1621/
+[OMB-22-09]: https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf
+[T1098: Account Manipulation]: https://attack.mitre.org/techniques/T1098/
+[T1098.005: Device Registration]: https://attack.mitre.org/techniques/T1098/005/
+[What authentication and verification methods are available in Microsoft Entra ID?]: https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods
+[How to use additional context in Microsoft Authenticator notifications - Authentication methods policy]: https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal
+[M-22-09 Federal Zero Trust Architecture Strategy]: https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf
+[Configure Microsoft Entra hybrid join]: https://learn.microsoft.com/en-us/entra/identity/devices/how-to-hybrid-join
+[Microsoft Entra joined devices]: https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join
+[Set up automatic enrollment for Windows devices (for Intune)]: https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll
+[How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID]: https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage
+[set the **Manage Migration** option to **Migration Complete**]: https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration
+[T1562: Impair Defenses]: https://attack.mitre.org/techniques/T1562/
+[T1562.008: Disable or Modify Cloud Logs]: https://attack.mitre.org/techniques/T1562/008/
+[Everything you wanted to know about Security and Audit Logging in Office 365]: https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/
+[What are Microsoft Entra sign-in logs??]: https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins
+[National Cybersecurity Protection System-Cloud Interface Reference Architecture Volume One: General Guidance]: https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf
+[T1098.001: Additional Cloud Credentials]: https://attack.mitre.org/techniques/T1098/001/
+[T1098.003: Additional Cloud Roles]: https://attack.mitre.org/techniques/T1098/003/
+[consent grant attacks]: https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide
+[Restrict Application Registration for Non-Privileged Users]: https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html
+[Enforce Administrators to Provide Consent for Apps Before Use]: https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html
+[Configure the admin consent workflow]: https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow
+[Password expiration requirements for users]: https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users
+[Eliminate bad passwords using Microsoft Entra Password Protection]: https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad
+[NIST Special Publication 800-63B - Digital Identity Guidelines]: https://pages.nist.gov/800-63-3/sp800-63b.html
+[Configure the **Password expiration policy** to **Set passwords to never expire**]: https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy
+[highly privileged Microsoft Entra ID built-in roles]: #highly-privileged-roles
+[T1651: Cloud Administration Command]: https://attack.mitre.org/techniques/T1651/
+[T1136: Create Account]: https://attack.mitre.org/techniques/T1136/
+[T1136.003: Cloud Account]: https://attack.mitre.org/techniques/T1136/003/
+[T1556: Modify Authentication Process]: https://attack.mitre.org/techniques/T1556/
+[T1556.007: Hybrid Identity]: https://attack.mitre.org/techniques/T1556/007/
+[Limit number of Global Administrators to less than 5]: https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#5-limit-the-number-of-global-administrators-to-less-than-5
+[Implement Privilege Access Management]: https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity#implement-privilege-access-management
+[Assign Microsoft Entra roles in Privileged Identity Management]: https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-add-role-to-user
+[Privileged Identity Management (PIM) for Groups]: https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups
+[Approve or deny requests for Microsoft Entra roles in Privileged Identity Management]: https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow
+[Configure security alerts for Microsoft Entra roles in Privileged Identity Management]: https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts
+[MS.AAD.7.4v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad74v1
+[MS.AAD.7.5v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad75v1
+[MS.AAD.7.6v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad76v1
+[MS.AAD.7.7v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad77v1
+[MS.AAD.7.8v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad78v1
+[MS.AAD.7.9v1]: https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad79v1
+[T1087: Account Discovery]: https://attack.mitre.org/techniques/T1087/
+[T1087.003: Email Account]: https://attack.mitre.org/techniques/T1087/003/
+[T1087.004: Cloud Account]: https://attack.mitre.org/techniques/T1087/004/
+[T1526: Cloud Service Discovery]: https://attack.mitre.org/techniques/T1526/
+[T1078.001: Default Accounts]: https://attack.mitre.org/techniques/T1078/001/
+[Configure external collaboration settings]: https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure
+[Compare member and guest default permissions]: https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions
+[Hybrid Identity Solutions Architecture]: https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf
+[Authentication and Conditional Access for External ID]: https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access
+[Overview: Cross-tenant access with Microsoft Entra External ID]: https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview

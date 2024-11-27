@@ -14,10 +14,10 @@ For non-Federal users, the information in this document is being provided “as 
 
 
 ## License Compliance and Copyright
-Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft's [M365][] and [Azure][] GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Sources are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+The **License Requirements** sections of this document assume the organization is using an [M365 E3][] or [G3][] license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 
 Agencies using Power BI may have a data classification scheme in place for
@@ -29,7 +29,7 @@ Agencies using Power BI may have a data classification scheme in place for
   the Power BI tenant; the agency disallows non-secure connections.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 Access to PowerBI can be controlled by the user type. In this baseline,
 the types of users are defined as follows:
@@ -68,15 +68,15 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 - _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1530: Data from Cloud Storage][]
 
 ### Resources
 
 - [About Power BI Tenant settings \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
+  Learn][]
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
+  repo][]
 
 ### License Requirements
 
@@ -106,19 +106,19 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 - _Rationale:_ Disabling external access to Power BI helps keep guest users from accessing potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1485: Data Destruction][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
+  - [T1078: Valid Accounts][]
+    - [T1078.001: Default Accounts][]
 
 ### Resources
 
 - [About Power BI Tenant settings \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
+  Learn][]
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
+  repo][]
 
 ### License Requirements
 
@@ -167,24 +167,24 @@ The Invite external users to your organization feature SHOULD be disabled unless
 > Note:
 > If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
-  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
-    - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
-  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+  - [T1485: Data Destruction][]
+  - [T1565: Data Manipulation][]
+    - [T1565.001: Stored Data Manipulation][]
+  - [T1078: Valid Accounts][]
+    - [T1078.001: Default Accounts][]
+  - [T1199: Trusted Relationship][]
 
 ### Resources
 
 - [About Power BI Tenant settings \| Microsoft
-  Docs](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
+  Docs][]
 
 - [Distribute Power BI content to external guest users with Microsoft Entra B2B \|
   Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-azure-ad-b2b)
+  Learn][]
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
+  repo][]
 
 ### License Requirements
 
@@ -235,8 +235,8 @@ Service principals with access to APIs SHOULD be restricted to specific security
 - _Rationale:_ With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
+  - [T1059: Command and Scripting Interpreter][]
+    - [T1059.009: Cloud API][]
 
 #### MS.POWERBI.4.2v1
 Service principals creating and using profiles SHOULD be restricted to specific security groups.
@@ -245,33 +245,33 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 - _Rationale:_ With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+  - [T1098: Account Manipulation][]
+    - [T1098.003: Additional Cloud Roles][]
 
 ### Resources
 
 - [Automate Premium workspace and dataset tasks with service principal
   \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-premium-service-principal)
+  Learn][]
 
 - [Embed Power BI content with service principal and an application
   secret \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal)
+  Learn][]
 
 - [Embed Power BI content with service principal and a certificate \|
   Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal-certificate)
+  Learn][]
 
 - [Enable service principal authentication for read-only admin APIs \|
   Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/read-only-apis-service-principal-authentication)
+  Learn][]
 
 - [Microsoft Power BI Embedded Developer Code Samples \| Microsoft
-  GitHub](https://github.com/microsoft/PowerBI-Developer-Samples/blob/master/Python/Encrypt%20credentials/README.md)
+  GitHub][]
 
 - [Azure security baseline for Power BI \|
   Microsoft
-  Learn](https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
+  Learn][]
 
 ### License Requirements
 
@@ -323,18 +323,18 @@ ResourceKey-based authentication SHOULD be blocked unless a specific use case (e
 - _Rationale:_ If resource keys are allowed, someone can move data without Microsoft Entra ID OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1134: Access Token Manipulation](https://attack.mitre.org/techniques/T1134/)
-    - [T1134.001: Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001/)
-    - [T1134.003: Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003/)
+  - [T1134: Access Token Manipulation][]
+    - [T1134.001: Token Impersonation/Theft][]
+    - [T1134.003: Make and Impersonate Token][]
 
 
 ### Resources
 
 - [Power BI Tenant settings \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings)
+  Learn][]
 
 - [Real-time streaming in Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/connect-data/service-real-time-streaming)
+  Learn][]
 
 ### License Requirements
 
@@ -371,15 +371,15 @@ Python and R interactions SHOULD be disabled.
 - _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or integrations. Disabling this will reduce the risk of a data leak or malicious actor.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1059: Command and Scripting Interpreter][]
+    - [T1059.009: Cloud API][]
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1567: Exfiltration Over Web Service][]
 
 ### Resources
 
 - [Create Power BI visuals with Python \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/connect-data/desktop-python-visuals)
+  Learn][]
 
 ### License Requirements
 
@@ -421,30 +421,30 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 - _Rationale:_ A document without sensitivity labels may be opened unknowingly, potentially exposing data to someone who is not supposed to have access to it. This policy will help organize and classify data, making it easier to keep data out of the wrong hands.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1048: Exfiltration Over Alternative Protocol][]
+  - [T1213: Data from Information Repositories][]
+    - [T1213.002: Sharepoint][]
+  - [T1530: Data from Cloud Storage][]
+  - [T1567: Exfiltration Over Web Service][]
 ### Resources
 
 - [Enable sensitivity labels in Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-enable-data-sensitivity-labels)
+  Learn][]
 
 - [Data loss prevention policies for Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-dlp-policies-for-power-bi-overview)
+  Learn][]
 
 - [Data Protection in Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-data-protection-overview)
+  Learn][]
 
 - [Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
-  repo](https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx)
+  repo][]
 
 ### License Requirements
 
 - Microsoft Purview Information Protection Premium P1 or Premium P2 license is required to apply or view
   Microsoft Information Protection sensitivity labels in Power BI. Azure Information Protection can be purchased either standalone or through one of the Microsoft licensing suites. See [Microsoft Purview Information Protection
-  service description](https://azure.microsoft.com/services/information-protection/) for
+  service description][] for
   details.
 
 - Microsoft Purview Information Protection sensitivity labels need to be migrated to
@@ -458,7 +458,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 - Before enabling sensitivity labels on the agency's tenant, ensure sensitivity labels have been defined and published for relevant
   users and groups. See [Create and configure sensitivity labels and
   their
-  policies](https://learn.microsoft.com/en-us/purview/create-sensitivity-labels)
+  policies][]
   for detail.
 
 
@@ -530,7 +530,7 @@ the agency.
   labels in Power BI. Microsoft Purview Information Protection can be purchased
   either standalone or through one of the Microsoft licensing suites.
   See [Microsoft Purview Information Protection
-  service](https://learn.microsoft.com/en-us/office365/servicedescriptions/azure-information-protection) description for
+  service][] description for
   details.
 
 - Microsoft Purview Information Protection sensitivity labels need to be migrated to
@@ -545,7 +545,7 @@ the agency.
   that sensitivity labels have been defined and published for relevant
   users and groups. See [Create and configure sensitivity labels and
   their
-  policies](https://learn.microsoft.com/en-us/purview/create-sensitivity-labels)
+  policies][]
   for detail.
 
 **High-Level Steps to Use Bring Your Own Key (BYOK) Feature in Power
@@ -555,9 +555,9 @@ First, confirm having the latest Power BI Management cmdlet. Install the
 latest version by running Install-Module -Name MicrosoftPowerBIMgmt.
 More information about the Power BI cmdlet and its parameters is
 available in [Power BI PowerShell cmdlet
-module](https://learn.microsoft.com/en-us/powershell/power-bi/overview?view=powerbi-ps).
+module][].
 
-Follow steps in [Bring Your Own (encryption) Keys for Power BI](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok).
+Follow steps in [Bring Your Own (encryption) Keys for Power BI][].
 
 **Row-Level Security Implementation**
 
@@ -584,24 +584,24 @@ should be completed in the following order.
 
 - Reference Microsoft Power BI documentation for additional detail on
   [row-level security
-  configuration](https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-rls).
+  configuration][].
 
 **Related Resources**
 
 - [Sensitivity labels in Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-sensitivity-label-overview)
+  Learn][]
 
 - [Bring your own encryption keys for Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok)
+  Learn][]
 
 - [What is an on-premises data gateway? \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/data-integration/gateway/service-gateway-onprem)
+  Learn][]
 
 - [Row-level security (RLS) with Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-rls)
+  Learn][]
 
 - [Power BI PowerShell cmdlets and modules references \| Microsoft
- Learn](https://learn.microsoft.com/en-us/powershell/power-bi/overview?view=powerbi-ps)
+ Learn][]
 
 # Appendix B: Source Code and Credential Security Considerations
 
@@ -623,7 +623,7 @@ use BYOK, which is supported by Power BI. By default,
 Power BI uses Microsoft-managed keys to encrypt the data. In Power BI
 Premium, users can use their own keys for data at-rest imported
 into a dataset. See [Data source and storage
-considerations](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok#data-source-and-storage-considerations)
+considerations][]
 for more information.
 
 - For Power BI embedded applications, a best practice is to implement a
@@ -637,7 +637,7 @@ for more information.
 
 - Implementers must do their own due diligence in selecting a source
   code scanner that integrates with their specific environment.
-  Microsoft documentation references an Open Web Application Security Project, [Source Code Analysis Tools](https://owasp.org/www-community/Source_Code_Analysis_Tools); which is a guide to
+  Microsoft documentation references an Open Web Application Security Project, [Source Code Analysis Tools][]; which is a guide to
   third-party scanners. This baseline does not endorse or advise on the selection or
   use of any specific third-party tool.
 
@@ -672,27 +672,27 @@ configuration steps are as follows:
 
 3. To turn on BYOK, Power BI Tenant administrators must use a set of
     Power BI [Admin PowerShell
-    Cmdlets](https://learn.microsoft.com/en-us/powershell/module/microsoftpowerbimgmt.admin/?view=powerbi-ps)
+    Cmdlets][]
     added to the Power BI Admin Cmdlets.
 
-    Follow detailed steps in Microsoft's [Bring your own encryption keys for Power BI](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok)
+    Follow detailed steps in Microsoft's [Bring your own encryption keys for Power BI][]
     from Microsoft.
 
 **Related Resources**
 
 - [Bring your own encryption keys for Power BI \| Microsoft
- Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok)
+ Learn][]
 
-- [Microsoft Security DevOps Azure DevOps extension](https://learn.microsoft.com/en-us/azure/defender-for-cloud/azure-devops-extension)
+- [Microsoft Security DevOps Azure DevOps extension][]
 
 - For GitHub, the agency can use the native secret scanning feature to
   identify credentials or other form of secrets within code at [About
   secret scanning \| GitHub
-  docs](https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning)
+  docs][]
 
 - [Announcing General Availability of Bring Your Own Key (BYOK) for
   Power BI
-  Premium](https://powerbi.microsoft.com/en-us/blog/announcing-general-availability-of-bring-your-own-key-byok-for-power-bi-premium/)
+  Premium][]
 
 # Appendix C: File Export and Visual Artifact Considerations
 
@@ -724,13 +724,13 @@ the Export and Sharing Settings.
 **Related Resources**
 
 - [Sensitivity labels in Power BI \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-sensitivity-label-overview)
+  Learn][]
 
 - [Say No to Export Data, Yes to Analyze in
-  Excel](https://radacad.com/say-no-to-export-data-yes-to-analyze-in-excel-power-bi-and-excel-can-talk)
+  Excel][]
 
 - [Power BI Governance – Why you should consider disabling Export to
-  Excel](https://data-marc.com/2020/04/13/power-bi-governance-why-you-should-consider-to-disable-export-to-excel/)
+  Excel][]
 
 **Implementation settings**
 
@@ -784,9 +784,9 @@ disabling public internet access.
 **Related Resources**
 
 - [Private endpoints for secure access to Power BI  \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-private-links)
+  Learn][]
 
-- [Azure security baseline for Power BI](https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline)
+- [Azure security baseline for Power BI][]
 
 ## Best Practices for Service Principals
 
@@ -806,3 +806,109 @@ disabling public internet access.
 > This policy is only applicable if the setting **Allow service principals to use Power BI APIs** is enabled.
 
 **`TLP:CLEAR`**
+
+[M365]: https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE
+[Azure]: https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE
+[M365 E3]: https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans
+[G3]: https://www.microsoft.com/en-us/microsoft-365/government
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[T1530: Data from Cloud Storage]: https://attack.mitre.org/techniques/T1530/
+[About Power BI Tenant settings \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings
+[Power BI Security Baseline v2.0 \| Microsoft benchmarks GitHub
+  repo]: https://github.com/MicrosoftDocs/SecurityBenchmarks/blob/master/Azure%20Offer%20Security%20Baselines/2.0/power-bi-security-baseline-v2.0.xlsx
+[T1485: Data Destruction]: https://attack.mitre.org/techniques/T1485/
+[T1565: Data Manipulation]: https://attack.mitre.org/techniques/T1565/
+[T1565.001: Stored Data Manipulation]: https://attack.mitre.org/techniques/T1565/001/
+[T1078: Valid Accounts]: https://attack.mitre.org/techniques/T1078/
+[T1078.001: Default Accounts]: https://attack.mitre.org/techniques/T1078/001/
+[T1199: Trusted Relationship]: https://attack.mitre.org/techniques/T1199/
+[About Power BI Tenant settings \| Microsoft
+  Docs]: https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings
+[Distribute Power BI content to external guest users with Microsoft Entra B2B \|
+  Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-azure-ad-b2b
+[T1059: Command and Scripting Interpreter]: https://attack.mitre.org/techniques/T1059/
+[T1059.009: Cloud API]: https://attack.mitre.org/techniques/T1059/009/
+[T1098: Account Manipulation]: https://attack.mitre.org/techniques/T1098/
+[T1098.003: Additional Cloud Roles]: https://attack.mitre.org/techniques/T1098/003/
+[Automate Premium workspace and dataset tasks with service principal
+  \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-premium-service-principal
+[Embed Power BI content with service principal and an application
+  secret \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal
+[Embed Power BI content with service principal and a certificate \|
+  Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/developer/embedded/embed-service-principal-certificate
+[Enable service principal authentication for read-only admin APIs \|
+  Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/read-only-apis-service-principal-authentication
+[Microsoft Power BI Embedded Developer Code Samples \| Microsoft
+  GitHub]: https://github.com/microsoft/PowerBI-Developer-Samples/blob/master/Python/Encrypt%20credentials/README.md
+[Azure security baseline for Power BI \|
+  Microsoft
+  Learn]: https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline
+[T1134: Access Token Manipulation]: https://attack.mitre.org/techniques/T1134/
+[T1134.001: Token Impersonation/Theft]: https://attack.mitre.org/techniques/T1134/001/
+[T1134.003: Make and Impersonate Token]: https://attack.mitre.org/techniques/T1134/003/
+[Power BI Tenant settings \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/admin/service-admin-portal-about-tenant-settings
+[Real-time streaming in Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/connect-data/service-real-time-streaming
+[T1048: Exfiltration Over Alternative Protocol]: https://attack.mitre.org/techniques/T1048/
+[T1567: Exfiltration Over Web Service]: https://attack.mitre.org/techniques/T1567/
+[Create Power BI visuals with Python \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/connect-data/desktop-python-visuals
+[T1213: Data from Information Repositories]: https://attack.mitre.org/techniques/T1213/
+[T1213.002: Sharepoint]: https://attack.mitre.org/techniques/T1213/002/
+[Enable sensitivity labels in Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-enable-data-sensitivity-labels
+[Data loss prevention policies for Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-dlp-policies-for-power-bi-overview
+[Data Protection in Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-data-protection-overview
+[Microsoft Purview Information Protection
+  service description]: https://azure.microsoft.com/services/information-protection/
+[Create and configure sensitivity labels and
+  their
+  policies]: https://learn.microsoft.com/en-us/purview/create-sensitivity-labels
+[Microsoft Purview Information Protection
+  service]: https://learn.microsoft.com/en-us/office365/servicedescriptions/azure-information-protection
+[Power BI PowerShell cmdlet
+module]: https://learn.microsoft.com/en-us/powershell/power-bi/overview?view=powerbi-ps
+[Bring Your Own (encryption) Keys for Power BI]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok
+[row-level security
+  configuration]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-rls
+[Sensitivity labels in Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-sensitivity-label-overview
+[Bring your own encryption keys for Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok
+[What is an on-premises data gateway? \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/data-integration/gateway/service-gateway-onprem
+[Row-level security (RLS) with Power BI \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-admin-rls
+[Power BI PowerShell cmdlets and modules references \| Microsoft
+ Learn]: https://learn.microsoft.com/en-us/powershell/power-bi/overview?view=powerbi-ps
+[Data source and storage
+considerations]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok#data-source-and-storage-considerations
+[Source Code Analysis Tools]: https://owasp.org/www-community/Source_Code_Analysis_Tools
+[Admin PowerShell
+    Cmdlets]: https://learn.microsoft.com/en-us/powershell/module/microsoftpowerbimgmt.admin/?view=powerbi-ps
+[Bring your own encryption keys for Power BI]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok
+[Bring your own encryption keys for Power BI \| Microsoft
+ Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-encryption-byok
+[Microsoft Security DevOps Azure DevOps extension]: https://learn.microsoft.com/en-us/azure/defender-for-cloud/azure-devops-extension
+[About
+  secret scanning \| GitHub
+  docs]: https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning
+[Announcing General Availability of Bring Your Own Key (BYOK) for
+  Power BI
+  Premium]: https://powerbi.microsoft.com/en-us/blog/announcing-general-availability-of-bring-your-own-key-byok-for-power-bi-premium/
+[Say No to Export Data, Yes to Analyze in
+  Excel]: https://radacad.com/say-no-to-export-data-yes-to-analyze-in-excel-power-bi-and-excel-can-talk
+[Power BI Governance – Why you should consider disabling Export to
+  Excel]: https://data-marc.com/2020/04/13/power-bi-governance-why-you-should-consider-to-disable-export-to-excel/
+[Private endpoints for secure access to Power BI  \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/power-bi/enterprise/service-security-private-links
+[Azure security baseline for Power BI]: https://learn.microsoft.com/en-us/security/benchmark/azure/baselines/power-bi-security-baseline

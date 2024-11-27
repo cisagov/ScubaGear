@@ -12,13 +12,13 @@ For non-Federal users, the information in this document is being provided “as 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 ## License Compliance and Copyright 
-Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft's [M365][] and [Azure][] GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
-The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
+The **License Requirements** sections of this document assume the organization is using an [M365 E3][] or [G3][] license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119][].
 
 Access to Teams can be controlled by the user type. In this baseline,
 the types of users are defined as follows:
@@ -71,8 +71,8 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
-    - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+  - [T1078: Valid Accounts][]
+    - [T1078.001: Default Accounts][]
 
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
@@ -127,16 +127,16 @@ Record an event SHOULD be set to Organizer can record.
 ### Resources
 
 - [Manage who can present and request control in Microsoft Teams \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
-- [Meeting policy settings \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings)
+  Learn][] 
+- [Meeting policy settings \| Microsoft Learn][]
 
 - [Teams cloud meeting recording \| Microsoft
-Learn ](https://learn.microsoft.com/en-us/microsoftteams/cloud-recording)
+Learn ][]
 
 - [Assign policies in Teams – getting started \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overview)
+Learn][]
 - [Live Event Recording Policies \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies)
+Learn][]
 
 ### License Requirements
 
@@ -255,7 +255,7 @@ able to attend meetings if added as B2B guest users.
 External access may be granted on a per-domain basis. This may be
 desirable in some cases (e.g., for agency-to-agency collaboration). See
 the Chief Information Officer Council's [Interagency Collaboration
-Program](https://community.max.gov/display/Egov/Interagency+Collaboration+Program) Office of Management and Budget MA site for a list of .gov domains for sharing.
+Program][] Office of Management and Budget MA site for a list of .gov domains for sharing.
 
 Similar to external users, blocking contact with unmanaged Teams users prevents these users from looking up internal users by their email address and initiating chats and calls within Teams. These users would still be able to join calls, assuming anonymous join is enabled. Additionally, unmanaged users may be added to Teams chats if the internal user initiates the contact.
 
@@ -268,9 +268,9 @@ External access for users SHALL only be enabled on a per-domain basis.
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+  - [T1199: Trusted Relationship][]
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
 
 #### MS.TEAMS.2.2v1
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
@@ -280,8 +280,8 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
 
 #### MS.TEAMS.2.3v1
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
@@ -291,24 +291,24 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
 
 ### Resources
 
 - [IT Admins - Manage external meetings and chat with people and organizations using Microsoft identities \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access)
+  Learn][]
 
 - [Teams settings and policies reference \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-settings-in-teams#allow-anonymous-users-to-join-meetings)
+  Learn][]
 
 - [Use guest access and external access to collaborate with people
   outside your organization \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoftteams/communicate-with-users-from-other-organizations)
+  Learn][]
 
 - [Manage chat with external Teams users not managed by an organization
 \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-chat-with-external-teams-users-not-managed-by-an-organization)
+Learn][]
 
 ### License Requirements
 
@@ -318,7 +318,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#m
 
 Steps for the unmanaged users are outlined in [Manage chat with external Teams users not
 managed by an
-organization](https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-chat-with-external-teams-users-not-managed-by-an-organization).
+organization][].
 
 #### MS.TEAMS.2.1v1 Instructions
 
@@ -382,15 +382,15 @@ Contact with Skype users SHALL be blocked.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+  - [T1567: Exfiltration Over Web Service][]
 
 ### Resources
 
 - [Configure external meetings and chat with Skype for Business Server \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
+Learn][]
 
 - [Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
-Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
+Blog][]
 
 ### License Requirements
 
@@ -421,14 +421,14 @@ Teams email integration SHALL be disabled.
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
+    - [T1204.002: Malicious File][]
 
 ### Resources
 
 - [Email Integration \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration)
+Learn][]
 
 ### License Requirements
 
@@ -467,7 +467,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
+  - [T1195: Supply Chain Compromise][]
 
 #### MS.TEAMS.5.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
@@ -477,8 +477,8 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
-  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1195: Supply Chain Compromise][]
+  - [T1528: Steal Application Access Token][]
 
 #### MS.TEAMS.5.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
@@ -488,14 +488,14 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
-  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1195: Supply Chain Compromise][]
+  - [T1528: Steal Application Access Token][]
 
 ### Resources
 
-- [Use app permission policies to control user access to apps \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)
+- [Use app permission policies to control user access to apps \| Microsoft Learn][]
 
-- [Upload your app in Microsoft Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)
+- [Upload your app in Microsoft Teams \| Microsoft Learn][]
 
 ### License Requirements
 
@@ -583,7 +583,7 @@ should offer services comparable to those offered by Microsoft.
 Though using Microsoft's DLP solution is not strictly
 required, guidance for configuring Microsoft's DLP solution can be found in following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
 
-- [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
+- [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365][]
 
 ### Policies
 
@@ -594,8 +594,8 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories][]
+  - [T1530: Data from Cloud Storage][]
 
 #### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
@@ -606,39 +606,39 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1213: Data from Information Repositories][]
+  - [T1530: Data from Cloud Storage][]
 
 ### Resources
 
-- [Plan for data loss prevention (DLP) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
+- [Plan for data loss prevention (DLP) \| Microsoft Learn][]
 
 - [Personally identifiable information (PII) \|
-  NIST](https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct)
+  NIST][]
 
 - [Sensitive information \|
-  NIST](https://csrc.nist.gov/glossary/term/sensitive_information)
+  NIST][]
 
 ### License Requirements
 
-- DLP for Teams within Microsoft Purview requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
+- DLP for Teams within Microsoft Purview requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft Learn][]
   for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
 
 ### Implementation
 
 #### MS.TEAMS.6.1v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP][] for additional guidance.
 
 #### MS.TEAMS.6.2v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP][] for additional guidance.
 
 ## 7. Malware Scanning
 
 Malware scanning protects M365 Teams assets from malicious software. Several commercial anti-malware solutions detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
+- [MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365][]
   - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
 ### Policies
@@ -650,8 +650,8 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+  - [T1566: Phishing][]
+    - [T1566.001: Spearphishing Attachment][]
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
@@ -660,18 +660,18 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+  - [T1204: User Execution][]
+    - [T1204.002: Malicious File][]
 
 
 ### Resources
 
 - [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings)
+  Learn][]
 
 - [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
   Teams \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide)
+  Learn][]
 
 ### License Requirements
 
@@ -682,11 +682,11 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 #### MS.TEAMS.7.1v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments][] for additional guidance.
 
 #### MS.TEAMS.7.2v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments][] for additional guidance.
 
 ## 8. Link Protection
 
@@ -712,7 +712,7 @@ If all checks pass, the user is redirected to the original URL.
 Microsoft Defender includes link-scanning capabilities. Using Microsoft Defender is not strictly required for this purpose; any product fulfilling the requirements outlined in this baseline policy group may be used.
 If the agency uses Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
+- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365][].
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -724,12 +724,12 @@ URL comparison with a blocklist SHOULD be enabled.
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
+    - [T1204.002: Malicious File][]
+  - [T1566: Phishing][]
+    - [T1566.001: Spearphishing Attachment][]
+  - [T1189: Drive-by Compromise][]
 
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
@@ -738,19 +738,19 @@ User click tracking SHOULD be enabled.
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
 - _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
+  - [T1204: User Execution][]
+    - [T1204.001: Malicious Link][]
+    - [T1204.002: Malicious File][]
+  - [T1566: Phishing][]
+    - [T1566.001: Spearphishing Attachment][]
+  - [T1189: Drive-by Compromise][]
 
 ### Resources
 
 - [Recommended settings for EOP and Microsoft Defender for Office 365
-  security \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
+  security \| Microsoft Learn][]
 
-- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
+- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn][]
   
 ### License Requirements
 
@@ -760,11 +760,11 @@ User click tracking SHOULD be enabled.
 
 #### MS.TEAMS.8.1v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy][] for additional guidance.
 
 #### MS.TEAMS.8.2v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy][] for additional guidance.
 
 
 [^1]: Note that B2B guest users and all anonymous users except for
@@ -798,3 +798,75 @@ record meetings:
 8.  Select **Apply**.
 
 **`TLP:CLEAR`**
+
+[M365]: https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE
+[Azure]: https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE
+[M365 E3]: https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans
+[G3]: https://www.microsoft.com/en-us/microsoft-365/government
+[RFC 2119]: https://datatracker.ietf.org/doc/html/rfc2119
+[T1078: Valid Accounts]: https://attack.mitre.org/techniques/T1078/
+[T1078.001: Default Accounts]: https://attack.mitre.org/techniques/T1078/001/
+[Manage who can present and request control in Microsoft Teams \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control
+[Meeting policy settings \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings
+[Teams cloud meeting recording \| Microsoft
+Learn ]: https://learn.microsoft.com/en-us/microsoftteams/cloud-recording
+[Assign policies in Teams – getting started \| Microsoft
+Learn]: https://learn.microsoft.com/en-us/microsoftteams/policy-assignment-overview
+[Live Event Recording Policies \| Microsoft
+Learn]: https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-events-recording-policies
+[Interagency Collaboration
+Program]: https://community.max.gov/display/Egov/Interagency+Collaboration+Program
+[T1199: Trusted Relationship]: https://attack.mitre.org/techniques/T1199/
+[T1204: User Execution]: https://attack.mitre.org/techniques/T1204/
+[T1204.001: Malicious Link]: https://attack.mitre.org/techniques/T1204/001/
+[IT Admins - Manage external meetings and chat with people and organizations using Microsoft identities \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoftteams/manage-external-access
+[Teams settings and policies reference \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoftteams/meeting-settings-in-teams#allow-anonymous-users-to-join-meetings
+[Use guest access and external access to collaborate with people
+  outside your organization \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoftteams/communicate-with-users-from-other-organizations
+[Manage chat with external Teams users not managed by an organization
+\| Microsoft
+Learn]: https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-chat-with-external-teams-users-not-managed-by-an-organization
+[Manage chat with external Teams users not
+managed by an
+organization]: https://learn.microsoft.com/en-us/microsoftteams/manage-external-access#manage-chat-with-external-teams-users-not-managed-by-an-organization
+[T1567: Exfiltration Over Web Service]: https://attack.mitre.org/techniques/T1567/
+[Configure external meetings and chat with Skype for Business Server \| Microsoft
+Learn]: https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid
+[Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
+Blog]: https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833
+[T1204.002: Malicious File]: https://attack.mitre.org/techniques/T1204/002/
+[Email Integration \| Microsoft
+Learn]: https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#email-integration
+[T1195: Supply Chain Compromise]: https://attack.mitre.org/techniques/T1195/
+[T1528: Steal Application Access Token]: https://attack.mitre.org/techniques/T1528/
+[Use app permission policies to control user access to apps \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies
+[Upload your app in Microsoft Teams \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload
+[Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365]: ./defender.md#4-data-loss-prevention
+[T1213: Data from Information Repositories]: https://attack.mitre.org/techniques/T1213/
+[T1530: Data from Cloud Storage]: https://attack.mitre.org/techniques/T1530/
+[Plan for data loss prevention (DLP) \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide
+[Personally identifiable information (PII) \|
+  NIST]: https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct
+[Sensitive information \|
+  NIST]: https://csrc.nist.gov/glossary/term/sensitive_information
+[Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft Learn]: https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams
+[DLP]: ./defender.md#implementation-3
+[MS.DEFENDER.3.1v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365]: ./defender.md#msdefender31v1
+[T1566: Phishing]: https://attack.mitre.org/techniques/T1566/
+[T1566.001: Spearphishing Attachment]: https://attack.mitre.org/techniques/T1566/001/
+[Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings
+[Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
+  Teams \| Microsoft
+  Learn]: https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide
+[Safe Attachments]: ./defender.md#implementation-2
+[MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365]: ./defender.md#msdefender13v1
+[T1189: Drive-by Compromise]: https://attack.mitre.org/techniques/T1189/
+[Recommended settings for EOP and Microsoft Defender for Office 365
+  security \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365
+[Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn]: https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide
+[standard or strict preset security policy]: defender.md#msdefender13v1-instructions
