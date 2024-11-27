@@ -1,3 +1,5 @@
+$PermissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
+
 function Format-RiskyPermissions {
     <#
     .Description
@@ -11,7 +13,7 @@ function Format-RiskyPermissions {
         [PSCustomObject]
         $Json,
 
-        [ValidateNotNullOrEmpty()]
+        # Initialized as empty array
         [Object[]]
         $Map,
 
@@ -27,7 +29,7 @@ function Format-RiskyPermissions {
         [boolean]
         $IsAdminConsented
     )
-
+    
     $RiskyPermissions = $Json.permissions.$Resource.PSObject.Properties.Name
     if ($RiskyPermissions -contains $Id) {
         $Map += [PSCustomObject]@{
@@ -40,7 +42,7 @@ function Format-RiskyPermissions {
     return $Map
 }
 
-function Get-ValidCredentials {
+function Format-Credentials {
     <#
     .Description
     Returns an array of valid credentials, expired credentials are excluded
@@ -48,8 +50,7 @@ function Get-ValidCredentials {
     #Internal
     ##>
     param (
-        [ValidateNotNullOrEmpty()]
-        [Array[]]
+        [Object[]]
         $Credentials,
 
         [ValidateNotNullOrEmpty()]
@@ -78,11 +79,11 @@ function Merge-Credentials {
     #Internal
     ##>
     param (
-        [ValidateNotNullOrEmpty()]
+        #[ValidateNotNullOrEmpty()]
         [Object[]]
         $ApplicationCredentials,
 
-        [ValidateNotNullOrEmpty()]
+        #[ValidateNotNullOrEmpty()]
         [Object[]]
         $ServicePrincipalCredentials
     )
@@ -177,8 +178,8 @@ function Get-ApplicationsWithRiskyPermissions {
                         AppId                = $App.AppId
                         DisplayName          = $App.DisplayName
                         IsMultiTenantEnabled = $IsMultiTenantEnabled
-                        KeyCredentials       = Get-ValidCredentials -Credentials $App.KeyCredentials -IsFromApplication $true
-                        PasswordCredentials  = Get-ValidCredentials -Credentials $App.PasswordCredentials -IsFromApplication $true
+                        KeyCredentials       = Format-Credentials -Credentials $App.KeyCredentials -IsFromApplication $true
+                        PasswordCredentials  = Format-Credentials -Credentials $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = $FederatedCredentialsResults
                         RiskyPermissions     = $MappedPermissions
                     }
@@ -228,17 +229,18 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                 # Disregard entries without risky permissions
                 if ($MappedPermissions.Count -gt 0) {
                     $ServicePrincipalResults += [PSCustomObject]@{
-                        ObjectId            = $ServicePrincipal.Id
-                        AppId               = $ServicePrincipal.AppId
-                        DisplayName         = $ServicePrincipal.DisplayName
-                        KeyCredentials      = Get-ValidCredentials -Credentials $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                        PasswordCredentials = Get-ValidCredentials -Credentials $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                        RiskyPermissions    = $MappedPermissions
+                        ObjectId             = $ServicePrincipal.Id
+                        AppId                = $ServicePrincipal.AppId
+                        DisplayName          = $ServicePrincipal.DisplayName
+                        KeyCredentials       = Format-Credentials -Credentials $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                        PasswordCredentials  = Format-Credentials -Credentials $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                        FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
+                        RiskyPermissions     = $MappedPermissions
                     }
                 }
             }
         } catch {
-            Write-Warning "An error occurred in Get-ApplicationsWithRiskyPermissions: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Get-ServicePrincipalsWithRiskyPermissions: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
@@ -246,18 +248,27 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     }
 }
 
-function Get-AggregatedRiskyServicePrincipals {
+function Get-ApplicationsOwnedByOrganization {
     <#
     .Description
-    Returns an aggregated JSON dataset, combining data from both applications and service principal objects.
-    Key/Password/Federated credentials are combined into a single object, and admin consent is reflected
-    in each object's list of associated risky permissions.
+    Returns an aggregated JSON dataset of application objects, combining data from both applications and 
+    service principal objects. Key/Password/Federated credentials are combined into a single object, and 
+    admin consent is reflected in each object's list of associated risky permissions.
     .Functionality
     #Internal
     ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskyApps,
+
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskySPs
+    )
     process {
         try {
-            $AggregatedResults = @()
+            $Applications = @()
             foreach ($App in $RiskyApps) {
                 $MatchedServicePrincipal = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
             
@@ -283,27 +294,27 @@ function Get-AggregatedRiskyServicePrincipals {
                         IsMultiTenantEnabled     = $App.IsMultiTenantEnabled
                         KeyCredentials           = Merge-Credentials -ApplicationCredentials $App.KeyCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.KeyCredentials
                         PasswordCredentials      = Merge-Credentials -ApplicationCredentials $App.PasswordCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.PasswordCredentials
-                        FederatedCredentials     = $App.FederatedCredentials
+                        FederatedCredentials     = Merge-Credentials -ApplicationCredentials $App.FederatedCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.FederatedCredentials
                         RiskyPermissions         = $App.RiskyPermissions
                     }
                 }
                 else {
                     $MergedObject = $App
                 }
-                $AggregatedResults += $MergedObject
+                $Applications += $MergedObject
             }
         }
         catch {
-            Write-Warning "An error occurred in Get-AggregatedRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Get-ApplicationsOwnedByOrganization: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $AggregatedResults | ConvertTo-Json -Depth 3
+        $Applications | ConvertTo-Json -Depth 3
     }
 }
 
 Export-ModuleMember -Function @(
     'Get-ApplicationsWithRiskyPermissions',
     'Get-ServicePrincipalsWithRiskyPermissions',
-    'Get-AggregatedRiskyServicePrincipals'
+    'Get-ApplicationsOwnedByOrganization'
 )
