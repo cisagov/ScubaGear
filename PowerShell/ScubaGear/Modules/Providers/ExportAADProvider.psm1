@@ -181,9 +181,18 @@ function Export-AADProvider {
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
     ##### This block gathers information on application/service principal API permissions
-    Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
-    $riskyApplications = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
-    Write-Output $riskyApplications
+    $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
+    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "AADRiskyPermissionsHelper.psm1")
+
+    $RiskyApps = Get-ApplicationsWithRiskyPermissions
+    $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+
+    $RiskyApps | Format-List > riskyapps.json
+    $RiskySPs | Format-List > riskysps.json
+    
+    $FirstPartyApps = Get-ApplicationsOwnedByOrganization -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+
+    
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
