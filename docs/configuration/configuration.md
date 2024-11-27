@@ -59,7 +59,7 @@ Invoke-SCuBA `
 ### SCuBA compliance use
 The [SCuBA compliance](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
 The configuration file contains a subset of ScubaGear parameters, fields for adding conditional access policy exceptions, fields for omitting ScubaGear policy checks, and additional fields for documenting the organization running ScubaGear.
-Users are highly encouraged to read all the configuration file documentation sections below to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
+Users are highly encouraged to read all the configuration file documentation sections to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
 
 Uniquely, this example configuration file contains the additional `OrgName` and `OrgUnitName` fields for documenting both the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
 
