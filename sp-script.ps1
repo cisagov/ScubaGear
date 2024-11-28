@@ -190,12 +190,12 @@ function Get-ApplicationsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $ApplicationResults | ConvertTo-Json -Depth 3
+        return $ApplicationResults
     }
 }
 
-$RiskyApps = Get-ApplicationsWithRiskyPermissions
-$RiskyApps > finalAppResults.json
+#$RiskyApps = Get-ApplicationsWithRiskyPermissions
+#$RiskyApps > finalAppResults.json
 
 function Get-ServicePrincipalsWithRiskyPermissions {
     <#
@@ -246,17 +246,17 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $ServicePrincipalResults | ConvertTo-Json -Depth 3
+        return $ServicePrincipalResults
     }
 }
 
-$RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-$RiskySPs > finalSPResults.json
+#$RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+#$RiskySPs > finalSPResults.json
 
-$RiskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
-$RiskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
+#$RiskyApps = (Get-Content -Path "./finalAppResults.json" | ConvertFrom-Json)
+#$RiskySPs = (Get-Content -Path "./finalSPResults.json" | ConvertFrom-Json)
 
-function Get-AggregatedRiskyServicePrincipals {
+function Get-FirstPartyRiskyApplications {
     <#
     .Description
     Returns an aggregated JSON dataset, combining data from both applications and service principal objects.
@@ -265,6 +265,15 @@ function Get-AggregatedRiskyServicePrincipals {
     .Functionality
     #Internal
     ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskyApps,
+
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskySPs
+    )
     process {
         try {
             $AggregatedResults = @()
@@ -304,13 +313,72 @@ function Get-AggregatedRiskyServicePrincipals {
             }
         }
         catch {
-            Write-Warning "An error occurred in Get-AggregatedRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Get-FirstPartyRiskyApplications: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $AggregatedResults | ConvertTo-Json -Depth 3
+        return $AggregatedResults
     }
 }
 
-$AggregatedRiskySPs = Get-AggregatedRiskyServicePrincipals
-$AggregatedRiskySPs > aggregatedResults.json
+#$AggregatedRiskySPs = Get-FirstPartyRiskyApplications
+#$AggregatedRiskySPs > aggregatedResults.json
+
+function Get-ThirdPartyRiskyServicePrincipals {
+    <#
+    .Description
+    Returns a JSON dataset of service principal objects which are owned by external organizations.
+    .Functionality
+    #Internal
+    ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskyApps,
+
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskySPs
+    )
+    process {
+        try {
+            $ServicePrincipals = @()
+            foreach ($ServicePrincipal in $RiskySPs) {
+                $MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
+                
+                # If a service principal does not have an associated application registration,
+                # then it is owned by an external organization.
+                if ($null -eq $MatchedApplication) {
+                    $ServicePrincipals += $ServicePrincipal
+                }
+            }
+        }
+        catch {
+            Write-Warning "An error occurred in Get-ThirdPartyRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
+        return $ServicePrincipals
+    }
+}
+
+#$thirdpartysps = Get-ThirdPartyRiskyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+#$thirdpartysps | ConvertTo-Json -Depth 3 > thirdpartysps.json
+
+$RiskyApps = Get-ApplicationsWithRiskyPermissions
+$RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+
+$RiskyApps > finalAppResults.json
+$RiskySPs > finalSPResults.json
+
+$FirstPartyApps = Get-FirstPartyRiskyApplications `
+    -RiskyApps $RiskyApps `
+    -RiskySPs $RiskySPs `
+| ConvertTo-Json -Depth 3
+$ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals `
+    -RiskyApps $RiskyApps `
+    -RiskySPs $RiskySPs `
+| ConvertTo-Json -Depth 3
+
+$FirstPartyApps > firstpartyapps.json
+$ThirdPartySPs > thirdpartysps.json
