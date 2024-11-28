@@ -190,7 +190,7 @@ function Get-ApplicationsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $ApplicationResults | ConvertTo-Json -Depth 3
+        return $ApplicationResults
     }
 }
 
@@ -244,11 +244,11 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $ServicePrincipalResults | ConvertTo-Json -Depth 3
+        return $ServicePrincipalResults
     }
 }
 
-function Get-ApplicationsOwnedByOrganization {
+function Get-FirstPartyRiskyApplications {
     <#
     .Description
     Returns an aggregated JSON dataset of application objects, combining data from both applications and 
@@ -305,16 +305,55 @@ function Get-ApplicationsOwnedByOrganization {
             }
         }
         catch {
-            Write-Warning "An error occurred in Get-ApplicationsOwnedByOrganization: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Get-FirstPartyRiskyApplications: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        $Applications | ConvertTo-Json -Depth 3
+        return $Applications
+    }
+}
+
+function Get-ThirdPartyRiskyServicePrincipals {
+    <#
+    .Description
+    Returns a JSON dataset of service principal objects which are owned by external organizations.
+    .Functionality
+    #Internal
+    ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskyApps,
+
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $RiskySPs
+    )
+    process {
+        try {
+            $ServicePrincipals = @()
+            foreach ($ServicePrincipal in $RiskySPs) {
+                $MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
+                
+                # If a service principal does not have an associated application registration,
+                # then it is owned by an external organization.
+                if ($null -eq $MatchedApplication) {
+                    $ServicePrincipals += $ServicePrincipal
+                }
+            }
+        }
+        catch {
+            Write-Warning "An error occurred in Get-ThirdPartyRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
+        return $ServicePrincipals
     }
 }
 
 Export-ModuleMember -Function @(
     'Get-ApplicationsWithRiskyPermissions',
     'Get-ServicePrincipalsWithRiskyPermissions',
-    'Get-ApplicationsOwnedByOrganization'
+    'Get-FirstPartyRiskyApplications',
+    'Get-ThirdPartyRiskyServicePrincipals'
 )
