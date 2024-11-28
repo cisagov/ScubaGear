@@ -187,17 +187,25 @@ function Export-AADProvider {
     $RiskyApps = Get-ApplicationsWithRiskyPermissions
     $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
 
-    $RiskyApps | Format-List > riskyapps.json
-    $RiskySPs | Format-List > riskysps.json
-    
-    $FirstPartyApps = Get-ApplicationsOwnedByOrganization -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+    $FirstPartyApps = Get-FirstPartyRiskyApplications `
+        -RiskyApps $RiskyApps `
+        -RiskySPs $RiskySPs `
+    | ConvertTo-Json -Depth 3
+    $ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals `
+        -RiskyApps $RiskyApps `
+        -RiskySPs $RiskySPs `
+    | ConvertTo-Json -Depth 3
 
-    
+    $FirstPartyApps > firstpartyapps.json
+    $ThirdPartySPs > thirdpartysps.json
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
+    #"first_party_risky_applications": $FirstPartyApps,
+    #"third_part_risky_service_principals": $ThirdPartySPs,
+    
     # Note the spacing and the last comma in the json is important
     $json = @"
     "conditional_access_policies": $AllPolicies,
@@ -211,6 +219,8 @@ function Export-AADProvider {
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
+    "first_party_applications": $FirstPartyApps,
+    "third_party_service_principals": $ThirdPartySPs,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
