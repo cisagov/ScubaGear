@@ -41,7 +41,7 @@ Describe "PSSA Check" {
     # The module should be installed
     $Module | Should -Not -BeNullOrEmpty
     # There should be write-warning statements
-    Write-Warning $Warnings
+    $Warnings | ForEach-Object { Write-Warning $_ } 
     $Warnings | Should -Not -BeNullOrEmpty
     # Note: This is a little bit fragile.  It only work as long as one of these two
     # summary statements is the final output written.
