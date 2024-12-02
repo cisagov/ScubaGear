@@ -20,16 +20,17 @@ Describe "PSSA Check" {
   It "PSSA should write output" {
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     Write-Warning "The repo root path is $RepoRootPath"
-    # . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
-    Write-Warning "The script path is $ScriptPath"
-    . $ScriptPath
+    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+    # Write-Warning "The script path is $ScriptPath"
+    # . $ScriptPath
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     # # Source the function
     # . $ScriptPath
     # # Invoke PSSA, redirecting all Write-Outputs to $Output
-    # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
     # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
