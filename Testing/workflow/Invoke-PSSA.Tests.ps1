@@ -19,9 +19,12 @@
 Describe "PSSA Check" {
   It "PSSA should write output" {
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
-    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    Write-Warning "The repo root path is $RepoRootPath"
+    # . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+    Write-Warning "The script path is $ScriptPath"
+    . $ScriptPath
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
     # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     # # Source the function
     # . $ScriptPath
