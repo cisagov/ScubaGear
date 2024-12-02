@@ -338,7 +338,7 @@ function LoadTestResults() {
 function SetAndCheckTenantSetting {
 <#
     .SYNOPSIS
-      Function executes one script block until the second registers it as successful or timeout occurs.
+      Function executes one script block until the second block registers it as successful or timeout occurs.
     .PARAMETER SetBlock
       Script block used to set the tenant setting value
     .PARAMETER CheckBlock
@@ -346,7 +346,9 @@ function SetAndCheckTenantSetting {
     .PARAMETER Retries
       Number of times to retry the set block before failing (0 - 10)
     .PARAMETER WaitInterval
-      Number of seconds to wait before each check (0 - 3600)
+      Number of seconds to wait before each check, except the first which always checks immediately (0 - 3600)
+    .PARAMETER WaitOnFirstCheck
+      Delay first check by WaitInterval if true, otherwise check immediately (Default: True)
     .NOTES
       If the check block does not return true after the last retry, function will throw an error.
 #>
@@ -367,7 +369,10 @@ param (
     [Parameter(Mandatory = $false)]
     [ValidateRange(0,3600)]
     [int]
-    $WaitInterval = 10
+    $WaitInterval = 10,
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $WaitOnFirstCheck = $False
 )
     $SetAttempts = 0
 
@@ -375,19 +380,24 @@ param (
         $SetFunc = [ScriptBlock]::Create($SetBlock)
         $CheckFunc = [ScriptBlock]::Create($CheckBlock)
         do {
-
+            Write-Debug("Running set block: $($SetFunc.Ast.EndBlock)...")
             Invoke-Command -ScriptBlock $SetFunc
-            Start-Sleep $WaitInterval
+
+            # Sleep if not first check or option to always wait is set
+            if($SetAttempts -ne 0 -or $WaitOnFirstCheck) {
+                Write-Debug("Sleeping for $WaitInterval seconds...")
+                Start-Sleep $WaitInterval
+            }
+            Write-Debug("Running check block: $($CheckFunc.Ast.EndBlock)...")
             $CheckSucceeded = Invoke-Command -ScriptBlock $CheckFunc
-            Write-Host("Tenant value changed?: $CheckSucceeded")
+            Write-Verbose("(Attempt $SetAttempts) Check block result = $CheckSucceeded")
             ++$SetAttempts
         } while(-not $CheckSucceeded -and $SetAttempts -lt $Retries)
 
         if(-not $CheckSucceeded) {
-          throw "Unable to set value after $SetAttempts attempts."
+            throw "Unable to set value after $SetAttempts attempts."
         }
     } catch {
-        throw "Error executing script blocks., $_.StackTrace"
+        throw "Error executing script block: $_.StackTrace"
     }
-
 }
