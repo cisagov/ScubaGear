@@ -18,7 +18,7 @@ function Invoke-PSSA {
 	)
 
 	Write-Warning "Testing PowerShell files with PSScriptAnalyzer..."
-	Write-Output " "
+	Write-Warning " "
 
 	# Install PSScriptAnalyzer
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -44,33 +44,33 @@ function Invoke-PSSA {
 		Write-Warning $PsFile
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		foreach ($Result in $Results) {
-			Write-Output "File:     $($Result.ScriptPath)"
-			Write-Output "Line:     $($Result.Line)"
-			Write-Output "Severity: $($Result.Severity)"
-			Write-Output "RuleName: $($Result.RuleName)"
+			Write-Warning "File:     $($Result.ScriptPath)"
+			Write-Warning "Line:     $($Result.Line)"
+			Write-Warning "Severity: $($Result.Severity)"
+			Write-Warning "RuleName: $($Result.RuleName)"
 			# Only create GitHub workflow annotation if warning or error
 			# The ::error:: notation is how a workflow annotation is created
 			if ($Result.Severity -eq 'Information') {
-				Write-Output "Message:  $($Result.Message)"
+				Write-Warning "Message:  $($Result.Message)"
 				$InfoCount++
 			}
 			elseif ($Result.Severity -eq 'Warning') {
-				Write-Output "::error::Message:  $($Result.Message)"
+				Write-Warning "::error::Message:  $($Result.Message)"
 				$WarningCount++
 			}
 			elseif ($Result.Severity -eq 'Error') {
-				Write-Output "::error::Message:  $($Result.Message)"
+				Write-Warning "::error::Message:  $($Result.Message)"
 				$ErrorCount++
 			}
-			Write-Output " "
+			Write-Warning " "
 		}
 	}
 
 	# Summarize results
-	Write-Output "Summary"
-	Write-Output "  Errors:       $ErrorCount"
-	Write-Output "  Warnings:     $WarningCount"
-	Write-Output "  Information:  $InfoCount"
+	Write-Warning "Summary"
+	Write-Warning "  Errors:       $ErrorCount"
+	Write-Warning "  Warnings:     $WarningCount"
+	Write-Warning "  Information:  $InfoCount"
 
 	# # If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# # This is not run every time because it takes too long.
