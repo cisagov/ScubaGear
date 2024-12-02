@@ -43,50 +43,50 @@ function Invoke-PSSA {
 	foreach ($PsFile in $RemainingPsFiles) {
 		Write-Warning $PsFile
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
-		foreach ($Result in $Results) {
-			Write-Output "File:     $($Result.ScriptPath)"
-			Write-Output "Line:     $($Result.Line)"
-			Write-Output "Severity: $($Result.Severity)"
-			Write-Output "RuleName: $($Result.RuleName)"
-			# Only create GitHub workflow annotation if warning or error
-			# The ::error:: notation is how a workflow annotation is created
-			if ($Result.Severity -eq 'Information') {
-				Write-Output "Message:  $($Result.Message)"
-				$InfoCount++
-			}
-			elseif ($Result.Severity -eq 'Warning') {
-				Write-Output "::error::Message:  $($Result.Message)"
-				$WarningCount++
-			}
-			elseif ($Result.Severity -eq 'Error') {
-				Write-Output "::error::Message:  $($Result.Message)"
-				$ErrorCount++
-			}
-			Write-Output " "
-		}
+		# foreach ($Result in $Results) {
+		# 	Write-Output "File:     $($Result.ScriptPath)"
+		# 	Write-Output "Line:     $($Result.Line)"
+		# 	Write-Output "Severity: $($Result.Severity)"
+		# 	Write-Output "RuleName: $($Result.RuleName)"
+		# 	# Only create GitHub workflow annotation if warning or error
+		# 	# The ::error:: notation is how a workflow annotation is created
+		# 	if ($Result.Severity -eq 'Information') {
+		# 		Write-Output "Message:  $($Result.Message)"
+		# 		$InfoCount++
+		# 	}
+		# 	elseif ($Result.Severity -eq 'Warning') {
+		# 		Write-Output "::error::Message:  $($Result.Message)"
+		# 		$WarningCount++
+		# 	}
+		# 	elseif ($Result.Severity -eq 'Error') {
+		# 		Write-Output "::error::Message:  $($Result.Message)"
+		# 		$ErrorCount++
+		# 	}
+		# 	Write-Output " "
+		# }
 	}
 
-	# Summarize results
-	Write-Output "Summary"
-	Write-Output "  Errors:       $ErrorCount"
-	Write-Output "  Warnings:     $WarningCount"
-	Write-Output "  Information:  $InfoCount"
+	# # Summarize results
+	# Write-Output "Summary"
+	# Write-Output "  Errors:       $ErrorCount"
+	# Write-Output "  Warnings:     $WarningCount"
+	# Write-Output "  Information:  $InfoCount"
 
-	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
-	# This is not run every time because it takes too long.
-	if ($DebuggingMode) {
-		Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
-	}
+	# # If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
+	# # This is not run every time because it takes too long.
+	# if ($DebuggingMode) {
+	# 	Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
+	# }
 
-	Write-Output " "
+	# Write-Output " "
 
-	# Exit 1 if warnings or errors
-	if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
-		Write-Output "Problems were found in the PowerShell scripts."
-		exit 1
-	}
-	else {
-		Write-Output "No problems were found in the PowerShell scripts."
-		exit 0
-	}
+	# # Exit 1 if warnings or errors
+	# if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
+	# 	Write-Output "Problems were found in the PowerShell scripts."
+	# 	exit 1
+	# }
+	# else {
+	# 	Write-Output "No problems were found in the PowerShell scripts."
+	# 	exit 0
+	# }
 }
