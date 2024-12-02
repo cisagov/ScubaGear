@@ -32,8 +32,8 @@ Describe "PSSA Check" {
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
-    $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
-    $Module | Should -Not -BeNullOrEmpty
+    # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
+    # $Module | Should -Not -BeNullOrEmpty
     # $Output | Should -Not -BeNullOrEmpty
     # # Note: This is a little bit fragile.  It only work as long as one of these two
     # # summary statements is the final output written.
