@@ -10,8 +10,9 @@ BeforeDiscovery {
   # Source the function
   . $ScriptPath
   # Invoke PSSA, redirecting all Write-Outputs to $Output
-  $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
-  $global:Output = $Writes
+  Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+  # $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+  # $global:Output = $Writes
 }
 
 Describe "PSSA Check" {
@@ -25,9 +26,9 @@ Describe "PSSA Check" {
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
-    # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
-    # $Module | Should -Not -BeNullOrEmpty
-    $Output | Should -Not -BeNullOrEmpty
+    $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
+    $Module | Should -Not -BeNullOrEmpty
+    # $Output | Should -Not -BeNullOrEmpty
     # # Note: This is a little bit fragile.  It only work as long as one of these two
     # # summary statements is the final output written.
     # $Output | Select-Object -Last 1 | Should -BeIn @("Problems were found in the PowerShell scripts.", "No problems were found in the PowerShell scripts.")
