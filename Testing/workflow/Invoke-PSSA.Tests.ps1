@@ -20,16 +20,22 @@ Describe "PSSA Check" {
   It "PSSA should write output" {
     $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     Write-Warning "The repo root path is $RepoRootPath"
-    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-    # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
-    # Write-Warning "The script path is $ScriptPath"
+    # Verify that the manifest file exists
+    if (Test-Path -Path $RepoRootPath) {
+      Write-Warning "The repo root path exists."
+    }
+    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+    Write-Warning "The script path is $ScriptPath"
+    if (Test-Path -Path $ScriptPath) {
+      Write-Warning "The script path exists."
+    }
     # . $ScriptPath
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
-    # # Source the function
-    # . $ScriptPath
+    # Source the function
+    . $ScriptPath
     # # Invoke PSSA, redirecting all Write-Outputs to $Output
-    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    # . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
