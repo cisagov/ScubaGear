@@ -78,15 +78,15 @@ function Invoke-PSSA {
 		Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 	}
 
-	# Write-Output " "
+	Write-Warning " "
 
-	# # Exit 1 if warnings or errors
-	# if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
-	# 	Write-Output "Problems were found in the PowerShell scripts."
-	# 	exit 1
-	# }
-	# else {
-	# 	Write-Output "No problems were found in the PowerShell scripts."
-	# 	exit 0
-	# }
+	# Exit 1 if warnings or errors
+	if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
+		Write-Warning "Problems were found in the PowerShell scripts."
+		exit 1
+	}
+	else {
+		Write-Warning "No problems were found in the PowerShell scripts."
+		exit 0
+	}
 }
