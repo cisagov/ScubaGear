@@ -5,10 +5,11 @@
 param()
 
 BeforeDiscovery {
-  $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+  # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
   # Source the function
-  . $ScriptPath
+  # . $ScriptPath
+  . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
   # Invoke PSSA, redirecting all Write-Outputs to $Output
   Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
   # $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
