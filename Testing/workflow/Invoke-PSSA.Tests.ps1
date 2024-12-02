@@ -35,12 +35,13 @@ Describe "PSSA Check" {
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # 3 = the warning stream
     $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 3>&1
-    # Write-Warning $Output
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
+    # The module should be installed
     $Module | Should -Not -BeNullOrEmpty
+    # There should be write-warning statements
     $Output | Should -Not -BeNullOrEmpty
-    # # Note: This is a little bit fragile.  It only work as long as one of these two
-    # # summary statements is the final output written.
-    # $Output | Select-Object -Last 1 | Should -BeIn @("Problems were found in the PowerShell scripts.", "No problems were found in the PowerShell scripts.")
+    # Note: This is a little bit fragile.  It only work as long as one of these two
+    # summary statements is the final output written.
+    $Output | Select-Object -Last 1 | Should -BeIn @("Problems were found in the PowerShell scripts.", "No problems were found in the PowerShell scripts.")
   }
 }
