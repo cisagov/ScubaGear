@@ -33,7 +33,8 @@ Describe "PSSA Check" {
     . $ScriptPath
     # Invoke PSSA, redirecting all Write-Outputs to $Output
     # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+    # 3 = the warning stream
+    $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 3>&1
     # Write-Warning $Output
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $Module | Should -Not -BeNullOrEmpty
