@@ -847,9 +847,6 @@ function Format-PlainText {
         # Group 6: '(</a>)' Matches the closing anchor tag
         # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
         $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
-        $CleanString = $CleanString.Replace("<", "&lt;")
-        $CleanString = $CleanString.Replace(">", "&gt;")
-        #$CleanString = $CleanString.Replace("&", "&amp;")
         $CleanString
     }
 }
@@ -1079,7 +1076,6 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u003c", "<")
             $ReportJson = $ReportJson.replace("\u003e", ">")
             $ReportJson = $ReportJson.replace("\u0027", "'")
-            $ReportJson = $ReportJson.replace("$amp;", "&")
 
             # Save the file
             $JsonFileName = Join-Path -Path $OutFolderPath "$($OutJsonFileName).json" -ErrorAction 'Stop'
