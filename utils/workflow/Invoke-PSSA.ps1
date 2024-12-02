@@ -43,27 +43,27 @@ function Invoke-PSSA {
 	foreach ($PsFile in $RemainingPsFiles) {
 		Write-Warning $PsFile
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
-		# foreach ($Result in $Results) {
-		# 	Write-Output "File:     $($Result.ScriptPath)"
-		# 	Write-Output "Line:     $($Result.Line)"
-		# 	Write-Output "Severity: $($Result.Severity)"
-		# 	Write-Output "RuleName: $($Result.RuleName)"
-		# 	# Only create GitHub workflow annotation if warning or error
-		# 	# The ::error:: notation is how a workflow annotation is created
-		# 	if ($Result.Severity -eq 'Information') {
-		# 		Write-Output "Message:  $($Result.Message)"
-		# 		$InfoCount++
-		# 	}
-		# 	elseif ($Result.Severity -eq 'Warning') {
-		# 		Write-Output "::error::Message:  $($Result.Message)"
-		# 		$WarningCount++
-		# 	}
-		# 	elseif ($Result.Severity -eq 'Error') {
-		# 		Write-Output "::error::Message:  $($Result.Message)"
-		# 		$ErrorCount++
-		# 	}
-		# 	Write-Output " "
-		# }
+		foreach ($Result in $Results) {
+			Write-Output "File:     $($Result.ScriptPath)"
+			Write-Output "Line:     $($Result.Line)"
+			Write-Output "Severity: $($Result.Severity)"
+			Write-Output "RuleName: $($Result.RuleName)"
+			# Only create GitHub workflow annotation if warning or error
+			# The ::error:: notation is how a workflow annotation is created
+			if ($Result.Severity -eq 'Information') {
+				Write-Output "Message:  $($Result.Message)"
+				$InfoCount++
+			}
+			elseif ($Result.Severity -eq 'Warning') {
+				Write-Output "::error::Message:  $($Result.Message)"
+				$WarningCount++
+			}
+			elseif ($Result.Severity -eq 'Error') {
+				Write-Output "::error::Message:  $($Result.Message)"
+				$ErrorCount++
+			}
+			Write-Output " "
+		}
 	}
 
 	# # Summarize results
