@@ -26,4 +26,3 @@ jobs:
       - name: Run Invoke PSSA Pester Tests
         run: |
           Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA'
-
