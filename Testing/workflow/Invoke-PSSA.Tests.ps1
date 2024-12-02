@@ -29,18 +29,14 @@ Describe "PSSA Check" {
     if (Test-Path -Path $ScriptPath) {
       Write-Warning "The script path exists."
     }
-    # . $ScriptPath
-    # Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-    # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     # Source the function
     . $ScriptPath
-    # # Invoke PSSA, redirecting all Write-Outputs to $Output
-    # . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    # Invoke PSSA, redirecting all Write-Outputs to $Output
     Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $Output = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
     # Write-Warning $Output
-    # $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
-    # $Module | Should -Not -BeNullOrEmpty
+    $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
+    $Module | Should -Not -BeNullOrEmpty
     # $Output | Should -Not -BeNullOrEmpty
     # # Note: This is a little bit fragile.  It only work as long as one of these two
     # # summary statements is the final output written.
