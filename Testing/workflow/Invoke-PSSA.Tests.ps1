@@ -4,21 +4,23 @@
 # [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
 # param()
 
-BeforeDiscovery {
-  # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
-  $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
-  # Source the function
-  # . $ScriptPath
-  . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
-  # Invoke PSSA, redirecting all Write-Outputs to $Output
-  Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
-  # $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
-  # $global:Output = $Writes
-}
+# BeforeDiscovery {
+#   # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
+#   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+#   # Source the function
+#   # . $ScriptPath
+#   . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+#   # Invoke PSSA, redirecting all Write-Outputs to $Output
+#   Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
+#   # $Writes = Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath 6>&1
+#   # $global:Output = $Writes
+# }
 
 Describe "PSSA Check" {
   It "PSSA should write output" {
-    Write-Warning "placeholder..."
+    $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+    . $PSScriptRoot/../../utils/workflow/Invoke-PSSA.ps1
+    Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath
     # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
     # $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
     # # Source the function
