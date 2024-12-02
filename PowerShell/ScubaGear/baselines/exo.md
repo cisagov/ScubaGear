@@ -1126,7 +1126,7 @@ capabilities for protecting against inbound spam emails. Using Microsoft
 Defender is not strictly required for this purpose; any product that
 fulfills the requirements outlined in this baseline policy group may be
 used. If the agency uses Microsoft Defender to meet this baseline policy
-group, see the following policy of the CISA M365 Security Configuration
+group, see the following policy of the CISA M365 Secure Configuration
 Baseline for Defender for Office 365.
 
 - [MS.DEFENDER.1.2v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
