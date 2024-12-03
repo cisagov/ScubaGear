@@ -66,7 +66,9 @@ function Format-Credentials {
     $ValidCredentials = @()
     foreach ($Credential in $Credentials) {
         # $credential is of type PSCredential which is immutable, create a copy
-        $CredentialCopy = $Credential | Select-Object *, @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+        $CredentialCopy = $Credential | Select-Object -Property `
+            KeyId, DisplayName, StartDateTime, EndDateTime, `
+            @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
         $ValidCredentials += $CredentialCopy
     }
 
