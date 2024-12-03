@@ -4,7 +4,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
 param()
 
-BeforeDiscovery {
+Describe "PSSA Check" {
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
   $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
   # Source the function
@@ -12,14 +12,14 @@ BeforeDiscovery {
   # Invoke PSSA, redirecting all Write-Warnings to a variable
   $global:Warnings = @()
   Invoke-PSSA -DebuggingMode $false -RepoPath $RepoRootPath -WarningVariable Warnings 
-}
-
-Describe "PSSA Check" {
   It "PSSA should be installed" {
     $Module = Get-Module -ListAvailable -Name 'PSScriptAnalyzer'
     $Module | Should -Not -BeNullOrEmpty
   }
   It "PSSA should write output" {
+    # Write-Warning "----"
+    # $global:Warnings | ForEach-Object { Write-Warning $_ } 
+    # Write-Warning "----"
     # There should be write-warning statements
     $global:Warnings | Should -Not -BeNullOrEmpty
     # Note: This is a little bit fragile.  It only work as long as one of these two
