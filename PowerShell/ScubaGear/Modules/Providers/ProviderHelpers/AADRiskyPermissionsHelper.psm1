@@ -1,4 +1,9 @@
-$PermissionsJson = (Get-Content -Path "./riskyPermissions.json" | ConvertFrom-Json)
+$PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
+$PermissionsJson = (
+    Get-Content -Path ( `
+        Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
+    ) | ConvertFrom-Json
+)
 
 function Format-RiskyPermissions {
     <#
@@ -125,7 +130,7 @@ function Get-ApplicationsWithRiskyPermissions {
             foreach ($App in $Applications) {
                 # `AzureADMyOrg` = single tenant; `AzureADMultipleOrgs` = multi tenant
                 $IsMultiTenantEnabled = $false
-                if ($App.signInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
+                if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
             
                 # Map permissions assigned to application to risky permissions
                 $MappedPermissions = @()
