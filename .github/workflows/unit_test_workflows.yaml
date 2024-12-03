@@ -19,10 +19,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      # - name: Run Pester Tests
-      #   run: |
-      #     # This should run all workflow unit tests
-      #     Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
-      - name: Run Invoke PSSA Pester Tests
+      - name: Run Pester Tests
         run: |
-          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA.Tests.ps1'
+          # This should run all workflow unit tests
+          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
+      # - name: Run Invoke PSSA Pester Tests
+      #   run: |
+      #     Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA.Tests.ps1'
