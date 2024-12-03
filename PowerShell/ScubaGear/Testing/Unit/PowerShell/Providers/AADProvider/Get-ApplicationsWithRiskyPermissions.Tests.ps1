@@ -17,9 +17,19 @@ InModuleScope AADRiskyPermissionsHelper {
                     AppId = "00000000-0000-0000-0000-000000000000"
                     DisplayName = "Test App 1"
                     RequiredResourceAccess = @(
-                        "00000003-0000-0000-c000-000000000000",
-                        "00000002-0000-0ff1-ce00-000000000000",
-                        "00000003-0000-0ff1-ce00-000000000000"
+                        [PSCustomObject]@{
+                            ResourceAppId = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+                            ResourceAccess = @(
+                                [PSCustomObject]@{
+                                    Id = "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9" # Application.ReadWrite.All
+                                    Type = "Role"
+                                }
+                                [PSCustomObject]@{
+                                    Id = "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8" # RoleManagement.ReadWrite.Directory
+                                    Type = "Role"
+                                }
+                            )
+                        }
                     )
                     SignInAudience = "AzureADMultipleOrgs"
                     KeyCredentials =  @()
@@ -30,9 +40,19 @@ InModuleScope AADRiskyPermissionsHelper {
                     AppId = "00000000-0000-0000-0000-000000000000"
                     DisplayName = "Test App 2"
                     RequiredResourceAccess = @(
-                        "00000003-0000-0000-c000-000000000000",
-                        "00000002-0000-0ff1-ce00-000000000000",
-                        "00000003-0000-0ff1-ce00-000000000000"
+                        [PSCustomObject]@{
+                            ResourceAppId = "00000003-0000-0000-c000-000000000000" # Microsoft Graph
+                            ResourceAccess = @(
+                                [PSCustomObject]@{
+                                    Id = "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9" # Application.ReadWrite.All
+                                    Type = "Role"
+                                }
+                                [PSCustomObject]@{
+                                    Id = "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8" # RoleManagement.ReadWrite.Directory
+                                    Type = "Role"
+                                }
+                            )
+                        }
                     )
                     SignInAudience = "AzureADMyOrg"
                     KeyCredentials =  @()
