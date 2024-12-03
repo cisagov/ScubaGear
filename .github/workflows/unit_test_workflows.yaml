@@ -10,20 +10,8 @@ on:
 permissions: read-all
 
 jobs:
-  # workflow-tests:
-  #   name: Workflow Unit Tests
-  #   runs-on: windows-latest
-  #   defaults:
-  #     run:
-  #       shell: powershell
-  #   steps:
-  #     - name: Check out repository code
-  #       uses: actions/checkout@v4
-      # - name: Run Pester Tests
-      #   run: |
-      #     # This should run all workflow unit tests
-      #     Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
-  pssa:
+  workflow-tests:
+    name: Workflow Unit Tests
     runs-on: windows-latest
     defaults:
       run:
