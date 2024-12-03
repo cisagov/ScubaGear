@@ -26,7 +26,7 @@ jobs:
       - name: Run Invoke PSSA Pester Tests
         run: |
           Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA.Tests.ps1'
-      - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/New-PRBody.Tests.ps1
+      - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/New-PRBody.Tests.ps1'
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/Set-ScubaGearVersionDoc.Tests.ps1'
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/Set-ScubaGearVersionManifest.ps1'
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Initialize-ScubaGearForTesting.Tests.ps1'
