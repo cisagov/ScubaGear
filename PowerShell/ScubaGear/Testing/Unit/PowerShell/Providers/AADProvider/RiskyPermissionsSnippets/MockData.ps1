@@ -105,3 +105,77 @@ $MockFederatedCredentials = @(
         Audiences = "api://AzureADTokenExchange"
     }
 )
+
+$MockServicePrincipals = @(
+    [PSCustomObject]@{
+        Id = "00000000-0000-0000-0000-000000000001"
+        AppId = "00000000-0000-0000-0000-000000000000"
+        DisplayName = "Test SP 1"
+        KeyCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000001"
+                DisplayName = "Test key credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        PasswordCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000001"
+                DisplayName = "Test password credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        FederatedIdentityCredentials = @() 
+    }
+    [PSCustomObject]@{
+        Id = "00000000-0000-0000-0000-000000000002"
+        AppId = "00000000-0000-0000-0000-000000000000"
+        DisplayName = "Test SP 2"
+        KeyCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000001"
+                DisplayName = "Test key credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        PasswordCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000001"
+                DisplayName = "Test password credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        FederatedIdentityCredentials = @() 
+    }
+)
+
+$MockServicePrincipalAppRoleAssignments = @(
+    [PSCustomObject]@{
+        AppRoleId = "df021288-bdef-4463-88db-98f22de89214" # User.Read.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "e2a3a72e-5f79-4c64-b1b1-878b674786c9" # Mail.ReadWrite
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "dbaae8cf-10b5-4b86-a4a1-f871c94c6695" # GroupMember.ReadWrite.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "75359482-378d-4052-8f01-80520e7db3cd" # Files.ReadWrite.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "dc890d15-9560-4a4c-9b7f-a736ec74ec40" # full_access_as_app
+        ResourceDisplayName = "Office 365 Exchange Online"
+    }
+)
