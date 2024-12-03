@@ -10,8 +10,20 @@ on:
 permissions: read-all
 
 jobs:
-  workflow-tests:
-    name: Workflow Unit Tests
+  # workflow-tests:
+  #   name: Workflow Unit Tests
+  #   runs-on: windows-latest
+  #   defaults:
+  #     run:
+  #       shell: powershell
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v4
+      # - name: Run Pester Tests
+      #   run: |
+      #     # This should run all workflow unit tests
+      #     Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
+  pssa:
     runs-on: windows-latest
     defaults:
       run:
@@ -19,16 +31,58 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      # - name: Run Pester Tests
-      #   run: |
-      #     # This should run all workflow unit tests
-      #     Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
-      - name: Run Invoke PSSA Pester Tests
-        run: |
-          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA.Tests.ps1'
+      - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Invoke-PSSA.Tests.ps1'
+  prbody:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/New-PRBody.Tests.ps1'
+  versiondoc:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/Set-ScubaGearVersionDoc.Tests.ps1'
-      - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/Set-ScubaGearVersionManifest.ps1'
+  versionmanifest:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Set-ScubaGearModuleVersion/Set-ScubaGearVersionManifest.Tests.ps1'
+  initializesg:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Initialize-ScubaGearForTesting.Tests.ps1'
+  selenium:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Install-SeleniumForTesting.Tests.ps1'
+  publish:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/Publish-ScubaGear.Tests.ps1'
