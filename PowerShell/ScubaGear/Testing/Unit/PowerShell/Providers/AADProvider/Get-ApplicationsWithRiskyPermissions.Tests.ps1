@@ -3,23 +3,23 @@ $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRisky
 Import-Module $AADRiskyPermissionsHelper
 
 InModuleScope AADRiskyPermissionsHelper {
-    BeforeAll {
-        $PermissionsPath = (Join-Path -Path $PSScriptRoot -ChildPath "../../../../../Modules/Permissions")
-        $PermissionsJson = (
-            Get-Content -Path ( `
-                Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
-            ) | ConvertFrom-Json
-        )
-
-        # Import mock data
-        . .\RiskyPermissionsSnippets/MockData.ps1
-    
-        function Get-MgBetaApplication { return $MockApplications }
-        function Get-MgBetaApplicationFederatedIdentityCredential { return $MockFederatedCredentials }
-    }
-    
     Describe "Get-ApplicationsWithRiskyPermissions" {
-        It "returns a list of applications with all valid properties" {
+        BeforeAll {
+            $PermissionsPath = (Join-Path -Path $PSScriptRoot -ChildPath "../../../../../Modules/Permissions")
+            $PermissionsJson = (
+                Get-Content -Path ( `
+                    Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
+                ) | ConvertFrom-Json
+            )
+    
+            # Import mock data
+            . .\RiskyPermissionsSnippets/MockData.ps1
+        
+            function Get-MgBetaApplication { return $MockApplications }
+            function Get-MgBetaApplicationFederatedIdentityCredential { return $MockFederatedCredentials }
+        }
+
+        It "returns a list of applications with valid properties" {
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             
