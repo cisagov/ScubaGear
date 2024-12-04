@@ -62,7 +62,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "matches service principals with applications that have the same AppId" {
             $FirstPartyApps[0].ObjectId | Should -BeOfType [Object]
             $FirstPartyApps[1].ObjectId | Should -BeOfType [Object]
-            $FirstPartyApps[2].ObjectId | Should -BeOfType [string]
+            $FirstPartyApps[2].ObjectId | Should -BeOfType [Object]
         }
 
         It "sets an application permission's admin consent property to true" {
@@ -99,7 +99,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 $App.PSObject.Properties.Name | Should -Be $ExpectedKeys
             }
         }
-        
+
         It "keeps applications in the merged dataset that don't have a matching service principal object" {
             $AppsWithNoMatch = 0
             foreach ($App in $FirstPartyApps) {
@@ -112,4 +112,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $AppsWithNoMatch | Should -Be 1
         }
     }
+}
+
+AfterAll {
+    Remove-Module AADRiskyPermissionsHelper -Force -ErrorAction 'SilentlyContinue'
 }

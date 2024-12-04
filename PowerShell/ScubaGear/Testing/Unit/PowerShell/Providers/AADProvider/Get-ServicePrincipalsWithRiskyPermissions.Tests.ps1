@@ -17,8 +17,8 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
         
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-            $RiskySPs | Should -HaveCount 2
-            
+            $RiskySPs | Should -HaveCount 5
+
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
             $RiskySPs[0].KeyCredentials | Should -HaveCount 1
             $RiskySPs[0].PasswordCredentials | Should -HaveCount 1
@@ -53,4 +53,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
         }
     }
+}
+
+AfterAll {
+    Remove-Module AADRiskyPermissionsHelper -Force -ErrorAction 'SilentlyContinue'
 }
