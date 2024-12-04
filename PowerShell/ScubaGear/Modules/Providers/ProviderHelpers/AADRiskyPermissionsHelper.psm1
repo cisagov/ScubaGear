@@ -9,7 +9,7 @@ function Format-RiskyPermissions {
     <#
     .Description
     Returns an array of API permissions from either application/service principal which map
-    to the list of permissions declared in the riskyPermissions.json file
+    to the list of permissions declared in the RiskyPermissions.json file
     .Functionality
     #Internal
     ##>
@@ -65,7 +65,7 @@ function Format-Credentials {
 
     $ValidCredentials = @()
     foreach ($Credential in $Credentials) {
-        # $credential is of type PSCredential which is immutable, create a copy
+        # $Credential is of type PSCredential which is immutable, create a copy
         $CredentialCopy = $Credential | Select-Object -Property `
             KeyId, DisplayName, StartDateTime, EndDateTime, `
             @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
