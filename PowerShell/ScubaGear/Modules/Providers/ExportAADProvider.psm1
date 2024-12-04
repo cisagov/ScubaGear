@@ -136,9 +136,8 @@ function Export-AADProvider {
         # Output the hashtable to verify
         $hashtable | Format-Table -AutoSize
 
-        
         foreach ($key in $hashtable.Keys) {
-            
+
             # Check if it has ServicePrincipalId property instead of AppId
             if ($null -ne $hashtable[$key].ServicePrincipalId) {
                 $PrivilegedServicePrincipals[$key] = $hashtable[$key]
@@ -155,8 +154,6 @@ function Export-AADProvider {
         # on error, $TryCommand returns an empty list, not a dictionary.
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
         $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
-
-        
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
@@ -427,8 +424,8 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
     }
 
     elseif ($Objecttype -eq "serviceprincipal") {
+
         # In this section we need to add the service principal information to the "service principal" hashtable
-        
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
             $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ObjectId -ErrorAction Stop
             $PrivilegedUsers[$ObjectId] = @{
@@ -437,12 +434,10 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
                 "AppId" = $AADServicePrincipal.AppId
                 "roles" = @()
             }
-
         }
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
             $PrivilegedUsers[$ObjectId].roles += $RoleName
-        }
-        
+        } 
     }
 
     elseif ($Objecttype -eq "group") {

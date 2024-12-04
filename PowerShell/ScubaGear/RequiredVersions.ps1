@@ -70,4 +70,4 @@ $ModuleList = @(
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     }
-)    
+)
