@@ -43,7 +43,7 @@ class CapHelper {
         <#
         .Description
         Returns a list of the keys in $Keys are not members of $Obj. Used
-        to validate the structure of the conditonal access policies. 
+        to validate the structure of the conditonal access policies.
         .Functionality
         Internal
         #>
