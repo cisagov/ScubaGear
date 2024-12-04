@@ -54,6 +54,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             )
             $ResourceAccess += $ResourcesOfTypeScope
+            $ResourceAccess | Should -HaveCount 4
 
             Mock Get-MgBetaApplication { $MockApplications[0] }
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
