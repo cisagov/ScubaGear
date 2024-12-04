@@ -144,16 +144,8 @@ $MockServicePrincipals = @(
                 IsFromApplication = $false
             }
         )
-        PasswordCredentials = @(
-            [PSCustomObject]@{
-                KeyId = "00000000-0000-0000-0000-000000000001"
-                DisplayName = "Test password credential 1"
-                StartDateTime = "\/Date(1733343742000)\/" # valid credential
-                EndDateTime = "\/Date(4102444800000)\/"
-                IsFromApplication = $false
-            }
-        )
-        FederatedIdentityCredentials = @() 
+        PasswordCredentials = @()
+        FederatedIdentityCredentials = @()
     }
 )
 
