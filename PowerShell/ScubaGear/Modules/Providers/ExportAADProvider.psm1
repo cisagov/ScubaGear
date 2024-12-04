@@ -111,24 +111,6 @@ function Export-AADProvider {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
 
-        # # Get-PrivilegedUser provides a list of privileged users and their role assignments.
-        # if ($RequiredServicePlan) {
-        #     # If the tenant has the premium license then we also include calls to PIM APIs
-        #     $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
-        #     $PrivilegedServicePrincipals = $Tracker.TryCommand("Get-PrivilegedServicePrincipal", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
-
-        # }
-        # else{
-        #     $PrivilegedUsers = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
-        #     $PrivilegedServicePrincipals = $Tracker.TryCommand("Get-PrivilegedServicePrincipal", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
-
-        # }
-        # # The Converto-Json call below doesn't need to have the input wrapped in an
-        # # array (e.g, "ConvertTo-Json (@PrivilegedUsers)") because $PrivilegedUsers is
-        # # a dictionary, not an array, and ConvertTo-Json doesn't mess up dictionaries like it does arrays
-        # $PrivilegedUsers = $PrivilegedUsers | ConvertTo-Json
-        # $PrivilegedServicePrincipals = $PrivilegedServicePrincipals | ConvertTo-Json
-        
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we also include calls to PIM APIs
             $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})

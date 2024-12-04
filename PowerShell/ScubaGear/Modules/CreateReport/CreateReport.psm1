@@ -281,9 +281,9 @@ function New-Report {
 
             }
         } | ConvertTo-Html -Fragment
-        
+
         $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
-        
+
         # Create a section header for the service principal information
         $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
 
