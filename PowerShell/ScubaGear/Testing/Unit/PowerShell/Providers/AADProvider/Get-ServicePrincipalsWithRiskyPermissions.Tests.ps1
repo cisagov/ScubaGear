@@ -18,16 +18,18 @@ InModuleScope AADRiskyPermissionsHelper {
         
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -HaveCount 2
+            
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
             $RiskySPs[0].KeyCredentials | Should -HaveCount 1
             $RiskySPs[0].PasswordCredentials | Should -HaveCount 1
             $RiskySPs[0].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[0].RiskyPermissions | Should -HaveCount 5
+            $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
+
             $RiskySPs[1].DisplayName | Should -Match "Test SP 2"
             $RiskySPs[1].KeyCredentials | Should -HaveCount 1
             $RiskySPs[1].PasswordCredentials | Should -BeNullOrEmpty
             $RiskySPs[1].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[1].RiskyPermissions | Should -HaveCount 5
+            $RiskySPs[1].RiskyPermissions | Should -HaveCount 8
         }
 
         It "excludes service principals with no risky permissions" {
@@ -42,13 +44,13 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "excludes permissions not included in the RiskyPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $SafePermissions
-            $MockServicePrincipalAppRoleAssignments | Should -HaveCount 8
+            $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
             
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-            $RiskySPs[0].RiskyPermissions | Should -HaveCount 5
+            $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
         }
     }
 }

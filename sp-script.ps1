@@ -1,4 +1,4 @@
-Connect-MgGraph -Scopes "Application.Read.All", "Directory.Read.All"
+Connect-MgGraph -Scopes "Application.ReadWrite.All", "Directory.Read.All"
 
 function Format-RiskyPermissions {
     <#
@@ -61,7 +61,9 @@ function Get-ValidCredentials {
     $ValidCredentials = @()
     foreach ($Credential in $Credentials) {
         # $credential is of type PSCredential which is immutable, create a copy
-        $CredentialCopy = $Credential | Select-Object *, @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+        $CredentialCopy = $Credential | Select-Object -Property `
+            KeyId, DisplayName, StartDateTime, EndDateTime, Type, Usage, `
+            @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
         $ValidCredentials += $CredentialCopy
     }
 
@@ -130,9 +132,12 @@ function Get-ApplicationsWithRiskyPermissions {
                 # Map permissions assigned to application to risky permissions
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
+                    Write-Output $App.RequiredResourceAccess > apprequiredaccess.txt
                     # Exclude delegated permissions with property Type="Scope"
                     $Roles = $Resource.ResourceAccess | Where-Object { $_.Type -eq "Role" }
                     $ResourceAppId = $Resource.ResourceAppId
+
+                    Write-Output $Resource.ResourceAccess > resourceaccess.txt
                     
                     # Additional processing is required to determine if a permission is admin consented.
                     # Initially assume admin consent is false since we are referencing the application's manifest,
@@ -194,8 +199,8 @@ function Get-ApplicationsWithRiskyPermissions {
     }
 }
 
-#$RiskyApps = Get-ApplicationsWithRiskyPermissions
-#$RiskyApps > finalAppResults.json
+$RiskyApps = Get-ApplicationsWithRiskyPermissions
+$RiskyApps > finalAppResults.json
 
 function Get-ServicePrincipalsWithRiskyPermissions {
     <#
