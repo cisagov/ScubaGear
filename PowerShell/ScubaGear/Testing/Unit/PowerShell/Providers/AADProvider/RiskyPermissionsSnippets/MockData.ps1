@@ -191,6 +191,53 @@ $MockServicePrincipals = @(
         PasswordCredentials = $null
         FederatedIdentityCredentials = $null
     }
+    [PSCustomObject]@{
+        Id = "00000000-0000-0000-0000-000000000030"
+        AppId = "40000000-0000-0000-0000-000000000000"
+        DisplayName = "Test SP 3"
+        KeyCredentials = $null
+        PasswordCredentials = $null
+        FederatedIdentityCredentials = $null
+    }
+    [PSCustomObject]@{
+        Id = "00000000-0000-0000-0000-000000000040"
+        AppId = "50000000-0000-0000-0000-000000000000"
+        DisplayName = "Test SP 4"
+        KeyCredentials = $null
+        PasswordCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000010"
+                DisplayName = "Test key credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000020"
+                DisplayName = "Test key credential 2"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        FederatedIdentityCredentials = $null
+    }
+    [PSCustomObject]@{
+        Id = "00000000-0000-0000-0000-000000000050"
+        AppId = "60000000-0000-0000-0000-000000000000"
+        DisplayName = "Test SP 5"
+        KeyCredentials = @(
+            [PSCustomObject]@{
+                KeyId = "00000000-0000-0000-0000-000000000010"
+                DisplayName = "Test key credential 1"
+                StartDateTime = "\/Date(1733343742000)\/" # valid credential
+                EndDateTime = "\/Date(4102444800000)\/"
+                IsFromApplication = $false
+            }
+        )
+        PasswordCredentials = $null
+        FederatedIdentityCredentials = $null
+    }
 )
 
 $MockServicePrincipalAppRoleAssignments = @(
