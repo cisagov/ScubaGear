@@ -437,7 +437,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         }
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
             $PrivilegedUsers[$ObjectId].roles += $RoleName
-        } 
+        }
     }
 
     elseif ($Objecttype -eq "group") {
