@@ -5,18 +5,11 @@ Import-Module $AADRiskyPermissionsHelper
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ApplicationsWithRiskyPermissions" {
         BeforeAll {
-            $PermissionsPath = (Join-Path -Path $PSScriptRoot -ChildPath "../../../../../Modules/Permissions")
-            $PermissionsJson = (
-                Get-Content -Path ( `
-                    Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
-                ) | ConvertFrom-Json
-            )
-    
             # Import mock data
             . .\RiskyPermissionsSnippets/MockData.ps1
         
-            function Get-MgBetaApplication { return $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { return $MockFederatedCredentials }
+            function Get-MgBetaApplication { $MockApplications }
+            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
         }
 
         It "returns a list of applications with valid properties" {
@@ -24,7 +17,7 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             
             # Refer to $MockApplications in ./RiskyPermissionsSnippets,
-            # we are comparing the data stored there with what the function returns
+            # we are comparing data stored there with the function's return value
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskyApps | Should -HaveCount 2
             $RiskyApps[0].IsMultiTenantEnabled | Should -Be $true
