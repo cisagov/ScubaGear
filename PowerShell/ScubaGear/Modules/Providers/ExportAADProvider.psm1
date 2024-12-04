@@ -187,14 +187,10 @@ function Export-AADProvider {
     $RiskyApps = Get-ApplicationsWithRiskyPermissions
     $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
 
-    $FirstPartyApps = Get-FirstPartyRiskyApplications `
-        -RiskyApps $RiskyApps `
-        -RiskySPs $RiskySPs `
-    | ConvertTo-Json -Depth 3
-    $ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals `
-        -RiskyApps $RiskyApps `
-        -RiskySPs $RiskySPs `
-    | ConvertTo-Json -Depth 3
+    $FirstPartyApps = Get-FirstPartyRiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs `
+        | ConvertTo-Json -Depth 3
+    $ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs `
+        | ConvertTo-Json -Depth 3
 
     $FirstPartyApps > firstpartyapps.json
     $ThirdPartySPs > thirdpartysps.json
