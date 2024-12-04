@@ -23,7 +23,7 @@ jobs:
         run: |
           # This should run all workflow unit tests
           Try {
-            Invoke-Pester -CI -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err
+            Invoke-Pester -ErrorAction Stop -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err
             $err.Count | Should -Not -Be 0
           } Catch {
             Throw "Something went wrong!"
