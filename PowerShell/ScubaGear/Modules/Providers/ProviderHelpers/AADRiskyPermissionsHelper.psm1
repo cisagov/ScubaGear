@@ -323,7 +323,7 @@ function Get-FirstPartyRiskyApplications {
 function Get-ThirdPartyRiskyServicePrincipals {
     <#
     .Description
-    Returns a JSON dataset of service principal objects which are owned by external organizations.
+    Returns a JSON dataset of service principal objects owned by external organizations.
     .Functionality
     #Internal
     ##>
