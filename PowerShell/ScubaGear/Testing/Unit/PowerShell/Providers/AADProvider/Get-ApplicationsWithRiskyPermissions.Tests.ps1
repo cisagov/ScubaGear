@@ -112,3 +112,7 @@ InModuleScope AADRiskyPermissionsHelper {
         }
     }
 }
+
+AfterAll {
+    Remove-Module AADRiskyPermissionsHelper -Force -ErrorAction 'SilentlyContinue'
+}
