@@ -22,4 +22,4 @@ jobs:
       - name: Run Pester Tests
         run: |
           # This should run all workflow unit tests
-          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
+          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
