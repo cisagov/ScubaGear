@@ -66,3 +66,9 @@ Users SHALL be prevented from running custom scripts on personal sites (aka OneD
 - _Removal date:_ July 2024
 - _Removal rationale:_ The option to enable and disable custom scripting on personal sites (aka OneDrive) found in policy MS.SHAREPOINT.4.1v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.  Furthermore, it is no longer possible to allow custom scripts on personal sites.
 
+#### MS.SHAREPOINT.4.2v1
+Users SHALL be prevented from running custom scripts on self-service created sites.
+- _Removal date:_ November 2024
+- _Removal rationale:_ Microsoft has noted that after November 2024 it will no longer be possible to prevent SharePoint in resetting custom script settings to its original value (disabled) for all sites. All references including the policy, implementation steps, and section, by direction of CISA and Microsoft, have been removed as the setting will be automatically reverted back to **Blocked** within 24 hours.
+
+**`TLP:CLEAR`**

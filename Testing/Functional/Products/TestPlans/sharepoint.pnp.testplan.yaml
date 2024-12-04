@@ -409,11 +409,3 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
-  - PolicyId: MS.SHAREPOINT.4.2v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.SHAREPOINT.4.2v1 Non-compliant DenyAddAndCustomizePages Not-Implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
