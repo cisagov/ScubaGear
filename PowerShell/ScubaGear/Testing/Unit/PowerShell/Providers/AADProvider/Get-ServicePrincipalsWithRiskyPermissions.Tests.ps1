@@ -5,13 +5,6 @@ Import-Module $AADRiskyPermissionsHelper
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ServicePrincipalsWithRiskyPermissions" {
         BeforeAll {
-            $PermissionsPath = (Join-Path -Path $PSScriptRoot -ChildPath "../../../../../Modules/Permissions")
-            $PermissionsJson = (
-                Get-Content -Path ( `
-                    Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
-                ) | ConvertFrom-Json
-            )
-    
             # Import mock data
             . .\RiskyPermissionsSnippets/MockData.ps1
         
@@ -24,8 +17,6 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
         
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-            Write-Output $RiskySPs > riskysptestoutput.json
-
             $RiskySPs | Should -HaveCount 2
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
             $RiskySPs[0].KeyCredentials | Should -HaveCount 1
@@ -39,30 +30,17 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[1].RiskyPermissions | Should -HaveCount 5
         }
 
-        It "excludes service principals without any risky permissions" {
+        It "excludes service principals with no risky permissions" {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            # Set to empty list
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { @() }
+            # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
+            # to simulate service principals assigned to safe permissions
+            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $SafePermissions }
             
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -BeNullOrEmpty
         }
 
-        It "excludes roles not included in the RiskyPermissions.json mapping" {
-            $SafePermissions = @(
-                [PSCustomObject]@{
-                    AppRoleId = "2f3e6f8c-093b-4c57-a58b-ba5ce494a169" # Agreement.Read.All
-                    ResourceDisplayName = "Microsoft Graph"
-                }
-                [PSCustomObject]@{
-                    AppRoleId = "e12dae10-5a57-4817-b79d-dfbec5348930" # AppCatalog.Read.All
-                    ResourceDisplayName = "Microsoft Graph"
-                }
-                [PSCustomObject]@{
-                    AppRoleId = "be95e614-8ef3-49eb-8464-1c9503433b86" # Bookmark.Read.All
-                    ResourceDisplayName = "Microsoft Graph"
-                }
-            )
+        It "excludes permissions not included in the RiskyPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $SafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 8
 

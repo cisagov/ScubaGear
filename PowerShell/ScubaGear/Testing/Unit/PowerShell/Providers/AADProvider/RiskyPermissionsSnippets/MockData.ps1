@@ -171,3 +171,18 @@ $MockServicePrincipalAppRoleAssignments = @(
         ResourceDisplayName = "Office 365 Exchange Online"
     }
 )
+
+$SafePermissions = @(
+    [PSCustomObject]@{
+        AppRoleId = "2f3e6f8c-093b-4c57-a58b-ba5ce494a169" # Agreement.Read.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "e12dae10-5a57-4817-b79d-dfbec5348930" # AppCatalog.Read.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+    [PSCustomObject]@{
+        AppRoleId = "be95e614-8ef3-49eb-8464-1c9503433b86" # Bookmark.Read.All
+        ResourceDisplayName = "Microsoft Graph"
+    }
+)
