@@ -7,13 +7,13 @@ InModuleScope AADRiskyPermissionsHelper {
         BeforeAll {
             # Import mock data
             . ../RiskyPermissionsSnippets/MockData.ps1
-            
+
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
 
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
-        
+
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
 
@@ -67,7 +67,6 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "sets an application permission's admin consent property to true" {
             foreach ($App in $FirstPartyApps) {
-                $AppPermissions = $App.RiskyPermissions
                 $MatchedSP = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
                 # Check if corresponding service principal object exists
                 if($MatchedSP) {
