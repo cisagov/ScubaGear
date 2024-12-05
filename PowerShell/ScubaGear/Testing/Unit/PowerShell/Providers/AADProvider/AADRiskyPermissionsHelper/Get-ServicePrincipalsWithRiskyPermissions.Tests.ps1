@@ -7,15 +7,15 @@ InModuleScope AADRiskyPermissionsHelper {
         BeforeAll {
             # Import mock data
             . ../RiskyPermissionsSnippets/MockData.ps1
-        
+
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
         }
-        
+
         It "returns a list of service principals with valid properties" {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
-        
+
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -HaveCount 5
 
@@ -37,7 +37,7 @@ InModuleScope AADRiskyPermissionsHelper {
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockSafePermissions }
-            
+
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -BeNullOrEmpty
         }
@@ -48,7 +48,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
-            
+
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
         }
