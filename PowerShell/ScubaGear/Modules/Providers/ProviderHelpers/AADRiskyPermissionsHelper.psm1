@@ -55,9 +55,9 @@ function Format-Credentials {
         [Object[]]
         $AccessKeys,
 
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "IsFromApplication")]
         [ValidateNotNullOrEmpty()]
         [boolean]
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'IsFromApplication')]
         $IsFromApplication
     )
 
