@@ -5,11 +5,11 @@ $PermissionsJson = (
     ) | ConvertFrom-Json
 )
 
-function Format-RiskyPermissions {
+function Format-RiskyPermission {
     <#
     .Description
-    Returns an array of API permissions from either application/service principal which map
-    to the list of permissions declared in the RiskyPermissions.json file
+    Returns an API permission from either application/service principal which maps
+    to the list of permissions declared in RiskyPermissions.json
     .Functionality
     #Internal
     ##>
@@ -146,7 +146,7 @@ function Get-ApplicationsWithRiskyPermissions {
                     foreach($Role in $Roles) {
                         $ResourceDisplayName = $PermissionsJson.resources.$ResourceAppId
                         $RoleId = $Role.Id
-                        $MappedPermissions += Format-RiskyPermissions `
+                        $MappedPermissions += Format-RiskyPermission `
                             -Json $PermissionsJson `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
@@ -222,7 +222,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         # Default to true,
                         # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
                         $IsAdminConsented = $true
-                        $MappedPermissions += Format-RiskyPermissions `
+                        $MappedPermissions += Format-RiskyPermission `
                             -Json $PermissionsJson `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
