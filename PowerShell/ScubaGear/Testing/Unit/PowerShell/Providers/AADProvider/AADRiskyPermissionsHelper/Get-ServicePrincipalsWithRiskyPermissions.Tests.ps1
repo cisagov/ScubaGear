@@ -36,14 +36,14 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $SafePermissions }
+            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockSafePermissions }
             
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -BeNullOrEmpty
         }
 
         It "excludes permissions not included in the RiskyPermissions.json mapping" {
-            $MockServicePrincipalAppRoleAssignments += $SafePermissions
+            $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
