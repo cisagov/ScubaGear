@@ -275,7 +275,7 @@ $MockServicePrincipalAppRoleAssignments = @(
     }
 )
 
-$SafePermissions = @(
+$MockSafePermissions = @(
     [PSCustomObject]@{
         AppRoleId = "2f3e6f8c-093b-4c57-a58b-ba5ce494a169" # Agreement.Read.All
         ResourceDisplayName = "Microsoft Graph"
