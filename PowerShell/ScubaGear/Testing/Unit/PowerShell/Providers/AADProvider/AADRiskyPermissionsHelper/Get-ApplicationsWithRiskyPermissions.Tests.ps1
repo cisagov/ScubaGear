@@ -68,7 +68,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             Mock Get-MgBetaApplication { $MockApplications[0] }
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
-            
+
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskyApps[0].RiskyPermissions | Should -HaveCount 2
         }
@@ -106,7 +106,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
-            
+
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskyApps | Should -HaveCount 2
         }
