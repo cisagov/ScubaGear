@@ -30,7 +30,7 @@ function Format-RiskyPermission {
         [boolean]
         $IsAdminConsented
     )
-    
+
     $RiskyPermissions = $Json.permissions.$Resource.PSObject.Properties.Name
     $Map = @()
     if ($RiskyPermissions -contains $Id) {
@@ -53,7 +53,7 @@ function Format-Credentials {
     ##>
     param (
         [Object[]]
-        $Credentials,
+        $AccessKeys,
 
         [ValidateNotNullOrEmpty()]
         [boolean]
@@ -63,7 +63,7 @@ function Format-Credentials {
     process {
         $ValidCredentials = @()
         $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
-        foreach ($Credential in $Credentials) {
+        foreach ($Credential in $AccessKeys) {
             # Only format credentials with the correct keys
             $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
             if ($MissingKeys.Count -eq 0) {
@@ -74,8 +74,8 @@ function Format-Credentials {
                 $ValidCredentials += $CredentialCopy
             }
         }
-    
-        if ($null -eq $Credentials -or $Credentials.Count -eq 0 -or $ValidCredentials.Count -eq 0) {
+
+        if ($null -eq $AccessKeys -or $AccessKeys.Count -eq 0 -or $ValidCredentials.Count -eq 0) {
             return $null
         }
         return $ValidCredentials
@@ -90,29 +90,27 @@ function Merge-Credentials {
     #Internal
     ##>
     param (
-        #[ValidateNotNullOrEmpty()]
         [Object[]]
-        $ApplicationCredentials,
+        $ApplicationAccessKeys,
 
-        #[ValidateNotNullOrEmpty()]
         [Object[]]
-        $ServicePrincipalCredentials
+        $ServicePrincipalAccessKeys
     )
 
     # Both applications/sp objects have key and federated credentials.
     # Conditionally merge the two together, select only application/service principal creds, or none.
     $MergedCredentials = @()
-    if ($null -ne $ServicePrincipalCredentials -and $null -ne $ApplicationCredentials) {
+    if ($null -ne $ServicePrincipalAccessKeys -and $null -ne $ApplicationAccessKeys) {
         # Both objects valid
-        $MergedCredentials = @($ServicePrincipalCredentials) + @($ApplicationCredentials)
+        $MergedCredentials = @($ServicePrincipalAccessKeys) + @($ApplicationAccessKeys)
     }
-    elseif ($null -eq $ServicePrincipalCredentials -and $null -ne $ApplicationCredentials) {
+    elseif ($null -eq $ServicePrincipalAccessKeys -and $null -ne $ApplicationAccessKeys) {
         # Only application credentials valid
-        $MergedCredentials = @($ApplicationCredentials)
+        $MergedCredentials = @($ApplicationAccessKeys)
     }
-    elseif ($null -ne $ServicePrincipalCredentials -and $null -eq $ApplicationCredentials) {
+    elseif ($null -ne $ServicePrincipalAccessKeys -and $null -eq $ApplicationAccessKeys) {
         # Only service principal credentials valid
-        $MergedCredentials = @($ServicePrincipalCredentials)
+        $MergedCredentials = @($ServicePrincipalAccessKeys)
     }
     else {
         # Neither credentials are valid
@@ -137,19 +135,19 @@ function Get-ApplicationsWithRiskyPermissions {
                 # `AzureADMyOrg` = single tenant; `AzureADMultipleOrgs` = multi tenant
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
-            
+
                 # Map application permissions against RiskyPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
                     # Exclude delegated permissions with property Type="Scope"
                     $Roles = $Resource.ResourceAccess | Where-Object { $_.Type -eq "Role" }
                     $ResourceAppId = $Resource.ResourceAppId
-                    
+
                     # Additional processing is required to determine if a permission is admin consented.
                     # Initially assume admin consent is false since we reference the application's manifest,
                     # then update the value later when its compared to service principal permissions.
                     $IsAdminConsented = $false
-            
+
                     foreach($Role in $Roles) {
                         $ResourceDisplayName = $PermissionsJson.resources.$ResourceAppId
                         $RoleId = $Role.Id
@@ -160,10 +158,10 @@ function Get-ApplicationsWithRiskyPermissions {
                             -IsAdminConsented $IsAdminConsented
                     }
                 }
-            
+
                 $FederatedCredentials = Get-MgBetaApplicationFederatedIdentityCredential -All -ApplicationId $App.Id
                 $FederatedCredentialsResults = @()
-            
+
                 if ($null -ne $FederatedCredentials) {
                     foreach ($federatedCredential in $FederatedCredentials) {
                         $FederatedCredentialsResults += [PSCustomObject]@{
@@ -179,7 +177,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 else {
                     $FederatedCredentialsResults = $null
                 }
-            
+
                 # Exclude applications without risky permissions
                 if ($MappedPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
@@ -189,8 +187,8 @@ function Get-ApplicationsWithRiskyPermissions {
                         IsMultiTenantEnabled = $IsMultiTenantEnabled
                         # Credentials from application and service principal objects may get merged in other cmdlets.
                         # Differentiate between the two by setting IsFromApplication=$true
-                        KeyCredentials       = Format-Credentials -Credentials $App.KeyCredentials -IsFromApplication $true
-                        PasswordCredentials  = Format-Credentials -Credentials $App.PasswordCredentials -IsFromApplication $true
+                        KeyCredentials       = Format-Credentials -AccessKeys $App.KeyCredentials -IsFromApplication $true
+                        PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = $FederatedCredentialsResults
                         RiskyPermissions     = $MappedPermissions
                     }
@@ -236,7 +234,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                             -IsAdminConsented $IsAdminConsented
                     }
                 }
-            
+
                 # Exclude service principals without risky permissions
                 if ($MappedPermissions.Count -gt 0) {
                     $ServicePrincipalResults += [PSCustomObject]@{
@@ -245,8 +243,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         DisplayName          = $ServicePrincipal.DisplayName
                         # Credentials from application and service principal objects may get merged in other cmdlets.
                         # Differentiate between the two by setting IsFromApplication=$false
-                        KeyCredentials       = Format-Credentials -Credentials $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                        PasswordCredentials  = Format-Credentials -Credentials $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                        KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                        PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                         FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
                         RiskyPermissions     = $MappedPermissions
                     }
@@ -264,8 +262,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
 function Get-FirstPartyRiskyApplications {
     <#
     .Description
-    Returns an aggregated JSON dataset of application objects, combining data from both applications and 
-    service principal objects. Key/Password/Federated credentials are combined into a single object, and 
+    Returns an aggregated JSON dataset of application objects, combining data from both applications and
+    service principal objects. Key/Password/Federated credentials are combined into a single object, and
     admin consent is reflected in each object's list of associated risky permissions.
     .Functionality
     #Internal
@@ -284,7 +282,7 @@ function Get-FirstPartyRiskyApplications {
             $Applications = @()
             foreach ($App in $RiskyApps) {
                 $MatchedServicePrincipal = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
-            
+
                 # Merge objects if an application and service principal exist with the same AppId
                 $MergedObject = @{}
                 if ($MatchedServicePrincipal) {
@@ -300,15 +298,18 @@ function Get-FirstPartyRiskyApplications {
                         Application      = $App.ObjectId
                         ServicePrincipal = $MatchedServicePrincipal.ObjectId
                     }
-                
+
                     $MergedObject = [PSCustomObject]@{
                         ObjectId                 = $ObjectIds
                         AppId                    = $App.AppId
                         DisplayName              = $App.DisplayName
                         IsMultiTenantEnabled     = $App.IsMultiTenantEnabled
-                        KeyCredentials           = Merge-Credentials -ApplicationCredentials $App.KeyCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.KeyCredentials
-                        PasswordCredentials      = Merge-Credentials -ApplicationCredentials $App.PasswordCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.PasswordCredentials
-                        FederatedCredentials     = Merge-Credentials -ApplicationCredentials $App.FederatedCredentials -ServicePrincipalCredentials $MatchedServicePrincipal.FederatedCredentials
+                        KeyCredentials           = Merge-Credentials -ApplicationAccessKeys $App.KeyCredentials `
+                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.KeyCredentials
+                        PasswordCredentials      = Merge-Credentials -ApplicationAccessKeys $App.PasswordCredentials `
+                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.PasswordCredentials
+                        FederatedCredentials     = Merge-Credentials -ApplicationAccessKeys $App.FederatedCredentials `
+                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.FederatedCredentials
                         RiskyPermissions         = $App.RiskyPermissions
                     }
                 }
@@ -348,7 +349,7 @@ function Get-ThirdPartyRiskyServicePrincipals {
             $ServicePrincipals = @()
             foreach ($ServicePrincipal in $RiskySPs) {
                 $MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
-                
+
                 # If a service principal does not have an associated application registration,
                 # then it is owned by an external organization.
                 if ($null -eq $MatchedApplication) {
