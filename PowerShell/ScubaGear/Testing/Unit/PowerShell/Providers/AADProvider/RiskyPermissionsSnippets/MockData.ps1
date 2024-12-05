@@ -289,3 +289,18 @@ $SafePermissions = @(
         ResourceDisplayName = "Microsoft Graph"
     }
 )
+
+$MockApplicationPermissions = @(
+    [PSCustomObject]@{
+        ResourceDisplayName = "Microsoft Graph"
+        RoleId = "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9" # Application.ReadWrite.All
+    }
+    [PSCustomObject]@{
+        ResourceDisplayName = "Office 365 Management APIs"
+        RoleId = "4807a72c-ad38-4250-94c9-4eabfe26cd55" # ActivityFeed.ReadDlp
+    }
+    [PSCustomObject]@{
+        ResourceDisplayName = "Office 365 Exchange Online"
+        RoleId = "e2a3a72e-5f79-4c64-b1b1-878b674786c9" # Mail.ReadWrite
+    }
+)
