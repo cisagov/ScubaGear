@@ -57,6 +57,7 @@ function Format-Credentials {
 
         [ValidateNotNullOrEmpty()]
         [boolean]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'IsFromApplication')]
         $IsFromApplication
     )
 
