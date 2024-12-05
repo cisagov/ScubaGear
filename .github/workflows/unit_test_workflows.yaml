@@ -27,4 +27,5 @@ jobs:
             $err.Count | Should -Not -Be 0
           } Catch [System.Management.Automation.RuntimeException] {
             Write-Warning $_
+            throw $_
           }
