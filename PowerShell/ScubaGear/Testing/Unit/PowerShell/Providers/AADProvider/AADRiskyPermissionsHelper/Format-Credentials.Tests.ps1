@@ -8,12 +8,14 @@ InModuleScope AADRiskyPermissionsHelper {
             # Import mock data
             . ../RiskyPermissionsSnippets/MockData.ps1
 
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockKeyCredentials')]
             $MockKeyCredentials = $MockApplications[0].KeyCredentials
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockPasswordCredentials')]
             $MockPasswordCredentials = $MockServicePrincipals[3].PasswordCredentials
         }
 
         It "returns the correct number of objects (key credential variant)" {
-            $Output = Format-Credentials -Credentials $MockKeyCredentials -IsFromApplication $true
+            $Output = Format-Credentials -AccessKeys $MockKeyCredentials -IsFromApplication $true
             $Output | Should -HaveCount 2
             foreach ($Obj in $Output) {
                 $Obj.IsFromApplication | Should -Be $true
@@ -21,7 +23,7 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns the correct number of objects (password credential variant)" {
-            $Output = Format-Credentials -Credentials $MockPasswordCredentials -IsFromApplication $false
+            $Output = Format-Credentials -AccessKeys $MockPasswordCredentials -IsFromApplication $false
             $Output | Should -HaveCount 2
             foreach ($Obj in $Output) {
                 $Obj.IsFromApplication | Should -Be $false
@@ -31,14 +33,14 @@ InModuleScope AADRiskyPermissionsHelper {
         It "formats the return output correctly" {
             # Test with true/false values for IsFromApplication
             $ExpectedKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime", "IsFromApplication")
-            $Output = Format-Credentials -Credentials $MockKeyCredentials -IsFromApplication $true
+            $Output = Format-Credentials -AccessKeys $MockKeyCredentials -IsFromApplication $true
             $Output | Should -HaveCount 2
             foreach ($Obj in $Output) {
                 $Obj.IsFromApplication | Should -Be $true
                 $Obj.PSObject.Properties.Name | Should -Be $ExpectedKeys
             }
 
-            $Output = Format-Credentials -Credentials $MockKeyCredentials -IsFromApplication $false
+            $Output = Format-Credentials -AccessKeys $MockKeyCredentials -IsFromApplication $false
             $Output | Should -HaveCount 2
             foreach ($Obj in $Output) {
                 $Obj.IsFromApplication | Should -Be $false
@@ -47,12 +49,12 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns null if credentials equal null" {
-            $Output = Format-Credentials -Credentials $null -IsFromApplication $true
+            $Output = Format-Credentials -AccessKeys $null -IsFromApplication $true
             $Output | Should -BeNullOrEmpty
         }
 
         It "returns null if the credential count is 0" {
-            $Output = Format-Credentials -Credentials @() -IsFromApplication $true
+            $Output = Format-Credentials -AccessKeys @() -IsFromApplication $true
             $Output | Should -BeNullOrEmpty
         }
 
@@ -65,7 +67,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             )
             $MockKeyCredentials += $InvalidKeyCredential
-            $Output = Format-Credentials -Credentials $MockKeyCredentials -IsFromApplication $true
+            $Output = Format-Credentials -AccessKeys $MockKeyCredentials -IsFromApplication $true
             $Output | Should -HaveCount 2
         }
     }
