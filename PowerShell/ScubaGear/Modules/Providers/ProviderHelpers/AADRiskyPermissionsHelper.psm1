@@ -47,7 +47,7 @@ function Format-RiskyPermission {
 function Format-Credentials {
     <#
     .Description
-    Returns an array of valid credentials, expired credentials are excluded
+    Returns an array of valid/expired credentials
     .Functionality
     #Internal
     ##>
@@ -60,19 +60,26 @@ function Format-Credentials {
         $IsFromApplication
     )
 
-    $ValidCredentials = @()
-    foreach ($Credential in $Credentials) {
-        # $Credential is of type PSCredential which is immutable, create a copy
-        $CredentialCopy = $Credential | Select-Object -Property `
-            KeyId, DisplayName, StartDateTime, EndDateTime, `
-            @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
-        $ValidCredentials += $CredentialCopy
+    process {
+        $ValidCredentials = @()
+        $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
+        foreach ($Credential in $Credentials) {
+            # Only format credentials with the correct keys
+            $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
+            if ($MissingKeys.Count -eq 0) {
+                # $Credential is of type PSCredential which is immutable, create a copy
+                $CredentialCopy = $Credential | Select-Object -Property `
+                    KeyId, DisplayName, StartDateTime, EndDateTime, `
+                    @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                $ValidCredentials += $CredentialCopy
+            }
+        }
+    
+        if ($null -eq $Credentials -or $Credentials.Count -eq 0 -or $ValidCredentials.Count -eq 0) {
+            return $null
+        }
+        return $ValidCredentials
     }
-
-    if ($null -eq $Credentials -or $Credentials.Count -eq 0 -or $ValidCredentials.Count -eq 0) {
-        return $null
-    }
-    return $ValidCredentials
 }
 
 function Merge-Credentials {
