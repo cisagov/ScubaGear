@@ -22,9 +22,11 @@ jobs:
       - name: Run Pester Tests
         run: |
           # This should run all workflow unit tests
+          Write-Warning "start here"
           Try {
-            Invoke-Pester -ErrorAction Stop -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err
+            Invoke-Pester -ErrorActionPreference Stop -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err
             $err.Count | Should -Not -Be 0
           } Catch {
             Throw "Something went wrong!"
           }
+          Write-Warning "end here"
