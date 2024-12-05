@@ -51,11 +51,13 @@ function Format-Credentials {
     .Functionality
     #Internal
     ##>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        "PSReviewUnusedParameter", "IsFromApplication", Justification = "False positive"
+    )]
     param (
         [Object[]]
         $AccessKeys,
 
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "IsFromApplication", Justification = "False positive")]
         [ValidateNotNullOrEmpty()]
         [boolean]
         $IsFromApplication
