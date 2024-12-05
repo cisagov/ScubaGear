@@ -1,3 +1,4 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplications')]
 $MockApplications = @(
     [PSCustomObject]@{
         Id = "00000000-0000-0000-0000-000000000001"
@@ -131,6 +132,7 @@ $MockApplications = @(
     }
 )
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockFederatedCredentials')]
 $MockFederatedCredentials = @(
     [PSCustomObject]@{
         Id = "00000000-0000-0000-0000-000000000001"
@@ -150,6 +152,7 @@ $MockFederatedCredentials = @(
     }
 )
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipals')]
 $MockServicePrincipals = @(
     [PSCustomObject]@{
         Id = "00000000-0000-0000-0000-000000000010"
@@ -240,6 +243,7 @@ $MockServicePrincipals = @(
     }
 )
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipalAppRoleAssignments')]
 $MockServicePrincipalAppRoleAssignments = @(
     [PSCustomObject]@{
         AppRoleId = "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9" # Application.ReadWrite.All
@@ -275,6 +279,7 @@ $MockServicePrincipalAppRoleAssignments = @(
     }
 )
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
 $MockSafePermissions = @(
     [PSCustomObject]@{
         AppRoleId = "2f3e6f8c-093b-4c57-a58b-ba5ce494a169" # Agreement.Read.All
@@ -290,6 +295,7 @@ $MockSafePermissions = @(
     }
 )
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplicationPermissions')]
 $MockApplicationPermissions = @(
     [PSCustomObject]@{
         ResourceDisplayName = "Microsoft Graph"
