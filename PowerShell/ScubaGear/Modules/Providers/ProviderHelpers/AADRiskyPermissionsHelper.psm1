@@ -55,7 +55,7 @@ function Format-Credentials {
         [Object[]]
         $AccessKeys,
 
-        
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "IsFromApplication", Justification = "False positive")]
         [ValidateNotNullOrEmpty()]
         [boolean]
         $IsFromApplication
@@ -71,7 +71,6 @@ function Format-Credentials {
                 # $Credential is of type PSCredential which is immutable, create a copy
                 $CredentialCopy = $Credential | Select-Object -Property `
                     KeyId, DisplayName, StartDateTime, EndDateTime, `
-                    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "IsFromApplication")]
                     @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
                 $ValidCredentials += $CredentialCopy
             }
