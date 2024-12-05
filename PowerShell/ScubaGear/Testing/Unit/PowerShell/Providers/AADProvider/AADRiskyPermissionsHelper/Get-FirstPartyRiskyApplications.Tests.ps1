@@ -1,4 +1,4 @@
-$ModulesPath = "../../../../../Modules"
+$ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module $AADRiskyPermissionsHelper
 
@@ -6,7 +6,7 @@ InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-FirstPartyRiskyApplications" {
         BeforeAll {
             # Import mock data
-            . .\RiskyPermissionsSnippets/MockData.ps1
+            . ../RiskyPermissionsSnippets/MockData.ps1
             
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }

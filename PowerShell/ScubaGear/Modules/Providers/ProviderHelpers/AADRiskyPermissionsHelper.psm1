@@ -18,10 +18,6 @@ function Format-RiskyPermissions {
         [PSCustomObject]
         $Json,
 
-        # Initialized as empty array
-        [Object[]]
-        $Map,
-
         [ValidateNotNullOrEmpty()]
         [string]
         $Resource,
@@ -36,6 +32,7 @@ function Format-RiskyPermissions {
     )
     
     $RiskyPermissions = $Json.permissions.$Resource.PSObject.Properties.Name
+    $Map = @()
     if ($RiskyPermissions -contains $Id) {
         $Map += [PSCustomObject]@{
             RoleId              = $Id
@@ -134,7 +131,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
             
-                # Map permissions assigned to application to risky permissions
+                # Map application permissions against RiskyPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
                     # Exclude delegated permissions with property Type="Scope"
@@ -142,23 +139,21 @@ function Get-ApplicationsWithRiskyPermissions {
                     $ResourceAppId = $Resource.ResourceAppId
                     
                     # Additional processing is required to determine if a permission is admin consented.
-                    # Initially assume admin consent is false since we are referencing the application's manifest,
+                    # Initially assume admin consent is false since we reference the application's manifest,
                     # then update the value later when its compared to service principal permissions.
                     $IsAdminConsented = $false
             
                     foreach($Role in $Roles) {
                         $ResourceDisplayName = $PermissionsJson.resources.$ResourceAppId
                         $RoleId = $Role.Id
-                        $MappedPermissions = Format-RiskyPermissions `
+                        $MappedPermissions += Format-RiskyPermissions `
                             -Json $PermissionsJson `
-                            -Map $MappedPermissions `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
                             -IsAdminConsented $IsAdminConsented
                     }
                 }
             
-                # Get federated credentials
                 $FederatedCredentials = Get-MgBetaApplicationFederatedIdentityCredential -All -ApplicationId $App.Id
                 $FederatedCredentialsResults = @()
             
@@ -178,13 +173,15 @@ function Get-ApplicationsWithRiskyPermissions {
                     $FederatedCredentialsResults = $null
                 }
             
-                # Disregard entries without risky permissions
+                # Exclude applications without risky permissions
                 if ($MappedPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
                         DisplayName          = $App.DisplayName
                         IsMultiTenantEnabled = $IsMultiTenantEnabled
+                        # Credentials from application and service principal objects may get merged in other cmdlets.
+                        # Differentiate between the two by setting IsFromApplication=$true
                         KeyCredentials       = Format-Credentials -Credentials $App.KeyCredentials -IsFromApplication $true
                         PasswordCredentials  = Format-Credentials -Credentials $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = $FederatedCredentialsResults
@@ -214,7 +211,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             $ServicePrincipalResults = @()
             $ServicePrincipals = Get-MgBetaServicePrincipal -All
             foreach ($ServicePrincipal in $ServicePrincipals) {
-                # Only retrieves permissions an admin has consented to
+                # Only retrieves admin consented permissions
                 $AppRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -All -ServicePrincipalId $ServicePrincipal.Id
                 $MappedPermissions = @()
                 if ($AppRoleAssignments.Count -gt 0) {
@@ -222,23 +219,25 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         $ResourceDisplayName = $Role.ResourceDisplayName
                         $RoleId = $Role.AppRoleId
 
-                        # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns permissions that are admin consented
+                        # Default to true,
+                        # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
                         $IsAdminConsented = $true
-                        $MappedPermissions = Format-RiskyPermissions `
+                        $MappedPermissions += Format-RiskyPermissions `
                             -Json $PermissionsJson `
-                            -Map $MappedPermissions `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
                             -IsAdminConsented $IsAdminConsented
                     }
                 }
             
-                # Disregard entries without risky permissions
+                # Exclude service principals without risky permissions
                 if ($MappedPermissions.Count -gt 0) {
                     $ServicePrincipalResults += [PSCustomObject]@{
                         ObjectId             = $ServicePrincipal.Id
                         AppId                = $ServicePrincipal.AppId
                         DisplayName          = $ServicePrincipal.DisplayName
+                        # Credentials from application and service principal objects may get merged in other cmdlets.
+                        # Differentiate between the two by setting IsFromApplication=$false
                         KeyCredentials       = Format-Credentials -Credentials $ServicePrincipal.KeyCredentials -IsFromApplication $false
                         PasswordCredentials  = Format-Credentials -Credentials $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                         FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
@@ -280,6 +279,7 @@ function Get-FirstPartyRiskyApplications {
                 $MatchedServicePrincipal = $RiskySPs | Where-Object { $_.AppId -eq $App.AppId }
             
                 # Merge objects if an application and service principal exist with the same AppId
+                $MergedObject = @{}
                 if ($MatchedServicePrincipal) {
                     # Determine if each risky permission was admin consented or not
                     foreach ($Permission in $App.RiskyPermissions) {
