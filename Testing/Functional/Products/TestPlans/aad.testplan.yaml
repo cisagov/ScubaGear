@@ -689,7 +689,7 @@ TestPlan:
   - PolicyId: MS.AAD.5.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.5.4v1 
+      - TestDescription: MS.AAD.5.4v1
         Preconditions: []
         Postconditions: []
         ExpectedResult: true
