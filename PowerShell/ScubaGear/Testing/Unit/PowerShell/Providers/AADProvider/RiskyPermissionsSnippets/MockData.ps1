@@ -310,3 +310,10 @@ $MockApplicationPermissions = @(
         RoleId = "e2a3a72e-5f79-4c64-b1b1-878b674786c9" # Mail.ReadWrite
     }
 )
+
+$MockApplications | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockApplications.json
+$MockFederatedCredentials | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockFederatedCredentials.json
+$MockServicePrincipals | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockServicePrincipals.json
+$MockServicePrincipalAppRoleAssignments | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockServicePrincipalAppRoleAssignments.json
+$MockSafePermissions | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockSafePermissions.json
+$MockApplicationPermissions | ConvertTo-Json -Depth 5 | Out-File -FilePath ./MockApplicationPermissions.json
