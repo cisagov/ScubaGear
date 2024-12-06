@@ -71,6 +71,22 @@ InModuleScope -ModuleName ExportAADProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-ApplicationsWithRiskyPermissions."{
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-FirstPartyRiskyApplications..."{
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ServicePrincipalsWithRiskyPermissions.."{
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ThirdPartyRiskyServicePrincipals..."{
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }
