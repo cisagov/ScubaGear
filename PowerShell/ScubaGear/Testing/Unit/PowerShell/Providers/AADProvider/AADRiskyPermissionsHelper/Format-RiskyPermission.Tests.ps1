@@ -1,12 +1,16 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
-Import-Module $AADRiskyPermissionsHelper
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyPermission" {
         BeforeAll {
             # Import mock data
-            . ../RiskyPermissionsSnippets/MockData.ps1
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplicationPermissions')]
+            $MockApplicationPermissions = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplicationPermissions.json") | ConvertFrom-Json
+
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipalAppRoleAssignments')]
+            $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
         }
 
         It "pulls risky permissions from the specified resource (application variant)" {
