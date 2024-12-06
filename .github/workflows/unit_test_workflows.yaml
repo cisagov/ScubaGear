@@ -22,18 +22,16 @@ jobs:
       - name: Run Pester Tests
         run: |
           # This should run all workflow unit tests
-          Try {
+          $result = Try {
             Write-Warning "Calling Pester..."
-            # $result = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
-            $result = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
+            # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
+            Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
             Write-Warning "Pester finished..."
-            if ($result -eq $null) {
-              throw "Pester failed to run."
-            }
-            Write-Warning $result.GetType()
-            Write-Warning $result.Result
           } Catch {
             Write-Warning "This is the catch"
             Write-Warning $_
             exit 1
+          }
+          if ($result -eq $null) {
+            throw "Pester failed to run."
           }
