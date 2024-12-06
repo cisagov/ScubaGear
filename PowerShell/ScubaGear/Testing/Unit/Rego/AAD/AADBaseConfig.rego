@@ -89,10 +89,6 @@ DirectorySettings := {
         {
             "Name":  "EnableAdminConsentRequests",
             "Value":  "true"
-        },
-        {
-            "Name": "EnableGroupSpecificConsent",
-            "Value": "false"
         }
     ]
 }
