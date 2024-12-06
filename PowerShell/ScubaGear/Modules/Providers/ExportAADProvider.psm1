@@ -184,12 +184,12 @@ function Export-AADProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "AADRiskyPermissionsHelper.psm1")
 
-    $RiskyApps = Get-ApplicationsWithRiskyPermissions
-    $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions")
 
-    $FirstPartyApps = Get-FirstPartyRiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs | ConvertTo-Json -Depth 3
-    $ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs | ConvertTo-Json -Depth 3
-
+    $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+    $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+    
     $FirstPartyApps > firstpartyapps.json
     $ThirdPartySPs > thirdpartysps.json
     ##### End block
