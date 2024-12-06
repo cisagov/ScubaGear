@@ -24,9 +24,9 @@ jobs:
           # This should run all workflow unit tests
           Try {
             Write-Warning "Calling Pester..."
-            $invokePesterResult = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err -ErrorAction Stop
+            $result = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -ErrorVariable err -ErrorAction Stop
             Write-Warning "Pester finished..."
-            Write-Warning $invokePesterResult
+            Write-Warning $result.Result
             $err.Count | Should -Not -Be 0
           } Catch [System.Management.Automation.RuntimeException] {
             Write-Warning "This is the catch"
