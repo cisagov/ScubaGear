@@ -23,10 +23,8 @@ jobs:
         run: |
           # This should run all workflow unit tests
           $result = Try {
-            Write-Warning "Calling Pester..."
             # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
             Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
-            Write-Warning "Pester finished..."
           } Catch {
             Write-Warning "This is the catch"
             Write-Warning $_
