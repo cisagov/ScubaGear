@@ -150,10 +150,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.DEFENDER.4.1v1
+  - PolicyId: MS.DEFENDER.4.1v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Advanced Rule
+      - TestDescription: MS.DEFENDER.4.1v2 Compliant case - Advanced Rule
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -176,7 +176,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.1v1 Compliant case - Not Advanced Rule
+      - TestDescription: MS.DEFENDER.4.1v2 Compliant case - Not Advanced Rule
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -205,7 +205,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Disabled
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -224,7 +224,7 @@ TestPlan:
                     Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Disabled
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -249,7 +249,7 @@ TestPlan:
                     Disabled: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Enabled
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -272,7 +272,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Enabled
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -301,7 +301,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Mode
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Mode
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -324,7 +324,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Mode
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Mode
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -353,7 +353,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing U.S. Social Security Number (SSN)
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Missing U.S. Social Security Number (SSN)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -376,7 +376,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing U.S. Social Security Number (SSN)
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Missing U.S. Social Security Number (SSN)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -403,7 +403,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -426,7 +426,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Missing U.S. Individual Taxpayer Identification Number (ITIN)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -453,7 +453,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, Missing Credit Card
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, Missing Credit Card
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -476,7 +476,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, Missing Credit Card
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, Missing Credit Card
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -503,7 +503,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Advanced Rule, ParentPolicyName
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Advanced Rule, ParentPolicyName
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -526,7 +526,7 @@ TestPlan:
                     NotifyUserType: "NotSet"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.DEFENDER.4.1v1 Non-Compliant case - Not Advanced Rule, ParentPolicyName
+      - TestDescription: MS.DEFENDER.4.1v2 Non-Compliant case - Not Advanced Rule, ParentPolicyName
         Preconditions:
           - Command: UpdateProviderExport
             Splat:

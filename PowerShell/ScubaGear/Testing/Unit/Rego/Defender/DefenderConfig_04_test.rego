@@ -9,7 +9,7 @@ import data.utils.report.NotCheckedDetails
 import rego.v1
 
 #
-# Policy MS.DEFENDER.4.1v1
+# Policy MS.DEFENDER.4.1v2
 #--
 test_ContentContainsSensitiveInformation_Correct_V1 if {
     Output := defender.tests with input.dlp_compliance_rules as [DlpComplianceRules]
@@ -17,7 +17,7 @@ test_ContentContainsSensitiveInformation_Correct_V1 if {
                             with input.defender_license as true
                             with input.defender_dlp_license as true
 
-    TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, PASS, true) == true
 }
 
 test_AdvancedRule_Correct_V2 if {
@@ -33,7 +33,7 @@ test_AdvancedRule_Correct_V2 if {
                             with input.defender_license as true
                             with input.defender_dlp_license as true
 
-    TestResult("MS.DEFENDER.4.1v1", Output, PASS, true) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, PASS, true) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V1 if {
@@ -46,7 +46,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V1 if {
                             with input.defender_dlp_license as true
 
     ReportDetailString := "No matching rules found for: U.S. Social Security Number (SSN)"
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V2 if {
@@ -59,7 +59,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V2 if {
                             with input.defender_dlp_license as true
 
     ReportDetailString := "No matching rules found for: U.S. Individual Taxpayer Identification Number (ITIN)"
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V3 if {
@@ -72,7 +72,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V3 if {
                             with input.defender_dlp_license as true
 
     ReportDetailString := "No matching rules found for: Credit Card Number"
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V4 if {
@@ -89,7 +89,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V4 if {
         "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     ])
 
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V5 if {
@@ -106,7 +106,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V5 if {
         "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     ])
 
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_ContentContainsSensitiveInformation_Incorrect_V6 if {
@@ -123,7 +123,7 @@ test_ContentContainsSensitiveInformation_Incorrect_V6 if {
         "U.S. Individual Taxpayer Identification Number (ITIN), U.S. Social Security Number (SSN)"
     ])
 
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 test_NoDLPLicense_Incorrect_4_1_V1 if {
@@ -131,7 +131,7 @@ test_NoDLPLicense_Incorrect_4_1_V1 if {
                             with input.defender_dlp_license as false
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
-    TestResult("MS.DEFENDER.4.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.DEFENDER.4.1v2", Output, ReportDetailString, false) == true
 }
 
 #--
