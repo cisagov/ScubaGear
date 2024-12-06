@@ -1,6 +1,7 @@
 package aad
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
@@ -658,52 +659,17 @@ tests contains {
 # MS.AAD.5.4v1
 #--
 
-# For specific setting, save the value & group.
-AllConsentSettings contains {
-    "SettingsGroup": SettingGroup.DisplayName,
-    "Name": Setting.Name,
-    "Value": Setting.Value
-} if {
-    some SettingGroup in input.directory_settings
-    some Setting in SettingGroup.Values
-    Setting.Name == "EnableGroupSpecificConsent"
-}
+# Microsoft has removed this configuration option
+# We are setting this policy to not-implemented and will likely remove it 
+# from the baseline in the next version.
 
-# Save all settings that have a value of false
-GoodConsentSettings contains {
-    "SettingsGroup": Setting.SettingsGroup,
-    "Name": Setting.Name,
-    "Value": Setting.Value
-} if {
-    some Setting in AllConsentSettings
-    lower(Setting.Value) == "false"
-}
-
-# Save all settings that have a value of true
-BadConsentSettings contains {
-    "SettingsGroup": Setting.SettingsGroup,
-    "Name": Setting.Name,
-    "Value": Setting.Value
-} if {
-    some Setting in AllConsentSettings
-    lower(Setting.Value) == "true"
-}
-
-# If there are no bad settings & more than 1
-# good setting, pass
 tests contains {
     "PolicyId": "MS.AAD.5.4v1",
-    "Criticality": "Shall",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaDirectorySetting"],
-    "ActualValue": AllConsentSettings,
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    Conditions := [
-        count(BadConsentSettings) == 0,
-        count(GoodConsentSettings) > 0
-    ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDeprecation,
+    "RequirementMet": false
 }
 #--
 
