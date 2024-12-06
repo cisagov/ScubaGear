@@ -24,14 +24,13 @@ jobs:
           # This should run all workflow unit tests
           Try {
             Write-Warning "Calling Pester..."
-            $result = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' 
+            $result = Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
             Write-Warning "Pester finished..."
             if ($result -eq $null) {
               throw "Pester failed to run."
             }
             Write-Warning $result.GetType()
-            # Write-Warning $result.Result
-            $err.Count | Should -Not -Be 0
+            Write-Warning $result.Result
           } Catch {
             Write-Warning "This is the catch"
             Write-Warning $_
