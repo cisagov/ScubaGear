@@ -179,6 +179,20 @@ function Export-AADProvider {
     # Provides data on the password expiration policy
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
+    ##### This block gathers information on application/service principal API permissions
+    $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
+    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "AADRiskyPermissionsHelper.psm1")
+
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions")
+
+    $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+    $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+
+    $FirstPartyApps > firstpartyapps.json
+    $ThirdPartySPs > thirdpartysps.json
+    ##### End block
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -195,6 +209,8 @@ function Export-AADProvider {
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
+    "first_party_risky_applications": $FirstPartyApps,
+    "third_party_risky_service_principals": $ThirdPartySPs,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
@@ -631,4 +647,3 @@ function Get-PrivilegedRole {
     # Return the array
     $PrivilegedRoleArray
 }
-
