@@ -1,6 +1,7 @@
 package aad_test
 import rego.v1
 import data.aad
+import data.utils.report.NotCheckedDeprecation
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -136,33 +137,11 @@ test_IsEnabled_Incorrect if {
 #
 # Policy MS.AAD.5.4v1
 #--
-test_Value_Correct_Lowercase if {
+test_TeamsGroupConsentDisabled_NotImplemented_V1 if {
+    PolicyId := "MS.AAD.5.4v1"
+
     Output := aad.tests with input.directory_settings as [DirectorySettings]
 
-    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
-}
-
-test_Value_Correct_Uppercase if {
-    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "False"}])
-
-    Output := aad.tests with input.directory_settings as [Settings]
-
-    TestResult("MS.AAD.5.4v1", Output, PASS, true) == true
-}
-
-test_Value_Incorrect_Lowercase if {
-    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "true"}])
-
-    Output := aad.tests with input.directory_settings as [Settings]
-
-    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
-}
-
-test_Value_Incorrect_Uppercase if {
-    Settings := json.patch(DirectorySettings, [{"op": "add", "path": "Values/1/Value", "value": "True"}])
-
-    Output := aad.tests with input.directory_settings as [Settings]
-
-    TestResult("MS.AAD.5.4v1", Output, FAIL, false) == true
+    TestResult(PolicyId, Output, NotCheckedDeprecation, false) == true
 }
 #--
