@@ -687,40 +687,13 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.4v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.AAD.5.4v1 Non-Compliant - Allow group owners to consent to apps
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                directory_settings[0].Values:
-                  - Name: EnableGroupSpecificConsent
-                    Value: "true"
-                  - Name: BlockUserConsentForRiskyApps
-                    Value: "false"
-                  - Name: EnableAdminConsentRequests
-                    Value: "false"
-                  - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                    Value: ""
+      - TestDescription: MS.AAD.5.4v1
+        Preconditions: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.4v1 Compliant - Do NOT allow group owners to consent to apps
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                directory_settings[0].Values:
-                  - Name: EnableGroupSpecificConsent
-                    Value: "false"
-                  - Name: BlockUserConsentForRiskyApps
-                    Value: "false"
-                  - Name: EnableAdminConsentRequests
-                    Value: "false"
-                  - Name: ConstrainGroupSpecificConsentToMembersOfGroupId
-                    Value: ""
-        Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
 
   - PolicyId: MS.AAD.6.1v1
     TestDriver: ScubaCached
