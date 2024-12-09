@@ -31,7 +31,7 @@ jobs:
           $result = Try {
             # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
             # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
-            Invoke-Pester -Configuration $config 6>&1
+            Invoke-Pester -Configuration $config -PassThru
           } Catch {
             Write-Warning "This is the catch"
             Write-Warning $_
@@ -40,4 +40,3 @@ jobs:
           if ($result -eq $null) {
             throw "Pester failed to run."
           }
-          Write-Warning $result
