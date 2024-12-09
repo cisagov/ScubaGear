@@ -1,9 +1,5 @@
 $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
-$PermissionsJson = (
-    Get-Content -Path ( `
-        Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json" `
-    ) | ConvertFrom-Json
-)
+$PermissionsJson = Get-Content -Path (Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json") | ConvertFrom-Json
 
 function Format-RiskyPermission {
     <#
@@ -52,7 +48,7 @@ function Format-Credentials {
     #Internal
     ##>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
-        "PSReviewUnusedParameter", "IsFromApplication", Justification = "False positive"
+        "PSReviewUnusedParameter", "IsFromApplication", Justification = "False positive due to variable scoping"
     )]
     param (
         [Object[]]
@@ -100,7 +96,7 @@ function Merge-Credentials {
         $ServicePrincipalAccessKeys
     )
 
-    # Both applications/sp objects have key and federated credentials.
+    # Both application/sp objects have key and federated credentials.
     # Conditionally merge the two together, select only application/service principal creds, or none.
     $MergedCredentials = @()
     if ($null -ne $ServicePrincipalAccessKeys -and $null -ne $ApplicationAccessKeys) {
@@ -266,7 +262,7 @@ function Get-FirstPartyRiskyApplications {
     <#
     .Description
     Returns an aggregated JSON dataset of application objects, combining data from both applications and
-    service principal objects. Key/Password/Federated credentials are combined into a single object, and
+    service principal objects. Key/Password/Federated credentials are combined into a single array, and
     admin consent is reflected in each object's list of associated risky permissions.
     .Functionality
     #Internal
@@ -302,17 +298,26 @@ function Get-FirstPartyRiskyApplications {
                         ServicePrincipal = $MatchedServicePrincipal.ObjectId
                     }
 
+                    $MergedKeyCredentials = Merge-Credentials `
+                        -ApplicationAccessKeys $App.KeyCredentials `
+                        -ServicePrincipalAccessKeys $MatchedServicePrincipal.KeyCredentials
+                    
+                    $MergedPasswordCredentials = Merge-Credentials `
+                        -ApplicationAccessKeys $App.PasswordCredentials `
+                        -ServicePrincipalAccessKeys $MatchedServicePrincipal.PasswordCredentials
+
+                    $MergedFederatedCredentials = Merge-Credentials `
+                        -ApplicationAccessKeys $App.FederatedCredentials `
+                        -ServicePrincipalAccessKeys $MatchedServicePrincipal.FederatedCredentials
+
                     $MergedObject = [PSCustomObject]@{
                         ObjectId                 = $ObjectIds
                         AppId                    = $App.AppId
                         DisplayName              = $App.DisplayName
                         IsMultiTenantEnabled     = $App.IsMultiTenantEnabled
-                        KeyCredentials           = Merge-Credentials -ApplicationAccessKeys $App.KeyCredentials `
-                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.KeyCredentials
-                        PasswordCredentials      = Merge-Credentials -ApplicationAccessKeys $App.PasswordCredentials `
-                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.PasswordCredentials
-                        FederatedCredentials     = Merge-Credentials -ApplicationAccessKeys $App.FederatedCredentials `
-                                                                     -ServicePrincipalAccessKeys $MatchedServicePrincipal.FederatedCredentials
+                        KeyCredentials           = $MergedKeyCredentials
+                        PasswordCredentials      = $MergedPasswordCredentials
+                        FederatedCredentials     = $MergedFederatedCredentials
                         RiskyPermissions         = $App.RiskyPermissions
                     }
                 }
