@@ -1,4 +1,3 @@
-#$ModulesPathTest = (Join-Path -Path $PSScriptRoot -ChildPath "../../../../../../Modules")
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
@@ -7,10 +6,7 @@ InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ApplicationsWithRiskyPermissions" {
         BeforeAll {
             # Import mock data
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplications')]
             $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
-
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockFederatedCredentials')]
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
 
             function Get-MgBetaApplication { $MockApplications }
