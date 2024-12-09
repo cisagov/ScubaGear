@@ -123,27 +123,15 @@ function Export-AADProvider {
         $PrivilegedUsers = @{}
         $PrivilegedServicePrincipals = @{}
 
-        # Initialize an empty hashtable
-        $hashtable = @{}
-
-        # Iterate over each object in the array
-        foreach ($item in $PrivilegedObjects) {
-            foreach ($key in $item.Keys) {
-                $hashtable[$key] = $item[$key]
-            }
-        }
-
-        # Output the hashtable to verify
-        $hashtable | Format-Table -AutoSize
-
-        foreach ($key in $hashtable.Keys) {
+        #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable 
+        foreach ($key in $PrivilegedObjects[0].Keys) {
 
             # Check if it has ServicePrincipalId property instead of AppId
-            if ($null -ne $hashtable[$key].ServicePrincipalId) {
-                $PrivilegedServicePrincipals[$key] = $hashtable[$key]
+            if ($null -ne $PrivilegedObjects[0][$key].ServicePrincipalId) {
+                $PrivilegedServicePrincipals[$key] = $PrivilegedObjects[0][$key]
             }
             else {
-                $PrivilegedUsers[$key] = $hashtable[$key]
+                $PrivilegedUsers[$key] = $PrivilegedObjects[0][$key]
             }
         }
 
