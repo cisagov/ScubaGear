@@ -21,20 +21,22 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Pester Tests
         run: |
-          # Import-Module -Name Pester -Version 5.5.0
-          # The -PassThru parameter is what allows the output to be passed to the $result output.
-          # https://pester.dev/docs/commands/Invoke-Pester#-passthru
-          $result = Try {
-            # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -PassThru
-            Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow' -PassThru
-          } Catch {
-            # This catches errors with the Pester tests.
-            Write-Warning "An error occurred while running the Pester tests:"
-            Write-Warning $_
-            exit 1
-          }
-          # This catches an error that causes Pester not to run at all (e.g.,
-          # if the -Path is set to a nonexistent directory).
-          if ($result -eq $null) {
-            throw "The Pester tests failed to run."
-          }
+          # Source the function
+          . repo/utils/workflow/Invoke-PesterTests.ps1
+          Invoke-PesterTests -Path 'Testing/workflow'
+          # # The -PassThru parameter is what allows the output to be passed to the $result output.
+          # # https://pester.dev/docs/commands/Invoke-Pester#-passthru
+          # $result = Try {
+          #   # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -PassThru
+          #   Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow' -PassThru
+          # } Catch {
+          #   # This catches errors with the Pester tests.
+          #   Write-Warning "An error occurred while running the Pester tests:"
+          #   Write-Warning $_
+          #   exit 1
+          # }
+          # # This catches an error that causes Pester not to run at all (e.g.,
+          # # if the -Path is set to a nonexistent directory).
+          # if ($result -eq $null) {
+          #   throw "The Pester tests failed to run."
+          # }
