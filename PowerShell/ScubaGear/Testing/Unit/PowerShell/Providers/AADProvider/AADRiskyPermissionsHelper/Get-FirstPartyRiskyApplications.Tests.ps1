@@ -2,8 +2,6 @@ $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
-# Import mock data
-
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-FirstPartyRiskyApplications" {
         BeforeAll {
@@ -15,13 +13,11 @@ InModuleScope AADRiskyPermissionsHelper {
 
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
 
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
 
@@ -68,7 +64,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "matches service principals with applications that have the same AppId" {
             $FirstPartyApps[0].ObjectId | Should -BeOfType [Object]
             $FirstPartyApps[1].ObjectId | Should -BeOfType [Object]
-            $FirstPartyApps[2].ObjectId | Should -BeOfType [Object]
+            $FirstPartyApps[2].ObjectId | Should -BeOfType [string]
         }
 
         It "sets an application permission's admin consent property to true" {
