@@ -26,6 +26,10 @@ function Invoke-PSSA {
 
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+	foreach ($PsFile in $PsFiles) {
+		Write-Warning $PsFile
+	}
+
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 
