@@ -40,3 +40,4 @@ jobs:
           if ($result -eq $null) {
             throw "Pester failed to run."
           }
+          Write-Warning $result
