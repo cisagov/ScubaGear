@@ -19,7 +19,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: Run Pester Tests
-        if: ${{ !cancelled() }}
         shell: powershell
         run: |
-          Invoke-Pester -Output 'Detailed' -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
+          # Source the function
+          . utils/workflow/Invoke-PesterTests.ps1
+          Invoke-PesterTests -Path 'PowerShell/ScubaGear/Testing/Unit/PowerShell'
