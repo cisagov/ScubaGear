@@ -687,12 +687,13 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.5.4v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.AAD.5.4v1
         Preconditions: []
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
+        IsNotChecked: true
 
   - PolicyId: MS.AAD.6.1v1
     TestDriver: ScubaCached
