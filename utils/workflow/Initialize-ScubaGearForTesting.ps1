@@ -1,7 +1,7 @@
 function Initialize-ScubaGearForTesting {
   <#
-    .DESCRIPTION
-      Initializes ScubaGear for testing
+    .SYNOPSIS
+      Initializes ScubaGear, which installs the necessary modules and tools to run ScubaGear.
   #>
 
   Write-Output 'Initializing ScubaGear for testing...'
@@ -12,4 +12,3 @@ function Initialize-ScubaGearForTesting {
   Import-Module (Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
   Write-Output 'Calling Initialize ScubaGear...'
   Initialize-SCuBA
-}
