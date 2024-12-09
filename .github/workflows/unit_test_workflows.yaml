@@ -21,22 +21,18 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Pester Tests
         run: |
-          # This should run all workflow unit tests
-          Import-Module -Name Pester -Version 5.5.0
-          $config = [PesterConfiguration] @{
-            Run    = @{ Path = 'Testing/workflow' }
-            Should = @{ ErrorAction = 'Continue' }
-            Output = @{ Verbosity = 'Detailed' }
-          }
+          # Import-Module -Name Pester -Version 5.5.0
           $result = Try {
             Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -PassThru
             # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow' -PassThru
-            # Invoke-Pester -Configuration $config
           } Catch {
-            Write-Warning "This is the catch"
+            # This catches errors with the Pester tests.
+            Write-Warning "An error occurred while running the Pester tests:"
             Write-Warning $_
             exit 1
           }
+          # This catches an error that causes Pester not to run at all (e.g., 
+          # if the -Path is set to a nonexistent directory).
           if ($result -eq $null) {
-            throw "Pester failed to run."
+            throw "The Pester tests failed to run."
           }
