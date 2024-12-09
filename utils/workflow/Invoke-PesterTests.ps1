@@ -11,6 +11,7 @@ function Invoke-PesterTests {
 		[string]
 		$Path
 	)
+  Write-Warning "The path to test is ${Path}."
   # The -PassThru parameter is what allows the output to be passed to the $result output.
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
