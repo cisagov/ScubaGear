@@ -458,3 +458,8 @@ Invoke-SCuBA -ProductNames teams `
 # Check the version
 Invoke-SCuBA -Version
 ```
+
+
+## Muting the Version Check Warnings
+
+To prevent ScubaGear from trying to determine if a newer release is available and emitting a warning at import time, set the environment variable SCUBAGEAR_SKIP_VERSION_CHECK to any non-whitespace value.
