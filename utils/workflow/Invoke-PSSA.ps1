@@ -26,9 +26,9 @@ function Invoke-PSSA {
 
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
-	foreach ($PsFile in $PsFiles) {
-		Write-Warning $PsFile
-	}
+	# There is a dummy test file that intentionally has problems.
+	# It's part of a Pester test, so I don't want this workflow to test it.
+	$PsFiles.Remove("D:\a\ScubaGear\ScubaGear\Testing\PesterTestFiles\DummyFail.ps1")
 
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
