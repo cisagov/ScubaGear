@@ -180,23 +180,14 @@ function Export-AADProvider {
     # Provides data on the password expiration policy
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
 
-    ##### This block gathers information on application/service principal API permissions
-    #$HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
-    #Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "AADRiskyPermissionsHelper.psm1")
+    ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions")
-    #$RiskyApps = Get-ApplicationsWithRiskyPermissions
-    #$RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
 
     $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
     $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-    #$FirstPartyApps = Get-FirstPartyRiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs | ConvertTo-Json -Depth 3
-    #$ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs | ConvertTo-Json -Depth 3
-
-    $FirstPartyApps > firstpartyapps.json
-    $ThirdPartySPs > thirdpartysps.json
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
