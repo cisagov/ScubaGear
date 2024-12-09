@@ -405,26 +405,3 @@ tests contains {
     )
 }
 #--
-
-###################
-# MS.SHAREPOINT.4 #
-###################
-
-#
-# MS.SHAREPOINT.4.2v1
-#--
-
-# Microsoft has planned to remove the custom scripting configuration option
-# from SharePoint and OneDrive. We are setting this policy to not-implemented
-# and will likely remove it from the baseline in the next version.
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOSite", "Get-PnPTenantSite"],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDeprecation,
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.SHAREPOINT.4.2v1"
-}
-#--
