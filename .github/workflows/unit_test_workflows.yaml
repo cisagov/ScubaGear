@@ -22,7 +22,7 @@ jobs:
       - name: Run Pester Tests
         run: |
           # Source the function
-          . repo/utils/workflow/Invoke-PesterTests.ps1
+          . utils/workflow/Invoke-PesterTests.ps1
           Invoke-PesterTests -Path 'Testing/workflow'
           # # The -PassThru parameter is what allows the output to be passed to the $result output.
           # # https://pester.dev/docs/commands/Invoke-Pester#-passthru
