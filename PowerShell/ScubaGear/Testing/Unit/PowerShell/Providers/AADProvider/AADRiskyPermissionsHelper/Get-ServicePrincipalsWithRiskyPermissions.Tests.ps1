@@ -6,10 +6,7 @@ InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ServicePrincipalsWithRiskyPermissions" {
         BeforeAll {
             # Import mock data
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipals')]
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
-
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipalAppRoleAssignments')]
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
@@ -37,6 +34,24 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[1].PasswordCredentials | Should -BeNullOrEmpty
             $RiskySPs[1].FederatedCredentials | Should -BeNullOrEmpty
             $RiskySPs[1].RiskyPermissions | Should -HaveCount 8
+
+            $RiskySPs[2].DisplayName | Should -Match "Test SP 3"
+            $RiskySPs[2].KeyCredentials | Should -BeNullOrEmpty
+            $RiskySPs[2].PasswordCredentials | Should -BeNullOrEmpty
+            $RiskySPs[2].FederatedCredentials | Should -BeNullOrEmpty
+            $RiskySPs[2].RiskyPermissions | Should -HaveCount 8
+
+            $RiskySPs[3].DisplayName | Should -Match "Test SP 4"
+            $RiskySPs[3].KeyCredentials | Should -BeNullOrEmpty
+            $RiskySPs[3].PasswordCredentials | Should -HaveCount 2
+            $RiskySPs[3].FederatedCredentials | Should -BeNullOrEmpty
+            $RiskySPs[3].RiskyPermissions | Should -HaveCount 8
+
+            $RiskySPs[4].DisplayName | Should -Match "Test SP 5"
+            $RiskySPs[4].KeyCredentials | Should -HaveCount 1
+            $RiskySPs[4].PasswordCredentials | Should -BeNullOrEmpty
+            $RiskySPs[4].FederatedCredentials | Should -BeNullOrEmpty
+            $RiskySPs[4].RiskyPermissions | Should -HaveCount 8
         }
 
         It "excludes service principals with no risky permissions" {
