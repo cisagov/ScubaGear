@@ -301,7 +301,7 @@ function Get-FirstPartyRiskyApplications {
                     $MergedKeyCredentials = Merge-Credentials `
                         -ApplicationAccessKeys $App.KeyCredentials `
                         -ServicePrincipalAccessKeys $MatchedServicePrincipal.KeyCredentials
-                    
+
                     $MergedPasswordCredentials = Merge-Credentials `
                         -ApplicationAccessKeys $App.PasswordCredentials `
                         -ServicePrincipalAccessKeys $MatchedServicePrincipal.PasswordCredentials
