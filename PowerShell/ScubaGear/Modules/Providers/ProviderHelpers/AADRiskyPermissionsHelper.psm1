@@ -162,14 +162,14 @@ function Get-ApplicationsWithRiskyPermissions {
                 $FederatedCredentialsResults = @()
 
                 if ($null -ne $FederatedCredentials) {
-                    foreach ($federatedCredential in $FederatedCredentials) {
+                    foreach ($FederatedCredential in $FederatedCredentials) {
                         $FederatedCredentialsResults += [PSCustomObject]@{
-                            Id          = $federatedCredential.Id
-                            Name        = $federatedCredential.Name
-                            Description = $federatedCredential.Description
-                            Issuer      = $federatedCredential.Issuer
-                            Subject     = $federatedCredential.Subject
-                            Audiences   = $federatedCredential.Audiences | Out-String
+                            Id          = $FederatedCredential.Id
+                            Name        = $FederatedCredential.Name
+                            Description = $FederatedCredential.Description
+                            Issuer      = $FederatedCredential.Issuer
+                            Subject     = $FederatedCredential.Subject
+                            Audiences   = $FederatedCredential.Audiences | Out-String
                         }
                     }
                 }
