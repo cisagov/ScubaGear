@@ -29,8 +29,8 @@ jobs:
             Output = @{ Verbosity = 'Detailed' }
           }
           $result = Try {
-            # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory'
-            Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow' -PassThru
+            Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow/fakedirectory' -PassThru
+            # Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow' -PassThru
             # Invoke-Pester -Configuration $config
           } Catch {
             Write-Warning "This is the catch"
