@@ -1037,7 +1037,7 @@
                            "Get-MalwareFilterPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.DEFENDER.4.1v1",
+        "PolicyId":  "MS.DEFENDER.4.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -1494,7 +1494,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
@@ -1527,7 +1527,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
@@ -1560,7 +1560,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
