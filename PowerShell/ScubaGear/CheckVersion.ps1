@@ -88,9 +88,8 @@ function Invoke-CheckScubaGearVersionGit {
     }
 }
 
-# Run the version check
-function Invoke-CheckVersions {
+# Do the version check if the skip envvar is not defined.
+if ([string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
     Invoke-CheckScubaGearVersionPSGallery
     Invoke-CheckScubaGearVersionGit
 }
-
