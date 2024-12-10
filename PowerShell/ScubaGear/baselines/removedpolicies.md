@@ -1,7 +1,7 @@
 **`TLP:CLEAR`**
-# Removed CISA M365 Security Configuration Baseline Policies
+# Removed CISA M365 Secure Configuration Baseline Policies
 
-This document tracks policies that have been removed from the security configuration baselines. The removal of a policy from the baselines does not necessarily imply that whatever configuration recommended by the removed policy should not be used. In each case, review the "Removal rationale" section of the removed policy in this document for more details.
+This document tracks policies that have been removed from the Secure Configuration Baselines. The removal of a policy from the baselines does not necessarily imply that whatever configuration recommended by the removed policy should not be used. In each case, review the "Removal rationale" section of the removed policy in this document for more details.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
