@@ -82,7 +82,8 @@ function Get-TeamsTenantDetail {
         $TeamsTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-TeamsTenantDetail $($_)"
+        Write-Warning "Error retrieving Tenant details in Get-TeamsTenantDetail: $($_.Exception.Message)"
+        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
         $TeamsTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";
