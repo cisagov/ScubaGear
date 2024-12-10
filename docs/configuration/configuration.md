@@ -169,4 +169,4 @@ If YAML is chosen as the config file format, YAML [anchors and aliases](https://
 
 ## Muting the Version Check Warnings
 
-To prevent ScubaGear from trying to determine if a newer release is available and emitting a warning at import time, set the environment variable SCUBAGEAR_SKIP_VERSION_CHECK to any non-whitespace value.
+To prevent ScubaGear from trying to determine if a newer release is available and emitting a warning at import time, set the environment variable `SCUBAGEAR_SKIP_VERSION_CHECK` to any non-whitespace value.
