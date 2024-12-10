@@ -5,11 +5,13 @@ Describe "Pester Check" {
   It "Pester should fail" {
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    { Invoke-PesterTests -Path 'Testing/PesterTestFiles/DummyFail.ps1' } | Should -Throw -Because "directory does not exist."
+    $FailFilePath = '$PSScriptRoot/../../Testing/PesterTestFiles/DummyFail.ps1'
+    { Invoke-PesterTests -Path $FailFilePath } | Should -Throw -Because "directory does not exist."
   }
   It "Pester should pass" {
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    { Invoke-PesterTests -Path 'Testing/PesterTestFiles/DummyPass.ps1' } | Should -Not -Throw
+    $PassFilePath = '$PSScriptRoot/../../Testing/PesterTestFiles/DummyPass.ps1'
+    { Invoke-PesterTests -Path $PassFilePath } | Should -Not -Throw
   }
 }
