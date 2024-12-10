@@ -307,43 +307,4 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 6. Select **Save**.
 
-## 4. Custom Scripts
-
-This section provides policies for restricting custom scripts execution.
-
-### Policies
-
-#### MS.SHAREPOINT.4.2v1
-Users SHALL be prevented from running custom scripts on self-service created sites.
-
-<!--Policy: MS.SHAREPOINT.4.2v1; Criticality: SHALL -->
-- _Rationale:_ Scripts on SharePoint sites run in the context of users visiting the site and therefore provide access to everything users can access. By preventing custom scripts on self-service created sites, administrators block a path for potentially malicious code execution.
-- _Last modified:_ June 2023
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
-    - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
-
-### Resources
-
-- [Allow or prevent custom script \| Microsoft
-  Documents](https://docs.microsoft.com/en-us/sharepoint/allow-or-prevent-custom-script)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-#### MS.SHAREPOINT.4.2v1 Instructions
-
-1.  Sign in to the **SharePoint admin center**.
-
-2.  Select **Settings**.
-
-3.  Scroll down and select **classic settings page**.
-
-4.  Scroll to the **Custom Script** section.
-
-5.  Select **Prevent users from running custom script on self-service created sites**.
-
-6.  Select **OK**.
+**`TLP:CLEAR`**
