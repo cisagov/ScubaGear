@@ -123,7 +123,7 @@ function Export-AADProvider {
         $PrivilegedUsers = @{}
         $PrivilegedServicePrincipals = @{}
 
-        #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable 
+        #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable
         foreach ($key in $PrivilegedObjects[0].Keys) {
 
             # Check if it has ServicePrincipalId property instead of AppId
