@@ -1,15 +1,6 @@
 function Invoke-CheckScubaGearVersionPSGallery {
-    param (
-        [bool]$DisableVersionCheck = $false
-    )
-
     # Define the path to the file where we store the last version check time
     $versionCheckFile = [System.IO.Path]::Combine($env:TEMP, "ScubaVersionCheck.txt")
-
-    # Check if version checking is disabled
-    if ($DisableVersionCheck) {
-        return
-    }
 
     # Check if the version check file exists
     if (Test-Path $versionCheckFile) {
