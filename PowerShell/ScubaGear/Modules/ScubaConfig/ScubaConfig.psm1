@@ -178,3 +178,4 @@ class ScubaConfig {
         return [ScubaConfig]::_Instance
     }
 }
+
