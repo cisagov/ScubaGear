@@ -21,6 +21,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Pester Tests
         run: |
-          # Source the function
-          . utils/workflow/Invoke-PesterTests.ps1
-          Invoke-PesterTests -Path 'Testing/workflow'
+          # This should run all workflow unit tests
+          Invoke-Pester -Output 'Detailed' -Path 'Testing/workflow'
