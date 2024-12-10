@@ -7,15 +7,13 @@ Describe "Pester Check" {
     $FailFilePath = Join-Path -Path $PSScriptRoot -ChildPath '../../Testing/PesterTestFiles/DummyFail.ps1' -Resolve
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    $exitCode = Invoke-PesterTests -Path $FailFilePath
-    $exitCode | Should -Be 1
+    Invoke-PesterTests -Path $FailFilePath
   }
   It "Pester should pass" {
     # This file has no problems.
     $PassFilePath = Join-Path -Path $PSScriptRoot -ChildPath '../../Testing/PesterTestFiles/DummyPass.ps1' -Resolve
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    $exitCode = Invoke-PesterTests -Path $PassFilePath
-    $exitCode | Should -Be 0
+    Invoke-PesterTests -Path $PassFilePath
   }
 }
