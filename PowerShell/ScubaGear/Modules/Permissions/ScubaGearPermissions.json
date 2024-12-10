@@ -3,7 +3,7 @@
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
         "apiResource": "/roleManagement/directory/roleDefinitions/{unifiedRoleDefinition-id}",
         "poshModule": "Identity.Governance",
-        "leastPermissions": "RoleManagement.Read.Directory",
+        "leastPermissions": ["RoleManagement.Read.Directory"],
         "higherPermissions": [
             "RoleManagement.ReadWrite.Directory",
             "RoleManagement.Read.All",
