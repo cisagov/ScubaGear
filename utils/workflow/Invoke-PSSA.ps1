@@ -39,7 +39,7 @@ function Invoke-PSSA {
 
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
-		Write-Warning $PsFile
+		Write-Warning "Checking $PsFile"
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		foreach ($Result in $Results) {
 			Write-Warning "File:     $($Result.ScriptPath)"
