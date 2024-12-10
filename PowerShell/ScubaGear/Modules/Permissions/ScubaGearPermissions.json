@@ -2,7 +2,7 @@
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
         "apiResource": "/roleManagement/directory/roleDefinitions/{unifiedRoleDefinition-id}",
-        "poshModule": "Identity.Governance",
+        "poshModule": ["Identity.Governance"],
         "leastPermissions": ["RoleManagement.Read.Directory"],
         "higherPermissions": [
             "RoleManagement.ReadWrite.Directory",
@@ -29,8 +29,8 @@
     {
         "moduleCmdlet": "Get-MgServicePrincipal",
         "apiResource": "/servicePrincipals/{servicePrincipal-id}",
-        "poshModule": "Applications",
-        "leastPermissions": "Application.Read.All",
+        "poshModule": ["Applications"],
+        "leastPermissions": ["Application.Read.All"],
         "higherPermissions": [
             "Directory.ReadWrite.All",
             "Directory.Read.All",
@@ -56,8 +56,8 @@
     {
         "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
         "apiResource": "/roleManagement/directory/roleAssignments",
-        "poshModule": "Identity.Governance",
-        "leastPermissions": "RoleManagement.ReadWrite.Directory",
+        "poshModule": ["Identity.Governance"],
+        "leastPermissions": ["RoleManagement.ReadWrite.Directory"],
         "higherPermissions": null,
         "permissionType": "Application",
         "scubaGearProduct": [
@@ -78,7 +78,7 @@
     {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
         "apiResource": "/servicePrincipals/{servicePrincipal-id}/appRoleAssignments",
-        "poshModule": "Applications",
+        "poshModule": ["Applications"],
         "leastPermissions": [
             "AppRoleAssignment.ReadWrite.All",
             "Application.Read.All"
@@ -103,8 +103,8 @@
     {
         "moduleCmdlet": "Invoke-MgGraphRequest",
         "apiResource": "/v1.0/me",
-        "poshModule": "Applications",
-        "leastPermissions": "User.Read",
+        "poshModule": ["Applications"],
+        "leastPermissions": ["User.Read"],
         "higherPermissions": null,
         "permissionType": "Application",
         "scubaGearProduct": [
@@ -124,9 +124,16 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRole",
         "apiResource": "/beta/directoryRoles",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["RoleManagement.Read.Directory"],
-        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
+        "higherPermissions": [
+            "Directory.Read.All",
+            "Directory.ReadWrite.All",
+            "RoleManagement.ReadWrite.Directory"
+        ],
         "scubaGearProduct": ["aad"],
         "supportedEnv": [
             "commercial", 
@@ -144,7 +151,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRoleMember",
         "apiResource": "/beta/directoryRoles/{id}/members",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["RoleManagement.Read.Directory"],
         "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
         "scubaGearProduct": ["aad"],
@@ -164,7 +174,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRoleTemplate",
         "apiResource": "/beta/directoryRoleTemplates",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["RoleManagement.Read.Directory"],
         "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
         "scubaGearProduct": ["aad"],
@@ -184,7 +197,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectorySettings",
         "apiResource": "/beta/directorySettings",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["Directory.Read.All"],
         "higherPermissions": ["Directory.ReadWrite.All","Group.Read.All","Group.ReadWrite.All"],
         "scubaGearProduct": ["aad"],
@@ -204,7 +220,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDomain",
         "apiResource": "/beta/domains",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["Domain.Read.All"],
         "higherPermissions": ["Domain.ReadWrite.All", "Directory.Read.All"],
         "scubaGearProduct": ["aad"],
@@ -224,7 +243,10 @@
     {
         "moduleCmdlet": "Get-MgBetaGroup",
         "apiResource": "/beta/groups",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Groups"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Groups"
+        ],
         "leastPermissions": ["GroupMember.Read.All"],
         "higherPermissions": ["Group.ReadWrite.All", "Directory.Read.All", "Directory.ReadWrite.All", "Group.Read.All"],
         "scubaGearProduct": ["aad"],
@@ -244,7 +266,10 @@
     {
         "moduleCmdlet": "Get-MgBetaGroupMember",
         "apiResource": "/beta/groups/{id}/members",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Groups"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Groups"
+        ],
         "leastPermissions": ["GroupMember.Read.All"],
         "higherPermissions": ["Group.Read.All,","Group.ReadWrite.All","Directory.Read.All","GroupMember.ReadWrite.All"],
         "scubaGearProduct": ["aad"],
@@ -264,7 +289,10 @@
     {
         "moduleCmdlet": "Get-MgBetaIdentityConditionalAccessPolicy",
         "apiResource": "/beta/identity/conditionalAccess/policies",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.SignIns"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
         "leastPermissions": ["Policy.Read.All"],
         "higherPermissions": [],
         "scubaGearProduct": ["aad"],
@@ -284,7 +312,10 @@
     {
         "moduleCmdlet": "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance",
         "apiResource": "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.Governance"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
         "leastPermissions": ["PrivilegedEligibilitySchedule.Read.AzureADGroup"],
         "higherPermissions": ["PrivilegedEligibilitySchedule.ReadWrite.AzureADGroup"],
         "scubaGearProduct": ["aad"],
@@ -304,7 +335,10 @@
     {
         "moduleCmdlet": "Get-MgBetaOrganization",
         "apiResource": "/beta/organization",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["Organization.Read.All"],
         "higherPermissions": ["Directory.Read.All","Organization.ReadWrite.All","Directory.ReadWrite.All"],
         "scubaGearProduct": ["aad"],
@@ -324,7 +358,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPolicyAuthorizationPolicy",
         "apiResource": "/beta/policies/authorizationPolicy",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.SignIns"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
         "leastPermissions": ["Policy.Read.All"],
         "higherPermissions": ["Policy.ReadWrite.Authorization"],
         "scubaGearProduct": ["aad"],
@@ -345,7 +382,10 @@
         "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyAssignment",
         "apiResource": "/beta/policies/roleManagementPolicyAssignments",
         "apiFilter": "scopeId eq '/' and scopeType eq 'DirectoryRole'",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.SignIns"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
         "leastPermissions": ["RoleManagementPolicy.Read.Directory"],
         "higherPermissions": ["RoleManagement.ReadWrite.Directory","RoleManagement.Read.All","RoleManagementPolicy.ReadWrite.Directory"],
         "scubaGearProduct": ["aad"],
@@ -365,7 +405,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPrivilegedAccessResource",
         "apiResource": "/beta/privilegedAccess/aadGroups/resources",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.Governance"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
         "leastPermissions": ["PrivilegedAccess.Read.AzureADGroup"],
         "higherPermissions": ["PrivilegedAccess.ReadWrite.AzureADGroup"],
         "scubaGearProduct": ["aad"],
@@ -385,7 +428,10 @@
     {
         "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "apiResource": "/beta/roleManagement/directory/roleAssignmentScheduleInstances",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.Governance"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
         "leastPermissions": ["RoleAssignmentSchedule.Read.Directory"],
         "higherPermissions": ["RoleAssignmentSchedule.ReadWrite.Directory","RoleManagement.ReadWrite.Directory","RoleManagement.Read.All", "RoleManagement.Read.Directory"],
         "scubaGearProduct": ["aad"],
@@ -405,7 +451,10 @@
     {
         "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance",
         "apiResource": "/beta/roleManagement/directory/roleEligibilityScheduleInstances",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.Governance"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
         "leastPermissions": ["RoleEligibilitySchedule.Read.Directory"],
         "higherPermissions": ["RoleEligibilitySchedule.ReadWrite.Directory", "RoleManagement.Read.All", "RoleManagement.Read.Directory", "RoleManagement.ReadWrite.Directory"],
         "scubaGearProduct": ["aad"],
@@ -425,7 +474,10 @@
     {
         "moduleCmdlet": "Get-MgBetaSubscribedSku",
         "apiResource": "/beta/subscribedSkus",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
+        ],
         "leastPermissions": ["Organization.Read.All"],
         "higherPermissions": ["Directory.Read.All","Organization.Read.All","Directory.ReadWrite.All"],
         "scubaGearProduct": ["aad"],
@@ -446,7 +498,10 @@
     {
         "moduleCmdlet": "Get-MgBetaUser",
         "apiResource": "/beta/users",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Users"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Users"
+        ],
         "leastPermissions": ["User.Read.All"],
         "higherPermissions": ["User.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All"],
         "scubaGearProduct": ["exo", "defender", "aad"],
@@ -468,7 +523,10 @@
         "apiResource": "/beta/users",
         "apiQuery": "$count=true",
         "consistencyLevel": "eventual",
-        "poshModule": ["Microsoft.Graph.Authentication","Microsoft.Graph.Beta.Users"],
+        "poshModule": [
+            "Microsoft.Graph.Authentication",
+            "Microsoft.Graph.Beta.Users"
+        ],
         "leastPermissions": ["User.Read.All"],
         "higherPermissions": ["User.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All"],
         "scubaGearProduct": ["exo", "defender", "aad"],
