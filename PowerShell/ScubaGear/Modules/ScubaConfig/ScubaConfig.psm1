@@ -41,7 +41,6 @@ class ScubaConfig {
             "Application Administrator",
             "Cloud Application Administrator")
         DefaultOPAVersion = '0.69.0'
-        DisableVersionCheck = $false
     }
 
     static [object]ScubaDefault ([string]$Name){
