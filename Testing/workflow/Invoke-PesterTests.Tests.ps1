@@ -7,13 +7,15 @@ Describe "Pester Check" {
     $FailFilePath = Join-Path -Path $PSScriptRoot -ChildPath '../../Testing/PesterTestFiles/DummyFail.ps1' -Resolve
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    { Invoke-PesterTests -Path $FailFilePath } | Should -Throw -Because "directory does not exist."
+    $exitCode = Invoke-PesterTests -Path $FailFilePath
+    $exitCode | Should -Be 1
   }
   It "Pester should pass" {
     # This file has no problems.
     $PassFilePath = Join-Path -Path $PSScriptRoot -ChildPath '../../Testing/PesterTestFiles/DummyPass.ps1' -Resolve
     # Source the function
     . $PSScriptRoot/../../utils/workflow/Invoke-PesterTests.ps1
-    { Invoke-PesterTests -Path $PassFilePath } | Should -Not -Throw
+    $exitCode = Invoke-PesterTests -Path $PassFilePath
+    $exitCode | Should -Be 0
   }
 }
