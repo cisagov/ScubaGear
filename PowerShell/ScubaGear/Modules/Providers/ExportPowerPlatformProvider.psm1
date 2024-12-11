@@ -252,7 +252,8 @@ function Get-PowerPlatformTenantDetail {
         $PowerTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-PowerPlatformTenantDetail $($_)"
+        Write-Warning "Error retrieving Tenant details using Get-PowerPlatformTenantDetail: $($_.Exception.Message)"
+        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
         $PowerTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";
