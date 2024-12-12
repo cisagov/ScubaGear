@@ -1,23 +1,24 @@
 function Invoke-CheckScubaGearVersionPSGallery {
     # Define the path to the file where we store the last version check time
-    $versionCheckFile = [System.IO.Path]::Combine($env:TEMP, "ScubaVersionCheck.txt")
+    $VersionCheckFile = [System.IO.Path]::Combine($env:TEMP, "ScubaVersionCheck.txt")
 
     # Check if the version check file exists
-    if (Test-Path $versionCheckFile) {
+    if (Test-Path $VersionCheckFile) {
         # Read the last check time
-        $lastCheckTime = Get-Content $versionCheckFile | Out-String
-        $lastCheckTime = [datetime]::Parse($lastCheckTime)
+        $LastCheckTime = Get-Content $VersionCheckFile | Out-String
+        $LastCheckTime = [datetime]::Parse($LastCheckTime)
 
         # If the last check was within 24 hours, skip the version check
-        if ((Get-Date) -lt $lastCheckTime.AddHours(24)) {
-            return  # Exit function without checking for a new version
+        if ((Get-Date) -lt $LastCheckTime.AddHours(24)) {
+            # Exit function without checking for a new version
+            return
         }
     }
 
     # Retrieve the installed version of ScubaGear from the system
-    $installedModule = Get-Module -Name ScubaGear -ListAvailable
-    if ($installedModule) {
-        $currentVersion = [System.Version]$installedModule.Version
+    $InstalledModule = Get-Module -Name ScubaGear -ListAvailable
+    if ($InstalledModule) {
+        $CurrentVersion = [System.Version]$InstalledModule.Version
     } else {
         # If we are here, ScubaGear is not installed from PSGallery.
         # Or it may have been installed a different way in a nonstandard folder,
@@ -26,15 +27,15 @@ function Invoke-CheckScubaGearVersionPSGallery {
     }
 
     # Retrieve the latest version from PowerShell Gallery
-    $moduleInfo = Find-Module -Name ScubaGear
-    $latestVersion = [System.Version]$moduleInfo.Version
+    $ModuleInfo = Find-Module -Name ScubaGear
+    $LatestVersion = [System.Version]$ModuleInfo.Version
 
-    if ($currentVersion -lt $latestVersion) {
-        Write-Warning "A new version of ScubaGear ($latestVersion) is available on PowerShell Gallery."
+    if ($CurrentVersion -lt $LatestVersion) {
+        Write-Warning "A new version of ScubaGear ($LatestVersion) is available on PowerShell Gallery."
     }
 
     # Store the current time in the file to mark the last check time
-    (Get-Date).ToString() | Set-Content $versionCheckFile
+    (Get-Date).ToString() | Set-Content $VersionCheckFile
 }
 
 
