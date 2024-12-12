@@ -203,7 +203,7 @@ Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Mic
 #### MS.AAD.3.1v1
 Phishing-resistant MFA SHALL be enforced for all users.
 
-The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key**, **Windows Hello for Business**, and **device-bound passkeys** (in the (in the authenticator app of choice) are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
+The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key**, **Windows Hello for Business**, and **device-bound passkeys** (in the authenticator app of choice) are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
