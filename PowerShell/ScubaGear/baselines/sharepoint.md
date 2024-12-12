@@ -1,5 +1,5 @@
 **`TLP:CLEAR`**
-# CISA M365 Security Configuration Baseline for SharePoint Online and OneDrive
+# CISA M365 Secure Configuration Baseline for SharePoint Online and OneDrive
 
 Microsoft 365 (M365) SharePoint Online is a web-based collaboration and document management platform. It is primarily used to collaborate on documents and communicate information in projects. M365 OneDrive is a cloud-based file storage system primarily used to store a user's personal files, but it can also be used to share documents with others. This secure configuration baseline (SCB) provides specific policies to strengthen the security of both services.
 
