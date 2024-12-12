@@ -20,7 +20,9 @@ function Invoke-CheckScubaGearVersionPSGallery {
         $currentVersion = [System.Version]$installedModule.Version
     } else {
         # If we are here, ScubaGear is not installed from PSGallery.
-        return
+        # Or it may have been installed a different way in a nonstandard folder,
+        # or is running in an extracted release folder. Check github instead.
+        return Invoke-CheckScubaGearVersionGithub
     }
 
     # Retrieve the latest version from PowerShell Gallery
@@ -48,5 +50,4 @@ function Invoke-CheckScubaGearVersionGithub {
 # Do the version check if the skip envvar is not defined.
 if ([string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
     Invoke-CheckScubaGearVersionPSGallery
-    Invoke-CheckScubaGearVersionGithub
 }
