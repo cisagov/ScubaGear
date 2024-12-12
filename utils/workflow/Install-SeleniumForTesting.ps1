@@ -1,7 +1,7 @@
 function Install-SeleniumForTesting {
   <#
-    .SYNOPSIS
-      Installs Selenium PowerShell module and Chrome driver for ScubaGear testing
+    .DESCRIPTION
+      Installs Selenium for ScubaGear testing
   #>
 
   Write-Output 'Installing Selenium for testing...'
