@@ -1,7 +1,7 @@
 function Initialize-ScubaGearForTesting {
   <#
-    .DESCRIPTION
-      Initializes ScubaGear for testing
+    .SYNOPSIS
+      Initializes ScubaGear, which installs the necessary modules and tools to run ScubaGear.
   #>
 
   Write-Output 'Initializing ScubaGear for testing...'
