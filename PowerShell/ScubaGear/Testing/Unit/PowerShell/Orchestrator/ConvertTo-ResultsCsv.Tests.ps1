@@ -85,7 +85,7 @@ InModuleScope Orchestrator {
             }
             { ConvertTo-ResultsCsv @CsvParameters} | Should -Not -Throw
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
-            Should -Invoke -CommandName Write-Warning -Exactly -Times 1
+            Should -Invoke -CommandName Write-Warning -Exactly -Times 2
         }
     }
 }

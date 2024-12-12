@@ -638,7 +638,8 @@ function Invoke-ProviderList {
                     $ProviderJSON += $RetVal
                 }
                 catch {
-                    Write-Error "Error with the $($BaselineName) Provider. See the exception message for more details:  $($_)"
+                    Write-Warning "Error with the $($BaselineName) Provider: $($_.Exception.Message)"
+                    Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
                     $ProdProviderFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
                 }
@@ -686,7 +687,8 @@ function Invoke-ProviderList {
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)`n$($_.ScriptStackTrace)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message) `
+            Stacktrace: $($_.ScriptStackTrace)"
             throw $InvokeProviderListErrorMessage
         }
     }
@@ -768,7 +770,8 @@ function Invoke-RunRego {
                     $TestResults += $RetVal
                 }
                 catch {
-                    Write-Error "Error with the $($BaselineName) Rego invocation. See the exception message for more details:  $($_)"
+                    Write-Warning "Error with the $($BaselineName) Rego invocation: $($_.Exception.Message)"
+                    Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
                     $ProdRegoFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above"
                 }
@@ -782,7 +785,8 @@ function Invoke-RunRego {
         }
         catch {
             $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message) `
+            Stacktrace: $($_.ScriptStackTrace)"
             throw $InvokeRegoErrorMessage
         }
     }
@@ -1012,9 +1016,8 @@ function ConvertTo-ResultsCsv {
             }
         }
         catch {
-            $Warning = "Error involving the creation of CSV version of output. "
-            $Warning += "See the exception message for more details: $($_)"
-            Write-Warning $Warning
+            Write-Warning "Error creating CSV output file: $($_.Exception.Message)"
+            Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
         }
     }
 }
@@ -1153,12 +1156,15 @@ function Merge-JsonOutput {
                 $PathLengthErrorMessage = "ScubaGear was likely executed in a location where the maximum file path length is greater than the allowable Windows file system limit `
                 Please execute ScubaGear in a directory where for Windows file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
                 Another option is to change the -NumberOfUUIDCharactersToTruncate, -OutJSONFileName, or -OutFolderName parameters to achieve an acceptable file path length `
-                See the Invoke-SCuBA parameters documentation for more details. $($_)"
+                See the Invoke-SCuBA parameters documentation for more details. `
+                Error: $($_.Exception.Message) `
+                Stacktrace: $($_.ScriptStackTrace)"
                 throw $PathLengthErrorMessage
             }
             else {
                 $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
-                Ending ScubaGear execution. See the exception message for more details: $($_)"
+                Ending ScubaGear execution. Error: $($_.Exception.Message) `
+                Stacktrace: $($_.ScriptStackTrace)"
                 throw $MergeJsonErrorMessage
             }
         }
@@ -1356,7 +1362,8 @@ function Invoke-ReportCreation {
         }
         catch {
             $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message) `
+            Stacktrace: $($_.ScriptStackTrace)"
             throw $InvokeReportErrorMessage
         }
     }
@@ -1572,7 +1579,8 @@ function Import-Resources {
     }
     catch {
         $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
-            Ending ScubaGear execution. See the exception message for more details: $($_)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message) `
+            Stacktrace: $($_.ScriptStackTrace)"
             throw $ImportResourcesErrorMessage
     }
 }
