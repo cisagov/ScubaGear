@@ -25,8 +25,6 @@ function Invoke-PSSA {
 	Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 
 	# Get all PowerShell script files in the repository
-	# There is a dummy test file that intentionally has problems.  It's part of a 
-	# Pester test, so I don't want this workflow to test it.  Hence the exclude.
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
 
 	# Find the PSScriptAnalyzer config file
