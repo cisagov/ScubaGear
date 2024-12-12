@@ -17,7 +17,7 @@ function Invoke-PesterTests {
   $result = Try {
     Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
   } Catch {
-    # This catche an error with the Pester tests.
+    # This catches an error with the Pester tests.
     Write-Warning "An error occurred while running the Pester tests:"
     Write-Warning $_
     exit 1
