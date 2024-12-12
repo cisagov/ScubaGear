@@ -17,13 +17,13 @@ function Invoke-PesterTests {
   $result = Try {
     Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
   } Catch {
-    # This catches errors with the Pester tests.
+    # This catche an error with the Pester tests.
     Write-Warning "An error occurred while running the Pester tests:"
     Write-Warning $_
     exit 1
   }
-  # This catches an error that causes Pester not to run at all (e.g.,
-  # if the -Path is set to a nonexistent directory).
+  # This catches an error that causes Pester not to run at all
+  # (e.g., if the -Path is set to a nonexistent directory).
   if ($null -eq $result) {
     throw "The Pester tests failed to run."
   }
