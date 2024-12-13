@@ -1,3 +1,5 @@
+#Error Module
+
 using module '..\ScubaConfig\ScubaConfig.psm1'
 
 function Resolve-Error ($E) #($ErrorRecord=$Error[0]) #$ErrorRecord.InvocationInfo.PositionMessage #$_
