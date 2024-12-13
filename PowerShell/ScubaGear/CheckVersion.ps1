@@ -1,6 +1,7 @@
 function Invoke-CheckScubaGearVersionPSGallery {
     # Define the path to the file where we store the last version check time
-    $VersionCheckFile = [System.IO.Path]::Combine($env:TEMP, "ScubaVersionCheck.txt")
+    $TempDir = if ($env:TEMP) { $env:TEMP } else { "/tmp" }
+    $VersionCheckFile = [System.IO.Path]::Combine($TempDir, "ScubaVersionCheck.txt")
 
     # Check if the version check file exists
     if (Test-Path $VersionCheckFile) {
