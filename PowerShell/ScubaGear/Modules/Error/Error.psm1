@@ -1,5 +1,3 @@
-#Error Module
-
 using module '..\ScubaConfig\ScubaConfig.psm1'
 
 function Resolve-Error ($E) #($ErrorRecord=$Error[0]) #$ErrorRecord.InvocationInfo.PositionMessage #$_
@@ -21,7 +19,7 @@ function Resolve-Error ($E) #($ErrorRecord=$Error[0]) #$ErrorRecord.InvocationIn
 
     for ($i = 0; $Exception; $i++, ($Exception = $Exception.InnerException))
     {
-        "$i" * 80
+        "-" * 80
         $Exception |Format-List * -Force
     }
 }
