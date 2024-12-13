@@ -14,7 +14,7 @@ function Resolve-Error ($E) #($ErrorRecord=$Error[0]) #$ErrorRecord.InvocationIn
 
     else
     {
-        Get-PSCallStack | Select -Skip $Skip | % {
+        Get-PSCallStack | Select -Skip 0 | % {
         Write-Warning $E.Command $E.Location $(if ($E.Arguments.Length -le 80) { $E.Arguments })
         }
     }
