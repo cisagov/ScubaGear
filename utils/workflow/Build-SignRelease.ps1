@@ -24,8 +24,10 @@ function New-ModuleSignature {
 
   Write-Warning "Signing the module with AzureSignTool..."
   
+
   # Source the deploy utilities so the functions in it can be called.
-  . Publish-ScubaGear.ps1
+  $PublishPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\utils\workflow\Publish-ScubaGear.ps1' -Resolve
+  . $PublishPath
   
   # Remove non-release files
   Remove-Item -Recurse -Force repo -Include .git*
