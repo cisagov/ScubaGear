@@ -6,6 +6,10 @@ name: Unit Test OPA
 on:
   workflow_call:
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/unit_test_opa.yaml"
+      - "utils/Invoke-Opa.ps1"
 
 permissions: read-all
 
