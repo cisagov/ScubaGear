@@ -65,7 +65,7 @@ jobs:
       - name: Sign Module
         run: |
           # Source the function
-          . ./utils/workflow/Build-SignRelease.ps1
+          . repo/utils/workflow/Build-SignRelease.ps1
           New-ModuleSignature `
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
