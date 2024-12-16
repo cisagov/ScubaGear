@@ -1497,12 +1497,11 @@ function Compare-ProductList {
         $ExceptionMessage
     )
 
-    $Difference = Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
-    if (-not $Difference) {
-        throw "$($ExceptionMessage); aborting ScubaGear execution"
+    try {
+        return Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
     }
-    else {
-        $Difference
+    catch {
+        Write-Warning "Error when comparing product names: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
     }
 }
 
