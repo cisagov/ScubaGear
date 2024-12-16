@@ -46,7 +46,7 @@ function Invoke-CheckScubaGearVersionGithub {
     $CurrentVersion = $ScubaManifest.ModuleVersion
     $LatestVersion = $(Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest" -ErrorAction 'Stop').tag_name.TrimStart("v")
     if ($CurrentVersion -ne $LatestVersion) {
-        Write-Warning "A new version of ScubaGear ($latestVersion) is available. Please consider updating at: https://github.com/cisagov/ScubaGear/releases. This notification can be disabled by setting env:SCUBAGEAR_SKIP_VERSION_CHECK = $true before running ScubaGear."
+        Write-Warning "A new version of ScubaGear ($latestVersion) is available. Please consider updating at: https://github.com/cisagov/ScubaGear/releases. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
     }
 }
 
