@@ -638,8 +638,7 @@ function Invoke-ProviderList {
                     $ProviderJSON += $RetVal
                 }
                 catch {
-                    Write-Warning "Error with the $($BaselineName) Provider: $($_.Exception.Message)"
-                    Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+                    Write-Warning "Error with the $($BaselineName) Provider: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
                     $ProdProviderFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
                 }
@@ -687,8 +686,8 @@ function Invoke-ProviderList {
         }
         catch {
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            Stacktrace: $($_.ScriptStackTrace)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message)`
+            `n$($_.ScriptStackTrace)"
             throw $InvokeProviderListErrorMessage
         }
     }
@@ -770,8 +769,7 @@ function Invoke-RunRego {
                     $TestResults += $RetVal
                 }
                 catch {
-                    Write-Warning "Error with the $($BaselineName) Rego invocation: $($_.Exception.Message)"
-                    Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+                    Write-Warning "Error with the $($BaselineName) Rego invocation: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
                     $ProdRegoFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above"
                 }
@@ -785,8 +783,8 @@ function Invoke-RunRego {
         }
         catch {
             $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            Stacktrace: $($_.ScriptStackTrace)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message)`
+            `n$($_.ScriptStackTrace)"
             throw $InvokeRegoErrorMessage
         }
     }
@@ -1016,8 +1014,7 @@ function ConvertTo-ResultsCsv {
             }
         }
         catch {
-            Write-Warning "Error creating CSV output file: $($_.Exception.Message)"
-            Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+            Write-Warning "Error creating CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
 }
@@ -1362,8 +1359,8 @@ function Invoke-ReportCreation {
         }
         catch {
             $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            Stacktrace: $($_.ScriptStackTrace)"
+            Ending ScubaGear execution. Error: $($_.Exception.Message)`
+            `n$($_.ScriptStackTrace)"
             throw $InvokeReportErrorMessage
         }
     }
@@ -1580,7 +1577,7 @@ function Import-Resources {
     catch {
         $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
             Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            Stacktrace: $($_.ScriptStackTrace)"
+            `n$($_.ScriptStackTrace)"
             throw $ImportResourcesErrorMessage
     }
 }

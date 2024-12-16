@@ -45,8 +45,7 @@ function Export-DefenderProvider {
             Connect-EXOHelper @ServicePrincipalParams;
         }
         catch {
-            Write-Warning "Error connecting to ExchangeOnline: $($_.Exception.Message)"
-            Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+            Write-Warning "Error connecting to ExchangeOnline: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
 
@@ -95,8 +94,7 @@ function Export-DefenderProvider {
         $IPPSConnected = $true
     }
     catch {
-        Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)"
-        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+        Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
         $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
         $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")

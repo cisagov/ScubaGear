@@ -120,8 +120,7 @@ function Get-EXOTenantDetail {
             $TenantId = (ConvertFrom-Json $Content).token_endpoint.Split("/")[3]
         }
         catch {
-            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution: $($_.Exception.Message)"
-            Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
 
         $EXOTenantInfo = @{
@@ -134,8 +133,7 @@ function Get-EXOTenantDetail {
         $EXOTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail: $($_.Exception.Message)"
-        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $EXOTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";

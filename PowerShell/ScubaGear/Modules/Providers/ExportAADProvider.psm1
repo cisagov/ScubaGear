@@ -93,8 +93,7 @@ function Export-AADProvider {
     }
     catch {
         # Display error message but do not stop execution
-        Write-Warning "ConvertFrom-Json failed to parse CAP data received ExportCapPolicies: $($_.Exception.Message)"
-        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+        Write-Warning "ConvertFrom-Json failed to parse CAP data received from ExportCapPolicies: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $CapTableData = "[]"
     }
 
@@ -227,8 +226,7 @@ function Get-AADTenantDetail {
         $AADTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail: $($_.Exception.Message)"
-        Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+        Write-Warning "Error retrieving Tenant details using Get-AADTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $AADTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";
