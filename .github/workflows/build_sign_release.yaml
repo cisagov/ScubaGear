@@ -67,7 +67,7 @@ jobs:
           # Source the function
           . ./utils/workflow/Build-SignRelease.ps1
           New-ModuleSignature `
-            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} ` 
+            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
             -ReleaseVersion ${env:RELEASE_VERSION}
           # # Source the deploy utilities so the functions in it can be called.
