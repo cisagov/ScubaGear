@@ -18,6 +18,7 @@ const colorRows = () => {
             }
             else if (rows[i].children[statusCol].innerHTML === "Fail") {
                 rows[i].style.background = "var(--test-fail)";
+                rows[i].style.color = "var(--test-error-color)";
             }
             else if (rows[i].children[statusCol].innerHTML === "Warning") {
                 rows[i].style.background = "var(--test-warning)";

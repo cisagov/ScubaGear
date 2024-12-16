@@ -226,7 +226,7 @@ function New-Report {
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
     $AADWarning = "Exclusions must only be used if they are approved within an organization's security risk acceptance process.
-    Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the README file</a>
+    Please reference <a href=`"$($ScubaGitHubUrl)/blob/main/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`" class=`" aad-link`">this section in the README file</a>
     file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
     <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
     $NoWarning = "<br/>"
