@@ -25,8 +25,17 @@ jobs:
         uses: open-policy-agent/setup-opa@v2
         with:
           version: latest
+      # - name: Run OPA Check
+      #   run: opa check ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego --strict
       - name: Run OPA Check
-        run: opa check ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego --strict
+        run: |
+          # Source the function
+          . ./utils/workflow/Invoke-Opa.ps1
+          $Paths = @(
+            '${{ env.MODULE_ROOT }}/Rego',
+            '${{ env.MODULE_ROOT }}/Testing/Unit/Rego'
+          )
+          Invoke-OpaCheck($Paths)
       - name: Run OPA Tests
         run: opa test ${{ env.MODULE_ROOT }}/Rego/*.rego ${{ env.MODULE_ROOT }}/Rego/Utils/*.rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego/**/*.rego -v
       - name: Setup Regal
