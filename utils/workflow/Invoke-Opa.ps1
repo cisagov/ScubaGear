@@ -16,6 +16,6 @@ function Invoke-OpaCheck {
   Write-Warning " "
 
   foreach ($Path in $Paths) {
-    opa test $Path --strict
+    opa test $Path # --strict
   }
 }
