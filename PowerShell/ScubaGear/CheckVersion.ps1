@@ -52,5 +52,10 @@ function Invoke-CheckScubaGearVersionGithub {
 
 # Do the version check if the skip envvar is not defined.
 if ([string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
-    Invoke-CheckScubaGearVersionPSGallery -ErrorAction 'Stop'
+    try {
+        Invoke-CheckScubaGearVersionPSGallery -ErrorAction 'Stop'
+    }
+    catch {
+        Write-Warning "The ScubaGear version check failed to execute. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true.`n$($_.Exception.Message)`n$($_.ScriptStackTrace)"
+    }
 }
