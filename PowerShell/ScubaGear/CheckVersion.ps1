@@ -1,20 +1,4 @@
 function Invoke-CheckScubaGearVersionPSGallery {
-    # Define the path to the file where we store the last version check time
-    $TempDir = if ($env:TEMP) { $env:TEMP } else { "/tmp" }
-    $VersionCheckFile = [System.IO.Path]::Combine($TempDir, "ScubaVersionCheck.txt")
-
-    # Check if the version check file exists
-    if (Test-Path $VersionCheckFile -ErrorAction 'Stop') {
-        # Read the last check time
-        $LastCheckTime = Get-Content $VersionCheckFile -ErrorAction 'Stop' | Out-String -ErrorAction 'Stop'
-        $LastCheckTime = [datetime]::Parse($LastCheckTime)
-
-        # If the last check was within 24 hours, skip the version check
-        if ((Get-Date -ErrorAction 'Stop') -lt $LastCheckTime.AddHours(24)) {
-            # Exit function without checking for a new version
-            return
-        }
-    }
 
     # Retrieve the installed version of ScubaGear from the system
     $InstalledModule = Get-Module -Name ScubaGear -ListAvailable -ErrorAction 'Stop'
