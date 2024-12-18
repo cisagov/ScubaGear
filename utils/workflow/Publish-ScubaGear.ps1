@@ -381,7 +381,7 @@ function New-FileList {
 
 function Use-AzureSignTool {
   <#
-    .DESCRIPTION
+    .SYNOPSIS
       AzureSignTool is a utility for signing code that is used to secure ScubaGear.
       https://github.com/vcsjones/AzureSignTool
       Throws an error if there was an error signing the files.

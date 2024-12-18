@@ -1,3 +1,15 @@
+function Install-AzureSigningTool {
+  <#
+    .SYNOPSIS
+      Install Azure Signing Tool
+  #>
+
+  Write-Warning "Installing AST..."
+
+  dotnet --version
+  dotnet tool install --global AzureSignTool --version 5.0.0
+}
+
 function New-ModuleSignature {
   <#
     .SYNOPSIS
@@ -45,21 +57,4 @@ function New-ModuleSignature {
     -FileList $FileListFileName
   Move-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
-}
-
-function Test-Release {
-  <#
-    .SYNOPSIS
-      Tests a release of ScubaGear from GitHub by executing it.
-    .PARAMETER $Version
-      The version of ScubaGear expand and test.
-  #>
-
-  Write-Warning "Testing the release..."
-
-  Expand-Archive -Path "ScubaGear-$Version.zip"
-  Get-ChildItem
-  Set-Location -Path "ScubaGear-$Version"
-  Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-  Invoke-SCuBA -Version
 }

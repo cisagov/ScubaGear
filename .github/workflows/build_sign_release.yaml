@@ -48,8 +48,11 @@ jobs:
           path: repo
       - name: Install Azure Signing Tool
         run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 5.0.0
+          # Source the function
+          . repo/utils/workflow/Build-SignRelease.ps1
+          Install-AzureSigningTool
+          # dotnet --version
+          # dotnet tool install --global AzureSignTool --version 5.0.0
       # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       - name: Login to Azure
         uses: azure/login@v2
@@ -94,10 +97,8 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
-          # Source the function
-          # . repo/utils/workflow/Build-SignRelease.ps1
-          # Test-Release -Version ${{ inputs.version }}
-          
+          # Note: Cannot move this code to a function in the utils/workflow folder
+          # because the Sign Module code above relocates that folder
           Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
           Get-ChildItem
           Set-Location -Path "ScubaGear-${{ inputs.version }}"
