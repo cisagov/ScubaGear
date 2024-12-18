@@ -94,7 +94,8 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
-          Test-Path -path repo/utils/workflow/Build-SignRelease.ps1
+          Test-Path -path repo
+          Test-Path -path repo/workflow
           # Source the function
           . repo/utils/workflow/Build-SignRelease.ps1
           Test-Release -Version ${{ inputs.version }}
