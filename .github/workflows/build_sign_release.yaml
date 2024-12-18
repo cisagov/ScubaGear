@@ -74,7 +74,6 @@ jobs:
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
             -ReleaseVersion ${env:RELEASE_VERSION}
-          Test-Path -path repo
       - name: Create Release
         uses: softprops/action-gh-release@v1
         id: create-release
@@ -95,8 +94,6 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
-          Test-Path -path repo
-          Test-Path -path repo/workflow
           # Source the function
           . repo/utils/workflow/Build-SignRelease.ps1
           Test-Release -Version ${{ inputs.version }}
