@@ -16,6 +16,6 @@ Describe "AST Check" {
     Write-Warning $Commands.GetType()
     $ToolPath = (Get-Command AzureSignTool).Path
     Write-Warning "The path to AzureSignTool is $ToolPath"
-    Test-Path -Path $ToolPath | Should -Be -True
+    Test-Path -Path $ToolPath | Should -Be $true
   }
 }
