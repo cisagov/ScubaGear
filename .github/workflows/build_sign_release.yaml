@@ -10,6 +10,10 @@ on:
         description: "Release Name"
         required: true
         type: string
+      # Note: This is NOT the ACTUAL release version for ScubaGear.
+      # That value is found in ScubaGear.psd1.
+      # This is only used for things like the file name.
+      # Yes, this is a disconnect that violates DRY.
       version:
         description: "Release Version (e.g., 1.2.4)"
         required: true
@@ -90,6 +94,7 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
+          Test-Path -path repo/utils/workflow/Build-SignRelease.ps1
           # Source the function
           . repo/utils/workflow/Build-SignRelease.ps1
           Test-Release -Version ${{ inputs.version }}
