@@ -429,7 +429,7 @@ function Use-AzureSignTool {
   Write-Warning "The path to AzureSignTool is $ToolPath"
   # & is the call operator that executes a command, script, or function.
   $Results = & $ToolPath $SignArguments
-
+  Write-Host $Results  # Temp testing...
   # Test the results for failures.
   # If there are no failures, the $SuccessPattern string will be the last
   # line in the results.
