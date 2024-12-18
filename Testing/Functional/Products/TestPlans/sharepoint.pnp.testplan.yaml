@@ -6,30 +6,42 @@ TestPlan:
     Tests:
       - TestDescription: MS.SHAREPOINT.1.1v1 Non-compliant - ExternalUserAndGuestSharing (3)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.1.1v1 Non-compliant - ExternalUserSharingOnly (1)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExternalUserSharingOnly
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.1.1v1 Compliant - ExistingExternalUserSharingOnly (2)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.1.1v1 Compliant - Disabled (0)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: Disabled
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: true
 
@@ -47,45 +59,70 @@ TestPlan:
     Tests:
       - TestDescription: MS.SHAREPOINT.1.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); SharingDomainRestrictionMode = BlockList
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserSharingOnly
               SharingDomainRestrictionMode: BlockList
               SharingBlockedDomainList: nefarious.com evil.is.us
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability = ExternalUserSharingOnly (New and existing guests); SharingDomainRestrictionMode = AllowList
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserSharingOnly
               SharingDomainRestrictionMode: AllowList
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.1.3v1 Compliant -  SharingCapability = ExternalUserAndGuestSharing (Anyone); SharingDomainRestrictionMode = AllowList
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               SharingDomainRestrictionMode: AllowList
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization);
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: Disabled
               SharingDomainRestrictionMode: None
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization); SharingDomainRestrictionMode = AllowList
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: Disabled
               SharingDomainRestrictionMode: AllowList
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
@@ -120,9 +157,12 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.2.1v1 Non-compliant - DefaultSharingLinkType = AnonymousAccess
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               DefaultSharingLinkType: AnonymousAccess
@@ -130,9 +170,12 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.2.1v1 Compliant - DefaultSharingLinkType = Direct
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: Disabled
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               DefaultSharingLinkType: Direct
@@ -162,87 +205,137 @@ TestPlan:
     Tests:
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays > 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 31
-              SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays < 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 7
-              SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays = 0 (Anyone links in unchecked state)
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 0
-              SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: ExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: Disabled
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: ExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
-              SharingCapability: Disabled
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -252,61 +345,94 @@ TestPlan:
     Tests:
       - TestDescription: MS.SHAREPOINT.3.2v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
+              WaitOnFirstCheck: True
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: View
               FolderAnonymousLinkType: View
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = View
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
+              WaitOnFirstCheck: True
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: Edit
               FolderAnonymousLinkType: View
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = Edit
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
+              WaitOnFirstCheck: True
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: View
               FolderAnonymousLinkType: Edit
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
+              WaitOnFirstCheck: True
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               FileAnonymousLinkType: Edit
               FolderAnonymousLinkType: Edit
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: Disabled
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests)
         Preconditions:
-          - Command: Set-PnPTenant
+          - Command: SetAndCheckTenantSetting
             Splat:
-              SharingCapability: ExternalUserSharingOnly
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -316,9 +442,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
               EmailAttestationRequired: false
               EmailAttestationReAuthDays: 30
         Postconditions: []
@@ -326,27 +457,42 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserSharingOnly
               EmailAttestationRequired: false
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               EmailAttestationRequired: false
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 31
         Postconditions: []
@@ -354,27 +500,42 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserSharingOnly
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 31
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExistingExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExistingExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 30
         Postconditions: []
@@ -382,27 +543,42 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserSharingOnly"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserSharingOnly'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserSharingOnly
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability ExternalUserAndGuestSharing"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'ExternalUserAndGuestSharing'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: ExternalUserAndGuestSharing
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 30
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization)
         Preconditions:
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: "Set-PnPTenant -SharingCapability Disabled"
+              CheckBlock: "$(Get-PnPTenant).SharingCapability -eq 'Disabled'"
+              Retries: 3
+              WaitInterval: 10
           - Command: Set-PnPTenant
             Splat:
-              SharingCapability: Disabled
               EmailAttestationRequired: true
               EmailAttestationReAuthDays: 29
         Postconditions: []

@@ -90,12 +90,22 @@ TestPlan:
     Tests:
       - TestDescription: MS.POWERPLATFORM.3.1v1 Non-Compliant case - Power Platform tenant isolation is NOT enabled
         Preconditions:
-          - Command: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $true; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $true; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+              CheckBlock: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled -eq $True'
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.3.1v1 Compliant case - Power Platform tenant isolation is enabled.
         Preconditions:
-          - Command: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $false; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+          - Command: SetAndCheckTenantSetting
+            Splat:
+              SetBlock: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled = $false; Set-PowerAppTenantIsolationPolicy -TenantId $guid -TenantIsolationPolicy $iso'
+              CheckBlock: '$guid = (Get-AdminPowerAppEnvironment -Default).EnvironmentName | Select-String -Pattern "[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$" -AllMatches | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Value; $iso = Get-PowerAppTenantIsolationPolicy -TenantId $guid; $iso.psobject.properties.value.isDisabled -eq $False'
+              Retries: 3
+              WaitInterval: 10
         Postconditions: []
         ExpectedResult: true
 
