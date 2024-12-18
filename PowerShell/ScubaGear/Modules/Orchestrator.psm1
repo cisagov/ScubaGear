@@ -852,6 +852,7 @@ function Format-PlainText {
         $CleanString = $CleanString.Replace("<br/>", " ")
         $CleanString = $CleanString.Replace("<b>", "")
         $CleanString = $CleanString.Replace("</b>", "")
+
         # Strip out HTML comments
         $CleanString = $CleanString -replace '(.*)(<!--)(.*)(-->)(.*)', '$1$5'
         # The following regex looks for a string with an anchor tag. If it finds an anchor tag, it reformats
@@ -868,7 +869,6 @@ function Format-PlainText {
         # Group 6: '(</a>)' Matches the closing anchor tag
         # Group 7: '(.*)' Matches any number of characters after the closing anchor tag
         $CleanString = $CleanString -replace '(.*)(<a href=")([\w#./=&?%\-+:;$@,]+)(".*>)(.*)(</a>)(.*)', '$1$5, $3$7'
-
         $CleanString
     }
 }
@@ -1115,9 +1115,16 @@ function Merge-JsonOutput {
 
                 # The date is listed under the metadata, no need to include it in the summary as well
                 $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
-
                 $Summary | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.ReportSummary
+            }
+            foreach ($Product in $Results.PSObject.Properties) {
+                foreach ($Group in $Product.Value) {
+                    foreach ($Control in $Group.Controls) {
+                        $Control.Requirement = Format-PlainText -RawString $Control.Requirement
+                        $Control.Details = Format-PlainText -RawString $Control.Details
+                    }
+                }
             }
 
             # Convert the output a json string
