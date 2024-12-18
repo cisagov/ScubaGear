@@ -90,8 +90,12 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
-          Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
-          Get-ChildItem
-          Set-Location -Path "ScubaGear-${{ inputs.version }}"
-          Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-          Invoke-SCuBA -Version
+          # Source the function
+          . repo/utils/workflow/Build-SignRelease.ps1
+          Test-Release -Version ${{ inputs.version }}
+          
+          # Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
+          # Get-ChildItem
+          # Set-Location -Path "ScubaGear-${{ inputs.version }}"
+          # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+          # Invoke-SCuBA -Version

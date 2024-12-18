@@ -23,7 +23,6 @@ function New-ModuleSignature {
 	)
 
   Write-Warning "Signing the module with AzureSignTool..."
-  
 
   # Source the deploy utilities so the functions in it can be called.
   $PublishPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\utils\workflow\Publish-ScubaGear.ps1' -Resolve
@@ -46,4 +45,21 @@ function New-ModuleSignature {
     -FileList $FileListFileName
   Move-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
+}
+
+function Test-Release {
+  <#
+    .SYNOPSIS
+      Tests a release of ScubaGear from GitHub by executing it.
+    .PARAMETER $Version
+      The version of ScubaGear expand and test.
+  #>
+
+  Write-Warning "Testing the release..."
+
+  Expand-Archive -Path "ScubaGear-$Version.zip"
+  Get-ChildItem
+  Set-Location -Path "ScubaGear-$Version"
+  Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+  Invoke-SCuBA -Version
 }
