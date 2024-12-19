@@ -54,6 +54,6 @@ function New-ModuleSignature {
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
     -CertificateName $CertificateName `
     -FileList $FileListFileName
-  Copy-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
+  Move-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
 }
