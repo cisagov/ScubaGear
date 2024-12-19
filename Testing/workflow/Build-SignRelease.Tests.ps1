@@ -9,7 +9,6 @@ BeforeDiscovery {
 
 Describe "AST Check" {
   It "AST should be installed" {
-    $Commands = Get-Command AzureSignTool
     $ToolPath = (Get-Command AzureSignTool).Path
     Write-Warning "The path to AzureSignTool is $ToolPath"
     Test-Path -Path $ToolPath | Should -Be $true

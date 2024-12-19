@@ -39,17 +39,17 @@ function New-ModuleSignature {
   # Source the deploy utilities so the functions in it can be called.
   $PublishPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\utils\workflow\Publish-ScubaGear.ps1' -Resolve
   . $PublishPath
-  
+
   # Remove non-release files
   Remove-Item -Recurse -Force repo -Include .git*
   Write-Warning "Creating an array of the files to sign..."
   $ArrayOfFilePaths = New-ArrayOfFilePaths `
     -ModuleDestinationPath repo
-  
+
   Write-Warning "Creating a file with a list of the files to sign..."
   $FileListFileName = New-FileList `
     -ArrayOfFilePaths $ArrayOfFilePaths
-  
+
   Write-Warning "Calling AzureSignTool function to sign scripts, manifest, and modules..."
   Use-AzureSignTool `
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
