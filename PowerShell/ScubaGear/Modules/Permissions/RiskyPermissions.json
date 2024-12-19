@@ -1,0 +1,75 @@
+{
+    "resources": {
+        "00000003-0000-0000-c000-000000000000": "Microsoft Graph",
+        "00000002-0000-0ff1-ce00-000000000000": "Office 365 Exchange Online",
+        "00000003-0000-0ff1-ce00-000000000000": "Office 365 SharePoint Online",
+        "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs"
+    },
+    "permissions": { 
+        "Microsoft Graph": {
+            "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9": "Application.ReadWrite.All",
+            "06b708a9-e830-4db3-a914-8e69da51d44f": "AppRoleAssignment.ReadWrite.All",
+            "0e263e50-5827-48a4-b97c-d940288653c7": "Directory.AccessAsUser.All",
+            "7ab1d382-f21e-4acd-a863-ba3e13f7da61": "Directory.Read.All",
+            "19dbc75e-c2e2-444c-a770-ec69d8559fc7": "Directory.ReadWrite.All",
+            "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8": "RoleManagement.ReadWrite.Directory",
+            "025d3225-3f02-4882-b4c0-cd5b541a4e80": "RoleManagement.ReadWrite.Exchange",
+            "18a4783c-866b-4cc7-a460-3d5e5662c884": "Application.ReadWrite.OwnedBy",
+            "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
+            "df021288-bdef-4463-88db-98f22de89214": "User.Read.All",
+            "405a51b5-8d8d-430b-9842-8be4b0e9f324": "User.Export.All",
+            "5b567255-7703-4780-807c-7be8301ae99b": "Group.Read.All", 
+            "62a82d76-70ea-41e2-9197-370581804d09": "Group.ReadWrite.All",
+            "98830695-27a2-44f7-8c18-0c3ebc9698f6": "GroupMember.Read.All",
+            "dbaae8cf-10b5-4b86-a4a1-f871c94c6695": "GroupMember.ReadWrite.All",
+            "658aa5d8-239f-45c4-aa12-864f4fc7e490": "Member.Read.Hidden",
+            "89c8469c-83ad-45f7-8ff2-6e3d4285709e": "ServicePrincipalEndpoint.ReadWrite.All",
+            "810c84a8-4a9e-49e6-bf7d-12d183f40d01": "Mail.Read",
+            "6be147d2-ea4f-4b5a-a3fa-3eab6f3c140a": "Mail.ReadBasic",
+            "693c5e45-0940-467d-9b8a-1022fb9d42ef": "Mail.ReadBasic.All",
+            "e2a3a72e-5f79-4c64-b1b1-878b674786c9": "Mail.ReadWrite",
+            "b633e1c5-b582-4048-a93e-9f11b44c7e96": "Mail.Send",
+            "40f97065-369a-49f4-947c-6a255697ae91": "MailboxSettings.Read",
+            "6931bccd-447a-43d1-b442-00a195474933": "MailboxSettings.ReadWrite",
+            "798ee544-9d2d-430c-a058-570e29e34338": "Calendars.Read",
+            "ef54d2bf-783f-4e0f-bca1-3210c0444d99": "Calendars.ReadWrite",
+            "089fe4d0-434a-44c5-8827-41ba8a0b17f5": "Contacts.Read",
+            "6918b873-d17a-4dc1-b314-35f528134491": "Contacts.ReadWrite",
+            "45bbb07e-7321-4fd7-a8f6-3ff27e6a81c8": "CallRecords.Read.All",
+            "a2611786-80b3-417e-adaa-707d4261a5f0": "CallRecord-PstnCalls.Read.All",
+            "01d4889c-1287-42c6-ac1f-5d1e02578ef6": "Files.Read.All",
+            "75359482-378d-4052-8f01-80520e7db3cd": "Files.ReadWrite.All",
+            "9492366f-7969-46a4-8d15-ed1a20078fff": "Sites.ReadWrite.All",
+            "332a536c-c7ef-4017-ab91-336970924f0d": "Sites.Read.All",
+            "a82116e5-55eb-4c41-a434-62fe8a61c773": "Sites.FullControl.All",
+            "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess",
+            "246dd0d5-5bd0-4def-940b-0421030a5b68": "Policy.Read.All"
+        },
+        "Office 365 Management APIs": {
+            "594c1fb6-4f81-4475-ae41-0c394909246c": "ActivityFeed.Read",
+            "4807a72c-ad38-4250-94c9-4eabfe26cd55": "ActivityFeed.ReadDlp"
+        },
+        "Office 365 Exchange Online": {
+            "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app",
+            "798ee544-9d2d-430c-a058-570e29e34338": "Calendars.Read",
+            "2dfdc6dc-2fa7-4a2c-a922-dbd4f85d17be": "Calendars.Read.All",
+            "ef54d2bf-783f-4e0f-bca1-3210c0444d99": "Calendars.ReadWrite.All",
+            "089fe4d0-434a-44c5-8827-41ba8a0b17f5": "Contacts.Read",
+            "6918b873-d17a-4dc1-b314-35f528134491": "Contacts.ReadWrite",
+            "e2a3a72e-5f79-4c64-b1b1-878b674786c9": "Mail.ReadWrite",
+            "810c84a8-4a9e-49e6-bf7d-12d183f40d01": "Mail.Read",
+            "b633e1c5-b582-4048-a93e-9f11b44c7e96": "Mail.Send",
+            "d45fa9f8-36e5-4cd2-b601-b063c7cf9ac2": "MailboxSettings.Read",
+            "f9156939-25cd-4ba8-abfe-7fabcf003749": "MailboxSettings.ReadWrite",
+            "bf24470f-10c1-436d-8d53-7b997eb473be": "User.Read.All",
+            "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
+        },
+        "Office 365 SharePoint Online": {
+            "fbcd29d2-fcca-4405-aded-518d457caae4": "Sites.ReadWrite.All",
+            "d13f72ca-a275-4b96-b789-48ebcc4da984": "Sites.Read.All",
+            "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All",
+            "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
+            "df021288-bdef-4463-88db-98f22de89214": "User.Read.All"
+        }
+    }
+}
