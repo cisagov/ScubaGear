@@ -32,8 +32,8 @@ jobs:
     runs-on: windows-latest
     environment: Development
     # TODO get rid of this env variable
-    env:
-      RELEASE_VERSION: ${{ inputs.version }}
+    # env:
+    #   RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       id-token: write
       contents: write
@@ -52,20 +52,17 @@ jobs:
           # Source the function
           . repo/utils/workflow/Build-SignRelease.ps1
           Install-AzureSigningTool
-      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          enable-AzPSSession: true
+      # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
+      # - name: Login to Azure
+      #   uses: azure/login@v2
+      #   with:
+      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      #     enable-AzPSSession: true
       - name: Get Key Vault info
         id: key-vault-info
-        # env:
-        #   KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
-          # $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           $KeyVaultInfo = ${{ secrets.SCUBA_KEY_VAULT_PROD}} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
@@ -76,7 +73,7 @@ jobs:
           New-ModuleSignature `
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
-            -ReleaseVersion ${env:RELEASE_VERSION}
+            -ReleaseVersion ${{ inputs.version }}
       - name: Create Release
         uses: softprops/action-gh-release@v1
         id: create-release
