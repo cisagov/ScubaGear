@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Power BI
+# CISA M365 Secure Configuration Baseline for Power BI
 
 Microsoft 365 (M365) Power BI is a cloud-based product that facilitates self-service business intelligence dashboards, reports, datasets, and visualizations. Power BI can connect to multiple different data sources, combine and shape data from those connections, then create reports and dashboards to share with others. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Power BI security.
 

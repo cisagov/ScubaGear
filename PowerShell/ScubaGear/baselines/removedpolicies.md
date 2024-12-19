@@ -1,7 +1,7 @@
 **`TLP:CLEAR`**
-# Removed CISA M365 Security Configuration Baseline Policies
+# Removed CISA M365 Secure Configuration Baseline Policies
 
-This document tracks policies that have been removed from the security configuration baselines. The removal of a policy from the baselines does not necessarily imply that whatever configuration recommended by the removed policy should not be used. In each case, review the "Removal rationale" section of the removed policy in this document for more details.
+This document tracks policies that have been removed from the Secure Configuration Baselines. The removal of a policy from the baselines does not necessarily imply that whatever configuration recommended by the removed policy should not be used. In each case, review the "Removal rationale" section of the removed policy in this document for more details.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -66,3 +66,9 @@ Users SHALL be prevented from running custom scripts on personal sites (aka OneD
 - _Removal date:_ July 2024
 - _Removal rationale:_ The option to enable and disable custom scripting on personal sites (aka OneDrive) found in policy MS.SHAREPOINT.4.1v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.  Furthermore, it is no longer possible to allow custom scripts on personal sites.
 
+#### MS.SHAREPOINT.4.2v1
+Users SHALL be prevented from running custom scripts on self-service created sites.
+- _Removal date:_ November 2024
+- _Removal rationale:_ Microsoft has noted that after November 2024 it will no longer be possible to prevent SharePoint in resetting custom script settings to its original value (disabled) for all sites. All references including the policy, implementation steps, and section, by direction of CISA and Microsoft, have been removed as the setting will be automatically reverted back to **Blocked** within 24 hours.
+
+**`TLP:CLEAR`**

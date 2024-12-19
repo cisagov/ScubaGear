@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Microsoft Entra ID
+# CISA M365 Secure Configuration Baseline for Microsoft Entra ID
 
 Microsoft Entra ID is a cloud-based identity and access control service that provides security and functional capabilities. This Secure Configuration Baseline (SCB) provides specific policies to help secure Microsoft Entra ID.
 
@@ -203,7 +203,7 @@ Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Mic
 #### MS.AAD.3.1v1
 Phishing-resistant MFA SHALL be enforced for all users.
 
-The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key** and **Windows Hello for Business** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
+The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key**, **Windows Hello for Business**, and **device-bound passkeys** (in the authenticator app of choice) are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
@@ -311,6 +311,8 @@ Managed Devices SHOULD be required to register MFA.
 - [Microsoft Entra joined devices](https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join)
 
 - [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
+
+- [Enable passkeys (FIDO2) for your organization](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2)
 
 ### License Requirements
 

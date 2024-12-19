@@ -222,7 +222,7 @@ function Connect-Tenant {
            }
        }
        catch {
-           Write-Error "Error establishing a connection with $($Product). $($_)"
+           Write-Warning "Error establishing a connection with $($Product): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
            $ProdAuthFailed += $Product
            Write-Warning "$($Product) will be omitted from the output because of failed authentication"
        }
@@ -299,7 +299,7 @@ function Disconnect-SCuBATenant {
        # Suppress error due to disconnect from service with no active connection
        continue
    } catch {
-       Write-Error "ERRROR: Could not disconnect from $Product`n$($Error[0]): "
+       Write-Warning "Could not disconnect from $Product`n: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
    } finally {
        $ErrorActionPreference = "Continue"
    }

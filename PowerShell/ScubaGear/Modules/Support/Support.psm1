@@ -50,6 +50,9 @@ function Initialize-SCuBA {
         existing module will not be updated to th latest version.
     .EXAMPLE
         Initialize-SCuBA
+    .EXAMPLE
+        Initalize-SCuBA -Scope AllUsers
+        Install all dependent PowerShell modules in a location that's accessible to all users of the computer.
     .NOTES
         Executing the script with no switches set will install the latest
         version of a module if not already installed.
@@ -91,7 +94,12 @@ function Initialize-SCuBA {
         [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain ScubaGear artifacts. Defaults to <home>.')]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
-        $ScubaParentDirectory = $env:USERPROFILE
+        $ScubaParentDirectory = $env:USERPROFILE,
+
+        [Parameter(Mandatory=$false, HelpMessage = 'Specifies the Install-Module scope of the dependent PowerShell modules. Acceptable values are AllUsers and CurrentUser. Defaults to CurrentUser')]
+        [ValidateSet('CurrentUser','AllUsers')]
+        [string]
+        $Scope = 'CurrentUser'
     )
 
     Write-Output 'Initializing ScubaGear...'
@@ -164,7 +172,7 @@ function Initialize-SCuBA {
                     Install-Module -Name $ModuleName `
                         -Force `
                         -AllowClobber `
-                        -Scope CurrentUser `
+                        -Scope "$($Scope)" `
                         -MaximumVersion $Module.MaximumVersion
                     Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}."
                 }
@@ -177,7 +185,7 @@ function Initialize-SCuBA {
                     Install-Module -Name $ModuleName `
                         -Force `
                         -AllowClobber `
-                        -Scope CurrentUser `
+                        -Scope "$($Scope)" `
                         -MaximumVersion $Module.MaximumVersion
                     $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
                     Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
@@ -187,7 +195,7 @@ function Initialize-SCuBA {
         else {
             Install-Module -Name $ModuleName `
                 -AllowClobber `
-                -Scope CurrentUser `
+                -Scope "$($Scope)" `
                 -MaximumVersion $Module.MaximumVersion
                 $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
             Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName}: ${MaxInstalledVersion}."

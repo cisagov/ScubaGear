@@ -24,7 +24,7 @@ class CommandTracker {
             return $Result
         }
         catch {
-            Write-Warning "Error running $($Command). $($_)"
+            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
             $this.UnSuccessfulCommands += $Command
             $Result = @()
             return $Result

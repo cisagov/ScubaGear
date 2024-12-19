@@ -1,6 +1,6 @@
 function Invoke-PSSA {
 	<#
-		.DESCRIPTION
+		.SYNOPSIS
 			Allows a GitHub workflow to install and use PSScriptAnalyzer (PSSA).
 		.PARAMETER DebuggingMode
 			When the debug parameter is true, extra debugging information is available.
