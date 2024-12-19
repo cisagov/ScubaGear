@@ -62,8 +62,10 @@ jobs:
           enable-AzPSSession: true
       - name: Get Key Vault info
         id: key-vault-info
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
-          $KeyVaultInfo = ${{ secrets.SCUBA_KEY_VAULT_PROD}} | ConvertFrom-Json
+          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign Module
