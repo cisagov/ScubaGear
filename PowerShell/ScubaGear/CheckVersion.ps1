@@ -19,9 +19,6 @@ function Invoke-CheckScubaGearVersionPSGallery {
         Write-Warning "A new version of ScubaGear ($LatestVersion) is available on PowerShell Gallery. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
 
     }
-
-    # Store the current time in the file to mark the last check time
-    (Get-Date -ErrorAction 'Stop').ToString() | Set-Content $VersionCheckFile -ErrorAction 'Stop'
 }
 
 
