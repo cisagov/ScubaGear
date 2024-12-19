@@ -1,5 +1,6 @@
-$PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
-$PermissionsJson = Get-Content -Path (Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json") | ConvertFrom-Json
+using module 'ScubaConfig\ScubaConfig.psm1'
+#$PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
+#$PermissionsJson = Get-Content -Path (Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json") | ConvertFrom-Json
 
 function Format-RiskyPermission {
     <#
@@ -128,6 +129,7 @@ function Get-ApplicationsWithRiskyPermissions {
     ##>
     process {
         try {
+            $RiskyPermissionsJson = [ScubaConfig]::GetInstance().RiskyPermissions
             $Applications = Get-MgBetaApplication -All
             $ApplicationResults = @()
             foreach ($App in $Applications) {
@@ -148,10 +150,10 @@ function Get-ApplicationsWithRiskyPermissions {
                     $IsAdminConsented = $false
 
                     foreach($Role in $Roles) {
-                        $ResourceDisplayName = $PermissionsJson.resources.$ResourceAppId
+                        $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
                         $RoleId = $Role.Id
                         $MappedPermissions += Format-RiskyPermission `
-                            -Json $PermissionsJson `
+                            -Json $RiskyPermissionsJson `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
                             -IsAdminConsented $IsAdminConsented
@@ -211,9 +213,11 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     #Internal
     ##>
     process {
-        try {
+        try { 
+            $RiskyPermissionsJson = [ScubaConfig]::GetInstance().RiskyPermissions
             $ServicePrincipalResults = @()
-            $ServicePrincipals = Get-MgBetaServicePrincipal -All
+            # Get all service principals excluding ones owned by Microsoft 
+            $ServicePrincipals = Get-MgBetaServicePrincipal -All | Where-Object { $_.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a" }
             foreach ($ServicePrincipal in $ServicePrincipals) {
                 # Only retrieves admin consented permissions
                 $AppRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -All -ServicePrincipalId $ServicePrincipal.Id
@@ -227,7 +231,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
                         $IsAdminConsented = $true
                         $MappedPermissions += Format-RiskyPermission `
-                            -Json $PermissionsJson `
+                            -Json $RiskyPermissionsJson `
                             -Resource $ResourceDisplayName `
                             -Id $RoleId `
                             -IsAdminConsented $IsAdminConsented
