@@ -575,7 +575,7 @@ Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
 forms an integral part of securing Microsoft Teams. There are
 several commercial DLP solutions available documenting support for
-M365. Microsoft itself offers DLP services, controlled within the Microsoft Purview
+Microsoft 365 (M365). Microsoft itself offers DLP services, controlled within the Microsoft Purview
 compliance portal. Agencies may select any service that fits their needs and meets
 the requirements outlined in this baseline setting. The DLP solution selected by an agency
 should offer services comparable to those offered by Microsoft.
@@ -636,7 +636,7 @@ Any product meeting the requirements outlined in this baseline policy may be use
 
 ## 7. Malware Scanning
 
-Malware scanning protects M365 Teams assets from malicious software. Several commercial anti-malware solutions detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
+Malware scanning protects Microsoft 365 (M365) Teams assets from malicious software. Several commercial anti-malware solutions detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
 
 - [MS.DEFENDER.3.1v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
   - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.

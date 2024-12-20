@@ -542,7 +542,7 @@ Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
 forms an integral part of securing Microsoft Exchange Online. There are
 several commercial DLP solutions available that document support for
-M365. Microsoft itself offer DLP services, controlled within the Microsoft Purview
+M365. Microsoft itself offers DLP services, controlled within the Microsoft Purview
 compliance portal. Agencies may select any service that fits their needs and meets
 the requirements outlined in this baseline setting. The DLP solution selected by an agency
 should offer services comparable to those offered by Microsoft.
@@ -642,7 +642,7 @@ those offered by Microsoft.
 
 Though using Microsoft Defender's solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
-Microsoft Defender can be found in the follow section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
+Microsoft Defender can be found in the following section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
 
 - [Preset Security Policies \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
 
@@ -855,8 +855,8 @@ already delivered to mailboxes and removes them.
 Several techniques exist for protecting against phishing attacks,
 including the following:
 
-- Impersonation protection checks, wherein a tool compares the sender's
-  address to the addresses of known senders to flag look-alike
+- Impersonation protection checks, where a tool compares the sender's
+  address to the addresses of known senders in order to flag look-alike
   addresses, such as `user@exmple.com` and `user@example.com`.
 
 - User warnings, such as displaying a notice the first time a user
@@ -1419,7 +1419,7 @@ users with E5 licenses assigned is retained for one year.
 
 However, in accordance with Office of Management and Budget (OMB) Memorandum 21-31, _Improving the Federal Government's
 Investigative and Remediation Capabilities Related to Cybersecurity Incidents_,
-Microsoft 365 audit logs are to be retained at least 12 months in active
+Microsoft 365 (M365) audit logs are to be retained at least 12 months in active
 storage and an additional 18 months in cold storage. This can be accomplished
 by offloading the logs out of the cloud environment or natively through
 Microsoft by creating an [audit log retention
