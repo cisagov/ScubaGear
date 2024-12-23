@@ -16,7 +16,7 @@ function Invoke-CheckScubaGearVersionPSGallery {
     $LatestVersion = [System.Version]$ModuleInfo.Version
 
     if ($CurrentVersion -lt $LatestVersion) {
-        Write-Warning "A new version of ScubaGear ($LatestVersion) is available on PowerShell Gallery. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
+        Write-Warning "A newer version of ScubaGear ($LatestVersion) is available on PowerShell Gallery. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
 
     }
 }
