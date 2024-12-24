@@ -6,8 +6,10 @@
 
 Describe "Sign Module Check" {
   It "Bad key vault URL should be handled gracefully" {
-    # Source the function.
-    . repo/utils/workflow/Build-SignRelease.ps1
+    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
+    # Source the function
+    . $ScriptPath
+
     New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.cisa.gov" `
       -CertificateName "certificate name" `

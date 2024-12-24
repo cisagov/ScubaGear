@@ -4,7 +4,7 @@ BeforeDiscovery {
   $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
   # Source the function
   . $ScriptPath
-  Install-AzureSigningTool
+  Install-AzureSignTool
 }
 
 Describe "AST Check" {
