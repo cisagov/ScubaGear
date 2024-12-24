@@ -9,11 +9,12 @@ Describe "Sign Module Check" {
     $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
     # Source the function
     . $ScriptPath
-
+    $RootFolderName = Join-Path -Path $PSScriptRoot -Childpath '../..'
     New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.cisa.gov" `
       -CertificateName "certificate name" `
-      -ReleaseVersion "0.0.1"
+      -ReleaseVersion "0.0.1" `
+      -RootFolderName $RootFolderName
   }
 
 }

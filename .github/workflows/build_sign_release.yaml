@@ -75,7 +75,8 @@ jobs:
           New-ModuleSignature `
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
-            -ReleaseVersion ${{ inputs.version }}
+            -ReleaseVersion ${{ inputs.version }} `
+            -RootFolderName "root"
       - name: Create Release
         uses: softprops/action-gh-release@v1
         id: create-release

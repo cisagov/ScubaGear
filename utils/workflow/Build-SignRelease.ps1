@@ -8,6 +8,8 @@ function New-ModuleSignature {
       The name of the certificate stored in the KeyVault.
     .PARAMETER $ReleaseVersion
       The version number of the release (e.g., 1.5.1).
+    .PARAMETER $RootFolderName
+      The name of the root folder.
   #>
   [CmdletBinding()]
 	param(
@@ -19,7 +21,10 @@ function New-ModuleSignature {
 		$CertificateName,
     [Parameter(Mandatory = $true)]
     [string]
-    $ReleaseVersion
+    $ReleaseVersion,
+    [Parameter(Mandatory = $true)]
+    [string]
+    $RootFolderName
 	)
 
   Write-Warning "Signing the module with AzureSignTool..."
@@ -29,10 +34,10 @@ function New-ModuleSignature {
   . $PublishPath
 
   # Remove non-release files (required for non-Windows machines)
-  Remove-Item -Recurse -Force repo -Include .git*
+  Remove-Item -Recurse -Force $RootFolderName -Include .git*
   Write-Warning "Creating an array of the files to sign..."
   $ArrayOfFilePaths = New-ArrayOfFilePaths `
-    -ModuleDestinationPath repo
+    -ModuleDestinationPath $RootFolderName
 
   Write-Warning "Creating a file with a list of the files to sign..."
   $FileListFileName = New-FileList `
@@ -43,6 +48,6 @@ function New-ModuleSignature {
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
     -CertificateName $CertificateName `
     -FileList $FileListFileName
-  Move-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
+  Move-Item -Path $RootFolderName -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
 }

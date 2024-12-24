@@ -1,7 +1,7 @@
 # The purpose of this test is to verify that Azure Sign Tool is working.
 
 BeforeDiscovery {
-  $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Install-AzureSignTool.ps1.ps1' -Resolve
+  $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Install-AzureSignTool.ps1' -Resolve
   # Source the function
   . $ScriptPath
   Install-AzureSignTool
