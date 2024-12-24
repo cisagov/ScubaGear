@@ -56,4 +56,6 @@ function New-ModuleSignature {
     -FileList $FileListFileName
   Copy-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
+  Write-Warning "DOES THE ZIP EXIST????"
+  Test-Path -Path "ScubaGear-$ReleaseVersion.zip"
 }
