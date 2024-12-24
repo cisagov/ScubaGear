@@ -39,7 +39,7 @@ function New-ModuleSignature {
   $PublishPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\utils\workflow\Publish-ScubaGear.ps1' -Resolve
   . $PublishPath
 
-  # Remove non-release files
+  # Remove non-release files (required for non-Windows machines)
   Remove-Item -Recurse -Force repo -Include .git*
   Write-Warning "Creating an array of the files to sign..."
   $ArrayOfFilePaths = New-ArrayOfFilePaths `
@@ -54,11 +54,6 @@ function New-ModuleSignature {
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
     -CertificateName $CertificateName `
     -FileList $FileListFileName
-  Copy-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
+  Move-Item  -Path repo -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
-  Write-Warning "DOES THE ZIP EXIST????"
-  Write-Warning "ScubaGear-$ReleaseVersion.zip"
-  $Result = Test-Path -Path "ScubaGear-$ReleaseVersion.zip"
-  Write-Warning "The RESULT is"
-  Write-Warning $Result
 }
