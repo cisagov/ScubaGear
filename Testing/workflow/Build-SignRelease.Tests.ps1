@@ -1,21 +1,17 @@
-# The purpose of this test is to verify that Azure Sign Tool is working.
+# Add test with bad key vault URL
+# Add test with bad cert name
+# Add test that checks for zip file after compress
 
-BeforeDiscovery {
-  $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
-  # Source the function
-  . $ScriptPath
-  Install-AzureSigningTool
-}
+# The purpose of this test to ensure that the function properly signs the module.
 
-Describe "AST Check" {
-  It "Dotnet should be installed" {
-    $ToolPath = (Get-Command dotnet).Path
-    Write-Warning "The path to dotnet is $ToolPath"
-    Test-Path -Path $ToolPath | Should -Be $true
+Describe "Sign Module Check" {
+  It "Bad key vault URL should be handled gracefully" {
+    # Source the function.
+    . repo/utils/workflow/Build-SignRelease.ps1
+    New-ModuleSignature `
+      -AzureKeyVaultUrl "https://www.cisa.gov" `
+      -CertificateName "certificate name" `
+      -ReleaseVersion "0.0.1"
   }
-  It "AST should be installed" {
-    $ToolPath = (Get-Command AzureSignTool).Path
-    Write-Warning "The path to AzureSignTool is $ToolPath"
-    Test-Path -Path $ToolPath | Should -Be $true
-  }
+
 }

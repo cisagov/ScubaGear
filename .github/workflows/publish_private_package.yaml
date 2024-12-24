@@ -40,9 +40,10 @@ jobs:
           path: repo
       - name: Install Azure Signing Tool
         run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 5.0.0
-      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+          # Source the function
+          . repo/utils/workflow/Install-AzureSignTool.ps1
+          Install-AzureSignTool
+      # OIDC Login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -60,13 +61,13 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Create Private Gallery
         run: |
-          # Source the deploy utilities so the functions in it can be called.
+          # Source the function.
           . repo/utils/workflow/Publish-ScubaGear.ps1
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
         run: |
-            # Source the deploy utilities so the functions in it can be called.
+            # Source the function.
             . repo/utils/workflow/Publish-ScubaGear.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*

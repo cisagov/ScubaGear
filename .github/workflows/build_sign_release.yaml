@@ -50,8 +50,8 @@ jobs:
       - name: Install Azure Signing Tool
         run: |
           # Source the function
-          . repo/utils/workflow/Build-SignRelease.ps1
-          Install-AzureSigningTool
+          . repo/utils/workflow/Install-AzureSignTool.ps1
+          Install-AzureSignTool
       # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
         uses: azure/login@v2
@@ -70,7 +70,7 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign Module
         run: |
-          # Source the function
+          # Source the function.
           . repo/utils/workflow/Build-SignRelease.ps1
           New-ModuleSignature `
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
@@ -96,8 +96,6 @@ jobs:
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
-          # Note: Cannot move this code to a function in the utils/workflow folder
-          # because the Sign Module code above relocates that folder
           Expand-Archive -Path "ScubaGear-${{ inputs.version }}.zip"
           Get-ChildItem
           Set-Location -Path "ScubaGear-${{ inputs.version }}"
