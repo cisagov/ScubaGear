@@ -1,23 +1,29 @@
-function Invoke-CheckScubaGearVersionPSGallery {
+function Invoke-CheckScubaGearVersion {
 
     # Retrieve the installed version of ScubaGear from the system
     $InstalledModule = Get-Module -Name ScubaGear -ListAvailable -ErrorAction 'Stop'
-    if ($InstalledModule) {
-        $CurrentVersion = [System.Version]$InstalledModule.Version
-    } else {
+
+    # If multiple different versions are installed, get the most recent.
+    if ($InstalledModule -is [array]) {
+        $InstalledModule = $InstalledModule | Sort-Object | Select-Object -First 1
+    }
+
+    # Check if no results found.
+    if (!$InstalledModule) {
         # If we are here, ScubaGear is not installed from PSGallery.
         # Or it may have been installed a different way in a nonstandard folder,
         # or is running in an extracted release folder. Check github instead.
         return Invoke-CheckScubaGearVersionGithub -ErrorAction 'Stop'
     }
 
+    $LatestInstalledVersion = [System.Version]$InstalledModule.Version
+
     # Retrieve the latest version from PowerShell Gallery
     $ModuleInfo = Find-Module -Name ScubaGear -ErrorAction 'Stop'
-    $LatestVersion = [System.Version]$ModuleInfo.Version
+    $LatestPSGalleryVersion = [System.Version]$ModuleInfo.Version
 
-    if ($CurrentVersion -lt $LatestVersion) {
-        Write-Warning "A newer version of ScubaGear ($LatestVersion) is available on PowerShell Gallery. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
-
+    if ($LatestInstalledVersion -lt $LatestPSGalleryVersion) {
+        Write-Warning "A newer version of ScubaGear ($LatestPSGalleryVersion) is available on PowerShell Gallery. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
     }
 }
 
@@ -34,7 +40,7 @@ function Invoke-CheckScubaGearVersionGithub {
 # Do the version check if the skip envvar is not defined.
 if ([string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
     try {
-        Invoke-CheckScubaGearVersionPSGallery -ErrorAction 'Stop'
+        Invoke-CheckScubaGearVersion -ErrorAction 'Stop'
     }
     catch {
         Write-Warning "The ScubaGear version check failed to execute. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true.`n$($_.Exception.Message)`n$($_.ScriptStackTrace)"
