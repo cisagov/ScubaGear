@@ -1,4 +1,12 @@
 function Invoke-CheckScubaGearVersion {
+    <#
+    .SYNOPSIS
+    Complain if a newer version of ScubaGear is available on PSGallery.
+
+    .DESCRIPTION
+    Checks PSGallery latest version and compares it to the latest version installed
+    from PSGallery.
+    #>
 
     # Retrieve the installed version of ScubaGear from the system
     $InstalledModule = Get-Module -Name ScubaGear -ListAvailable -ErrorAction 'Stop'
@@ -29,6 +37,13 @@ function Invoke-CheckScubaGearVersion {
 
 
 function Invoke-CheckScubaGearVersionGithub {
+    <#
+    .SYNOPSIS
+    Complain if a newer version of ScubaGear is available from the Github release page.
+
+    .DESCRIPTION
+    Checks latest version available on the github release page and compares it to the current running verison.
+    #>
     $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $PSScriptRoot -ChildPath 'ScubaGear.psd1' -Resolve  -ErrorAction 'Stop' ) -ErrorAction 'Stop'
     $CurrentVersion = [System.Version]$ScubaManifest.ModuleVersion
     $LatestVersion = [System.Version]$(Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest" -ErrorAction 'Stop').tag_name.TrimStart("v")
