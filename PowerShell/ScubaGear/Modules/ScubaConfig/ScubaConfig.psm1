@@ -18,12 +18,12 @@ class ScubaConfig {
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
     hidden static [hashtable]$ScubaDefaults = @{
-        DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+        DefaultOPAPath = try {Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"} catch {"."};
         DefaultProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
         AllProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
         DefaultM365Environment = "commercial"
         DefaultLogIn = $true
-        DefaultOutPath = $PWD | Select-Object -ExpandProperty Path
+        DefaultOutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
         DefaultOutFolderName = "M365BaselineConformance"
         DefaultOutProviderFileName = "ProviderSettingsExport"
         DefaultOutRegoFileName = "TestResults"
@@ -178,3 +178,4 @@ class ScubaConfig {
         return [ScubaConfig]::_Instance
     }
 }
+

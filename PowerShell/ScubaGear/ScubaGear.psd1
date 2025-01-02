@@ -12,7 +12,7 @@
 RootModule = './ScubaGear.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.4.0'
+ModuleVersion = '1.5.0'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop'
@@ -62,7 +62,8 @@ PowerShellVersion = '5.1'
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 ScriptsToProcess = @(
     './RaiseFunctionCap.ps1',
-    './Dependencies.ps1'
+    './Dependencies.ps1',
+    './CheckVersion.ps1'
 )
 
 # Type files (.ps1xml) to be loaded when importing this module

@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Defender
+# CISA M365 Secure Configuration Baseline for Defender
 
 Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that coordinates prevention, detection, investigation, and response. This set of tools and features are used to detect many types of attacks.
 
@@ -679,13 +679,13 @@ before the instructions below can be completed.
 
 There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give administrators better
-real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Security Configuration Baseline for Exchange Online.
+real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Secure Configuration Baseline for Exchange Online.
 
-- [MS.EXO.16.1v1 \| CISA M365 Security Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
+- [MS.EXO.16.1v1 \| CISA M365 Secure Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.
+At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
@@ -725,7 +725,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 
 4. Select the checkbox next to each alert to enable as determined by the
    agency and at a minimum those referenced in the
-   [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
+   [_CISA M365 Secure Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
 
    a. **Suspicious email sending patterns detected.**
 
