@@ -5,7 +5,7 @@ function Invoke-CheckScubaGearVersion {
 
     # If multiple different versions are installed, get the most recent.
     if ($InstalledModule -is [array]) {
-        $InstalledModule = $InstalledModule | Sort-Object | Select-Object -First 1
+        $InstalledModule = $InstalledModule | Sort-Object -Property Version | Select-Object -Last 1
     }
 
     # Check if no results found.
