@@ -1,4 +1,4 @@
-using module 'ScubaConfig\ScubaConfig.psm1'
+using module "..\..\ScubaConfig\ScubaConfig.psm1"
 #$PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
 #$PermissionsJson = Get-Content -Path (Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json") | ConvertFrom-Json
 
@@ -379,8 +379,9 @@ function Get-ThirdPartyRiskyServicePrincipals {
 }
 
 Export-ModuleMember -Function @(
-    'Get-ApplicationsWithRiskyPermissions',
-    'Get-ServicePrincipalsWithRiskyPermissions',
-    'Get-FirstPartyRiskyApplications',
-    'Get-ThirdPartyRiskyServicePrincipals'
+    "Get-ApplicationsWithRiskyPermissions",
+    "Get-ServicePrincipalsWithRiskyPermissions",
+    "Get-FirstPartyRiskyApplications",
+    "Get-ThirdPartyRiskyServicePrincipals"
 )
+    
