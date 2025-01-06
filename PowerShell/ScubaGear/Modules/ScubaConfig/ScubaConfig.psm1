@@ -42,8 +42,11 @@ class ScubaConfig {
             "Application Administrator",
             "Cloud Application Administrator")
         DefaultOPAVersion = '0.70.0'
-    }    
-    hidden static [PSCustomObject]$RiskyPermissions 
+    }
+
+    hidden [PSCustomObject]$RiskyPermissions = (Get-Content -Path (
+        Join-Path -Path (Get-Item -Path $PSScriptRoot).Parent.FullName -ChildPath "Permissions/RiskyPermissions.json"
+    ) | ConvertFrom-Json)
 
     static [object]ScubaDefault ([string]$Name){
         return [ScubaConfig]::ScubaDefaults[$Name]
@@ -59,10 +62,6 @@ class ScubaConfig {
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
-
-        [Scubaconfig]::RiskyPermissions = Get-Content -Path (
-            Join-Path -Path (Get-Item -Path $PSScriptRoot).Parent.Parent.FullName -ChildPath "Permissions/RiskyPermissions.json"
-        ) | ConvertFrom-Json
 
         # If OmitPolicy was included in the config file, validate the policy IDs included there.
         if ($this.Configuration.ContainsKey("OmitPolicy")) {
