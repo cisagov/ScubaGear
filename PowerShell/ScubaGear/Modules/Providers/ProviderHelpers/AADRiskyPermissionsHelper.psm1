@@ -15,7 +15,7 @@ function Format-RiskyPermission {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $Resource,
+        $AppDisplayName,
 
         [ValidateNotNullOrEmpty()]
         [string]
@@ -26,14 +26,14 @@ function Format-RiskyPermission {
         $IsAdminConsented
     )
 
-    $RiskyPermissions = $Json.permissions.$Resource.PSObject.Properties.Name
+    $RiskyPermissions = $Json.permissions.$AppDisplayName.PSObject.Properties.Name
     $Map = @()
     if ($RiskyPermissions -contains $Id) {
         $Map += [PSCustomObject]@{
-            RoleId              = $Id
-            RoleDisplayName     = $Json.permissions.$Resource.$Id
-            ResourceDisplayName = $Resource
-            IsAdminConsented    = $IsAdminConsented
+            RoleId                 = $Id
+            RoleDisplayName        = $Json.permissions.$AppDisplayName.$Id
+            ApplicationDisplayName = $AppDisplayName
+            IsAdminConsented       = $IsAdminConsented
         }
     }
     return $Map
@@ -154,7 +154,7 @@ function Get-ApplicationsWithRiskyPermissions {
                             $RoleId = $Role.Id
                             $MappedPermissions += Format-RiskyPermission `
                                 -Json $RiskyPermissionsJson `
-                                -Resource $ResourceDisplayName `
+                                -AppDisplayName $ResourceDisplayName `
                                 -Id $RoleId `
                                 -IsAdminConsented $IsAdminConsented
                         }
@@ -236,7 +236,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
                             $MappedPermissions += Format-RiskyPermission `
                                 -Json $RiskyPermissionsJson `
-                                -Resource $ResourceDisplayName `
+                                -AppDisplayName $ResourceDisplayName `
                                 -Id $RoleId `
                                 -IsAdminConsented $IsAdminConsented
                         }
