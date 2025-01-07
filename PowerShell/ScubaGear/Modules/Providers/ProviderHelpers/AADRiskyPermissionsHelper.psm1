@@ -1,6 +1,4 @@
 using module "..\..\ScubaConfig\ScubaConfig.psm1"
-#$PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
-#$PermissionsJson = Get-Content -Path (Join-Path -Path $PermissionsPath -ChildPath "RiskyPermissions.json") | ConvertFrom-Json
 
 function Format-RiskyPermission {
     <#
@@ -149,14 +147,17 @@ function Get-ApplicationsWithRiskyPermissions {
                     # then update the value later when its compared to service principal permissions.
                     $IsAdminConsented = $false
 
-                    foreach($Role in $Roles) {
-                        $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
-                        $RoleId = $Role.Id
-                        $MappedPermissions += Format-RiskyPermission `
-                            -Json $RiskyPermissionsJson `
-                            -Resource $ResourceDisplayName `
-                            -Id $RoleId `
-                            -IsAdminConsented $IsAdminConsented
+                    # Only map on resources stored in RiskyPermissions.json file
+                    if ($RiskyPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
+                        foreach($Role in $Roles) {
+                            $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
+                            $RoleId = $Role.Id
+                            $MappedPermissions += Format-RiskyPermission `
+                                -Json $RiskyPermissionsJson `
+                                -Resource $ResourceDisplayName `
+                                -Id $RoleId `
+                                -IsAdminConsented $IsAdminConsented
+                        }
                     }
                 }
 
@@ -230,11 +231,15 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         # Default to true,
                         # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
                         $IsAdminConsented = $true
-                        $MappedPermissions += Format-RiskyPermission `
-                            -Json $RiskyPermissionsJson `
-                            -Resource $ResourceDisplayName `
-                            -Id $RoleId `
-                            -IsAdminConsented $IsAdminConsented
+
+                        # Only map on resources stored in RiskyPermissions.json file
+                        if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
+                            $MappedPermissions += Format-RiskyPermission `
+                                -Json $RiskyPermissionsJson `
+                                -Resource $ResourceDisplayName `
+                                -Id $RoleId `
+                                -IsAdminConsented $IsAdminConsented
+                        }
                     }
                 }
 
