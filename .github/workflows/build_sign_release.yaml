@@ -76,7 +76,7 @@ jobs:
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
             -ReleaseVersion ${{ inputs.version }} `
-            -RootFolderName "root"
+            -RootFolderName .
       - name: Create Release
         uses: softprops/action-gh-release@v1
         id: create-release

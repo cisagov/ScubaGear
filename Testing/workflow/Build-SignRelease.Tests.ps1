@@ -15,7 +15,7 @@ Describe "Sign Module Check" {
       -AzureKeyVaultUrl "https://www.cisa.gov" `
       -CertificateName "certificate name" `
       -ReleaseVersion "0.0.1" `
-      -RootFolderName "root"
+      -RootFolderName $RootFolderPath
   }
 }
 
