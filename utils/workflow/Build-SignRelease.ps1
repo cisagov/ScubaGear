@@ -29,13 +29,20 @@ function New-ModuleSignature {
 
   Write-Warning "Signing the module with AzureSignTool..."
 
+  # Verify that $RootFolderName exists
+  Write-Warning "The root folder name is $RootFolderName"
+  if (Test-Path -Path $RootFolderName) {
+    Write-Warning "Directory exists"
+  } else {
+    Write-Warning "Directory does not exist; throwing an exception..."
+    throw [System.IO.DirectoryNotFoundException] "Directory not found: $RootFolderName"
+  }
+
   # Source the deploy utilities so the functions in it can be called.
   $PublishPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\utils\workflow\Publish-ScubaGear.ps1' -Resolve
   . $PublishPath
 
   # Remove non-release files (required for non-Windows machines)
-  Write-Warning "The root folder name contains"
-  Get-ChildItem -Path $RootFolderName
   # Delete git folder
   Remove-Item -Recurse -Force $RootFolderName -Include .git*
   Write-Warning "Creating an array of the files to sign..."
