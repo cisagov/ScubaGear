@@ -15,7 +15,7 @@ Describe "Sign Module Check" {
       -AzureKeyVaultUrl "https://www.cisa.gov" `
       -CertificateName "certificate name" `
       -ReleaseVersion "0.0.1" `
-      -RootFolderName .
+      -RootFolderName $RootFolderName
   }
 }
 
@@ -24,8 +24,6 @@ Describe "Bad Inputs Check" {
     $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
     # Source the function
     . $ScriptPath
-    $RootFolderPath = Join-Path -Path $PSScriptRoot -Childpath '../..'
-    $RootFolderName = $RootFolderPath.Name
     New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.example.com" `
       -CertificateName "certificate name" `
