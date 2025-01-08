@@ -9,7 +9,7 @@ Describe "Sign Module Check" {
     $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
     # Source the function
     . $ScriptPath
-    $RootFolderPath = Join-Path -Path $PSScriptRoot -Childpath '../../../..'
+    $RootFolderPath = Join-Path -Path $PSScriptRoot -Childpath '../../../..' -Resolve
     Write-Warning "Root Folder Path: $RootFolderPath"
     New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.cisa.gov" `
