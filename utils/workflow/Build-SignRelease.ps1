@@ -10,6 +10,9 @@ function New-ModuleSignature {
       The version number of the release (e.g., 1.5.1).
     .PARAMETER $RootFolderName
       The name of the root folder.
+    .EXCEPTIONS
+      System.IO.DirectoryNotFoundException
+        Thrown if $RootFolderName does not exist.
   #>
   [CmdletBinding()]
 	param(
