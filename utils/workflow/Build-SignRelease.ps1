@@ -38,7 +38,7 @@ function New-ModuleSignature {
     Write-Warning "Directory exists"
   } else {
     Write-Warning "Directory does not exist; throwing an exception..."
-    throw [System.IO.DirectoryNotFoundException] "Directory not found: $RootFolderName"
+    # throw [System.IO.DirectoryNotFoundException] "Directory not found: $RootFolderName"
   }
 
   # Source the deploy utilities so the functions in it can be called.
@@ -47,7 +47,7 @@ function New-ModuleSignature {
 
   # Remove non-release files (required for non-Windows machines)
   # Delete git folder
-  Remove-Item -Recurse -Force $RootFolderName -Include .git*
+  # Remove-Item -Recurse -Force $RootFolderName -Include .git*
   Write-Warning "Creating an array of the files to sign..."
   $ArrayOfFilePaths = New-ArrayOfFilePaths `
     -ModuleDestinationPath $RootFolderName
