@@ -4,12 +4,12 @@
 
 # The purpose of this test to ensure that the function properly signs the module.
 
-Describe "Sign Module Check" {
+Describe "Bad Inputs Check" {
   It "Bad key vault URL should be handled gracefully" {
     $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Build-SignRelease.ps1' -Resolve
     # Source the function
     . $ScriptPath
-    $RootFolderPath = Join-Path -Path $PSScriptRoot -Childpath '../../../..' -Resolve
+    $RootFolderPath = Join-Path -Path $PSScriptRoot -Childpath '../..' -Resolve
     Write-Warning "Root Folder Path: $RootFolderPath"
     New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.cisa.gov" `
