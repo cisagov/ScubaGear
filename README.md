@@ -1,4 +1,3 @@
-![CISA Logo](/docs/images/cisa.png)
 ![ScubaGear Logo](/docs/images//SCuBA%20ScubaGear%20GitHub%20Graphic%20v6-04.png)
 
 [![GitHub Release][github-release-img]][release]
