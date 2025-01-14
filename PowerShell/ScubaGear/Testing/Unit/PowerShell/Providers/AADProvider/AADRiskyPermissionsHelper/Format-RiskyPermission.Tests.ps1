@@ -27,7 +27,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockApplicationPermissions[1].ResourceDisplayName `
+                -AppDisplayName $MockApplicationPermissions[1].ResourceDisplayName `
                 -Id $MockApplicationPermissions[1].RoleId `
                 -IsAdminConsented $false
 
@@ -38,7 +38,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockApplicationPermissions[2].ResourceDisplayName `
+                -AppDisplayName $MockApplicationPermissions[2].ResourceDisplayName `
                 -Id $MockApplicationPermissions[2].RoleId `
                 -IsAdminConsented $false
 
@@ -51,7 +51,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "pulls risky permissions from the specified resource (service principal variant)" {
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockServicePrincipalAppRoleAssignments[1].ResourceDisplayName `
+                -AppDisplayName $MockServicePrincipalAppRoleAssignments[1].ResourceDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[1].AppRoleId `
                 -IsAdminConsented $true
 
@@ -62,7 +62,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockServicePrincipalAppRoleAssignments[5].ResourceDisplayName `
+                -AppDisplayName $MockServicePrincipalAppRoleAssignments[5].ResourceDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[5].AppRoleId `
                 -IsAdminConsented $true
 
@@ -73,7 +73,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockServicePrincipalAppRoleAssignments[6].ResourceDisplayName `
+                -AppDisplayName $MockServicePrincipalAppRoleAssignments[6].ResourceDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[6].AppRoleId `
                 -IsAdminConsented $true
 
@@ -86,7 +86,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "formats the return output correctly" {
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockApplicationPermissions[0].ResourceDisplayName `
+                -AppDisplayName $MockApplicationPermissions[0].ResourceDisplayName `
                 -Id $MockApplicationPermissions[0].RoleId `
                 -IsAdminConsented $false
 

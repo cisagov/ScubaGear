@@ -186,8 +186,22 @@ function Export-AADProvider {
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions")
 
-    $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-    $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+    $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
+    $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
+    
+    if ($RiskyApps -and $RiskySPs) {
+        Write-Host "Valid risky apps and SPs"
+        $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+        $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+    }
+    else {
+        $FirstPartyApps = "{}"
+        $ThirdPartySPs = "{}"
+    }
+
+    Write-Host $FirstPartyApps
+    Write-Host $ThirdPartySPs
+    
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
