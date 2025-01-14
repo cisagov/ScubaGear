@@ -44,9 +44,9 @@ class ScubaConfig {
         DefaultOPAVersion = '0.70.0'
     }
 
-    hidden [PSCustomObject]$RiskyPermissions = (Get-Content -Path (
-        Join-Path -Path (Get-Item -Path $PSScriptRoot).Parent.FullName -ChildPath "Permissions/RiskyPermissions.json"
-    ) | ConvertFrom-Json)
+    #hidden [PSCustomObject]$RiskyPermissions = (Get-Content -Path (
+    #    Join-Path -Path (Get-Item -Path $PSScriptRoot).Parent.FullName -ChildPath "Permissions/RiskyPermissions.json"
+    #) | ConvertFrom-Json)
 
     static [object]ScubaDefault ([string]$Name){
         return [ScubaConfig]::ScubaDefaults[$Name]

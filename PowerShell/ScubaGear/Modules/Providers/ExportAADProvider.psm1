@@ -188,10 +188,9 @@ function Export-AADProvider {
 
     $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
-    
+
     if ($RiskyApps -and $RiskySPs) {
-        Write-Host "Valid risky apps and SPs"
-        $FirstPartyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-FirstPartyRiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+        $AggregateRiskyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
         $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
     }
     else {
@@ -199,9 +198,9 @@ function Export-AADProvider {
         $ThirdPartySPs = "{}"
     }
 
-    Write-Host $FirstPartyApps
-    Write-Host $ThirdPartySPs
-    
+    Write-Output $AggregateRiskyApps
+    Write-Output $ThirdPartySPs
+
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -220,7 +219,7 @@ function Export-AADProvider {
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
-    "first_party_risky_applications": $FirstPartyApps,
+    "risky_applications": $AggregateRiskyApps,
     "third_party_risky_service_principals": $ThirdPartySPs,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
