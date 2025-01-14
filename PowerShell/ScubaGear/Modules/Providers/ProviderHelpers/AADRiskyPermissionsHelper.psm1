@@ -234,44 +234,84 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
             $ServicePrincipalResults = @()
-            # Get all service principals excluding ones owned by Microsoft
-            $ServicePrincipals = Get-MgBetaServicePrincipal -All | Where-Object { $_.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a" }
-            foreach ($ServicePrincipal in $ServicePrincipals) {
-                # Only retrieves admin consented permissions
-                $AppRoleAssignments = Get-MgBetaServicePrincipalAppRoleAssignment -All -ServicePrincipalId $ServicePrincipal.Id
-                $MappedPermissions = @()
-                if ($AppRoleAssignments.Count -gt 0) {
-                    foreach ($Role in $AppRoleAssignments) {
-                        $ResourceDisplayName = $Role.ResourceDisplayName
-                        $RoleId = $Role.AppRoleId
+            # Get all service principals including ones owned by Microsoft
+            $ServicePrincipals = Get-MgBetaServicePrincipal -All
 
-                        # Default to true,
-                        # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
-                        $IsAdminConsented = $true
+            # Prepare service principal IDs for batch processing
+            $ServicePrincipalIds = $ServicePrincipals.Id
 
-                        # Only map on resources stored in RiskyPermissions.json file
-                        if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
-                            $MappedPermissions += Format-RiskyPermission `
-                                -Json $RiskyPermissionsJson `
-                                -AppDisplayName $ResourceDisplayName `
-                                -Id $RoleId `
-                                -IsAdminConsented $IsAdminConsented
-                        }
+            # Split the service principal IDs into chunks of 20
+            $Chunks = [System.Collections.Generic.List[System.Object]]::new()
+            $ChunkSize = 20
+            for ($i = 0; $i -lt $ServicePrincipalIds.Count; $i += $ChunkSize) {
+                $Chunks.Add($ServicePrincipalIds[$i..([math]::Min($i + $ChunkSize - 1, $ServicePrincipalIds.Count - 1))])
+            }
+
+            # Process each chunk
+            foreach ($Chunk in $Chunks) {
+                $BatchBody = @{
+                    Requests = @()
+                }
+
+                foreach ($ServicePrincipalId in $Chunk) {
+                    $BatchBody.Requests += @{
+                        id     = $ServicePrincipalId
+                        method = "GET"
+                        url    = "/servicePrincipals/$ServicePrincipalId/appRoleAssignments"
                     }
                 }
 
-                # Exclude service principals without risky permissions
-                if ($MappedPermissions.Count -gt 0) {
-                    $ServicePrincipalResults += [PSCustomObject]@{
-                        ObjectId             = $ServicePrincipal.Id
-                        AppId                = $ServicePrincipal.AppId
-                        DisplayName          = $ServicePrincipal.DisplayName
-                        # Credentials from application and service principal objects may get merged in other cmdlets.
-                        # Differentiate between the two by setting IsFromApplication=$false
-                        KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                        PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                        FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
-                        RiskyPermissions     = $MappedPermissions
+                # Send the batch request
+                $Response = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/$batch' -Body (
+                    $BatchBody | ConvertTo-Json -Depth 5
+                )
+
+                # Check the response
+                if ($Response.responses) {
+                    foreach ($Result in $Response.responses) {
+                        $ServicePrincipalId = $Result.id
+                        $ServicePrincipal = $ServicePrincipals | Where-Object { $_.Id -eq $ServicePrincipalId }
+                        $MappedPermissions = @()
+
+                        if ($Result.status -eq 200) {
+                            $AppRoleAssignments = $Result.body.value
+                            if ($AppRoleAssignments.Count -gt 0) {
+                                foreach ($Role in $AppRoleAssignments) {
+                                    $ResourceDisplayName = $Role.ResourceDisplayName
+                                    $RoleId = $Role.AppRoleId
+
+                                    # Default to true,
+                                    # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
+                                    $IsAdminConsented = $true
+
+                                    # Only map on resources stored in RiskyPermissions.json file
+                                    if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
+                                        $MappedPermissions += Format-RiskyPermission `
+                                            -Json $RiskyPermissionsJson `
+                                            -AppDisplayName $ResourceDisplayName `
+                                            -Id $RoleId `
+                                            -IsAdminConsented $IsAdminConsented
+                                    }
+                                }
+                            }
+                        } else {
+                            Write-Warning "Error for service principal $($Result.id): $($Result.status)"
+                        }
+
+                        # Exclude service principals without risky permissions
+                        if ($MappedPermissions.Count -gt 0) {
+                            $ServicePrincipalResults += [PSCustomObject]@{
+                                ObjectId             = $ServicePrincipal.Id
+                                AppId                = $ServicePrincipal.AppId
+                                DisplayName          = $ServicePrincipal.DisplayName
+                                # Credentials from application and service principal objects may get merged in other cmdlets.
+                                # Differentiate between the two by setting IsFromApplication=$false
+                                KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                                PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                                FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
+                                RiskyPermissions     = $MappedPermissions
+                            }
+                        }
                     }
                 }
             }
