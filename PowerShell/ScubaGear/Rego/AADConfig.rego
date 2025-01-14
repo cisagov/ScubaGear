@@ -262,16 +262,22 @@ MSAuthEnabled := true if {
 # Returns true if MS Authenticator is configured per the baseline, false if it is not
 default MSAuthProperlyConfigured := false
 MSAuthProperlyConfigured := true if {
-    MSAuth.State == "enabled"
-
+    MSAuthEnabled == true
+    MSAuthOTP := MSAuth.AdditionalProperties.isSoftwareOathEnabled # either true/false
+    MSAuthOTP == true
     # Make sure that MS Auth shows the app name and geographic location
     Settings := MSAuth.AdditionalProperties.featureSettings
     Settings.displayAppInformationRequiredState.state == "enabled"
     Settings.displayLocationInformationRequiredState.state == "enabled"
 
     # Make sure that the configuration applies to all users
-    some target in MSAuth.AdditionalProperties.includeTargets
+    DisplayAppIncludeTarget := Settings.displayAppInformationRequiredState.includeTarget
+    some target in DisplayAppIncludeTarget.includeTargets
     target.id == "all_users"
+
+    DisplayAppIncludeTarget.id == "all_users"
+    LocationAppIncludeTarget := Settings.displayLocationInformationRequiredState.includeTarget
+    LocationAppIncludeTarget.id == "all_users"
 }
 
 default AAD_3_3_Not_Applicable := false
