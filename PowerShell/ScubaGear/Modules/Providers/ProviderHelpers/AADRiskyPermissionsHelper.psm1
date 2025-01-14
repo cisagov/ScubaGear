@@ -1,5 +1,22 @@
 using module "..\..\ScubaConfig\ScubaConfig.psm1"
 
+function Get-RiskyPermissionsJson {
+    process {
+        try {
+            $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
+            $PermissionsJson = Get-Content -Path (
+                Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
+            ) | ConvertFrom-Json
+        }
+        catch {
+            Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
+        return $PermissionsJson
+    }
+}
+
 function Format-RiskyPermission {
     <#
     .Description
@@ -127,7 +144,7 @@ function Get-ApplicationsWithRiskyPermissions {
     ##>
     process {
         try {
-            $RiskyPermissionsJson = [ScubaConfig]::GetInstance().RiskyPermissions
+            $RiskyPermissionsJson = Get-RiskyPermissionsJson
             $Applications = Get-MgBetaApplication -All
             $ApplicationResults = @()
             foreach ($App in $Applications) {
@@ -214,10 +231,10 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     #Internal
     ##>
     process {
-        try { 
-            $RiskyPermissionsJson = [ScubaConfig]::GetInstance().RiskyPermissions
+        try {
+            $RiskyPermissionsJson = Get-RiskyPermissionsJson
             $ServicePrincipalResults = @()
-            # Get all service principals excluding ones owned by Microsoft 
+            # Get all service principals excluding ones owned by Microsoft
             $ServicePrincipals = Get-MgBetaServicePrincipal -All | Where-Object { $_.AppOwnerOrganizationId -ne "f8cdef31-a31e-4b4a-93e4-5f571e91255a" }
             foreach ($ServicePrincipal in $ServicePrincipals) {
                 # Only retrieves admin consented permissions
@@ -267,7 +284,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     }
 }
 
-function Get-FirstPartyRiskyApplications {
+function Format-RiskyApplications {
     <#
     .Description
     Returns an aggregated JSON dataset of application objects, combining data from both applications and
@@ -337,7 +354,7 @@ function Get-FirstPartyRiskyApplications {
             }
         }
         catch {
-            Write-Warning "An error occurred in Get-FirstPartyRiskyApplications: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Format-RiskyApplications: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
@@ -386,7 +403,6 @@ function Get-ThirdPartyRiskyServicePrincipals {
 Export-ModuleMember -Function @(
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
-    "Get-FirstPartyRiskyApplications",
+    "Format-RiskyApplications",
     "Get-ThirdPartyRiskyServicePrincipals"
 )
-    

@@ -2,6 +2,8 @@ $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
+using module "$($ModulesPath)/ScubaConfig/ScubaConfig.psm1"
+
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyPermission" {
         BeforeAll {
@@ -16,7 +18,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "pulls risky permissions from the specified resource (application variant)" {
             $Output = Format-RiskyPermission `
                 -Json $PermissionsJson `
-                -Resource $MockApplicationPermissions[0].ResourceDisplayName `
+                -AppDisplayName $MockApplicationPermissions[0].ResourceDisplayName `
                 -Id $MockApplicationPermissions[0].RoleId `
                 -IsAdminConsented $false
 
