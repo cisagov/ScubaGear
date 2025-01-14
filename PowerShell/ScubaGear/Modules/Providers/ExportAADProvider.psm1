@@ -194,12 +194,9 @@ function Export-AADProvider {
         $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
     }
     else {
-        $FirstPartyApps = "{}"
+        $AggregateRiskyApps = "{}"
         $ThirdPartySPs = "{}"
     }
-
-    Write-Output $AggregateRiskyApps
-    Write-Output $ThirdPartySPs
 
     ##### End block
 

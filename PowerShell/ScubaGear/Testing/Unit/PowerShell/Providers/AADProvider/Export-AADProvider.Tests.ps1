@@ -79,7 +79,7 @@ InModuleScope -ModuleName ExportAADProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-FirstPartyRiskyApplications" {
+                            "Format-RiskyApplications" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
