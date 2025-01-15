@@ -2,7 +2,7 @@
 
 ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Important details about executing ScubaGear with a configuration file are listed below.
 
-- Executing ScubaGear with a modified configuration file is required to pass or omit specific ScubaGear policy checks. See [SCuBA compliance use](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use) and the associated sample configuration file for details.
+- Executing ScubaGear with a modified configuration file is required to pass or omit specific ScubaGear policy checks. See [SCuBA compliance use](#scuba-compliance-use) and the associated sample configuration file for details.
 
 - The configuration file allows users to add additional fields to embed within the ScubaGear output JSON for supplemental metadata purposes.
 
@@ -12,11 +12,11 @@ ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters]
 
 ## Sample Configuration Files
 
-[Sample config files](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
+[Sample config files](../../PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
 
 ### Basic Use
 
-The [basic use](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/basic_config.yaml) example config file only specifies a product name and an M365 environment.
+The [basic use](../../PowerShell/ScubaGear/Sample-Config-Files/basic_config.yaml) example config file only specifies a product name and an M365 environment.
 
 ScubaGear can be invoked with this config file:
 
@@ -36,7 +36,7 @@ Invoke-SCuBA `
 
 ### Typical Use
 
-The [typical use](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/typical_config.yaml) example config file includes multiple products specified as a list and an M365 environment. Additional product values are commented out and will not be included in the testing, but they are retained in the config file to easily add them back later.
+The [typical use](../../PowerShell/ScubaGear/Sample-Config-Files/typical_config.yaml) example config file includes multiple products specified as a list and an M365 environment. Additional product values are commented out and will not be included in the testing, but they are retained in the config file to easily add them back later.
 
 ScubaGear can be invoked with this config file:
 
@@ -57,7 +57,7 @@ Invoke-SCuBA `
 ```
 
 ### SCuBA compliance use
-The [SCuBA compliance](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
+The [SCuBA compliance](../../PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
 The configuration file contains a subset of ScubaGear parameters, fields for adding conditional access policy exceptions, fields for omitting ScubaGear policy checks, and additional fields for documenting the organization running ScubaGear.
 Users are highly encouraged to read all the configuration file documentation sections to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
 
@@ -77,7 +77,7 @@ Invoke-SCuBA -ConfigFilePath scuba_compliance.yaml
 
 ### Credential Use
 
-The [credential user](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/creds_config.yaml) example config file supplies credentials using a service principal, appId, and certificate thumbprint. (The associated private key is still required.)  Config files with sensitive data should be protected appropriately.
+The [credential user](../../PowerShell/ScubaGear/Sample-Config-Files/creds_config.yaml) example config file supplies credentials using a service principal, appId, and certificate thumbprint. (The associated private key is still required.)  Config files with sensitive data should be protected appropriately.
 
 ScubaGear can be invoked with this config file:
 
@@ -97,7 +97,7 @@ Invoke-SCuBA `
 
 ### Full Use
 
-The [full config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) shows all of the global parameters supported by ScubaConfig specified in the config file. Any one of these parameters may be commented out. If not specified or if commented out, ScubaConfig will supply the default value, unless it's overridden on the command line. Default values do not apply to authentication parameters.
+The [full config file](../../PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) shows all of the global parameters supported by ScubaConfig specified in the config file. Any one of these parameters may be commented out. If not specified or if commented out, ScubaConfig will supply the default value, unless it's overridden on the command line. Default values do not apply to authentication parameters.
 
 ```powershell
 # Invoke without any overrides
@@ -119,7 +119,7 @@ In some cases, it may be appropriate to omit specific policies from ScubaGear ev
 - When a policy is implemented by a third-party service that ScubaGear does not audit
 - When a policy is not applicable to your organization (e.g., policy MS.EXO.4.3v1 is only applicable to federal, executive branch, departments and agencies)
 
-The `OmitPolicy` top-level key, shown in this [example ScubaGear configuration file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml), allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
+The `OmitPolicy` top-level key, shown in this [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml), allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
 
 For each omitted policy, the config file allows you to indicate the following:
 - `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
@@ -127,7 +127,7 @@ For each omitted policy, the config file allows you to indicate the following:
 
 ## Product-specific Configuration
 
-Config files can include a top-level level key for a given product whose values are related to that specific product. For example, look for the value of `Defender` in this [Defender config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). Currently, only Entra ID and Defender use this extra configuration.
+Config files can include a top-level level key for a given product whose values are related to that specific product. For example, look for the value of `Defender` in this [Defender config file](../../PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). Currently, only Entra ID and Defender use this extra configuration.
 
 Under a product key, there can be policy keys that provide configuration values unique to the product. In the Defender config file, for example, there is the `MS.DEFENDER.1.4v1` key.
 
@@ -135,11 +135,11 @@ Under a product key, there can be policy keys that provide configuration values 
 
 The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks. For example, a user could exclude emergency access accounts from some of the policy checks. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce grave risks to your system and must be managed carefully**.
 
-An example configuration file for Entra ID can be found in this sample [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml).
+An example configuration file for Entra ID can be found in this sample [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml).
 
 #### Conditional Access Policy Exclusions
 
-The `Aad` top level key in the [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml) allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
+The `Aad` top level key in the [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml) allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
 
 CapExclusions are supported for the following policies:
 
@@ -153,7 +153,7 @@ CapExclusions are supported for the following policies:
 
 #### Privileged User Policy Exclusions
 
-In addition to defining exclusions for conditional access policies, the [configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml) also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
+In addition to defining exclusions for conditional access policies, the [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad-config.yaml) also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
 
 RoleExclusions are supported for the following policies:
 
@@ -213,7 +213,7 @@ Each domain in the list should be shown as the fully-qualified domain name assoc
 
 ## Anchors and Aliases
 
-If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the [Defender config file](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml), `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
+If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the [Defender config file](../../PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml), `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
 
 Using anchors and aliases is optional, but supports reuse in a way that allows for updating variable values in a consistent way when they apply to multiple policies.
 
