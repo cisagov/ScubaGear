@@ -171,7 +171,7 @@ All Defender related policy-specific variables are found under the `Defender` co
 - MS.DEFENDER.2.2v1
 - MS.DEFENDER.2.3v1
 
-Several examples of using Defender policy-specific variables can be found in this [sample configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). The sample configuration file also uses [Anchors and Aliases](./#Anchors%20and%20Aliases) notation to reuse variable definitions across policy items with the same values.
+Several examples of using Defender policy-specific variables can be found in this [sample configuration](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). The sample configuration file also uses [Anchors and Aliases](#anchorsandaliases) notation to reuse variable definitions across policy items with the same values.
 
 #### Sensitive Accounts
 
@@ -190,7 +190,7 @@ Values for each key match those shown in the **Apply Defender for Office 365 pro
 - `ExcludedGroups`
 - `ExcludedDomains`
 
-See the sample configuration file shown in the previous section [Defender Configuration](./#Defender%20Configuration) for an example of sensitive account filter settings.
+See the sample configuration file shown in the previous section [Defender Configuration](#defenderconfiguration) for an example of sensitive account filter settings.
 
 #### User impersonation protection
 
