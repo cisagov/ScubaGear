@@ -11,15 +11,32 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
 
+            function Invoke-MgGraphRequest {}
+            Mock -CommandName Invoke-MgGraphRequest -ParameterFilter {
+                $Method -eq "POST"
+            } -MockWith {
+                @{
+                    responses = @(
+                        @{
+                            id = "00000000-0000-0000-0000-000000000010"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        }
+                    )
+                }
+            }
+
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            #function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
 
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            #Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
 
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
