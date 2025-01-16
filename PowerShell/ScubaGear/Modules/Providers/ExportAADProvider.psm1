@@ -147,11 +147,11 @@ function Export-AADProvider {
     }
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
-    # $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
-    # Ensure we successfully got a count of users
-    # if(-Not $UserCount -is [int]) {
+    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"ConsistencyLevel"='eventual'})
+    # If the UserAcount array does not contain exactly one value of type integer
+    if(-Not ( $UserCount.Length -eq 1 -and $UserCount[0] -is [int] ) ) {
         $UserCount = """NaN"""
-    # }
+    }
 
     # Provides data for policies such as user consent and guest user access
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy"))
