@@ -13,10 +13,10 @@ Describe "Bad Inputs Check" {
     # Write-Warning "Root Folder Path: $RootFolderPath"
     # Copy to pester $TestDrive and put in repo folder
     # pass that repo folder to signature below
-    New-ModuleSignature `
+    { New-ModuleSignature `
       -AzureKeyVaultUrl "https://www.cisa.gov" `
       -CertificateName "certificate name" `
       -ReleaseVersion "0.0.1" `
-      -RootFolderName "nonexistantfoldername" | Should -Throw
+      -RootFolderName "nonexistantfoldername" } | Should -Throw
   }
 }
