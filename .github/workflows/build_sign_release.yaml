@@ -31,9 +31,6 @@ jobs:
     name: Build and Draft Release
     runs-on: windows-latest
     environment: Development
-    # TODO get rid of this env variable
-    # env:
-    #   RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       id-token: write
       contents: write
