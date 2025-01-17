@@ -171,7 +171,7 @@ All Defender related policy-specific variables are found under the `Defender` co
 - MS.DEFENDER.2.2v1
 - MS.DEFENDER.2.3v1
 
-Several examples of using Defender policy-specific variables can be found in this [sample configuration](../../PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). The sample configuration file also uses [Anchors and Aliases](#anchorsandaliases) notation to reuse variable definitions across policy items with the same values.
+Several examples of using Defender policy-specific variables can be found in this [sample configuration](../../PowerShell/ScubaGear/Sample-Config-Files/defender-config.yaml). The sample configuration file also uses [Anchors and Aliases](#anchors-and-aliases) notation to reuse variable definitions across policy items with the same values.
 
 #### Sensitive Accounts
 
@@ -190,14 +190,13 @@ Values for each key match those shown in the **Apply Defender for Office 365 pro
 - `ExcludedGroups`
 - `ExcludedDomains`
 
-See the sample configuration file shown in the previous section [Defender Configuration](#defenderconfiguration) for an example of sensitive account filter settings.
+See the sample configuration file shown in the previous section [Defender Configuration](#defender-configuration) for an example of sensitive account filter settings.
 
 #### User impersonation protection
 
 The policy `MS.DEFENDER.2.1v1` supports a variable called `SensitiveUsers` that can be defined as a list of sensitive user accounts denoted by a display name and email address in the Strict and Standard Preset Security Policies impersonation protection section.
 
-Each value should be a string in the form of the display name and
-email address separated by a semicolon (e.g.,`John Doe;jdoe@example.com`).
+Each value should be a string in the form of the display name and email address separated by a semicolon (e.g.,`John Doe;jdoe@example.com`).
 
 #### Agency Domain Impersonation Protection
 
