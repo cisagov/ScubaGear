@@ -11,15 +11,36 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
-
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            Mock Invoke-MgGraphRequest {
+                return @{
+                    responses = @(
+                        @{
+                            id = "00000000-0000-0000-0000-000000000030"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000040"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000050"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        }
+                    )
+                }
+            }
 
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
