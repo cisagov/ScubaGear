@@ -1,5 +1,3 @@
-using module "..\..\ScubaConfig\ScubaConfig.psm1"
-
 function Get-RiskyPermissionsJson {
     process {
         try {
@@ -230,6 +228,11 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     .Functionality
     #Internal
     ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
     process {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
@@ -247,6 +250,17 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                 $Chunks.Add($ServicePrincipalIds[$i..([math]::Min($i + $ChunkSize - 1, $ServicePrincipalIds.Count - 1))])
             }
 
+            $endpoint = '/beta/$batch'
+            if ($M365Environment -eq "gcchigh") {
+                $endpoint = "https://graph.microsoft.us" + $endpoint
+            }
+            elseif ($M365Environment -eq "dod") {
+                $endpoint = "https://dod-graph.microsoft.us" + $endpoint
+            }
+            else {
+                $endpoint = "https://graph.microsoft.com" + $endpoint
+            }
+
             # Process each chunk
             foreach ($Chunk in $Chunks) {
                 $BatchBody = @{
@@ -262,7 +276,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                 }
 
                 # Send the batch request
-                $Response = Invoke-MgGraphRequest -Method POST -Uri 'https://graph.microsoft.com/beta/$batch' -Body (
+                $Response = Invoke-MgGraphRequest -Method POST -Uri $endpoint -Body (
                     $BatchBody | ConvertTo-Json -Depth 5
                 )
 

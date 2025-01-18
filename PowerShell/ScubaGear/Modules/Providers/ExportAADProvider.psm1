@@ -184,7 +184,7 @@ function Export-AADProvider {
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
-    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions")
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
 
     $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
@@ -197,7 +197,6 @@ function Export-AADProvider {
         $AggregateRiskyApps = "{}"
         $ThirdPartySPs = "{}"
     }
-
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
