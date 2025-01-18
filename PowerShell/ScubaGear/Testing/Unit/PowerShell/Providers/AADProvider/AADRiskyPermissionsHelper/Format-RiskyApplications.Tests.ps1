@@ -11,6 +11,10 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
 
+            function Get-MgBetaApplication { $MockApplications }
+            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
+            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
