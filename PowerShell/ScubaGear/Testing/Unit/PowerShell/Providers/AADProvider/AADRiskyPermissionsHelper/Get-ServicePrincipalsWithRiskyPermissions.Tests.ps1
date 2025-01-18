@@ -6,19 +6,82 @@ InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ServicePrincipalsWithRiskyPermissions" {
         BeforeAll {
             # Import mock data
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipals')]
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipalAppRoleAssignments')]
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
-
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
             $MockSafePermissions = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockSafePermissions.json") | ConvertFrom-Json
-
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            function Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            
+            function New-MockMgGraphResponse {
+                param (
+                    [int]
+                    $Size,
+    
+                    [array]
+                    $MockBody
+                )
+                
+                $data = @()
+                for ($i = 1; $i -le $Size; $i++) {
+                    $id = "00000000-0000-0000-0000-0000000000{0:D3}" -f ($i * 10)
+                    $mockResponse = @{
+                        id     = $id
+                        status = 200
+                        body   = @{
+                            value = $MockBody
+                        }
+                    }
+                    $data += $mockResponse
+                }
+            
+                return $data
+            }
         }
 
         It "returns a list of service principals with valid properties" {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            Mock Invoke-MgGraphRequest {
+                return @{
+                    responses = @(
+                        @{
+                            id = "00000000-0000-0000-0000-000000000010"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000020"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000030"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000040"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000050"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        }
+                    )
+                }
+            }
 
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -HaveCount 5
@@ -58,7 +121,47 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockSafePermissions }
+            Mock Invoke-MgGraphRequest {
+                return @{
+                    responses = @(
+                        @{
+                            id = "00000000-0000-0000-0000-000000000010"
+                            status = 200
+                            body = @{
+                                value = $MockSafePermissions
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000020"
+                            status = 200
+                            body = @{
+                                value = $MockSafePermissions
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000030"
+                            status = 200
+                            body = @{
+                                value = $MockSafePermissions
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000040"
+                            status = 200
+                            body = @{
+                                value = $MockSafePermissions
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000050"
+                            status = 200
+                            body = @{
+                                value = $MockSafePermissions
+                            }
+                        }
+                    )
+                }
+            }
 
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs | Should -BeNullOrEmpty
@@ -67,9 +170,49 @@ InModuleScope AADRiskyPermissionsHelper {
         It "excludes permissions not included in the RiskyPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
-
+    
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            Mock Get-MgBetaServicePrincipalAppRoleAssignment { $MockServicePrincipalAppRoleAssignments }
+            Mock Invoke-MgGraphRequest {
+                return @{
+                    responses = @(
+                        @{
+                            id = "00000000-0000-0000-0000-000000000010"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000020"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000030"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000040"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        },
+                        @{
+                            id = "00000000-0000-0000-0000-000000000050"
+                            status = 200
+                            body = @{
+                                value = $MockServicePrincipalAppRoleAssignments
+                            }
+                        }
+                    )
+                }
+            }
 
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
