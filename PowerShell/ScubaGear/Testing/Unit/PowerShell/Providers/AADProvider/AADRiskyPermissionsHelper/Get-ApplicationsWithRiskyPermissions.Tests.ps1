@@ -6,10 +6,11 @@ InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ApplicationsWithRiskyPermissions" {
         BeforeAll {
             # Import mock data
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplications')]
             $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockFederatedCredentials')]
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
+        
+            function Get-MgBetaApplication { $MockApplications }
+            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
         }
 
         It "returns a list of applications with valid properties" {
