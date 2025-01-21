@@ -5,7 +5,7 @@ function Invoke-CheckScubaGearVersion {
     Complain if a newer version of ScubaGear is available from the Github release page.
 
     .DESCRIPTION
-    Checks latest version available on the github release page and compares it to the current running verison.
+    Checks latest version available on the Github release page and compares it to the current running version.
     #>
     $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $PSScriptRoot -ChildPath 'ScubaGear.psd1' -Resolve  -ErrorAction 'Stop' ) -ErrorAction 'Stop'
     $CurrentVersion = [System.Version]$ScubaManifest.ModuleVersion
