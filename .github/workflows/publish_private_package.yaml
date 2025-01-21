@@ -117,12 +117,12 @@ jobs:
           # value from Install-Module
           $Output = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check to make sure that the name is expected.
-          if ($Info.Name -ne $ExpectedName) {
+          if ($Output.Name -ne $ExpectedName) {
             Write-Output "::error::The name of the published module should be $ExpectedName"
           }
           # Because reasons, the description has a newline character.
           # Strip all whitespace before comparing the descriptions.
-          $DescriptionFixed = $Info.Description -replace "\s", ""
+          $DescriptionFixed = $Output.Description -replace "\s", ""
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
           # Check to make sure that the description is expected.
           if ($DescriptionFixed -ne $ExpectedFixed) {
