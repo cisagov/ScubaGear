@@ -112,11 +112,11 @@ jobs:
           $ExpectedName = 'ScubaGear'
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           $Info = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          Write-Output "The name of the module is $Info.Name"
+          Write-Output "The name of the module is $($Info.Name)"
           if ($Info.Name -ne $ExpectedName) {
             Write-Output "::error::The name of the published module should be $ExpectedName"
           }
-          Write-Output "The description of the module is $Info.Description"
+          Write-Output "The description of the module is " + $Info.Description
           if ($Info.Description -ne $ExpectedDescription) {
             Write-Output "::error::The name of the published module should be $ExpectedDescription"
           }
