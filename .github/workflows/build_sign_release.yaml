@@ -15,7 +15,7 @@ on:
       # This is only used for things like the release file name.
       # Yes, this is a disconnect that violates DRY.
       # Note: It's possible that this value could be retrieved from ScubaGear.psd1
-      # using a function similar to Set-ScubaGearVersionManifest in 
+      # using a function similar to Set-ScubaGearVersionManifest in
       # utils/workflow/Set-ScubaGearModuleVersion.psm1.
       version:
         description: "Release Version (e.g., 1.2.4)"
