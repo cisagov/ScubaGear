@@ -119,6 +119,7 @@ jobs:
           Write-Output "The description of the module is $($Info.Description)"
           $NewLine = [environment]::NewLine
           $DescriptionFixed = $Info.Description -replace $NewLine, '\n'
+          Write-Output "The description of the module is $($DescriptionFixed)"
           if ($DescriptionFixed -ne $ExpectedDescription) {
             Write-Output "::error::The name of the published module should be $ExpectedDescription"
           }
