@@ -109,17 +109,22 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
+          # These are two of the expected output values that result
+          # from installing the module
           $ExpectedName = 'ScubaGear'
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
-          $Info = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          Write-Output "The name of the module is $($Info.Name)"
+          # The -PassThru paramaters allows us to read the output
+          # value from Install-Module
+          $Output = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          # Check to make sure that the name is expected.
           if ($Info.Name -ne $ExpectedName) {
             Write-Output "::error::The name of the published module should be $ExpectedName"
           }
-          Write-Output "The description of the module is $($Info.Description)"
+          # Because reasons, the description has a newline character.
+          # Strip all whitespace before comparing the descriptions.
           $DescriptionFixed = $Info.Description -replace "\s", ""
-          Write-Output "The description of the module is $($DescriptionFixed)"
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
+          # Check to make sure that the description is expected.
           if ($DescriptionFixed -ne $ExpectedFixed) {
             Write-Output "::error::The name of the published module should be $ExpectedDescription"
           }
