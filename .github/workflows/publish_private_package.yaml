@@ -118,7 +118,7 @@ jobs:
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check to make sure that the name is expected.
           if ($InstallOutput.Name -ne $ExpectedName) {
-            Write-Output "::error::The name of the published module should be $ExpectedName"
+            Write-Output "::error::The name of the published module should be $ExpectedName" && exit 1
           }
           # Because reasons, the description has a newline character.
           # Strip all whitespace before comparing the descriptions.
@@ -126,7 +126,7 @@ jobs:
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
           # Check to make sure that the description is expected.
           if ($DescriptionFixed -ne $ExpectedFixed) {
-            Write-Output "::error::The name of the published module should be $ExpectedDescription"
+            Write-Output "::error::The name of the published module should be $ExpectedDescription" && exit 1
           }
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
@@ -136,7 +136,7 @@ jobs:
           $ExpectedVersion = 'SCuBA Gear v1.6'
           Write-Output "The version is $VersionOutput"
           if (-not $VersionOutput.StartsWith($ExpectedVersion)) {
-            Write-Output "::error::The name of the published module should be $ExpectedVersion"
+            Write-Output "::error::The name of the published module should be $ExpectedVersion" && exit 1
           }
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
       - name: Install Selenium
