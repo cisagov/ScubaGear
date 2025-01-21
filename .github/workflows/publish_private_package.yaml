@@ -117,10 +117,10 @@ jobs:
             Write-Output "::error::The name of the published module should be $ExpectedName"
           }
           Write-Output "The description of the module is $($Info.Description)"
-          $NewLine = [environment]::NewLine
-          $DescriptionFixed = $Info.Description -replace $NewLine, '\n'
+          $DescriptionFixed = $Info.Description -replace "\s", ""
           Write-Output "The description of the module is $($DescriptionFixed)"
-          if ($DescriptionFixed -ne $ExpectedDescription) {
+          $ExpectedFixed = $ExpectedDescription -replace "\s", ""
+          if ($DescriptionFixed -ne $ExpectedFixed) {
             Write-Output "::error::The name of the published module should be $ExpectedDescription"
           }
           # Source the function
