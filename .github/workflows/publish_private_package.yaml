@@ -115,14 +115,14 @@ jobs:
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           # The -PassThru paramaters allows us to read the output
           # value from Install-Module
-          $Output = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check to make sure that the name is expected.
-          if ($Output.Name -ne $ExpectedName) {
+          if ($InstallOutput.Name -ne $ExpectedName) {
             Write-Output "::error::The name of the published module should be $ExpectedName"
           }
           # Because reasons, the description has a newline character.
           # Strip all whitespace before comparing the descriptions.
-          $DescriptionFixed = $Output.Description -replace "\s", ""
+          $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
           # Check to make sure that the description is expected.
           if ($DescriptionFixed -ne $ExpectedFixed) {
@@ -132,7 +132,12 @@ jobs:
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
-          Invoke-SCuBA -Version
+          $VersionOutput = Invoke-SCuBA -Version
+          $ExpectedVersion = 'SCuBA Gear v1.5'
+          Write-Output "The version is $VersionOutput"
+          if (-not $VersionOutput.StartsWith($ExpectedVersion)) {
+            Write-Output "::error::The name of the published module should be $ExpectedVersion"
+          }
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
       - name: Install Selenium
         run: |
