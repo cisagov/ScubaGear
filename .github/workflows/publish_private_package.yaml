@@ -111,7 +111,7 @@ jobs:
         run: |
           # These are two of the expected output values that result
           # from installing the module
-          $ExpectedName = 'ScubaGoggles'
+          $ExpectedName = 'ScubaGear'
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           # The -PassThru paramaters allows us to read the output
           # value from Install-Module
