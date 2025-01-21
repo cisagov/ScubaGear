@@ -76,6 +76,7 @@ jobs:
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
+        id: sign-publish-module
         run: |
             # Source the deploy utilities so the functions in it can be called.
             . repo/utils/workflow/Publish-ScubaGear.ps1
@@ -93,6 +94,7 @@ jobs:
             # published to PSGallery.
             $ModuleVersion = Publish-ScubaGearModule @Parameters
             Write-Output "The module version is $ModuleVersion"
+            echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
         run: |
           Get-Location
@@ -136,10 +138,11 @@ jobs:
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
           $VersionOutput = Invoke-SCuBA -Version
-          $ExpectedVersion = 'SCuBA Gear v1.5'
+          $ExpectedVersion = '${{ steps.sign-publish-module.outputs.ModuleVersion }}'
           Write-Output "The version is $VersionOutput"
-          if (-not $VersionOutput.StartsWith($ExpectedVersion)) {
-            Write-Output "::error::The name of the published module start with $ExpectedVersion"
+          Write-Output "The expected version is $ExpectedVersion"
+          if ($VersionOutput -ne $ExpectedVersion) {
+            Write-Output "::error::The version of the published module should be $ExpectedVersion"
             exit 1
           }
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
