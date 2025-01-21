@@ -110,7 +110,7 @@ jobs:
       - name: Initialize ScubaGear
         run: |
           $ExpectedName = 'ScubaGear'
-          $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates\nconformance testing about CISA M365 Secure Configuration Baselines.'
+          $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates`rconformance testing about CISA M365 Secure Configuration Baselines.'
           $Info = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           Write-Output "The name of the module is $($Info.Name)"
           if ($Info.Name -ne $ExpectedName) {
