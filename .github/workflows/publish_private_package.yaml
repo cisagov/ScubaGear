@@ -110,7 +110,8 @@ jobs:
       - name: Initialize ScubaGear
         run: |
           Write-Output "Preparing to install..."
-          Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
+          $Info = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          Write-Output $Info
           Write-Output "Finished installing..."
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
