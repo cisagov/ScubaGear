@@ -50,12 +50,17 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.ClientId }}
-          tenant-id: ${{ secrets.TenantId }}
-          subscription-id: ${{ secrets.SubscriptionId }}
+          # client-id: ${{ secrets.ClientId }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          # tenant-id: ${{ secrets.TenantId }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          # subscription-id: ${{ secrets.SubscriptionId }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
       - name: Get Key Vault Info
         id: key-vault-info
+        # Stop the workflow if logging into Azure failed.
+        if: ${{ success() }}
         env:
           KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
         run: |
