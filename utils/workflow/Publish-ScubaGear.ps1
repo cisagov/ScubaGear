@@ -124,7 +124,7 @@ function Publish-ScubaGearModule {
     -ModuleTempPath $env:TEMP
 
     Write-Output "Editing the manifest file..."
-    Edit-ManifestFile `
+    $ModuleVersion = Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
     -PrereleaseTag $PrereleaseTag
@@ -176,6 +176,7 @@ function Publish-ScubaGearModule {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
     exit 1
   }
+  return $ModuleVersion
 }
 
 function Copy-ModuleToTempLocation {
@@ -228,7 +229,7 @@ function Edit-ManifestFile {
     .DESCRIPTION
       Updates the manifest file in the module with info that PSGallery needs
       Throws an error if the manifest file cannot be found or updated.
-      No return.
+      Returns the module version.
   #>
   param (
     [Parameter(Mandatory = $true)]
@@ -314,6 +315,7 @@ function Edit-ManifestFile {
     Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
+  return $ModuleVersion
 }
 
 function New-ArrayOfFilePaths {

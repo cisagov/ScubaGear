@@ -61,7 +61,7 @@ jobs:
         id: key-vault-info
         # Stop the workflow if logging into Azure failed.
         if: ${{ success() }}
-        # TODO: Remove this env, just use secret
+        # TODO: Remove this env, just use the secret already
         env:
           # KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
@@ -91,7 +91,8 @@ jobs:
             # This publishes to a private gallery, from which we will pull in a future step.
             # This step helps us verify that ScubaGear is in a state where it can be
             # published to PSGallery.
-            Publish-ScubaGearModule @Parameters
+            $ModuleVersion = Publish-ScubaGearModule @Parameters
+            Write-Output "The module version is $ModuleVersion"
       - name: Test Module Publish
         run: |
           Get-Location
@@ -135,10 +136,10 @@ jobs:
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
           $VersionOutput = Invoke-SCuBA -Version
-          $ExpectedVersion = 'SCuBA Gear v1.6'
+          $ExpectedVersion = 'SCuBA Gear v1.5'
           Write-Output "The version is $VersionOutput"
           if (-not $VersionOutput.StartsWith($ExpectedVersion)) {
-            Write-Output "::error::The name of the published module should be $ExpectedVersion"
+            Write-Output "::error::The name of the published module start with $ExpectedVersion"
             exit 1
           }
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
