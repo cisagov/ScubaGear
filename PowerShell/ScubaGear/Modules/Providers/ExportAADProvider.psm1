@@ -311,9 +311,9 @@ function Get-PrivilegedUser {
         }
     } catch {
         Write-Warning "An error occurred in Get-PrivilegedUser: $($_.Exception.Message)"
-		Resolve-Error($_)
-        #Write-Warning "Stack trace: $($_.ScriptStackTrace)"
-        throw $_ #TODO DO I WANT TO THROW AN ERROR HERE? OR IN RESOLVE ERROR FOR THIS CASE?
+	Resolve-Error($_)
+        Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_
     }
     $PrivilegedUsers
 }
@@ -369,7 +369,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         try {
             $DirectoryObject = Get-MgBetaDirectoryObject -ErrorAction Stop -DirectoryObjectId $ObjectId
         } catch {
-			Resolve-Error($_)
             # If the object was probably recently deleted from the directory we ignore it. Otherwise an unhandled 404 causes the tool to crash.
             if ($_.Exception.Message -match "Request_ResourceNotFound") {
                 Write-Warning "Processing privileged users. Resource $ObjectId may have been recently deleted from the directory because it was not found."
@@ -377,7 +376,8 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
             }
             # If it is a different error, rethrow the error to let the calling function handle it.
             else {
-                throw $_ #TODO still throw this even if error is handled here? or handle this error in calling function only?
+		Resolve-Error($_)
+                throw $_
             }
         }
 
