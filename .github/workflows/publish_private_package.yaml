@@ -111,7 +111,7 @@ jobs:
         run: |
           # These are two of the expected output values that result
           # from installing the module
-          $ExpectedName = 'ScubaGear'
+          $ExpectedName = 'ScubaGoggles'
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           # The -PassThru paramaters allows us to read the output
           # value from Install-Module
@@ -133,7 +133,7 @@ jobs:
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
           $VersionOutput = Invoke-SCuBA -Version
-          $ExpectedVersion = 'SCuBA Gear v1.5'
+          $ExpectedVersion = 'SCuBA Gear v1.6'
           Write-Output "The version is $VersionOutput"
           if (-not $VersionOutput.StartsWith($ExpectedVersion)) {
             Write-Output "::error::The name of the published module should be $ExpectedVersion"
