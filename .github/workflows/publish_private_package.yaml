@@ -109,12 +109,17 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
-          Write-Output "Preparing to install..."
+          $ExpectedName = 'ScubaGear'
+          $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           $Info = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          Write-Output $Info.Version
-          Write-Output $Info.Name
-          Write-Output $Info.Description
-          Write-Output "Finished installing..."
+          Write-Output "The name of the module is $Info.Name"
+          if ($Info.Name -ne $ExpectedName) {
+            Write-Output "::error::The name of the published module should be $ExpectedName"
+          }
+          Write-Output "The description of the module is $Info.Description"
+          if ($Info.Description -ne $ExpectedDescription) {
+            Write-Output "::error::The name of the published module should be $ExpectedDescription"
+          }
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
