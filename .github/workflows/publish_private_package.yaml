@@ -14,6 +14,7 @@ on:
         required: true
       KeyVaultInfo:
         required: true
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -98,7 +99,9 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
+          Write-Output "Preparing to install..."
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
+          Write-Output "Finished installing..."
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
