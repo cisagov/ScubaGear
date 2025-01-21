@@ -15,6 +15,9 @@ on:
       KeyVaultInfo:
         required: true
   workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/publish_private_package.yaml"
 
 permissions:
   id-token: write
