@@ -14,7 +14,6 @@ on:
         required: true
       KeyVaultInfo:
         required: true
-  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -55,6 +54,8 @@ jobs:
         id: key-vault-info
         env:
           KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
+        # Do not attempt to access the Key Vault if logging into Azure failed.
+        if: ${{ success() }}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
@@ -65,6 +66,7 @@ jobs:
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
+        id: sign-publish-module
         run: |
             . repo/utils/workflow/Publish-ScubaGear.ps1
             # Remove non-release files
@@ -79,7 +81,9 @@ jobs:
             # This publishes to a private gallery, from which we will pull in a future step.
             # This step helps us verify that ScubaGear is in a state where it can be
             # published to PSGallery.
-            Publish-ScubaGearModule @Parameters
+            $ModuleVersion = Publish-ScubaGearModule @Parameters
+            Write-Output "The module version is $ModuleVersion"
+            echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
         run: |
           Get-Location
@@ -97,15 +101,42 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
-          Write-Output "Preparing to install..."
-          Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
-          Write-Output "Finished installing..."
+          # Name and description are two of the expected output values that result from
+          # installing the module.  These checks are intended to help verify that the module
+          # installed correctly.
+          $ExpectedName = 'ScubaGear'
+          # Read the description value from the manifest file (ScubaGear.psd1)
+          $ManifestFilePath = Join-Path -Path repo/PowerShell/ScubaGear -ChildPath 'ScubaGear.psd1' -Resolve
+          $Manifest = Import-PowerShellDataFile $ManifestFilePath
+          $ExpectedDescription = $Manifest.Description
+          # The -PassThru paramaters allows us to read the output
+          # value from Install-Module
+          $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          # Check for the expected name.
+          if ($InstallOutput.Name -ne $ExpectedName) {
+            Write-Output "::error::The name of the published module should be $ExpectedName"
+            exit 1
+          }
+          # Because reasons, the description has a newline character.
+          # Strip all whitespace before comparing the descriptions.
+          $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
+          $ExpectedFixed = $ExpectedDescription -replace "\s", ""
+          # Check for the expected description.
+          if ($DescriptionFixed -ne $ExpectedFixed) {
+            Write-Output "::error::The description of the published module should be $ExpectedDescription"
+            exit 1
+          }
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # This is a manual test that simply writes the version to the console.
-          Invoke-SCuBA -Version
-          Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+          # This is the expected output value that results from running the module.
+          # This check is intended to help verify that ScubaGear installed correctly.
+          $VersionOutput = Invoke-SCuBA -Version
+          $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
+          if ($VersionOutput -ne $ExpectedVersion) {
+            Write-Output "::error::The version of the published module should be $ExpectedVersion"
+            exit 1
+          }
       - name: Install Selenium
         run: |
           . repo/utils/workflow/Install-SeleniumForTesting.ps1
