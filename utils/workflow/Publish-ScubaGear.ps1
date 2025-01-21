@@ -114,6 +114,8 @@ function Publish-ScubaGearModule {
     $NuGetApiKey
   )
 
+  $ModuleVersion = ""
+
   try {
     # Most of the functions called below can throw an error if something goes wrong,
     # hence the try-catch block.
@@ -128,6 +130,7 @@ function Publish-ScubaGearModule {
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
     -PrereleaseTag $PrereleaseTag
+    Write-Output "The module version is $ModuleVersion"
 
     Write-Output "Creating an array of the files to sign..."
     $ArrayOfFilePaths = New-ArrayOfFilePaths `
@@ -315,6 +318,7 @@ function Edit-ManifestFile {
     Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
+  Write-Warning "The module version is $ModuleVersion"
   return $ModuleVersion
 }
 
