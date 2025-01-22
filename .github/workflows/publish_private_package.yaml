@@ -94,7 +94,7 @@ jobs:
             # published to PSGallery.
             $ModuleVersion = Publish-ScubaGearModule @Parameters
             # Publish-ScubaGearModule @Parameters
-            Write-Output "I. The module version is $ModuleVersion"
+            Write-Output "1. The module version is $ModuleVersion"
             echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
         run: |
