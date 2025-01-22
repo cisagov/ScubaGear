@@ -126,10 +126,10 @@ function Publish-ScubaGearModule {
     -ModuleTempPath $env:TEMP
 
     Write-Warning "Editing the manifest file..."
-    $ModuleVersion = Edit-ManifestFile `
+    $ModuleVersion = (Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
-    -PrereleaseTag $PrereleaseTag
+    -PrereleaseTag $PrereleaseTag)[-1]
     Write-Warning "1) The module version is $ModuleVersion"
 
     Write-Warning "Creating an array of the files to sign..."
