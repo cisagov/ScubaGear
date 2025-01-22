@@ -14,5 +14,5 @@ function Initialize-ScubaGearForTesting {
   $Output = Initialize-SCuBA
   Write-Host ">>>>"
   Write-Host $Output
-  Write-Hose "<<<<"
+  Write-Host "<<<<"
 }
