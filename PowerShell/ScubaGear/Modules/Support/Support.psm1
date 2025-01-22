@@ -146,7 +146,9 @@ function Initialize-SCuBA {
     }
 
     if ($ModuleList) {
-        # Add PowerShellGet to beginning of ModuleList for installing required modules.
+        # Note: PS-Get is intentionally not listed with the other modules in RequiredVersions.ps1.
+        # It is added here to ensure it is the first module to be installed, which is required to
+        # ensure "that the other packages can be properly evaluated and installed."
         $ModuleList = ,@{
             ModuleName = 'PowerShellGet'
             ModuleVersion = [version] '2.1.0'
