@@ -130,7 +130,7 @@ function Publish-ScubaGearModule {
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
     -PrereleaseTag $PrereleaseTag
-    Write-Output "The module version is $ModuleVersion"
+    Write-Output "1) The module version is $ModuleVersion"
 
     Write-Output "Creating an array of the files to sign..."
     $ArrayOfFilePaths = New-ArrayOfFilePaths `
@@ -179,6 +179,7 @@ function Publish-ScubaGearModule {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
     exit 1
   }
+  Write-Output "2) The module version is $ModuleVersion"
   return $ModuleVersion
 }
 
@@ -272,7 +273,7 @@ function Edit-ManifestFile {
     $ModuleVersion = $OverrideModuleVersion
   }
 
-  Write-Warning "The module version is $ModuleVersion"
+  Write-Warning "A) The module version is $ModuleVersion"
   Write-Warning "The prerelease tag is $PrereleaseTag" # Can be empty
 
   $ProjectUri = "https://github.com/cisagov/ScubaGear"
@@ -318,7 +319,7 @@ function Edit-ManifestFile {
     Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
-  Write-Warning "The module version is $ModuleVersion"
+  Write-Warning "B) The module version is $ModuleVersion"
   return $ModuleVersion
 }
 
