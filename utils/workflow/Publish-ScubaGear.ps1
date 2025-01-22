@@ -120,45 +120,45 @@ function Publish-ScubaGearModule {
     # Most of the functions called below can throw an error if something goes wrong,
     # hence the try-catch block.
 
-    Write-Output "Copying the module to a temp location..."
+    Write-Debug "Copying the module to a temp location..."
     $ModuleDestinationPath = Copy-ModuleToTempLocation `
     -ModuleSourcePath $ModuleSourcePath `
     -ModuleTempPath $env:TEMP
 
-    Write-Output "Editing the manifest file..."
+    Write-Debug "Editing the manifest file..."
     $ModuleVersion = Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
     -PrereleaseTag $PrereleaseTag
-    Write-Output "1) The module version is $ModuleVersion"
+    Write-Debug "1) The module version is $ModuleVersion"
 
-    Write-Output "Creating an array of the files to sign..."
+    Write-Debug "Creating an array of the files to sign..."
     $ArrayOfFilePaths = New-ArrayOfFilePaths `
     -ModuleDestinationPath $ModuleDestinationPath
 
-    Write-Output "Creating a file with a list of the files to sign..."
+    Write-Debug "Creating a file with a list of the files to sign..."
     $FileListFileName = New-FileList `
     -ArrayOfFilePaths $ArrayOfFilePaths
 
-    Write-Output "Calling AzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Debug "Calling AzureSignTool function to sign scripts, manifest, and modules..."
     Use-AzureSignTool `
       -AzureKeyVaultUrl $AzureKeyVaultUrl `
       -CertificateName $CertificateName `
       -FileList $FileListFileName
 
-    Write-Output "Creating the catalog list file..."
+    Write-Debug "Creating the catalog list file..."
     $ReturnObject = New-ScubaCatalogFile `
       -ModuleDestinationPath $ModuleDestinationPath
     $CatalogFilePath = $($ReturnObject.CatalogFilePath)
     $CatalogList = $($ReturnObject.TempCatalogList)
 
-    Write-Output "Calling AzureSignTool function to sign catalog list..."
+    Write-Debug "Calling AzureSignTool function to sign catalog list..."
     Use-AzureSignTool `
       -AzureKeyVaultUrl $AzureKeyVaultUrl `
       -CertificateName $CertificateName `
       -FileList $CatalogList
 
-    Write-Output "Testing the catalog file..."
+    Write-Debug "Testing the catalog file..."
     Test-ScubaCatalogFile `
       -CatalogFilePath $CatalogFilePath
 
@@ -170,7 +170,7 @@ function Publish-ScubaGearModule {
       $Parameters.Add('NuGetApiKey', $NuGetApiKey)
     }
 
-    Write-Output "The ScubaGear module will be published..."
+    Write-Debug "The ScubaGear module will be published..."
     # The -Force parameter is only required if the new version is less than or equal to
     # the current version, which is typically only true when testing.
     Publish-Module @Parameters -Force
@@ -179,7 +179,7 @@ function Publish-ScubaGearModule {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
     exit 1
   }
-  Write-Output "2) The module version is $ModuleVersion"
+  Write-Debug "2) The module version is $ModuleVersion"
   return $ModuleVersion
 }
 
