@@ -21,11 +21,11 @@ ConditionalAccessPolicies := {
             "ExcludeGroups": [],
             "ExcludeRoles": [],
             "ExcludeGuestsOrExternalUsers":  {
-                                                                              "ExternalTenants":  {
-                                                                                                      "MembershipKind":  null
-                                                                                                  },
-                                                                              "GuestOrExternalUserTypes":  null
-                                                                          },
+                "ExternalTenants":  {
+                    "MembershipKind":  null
+                },
+                "GuestOrExternalUserTypes":  null
+            },
         },
         "UserRiskLevels": [
             "high"

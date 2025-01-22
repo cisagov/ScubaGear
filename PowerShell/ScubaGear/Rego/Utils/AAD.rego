@@ -153,10 +153,12 @@ PolicyConditionsMatch(Policy) := true if {
     Contains(Policy.Conditions.Users.IncludeUsers, "All") == true
     Contains(Policy.Conditions.Applications.IncludeApplications, "All") == true
     Count(Policy.Conditions.Users.ExcludeRoles) == 0
-    Count(Policy.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes) == 0
     Count(Policy.Conditions.Applications.ExcludeApplications) == 0
-
     Policy.State == "enabled"
+
+    # Uncomment this line of code when we want to check for external or guest users
+    # Object.get() protects against undefined errors
+    # Count(object.get(Policy, ["Conditions", "Users", "ExcludeGuestsOrExternalUsers", "GuestOrExternalUserTypes"], null)) == 0
 } else := false
 
 
