@@ -125,12 +125,15 @@ function Publish-ScubaGearModule {
     -ModuleSourcePath $ModuleSourcePath `
     -ModuleTempPath $env:TEMP
 
+    # Somewhere in the Edit-ManifestFile method something is adding implicit expression output.
+    # The only output that I want from this method is the module version number.
+    # The parens and [-1] are designed to suppress everything but the module version number.
+    # Yes, this is a kludge, but PowerShell doesn't have a graceful way of handling this.
     Write-Warning "Editing the manifest file..."
     $ModuleVersion = (Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
     -PrereleaseTag $PrereleaseTag)[-1]
-    Write-Warning "1) The module version is $ModuleVersion"
 
     Write-Warning "Creating an array of the files to sign..."
     $ArrayOfFilePaths = New-ArrayOfFilePaths `
@@ -179,7 +182,6 @@ function Publish-ScubaGearModule {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
     exit 1
   }
-  Write-Warning "2) The module version is $ModuleVersion"
   return $ModuleVersion
 }
 
@@ -273,7 +275,7 @@ function Edit-ManifestFile {
     $ModuleVersion = $OverrideModuleVersion
   }
 
-  Write-Warning "A) The module version is $ModuleVersion"
+  Write-Warning "The module version is $ModuleVersion"
   Write-Warning "The prerelease tag is $PrereleaseTag" # Can be empty
 
   $ProjectUri = "https://github.com/cisagov/ScubaGear"
@@ -319,7 +321,6 @@ function Edit-ManifestFile {
     Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
-  Write-Warning "B) The module version is $ModuleVersion"
   return $ModuleVersion
 }
 

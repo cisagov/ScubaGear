@@ -94,7 +94,7 @@ jobs:
             # published to PSGallery.
             $ModuleVersion = Publish-ScubaGearModule @Parameters
             # Publish-ScubaGearModule @Parameters
-            Write-Output "1. The module version is $ModuleVersion"
+            Write-Output "The module version is $ModuleVersion"
             echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
         run: |
@@ -139,8 +139,7 @@ jobs:
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
           $VersionOutput = Invoke-SCuBA -Version
-          $ExpectedVersion = '${{ steps.sign-publish-module.outputs.ModuleVersion }}'
-          # $ExpectedVersion = "1.5.0"
+          $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
           Write-Output "The version is $VersionOutput"
           Write-Output "The expected version is $ExpectedVersion"
           if ($VersionOutput -ne $ExpectedVersion) {
