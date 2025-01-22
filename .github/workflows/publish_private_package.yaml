@@ -2,7 +2,7 @@
 
 name: Publish Private Package
 
-# This is a reusable workflow called by the pipeline.
+# This is a reusable workflow called by the pipeline
 on:
   workflow_call:
     secrets:
@@ -113,14 +113,14 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
-          # These are two of the expected output values that result
-          # from installing the module
+          # These are two of the expected output values that result from installing the module.
+          # These checks are intended to help verify that the module installed correctly.
           $ExpectedName = 'ScubaGear'
           $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
           # The -PassThru paramaters allows us to read the output
           # value from Install-Module
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          # Check to make sure that the name is expected.
+          # Check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
             Write-Output "::error::The name of the published module should be $ExpectedName"
             exit 1
@@ -129,7 +129,7 @@ jobs:
           # Strip all whitespace before comparing the descriptions.
           $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
-          # Check to make sure that the description is expected.
+          # Check for the expected description.
           if ($DescriptionFixed -ne $ExpectedFixed) {
             Write-Output "::error::The name of the published module should be $ExpectedDescription"
             exit 1
@@ -137,7 +137,8 @@ jobs:
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # This is a manual test that simply writes the version to the console.
+          # This is the expected output value that results from running the module.
+          # This check is intended to help verify that ScubaGear installed correctly.
           $VersionOutput = Invoke-SCuBA -Version
           $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
           Write-Output "The version is $VersionOutput"

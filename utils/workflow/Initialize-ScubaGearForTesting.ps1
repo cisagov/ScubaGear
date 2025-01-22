@@ -11,5 +11,6 @@ function Initialize-ScubaGearForTesting {
   Write-Output 'Importing function Initialize-Scuba...'
   Import-Module (Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
   Write-Output 'Calling Initialize ScubaGear...'
-  Initialize-SCuBA
+  $Output = Initialize-SCuBA
+  Write-Host $Output
 }
