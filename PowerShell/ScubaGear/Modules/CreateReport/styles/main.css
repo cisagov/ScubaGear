@@ -2,20 +2,21 @@
     --background-primary: white;
     --background-secondary: #b9bec2;
     --test-pass: #d5ebd5;
-    --test-fail: #E5C7C7;
+    --test-fail: #cd2026;
     --test-warning: #fff7d6;
     --test-other: #ebebf2;
     --test-deleted-bg: #b2beb5;
     --test-deleted-color: #6f7478;
     --test-bug-color: #e80b0b;
-    --test-error-color: #DD4803;
+    --test-error-color: #ffffff;
     --cap-even: #0052882d;
     --cap-hover: #00528850;
     --header-color: #005288;
-    --note-color: #ee4e04;
+    --note-color: #D34503;
     --header-bottom: black;
     --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --unvisited-link-color: #00668f;
+    --fail-link-color: #D7EDF4;
     --text-color: black;
     --uuid-color: #424242;
     --border-color: black;
@@ -38,7 +39,8 @@ html[data-theme='dark'] {
     --note-color: #ee4e04;
     --header-bottom: rgb(221, 221, 221);
     --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --unvisited-link-color: #E6F598;
+    --fail-link-color: #E6F598;;
     --text-color: #bdbdbd;
     --uuid-color: #999999;
     --border-color: #7b7b7b;
@@ -74,6 +76,23 @@ h4 {
     margin-left:20%;
     margin-right: 20%;
     margin-bottom: 0.313em;
+}
+
+h4 .aad-link {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--unvisited-link-color);
+    text-decoration: underline;
+}
+
+h4 .aad-link:visited {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+}
+
+h4 .aad-link:hover {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+    text-decoration: none;
 }
 
 
@@ -115,6 +134,51 @@ td {
     overflow-wrap: break-word;
 }
 
+tr[data-state="pass"] {
+    background:var(--test-pass);    
+}
+
+tr[data-state="fail"] {
+    background:var(--test-fail);
+    color:var(--test-error-color);
+    td a {
+        color:var(--fail-link-color);
+    }
+}
+
+tr[data-state="bug"] {
+    background:var(--test-bug-color);    
+}
+
+tr[data-state="warning"] {
+    background:var(--test-warning);    
+}
+
+tr[data-state="deleted"] {
+    background:var(--test-other);
+    color:var(--test-deleted-color);    
+}
+
+tr[data-state="omitted"]{
+    background:var(--test-other);  
+}
+
+tr[data-state="notimplemented"]{
+    background:var(--test-other);    
+}
+
+tr[data-state="thirdparty"]{
+    background:var(--test-other);    
+}
+
+tr[data-state="error"]{
+    background:var(--test-fail);
+    td {
+        border-color:var(--border-color);
+        color:var(--test-error-color);
+    }
+}
+
 td a {
     color: var(--header-color);
 }
@@ -154,6 +218,10 @@ h2 {
 
 img {
     width: 6.25em;
+}
+
+a[href="#caps"] {
+    color: var(--caps-link-color);
 }
 
 #caps h2 {
@@ -232,7 +300,7 @@ th.conditions {
 }
 
 #toggle-text {
-    color: #7b7b7b;
+    color: var(--text-color);
     margin: 0.313em 3.125em;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.875em;
