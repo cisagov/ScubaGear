@@ -12,7 +12,6 @@ ProductNames:
   - aad
   - sharepoint
 M365Environment: commercial
-OPAPath: .
 LogIn: true
 DisconnectOnExit: false
 OutPath: .
