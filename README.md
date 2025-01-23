@@ -1,4 +1,5 @@
-![ScubaGear Logo](/docs/images//SCuBA%20ScubaGear%20GitHub%20Graphic%20v6-04.png)
+![ScubaGear Logo](/docs/images//SCuBA%20GitHub%20Graphic%20v6-05.png)
+
 
 [![GitHub Release][github-release-img]][release]
 [![PSGallery Release][psgallery-release-img]][psgallery]
