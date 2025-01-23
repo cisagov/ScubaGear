@@ -5,8 +5,7 @@
       "exo",
       "defender",
       "aad",
-      "sharepoint",
-      "onedrive"
+      "sharepoint"
     ],
     "M365Environment":"commercial",
     "OPAPath":".",
