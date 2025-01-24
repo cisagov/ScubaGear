@@ -191,11 +191,11 @@ function Export-AADProvider {
 
     if ($RiskyApps -and $RiskySPs) {
         $AggregateRiskyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-        $ThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Get-ThirdPartyRiskyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+        $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
     }
     else {
         $AggregateRiskyApps = "{}"
-        $ThirdPartySPs = "{}"
+        $RiskyThirdPartySPs = "{}"
     }
     ##### End block
 
@@ -216,7 +216,7 @@ function Export-AADProvider {
     "license_information": $LicenseInfo,
     "total_user_count": $UserCount,
     "risky_applications": $AggregateRiskyApps,
-    "third_party_risky_service_principals": $ThirdPartySPs,
+    "risky_third_party_service_principals": $RiskyThirdPartySPs,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@

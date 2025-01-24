@@ -416,7 +416,7 @@ function Format-RiskyApplications {
     }
 }
 
-function Get-ThirdPartyRiskyServicePrincipals {
+function Format-RiskyThirdPartyServicePrincipals {
     <#
     .Description
     Returns a JSON dataset of service principal objects owned by external organizations.
@@ -446,7 +446,7 @@ function Get-ThirdPartyRiskyServicePrincipals {
             }
         }
         catch {
-            Write-Warning "An error occurred in Get-ThirdPartyRiskyServicePrincipals: $($_.Exception.Message)"
+            Write-Warning "An error occurred in Format-RiskyThirdPartyServicePrincipals: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
@@ -458,5 +458,5 @@ Export-ModuleMember -Function @(
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
     "Format-RiskyApplications",
-    "Get-ThirdPartyRiskyServicePrincipals"
+    "Format-RiskyThirdPartyServicePrincipals"
 )
