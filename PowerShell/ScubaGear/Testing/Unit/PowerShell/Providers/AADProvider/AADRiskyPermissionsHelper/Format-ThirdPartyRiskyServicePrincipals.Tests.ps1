@@ -3,7 +3,7 @@ $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRisky
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
 InModuleScope AADRiskyPermissionsHelper {
-    Describe "Get-ThirdPartyRiskyServicePrincipals" {
+    Describe "Format-RiskyThirdPartyServicePrincipals" {
         BeforeAll {
             # Import mock data
             $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
@@ -49,7 +49,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
-            $ThirdPartySPs = Get-ThirdPartyRiskyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
