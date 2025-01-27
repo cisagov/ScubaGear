@@ -9,7 +9,9 @@ BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
-  Initialize-ScubaGearForTesting
+  $Output = Initialize-ScubaGearForTesting
+  Write-Warning "The output for initialize is"
+  Write-Warning $Output
 }
 
 # Use Write-Warning b/c other writes don't actually write

@@ -41,8 +41,8 @@ function Copy-SCuBABaselineDocument {
 function Initialize-SCuBA {
     <#
     .SYNOPSIS
-        This script installs the required Powershell modules used by the
-        assessment tool
+        This function installs the required Powershell modules used by the
+        assessment tool.
     .DESCRIPTION
         Installs the modules required to support SCuBAGear.  If the Force
         switch is set then any existing module will be re-installed even if
@@ -110,11 +110,17 @@ function Initialize-SCuBA {
     $DebugPreference = "Continue"
     $InformationPreference = "Continue"
 
-    if (-not $DoNotAutoTrustRepository) {
+    if ($DoNotAutoTrustRepository) {
+        Write-Output "AutoTrust:False"
+        Get-PSRepository -Name "PSGallery"
+        # TODO determine if it's trusted
+    }
+    else {
+        Write-Output "AutoTrust:True"
         $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
-
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+            Write-Output "TrustPSGallery:True"
             Write-Information -MessageData "Setting PSGallery repository to trusted."
         }
     }
