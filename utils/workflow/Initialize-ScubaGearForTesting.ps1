@@ -15,7 +15,8 @@ function Initialize-ScubaGearForTesting {
   Write-Warning  ">>>>"
   Write-Warning "The type of outputs"
   Write-Warning $Outputs.GetType()
-  for $Output in $Outputs:
+  foreach ($Output in $Outputs) {
     Write-Warning $Output
+  }
   Write-Warning  "<<<<"
 }
