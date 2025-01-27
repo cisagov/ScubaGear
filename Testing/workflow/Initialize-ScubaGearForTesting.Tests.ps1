@@ -40,7 +40,7 @@ Describe "PowerShell Modules Check" {
 Describe "Initialize-ScubaGear Output Check" {
   It "Expected output statements should exist and have expected values." {
     Write-Warning "Checking for outputs..."
-    foreach ($Output in $global:$Outputs) {
+    foreach ($Output in $global:Outputs) {
       Write-Warning $Output
     }
   }
