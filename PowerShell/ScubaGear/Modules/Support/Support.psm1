@@ -102,7 +102,7 @@ function Initialize-SCuBA {
         $Scope = 'CurrentUser'
     )
 
-    Write-Output 'Initializing ScubaGear...'
+    Write-Information 'Initializing ScubaGear...'
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
@@ -220,6 +220,8 @@ function Initialize-SCuBA {
     $Stopwatch.stop()
 
     Write-Debug "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+    # JAMES TODO ALL LIKE THIS
+    Write-Output "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
