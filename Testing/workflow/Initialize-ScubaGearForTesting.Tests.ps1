@@ -9,7 +9,14 @@ BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
-  Initialize-ScubaGearForTesting
+  $Outputs = Initialize-ScubaGearForTesting
+  Write-Warning  ">>>>"
+  Write-Warning "The type of outputs"
+  Write-Warning $Outputs.GetType()
+  foreach ($Output in $Outputs) {
+    Write-Warning $Output
+  }
+  Write-Warning  "<<<<"
 }
 
 # Use Write-Warning b/c other writes don't actually write
