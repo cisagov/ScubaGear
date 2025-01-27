@@ -9,14 +9,7 @@ BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
-  $Outputs = Initialize-ScubaGearForTesting
-  Write-Warning  ">>>>"
-  Write-Warning "The type of outputs"
-  Write-Warning $Outputs.GetType()
-  foreach ($Output in $Outputs) {
-    Write-Warning $Output
-  }
-  Write-Warning  "<<<<"
+  $global:$Outputs = Initialize-ScubaGearForTesting
 }
 
 # Use Write-Warning b/c other writes don't actually write
@@ -40,6 +33,15 @@ Describe "PowerShell Modules Check" {
     It "Module $global:moduleName should be installed" {
       $module = Get-Module -ListAvailable -Name $global:ModuleName
       $module | Should -Not -BeNullOrEmpty
+    }
+  }
+}
+
+Describe "Initialize-ScubaGear Output Check" {
+  It "Expected output statements should exist and have expected values." {
+    Write-Warning "Checking for outputs..."
+    foreach ($Output in $global:$Outputs) {
+      Write-Warning $Output
     }
   }
 }
