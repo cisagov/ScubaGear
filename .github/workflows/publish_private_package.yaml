@@ -61,7 +61,6 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Create Private Gallery
         run: |
-          # Source the function.
           . repo/utils/workflow/Publish-ScubaGear.ps1
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted

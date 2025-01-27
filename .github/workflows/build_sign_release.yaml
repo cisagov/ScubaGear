@@ -70,7 +70,6 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign Module
         run: |
-          # Source the function.
           . repo/utils/workflow/Build-SignRelease.ps1
           New-ModuleSignature `
             -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `

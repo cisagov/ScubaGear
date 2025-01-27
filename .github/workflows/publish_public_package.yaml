@@ -46,7 +46,6 @@ jobs:
           path: repo
       - name: Install Azure Signing Tool
         run: |
-          # Source the function
           . repo/utils/workflow/Install-AzureSignTool.ps1
           Install-AzureSignTool
       # OIDC Login to Azure Public Cloud with AzPowershell
@@ -67,7 +66,6 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign and Publish Module
         run: |
-          # Source the function.
           . repo/utils/workflow/Publish-ScubaGear.ps1
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*

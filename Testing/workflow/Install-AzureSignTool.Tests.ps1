@@ -2,7 +2,6 @@
 
 BeforeDiscovery {
   $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Install-AzureSignTool.ps1' -Resolve
-  # Source the function
   . $ScriptPath
   Install-AzureSignTool
 }
