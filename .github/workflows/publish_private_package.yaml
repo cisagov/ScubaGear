@@ -67,7 +67,6 @@ jobs:
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
         run: |
-            # Source the function.
             . repo/utils/workflow/Publish-ScubaGear.ps1
             # Remove non-release files
             Remove-Item -Recurse -Force repo -Include .git*
