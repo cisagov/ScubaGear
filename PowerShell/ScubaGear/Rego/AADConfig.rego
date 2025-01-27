@@ -181,10 +181,8 @@ tests contains {
 PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    "All" in CAPolicy.Conditions.Users.IncludeUsers
-    "All" in CAPolicy.Conditions.Applications.IncludeApplications
-    CAPolicy.State == "enabled"
-    count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    PolicyConditionsMatch(CAPolicy)
+
 
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
@@ -402,7 +400,7 @@ tests contains {
 PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    CAPolicy.State == "enabled"
+    PolicyConditionsMatch(CAPolicy)
     PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
 
     # Filter: only include policies that meet all the requirements
@@ -413,8 +411,6 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     count(PrivRolesSet & ConvertToSet(CAPolicy.Conditions.Users.ExcludeRoles)) == 0
 
     # Basic & special conditions
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    IsEmptyContainer(CAPolicy.Conditions.Applications.ExcludeApplications) == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 
@@ -480,9 +476,8 @@ tests contains {
 RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    PolicyConditionsMatch(CAPolicy)
     Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
-    CAPolicy.State == "enabled"
 
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
