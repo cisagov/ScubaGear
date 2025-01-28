@@ -39,41 +39,35 @@ Describe "PowerShell Modules Check" {
 Describe "Initialize-ScubaGear Output Check" {
   It "Expected output statements should exist and have expected values." {
     foreach ($Output in $global:Outputs) {
-      # $Time = $false
-      # $TimeValue = 0
-      if ($Output.GetType() -is [String]) {
+      $PSGallery = $false
+      $DownloadedOPAVersion = $false
+      $SetupTime = $false
+      $SetupTimeValue = 0
+      if ($Output.GetType().Name -eq 'String') {
         Write-Warning "String:"
         Write-Warning $Output
-        # $Key = $Output.split(":")[0]
-        # $Value = $Output.split(":")[1]
-        # if ($Key -eq  "AutoTrust") {
-        #   $AutoTrust = $true
-        # }
-        # elseif ($Key -eq "TrustPSGallery") {
-        #   $TrustPSGallery = $true
-        # }
-        # elseif ($Key -eq "Time") {
-        #   $Time = $true
-        #   $TimeValue = $Value
-        # }
-        # else {
-        #   Write-Warning "Unexpected output"
-        #   # If we get to here, we have encountered an unexpected output, so fail
-        #   # TODO is there a smarter way to just fail in Pester?  This seems convoluted.
-        #   # $true | Should -Be $false
-        # }
+        if ($Output.StartsWith("PSGallery is")) {
+          $PSGallery = $true
+        }
+        elseif ($Output.StartsWith("Downloaded OPA version")) {
+          $DownloadOPAVersion = $true
+        }
+        elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
+          $DownloadOPAVersion = $true
+          $SetupTimeValue = [int]$Output.split(":")[1]
+        }
       }
       else {
         Write-Warning $Output.GetType()
         Write-Warning $Output
       }
     }
-    # Write-Output "AutoTrust"
-    # $AutoTrust | Should -Be $true
-    # Write-Output "TrustPSGallery"
-    # $TrustPSGallery | Should -Be $true
-    # Write-Output "Time"
-    # $Time | Should -Be $true
-    # $TimeValue | Should -BeLessThan 1000
+    Write-Output "PSGallery"
+    $PSGallery | Should -Be $true
+    Write-Output "DownloadOPAVersion"
+    $DownloadOPAVersion | Should -Be $true
+    Write-Output "SetupTime"
+    $SetupTime | Should -Be $true
+    $SetupTimeValue | Should -BeLessThan 1000
   }
 }

@@ -229,7 +229,7 @@ function Initialize-SCuBA {
 
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
-    Write-Output "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+    Write-Output "ScubaGear setup time elapsed (in seconds):$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
