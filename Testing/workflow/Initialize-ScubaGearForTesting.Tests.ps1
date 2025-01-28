@@ -43,11 +43,11 @@ Describe "Initialize-ScubaGear Output Check" {
     foreach ($Output in $global:Outputs) {
       Write-Warning $Output
       $AutoTrust = $false
-      $TrustPSGallery = $false
-      $Time = $false
+      # $TrustPSGallery = $false
+      # $Time = $false
       $Key = $Output.split(":")[0]
-      $Value = $Output.split(":")[1]
-      if ($Key = "AutoTrust") {
+      # $Value = $Output.split(":")[1]
+      if ($Key -eq  "AutoTrust") {
         $AutoTrust = $true
       }
       $AutoTrust | Should -Be $true
