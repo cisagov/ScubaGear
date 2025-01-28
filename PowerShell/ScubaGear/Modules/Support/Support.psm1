@@ -450,8 +450,10 @@ function InstallOPA {
     )
 
     Get-OPAFile -out $OPAExe -version $ExpectedVersion -name $Filename
-    $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+    Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+    # $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
     # $Result[1] | Out-Host
+
 }
 
 function Debug-SCuBA {

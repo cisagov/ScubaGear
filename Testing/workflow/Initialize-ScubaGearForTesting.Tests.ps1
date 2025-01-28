@@ -61,7 +61,7 @@ Describe "Initialize-ScubaGear Output Check" {
       else {
         # If we get to here, we have encountered an unexpected output, so fail
         # TODO is there a smarter way to just fail?
-        $true | Should -Be $false 
+        $true | Should -Be $false
       }
     }
     Write-Warning "AutoTrust"
