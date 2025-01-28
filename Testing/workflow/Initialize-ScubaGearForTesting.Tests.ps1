@@ -12,7 +12,7 @@ BeforeDiscovery {
 }
 
 # Use Write-Warning b/c other writes don't actually write
-Write-Information -MessageData "Getting required modules..."
+Write-Output "Getting required modules..."
 try {
   . PowerShell\ScubaGear\RequiredVersions.ps1
 }
@@ -20,7 +20,7 @@ catch {
   throw "Unable to find RequiredVersions.ps1"
 }
 if ($ModuleList) {
-  Write-Information -MessageData "Found list of modules!"
+  Write-Output "Found list of modules!"
 }
 else {
   Write-Warning 'Did NOT find list of modules!!'
@@ -39,14 +39,13 @@ Describe "PowerShell Modules Check" {
 Describe "Initialize-ScubaGear Output Check" {
   It "Expected output statements should exist and have expected values." {
     foreach ($Output in $global:Outputs) {
-      Write-Information -MessageData  $Output
+      Write-Output $Output
       $AutoTrust = $false
       $TrustPSGallery = $false
       $Time = $false
+      $TimeValue = 0
       $Key = $Output.split(":")[0]
-      # Write-Warning " The key is $Key"
       $Value = $Output.split(":")[1]
-      # Write-Warning " The value is $Value"
       if ($Key -eq  "AutoTrust") {
         $AutoTrust = $true
       }
@@ -55,7 +54,7 @@ Describe "Initialize-ScubaGear Output Check" {
       }
       elseif ($Key -eq "Time") {
         $Time = $true
-        $Value | Should -BeLessThan 1000
+        $TimeValue = $Value
       }
       else {
         # If we get to here, we have encountered an unexpected output, so fail
@@ -63,11 +62,12 @@ Describe "Initialize-ScubaGear Output Check" {
         $true | Should -Be $false
       }
     }
-    Write-Information -MessageData  "AutoTrust"
+    Write-Output "AutoTrust"
     $AutoTrust | Should -Be $true
-    Write-Information -MessageData  "TrustPSGallery"
+    Write-Output "TrustPSGallery"
     $TrustPSGallery | Should -Be $true
-    Write-Information -MessageData  "Time"
+    Write-Output "Time"
     $Time | Should -Be $true
+    $TimeValue | Should -BeLessThan 1000
   }
 }

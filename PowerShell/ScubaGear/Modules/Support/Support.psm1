@@ -221,9 +221,9 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Write-Output "Installing OPA"
+            Write-Information -MessageData "Installing OPA"
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
-            Write-Output "Installed OPA"
+            Write-Information -MessageData "Installed OPA"
         }
         catch {
             # $Error[0] | Format-List -Property * -Force | Out-Host
