@@ -221,9 +221,9 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Write-Information -MessageData "Installing OPA"
+            Write-Output -MessageData "Installing OPA"
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
-            Write-Information -MessageData "Installed OPA"
+            Write-Output -MessageData "Installed OPA"
         }
         catch {
             # $Error[0] | Format-List -Property * -Force | Out-Host
@@ -235,7 +235,7 @@ function Initialize-SCuBA {
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
     Write-Information -MessageData "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
-    Write-Information -MessageData "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
+    Write-Output "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
@@ -319,12 +319,12 @@ function Install-OPAforSCuBA {
         else {
             if($OPAExe -eq $Filename) {
                 # Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
-                Write-Information "SHA256 verification failed, downloading new executable"
+                Write-Information -MessageData "SHA256 verification failed, downloading new executable"
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
                 # Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
-                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
+                Write-Warning -MessageData "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
             }
         }
     }
