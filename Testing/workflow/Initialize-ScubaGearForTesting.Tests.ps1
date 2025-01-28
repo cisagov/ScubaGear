@@ -13,7 +13,7 @@ BeforeDiscovery {
 }
 
 # Use Write-Warning b/c other writes don't actually write
-Write-Warning 'Getting required modules...'
+# Write-Warning 'Getting required modules...'
 try {
   . PowerShell\ScubaGear\RequiredVersions.ps1
 }
@@ -21,7 +21,7 @@ catch {
   throw "Unable to find RequiredVersions.ps1"
 }
 if ($ModuleList) {
-  Write-Warning 'Found list of modules!'
+  Write-Debug 'Found list of modules!'
 }
 else {
   Write-Warning 'Did NOT find list of modules!!'
@@ -39,16 +39,15 @@ Describe "PowerShell Modules Check" {
 
 Describe "Initialize-ScubaGear Output Check" {
   It "Expected output statements should exist and have expected values." {
-    Write-Warning "Checking for outputs..."
     foreach ($Output in $global:Outputs) {
       Write-Warning $Output
       $AutoTrust = $false
       $TrustPSGallery = $false
       $Time = $false
       $Key = $Output.split(":")[0]
-      Write-Warning "The key is $Key"
+      Write-Warning " The key is $Key"
       $Value = $Output.split(":")[1]
-      Write-Warning "The value is $Value"
+      Write-Warning " The value is $Value"
       if ($Key -eq  "AutoTrust") {
         $AutoTrust = $true
       }

@@ -112,7 +112,7 @@ function Initialize-SCuBA {
         $Scope = 'CurrentUser'
     )
 
-    Write-Information 'Initializing ScubaGear...'
+    Write-Information -MessageData "Initializing ScubaGear..."
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
@@ -217,22 +217,24 @@ function Initialize-SCuBA {
     }
 
     if ($NoOPA -eq $true) {
-        Write-Debug "Skipping Download for OPA.`n"
+        Write-Information -MessageData "Skipping Download for OPA.`n"
     }
     else {
         try {
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
         }
         catch {
-            $Error[0] | Format-List -Property * -Force | Out-Host
+            # $Error[0] | Format-List -Property * -Force | Out-Host
+            $OpaInstallError = $Error[0] | Format-List -Property * -Force
+            Write-Information -MessageData $OpaInstallError
         }
     }
 
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
 
-    Write-Debug "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
-    Write-Output "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
+    Write-Information -MessageData "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
+    Write-Information -MessageData "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
