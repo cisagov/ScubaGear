@@ -121,17 +121,15 @@ function Initialize-SCuBA {
     $InformationPreference = "Continue"
 
     if ($DoNotAutoTrustRepository) {
-        # Write-Output "AutoTrust:False"
-        # $RepositoryDetails = Get-PSRepository -Name "PSGallery"
+        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
         Get-PSRepository -Name "PSGallery"
-        # Write-Output "TrustPSGallery:$($RepositoryDetails.Trusted)"
+        Write-Output "PSGallery is already $($RepositoryDetails.Trusted)."
     }
     else {
-        # Write-Output "AutoTrust:True"
         $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-            # Write-Output "TrustPSGallery:True"
+            Write-Output "PSGallery is now trusted."
             Write-Information -MessageData "Setting PSGallery repository to trusted."
         }
     }
@@ -231,8 +229,7 @@ function Initialize-SCuBA {
 
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
-    Write-Information -MessageData "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
-    Write-Output "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
+    Write-Output "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()

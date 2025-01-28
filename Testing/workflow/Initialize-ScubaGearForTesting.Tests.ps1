@@ -64,7 +64,7 @@ Describe "Initialize-ScubaGear Output Check" {
         # }
       }
       else {
-        Write-Warning "Not String:"
+        Write-Warning $Output.GetType()
         Write-Warning $Output
       }
     }
