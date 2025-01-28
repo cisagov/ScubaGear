@@ -121,16 +121,17 @@ function Initialize-SCuBA {
     $InformationPreference = "Continue"
 
     if ($DoNotAutoTrustRepository) {
-        Write-Output "AutoTrust:False"
-        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
-        Write-Output "TrustPSGallery:$($RepositoryDetails.Trusted)"
+        # Write-Output "AutoTrust:False"
+        # $RepositoryDetails = Get-PSRepository -Name "PSGallery"
+        Get-PSRepository -Name "PSGallery"
+        # Write-Output "TrustPSGallery:$($RepositoryDetails.Trusted)"
     }
     else {
-        Write-Output "AutoTrust:True"
+        # Write-Output "AutoTrust:True"
         $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-            Write-Output "TrustPSGallery:True"
+            # Write-Output "TrustPSGallery:True"
             Write-Information -MessageData "Setting PSGallery repository to trusted."
         }
     }
@@ -221,14 +222,10 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Write-Output "Installing OPA"
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
-            Write-Output "Installed OPA"
         }
         catch {
-            # $Error[0] | Format-List -Property * -Force | Out-Host
-            $OpaInstallError = $Error[0] | Format-List -Property * -Force
-            Write-Information -MessageData $OpaInstallError
+            $Error[0] | Format-List -Property * -Force | Out-Host
         }
     }
 
@@ -296,7 +293,7 @@ function Install-OPAforSCuBA {
     $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
     if((Test-Path -Path $ScubaTools) -eq $false) {
         New-Item -ItemType Directory -Force -Path $ScubaTools | Out-Null
-        # Write-Information "" | Out-Host
+        Write-Information "" | Out-Host
     }
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
         $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
@@ -306,27 +303,19 @@ function Install-OPAforSCuBA {
     if($OPAExe -eq "") {
         $OPAExe = $Filename
     }
-    Write-Output "4"
     if(Test-Path -Path ( Join-Path $ScubaTools $OPAExe) -PathType Leaf) {
-        Write-Output "4a"
         $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-        Write-Warning "Result from Confirm OPA Hash"
-        Write-Warning $Result
-        Write-Output "4b"
         if($Result[0]) {
-            Write-Output "5"
             Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
         }
         else {
             Write-Output "6"
             if($OPAExe -eq $Filename) {
-                # Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
-                Write-Information -MessageData "SHA256 verification failed, downloading new executable"
+                Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
-                # Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
-                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
+                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
             }
         }
     }
@@ -337,9 +326,6 @@ function Install-OPAforSCuBA {
     $ErrorActionPreference = $PreferenceStack.Pop()
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
-
-    # Clear the results from calling Confirm-OPAHash so that they don't bubble up.
-    return @()
 }
 
 function Get-OPAFile {
@@ -390,26 +376,20 @@ function Get-ExeHash {
         [Alias('version')]
         [string]$ExpectedVersion
     )
-    Write-Output "GEH1"
+
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
     $OutFile = (Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
-    Write-Output "GEH2"
     try {
-        Write-Output "GEH3"
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($InstallUrl, $OutFile)
     }
     catch {
-        Write-Output "GEH4"
-        # $Error[0] | Format-List -Property * -Force | Out-Host
-        $Error[0] | Format-List -Property * -Force
-        # Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
-        Write-Error "Unable to download OPA SHA256 hash for verification"
+        $Error[0] | Format-List -Property * -Force | Out-Host
+        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
     }
     finally {
         $WebClient.Dispose()
     }
-    Write-Output "GEH4"
     $Hash = ($(Get-Content $OutFile -raw) -split " ")[0]
     Remove-Item $OutFile
     return $Hash
@@ -434,12 +414,9 @@ function Confirm-OPAHash {
         [string]
         $Filename
     )
-    Write-Output "CO1"
     if ((Get-FileHash ( Join-Path $ScubaTools $OPAExe ) -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
-        Write-Output "CO2"
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
-    Write-Output "CO3"
     return $true, "Downloaded OPA version ($ExpectedVersion) SHA256 verified successfully`n"
 }
 
