@@ -57,13 +57,13 @@ Describe "Initialize-ScubaGear Output Check" {
     }
   }
   It "PSGallery should be trust" {
-    $PSGallery | Should -Be $true
+    $global:PSGallery | Should -Be $true
   }
   It "OPA should be downloaded" {
-    $DownloadedOPAVersion | Should -Be $true
+    $global:DownloadedOPAVersion | Should -Be $true
   }
   It "Setup time should be minimal" {
-    $SetupTime | Should -Be $true
-    $SetupTimeValue | Should -BeLessThan 1000
+    $global:SetupTime | Should -Be $true
+    $global:SetupTimeValue | Should -BeLessThan 1000
   }
 }
