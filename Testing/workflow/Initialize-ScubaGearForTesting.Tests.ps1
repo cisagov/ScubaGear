@@ -46,14 +46,14 @@ Describe "Initialize-ScubaGear Output Check" {
       if ($Output.GetType().Name -eq 'String') {
         Write-Warning "String:"
         Write-Warning $Output
-        if ($Output.StartsWith("PSGallery is")) {
+        if ($Output.StartsWith("PSGallery is trusted")) {
           $PSGallery = $true
         }
         elseif ($Output.StartsWith("Downloaded OPA version")) {
-          $DownloadOPAVersion = $true
+          $DownloadedOPAVersion = $true
         }
         elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
-          $DownloadOPAVersion = $true
+          $SetupTime = $true
           $SetupTimeValue = [int]$Output.split(":")[1]
         }
       }
@@ -65,7 +65,7 @@ Describe "Initialize-ScubaGear Output Check" {
     Write-Output "PSGallery"
     $PSGallery | Should -Be $true
     Write-Output "DownloadOPAVersion"
-    $DownloadOPAVersion | Should -Be $true
+    $DownloadedOPAVersion | Should -Be $true
     Write-Output "SetupTime"
     $SetupTime | Should -Be $true
     $SetupTimeValue | Should -BeLessThan 1000

@@ -123,13 +123,13 @@ function Initialize-SCuBA {
     if ($DoNotAutoTrustRepository) {
         $RepositoryDetails = Get-PSRepository -Name "PSGallery"
         Get-PSRepository -Name "PSGallery"
-        Write-Output "PSGallery is already $($RepositoryDetails.Trusted)."
+        Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
     }
     else {
         $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-            Write-Output "PSGallery is now trusted."
+            Write-Output "PSGallery is trusted."
             Write-Information -MessageData "Setting PSGallery repository to trusted."
         }
     }
