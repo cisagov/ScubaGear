@@ -1,5 +1,4 @@
-# The purpose of this test is to verify that the required
-# PS modules were installed.
+# The purpose of this test is to verify that the required PS modules were installed.
 
 # Suppress PSSA warnings here at the root of the test file.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -56,6 +55,7 @@ Describe "Initialize-ScubaGear Output Check" {
       }
       elseif ($Key -eq "Time") {
         $Time = $true
+        $Value | Should -BeLessThan 1000
       }
       else {
         # If we get to here, we have encountered an unexpected output, so fail
