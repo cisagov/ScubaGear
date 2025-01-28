@@ -308,8 +308,11 @@ function Install-OPAforSCuBA {
     }
     Write-Output "4"
     if(Test-Path -Path ( Join-Path $ScubaTools $OPAExe) -PathType Leaf) {
+        Write-Output "4a"
         $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-
+        Write-Warning "Result from Confirm OPA Hash"
+        Write-Warning $Result
+        Write-Output "4b"
         if($Result[0]) {
             Write-Output "5"
             Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
