@@ -61,6 +61,7 @@ Describe "Initialize-ScubaGear Output Check" {
         #   # TODO is there a smarter way to just fail in Pester?  This seems convoluted.
         #   # $true | Should -Be $false
         # }
+      }
     }
     # Write-Output "AutoTrust"
     # $AutoTrust | Should -Be $true
