@@ -221,7 +221,9 @@ function Initialize-SCuBA {
     }
     else {
         try {
+            Write-Output "Installing OPA"
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+            Write-Output "Installed OPA"
         }
         catch {
             # $Error[0] | Format-List -Property * -Force | Out-Host
@@ -232,7 +234,6 @@ function Initialize-SCuBA {
 
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
-
     Write-Information -MessageData "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
     Write-Information -MessageData "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 

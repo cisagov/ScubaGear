@@ -13,7 +13,7 @@ BeforeDiscovery {
 }
 
 # Use Write-Warning b/c other writes don't actually write
-# Write-Warning 'Getting required modules...'
+Write-Information -MessageData "Getting required modules..."
 try {
   . PowerShell\ScubaGear\RequiredVersions.ps1
 }
@@ -21,7 +21,7 @@ catch {
   throw "Unable to find RequiredVersions.ps1"
 }
 if ($ModuleList) {
-  Write-Debug 'Found list of modules!'
+  Write-Information -MessageData "Found list of modules!"
 }
 else {
   Write-Warning 'Did NOT find list of modules!!'
@@ -40,14 +40,14 @@ Describe "PowerShell Modules Check" {
 Describe "Initialize-ScubaGear Output Check" {
   It "Expected output statements should exist and have expected values." {
     foreach ($Output in $global:Outputs) {
-      Write-Warning $Output
+      Write-Information -MessageData  $Output
       $AutoTrust = $false
       $TrustPSGallery = $false
       $Time = $false
       $Key = $Output.split(":")[0]
-      Write-Warning " The key is $Key"
+      # Write-Warning " The key is $Key"
       $Value = $Output.split(":")[1]
-      Write-Warning " The value is $Value"
+      # Write-Warning " The value is $Value"
       if ($Key -eq  "AutoTrust") {
         $AutoTrust = $true
       }
@@ -59,15 +59,15 @@ Describe "Initialize-ScubaGear Output Check" {
       }
       else {
         # If we get to here, we have encountered an unexpected output, so fail
-        # TODO is there a smarter way to just fail?
+        # TODO is there a smarter way to just fail in Pester?  This seems convoluted.
         $true | Should -Be $false
       }
     }
-    Write-Warning "AutoTrust"
+    Write-Information -MessageData  "AutoTrust"
     $AutoTrust | Should -Be $true
-    Write-Warning "TrustPSGallery"
+    Write-Information -MessageData  "TrustPSGallery"
     $TrustPSGallery | Should -Be $true
-    Write-Warning "Time"
+    Write-Information -MessageData  "Time"
     $Time | Should -Be $true
   }
 }
