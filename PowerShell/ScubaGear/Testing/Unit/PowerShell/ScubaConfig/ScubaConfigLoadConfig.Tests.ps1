@@ -7,6 +7,17 @@ InModuleScope ScubaConfig {
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
         }
+        context 'Handling repeated keys in YAML file' {
+            It 'Load config with dupliacte keys'{
+                $cfg = [ScubaConfig]::GetInstance()
+                # Load the first file and check the ProductNames value.
+		
+                {[ScubaConfig]::GetInstance().LoadConfig((Join-Path -Path $PSScriptRoot -ChildPath "./MockLoadConfig.yaml"))} | Should -Throw
+            }
+            AfterAll {
+                [ScubaConfig]::ResetInstance()
+            }
+        }
         context 'Handling repeated LoadConfig invocations' {
             It 'Load valid config file followed by another'{
                 $cfg = [ScubaConfig]::GetInstance()
