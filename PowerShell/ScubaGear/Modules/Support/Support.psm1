@@ -337,6 +337,9 @@ function Install-OPAforSCuBA {
     $ErrorActionPreference = $PreferenceStack.Pop()
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
+
+    # Clear the results from calling Confirm-OPAHash so that they don't bubble up.
+    return @()
 }
 
 function Get-OPAFile {
