@@ -63,9 +63,12 @@ Describe "Initialize-ScubaGear Output Check" {
         # TODO is there a smarter way to just fail?
         $true | Should -Be $false 
       }
-      $AutoTrust | Should -Be $true
-      $TrustPSGallery | Should -Be $true
-      $Time | Should -Be $true
     }
+    Write-Warning "AutoTrust"
+    $AutoTrust | Should -Be $true
+    Write-Warning "TrustPSGallery"
+    $TrustPSGallery | Should -Be $true
+    Write-Warning "Time"
+    $Time | Should -Be $true
   }
 }
