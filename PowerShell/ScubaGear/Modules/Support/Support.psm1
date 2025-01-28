@@ -315,11 +315,13 @@ function Install-OPAforSCuBA {
         }
         else {
             if($OPAExe -eq $Filename) {
-                Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
+                # Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
+                Write-Information "SHA256 verification failed, downloading new executable"
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
                 # Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
             }
         }
     }
@@ -367,38 +369,37 @@ function Get-OPAFile {
 }
 
 function Get-ExeHash {
+    <#
+    .FUNCTIONALITY Internal
+    #>
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('name')]
         [string]$Filename,
-
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('version')]
         [string]$ExpectedVersion
     )
-    <#
-    .FUNCTIONALITY Internal
-    #>
+
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
     $OutFile = (Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
-
     try {
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($InstallUrl, $OutFile)
     }
     catch {
-        $Error[0] | Format-List -Property * -Force | Out-Host
-        Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
+        # $Error[0] | Format-List -Property * -Force | Out-Host
+        $Error[0] | Format-List -Property * -Force |
+        # Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
+        Write-Error "Unable to download OPA SHA256 hash for verification"
     }
     finally {
         $WebClient.Dispose()
     }
-
     $Hash = ($(Get-Content $OutFile -raw) -split " ")[0]
     Remove-Item $OutFile
-
     return $Hash
 }
 
@@ -425,7 +426,6 @@ function Confirm-OPAHash {
     if ((Get-FileHash ( Join-Path $ScubaTools $OPAExe ) -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
-
     return $true, "Downloaded OPA version ($ExpectedVersion) SHA256 verified successfully`n"
 }
 
