@@ -292,19 +292,16 @@ function Install-OPAforSCuBA {
     $DebugPreference = "Continue"
     $InformationPreference = "Continue"
     $ErrorActionPreference = "Stop"
-    Write-Output "1"
     $ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
     $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
     if((Test-Path -Path $ScubaTools) -eq $false) {
         New-Item -ItemType Directory -Force -Path $ScubaTools | Out-Null
         # Write-Information "" | Out-Host
     }
-    Write-Output "2"
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
         $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
         throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
     }
-    Write-Output "3"
     $Filename = $FILENAME.$OperatingSystem
     if($OPAExe -eq "") {
         $OPAExe = $Filename
@@ -387,22 +384,26 @@ function Get-ExeHash {
         [Alias('version')]
         [string]$ExpectedVersion
     )
-
+    Write-Output "GEH1"
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename).sha256"
     $OutFile = (Join-Path (Get-Location).Path $InstallUrl.SubString($InstallUrl.LastIndexOf('/')))
+    Write-Output "GEH2"
     try {
+        Write-Output "GEH3"
         $WebClient = New-Object System.Net.WebClient
         $WebClient.DownloadFile($InstallUrl, $OutFile)
     }
     catch {
+        Write-Output "GEH4"
         # $Error[0] | Format-List -Property * -Force | Out-Host
-        $Error[0] | Format-List -Property * -Force |
+        $Error[0] | Format-List -Property * -Force
         # Write-Error "Unable to download OPA SHA256 hash for verification" | Out-Host
         Write-Error "Unable to download OPA SHA256 hash for verification"
     }
     finally {
         $WebClient.Dispose()
     }
+    Write-Output "GEH4"
     $Hash = ($(Get-Content $OutFile -raw) -split " ")[0]
     Remove-Item $OutFile
     return $Hash
@@ -427,10 +428,12 @@ function Confirm-OPAHash {
         [string]
         $Filename
     )
-
+    Write-Output "CO1"
     if ((Get-FileHash ( Join-Path $ScubaTools $OPAExe ) -Algorithm SHA256 ).Hash -ne $(Get-ExeHash -name $Filename -version $ExpectedVersion)) {
+        Write-Output "CO2"
         return $false, "SHA256 verification failed, retry download or install manually. See README under 'Download the required OPA executable' for instructions."
     }
+    Write-Output "CO3"
     return $true, "Downloaded OPA version ($ExpectedVersion) SHA256 verified successfully`n"
 }
 
