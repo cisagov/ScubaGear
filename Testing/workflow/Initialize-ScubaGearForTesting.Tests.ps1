@@ -42,6 +42,7 @@ Describe "Initialize-ScubaGear Output Check" {
       # $Time = $false
       # $TimeValue = 0
       if ($Output.GetType() -is [String]) {
+        Write-Warning "String:"
         Write-Warning $Output
         # $Key = $Output.split(":")[0]
         # $Value = $Output.split(":")[1]
@@ -61,6 +62,10 @@ Describe "Initialize-ScubaGear Output Check" {
         #   # TODO is there a smarter way to just fail in Pester?  This seems convoluted.
         #   # $true | Should -Be $false
         # }
+      }
+      else {
+        Write-Warning "Not String:"
+        Write-Warning $Output
       }
     }
     # Write-Output "AutoTrust"
