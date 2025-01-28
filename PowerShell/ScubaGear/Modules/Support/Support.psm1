@@ -294,7 +294,7 @@ function Install-OPAforSCuBA {
     $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
     if((Test-Path -Path $ScubaTools) -eq $false) {
         New-Item -ItemType Directory -Force -Path $ScubaTools
-        Write-Information "" | Out-Host
+        # Write-Information "" | Out-Host
     }
 
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
@@ -319,7 +319,7 @@ function Install-OPAforSCuBA {
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
-                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+                # Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
             }
         }
     }
