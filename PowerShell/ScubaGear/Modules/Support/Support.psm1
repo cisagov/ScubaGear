@@ -221,9 +221,9 @@ function Initialize-SCuBA {
     }
     else {
         try {
-            Write-Output -MessageData "Installing OPA"
+            Write-Output "Installing OPA"
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
-            Write-Output -MessageData "Installed OPA"
+            Write-Output "Installed OPA"
         }
         catch {
             # $Error[0] | Format-List -Property * -Force | Out-Host
@@ -324,7 +324,7 @@ function Install-OPAforSCuBA {
             }
             else {
                 # Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
-                Write-Warning -MessageData "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
+                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script"
             }
         }
     }
