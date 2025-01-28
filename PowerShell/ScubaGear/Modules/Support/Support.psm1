@@ -48,6 +48,24 @@ function Initialize-SCuBA {
         switch is set then any existing module will be re-installed even if
         already at latest version. If the SkipUpdate switch is set then any
         existing module will not be updated to th latest version.
+    .PARAMETER $Force
+        Installs a given module and overrides warning messages about module installation conflicts. If a module with the same name already exists on the computer, Force allows for multiple versions to be installed. If there is an existing module with the same name and version, Force overwrites that version.
+    .PARAMETER $SkipUpdate
+        If specified then modules will not be updated to latest version.
+    .PARAMETER $DoNotAutoTrustRepository
+        Do not automatically trust the PSGallery repository for module installation.
+    .PARAMETER $NoOPA
+        Do not download OPA
+    .PARAMETER $ExpectedVersion
+        The version of OPA Rego to be downloaded, must be in "x.x.x" format.
+    .PARAMETER $OperatingSystem
+        The operating system the program is running on.
+    .PARAMETER $OPAExe
+        The file name that the opa executable is to be saved as.
+    .PARAMETER $ScubaParentDirectory
+        Directory to contain ScubaGear artifacts. Defaults to <home>.
+    .PARAMETER $Scope
+        Specifies the Install-Module scope of the dependent PowerShell modules. Acceptable values are AllUsers and CurrentUser. Defaults to CurrentUser.
     .EXAMPLE
         Initialize-SCuBA
     .EXAMPLE
@@ -59,44 +77,36 @@ function Initialize-SCuBA {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $false, HelpMessage = 'Installs a given module and overrides warning messages about module installation conflicts. If a module with the same name already exists on the computer, Force allows for multiple versions to be installed. If there is an existing module with the same name and version, Force overwrites that version')]
+        [Parameter(Mandatory = $false)]
         [switch]
         $Force,
-
-        [Parameter(HelpMessage = 'If specified then modules will not be updated to latest version')]
+        [Parameter()]
         [switch]
         $SkipUpdate,
-
-        [Parameter(HelpMessage = 'Do not automatically trust the PSGallery repository for module installation')]
+        [Parameter()]
         [switch]
         $DoNotAutoTrustRepository,
-
-        [Parameter(HelpMessage = 'Do not download OPA')]
+        [Parameter()]
         [switch]
         $NoOPA,
-
-        [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+        [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
         $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
-
-        [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+        [Parameter(Mandatory = $false)]
         [ValidateSet('Windows','MacOS','Linux')]
         [Alias('os')]
         [string]
         $OperatingSystem  = "Windows",
-
-        [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+        [Parameter(Mandatory = $false)]
         [Alias('name')]
         [string]
         $OPAExe = "",
-
-        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain ScubaGear artifacts. Defaults to <home>.')]
+        [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ScubaParentDirectory = $env:USERPROFILE,
-
-        [Parameter(Mandatory=$false, HelpMessage = 'Specifies the Install-Module scope of the dependent PowerShell modules. Acceptable values are AllUsers and CurrentUser. Defaults to CurrentUser')]
+        [Parameter(Mandatory=$false)]
         [ValidateSet('CurrentUser','AllUsers')]
         [string]
         $Scope = 'CurrentUser'
@@ -166,16 +176,12 @@ function Initialize-SCuBA {
     }
 
     foreach ($Module in $ModuleList) {
-
         $ModuleName = $Module.ModuleName
-
         if (Get-Module -ListAvailable -Name $ModuleName) {
             $HighestInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
             $LatestVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
-
             if ($HighestInstalledVersion -ge $LatestVersion) {
                 Write-Debug "${ModuleName}: ${HighestInstalledVersion} already has latest installed."
-
                 if ($Force -eq $true) {
                     Install-Module -Name $ModuleName `
                         -Force `
@@ -239,28 +245,33 @@ function Install-OPAforSCuBA {
         assessment tool
     .DESCRIPTION
         Installs the OPA executable required to support SCuBAGear.
+    .PARAMETER $ExpectedVersion
+        The version of OPA Rego to be downloaded, must be in "x.x.x" format.
+    .PARAMETER $OPAExe
+        The file name that the opa executable is to be saved as.
+    .PARAMETER $OperatingSystem
+        The operating system the program is running on.
+    .PARAMETER $ScubaParentDirectory
+        Directory to contain ScubaGear artifacts. Defaults to <home>.
     .EXAMPLE
         Install-OPAforSCuBA
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $false, HelpMessage = 'The version of OPA Rego to be downloaded, must be in "x.x.x" format')]
+        [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
         $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
-
-        [Parameter(Mandatory = $false, HelpMessage = 'The file name that the opa executable is to be saved as')]
+        [Parameter(Mandatory = $false)]
         [Alias('name')]
         [string]
         $OPAExe = "",
-
-        [Parameter(Mandatory = $false, HelpMessage = 'The operating system the program is running on')]
+        [Parameter(Mandatory = $false)]
         [ValidateSet('Windows','MacOS','Linux')]
         [Alias('os')]
         [string]
         $OperatingSystem  = "Windows",
-
-        [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain ScubaGear artifacts. Defaults to <home>.')]
+        [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
         $ScubaParentDirectory = $env:USERPROFILE
@@ -270,7 +281,7 @@ function Install-OPAforSCuBA {
     $ACCEPTABLEVERSIONS = '0.69.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
-    # Set prefernces for writing messages
+    # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
     $PreferenceStack.Push($DebugPreference)
     $PreferenceStack.Push($InformationPreference)
@@ -283,7 +294,7 @@ function Install-OPAforSCuBA {
     $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
     if((Test-Path -Path $ScubaTools) -eq $false) {
         New-Item -ItemType Directory -Force -Path $ScubaTools
-        Write-Output "" | Out-Host
+        Write-Information "" | Out-Host
     }
 
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
