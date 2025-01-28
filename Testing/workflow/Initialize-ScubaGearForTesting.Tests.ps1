@@ -37,36 +37,32 @@ Describe "PowerShell Modules Check" {
 }
 
 Describe "Initialize-ScubaGear Output Check" {
-  It "Expected output statements should exist and have expected values." {
-    foreach ($Output in $global:Outputs) {
-      $PSGallery = $false
-      $DownloadedOPAVersion = $false
-      $SetupTime = $false
-      $SetupTimeValue = 0
-      if ($Output.GetType().Name -eq 'String') {
-        Write-Warning "String:"
-        Write-Warning $Output
-        if ($Output.StartsWith("PSGallery is trusted")) {
-          $PSGallery = $true
-        }
-        elseif ($Output.StartsWith("Downloaded OPA version")) {
-          $DownloadedOPAVersion = $true
-        }
-        elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
-          $SetupTime = $true
-          $SetupTimeValue = [int]$Output.split(":")[1]
-        }
+  foreach ($Output in $global:Outputs) {
+    $global:PSGallery = $false
+    $global:DownloadedOPAVersion = $false
+    $global:SetupTime = $false
+    $global:SetupTimeValue = 0
+    if ($Output.GetType().Name -eq "String") {
+      Write-Warning $Output
+      if ($Output.StartsWith("PSGallery is trusted")) {
+        $PSGallery = $true
       }
-      else {
-        Write-Warning $Output.GetType()
-        Write-Warning $Output
+      elseif ($Output.StartsWith("Downloaded OPA version")) {
+        $DownloadedOPAVersion = $true
+      }
+      elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
+        $SetupTime = $true
+        $SetupTimeValue = [int]$Output.split(":")[1]
       }
     }
-    Write-Output "PSGallery"
+  }
+  It "PSGallery should be trust" {
     $PSGallery | Should -Be $true
-    Write-Output "DownloadOPAVersion"
+  }
+  It "OPA should be downloaded" {
     $DownloadedOPAVersion | Should -Be $true
-    Write-Output "SetupTime"
+  }
+  It "Setup time should be minimal" {
     $SetupTime | Should -Be $true
     $SetupTimeValue | Should -BeLessThan 1000
   }
