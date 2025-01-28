@@ -404,19 +404,17 @@ function Get-ExeHash {
 
 function Confirm-OPAHash {
     <#
-    .FUNCTIONALITY Internal
+        .FUNCTIONALITY Internal
     #>
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('out')]
         [string]$OPAExe,
-
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('version')]
         [string]$ExpectedVersion,
-
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('name')]
@@ -432,29 +430,28 @@ function Confirm-OPAHash {
 }
 
 function InstallOPA {
+    <#
+        .FUNCTIONALITY Internal
+    #>
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('out')]
         [string]$OPAExe,
-
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('version')]
         [string]$ExpectedVersion,
-
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
         [Alias('name')]
         [string]
         $Filename
     )
-    <#
-    .FUNCTIONALITY Internal
-    #>
+
     Get-OPAFile -out $OPAExe -version $ExpectedVersion -name $Filename
     $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-    $Result[1] | Out-Host
+    # $Result[1] | Out-Host
 }
 
 function Debug-SCuBA {
@@ -478,11 +475,9 @@ function Debug-SCuBA {
         [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
         [string]
         $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
-
         [Parameter(Mandatory=$false, HelpMessage = 'Include ScubaGear report on tenant configuration?')]
         [switch]
         $IncludeReports  = $false,
-
         [Parameter(Mandatory=$false, HelpMessage = 'Include all available ScubaGear report on tenant configuration?')]
         [switch]
         $AllReports = $false
