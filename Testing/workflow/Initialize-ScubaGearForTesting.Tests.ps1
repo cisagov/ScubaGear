@@ -8,36 +8,8 @@ BeforeDiscovery {
   # Source the function
   . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
-  $global:Outputs = Initialize-ScubaGearForTesting
-}
-
-# Use Write-Warning b/c other writes don't actually write
-Write-Output "Getting required modules..."
-try {
-  . PowerShell\ScubaGear\RequiredVersions.ps1
-}
-catch {
-  throw "Unable to find RequiredVersions.ps1"
-}
-if ($ModuleList) {
-  Write-Output "Found list of modules!"
-}
-else {
-  Write-Warning 'Did NOT find list of modules!!'
-}
-
-Describe "PowerShell Modules Check" {
-  foreach ($Module in $ModuleList) {
-    $global:ModuleName = $Module.ModuleName
-    It "Module $global:moduleName should be installed" {
-      $module = Get-Module -ListAvailable -Name $global:ModuleName
-      $module | Should -Not -BeNullOrEmpty
-    }
-  }
-}
-
-Describe "Initialize-ScubaGear Output Check" {
-  foreach ($Output in $global:Outputs) {
+  $Outputs = Initialize-ScubaGearForTesting
+  foreach ($Output in $Outputs) {
     $global:PSGallery = $false
     $global:DownloadedOPAVersion = $false
     $global:SetupTime = $false
@@ -56,7 +28,35 @@ Describe "Initialize-ScubaGear Output Check" {
       }
     }
   }
-  It "PSGallery should be trust" {
+}
+
+# Use Write-Warning b/c other writes don't actually write
+Write-Warning "Getting required modules..."
+try {
+  . PowerShell\ScubaGear\RequiredVersions.ps1
+}
+catch {
+  throw "Unable to find RequiredVersions.ps1"
+}
+if ($ModuleList) {
+  Write-Warning "Found list of modules!"
+}
+else {
+  Write-Warning 'Did NOT find list of modules!!'
+}
+
+Describe "PowerShell Modules Check" {
+  foreach ($Module in $ModuleList) {
+    $global:ModuleName = $Module.ModuleName
+    It "Module $global:moduleName should be installed" {
+      $module = Get-Module -ListAvailable -Name $global:ModuleName
+      $module | Should -Not -BeNullOrEmpty
+    }
+  }
+}
+
+Describe "Initialize-ScubaGear Output Check" {
+  It "PSGallery should be trusted" {
     $global:PSGallery | Should -Be $true
   }
   It "OPA should be downloaded" {
