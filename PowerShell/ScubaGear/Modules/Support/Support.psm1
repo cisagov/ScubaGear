@@ -292,31 +292,33 @@ function Install-OPAforSCuBA {
     $DebugPreference = "Continue"
     $InformationPreference = "Continue"
     $ErrorActionPreference = "Stop"
-
+    Write-Output "1"
     $ScubaHiddenHome = Join-Path -Path $ScubaParentDirectory -ChildPath '.scubagear'
     $ScubaTools = Join-Path -Path $ScubaHiddenHome -ChildPath 'Tools'
     if((Test-Path -Path $ScubaTools) -eq $false) {
-        New-Item -ItemType Directory -Force -Path $ScubaTools
+        New-Item -ItemType Directory -Force -Path $ScubaTools | Out-Null
         # Write-Information "" | Out-Host
     }
-
+    Write-Output "2"
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
         $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
         throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
     }
-
+    Write-Output "3"
     $Filename = $FILENAME.$OperatingSystem
     if($OPAExe -eq "") {
         $OPAExe = $Filename
     }
-
+    Write-Output "4"
     if(Test-Path -Path ( Join-Path $ScubaTools $OPAExe) -PathType Leaf) {
         $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
 
         if($Result[0]) {
+            Write-Output "5"
             Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
         }
         else {
+            Write-Output "6"
             if($OPAExe -eq $Filename) {
                 # Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
                 Write-Information -MessageData "SHA256 verification failed, downloading new executable"
