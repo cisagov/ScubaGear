@@ -113,7 +113,6 @@ function Initialize-SCuBA {
     if ($DoNotAutoTrustRepository) {
         Write-Output "AutoTrust:False"
         $RepositoryDetails = Get-PSRepository -Name "PSGallery"
-        # TODO determine if it's trusted
         Write-Output "TrustPSGallery:$($RepositoryDetails.Trusted)"
     }
     else {
@@ -227,7 +226,6 @@ function Initialize-SCuBA {
     $Stopwatch.stop()
 
     Write-Debug "ScubaGear setup time elapsed: $([math]::Round($stopwatch.Elapsed.TotalSeconds,0)) seconds."
-    # JAMES TODO ALL LIKE THIS
     Write-Output "Time:$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()

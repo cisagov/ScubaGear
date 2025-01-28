@@ -43,14 +43,29 @@ Describe "Initialize-ScubaGear Output Check" {
     foreach ($Output in $global:Outputs) {
       Write-Warning $Output
       $AutoTrust = $false
-      # $TrustPSGallery = $false
-      # $Time = $false
+      $TrustPSGallery = $false
+      $Time = $false
       $Key = $Output.split(":")[0]
-      # $Value = $Output.split(":")[1]
+      Write-Warning "The key is $Key"
+      $Value = $Output.split(":")[1]
+      Write-Warning "The value is $Value"
       if ($Key -eq  "AutoTrust") {
         $AutoTrust = $true
       }
+      elseif ($Key -eq "TrustPSGallery") {
+        $TrustPSGallery = $true
+      }
+      elseif ($Key -eq "Time") {
+        $Time = $true
+      }
+      else {
+        # If we get to here, we have encountered an unexpected output, so fail
+        # TODO is there a smarter way to just fail?
+        $true | Should -Be $false 
+      }
       $AutoTrust | Should -Be $true
+      $TrustPSGallery | Should -Be $true
+      $Time | Should -Be $true
     }
   }
 }
