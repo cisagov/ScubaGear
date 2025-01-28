@@ -55,41 +55,30 @@ function Connect-Tenant {
        try {
            switch ($Product) {
                "aad" {
-                   $GraphScopes = (
-                       'User.Read.All',
-                       'Policy.Read.All',
-                       'Organization.Read.All',
-                       'RoleManagement.Read.Directory',
-                       'GroupMember.Read.All',
-                       'Directory.Read.All',
-                       'PrivilegedEligibilitySchedule.Read.AzureADGroup',
-                       'PrivilegedAccess.Read.AzureADGroup',
-                       'RoleManagementPolicy.Read.AzureADGroup'
-                   )
-                   $GraphParams = @{
+                    $GraphScopes = Get-ScubaGearPermissions -Product "aad" -Environment $M365Environment
+
+                    $GraphParams = @{
                        'M365Environment' = $M365Environment;
                        'Scopes' = $GraphScopes;
-                   }
-                   if($ServicePrincipalParams) {
-                    $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                   }
-                   Connect-GraphHelper @GraphParams
-                   $AADAuthRequired = $false
+                    }
+                    if($ServicePrincipalParams) {
+                        $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                    }
+                    Connect-GraphHelper @GraphParams
+                    $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
                    if($_ -eq "defender" -and $AADAuthRequired) {
-                       $GraphScopes = (
-                           'User.Read.All'
-                       )
-                       $GraphParams = @{
+                        $GraphScopes = Get-ScubaGearPermissions -Product "defender" -Environment $M365Environment
+                        $GraphParams = @{
                            'M365Environment' = $M365Environment;
                            'Scopes'          = $GraphScopes;
-                       }
-                       if($ServicePrincipalParams) {
-                        $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                       }
-                       Connect-GraphHelper @GraphParams
-                       $AADAuthRequired = $false
+                        }
+                        if($ServicePrincipalParams) {
+                            $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                        }
+                        Connect-GraphHelper @GraphParams
+                        $AADAuthRequired = $false
                    }
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
@@ -151,35 +140,27 @@ function Connect-Tenant {
                        $PnPParams = @{
                            'ErrorAction' = 'Stop';
                        }
+
+                       #pull api endpoint from json
+                       $Url = Get-ScubaGearPermissions -Product "sharepoint" -Environment $M365Environment -Domain $InitialDomainPrefix -OutAs endpoint
+                       $SPOParams += @{
+                            'Url'= $Url;
+                       }
+                       $PnPParams += @{
+                            'Url'= $Url;
+                       }
+
+                       #populate the rest of the parameters for splatting
                        switch ($M365Environment) {
-                           {($_ -eq "commercial") -or ($_ -eq "gcc")} {
-                               $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
-                               }
-                               $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
-                               }
-                           }
-                           "gcchigh" {
-                               $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.us";
-                                   'Region' = "ITAR";
-                               }
-                               $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint.us";
-                                   'AzureEnvironment' = 'USGovernmentHigh'
-                               }
-                           }
-                           "dod" {
-                               $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint-mil.us";
-                                   'Region' = "ITAR";
-                               }
-                               $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint-mil.us";
-                                   'AzureEnvironment' = 'USGovernmentDoD'
-                               }
-                           }
+                            "gcchigh" {
+                                 $SPOParams += @{'Region' = "ITAR"; }
+                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentHigh';}
+                            }
+                            "dod" {
+                                 $SPOParams += @{'Region' = "ITAR"; }
+                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentDoD';}
+                            }
+
                        }
                        if ($ServicePrincipalParams.CertThumbprintParams) {
                            $PnPParams += @{

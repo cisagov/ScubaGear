@@ -24,19 +24,26 @@ Configuring a service principal is beyond the scope of these instructions, but M
 
 The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
 
-| Product                 | API Permissions                                 | Role          |
-| ----------------------- | ----------------------------------------------- | ------------- |
-| Entra ID                | Directory.Read.All, GroupMember.Read.All,       |               |
-|                         | Organization.Read.All, Policy.Read.All,         |               |
-|                         | RoleManagement.Read.Directory, User.Read.All    |               |
-|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |
-|                         | PrivilegedAccess.Read.AzureADGroup              |               |
-|                         | RoleManagementPolicy.Read.AzureADGroup          |               |
-| Defender for Office 365 | Exchange.ManageAsApp                            | Global Reader |
-| Exchange Online         | Exchange.ManageAsApp                            | Global Reader |
-| Power Platform          | (see below)                                     |               |
-| SharePoint Online       | Sites.FullControl.All, Directory.Read.All       |               |
-| Microsoft Teams         |                                                 | Global Reader |
+| ScubaGear Product       | API Permissions                                 | Role          | API Name                              | API APPID                             |
+| ----------------------- | ----------------------------------------------- | ------------- | ------------------------------------- | ------------------------------------- |
+| Entra ID (aad)          | User.Read.All                                   |               | Microsoft.Graph                       | 00000003-0000-0000-c000-000000000000  |
+|                         | Directory.Read.All                              |               |                                       |                                       |
+|                         | Policy.Read.All                                 |               |                                       |                                       |
+|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |                                       |                                       |
+|                         | PrivilegedAccess.Read.AzureADGroup              |               |                                       |                                       |
+|                         | RoleAssignmentSchedule.Read.Directory           |               |                                       |                                       |
+|                         | RoleEligibilitySchedule.Read.Directory          |               |                                       |                                       |
+|                         | RoleManagementPolicy.Read.Directory             |               |                                       |                                       |
+| Defender                |                                                 | Global Reader |                                       |                                       |
+| Exchange (exo)          | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online            | 00000002-0000-0ff1-ce00-000000000000  |
+|                         | Exchange.ManageAsApp                            |               | **Microsoft Exchange Online Protection**<sup>1</sup>| **00000007-0000-0ff1-ce00-000000000000**<sup>1</sup> |
+| Power Platform          | (see below)                                     |               |                                       |                                       |
+| SharePoint              | Sites.FullControl.All                           |               | SharePoint                            | 00000003-0000-0ff1-ce00-000000000000  |
+| Microsoft Teams (teams) |                                                 | Global Reader |                                       |                                       |
+
+
+> [!IMPORTANT]
+> Required for Azure Government and DOD Tenants only (GCCH / DoD) [^1]
 
 ## Certificate Thumbprint
 
