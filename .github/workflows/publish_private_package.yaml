@@ -82,7 +82,6 @@ jobs:
             # This step helps us verify that ScubaGear is in a state where it can be
             # published to PSGallery.
             $ModuleVersion = Publish-ScubaGearModule @Parameters
-            # Publish-ScubaGearModule @Parameters
             Write-Output "The module version is $ModuleVersion"
             echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
