@@ -118,6 +118,7 @@
         "notes": ""
     },
 
+    
     {
         "moduleCmdlet": "Invoke-MgGraphRequest",
         "apiResource": "/v1.0/me",
@@ -144,6 +145,39 @@
         ],
         "notes": ""
     },
+
+    {
+        "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyRule",
+        "apiResource": "/beta/policies/roleManagementPolicies/{unifiedRoleManagementPolicy-id}/rules",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "RoleManagementPolicy.Read.Directory",
+            "RoleManagementPolicy.Read.AzureADGroup"
+        ],
+        "higherPermissions": [
+            "RoleManagementPolicy.ReadWrite.Directory",
+            "RoleManagement.ReadWrite.Directory",
+            "RoleManagement.Read.All",
+            "RoleManagementPolicy.ReadWrite.AzureADGroup"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http",
+            "https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": ["Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."]
+    },
+
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRole",
         "apiResource": "/beta/directoryRoles",
@@ -235,7 +269,7 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRoleTemplate?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/directoryroletemplate-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
     },
 
     {
@@ -516,7 +550,10 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyRoleManagementPolicyAssignment?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyassignment-get?view=graph-rest-beta"
         ],
-        "notes": "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'"
+        "notes": [
+            "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'",
+            "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
+        ]
     },
 
     {
@@ -579,7 +616,7 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/rbacapplication-list-roleassignmentscheduleinstances?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ""
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
     },
 
     {
