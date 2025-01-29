@@ -54,12 +54,8 @@ jobs:
         id: key-vault-info
         # Stop the workflow if logging into Azure failed.
         if: ${{ success() }}
-        # TODO: Remove this env, just use the secret already
-        env:
-          # KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
-          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+          $KeyVaultInfo = ${{ secrets.KeyVaultInfo }} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Create Private Gallery
