@@ -310,7 +310,7 @@ function Install-OPAforSCuBA {
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
-                Write-Warning -MessageData "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
             }
         }
     }
