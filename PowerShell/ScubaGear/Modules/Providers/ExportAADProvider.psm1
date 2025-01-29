@@ -1,12 +1,6 @@
-# Many of the commandlets can be replaced with direct API access, but we are starting the transition with the ones
-# below because they have slow imports that affect performance more than the others. Some commandlets are fast
-# and there is no obvoius performance advantage to using the API beyond maybe batching.
-$GraphEndpoints = @{
-    "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" = "/beta/roleManagement/directory/roleEligibilityScheduleInstances"
-    "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" = "/beta/roleManagement/directory/roleAssignmentScheduleInstances"
-    "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" = "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances"
-    "Get-MgBetaPrivilegedAccessResource" = "/beta/privilegedAccess/aadGroups/resources"
-}
+# Many of the cmdlets can be replaced with direct API access, but we are starting the transition with the ones
+# below because they have slow imports that affect performance more than the others. Some cmdlets are fast
+# and there is no obvious performance advantage to using the API beyond maybe batching.
 
 function Invoke-GraphDirectly {
     param (
@@ -23,20 +17,12 @@ function Invoke-GraphDirectly {
     )
 
     Write-Debug "Replacing Cmdlet: $commandlet"
-    try {
-        $endpoint = $GraphEndpoints[$commandlet]
-    } catch {
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
-    }
 
-    if ($M365Environment -eq "gcchigh") {
-        $endpoint = "https://graph.microsoft.us" + $endpoint
-    }
-    elseif ($M365Environment -eq "dod") {
-        $endpoint = "https://dod-graph.microsoft.us" + $endpoint
-    }
-    else {
-        $endpoint = "https://graph.microsoft.com" + $endpoint
+
+    #use Get-ScubaGearPermissions to convert cmdlets to API calls
+    $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment
+    If($null -eq $endpoint){
+        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     if ($queryParams) {
@@ -622,4 +608,3 @@ function Get-PrivilegedRole {
     # Return the array
     $PrivilegedRoleArray
 }
-
