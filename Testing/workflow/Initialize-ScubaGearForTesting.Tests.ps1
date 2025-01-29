@@ -26,7 +26,7 @@ BeforeDiscovery {
       }
       elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
         $global:SetupTime = $true
-        $global:SetupTimeValue = [int]$Output.split(":")[1]
+        $global:SetupTimeValue = [int]$Output.split(": ")[1]
       }
     }
   }

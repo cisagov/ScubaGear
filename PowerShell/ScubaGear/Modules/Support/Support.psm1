@@ -130,7 +130,6 @@ function Initialize-SCuBA {
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Write-Output "PSGallery is trusted."
-            Write-Information -MessageData "Setting PSGallery repository to trusted."
         }
     }
 
@@ -229,7 +228,7 @@ function Initialize-SCuBA {
 
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
-    Write-Output "ScubaGear setup time elapsed (in seconds):$([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
+    Write-Output "ScubaGear setup time elapsed (in seconds): $([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
