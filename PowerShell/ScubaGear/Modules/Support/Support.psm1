@@ -306,11 +306,11 @@ function Install-OPAforSCuBA {
         }
         else {
             if($OPAExe -eq $Filename) {
-                Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
+                Write-Information -MessageData "SHA256 verification failed, downloading new executable" | Out-Host
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
             }
             else {
-                Write-Warning "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
+                Write-Warning -MessageData "SHA256 verification failed, please confirm file name is correct & remove old file before running script" | Out-Host
             }
         }
     }
@@ -436,8 +436,9 @@ function InstallOPA {
     )
 
     Get-OPAFile -out $OPAExe -version $ExpectedVersion -name $Filename
-    $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-    $Result[1] | Out-Host
+    Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+    # $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
+    # $Result[1] | Out-Host
 }
 
 function Debug-SCuBA {
