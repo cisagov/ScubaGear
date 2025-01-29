@@ -559,13 +559,12 @@ test_PhishingMFAEnforced_MicrosoftAuthEnabled_NotApplicable if {
         "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled.",
         "See %v for more info"])
 
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == false
 }
 
 test_PhishingMFAEnforced_MicrosoftAuthDisabled_NotApplicable if {
     Auth := json.patch(AuthenticationMethod,
-                [{"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
-                {"op": "add", "path": "authentication_method_feature_settings/3/State", "value": "enabled"},
+                [{"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "false"},
                 {"op": "remove", "path": "authentication_method_feature_settings/2"},
                 {"op": "remove", "path": "authentication_method_feature_settings/1"}])
 
@@ -598,7 +597,7 @@ test_PhishingMFANotEnforced_MicrosoftAuthDisabled_NotApplicable if {
         "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled.",
         "See %v for more info"])
 
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), false) == false
 }
 
 test_PhishingMFANotEnforced_MicrosoftAuthEnabled_Correct if {

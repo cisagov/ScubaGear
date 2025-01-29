@@ -276,14 +276,9 @@ MSAuthProperlyConfigured := true if {
 }
 
 default AAD_3_3_Not_Applicable := false
-# Returns true no matter what if phishing-resistant MFA is being enforced
-AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) > 0
-}
 
 # Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
 AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) == 0
     MSAuthEnabled == false
 }
 
@@ -312,7 +307,6 @@ tests contains {
     "RequirementMet": Status
 } if {
     AAD_3_3_Not_Applicable == false
-
     Status := MSAuthProperlyConfigured == true
 }
 
