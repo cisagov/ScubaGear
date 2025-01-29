@@ -175,7 +175,7 @@
             "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http",
             "https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ["Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."]
+        "notes": ["Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."]
     },
 
     {

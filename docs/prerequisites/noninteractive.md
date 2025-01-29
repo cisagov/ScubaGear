@@ -34,6 +34,7 @@ The minimum permissions and roles that must be assigned to the service principal
 |                         | RoleAssignmentSchedule.Read.Directory           |               |                                       |                                       |
 |                         | RoleEligibilitySchedule.Read.Directory          |               |                                       |                                       |
 |                         | RoleManagementPolicy.Read.Directory             |               |                                       |                                       |
+|                         | RoleManagementPolicy.Read.AzureADGroup          |               |                                       |                                       |
 | Defender                |                                                 | Global Reader |                                       |                                       |
 | Exchange (exo)          | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online            | 00000002-0000-0ff1-ce00-000000000000  |
 |                         | Exchange.ManageAsApp                            |               | **Microsoft Exchange Online Protection**<sup>1</sup>| **00000007-0000-0ff1-ce00-000000000000**<sup>1</sup> |
