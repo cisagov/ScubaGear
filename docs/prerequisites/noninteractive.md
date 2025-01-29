@@ -44,7 +44,7 @@ The minimum permissions and roles that must be assigned to the service principal
 
 
 > [!IMPORTANT]
-> Required for Azure Government and DOD Tenants only (GCCH / DoD) [^1]
+> Required for Azure Government and DOD Tenants only (GCCH / DoD) <sup>1</sup>
 
 ## Certificate Thumbprint
 
