@@ -14,10 +14,6 @@ on:
         required: true
       KeyVaultInfo:
         required: true
-  workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/publish_private_package.yaml"
 
 permissions:
   id-token: write
@@ -50,12 +46,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          # client-id: ${{ secrets.ClientId }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          # tenant-id: ${{ secrets.TenantId }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          # subscription-id: ${{ secrets.SubscriptionId }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ClientId }}
+          tenant-id: ${{ secrets.TenantId }}
+          subscription-id: ${{ secrets.SubscriptionId }}
           enable-AzPSSession: true
       - name: Get Key Vault Info
         id: key-vault-info
@@ -131,7 +124,7 @@ jobs:
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
           # Check for the expected description.
           if ($DescriptionFixed -ne $ExpectedFixed) {
-            Write-Output "::error::The name of the published module should be $ExpectedDescription"
+            Write-Output "::error::The description of the published module should be $ExpectedDescription"
             exit 1
           }
           # Source the function
