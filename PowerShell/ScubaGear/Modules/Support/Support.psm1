@@ -305,7 +305,6 @@ function Install-OPAforSCuBA {
             Write-Debug "${OPAExe}: ${ExpectedVersion} already has latest installed."
         }
         else {
-            Write-Output "6"
             if($OPAExe -eq $Filename) {
                 Write-Information "SHA256 verification failed, downloading new executable" | Out-Host
                 InstallOPA -out $OPAExe -version $ExpectedVersion -name $Filename
