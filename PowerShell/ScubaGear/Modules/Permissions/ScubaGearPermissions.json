@@ -62,7 +62,7 @@
         ],
         "notes": ""
     },
-    
+
     {
         "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
         "apiResource": "/roleManagement/directory/roleAssignments",
@@ -89,7 +89,7 @@
         ],
         "notes": ""
     },
-    
+
     {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
         "apiResource": "/servicePrincipals/{servicePrincipal-id}/appRoleAssignments",
@@ -118,6 +118,7 @@
         "notes": ""
     },
 
+    
     {
         "moduleCmdlet": "Invoke-MgGraphRequest",
         "apiResource": "/v1.0/me",
@@ -143,7 +144,40 @@
             "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
         ],
         "notes": ""
-    }, 
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyRule",
+        "apiResource": "/beta/policies/roleManagementPolicies/{unifiedRoleManagementPolicy-id}/rules",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "RoleManagementPolicy.Read.Directory",
+            "RoleManagementPolicy.Read.AzureADGroup"
+        ],
+        "higherPermissions": [
+            "RoleManagementPolicy.ReadWrite.Directory",
+            "RoleManagement.ReadWrite.Directory",
+            "RoleManagement.Read.All",
+            "RoleManagementPolicy.ReadWrite.AzureADGroup"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http",
+            "https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": ["Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."]
+    },
+
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRole",
         "apiResource": "/beta/directoryRoles",
@@ -161,9 +195,9 @@
         "spRolePermissions": [],
         "scubaGearProduct": ["aad"],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -171,7 +205,7 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRole?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/directoryrole-list?view=graph-rest-beta"
         ],
-        "notes": ""  
+        "notes": ""
     },
 
     {
@@ -193,9 +227,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -225,9 +259,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -235,12 +269,12 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRoleTemplate?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/directoryroletemplate-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
     },
 
     {
-        "moduleCmdlet": "Get-MgBetaDirectorySettings",
-        "apiResource": "/beta/directorySettings",
+        "moduleCmdlet": "Get-MgBetaDirectorySetting",
+        "apiResource": "/beta/settings",
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -257,9 +291,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -288,9 +322,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -321,9 +355,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -344,7 +378,7 @@
             "GroupMember.Read.All"
         ],
         "higherPermissions": [
-            "Group.Read.All,",
+            "Group.Read.All",
             "Group.ReadWrite.All",
             "Directory.Read.All",
             "GroupMember.ReadWrite.All"
@@ -354,9 +388,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -382,9 +416,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -412,9 +446,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -444,9 +478,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -474,9 +508,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -497,18 +531,18 @@
             "RoleManagementPolicy.Read.Directory"
         ],
         "higherPermissions": [
+            "RoleManagementPolicy.ReadWrite.Directory",
             "RoleManagement.ReadWrite.Directory",
-            "RoleManagement.Read.All",
-            "RoleManagementPolicy.ReadWrite.Directory"
+            "RoleManagement.Read.Directory"
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -516,7 +550,10 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyRoleManagementPolicyAssignment?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyassignment-get?view=graph-rest-beta"
         ],
-        "notes": "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'"
+        "notes": [
+            "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'",
+            "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
+        ]
     },
 
     {
@@ -536,9 +573,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -569,9 +606,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -579,7 +616,7 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/rbacapplication-list-roleassignmentscheduleinstances?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ""
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
     },
 
     {
@@ -602,9 +639,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -634,9 +671,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -667,9 +704,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -678,7 +715,7 @@
             "https://learn.microsoft.com/graph/api/user-list?view=graph-rest-beta"
         ],
         "notes": ""
-    },  
+    },
 
     {
         "moduleCmdlet": "Get-MgBetaUserCount",
@@ -699,9 +736,9 @@
             "aad"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -729,7 +766,7 @@
             "exo"
         ],
         "supportedEnv": [
-            "commercial", 
+            "commercial",
             "gcc"
         ],
         "resourceAPIAppId": "00000002-0000-0ff1-ce00-000000000000",
@@ -790,7 +827,7 @@
         ],
         "notes": ""
     },
-    
+
     {
         "moduleCmdlet": "Connect-IPPSSession",
         "apiResource": "https://ps.compliance.protection.outlook.com/powershell-liveid/",
@@ -805,10 +842,11 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
+            "exo",
             "defender"
         ],
         "supportedEnv": [
-            "commercial", 
+            "commercial",
             "gcc"
         ],
         "resourceAPIAppId": "00000002-0000-0ff1-ce00-000000000000",
@@ -832,6 +870,7 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
+            "exo",
             "defender"
         ],
         "supportedEnv": [
@@ -858,6 +897,7 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
+            "exo",
             "defender"
         ],
         "supportedEnv": [
@@ -872,7 +912,7 @@
 
     {
         "moduleCmdlet": "Connect-MicrosoftTeams",
-        "apiResource": "v1.0/groups/{id}/team",
+        "apiResource": "https://*.api.interfaces.records.teams.microsoft.com",
         "poshModule": [
             "MicrosoftTeams"
         ],
@@ -885,9 +925,9 @@
             "teams"
         ],
         "supportedEnv": [
-            "commercial", 
-            "gcc", 
-            "gcchigh", 
+            "commercial",
+            "gcc",
+            "gcchigh",
             "dod"
         ],
         "resourceAPIAppId": "ab3be6b7-f5df-413d-ac2d-abf1e3fd9c0b",
@@ -912,7 +952,7 @@
             "sharepoint"
         ],
         "supportedEnv": [
-            "commercial", 
+            "commercial",
             "gcc"
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
@@ -969,7 +1009,7 @@
         ],
         "notes": ""
     },
-    
+
     {
         "moduleCmdlet": "Connect-PnPOnline",
         "apiResource": "https://{domain}-admin.sharepoint.com",
@@ -985,7 +1025,7 @@
             "sharepoint"
         ],
         "supportedEnv": [
-            "commercial", 
+            "commercial",
             "gcc"
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
@@ -1050,7 +1090,7 @@
             "Microsoft.Graph.Authentication"
         ],
         "leastPermissions": [
-            "User.Read.All"
+            "User.Read"
         ],
         "higherPermissions": [],
         "spRolePermissions": [],
@@ -1059,7 +1099,7 @@
             "defender"
         ],
         "supportedEnv": [
-            "commercial", 
+            "commercial",
             "gcc"
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
@@ -1076,7 +1116,7 @@
             "Microsoft.Graph.Authentication"
         ],
         "leastPermissions": [
-            "User.Read.All"
+            "User.Read"
         ],
         "higherPermissions": [],
         "spRolePermissions": [],
@@ -1101,7 +1141,7 @@
             "Microsoft.Graph.Authentication"
         ],
         "leastPermissions": [
-            "User.Read.All"
+            "User.Read"
         ],
         "higherPermissions": [],
         "spRolePermissions": [],
