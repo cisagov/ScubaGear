@@ -9,11 +9,13 @@ BeforeDiscovery {
   . $PSScriptRoot/../../utils/workflow/Initialize-ScubaGearForTesting.ps1
   # Initialize SG
   $Outputs = Initialize-ScubaGearForTesting
+  # Whitelist the outputs that we are interested in finding
+  $global:PSGallery = $false
+  $global:DownloadedOPAVersion = $false
+  $global:SetupTime = $false
+  $global:SetupTimeValue = 0
+  # Loop over the various outputs in the output array, looking for strings.
   foreach ($Output in $Outputs) {
-    $global:PSGallery = $false
-    $global:DownloadedOPAVersion = $false
-    $global:SetupTime = $false
-    $global:SetupTimeValue = 0
     if ($Output.GetType().Name -eq "String") {
       Write-Warning $Output
       if ($Output.StartsWith("PSGallery is trusted")) {
@@ -45,7 +47,7 @@ else {
   Write-Warning 'Did NOT find list of modules!!'
 }
 
-Describe "PowerShell Modules Check" {
+Describe "Initialize-ScubaGear Modules Check" {
   foreach ($Module in $ModuleList) {
     $global:ModuleName = $Module.ModuleName
     It "Module $global:moduleName should be installed" {
