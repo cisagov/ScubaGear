@@ -123,26 +123,28 @@ function Export-AADProvider {
         $PrivilegedUsers = @{}
         $PrivilegedServicePrincipals = @{}
 
-        #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable
-        foreach ($key in $PrivilegedObjects[0].Keys) {
+        if ($PrivilegedObjects.Count -gt 0 -and $null -ne $PrivilegedObjects[0].Keys) {
 
-            # Check if it has ServicePrincipalId property instead of AppId
-            if ($null -ne $PrivilegedObjects[0][$key].ServicePrincipalId) {
-                $PrivilegedServicePrincipals[$key] = $PrivilegedObjects[0][$key]
+            #PrivilegedObjects is an array because of the tracker.trycommand, and so the first index is the hashtable
+            foreach ($key in $PrivilegedObjects[0].Keys) {
+
+                # Check if it has ServicePrincipalId property instead of AppId
+                if ($null -ne $PrivilegedObjects[0][$key].ServicePrincipalId) {
+                    $PrivilegedServicePrincipals[$key] = $PrivilegedObjects[0][$key]
+                }
+                else {
+                    $PrivilegedUsers[$key] = $PrivilegedObjects[0][$key]
+                }
             }
-            else {
-                $PrivilegedUsers[$key] = $PrivilegedObjects[0][$key]
-            }
+
+            $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
+            $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+
+            # While ConvertTo-Json won't mess up a dict as described in the above comment,
+            # on error, $TryCommand returns an empty list, not a dictionary.
+            $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+            $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
         }
-
-        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-
-        # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary.
-        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
-
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we also include calls to PIM APIs
@@ -490,107 +492,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
     }
 
 }
-# function LoadObjectDataIntoPrivilegedUserHashtable {
-#     param (
-#         [Parameter(Mandatory=$true)]
-#         [ValidateNotNullOrEmpty()]
-#         [string]$RoleName,
-
-#         [Parameter(Mandatory=$true)]
-#         [hashtable]$PrivilegedUsers,
-
-#         [Parameter(Mandatory=$true)]
-#         [ValidateNotNullOrEmpty()]
-#         [string]$ObjectId,
-
-#         [Parameter(Mandatory=$true)]
-#         [ValidateNotNullOrEmpty()]
-#         [bool]$TenantHasPremiumLicense,
-
-#         [Parameter(Mandatory=$true)]
-#         [ValidateNotNullOrEmpty()]
-#         [string]$M365Environment,
-
-#         [Parameter()]
-#         [string]$Objecttype = "",
-
-#         [Parameter()]
-#         [int]$Recursioncount = 0
-#     )
-
-#     if ($recursioncount -ge 2) {
-#         return
-#     }
-
-#     if ($Objecttype -eq "") {
-#         try {
-#             $DirectoryObject = Get-MgBetaDirectoryObject -ErrorAction Stop -DirectoryObjectId $ObjectId
-#         } catch {
-#             if ($_.Exception.Message -match "Request_ResourceNotFound") {
-#                 Write-Warning "Processing privileged users. Resource $ObjectId may have been recently deleted from the directory because it was not found."
-#                 return
-#             }
-#             else {
-#                 throw $_
-#             }
-#         }
-#         $Objecttype = $DirectoryObject.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
-#     }
-
-#     if ($Objecttype -eq "user") {
-#         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
-#             $AADUser = Get-MgBetaUser -ErrorAction Stop -UserId $ObjectId
-#             $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
-#         }
-#         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
-#             $PrivilegedUsers[$ObjectId].roles += $RoleName
-#         }
-#     }
-#     elseif ($Objecttype -eq "servicePrincipal") {
-#         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
-#             $AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ObjectId -ErrorAction Stop
-#             $PrivilegedUsers[$ObjectId] = @{
-#                 "DisplayName" = $AADServicePrincipal.DisplayName
-#                 "ServicePrincipalId" = $AADServicePrincipal.Id
-#                 "AppId" = $AADServicePrincipal.AppId
-#                 "roles" = @()
-#             }
-#         }
-#         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
-#             $PrivilegedUsers[$ObjectId].roles += $RoleName
-#         }
-#     }
-#     elseif ($Objecttype -eq "group") {
-#         $GroupId = $ObjectId
-#         $GroupMembers = Get-MgBetaGroupMember -All -ErrorAction Stop -GroupId $GroupId
-
-#         foreach ($GroupMember in $GroupMembers) {
-#             $Membertype = $GroupMember.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
-#             if ($Membertype -eq "user" -or $Membertype -eq "servicePrincipal") {
-#                 if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
-#                     LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupMember.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype $Membertype
-#                 }
-#                 if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $RoleName) {
-#                     $PrivilegedUsers[$GroupMember.Id].roles += $RoleName
-#                 }
-#             }
-#         }
-
-#         if ($TenantHasPremiumLicense) {
-#             $graphArgs = @{
-#                 "commandlet" = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"
-#                 "queryParams" = @{'$filter' = "groupId eq '$GroupId'"}
-#                 "M365Environment" = $M365Environment }
-#             $PIMGroupMembers = Invoke-GraphDirectly @graphArgs
-#             foreach ($GroupMember in $PIMGroupMembers) {
-#                 if ($GroupMember.AccessId -ne "member") { continue }
-#                 $PIMEligibleUserId = $GroupMember.PrincipalId
-#                 $LoopIterationRecursioncount = $Recursioncount + 1
-#                 LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $PIMEligibleUserId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Recursioncount $LoopIterationRecursioncount
-#             }
-#         }
-#     }
-# }
 function AddRuleSource{
     <#
         .NOTES
