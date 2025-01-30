@@ -136,15 +136,15 @@ function Export-AADProvider {
                     $PrivilegedUsers[$key] = $PrivilegedObjects[0][$key]
                 }
             }
-
-            $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-            $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-
-            # While ConvertTo-Json won't mess up a dict as described in the above comment,
-            # on error, $TryCommand returns an empty list, not a dictionary.
-            $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-            $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
         }
+        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
+        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+
+        # While ConvertTo-Json won't mess up a dict as described in the above comment,
+        # on error, $TryCommand returns an empty list, not a dictionary.
+        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+    
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
             # If the tenant has the premium license then we also include calls to PIM APIs
