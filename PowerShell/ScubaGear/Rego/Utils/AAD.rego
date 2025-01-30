@@ -144,13 +144,26 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
 # General AAD Functions #
 #########################
 
-# Return true if policy matches all conditions:
-# All for include users & applications,
-# block for built in controls, enabled,
-# & NO excluded users, roles, groups, & applications.
-
-PolicyConditionsMatch(Policy) := true if {
+# Internal helper rule to handle the conditional logic for "All" users
+Check_For_All_Users(Policy, CheckForAllUsers) if {
+    # If false is passed then do not implement the check
+    CheckForAllUsers == false
+} {
+    CheckForAllUsers == true
     Contains(Policy.Conditions.Users.IncludeUsers, "All") == true
+}
+
+# PolicyConditionsMatch returns true if conditional access policy matches all conditions below:
+# IncludeUsers = All (you can bypass this by passing false in the CheckForAllUsers parameter)
+# IncludeApplications = All
+# ExcludeRoles is empty
+# ExcludeApplications is empty
+# Policy state = enabled
+
+PolicyConditionsMatch(Policy, CheckForAllUsers) := true if {
+    # If CheckForAllUsers is true then check for "All" users
+    Check_For_All_Users(Policy, CheckForAllUsers)
+
     Contains(Policy.Conditions.Applications.IncludeApplications, "All") == true
     Count(Policy.Conditions.Users.ExcludeRoles) == 0
     Count(Policy.Conditions.Applications.ExcludeApplications) == 0
@@ -160,7 +173,6 @@ PolicyConditionsMatch(Policy) := true if {
     # Object.get() protects against undefined errors
     # Count(object.get(Policy, ["Conditions", "Users", "ExcludeGuestsOrExternalUsers", "GuestOrExternalUserTypes"], null)) == 0
 } else := false
-
 
 # Save the Allowed MFA items as a set, check if there are any MFA
 # items allowed besides the acceptable ones & if there is at least
