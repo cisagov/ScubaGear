@@ -5,7 +5,6 @@ import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
-import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
@@ -48,7 +47,7 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy) == true
+    PolicyConditionsMatch(CAPolicy, true) == true
     "other" in CAPolicy.Conditions.ClientAppTypes
     "exchangeActiveSync" in CAPolicy.Conditions.ClientAppTypes
     "block" in CAPolicy.GrantControls.BuiltInControls
@@ -86,7 +85,7 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy) == true
+    PolicyConditionsMatch(CAPolicy, true) == true
     "high" in CAPolicy.Conditions.UserRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
 
@@ -139,7 +138,7 @@ SignInBlocked contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy)
+    PolicyConditionsMatch(CAPolicy, true)
     "high" in CAPolicy.Conditions.SignInRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
 
@@ -181,10 +180,8 @@ tests contains {
 PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    "All" in CAPolicy.Conditions.Users.IncludeUsers
-    "All" in CAPolicy.Conditions.Applications.IncludeApplications
-    CAPolicy.State == "enabled"
-    count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    PolicyConditionsMatch(CAPolicy, true)
+
 
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
@@ -219,7 +216,7 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy)
+    PolicyConditionsMatch(CAPolicy, true)
     "mfa" in CAPolicy.GrantControls.BuiltInControls
 
     # Only match policies with user and group exclusions if all exempted
@@ -402,19 +399,17 @@ tests contains {
 PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    CAPolicy.State == "enabled"
+    PolicyConditionsMatch(CAPolicy, false)
     PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
-
-    # Filter: only include policies that meet all the requirements
+    # Make sure all the necessary roles are included
     count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
 
     # Confirm excluded roles do not contain any of the privileged roles
     # (if it does, that means you are excluding it which leaves role unprotected)
-    count(PrivRolesSet & ConvertToSet(CAPolicy.Conditions.Users.ExcludeRoles)) == 0
+    # Ted thinks the next line is not needed
+    # count(PrivRolesSet & ConvertToSet(CAPolicy.Conditions.Users.ExcludeRoles)) == 0
 
-    # Basic & special conditions
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    IsEmptyContainer(CAPolicy.Conditions.Applications.ExcludeApplications) == true
+    # Only match policies with user and group exclusions if all exempted
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 
@@ -445,7 +440,7 @@ tests contains {
 ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy) == true
+    PolicyConditionsMatch(CAPolicy, true) == true
 
     "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
     "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
@@ -480,9 +475,8 @@ tests contains {
 RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    PolicyConditionsMatch(CAPolicy, true)
     Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
-    CAPolicy.State == "enabled"
 
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
