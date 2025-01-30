@@ -9,7 +9,6 @@ InModuleScope ScubaConfig {
         }
         context 'Handling repeated keys in YAML file' {
             It 'Load config with dupliacte keys'{
-                $cfg = [ScubaConfig]::GetInstance()
                 # Load the first file and check the ProductNames value.
 		
                 {[ScubaConfig]::GetInstance().LoadConfig((Join-Path -Path $PSScriptRoot -ChildPath "./MockLoadConfig.yaml"))} | Should -Throw
