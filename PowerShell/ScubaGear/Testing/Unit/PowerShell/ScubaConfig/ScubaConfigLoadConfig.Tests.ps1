@@ -76,6 +76,9 @@ InModuleScope ScubaConfig {
                 [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
+	    AfterAll {
+		Remove-Item function:\ConvertFrom-Yaml
+	    }
         }
     }
 }
