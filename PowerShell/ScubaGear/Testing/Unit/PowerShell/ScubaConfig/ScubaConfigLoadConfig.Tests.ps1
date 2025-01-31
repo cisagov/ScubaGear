@@ -6,6 +6,7 @@ InModuleScope ScubaConfig {
             Mock -CommandName Write-Warning {}
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
+	    Remove-Item function:\ConvertFrom-Yaml
         }
         context 'Handling repeated keys in YAML file' {
             It 'Load config with dupliacte keys'{
@@ -76,7 +77,6 @@ InModuleScope ScubaConfig {
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
 	    AfterAll {
-		Remove-Item function:\ConvertFrom-Yaml
 	    }
         }
     }
