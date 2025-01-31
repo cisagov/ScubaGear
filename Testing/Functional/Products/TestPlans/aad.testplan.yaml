@@ -245,8 +245,8 @@ TestPlan:
             Splat:
               updates:
                 authentication_method[0].authentication_method_feature_settings:
-                    Id: MicrosoftAuthenticator
-                    State: disabled
+                  Id: MicrosoftAuthenticator
+                  State: disabled
                     # AdditionalProperties:
                     #   featureSettings:
                     #     displayAppInformationRequiredState:
@@ -294,7 +294,7 @@ TestPlan:
                         displayLocationInformationRequiredState:
                           state: enabled
                           includeTarget:
-                            id: "all_users"  
+                            id: "all_users"
                       # includeTargets:
                       #   - id: "all_users"
         Postconditions: []
