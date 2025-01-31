@@ -1,8 +1,7 @@
+# yamllint disable-file
 OmitPolicy:
   MS.EXO.2.2v1:
     Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
         horizon setup but is available publicly."
-# yamllint disable
     Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
         horizon setup but is available publicly."
-# yamllint enable
