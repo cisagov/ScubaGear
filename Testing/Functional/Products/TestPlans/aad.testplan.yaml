@@ -285,6 +285,7 @@ TestPlan:
                   - Id: MicrosoftAuthenticator
                     State: enabled
                     AdditionalProperties:
+                      isSoftwareOathEnabled: false
                       featureSettings:
                         displayAppInformationRequiredState:
                           state: enabled
@@ -294,8 +295,8 @@ TestPlan:
                           state: enabled
                           includeTarget:
                             id: "all_users"  
-                      includeTargets:
-                        - id: "all_users"
+                      # includeTargets:
+                      #   - id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
