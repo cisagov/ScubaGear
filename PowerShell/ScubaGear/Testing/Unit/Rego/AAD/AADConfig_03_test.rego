@@ -561,7 +561,8 @@ test_MicrosoftAuthEnabled_Correct if {
     Output := aad.tests with input.conditional_access_policies as [CAP] with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
 }
-# Test 2: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 2: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
+#         displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_isSoftwareOathEnabled_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
@@ -756,7 +757,8 @@ test_isSoftwareOathEnabled_AppInformation_Target_Information_Incorrect_2 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 12: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 12: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled 
+# for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_Correct_12 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
@@ -1072,7 +1074,8 @@ test_MicrosoftAuthDisabled_NotApplicable_14 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
 
-# Test 28: MicrosoftAuthDisabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 28: MicrosoftAuthDisabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled 
+# for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthDisabled_NotApplicable_15 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
@@ -1150,7 +1153,7 @@ test_MicrosoftAuthDisabled_NotApplicable_16 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
 # Test 32: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState disabled for not_all_users
-test_isSoftwareOathEnabled_LocationInformation_Incorrect if {
+test_isSoftwareOathEnabled_LocationInformation_Incorrect_1 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -1205,7 +1208,8 @@ test_MicrosoftAuthDisabled_NotApplicable_17 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
 
-# Test 35: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 35: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled 
+# for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthDisabled_NotApplicable_18 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
@@ -1360,7 +1364,8 @@ test_MicrosoftAuthDisabled_NotApplicable_21 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
 
-# Test 43: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 43: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled
+#  for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthDisabled_NotApplicable_22 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
@@ -1632,7 +1637,7 @@ test_isSoftwareOathEnabled_AppInformationDisabled_LocationInformation_Incorrect 
 }
 
 # Test 57: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState disabled for all_users
-test_AppInformationDisabled_LocationInformationDisabled_Incorrect if {
+test_AppInformationDisabled_LocationInformationDisabled_Incorrect_2 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -1670,7 +1675,8 @@ test_MicrosoftAuthDisabled_NotApplicable_29 if {
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
 
-# Test 59: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 59: MicrosoftAuthDisabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled
+#  for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthDisabled_NotApplicable_30 if {
     CAP := json.patch(ConditionalAccessPolicies, [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}, {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
     Auth := json.patch(AuthenticationMethod, [
