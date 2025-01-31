@@ -18,7 +18,6 @@ Description: |
 ProductNames:
   - defender
 M365Environment: commercial
-OPAPath: .
 LogIn: true
 DisconnectOnExit: false
 OutPath: .
