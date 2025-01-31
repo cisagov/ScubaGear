@@ -10,7 +10,6 @@ on:
       - '.github/actions/**'
       - 'Testing/workflow/**'
       - 'utils/workflow/**'
-      - 'PowerShell/ScubaGear/Testing/Unit/PowerShell/ScubaConfig/*.yaml'
   pull_request:
   workflow_dispatch:
 
