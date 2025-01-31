@@ -227,7 +227,7 @@ TestPlan:
               updates:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
-                    State: enabled
+                    State: disabled
                     AdditionalProperties:
                       featureSettings:
                         displayAppInformationRequiredState:
@@ -239,22 +239,22 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Not Enforced MS Auth Disabled
+      - TestDescription: MS.AAD.3.3v1 Not-applicable case - MS Auth Disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 authentication_method[0].authentication_method_feature_settings:
-                  - Id: MicrosoftAuthenticator
-                    State: disabled
-                    AdditionalProperties:
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: disabled
-                        displayLocationInformationRequiredState:
-                          state: disabled
-                      includeTargets:
-                        - id: "all_users"
+                  Id: MicrosoftAuthenticator
+                  State: disabled
+                    # AdditionalProperties:
+                    #   featureSettings:
+                    #     displayAppInformationRequiredState:
+                    #       state: disabled
+                    #     displayLocationInformationRequiredState:
+                    #       state: disabled
+                    #   includeTargets:
+                    #     - id: "all_users"
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -285,13 +285,18 @@ TestPlan:
                   - Id: MicrosoftAuthenticator
                     State: enabled
                     AdditionalProperties:
+                      isSoftwareOathEnabled: false
                       featureSettings:
                         displayAppInformationRequiredState:
                           state: enabled
+                          includeTarget:
+                            id: "all_users"
                         displayLocationInformationRequiredState:
                           state: enabled
-                      includeTargets:
-                        - id: "all_users"
+                          includeTarget:
+                            id: "all_users"
+                      # includeTargets:
+                      #   - id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
