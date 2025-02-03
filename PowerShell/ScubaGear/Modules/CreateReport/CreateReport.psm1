@@ -1,5 +1,70 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
+function Get-TestResult {
+     <#
+    .Description
+    Given the Rego output for a specific test, determine the result (e.g. "Pass"/"Fail").
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $Test,
+
+        [Parameter(Mandatory=$true)]
+        [AllowNull()]
+        [array]
+        $MissingCommands,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $Control
+    )
+
+    $Result = @{}
+    if ($Control.MalformedDescription) {
+        $Result.DisplayString = "Error"
+        $Result.SummaryKey = "Errors"
+        $Result.Details = "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+    }
+    elseif ($Control.Deleted) {
+        $Result.DisplayString = "-"
+        $Result.SummaryKey = "-"
+        $Result.Details = "-"
+    }
+    elseif ($MissingCommands.Count -gt 0) {
+        $Result.DisplayString = "Error"
+        $Result.SummaryKey = "Errors"
+        $MissingString = $MissingCommands -Join ", "
+        $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+    }
+    elseif ($Test.RequirementMet) {
+        $Result.DisplayString = "Pass"
+        $Result.SummaryKey = "Passes"
+        $Result.Details = $Test.ReportDetails
+    }
+    elseif ($Test.Criticality -eq "Should") {
+        $Result.DisplayString = "Warning"
+        $Result.SummaryKey = "Warnings"
+        $Result.Details = $Test.ReportDetails
+    }
+    elseif ($Test.Criticality.EndsWith('3rd Party') -or $Test.Criticality.EndsWith('Not-Implemented')) {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Manual"
+        $Result.Details = $Test.ReportDetails
+    }
+    else {
+        $Result.DisplayString = "Fail"
+        $Result.SummaryKey = "Failures"
+        $Result.Details = $Test.ReportDetails
+    }
+    $Result
+}
+
 function New-Report {
      <#
     .Description
@@ -104,6 +169,9 @@ function New-Report {
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             if ($null -ne $Test){
+                $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                $Result = Get-TestResult $Test $MissingCommands
+
                 # Check if the config file indicates the control should be omitted
                 $Config = $SettingsExport.scuba_config
                 $Omit = Get-OmissionState $Config $Control.Id
@@ -123,61 +191,24 @@ function New-Report {
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= "Test omitted by user. $($OmitRationale)"
+                        "OmittedEvaluationResult"=$Result.DisplayString
+                        "OmittedEvaluationDetails"=$Result.Details
                     }
                     continue
                 }
 
-                $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-
-                if ($MissingCommands.Count -gt 0) {
-                    $Result = "Error"
-                    $ReportSummary.Errors += 1
-                    $MissingString = $MissingCommands -Join ", "
-                    $Test.ReportDetails = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
-                }
-                elseif ($Test.RequirementMet) {
-                    $Result = "Pass"
-                    $ReportSummary.Passes += 1
-                }
-                elseif ($Test.Criticality -eq "Should") {
-                    $Result = "Warning"
-                    $ReportSummary.Warnings += 1
-                }
-                elseif ($Test.Criticality.EndsWith('3rd Party') -or $test.Criticality.EndsWith('Not-Implemented')) {
-                    $Result = "N/A"
-                    $ReportSummary.Manual += 1
-                }
-                else {
-                    $Result = "Fail"
-                    $ReportSummary.Failures += 1
-                }
-
+                # This is the typical case, the test result is not missing or omitted
+                $ReportSummary[$Result.SummaryKey] += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= if ($Control.Deleted) {
-                        "-"
-                    }
-                    elseif ($Control.MalformedDescription) {
-                        $ReportSummary.Errors += 1
-                        "Error"
-                    }
-                    else {
-                        $Result
-                    }
+                    "Result"= $Result.DisplayString
                     "Criticality"=if ($Control.Deleted -or $Control.MalformedDescription) {"-"} else {$Test.Criticality}
-                    "Details"=if ($Control.Deleted) {
-                        "-"
-                    }
-                    elseif ($Control.MalformedDescription){
-                        "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
-                    }
-                    else {
-                        $Test.ReportDetails
-                    }
+                    "Details"= $Result.Details
                 }
             }
             else {
+                # The test result is missing
                 $ReportSummary.Errors += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
@@ -197,7 +228,14 @@ function New-Report {
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
         $GroupReferenceURL = "$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor"
         $MarkdownLink = "<a class='control_group' href=`"$($GroupReferenceURL)`" target=`"_blank`">$Name</a>"
-        $Fragments += $Fragment | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
+        $FragmentWithoutOmitted = $Fragment | ForEach-Object -Process {[pscustomobject]@{
+            "Control ID" = $_."Control ID";
+            "Requirement" = $_."Requirement";
+            "Result" = $_."Result";
+            "Criticality" = $_."Criticality";
+            "Details" = $_."Details";
+        }}
+        $Fragments += $FragmentWithoutOmitted | ConvertTo-Html -PreContent "<h2>$Number $MarkdownLink</h2>" -Fragment
 
         # Package Assessment Report into Report JSON by Policy Group
         $ReportJson.Results += [pscustomobject]@{
