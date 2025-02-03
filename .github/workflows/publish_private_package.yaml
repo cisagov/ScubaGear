@@ -97,7 +97,6 @@ jobs:
       - name: Initialize ScubaGear
         run: |
           Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
-          # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
           # This is a manual test that simply writes the version to the console.
@@ -105,7 +104,6 @@ jobs:
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
       - name: Install Selenium
         run: |
-          # Source the function
           . repo/utils/workflow/Install-SeleniumForTesting.ps1
           Install-SeleniumForTesting
       # Instead of initializing ScubaGear repeated for each of the test jobs below,
