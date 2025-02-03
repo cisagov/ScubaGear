@@ -225,9 +225,10 @@ function New-Report {
 
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "Exclusions must only be used if they are approved within an organization's security risk acceptance process.
-    Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the README file</a>
-    file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
+    $AADWarning = "The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks.
+    Exclusions must only be used if they are approved within an organization's security risk acceptance process.
+    See <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the product documentation</a>
+    for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
     <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
     $NoWarning = "<br/>"
     Add-Type -AssemblyName System.Web
