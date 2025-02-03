@@ -54,6 +54,8 @@ jobs:
         id: key-vault-info
         env:
           KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
+        # Stop the workflow if logging into Azure failed.
+        if: ${{ success() }}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
@@ -65,6 +67,7 @@ jobs:
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
+        id: sign-publish-module
         run: |
             # Source the deploy utilities so the functions in it can be called.
             . repo/utils/workflow/Publish-ScubaGear.ps1
@@ -80,7 +83,9 @@ jobs:
             # This publishes to a private gallery, from which we will pull in a future step.
             # This step helps us verify that ScubaGear is in a state where it can be
             # published to PSGallery.
-            Publish-ScubaGearModule @Parameters
+            $ModuleVersion = Publish-ScubaGearModule @Parameters
+            Write-Output "The module version is $ModuleVersion"
+            echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
       - name: Test Module Publish
         run: |
           Get-Location
@@ -98,12 +103,40 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
-          Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck
+          # These are two of the expected output values that result from installing the module.
+          # These checks are intended to help verify that the module installed correctly.
+          $ExpectedName = 'ScubaGear'
+          $ExpectedDescription = 'The Secure Cloud Business Applications (SCuBA) Gear module automates conformance testing about CISA M365 Secure Configuration Baselines.'
+          # The -PassThru paramaters allows us to read the output
+          # value from Install-Module
+          $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          # Check for the expected name.
+          if ($InstallOutput.Name -ne $ExpectedName) {
+            Write-Output "::error::The name of the published module should be $ExpectedName"
+            exit 1
+          }
+          # Because reasons, the description has a newline character.
+          # Strip all whitespace before comparing the descriptions.
+          $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
+          $ExpectedFixed = $ExpectedDescription -replace "\s", ""
+          # Check for the expected description.
+          if ($DescriptionFixed -ne $ExpectedFixed) {
+            Write-Output "::error::The description of the published module should be $ExpectedDescription"
+            exit 1
+          }
           # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # This is a manual test that simply writes the version to the console.
-          Invoke-SCuBA -Version
+          # This is the expected output value that results from running the module.
+          # This check is intended to help verify that ScubaGear installed correctly.
+          $VersionOutput = Invoke-SCuBA -Version
+          $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
+          Write-Output "The version is $VersionOutput"
+          Write-Output "The expected version is $ExpectedVersion"
+          if ($VersionOutput -ne $ExpectedVersion) {
+            Write-Output "::error::The version of the published module should be $ExpectedVersion"
+            exit 1
+          }
           Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
       - name: Install Selenium
         run: |
