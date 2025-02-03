@@ -15,13 +15,13 @@ function New-ModuleSignature {
         Thrown if $RootFolderName does not exist.
   #>
   [CmdletBinding()]
-	param(
-		[Parameter(Mandatory = $true)]
-		[string]
-		$AzureKeyVaultUrl,
-		[Parameter(Mandatory = $true)]
-		[string]
-		$CertificateName,
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $AzureKeyVaultUrl,
+    [Parameter(Mandatory = $true)]
+    [string]
+    $CertificateName,
     [Parameter(Mandatory = $true)]
     [string]
     $ReleaseVersion,

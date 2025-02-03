@@ -40,7 +40,6 @@ jobs:
           path: repo
       - name: Install Azure Signing Tool
         run: |
-          # Source the function
           . repo/utils/workflow/Install-AzureSignTool.ps1
           Install-AzureSignTool
       # OIDC Login to Azure Public Cloud with AzPowershell
