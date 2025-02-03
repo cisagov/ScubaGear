@@ -67,7 +67,23 @@ InModuleScope -ModuleName ExportAADProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MgBetaDomain"{
+                            "Get-MgBetaDomain" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ApplicationsWithRiskyPermissions" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-ServicePrincipalsWithRiskyPermissions" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Format-RiskyApplications" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Format-RiskyThirdPartyServicePrincipals" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
