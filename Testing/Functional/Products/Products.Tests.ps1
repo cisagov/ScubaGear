@@ -110,7 +110,6 @@ BeforeDiscovery {
     }
     $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath $TestPlanFileName
     Test-Path -Path $TestPlanPath -PathType Leaf
-
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
     $ProductTestPlan = ConvertFrom-Yaml $YamlString
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
@@ -132,17 +131,16 @@ BeforeDiscovery {
         }
 
         if (-Not [string]::IsNullOrEmpty($AppId)){
-            $ServicePrincipalParams = @{CertThumbprintParams = @{
-                CertificateThumbprint = $Thumbprint;
-                AppID = $AppId;
-                Organization = $TenantDomain;
-            }}
-
-            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+        $ServicePrincipalParams = @{CertThumbprintParams = @{
+            CertificateThumbprint = $Thumbprint;
+            AppID = $AppId;
+            Organization = $TenantDomain;
+        }}
+        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
-            Write-Debug "Manual Connect to Tenant"
-            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+        Write-Debug "Manual Connect to Tenant"
+        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         }
     }
 }
@@ -157,7 +155,7 @@ BeforeAll {
     Import-Module Selenium
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
-    $ProductDetails = @{
+  $ProductDetails = @{
         aad = "Azure Active Directory"
         defender = "Microsoft 365 Defender"
         exo = "Exchange Online"
@@ -202,7 +200,7 @@ BeforeAll {
         }
     }
 
-    function RunScuba() {
+  function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
             Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
@@ -213,9 +211,8 @@ BeforeAll {
     }
 }
 
-Describe "Policy Checks for <ProductName>"{
-
-    Context "Start tests for policy <PolicyId>" -ForEach $TestPlan{
+Describe "Policy Checks for <ProductName>" {
+    Context "Start tests for policy <PolicyId>" -ForEach $TestPlan {
         BeforeEach {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
@@ -272,19 +269,26 @@ Describe "Policy Checks for <ProductName>"{
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
-            $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose
+            Write-Warning "The URL is"
+            Write-Warning $Url
+            try {
+                $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
+            }
+            catch {
+                # Sometimes Selenium fails to start in a timely manner.  When that happens,
+                # simple try again.  This is a very simplistic attempt to solve the problem,
+                # but it seems to work.
+                $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
+            }
             Open-SeUrl $Url -Driver $Driver | Out-Null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" -Tag $PolicyId {
-
                 #Check intermediate output
                 ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
-
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
-
                 if ($IsCustomImplementation){
                     $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                 }
@@ -301,7 +305,7 @@ Describe "Policy Checks for <ProductName>"{
                 $Tables = Get-SeElement -Driver $Driver -By TagName 'table'
                 $Tables.Count | Should -BeGreaterThan 1
 
-                ForEach ($Table in $Tables){
+                ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
                     $Rows.Count | Should -BeGreaterThan 0
 
@@ -311,7 +315,7 @@ Describe "Policy Checks for <ProductName>"{
                         $Tenant = $TenantDataColumns[0].Text
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
                     }
-                    elseif ($Table.GetAttribute("class") -eq "caps_table"){
+                    elseif ($Table.GetAttribute("class") -eq "caps_table") {
                         ForEach ($Row in $Rows){
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
@@ -329,7 +333,7 @@ Describe "Policy Checks for <ProductName>"{
                             }
                         }
                     }
-                    elseif ($Table.GetProperty("id") -eq "license-info"){
+                    elseif ($Table.GetProperty("id") -eq "license-info") {
                         #Currently empty to determine if necessary and what to test in section
                     }
                     #Currently checks to make sure there are 4 row headers
@@ -339,7 +343,7 @@ Describe "Policy Checks for <ProductName>"{
                     }
                     else {
                         # Control report tables
-                        ForEach ($Row in $Rows){
+                        ForEach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
 
@@ -353,11 +357,11 @@ Describe "Policy Checks for <ProductName>"{
                             if ($RowData.Count -gt 0){
                                 $RowData.Count | Should -BeExactly 5
 
-                                if ($RowData[0].text -eq $PolicyId){
+                                if ($RowData[0].text -eq $PolicyId) {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
-                                    if ($IsCustomImplementation){
+                                    if ($IsCustomImplementation) {
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
                                         $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                                     }
@@ -369,14 +373,14 @@ Describe "Policy Checks for <ProductName>"{
                                         IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
                                     elseif ($null -ne $ExpectedResult ) {
-                                        if ('Shall' -eq $RowData[3].text){
-                                            $RowData[2].text | Should -BeLikeExactly "Fail" -Because "expected policy to fail. [$Msg]"
+                                        if ('Shall' -eq $RowData[3].text) {
+                                        $RowData[2].text | Should -BeLikeExactly "Fail" -Because "expected policy to fail. [$Msg]"
                                         }
                                         elseif ('Should' -eq $RowData[3].text){
-                                            $RowData[2].text | Should -BeLikeExactly "Warning" -Because "expected policy to warn. [$Msg]"
+                                        $RowData[2].text | Should -BeLikeExactly "Warning" -Because "expected policy to warn. [$Msg]"
                                         }
                                         else {
-                                            $RowData[2].text | Should -BeLikeExactly "Unknown" -Because "unexpected criticality. [$Msg]"
+                                        $RowData[2].text | Should -BeLikeExactly "Unknown" -Because "unexpected criticality. [$Msg]"
                                         }
                                         IsEquivalence -First $RowData[4].GetAttribute("innerHTML") -Second $PolicyResultObj.ReportDetails | Should -BeTrue
                                     }
