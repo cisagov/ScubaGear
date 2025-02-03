@@ -17,6 +17,8 @@ function Invoke-PSSA {
 		$RepoPath
 	)
 
+	Write-Verbose "This is a verbose test"
+
 	Write-Warning "Testing PowerShell files with PSScriptAnalyzer..."
 	Write-Warning " "
 

@@ -246,7 +246,7 @@ function Install-OPAforSCuBA {
     .PARAMETER $OPAExe
         The file name that the opa executable is to be saved as.
     .PARAMETER $OperatingSystem
-        The operating system the program is running on.
+        The operating system the program is running on.  Valid values are 'Windows', 'MacOS', and 'Linux'.
     .PARAMETER $ScubaParentDirectory
         Directory to contain ScubaGear artifacts. Defaults to <home>.
     .EXAMPLE
@@ -324,6 +324,9 @@ function Install-OPAforSCuBA {
 }
 
 function Get-OPAFile {
+    <#
+        .SYNOPSIS Internal
+    #>
     param (
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -340,9 +343,7 @@ function Get-OPAFile {
         [Alias('name')]
         [string]$Filename
     )
-    <#
-    .FUNCTIONALITY Internal
-    #>
+
     $InstallUrl = "https://openpolicyagent.org/downloads/v$($ExpectedVersion)/$($Filename)"
     $OutFile = ( Join-Path $ScubaTools $OPAExe ) #(Join-Path (Get-Location).Path $OPAExe)
 
@@ -359,7 +360,7 @@ function Get-OPAFile {
 
 function Get-ExeHash {
     <#
-        .FUNCTIONALITY Internal
+        .SYNOPSIS Internal
     #>
     param (
         [Parameter(Mandatory)]
@@ -392,7 +393,7 @@ function Get-ExeHash {
 
 function Confirm-OPAHash {
     <#
-        .FUNCTIONALITY Internal
+        .SYNOPSIS Internal
     #>
     param (
         [Parameter(Mandatory)]
@@ -417,7 +418,7 @@ function Confirm-OPAHash {
 
 function InstallOPA {
     <#
-        .FUNCTIONALITY Internal
+        .SYNOPSIS Internal
     #>
     param (
         [Parameter(Mandatory)]
@@ -437,8 +438,6 @@ function InstallOPA {
 
     Get-OPAFile -out $OPAExe -version $ExpectedVersion -name $Filename
     Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-    # $Result = Confirm-OPAHash -out $OPAExe -version $ExpectedVersion -name $Filename
-    # $Result[1] | Out-Host
 }
 
 function Debug-SCuBA {
