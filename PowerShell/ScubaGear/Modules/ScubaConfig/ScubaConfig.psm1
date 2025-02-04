@@ -54,7 +54,13 @@ class ScubaConfig {
         }
         [ScubaConfig]::ResetInstance()
         $Content = Get-Content -Raw -Path $Path
-        $this.Configuration = $Content | ConvertFrom-Yaml
+	try {
+        	$this.Configuration = $Content | ConvertFrom-Yaml
+	}
+	catch {
+		Write-E "Error Loading Config File: "
+                throw $_
+	}
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
