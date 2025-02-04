@@ -28,7 +28,7 @@ function New-ModuleSignature {
     [Parameter(Mandatory = $true)]
     [string]
     $RootFolderName
-	)
+  )
 
   Write-Warning "Signing the module with AzureSignTool..."
 
@@ -60,6 +60,7 @@ function New-ModuleSignature {
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
     -CertificateName $CertificateName `
     -FileList $FileListFileName
+  # These next 2 lines are what create the ScubaGear GitHub release artifact
   Move-Item -Path $RootFolderName -Destination "ScubaGear-$ReleaseVersion" -Force
   Compress-Archive -Path "ScubaGear-$ReleaseVersion" -DestinationPath "ScubaGear-$ReleaseVersion.zip"
 }
