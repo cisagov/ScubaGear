@@ -16,10 +16,10 @@ import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
-import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
+import data.utils.key.Count
 
 
 #############
@@ -46,13 +46,21 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 LegacyAuthentication contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy, true) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "other" in CAPolicy.Conditions.ClientAppTypes
     "exchangeActiveSync" in CAPolicy.Conditions.ClientAppTypes
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
 }
@@ -84,12 +92,20 @@ tests contains {
 BlockHighRisk contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy, true) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "high" in CAPolicy.Conditions.UserRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
 }
@@ -137,12 +153,20 @@ tests contains {
 SignInBlocked contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy, true)
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "high" in CAPolicy.Conditions.SignInRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
 }
@@ -180,13 +204,21 @@ tests contains {
 PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy, true)
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
-
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-
+    ### Conditional access checks specific to this policy
     IsPhishingResistantMFA(CAPolicy) == true
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -215,11 +247,19 @@ AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
 NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy, true)
-    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    ### Conditional access checks specific to this policy
+    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
 }
@@ -399,22 +439,24 @@ tests contains {
 PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy, false)
+    ### Common checks for conditional access policies
+    ### We don't check IncludeUsers All because this is a role based policy
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
     # Make sure all the necessary roles are included
     count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
-
-    # Confirm excluded roles do not contain any of the privileged roles
-    # (if it does, that means you are excluding it which leaves role unprotected)
-    # Ted thinks the next line is not needed
-    # count(PrivRolesSet & ConvertToSet(CAPolicy.Conditions.Users.ExcludeRoles)) == 0
-
-    # Only match policies with user and group exclusions if all exempted
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-
-    # Policy has only acceptable MFA
     IsPhishingResistantMFA(CAPolicy) == true
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -440,14 +482,22 @@ tests contains {
 ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy, true) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
+    ### Conditional access checks specific to this policy
     "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
     "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
     count(CAPolicy.GrantControls.BuiltInControls) == 2
     CAPolicy.GrantControls.Operator == "OR"
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
@@ -470,12 +520,18 @@ tests contains {
 # MS.AAD.3.8v1
 #--
 
-# If policy matches basic conditions, & needed strings
-# are in bult in controls, save the policy name
+# Checks to ensure a managed device is required to perform MFA registration
 RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy, true)
+    ### Common checks for conditional access policies
+    ### We don't check IncludeApplications and ExcludeApplications because they are not relevant when you have an IncludeUserActions node
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
 
     Conditions := [
@@ -483,8 +539,9 @@ RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
         "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
     ]
     count(FilterArray(Conditions, true)) > 0
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
 }

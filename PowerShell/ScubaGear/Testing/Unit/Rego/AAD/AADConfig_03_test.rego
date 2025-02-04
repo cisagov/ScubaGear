@@ -70,6 +70,7 @@ test_PhishingResistantMFAExcludeApp_Incorrect if {
     TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, false) == true
 }
 
+# User / Group exclusions tests
 test_PhishingResistantMFAExcludeUser_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["me"]}])
@@ -90,6 +91,25 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, false) == true
+}
+
+# Make sure user and group exclusions defined in config file pass the policy
+test_PhishingResistantMFAUserGroupExclusion_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "39b4dcdf-1f90-41a7c3609b425-9dd7-5e2"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["59b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "69b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "39b4dcdf-1f90-41a7c3609b425-9dd7-5e2"]
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Groups as ["59b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "69b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
 }
 #--
 
