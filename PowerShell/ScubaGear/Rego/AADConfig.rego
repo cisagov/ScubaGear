@@ -5,7 +5,6 @@ import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
-import data.utils.key.IsEmptyContainer
 import data.utils.key.Contains
 import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
@@ -17,10 +16,10 @@ import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
-import data.utils.aad.PolicyConditionsMatch
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
+import data.utils.key.Count
 
 
 #############
@@ -47,13 +46,21 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 LegacyAuthentication contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "other" in CAPolicy.Conditions.ClientAppTypes
     "exchangeActiveSync" in CAPolicy.Conditions.ClientAppTypes
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
 }
@@ -68,7 +75,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(LegacyAuthentication) > 0
+    Status := Count(LegacyAuthentication) > 0
 }
 #--
 
@@ -85,12 +92,20 @@ tests contains {
 BlockHighRisk contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "high" in CAPolicy.Conditions.UserRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
 }
@@ -107,10 +122,10 @@ tests contains {
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(BlockHighRisk) > 0
+        Count(Aad2P2Licenses) > 0,
+        Count(BlockHighRisk) > 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -138,12 +153,20 @@ tests contains {
 SignInBlocked contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy)
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
     "high" in CAPolicy.Conditions.SignInRiskLevels
     "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
 }
@@ -160,10 +183,10 @@ tests contains {
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(SignInBlocked) > 0
+        Count(Aad2P2Licenses) > 0,
+        Count(SignInBlocked) > 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -181,15 +204,21 @@ tests contains {
 PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    "All" in CAPolicy.Conditions.Users.IncludeUsers
-    "All" in CAPolicy.Conditions.Applications.IncludeApplications
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
-    count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    ###
 
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-
+    ### Conditional access checks specific to this policy
     IsPhishingResistantMFA(CAPolicy) == true
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -202,7 +231,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(PhishingResistantMFAPolicies) > 0
+    Status := Count(PhishingResistantMFAPolicies) > 0
 }
 #--
 
@@ -218,11 +247,19 @@ AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
 NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    # Match all simple conditions
-    PolicyConditionsMatch(CAPolicy)
-    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    ### Conditional access checks specific to this policy
+    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
 }
@@ -237,7 +274,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(AllMFA) > 0
+    Status := Count(AllMFA) > 0
 }
 #--
 
@@ -277,12 +314,12 @@ MSAuthProperlyConfigured := true if {
 default AAD_3_3_Not_Applicable := false
 # Returns true no matter what if phishing-resistant MFA is being enforced
 AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) > 0
+    Count(PhishingResistantMFAPolicies) > 0
 }
 
 # Returns true if phishing-resistant MFA is not being enforced but MS Auth is disabled
 AAD_3_3_Not_Applicable := true if {
-    count(PhishingResistantMFAPolicies) == 0
+    Count(PhishingResistantMFAPolicies) == 0
     MSAuthEnabled == false
 }
 
@@ -402,24 +439,24 @@ tests contains {
 PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    CAPolicy.State == "enabled"
-    PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
-
-    # Filter: only include policies that meet all the requirements
-    count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
-
-    # Confirm excluded roles do not contain any of the privileged roles
-    # (if it does, that means you are excluding it which leaves role unprotected)
-    count(PrivRolesSet & ConvertToSet(CAPolicy.Conditions.Users.ExcludeRoles)) == 0
-
-    # Basic & special conditions
+    ### Common checks for conditional access policies
+    ### We don't check IncludeUsers All because this is a role based policy
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    IsEmptyContainer(CAPolicy.Conditions.Applications.ExcludeApplications) == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
-    # Policy has only acceptable MFA
+    ### Conditional access checks specific to this policy
+    PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
+    # Make sure all the necessary roles are included
+    Count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
     IsPhishingResistantMFA(CAPolicy) == true
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -432,7 +469,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(PhishingResistantMFAPrivilegedRoles) > 0
+    Status := Count(PhishingResistantMFAPrivilegedRoles) > 0
 }
 #--
 
@@ -445,14 +482,22 @@ tests contains {
 ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
-    PolicyConditionsMatch(CAPolicy) == true
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
 
+    ### Conditional access checks specific to this policy
     "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
     "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
-    count(CAPolicy.GrantControls.BuiltInControls) == 2
+    Count(CAPolicy.GrantControls.BuiltInControls) == 2
     CAPolicy.GrantControls.Operator == "OR"
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
@@ -467,7 +512,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(ManagedDeviceAuth) > 0
+    Status := Count(ManagedDeviceAuth) > 0
 }
 #--
 
@@ -475,22 +520,28 @@ tests contains {
 # MS.AAD.3.8v1
 #--
 
-# If policy matches basic conditions, & needed strings
-# are in bult in controls, save the policy name
+# Checks to ensure a managed device is required to perform MFA registration
 RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
+    ### Common checks for conditional access policies
+    ### We don't check IncludeApplications and ExcludeApplications because they are not relevant when you have an IncludeUserActions node
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
+    Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
 
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
         "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
     ]
-    count(FilterArray(Conditions, true)) > 0
+    Count(FilterArray(Conditions, true)) > 0
+    ###
 
-    # Only match policies with user and group exclusions if all exempted
+    # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
 }
@@ -505,7 +556,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := count(RequireManagedDeviceMFA) > 0
+    Status := Count(RequireManagedDeviceMFA) > 0
 }
 #--
 
@@ -560,7 +611,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     BadPolicies := AuthPoliciesAppBad
-    Status := count(BadPolicies) == 0
+    Status := Count(BadPolicies) == 0
     DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
 }
 #--
@@ -598,7 +649,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     BadPolicies := BadDefaultGrantPolicies
-    Status := count(BadPolicies) == 0
+    Status := Count(BadPolicies) == 0
     DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
 #--
@@ -648,10 +699,10 @@ tests contains {
     "RequirementMet": Status
 } if {
     Conditions := [
-        count(BadAdminConsentSettings) == 0,
-        count(GoodAdminConsentSettings) > 0
+        Count(BadAdminConsentSettings) == 0,
+        Count(GoodAdminConsentSettings) > 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -724,10 +775,10 @@ tests contains {
     # User passwords for all domains shall not expire
     # Then check if at least 1 or more domains with user passwords set to expire exist
     Conditions := [
-        count(UserPasswordsSetToExpire) == 0, 
-        count(UserPasswordsSetToNotExpire) > 0
+        Count(UserPasswordsSetToExpire) == 0, 
+        Count(UserPasswordsSetToNotExpire) > 0
     ]
-    Status := count(FilterArray(Conditions, true)) == 2
+    Status := Count(FilterArray(Conditions, true)) == 2
     Metadata := {
         "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
         "FederatedDomains": FederatedDomains
@@ -753,8 +804,8 @@ GlobalAdmins contains User.DisplayName if {
 # Set conditions under which this policy will pass
 default IsGlobalAdminCountGood := false
 IsGlobalAdminCountGood := true if {
-    count(GlobalAdmins) <= 8
-    count(GlobalAdmins) >= 2
+    Count(GlobalAdmins) <= 8
+    Count(GlobalAdmins) >= 2
 }
 
 # Pass if there are at least 2, but no more than 8
@@ -783,9 +834,9 @@ NotGlobalAdmins contains User.DisplayName if {
 
 default GetScoreDescription := "All privileged users are Global Admin"
 GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)"]) if {
-    count(NotGlobalAdmins) > 0
-    RawRatio := sprintf("%v", [count(GlobalAdmins)/count(NotGlobalAdmins)])
-    CutOff := min([4, count(RawRatio)])
+    Count(NotGlobalAdmins) > 0
+    RawRatio := sprintf("%v", [Count(GlobalAdmins)/Count(NotGlobalAdmins)])
+    CutOff := min([4, Count(RawRatio)])
     Score := substring(RawRatio, 0, CutOff)
 }
 
@@ -805,9 +856,9 @@ tests contains {
 } if {
     Conditions := [
         IsGlobalAdminCountGood,
-        count(GlobalAdmins) <= count(NotGlobalAdmins)
+        Count(GlobalAdmins) <= Count(NotGlobalAdmins)
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -832,7 +883,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "admin(s) that are not cloud-only found"
-    Status := count(FederatedAdmins) == 0
+    Status := Count(FederatedAdmins) == 0
     AdminNames := concat(", ", FederatedAdmins)
 }
 #--
@@ -852,15 +903,15 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
 
-    count(PrivilegedRoleAssignedPrincipals) > 0
-    count(PrivilegedRoleAssignedPrincipals - (AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups)) != 0
+    Count(PrivilegedRoleAssignedPrincipals) > 0
+    Count(PrivilegedRoleAssignedPrincipals - (AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups)) != 0
 }
 
 # if no users with permenant assignment & config empty, return true
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    count({x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
-    count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
-    count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
+    Count({x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
+    Count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
+    Count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
 }
 
 # Save role name if there are rouge privileged roles
@@ -880,10 +931,10 @@ tests contains {
 } if {
     DescriptionString := "role(s) that contain users with permanent active assignment"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(PrivilegedRolesWithoutExpirationPeriod) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(PrivilegedRolesWithoutExpirationPeriod) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 
 #
@@ -895,7 +946,7 @@ RolesAssignedOutsidePim contains Role.DisplayName if {
     some Role in input.privileged_roles
     NoStartAssignments := {is_null(X.startDateTime) | some X in Role.Assignments}
 
-    count(FilterArray(NoStartAssignments, true)) > 0
+    Count(FilterArray(NoStartAssignments, true)) > 0
 }
 
 # If you have the correct license & no roles without start date, pass
@@ -909,10 +960,10 @@ tests contains {
 } if {
     DescriptionString := "role(s) assigned to users outside of PIM"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(RolesAssignedOutsidePim) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(RolesAssignedOutsidePim) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -945,10 +996,10 @@ tests contains {
 } if {
     DescriptionString := "role(s) or group(s) allowing activation without approval found"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(RolesWithoutApprovalRequired) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(RolesWithoutApprovalRequired) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -965,7 +1016,7 @@ RolesWithoutActiveAssignmentAlerts contains Offender if {
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_Admin_Assignment"
-    count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.AdditionalProperties.notificationRecipients) == 0
 }
 
 # Save role name if id is a specific string and no
@@ -977,7 +1028,7 @@ RolesWithoutEligibleAssignmentAlerts contains Offender if {
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_Admin_Eligibility"
-    count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.AdditionalProperties.notificationRecipients) == 0
 }
 
 # If you have the correct license & all roles have assignment
@@ -993,10 +1044,10 @@ tests contains {
     DescriptionString := "role(s) or group(s) without notification e-mail configured for role assignments found"
     RolesWithoutAssignmentAlerts := RolesWithoutActiveAssignmentAlerts | RolesWithoutEligibleAssignmentAlerts
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(RolesWithoutAssignmentAlerts) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(RolesWithoutAssignmentAlerts) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -1015,7 +1066,7 @@ GlobalAdminsWithoutActivationAlert contains Offender if {
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_EndUser_Assignment"
     Rule.AdditionalProperties.notificationType == "Email"
-    count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.AdditionalProperties.notificationRecipients) == 0
 }
 
 # If you have the correct license & Global Admin
@@ -1030,10 +1081,10 @@ tests contains {
 } if {
     DescriptionString := "role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(GlobalAdminsWithoutActivationAlert) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(GlobalAdminsWithoutActivationAlert) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -1050,7 +1101,7 @@ OtherAdminsWithoutActivationAlert contains Offender if {
     # Filter: only include policies that meet all the requirements
     Rule.Id == "Notification_Admin_EndUser_Assignment"
     Rule.AdditionalProperties.notificationType == "Email"
-    count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.AdditionalProperties.notificationRecipients) == 0
 }
 
 # If there are no roles without activation alert &
@@ -1065,10 +1116,10 @@ tests contains {
 } if {
     DescriptionString := "role(s) or group(s) without notification e-mail configured for role activations found"
     Conditions := [
-        count(Aad2P2Licenses) > 0,
-        count(OtherAdminsWithoutActivationAlert) == 0
+        Count(Aad2P2Licenses) > 0,
+        Count(OtherAdminsWithoutActivationAlert) == 0
     ]
-    Status := count(FilterArray(Conditions, false)) == 0
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
 
@@ -1131,7 +1182,7 @@ tests contains {
     "ReportDetails": ReportDetail,
     "RequirementMet": Status
 } if {
-    Status := count(AuthPoliciesBadRoleId) == 0
+    Status := Count(AuthPoliciesBadRoleId) == 0
     ReportDetail := concat("", ["Permission level set to ", concat(", ", RoleIdByPolicy)])
 }
 #--
@@ -1168,7 +1219,7 @@ tests contains {
     "ReportDetails": ReportDetail,
     "RequirementMet": Status
 } if {
-    Status := count(AuthPoliciesBadAllowInvites) == 0
+    Status := Count(AuthPoliciesBadAllowInvites) == 0
     ReportDetail := concat("", ["Permission level set to ", concat(", ", AllowInvitesByPolicy)])
 }
 #--

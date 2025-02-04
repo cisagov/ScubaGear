@@ -48,6 +48,18 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
 
+# test_ApplicationExclusions_Incorrect if {
+#     CAP := json.patch(ConditionalAccessPolicies,
+#                 [{"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+#     Output := aad.tests with input.conditional_access_policies as [CAP]
+
+#     ReportDetailStr :=
+#         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+#     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
+# }
+
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
@@ -449,6 +461,17 @@ test_NoExclusionsExemptGroups_Correct_V2 if {
 
     TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, true) == true
 }
+# test_ApplicationExclusions_Incorrect if {
+#     CAP := json.patch(ConditionalAccessPolicies,
+#                 [{"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+
+#     Output := aad.tests with input.conditional_access_policies as [CAP]
+
+#     ReportDetailStr :=
+#         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+#     TestResult("MS.AAD.2.3v1", Output, ReportDetailStr, false) == true
+# }
 
 # User exclusions test
 test_UserExclusionNoExempt_Incorrect_V2 if {
