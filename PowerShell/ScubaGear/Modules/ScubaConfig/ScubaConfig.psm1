@@ -58,7 +58,7 @@ class ScubaConfig {
         	$this.Configuration = $Content | ConvertFrom-Yaml
 	}
 	catch {
-		Write-Warning "Stacktrace: $($_.ScriptStackTrace)"
+		Write-E "Error Loading Config File: "
                 throw $_
 	}
 
