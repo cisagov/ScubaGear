@@ -381,7 +381,7 @@ function New-FileList {
 
 function Use-AzureSignTool {
   <#
-    .DESCRIPTION
+    .SYNOPSIS
       AzureSignTool is a utility for signing code that is used to secure ScubaGear.
       https://github.com/vcsjones/AzureSignTool
       Throws an error if there was an error signing the files.
@@ -429,7 +429,6 @@ function Use-AzureSignTool {
   Write-Warning "The path to AzureSignTool is $ToolPath"
   # & is the call operator that executes a command, script, or function.
   $Results = & $ToolPath $SignArguments
-
   # Test the results for failures.
   # If there are no failures, the $SuccessPattern string will be the last
   # line in the results.
