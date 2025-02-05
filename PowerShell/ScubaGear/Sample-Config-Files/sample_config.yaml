@@ -11,9 +11,7 @@ ProductNames:
   - defender
   - aad
   - sharepoint
-  - onedrive
 M365Environment: commercial
-OPAPath: .
 LogIn: true
 DisconnectOnExit: false
 OutPath: .
