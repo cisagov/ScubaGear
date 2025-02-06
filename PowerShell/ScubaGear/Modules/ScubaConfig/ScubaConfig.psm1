@@ -58,8 +58,7 @@ class ScubaConfig {
         	$this.Configuration = $Content | ConvertFrom-Yaml
 	}
 	catch {
-		Write-E "Error Loading Config File: "
-                throw $_
+               throw "Error loading config file: $($_.Exception.Message)"
 	}
 
         $this.SetParameterDefaults()
