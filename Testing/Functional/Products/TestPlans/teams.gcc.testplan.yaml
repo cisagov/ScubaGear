@@ -7,6 +7,7 @@ TestPlan:
         Preconditions:
           - Command: Set-CsTeamsClientConfiguration
             Splat:
+              Identity: Global
               AllowEmailIntoChannel: true
         Postconditions: []
         ExpectedResult: true
@@ -14,6 +15,7 @@ TestPlan:
         Preconditions:
           - Command: Set-CsTeamsClientConfiguration
             Splat:
+              Identity: Global
               AllowEmailIntoChannel: false
         Postconditions: []
         ExpectedResult: true
