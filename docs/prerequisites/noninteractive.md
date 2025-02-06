@@ -24,7 +24,7 @@ Configuring a service principal is beyond the scope of these instructions, but M
 
 The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
 
-> **Important**: Permissions that have 'write' privileges are included in the Power Platform & SharePoint application permissions. As the permissions are the minimum required to be able to read admin center configuration settings. The inclusion of read & write privileges instead of only fine-grained read-only privileges to ScubaGear is a limitation of the underlying configuration setting APIs for these services. ScubaGear itself does not exercise the use of the write privileges for it's assessments.
+> **Important**: Permissions that have 'write' privileges are included in the Power Platform & SharePoint application permissions. Those permissions are the minimum required by ScubaGear to be able to read admin center configuration settings. The mix of read & write privileges instead of only fine-grained read-only privileges is a limitation of the underlying configuration setting APIs for these services. ScubaGear itself does not exercise the use of the write privileges for it's assessments.
 
 | Product                 | API Permissions                                 | Role          |
 | ----------------------- | ----------------------------------------------- | ------------- |
@@ -40,7 +40,7 @@ The minimum permissions and roles that must be assigned to the service principal
 | SharePoint Online       | Sites.FullControl.All, Organization.Read.All    |               |
 | Microsoft Teams         |                                                 | Global Reader |
 
-> **Note** Additional details necessary for GCC High authentication are detailed in the section below.
+> **Note** Additional details necessary for specifically GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.
 
 ## Certificate Thumbprint
 
@@ -83,17 +83,19 @@ It's helpful to note the following details:
 
 * MS Graph has an expectation that the certificate at least be located in one of the local client's certificate stores.
 
-## GCC High additional details
+## Additional GCC High details
 
 This section is to note specific additional non-interactive authentication details to successfully run ScubaGear against a GCC High tenant.
 
 ### Defender in GCC High
+
 Additional details for running ScubaGear to assess Defender for Office 365 in a GCC High tenant.
 
 `Exchange.ManageAsApp` must be added as an application permission from BOTH the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online` APIs.
-This touched upon briefly in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
+This is touched upon briefly in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
 ### SharePoint in GCC High
-Additional details for running ScubaGear to assess SharePoint Online in a GCC High tenant
+
+Additional details for running ScubaGear to assess SharePoint Online in a GCC High tenant.
 
 The `Sites.FullControl.All` application permission must be added from the GCC High unique `Office 365 SharePoint Online` API rather than the commercial unique `SharePoint` API located in commercial/government commercial tenants.
