@@ -24,7 +24,7 @@ Configuring a service principal is beyond the scope of these instructions, but M
 
 The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
 
-> **Important**: Permissions that have 'write' privileges are included in the Power Platform & SharePoint application permissions. Those permissions are the minimum required by ScubaGear to be able to read admin center configuration settings. The mix of read & write privileges instead of only fine-grained read-only privileges is a limitation of the underlying configuration setting APIs for these services. ScubaGear itself does not exercise the use of the write privileges for it's assessments.
+> **Important**: Permissions that have 'write' privileges are included in the Power Platform & SharePoint application permissions. Those permissions are the minimum required by ScubaGear to be able to read admin center configuration settings. The mix of read & write privileges instead of fine-grained read-only privileges is an unfortunate access limitation of the underlying configuration setting APIs for these services. ScubaGear itself does not exercise the use of the write privileges for it's assessments.
 
 | Product                 | API Permissions                                 | Role          |
 | ----------------------- | ----------------------------------------------- | ------------- |
