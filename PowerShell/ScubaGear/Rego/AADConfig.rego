@@ -263,14 +263,15 @@ MSAuthEnabled := true if {
 default MSAuthProperlyConfigured := false
 MSAuthProperlyConfigured := true if {
     MSAuthEnabled == true 
-    MSAuthOTP := MSAuth.AdditionalProperties.isSoftwareOathEnabled # either true/false
-    MSAuthOTP == false
+    MSAuth.AdditionalProperties.isSoftwareOathEnabled == false
     # Make sure that MS Auth shows the app name and geographic location
     Settings := MSAuth.AdditionalProperties.featureSettings
     Settings.displayAppInformationRequiredState.state == "enabled"
     Settings.displayLocationInformationRequiredState.state == "enabled"
 
     # Make sure that the configuration applies to all users 
+    # if the following settings are not set to "all_users", 
+    # they will be set to the group id of the selected groups
     Settings.displayAppInformationRequiredState.includeTarget.id == "all_users"
     Settings.displayLocationInformationRequiredState.includeTarget.id == "all_users"    
 }
@@ -293,7 +294,7 @@ tests contains {
 } if {
     PolicyId := "MS.AAD.3.3v1"
     # regal ignore:line-length
-    Reason := "This policy is only applicable if phishing-resistant MFA is not enforced and MS Authenticator is enabled. See %v for more info"
+    Reason := "This policy is only applicable if MS Authenticator is enabled. See %v for more info"
     AAD_3_3_Not_Applicable == true
 }
 

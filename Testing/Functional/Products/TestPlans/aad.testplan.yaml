@@ -200,45 +200,6 @@ TestPlan:
   - PolicyId: MS.AAD.3.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.3v1 Not-applicable case - PhishingMFA Enforced MS Auth Enabled
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    IncludeRoles: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                authentication_method[0].authentication_method_feature_settings:
-                  - Id: MicrosoftAuthenticator
-                    State: disabled
-                    AdditionalProperties:
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: disabled
-                        displayLocationInformationRequiredState:
-                          state: disabled
-                      includeTargets:
-                        - id: "all_users"
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
       - TestDescription: MS.AAD.3.3v1 Not-applicable case - MS Auth Disabled
         Preconditions:
           - Command: UpdateProviderExport
@@ -247,14 +208,6 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   Id: MicrosoftAuthenticator
                   State: disabled
-                    # AdditionalProperties:
-                    #   featureSettings:
-                    #     displayAppInformationRequiredState:
-                    #       state: disabled
-                    #     displayLocationInformationRequiredState:
-                    #       state: disabled
-                    #   includeTargets:
-                    #     - id: "all_users"
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
@@ -295,8 +248,6 @@ TestPlan:
                           state: enabled
                           includeTarget:
                             id: "all_users"
-                      # includeTargets:
-                      #   - id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
