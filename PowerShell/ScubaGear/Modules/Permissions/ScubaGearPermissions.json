@@ -1,7 +1,7 @@
 [
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
-        "apiResource": "/roleManagement/directory/roleDefinitions/{unifiedRoleDefinition-id}",
+        "apiResource": "/roleManagement/directory/roleDefinitions/{id}",
         "poshModule": [
             "Microsoft.Graph.Identity.Governance"
         ],
@@ -33,7 +33,7 @@
 
     {
         "moduleCmdlet": "Get-MgServicePrincipal",
-        "apiResource": "/servicePrincipals/{servicePrincipal-id}",
+        "apiResource": "/servicePrincipals/{id}",
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -59,6 +59,38 @@
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
+        ],
+        "notes": ""
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaServicePrincipal",
+        "apiResource": "/servicePrincipals/{id}",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All",
+            "Directory.Read.All",
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-beta"
         ],
         "notes": ""
     },
@@ -91,8 +123,72 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaApplicationFederatedIdentityCredential",
+        "apiResource": "/applications/{id}/federatedIdentityCredentials",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/application-list-federatedidentitycredentials?view=graph-rest-beta&tabs=http",
+            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.applications/get-mgbetaapplicationfederatedidentitycredential?view=graph-powershell-beta"
+        ],
+        "notes": ""
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaApplication",
+        "apiResource": "/applications",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All",
+            "Directory.Read.All",
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
+            "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": ""
+    },
+
+    {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/servicePrincipals/{servicePrincipal-id}/appRoleAssignments",
+        "apiResource": "/servicePrincipals/{id}/appRoleAssignments",
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -118,7 +214,6 @@
         "notes": ""
     },
 
-    
     {
         "moduleCmdlet": "Invoke-MgGraphRequest",
         "apiResource": "/v1.0/me",
@@ -148,7 +243,7 @@
 
     {
         "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyRule",
-        "apiResource": "/beta/policies/roleManagementPolicies/{unifiedRoleManagementPolicy-id}/rules",
+        "apiResource": "/beta/policies/roleManagementPolicies/{id}/rules",
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],

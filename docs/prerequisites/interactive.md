@@ -29,14 +29,19 @@ This workflow-like process is sometimes referred to as the _application consent 
 
 The following API permissions are required for Microsoft Graph Powershell:
 
+- Application.Read.All
 - Directory.Read.All
+- Domain.Read.All
 - GroupMember.Read.All
 - Organization.Read.All
 - Policy.Read.All
-- PrivilegedEligibilitySchedule.Read.AzureADGroup
 - PrivilegedAccess.Read.AzureADGroup
+- PrivilegedEligibilitySchedule.Read.AzureADGroup
+- RoleAssignmentSchedule.Read.Directory
+- RoleEligibilitySchedule.Read.Directory
 - RoleManagement.Read.Directory
 - RoleManagementPolicy.Read.AzureADGroup
+- RoleManagementPolicy.Read.Directory
 - User.Read.All
 
 > **Note**: Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a long-standing [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
