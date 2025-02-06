@@ -20,7 +20,7 @@ OutReportName: BaselineReports
 OmitPolicy:
   MS.EXO.2.2v1:
     Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
-    horizon setup but is available publicly."
+      horizon setup but is available publicly."
     Expiration: "2023-12-31"
   MS.TEAMS.6.1v1:
     Rationale: &DLPRationale "The DLP capability required for Teams is implemented by third party product, [x],
