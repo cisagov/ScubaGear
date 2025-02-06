@@ -545,7 +545,8 @@ test_State_Incorrect_V1 if {
 #
 # Policy MS.AAD.3.3v1
 #--
-# Test 1: MicrosoftAuthDisabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 1: MicrosoftAuthDisabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthDisabled_NotApplicable if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
@@ -563,7 +564,8 @@ test_MicrosoftAuthDisabled_NotApplicable if {
 
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
 }
-# Test 2: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 2: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, 
+# displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -591,7 +593,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_2 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 4: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 4: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -605,7 +608,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 5: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 5: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -619,7 +624,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 6: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 6: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users,
+#  displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -633,7 +639,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 7: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 7: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users,
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -648,7 +655,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
 }
 
 
-# Test 8: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 8: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -662,7 +670,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 9: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 9: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -676,7 +685,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 10: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 10: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users,
+#  displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -691,7 +701,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
 }
 
 
-# Test 11: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 11: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users,
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -705,7 +716,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 12: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 12: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -719,7 +731,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 13: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 13: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -733,7 +747,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 14: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 14: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState disabled for all_users,
+#  displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -747,7 +763,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 15: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, 
+# Test 15: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState enabled for not_all_users, 
 #         displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
     Auth := json.patch(AuthenticationMethod, [
@@ -762,7 +779,8 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 16: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
+# Test 16: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState enabled for all_users, 
 #         displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
     Auth := json.patch(AuthenticationMethod, [
@@ -777,9 +795,10 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 17: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
+# Test 17: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
+# displayAppInformationRequiredState enabled for all_users, 
 #         displayLocationInformationRequiredState enabled for all_users
-test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
+test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
@@ -792,8 +811,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 18: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled 
-# for not_all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 18: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -808,7 +828,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
 }
 
 
-# Test 19: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 19: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -822,7 +844,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 20: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState disabled for not_all_users
+# Test 20: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for all_users, 
+# displayLocationInformationRequiredState disabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -836,7 +860,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 21: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 21: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -850,7 +876,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 22: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 22: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for all_users, 
+# displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -864,7 +892,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 23: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState enabled for all_users
+# Test 23: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for not_all_users,
+#  displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -878,7 +908,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 24: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 24: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -892,7 +924,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 25: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 25: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -906,7 +940,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 26: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 26: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -920,7 +956,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 27: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 27: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -934,7 +972,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 28: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for not_all_users, displayLocationInformationRequiredState enabled for not_all_users
+# Test 28: MicrosoftAuthEnabled, isSoftwareOathEnabled false,
+#  displayAppInformationRequiredState enabled for not_all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -948,7 +988,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 29: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for all_users, displayLocationInformationRequiredState disabled for all_users
+# Test 29: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for all_users, 
+# displayLocationInformationRequiredState disabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -962,8 +1004,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 30: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for all_users, 
-#         displayLocationInformationRequiredState enabled for all_users
+# Test 30: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -977,8 +1020,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
     TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
 }
 
-# Test 31: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState enabled for all_users, 
-#         displayLocationInformationRequiredState enabled for not_all_users
+# Test 31: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState enabled for all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -992,8 +1036,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
     TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
 }
 
-# Test 32: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, 
-#         displayLocationInformationRequiredState enabled for all_users
+# Test 32: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState enabled for all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
@@ -1008,8 +1053,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
 }
 
 
-# Test 33: MicrosoftAuthEnabled, isSoftwareOathEnabled false, displayAppInformationRequiredState disabled for not_all_users, 
-#         displayLocationInformationRequiredState enabled for not_all_users
+# Test 33: MicrosoftAuthEnabled, isSoftwareOathEnabled false,
+# displayAppInformationRequiredState disabled for not_all_users, 
+# displayLocationInformationRequiredState enabled for not_all_users
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
