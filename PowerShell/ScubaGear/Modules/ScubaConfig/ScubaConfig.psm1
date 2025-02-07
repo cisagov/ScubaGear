@@ -54,7 +54,13 @@ class ScubaConfig {
         }
         [ScubaConfig]::ResetInstance()
         $Content = Get-Content -Raw -Path $Path
-        $this.Configuration = $Content | ConvertFrom-Yaml
+	try {
+        	$this.Configuration = $Content | ConvertFrom-Yaml
+	}
+	catch {
+               $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
+	       throw "Error loading config file: $ParseError"
+	}
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
