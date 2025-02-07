@@ -8,14 +8,14 @@ TestPlan:
           - Command: Set-CsTeamsClientConfiguration
             Splat:
               Identity: Global
-              AllowEmailIntoChannel: 1
+              AllowEmailIntoChannel: true
         Postconditions: []
-        ExpectedResult: 0
+        ExpectedResult: false
       - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel
         Preconditions:
           - Command: Set-CsTeamsClientConfiguration
             Splat:
               Identity: Global
-              AllowEmailIntoChannel: 0
+              AllowEmailIntoChannel: false
         Postconditions: []
-        ExpectedResult: 1
+        ExpectedResult: true
