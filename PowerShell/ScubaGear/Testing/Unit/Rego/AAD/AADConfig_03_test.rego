@@ -559,7 +559,7 @@ test_MicrosoftAuthDisabled_NotApplicable if {
     Output := aad.tests with input.authentication_method as [Auth]
     PolicyId := "MS.AAD.3.3v1"
     ReportDetailStr := concat(" ", [
-        "This policy is only applicable if MS Authenticator is enabled .",
+        "This policy is only applicable if MS Authenticator is enabled.",
         "See %v for more info"])
 
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
