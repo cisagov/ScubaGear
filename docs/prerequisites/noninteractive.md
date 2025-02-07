@@ -40,7 +40,7 @@ The minimum permissions and roles that must be assigned to the service principal
 | SharePoint Online       | Sites.FullControl.All, Organization.Read.All    |               |
 | Microsoft Teams         |                                                 | Global Reader |
 
-> **Note** Additional details necessary for specifically GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.
+> **Note** Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.
 
 ## Certificate Thumbprint
 
