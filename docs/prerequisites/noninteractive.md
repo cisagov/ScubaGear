@@ -81,7 +81,7 @@ It's helpful to note the following details:
 
 * Power Platform has a [hardcoded expectation](https://github.com/microsoft/Microsoft365DSC/issues/2781) that the certificate is located in `Cert:\CurrentUser\My`.
 
-* MS Graph has an expectation that the certificate at least be located in one of the local client's certificate stores.
+* [MS Graph has an expectation](https://learn.microsoft.com/en-us/powershell/microsoftgraph/authentication-commands?view=graph-powershell-1.0#use-client-credential-with-a-certificate) that the certificate is located either in the client's `Cert:\CurrentUser\My` or `Cert:\LocalMachine\My` certificate stores.
 
 ## Additional GCC High details
 
