@@ -85,17 +85,14 @@ It's helpful to note the following details:
 
 ## Additional GCC High details
 
-This section is to note specific additional non-interactive authentication details to successfully run ScubaGear against a GCC High tenant.
+This section contains additional, non-interactive authentication details that are required to successfully run ScubaGear against a GCC High tenant.
+
 
 ### Defender in GCC High
 
-Additional details for running ScubaGear to assess Defender for Office 365 in a GCC High tenant.
+When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
-`Exchange.ManageAsApp` must be added as an application permission from BOTH the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online` APIs.
-This is touched upon briefly in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
 ### SharePoint in GCC High
 
-Additional details for running ScubaGear to assess SharePoint Online in a GCC High tenant.
-
-The `Sites.FullControl.All` application permission must be added from the GCC High unique `Office 365 SharePoint Online` API rather than the commercial unique `SharePoint` API located in commercial/government community cloud tenants.
+When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
