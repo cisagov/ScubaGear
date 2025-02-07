@@ -98,4 +98,4 @@ This is touched upon briefly in a GCC High application manifest writer's note in
 
 Additional details for running ScubaGear to assess SharePoint Online in a GCC High tenant.
 
-The `Sites.FullControl.All` application permission must be added from the GCC High unique `Office 365 SharePoint Online` API rather than the commercial unique `SharePoint` API located in commercial/government commercial tenants.
+The `Sites.FullControl.All` application permission must be added from the GCC High unique `Office 365 SharePoint Online` API rather than the commercial unique `SharePoint` API located in commercial/government community cloud tenants.
