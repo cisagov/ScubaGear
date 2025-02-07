@@ -39,6 +39,6 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagementPolicy.Read.AzureADGroup
 - User.Read.All
 
-> **Note**: Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a long-standing [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
+> **Note**: Microsoft Graph PowerShell SDK [now appears as "verified"](https://devblogs.microsoft.com/microsoft365dev/microsoft-graph-powershell-and-cli-are-now-verified/) on the AAD application consent screen.
 
 Once the user and application permissions have been set, ScubaGear can be [executed](../execution/execution.md) in interactive mode.
