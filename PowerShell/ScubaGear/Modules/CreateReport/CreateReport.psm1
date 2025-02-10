@@ -271,6 +271,31 @@ function New-Report {
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
 
+        if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_service_principals) {
+
+            # Create a section for privileged service principals
+            $privilegedServicePrincipalsTable = $SettingsExport.privileged_service_principals.psobject.properties | ForEach-Object {
+                $principal = $_.Value
+                [pscustomobject]@{
+                    "Display Name" = $principal.DisplayName
+                    "Service Principal ID" = $principal.ServicePrincipalId
+                    "Roles" = ($principal.roles -join ", ")
+                    "App ID" = $principal.AppId
+
+                }
+            } | ConvertTo-Html -Fragment
+
+            $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
+
+            # Create a section header for the service principal information
+            $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
+            $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
+
+        }
+        else{
+            $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
+
+        }
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
@@ -278,6 +303,7 @@ function New-Report {
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
+        $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
         $CapJson = "null"
     }
 
