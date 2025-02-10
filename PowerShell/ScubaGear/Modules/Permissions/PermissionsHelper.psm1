@@ -147,7 +147,10 @@ Function Get-ScubaGearPermissions {
 
         $ResourceAPIHash = @{
             'aad'        = '00000003-0000-0000-c000-000000000000'
-            'exo'        = '00000002-0000-0ff1-ce00-000000000000'
+            'exo'        = @(
+                '00000002-0000-0ff1-ce00-000000000000',
+                '00000007-0000-0ff1-ce00-000000000000'
+            )
             'defender'   = '00000002-0000-0ff1-ce00-000000000000'
             'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
             'scubatank'  = '00000003-0000-0000-c000-000000000000'
@@ -172,15 +175,15 @@ Function Get-ScubaGearPermissions {
                     $conditionsmsg = '`$_.scubaGearProduct -contains "' + $ProductItem + '"'
                     If($ServicePrincipal -and $ProductItem -ne 'teams'){
                         # Filter the resourceAPIAppId based on the product
-                        $conditions += {$_.resourceAPIAppId -contains $ResourceAPIHash[$ProductItem]}
-                        $conditionsmsg += '`$_.resourceAPIAppId -contains "' + $ResourceAPIHash[$ProductItem] + '"'
+                        $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
+                        $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
                     }elseif($OutAs -eq 'endpoint'){
                         #do no filter the resourceAPIAppId
                     }elseif($ProductItem -match 'exo|sharepoint|defender'){
                         # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
                         # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
-                        $conditions += {$_.resourceAPIAppId -notcontains $ResourceAPIHash[$ProductItem]}
-                        $conditionsmsg += '`$_.resourceAPIAppId -notcontains "' + $ResourceAPIHash[$ProductItem] + '"'
+                        $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}
+                        $conditionsmsg += '`$_.resourceAPIAppId -notmatch "' + ($ResourceAPIHash[$ProductItem] -join '|') + '"'
                     }
                 }
             }
@@ -213,12 +216,12 @@ Function Get-ScubaGearPermissions {
         switch ($OutAs) {
             'perms' {
                 If($PermissionLevel -eq 'least'){
-                    Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty leastPermissions -Unique"
-                    $output += $collection | Select-Object -ExpandProperty leastPermissions -Unique
+                    Write-Verbose -Message "Command: `$collection | Where-Object {`$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique"
+                    $output += $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique
                 }
                 else{
-                    Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty higherPermissions -Unique"
-                    $output += $collection | Select-Object -ExpandProperty higherPermissions -Unique
+                    Write-Verbose -Message "Command: `$collection  | Where-Object {`$_.moduleCmdlet -notlike 'Connect-Mg*'}| Select-Object -ExpandProperty higherPermissions -Unique"
+                    $output += $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty higherPermissions -Unique
                 }
             }
             'modules' {
@@ -293,12 +296,12 @@ Function Get-ScubaGearPermissions {
                     foreach ($property in $properties) {
                         if ($property.Value -is [string]) {
                             # Replace in string values
-                            $property.Value = $property.Value -replace '{domain}', 'contoso'
+                            $property.Value = $property.Value -replace '{id}',$Id -replace '{domain}',$Domain
                         } elseif ($property.Value -is [array]) {
                             # Replace in array values while keeping it as an array
                             $property.Value = @($property.Value | ForEach-Object {
                                 if ($_ -is [string]) {
-                                    $_ -replace '{domain}', 'contoso'
+                                    $_ -replace '{id}',$Id -replace '{domain}',$Domain
                                 } else {
                                     $_
                                 }
@@ -316,59 +319,56 @@ Function Get-ScubaGearPermissions {
     }
 }
 
-
 Function Get-ScubaGearEntraRedundantPermissions{
-    [CmdletBinding()]
-    Param(
+    <#
+    .SYNOPSIS
+        This Function is used to retrieve the redundant permissions of the SCuBAGear module
+
+    .DESCRIPTION
+        This Function is used to retrieve the redundant permissions of the SCuBAGear module for aad only
+
+    .PARAMETER Environment
+        The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
+
+    .EXAMPLE
+        Get-ScubaGearEntraRedundantPermissions
+    #>
+
+    param(
         [Parameter(Mandatory = $false)]
-        [switch]$FilterRedundancy
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
     )
 
-    $data = Get-ScubaGearPermissions -Product aad -OutAs all
+    # Create a list to hold the filtered permissions
+    $filteredPermissions = @()
 
-    ForEach($FirstItem in $data)
-    {
-        Write-Verbose "First loop [$($FirstItem.moduleCmdlet)] and HigherPermission: [$($FirstItem.higherPermissions)]  and LeastPermission: [$($FirstItem.leastPermissions)]"
-        ForEach($SecondItem in $data)
-        {
-            Write-Verbose "  Second loop $($SecondItem.moduleCmdlet) and LeastPermission: $($SecondItem.leastPermissions)"
-            if($SecondItem.moduleCmdlet -ne $FirstItem.moduleCmdlet `
-                -and $SecondItem.scubaGearProduct -eq $FirstItem.scubaGearProduct `
-                -and $SecondItem.higherPermissions -contains $FirstItem.leastPermissions `
-                -and $FirstItem.leastPermissions -ne $SecondItem.leastPermissions `
-                -and $SecondItem.PermissionNeeded -eq "false"
-                )
-            {
-                Write-Verbose "  - Match found [$($FirstItem.moduleCmdlet)] and [$($SecondItem.moduleCmdlet)] with: [$($FirstItem.leastPermissions) and $($SecondItem.higherPermissions)]"
-                # Create node in json named redundant and set value to true
-                #$SecondItem.permissionredunancy = "true"
-                #$SecondItem.redundantcmdlet = $FirstItem.moduleCmdlet
-                #added permissionredunancy member to the object dynamically
+    # get all modules with least and higher permissions
+    $allPermissions = Get-ScubaGearPermissions -Product aad -OutAs all -Environment $Environment
 
-                $SecondItem | Add-Member -MemberType NoteProperty -Name PermissionNeeded -Value "false" -Force
-                $SecondItem | Add-Member -MemberType NoteProperty -Name RedundantCmdlet -Value $FirstItem.moduleCmdlet -Force
+    # Compare the permissions to find the redundant ones
+    $comparedPermissions = Compare-Object $allPermissions.leastPermissions $allPermissions.higherPermissions -IncludeEqual
 
-                $data += $FirstItem
-            }
+    # filter to get the higher overwriting permissions
+    $OverwriteHigherPermissions = $comparedPermissions | Where-Object {$_.SideIndicator -eq "=="} | Select-Object -ExpandProperty InputObject -Unique
+
+    # loop thru each module and grab the least permissions unless the higher permissions is one from the $overriteHigherPermissions
+    # Don't include the least permissions that are overwriten by the higher permissions
+    foreach($permission in $allPermissions){
+        if( (Compare-Object $permission.higherPermissions -DifferenceObject $OverwriteHigherPermissions -IncludeEqual).SideIndicator -notcontains "=="){
+            $filteredPermissions += $permission
         }
     }
 
-    #filter out connect
-    $data = $data | Where-Object {$_ -notmatch 'Connect'}
+    # Build a new list of permissions that includes the least permissions and the higher permissions that overwrite them
+    $NewPermissions = @()
+    $NewPermissions += $filteredPermissions | Select-Object -ExpandProperty leastPermissions -Unique
+    # include overwrite higher permissions
+    $NewPermissions += $OverwriteHigherPermissions
+    $NewPermissions = $NewPermissions | Sort-Object -Unique
 
-    If($FilterRedundancy){
-        return $data | Where-Object {$_.PermissionNeeded -ne "false"} | Select -ExpandProperty leastPermissions -Unique | Sort
-    }Else{
-        return $data| Select moduleCmdlet,RedundantCmdlet,PermissionNeeded,leastPermissions
-    }
+    # Display the filtered permissions
+    return $NewPermissions
 }
-<#
-$leastPermissions = Get-ScubaGearPermissions -Product aad -PermissionLevel least
-$higherPermissions = Get-ScubaGearPermissions -Product aad -PermissionLevel higher
-$redundantPermissions = Get-ScubaGearEntraRedundantPermissions
-#Compare the two and populate only the least privileges that does not exist in higher
-$onlyLeastPrivileges = $leastPermissions | Where-Object {$_ -notin $higherPermissions}
-#>
-
 
 Export-ModuleMember -Function Get-ScubaGearPermissions,Get-ScubaGearEntraRedundantPermissions

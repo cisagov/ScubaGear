@@ -48,7 +48,8 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "scubatank"
+            "scubatank",
+            "aad"
         ],
         "supportedEnv": [
             "commercial",
@@ -64,10 +65,10 @@
     },
 
     {
-        "moduleCmdlet": "Get-MgBetaServicePrincipal",
-        "apiResource": "/servicePrincipals/{id}",
+        "moduleCmdlet": "Get-MgBetaApplication",
+        "apiResource": "/applications",
         "poshModule": [
-            "Microsoft.Graph.Beta.Applications"
+            "Microsoft.Graph.Applications"
         ],
         "leastPermissions": [
             "Application.Read.All"
@@ -90,7 +91,8 @@
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-beta"
+            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
+            "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
         ],
         "notes": ""
     },
@@ -118,70 +120,6 @@
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-1.0"
-        ],
-        "notes": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaApplicationFederatedIdentityCredential",
-        "apiResource": "/applications/{id}/federatedIdentityCredentials",
-        "poshModule": [
-            "Microsoft.Graph.Beta.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/application-list-federatedidentitycredentials?view=graph-rest-beta&tabs=http",
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.applications/get-mgbetaapplicationfederatedidentitycredential?view=graph-powershell-beta"
-        ],
-        "notes": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaApplication",
-        "apiResource": "/applications",
-        "poshModule": [
-            "Microsoft.Graph.Beta.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
         ],
         "notes": ""
     },
@@ -223,7 +161,9 @@
         "leastPermissions": [
             "User.Read"
         ],
-        "higherPermissions": null,
+        "higherPermissions": [
+            "User.Read.All"
+        ],
         "spRolePermissions": [],
         "scubaGearProduct": [
             "scubatank"
@@ -758,7 +698,6 @@
         ],
         "higherPermissions": [
             "Directory.Read.All",
-            "Organization.Read.All",
             "Directory.ReadWrite.All"
         ],
         "spRolePermissions": [],
@@ -895,6 +834,33 @@
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
         ],
         "notes": ""
+    },
+
+    {
+        "moduleCmdlet": "Connect-ExchangeOnline",
+        "apiResource": "https://outlook.office365.us/powershell-liveID",
+        "poshModule": [
+            "ExchangeOnlineManagement"
+        ],
+        "leastPermissions": [
+            "Exchange.ManageAsApp"
+        ],
+        "higherPermissions": [],
+        "spRolePermissions": [
+            "Global Reader"
+        ],
+        "scubaGearProduct": [
+            "exo"
+        ],
+        "supportedEnv": [
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000007-0000-0ff1-ce00-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
+        ],
+        "notes": "Microsoft Exchange Online Protection app id is required for gcchigh/DoD environments."
     },
 
     {
@@ -1187,7 +1153,9 @@
         "leastPermissions": [
             "User.Read"
         ],
-        "higherPermissions": [],
+        "higherPermissions": [
+            "User.Read.All"
+        ],
         "spRolePermissions": [],
         "scubaGearProduct": [
             "aad",
@@ -1213,7 +1181,9 @@
         "leastPermissions": [
             "User.Read"
         ],
-        "higherPermissions": [],
+        "higherPermissions": [
+            "User.Read.All"
+        ],
         "spRolePermissions": [],
         "scubaGearProduct": [
             "aad",
@@ -1238,7 +1208,9 @@
         "leastPermissions": [
             "User.Read"
         ],
-        "higherPermissions": [],
+        "higherPermissions": [
+            "User.Read.All"
+        ],
         "spRolePermissions": [],
         "scubaGearProduct": [
             "aad",
