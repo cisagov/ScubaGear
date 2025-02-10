@@ -12,7 +12,7 @@ ScubaGear queries various M365 APIs to gather information about their security s
 | Defender for Office 365 | Global Reader (or Exchange Administrator)                               |
 | Exchange Online         | Global Reader (or Exchange Administrator)                               |
 | Power Platform          | Power Platform Administrator with a "Power Apps for Office 365" license |
-| Sharepoint Online       | SharePoint Administrator                                                |
+| Sharepoint Online       | Global Reader (or SharePoint Administrator)                             |
 | Microsoft Teams         | Global Reader (or Teams Administrator)                                  |
 
 > **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
@@ -39,6 +39,6 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagementPolicy.Read.AzureADGroup
 - User.Read.All
 
-> **Note**: Microsoft Graph PowerShell SDK appears as "unverified" on the AAD application consent screen. This is a long-standing [known issue](https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/482).
+> **Note**: Microsoft Graph PowerShell SDK [now appears as "verified"](https://devblogs.microsoft.com/microsoft365dev/microsoft-graph-powershell-and-cli-are-now-verified/) on the AAD application consent screen.
 
 Once the user and application permissions have been set, ScubaGear can be [executed](../execution/execution.md) in interactive mode.
