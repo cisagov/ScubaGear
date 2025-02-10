@@ -101,16 +101,13 @@ jobs:
           Invoke-Pester -Configuration $Config
       - name: Initialize ScubaGear
         run: |
-          # Name and description are two of the expected output values that result from
-          # installing the module.  These checks are intended to help verify that the module
-          # installed correctly.
+          # This step initializes SG and runs some checks to verify that it installed correctly.
           $ExpectedName = 'ScubaGear'
           # Read the description value from the manifest file (ScubaGear.psd1)
           $ManifestFilePath = Join-Path -Path repo/PowerShell/ScubaGear -ChildPath 'ScubaGear.psd1' -Resolve
           $Manifest = Import-PowerShellDataFile $ManifestFilePath
           $ExpectedDescription = $Manifest.Description
-          # The -PassThru paramaters allows us to read the output
-          # value from Install-Module
+          # The -PassThru parameters allows us to read the output value from Install-Module
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
@@ -126,11 +123,9 @@ jobs:
             Write-Output "::error::The description of the published module should be $ExpectedDescription"
             exit 1
           }
-          # Source the function
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # This is the expected output value that results from running the module.
-          # This check is intended to help verify that ScubaGear installed correctly.
+          # Check for expected version.
           $VersionOutput = Invoke-SCuBA -Version
           $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
           if ($VersionOutput -ne $ExpectedVersion) {
