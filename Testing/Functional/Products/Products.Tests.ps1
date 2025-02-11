@@ -332,7 +332,7 @@ Describe "Policy Checks for <ProductName>"{
                     elseif ($Table.GetProperty("id") -eq "license-info"){
                         #Currently empty to determine if necessary and what to test in section
                     }
-                    elseif ($Table.GetProperty("id") -eq "service-principal"){
+                    elseif ($Table.GetProperty("id") -eq "privileged-service-principals"){
                         #Currently empty to determine if necessary and what to test in section
                     }
                     else {
