@@ -9,7 +9,7 @@ body:
       label: Prerequisites
       options:
         - label: This issue has an informative and human-readable title.
-        required: true
+          required: true
   - type: textarea
     attributes:
       label: "\U0001F4A1 Summary"
