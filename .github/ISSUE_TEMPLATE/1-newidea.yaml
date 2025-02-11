@@ -4,46 +4,46 @@ labels:
   - enhancement
 
 body:
-- type: checkboxes
-  attributes:
-    label: Prerequisites
-    options:
-    - label: This issue has an informative and human-readable title.
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      options:
+      - label: This issue has an informative and human-readable title.
+        required: true
+  - type: textarea
+    attributes:
+      label: "\U0001F4A1 Summary"
+      description: What is the work, as a high-level summary?
+      placeholder: |
+        The purpose of this issue is to accomplish x task for y reason...
+    validations:
       required: true
-- type: textarea
-  attributes:
-    label: "\U0001F4A1 Summary"
-    description: What is the work, as a high-level summary?
-    placeholder: |
-      The purpose of this issue is to accomplish x task for y reason...
-  validations:
-    required: true 
-- type: textarea
-  attributes:
-    label: Motivation and context 
-    description: Why does this work belong in this project?
-    placeholder: |
-     This would be useful because...
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Implementation notes
-    description: Please provide details for implementation. 
-    placeholder: |
-      1. An example for how this would be used
-      2. What would this look like
-      3. How this would act
-      4. Any related work, including links to related issues
-  validations:
-    required: true
-- type: textarea
-  attributes:
-    label: Acceptance criteria (optional)
-    description: How do we know when this work is done?
-    placeholder: |
-      - [ ] The new feature is fully implemented based on x, y, z criteria
-      - [ ] Additional unit test coverage is added
-      - [ ] Any other criteria
-  validations:
-    required: false
+  - type: textarea
+    attributes:
+      label: Motivation and context
+      description: Why does this work belong in this project?
+      placeholder: |
+       This would be useful because...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Implementation notes
+      description: Please provide details for implementation.
+      placeholder: |
+        1. An example for how this would be used
+        2. What would this look like
+        3. How this would act
+        4. Any related work, including links to related issues
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Acceptance criteria (optional)
+      description: How do we know when this work is done?
+      placeholder: |
+        - [ ] The new feature is fully implemented based on x, y, z criteria
+        - [ ] Additional unit test coverage is added
+        - [ ] Any other criteria
+    validations:
+      required: false
