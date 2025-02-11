@@ -8,8 +8,8 @@ body:
     attributes:
       label: Prerequisites
       options:
-      - label: This issue has an informative and human-readable title.
-        required: true
+        - label: This issue has an informative and human-readable title.
+          required: true
   - type: dropdown
     attributes:
       label: Operating System
