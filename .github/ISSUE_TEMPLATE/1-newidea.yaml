@@ -8,7 +8,7 @@ body:
     attributes:
       label: Prerequisites
       options:
-      - label: This issue has an informative and human-readable title.
+        - label: This issue has an informative and human-readable title.
         required: true
   - type: textarea
     attributes:
