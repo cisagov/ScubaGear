@@ -19,7 +19,12 @@ InModuleScope 'ExportEXOProvider' {
             }
             It "Resolves 1 domain name" {
                 # Test basic functionality
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{
+                        "DomainName" = "example.com";
+                        "IsCoexistenceDomain" = $false
+                    }
+                )
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
@@ -27,9 +32,34 @@ InModuleScope 'ExportEXOProvider' {
 
             It "Resolves multiple domain names" {
                 # Test to ensure function will loop over the domain names provided in the -Domains argument.
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"},
-                    @{"DomainName" = "example.com"})
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{
+                        "DomainName" = "example1.com";
+                        "IsCoexistenceDomain" = $false
+                    },
+                    @{
+                        "DomainName" = "example2.com";
+                        "IsCoexistenceDomain" = $false
+                    }
+                )
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
+                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
+                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+            }
+
+            It "Ignores the coexistence domain" {
+                # Test to ensure function will loop over the domain names provided in the -Domains argument.
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{
+                        "DomainName" = "example1.com";
+                        "IsCoexistenceDomain" = $false
+                    },
+                    @{
+                        "DomainName" = "example2.com";
+                        "IsCoexistenceDomain" = $true
+                    }
+                )
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
@@ -47,7 +77,7 @@ InModuleScope 'ExportEXOProvider' {
             It "Prints a warning" {
                 # If Invoke-RobustDnsTxt returns a low confidence answer, Get-ScubaDmarcRecord should print a
                 # warning.
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "example.com"})
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
