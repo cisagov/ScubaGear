@@ -48,7 +48,8 @@ InModuleScope 'ExportEXOProvider' {
             }
 
             It "Ignores the coexistence domain" {
-                # Test to ensure function will loop over the domain names provided in the -Domains argument.
+                # Get-ScubaDmarcRecord needs to skip the coexistence domain because DMARC
+                # records can't be added for it
                 $Response = Get-ScubaDmarcRecord -Domains @(
                     @{
                         "DomainName" = "example1.com";
