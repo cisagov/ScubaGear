@@ -975,7 +975,7 @@
                                                    "Requirement":  "Non-default environments SHOULD have at least one DLP policy affecting them.",
                                                    "Result":  "Warning",
                                                    "Criticality":  "Should",
-                                                   "Details":  "1 Subsequent environments without DLP policies: 407cbeff-b477-e3b4-9ca7-097888a9ec4e"
+                                                   "Details":  "1 Subsequent environments without DLP policies: 2c9cc86c-7a06-4162-adc0-be71f93abb4d"
                                                }
                                            ]
                           },
@@ -16538,7 +16538,7 @@
                          ],
     "environment_list":  [
                              {
-                                 "EnvironmentName":  "407cbeff-b477-e3b4-9ca7-097888a9ec4e",
+                                 "EnvironmentName":  "2c9cc86c-7a06-4162-adc0-be71f93abb4d",
                                  "DisplayName":  "Test-NonDefault",
                                  "Description":  "Testing MS.POWERPLATFORM.2.2",
                                  "IsDefault":  false,
@@ -16559,10 +16559,10 @@
                                  "CommonDataServiceDatabaseProvisioningState":  "Succeeded",
                                  "CommonDataServiceDatabaseType":  "Common Data Service for Apps",
                                  "Internal":  {
-                                                  "id":  "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/407cbeff-b477-e3b4-9ca7-097888a9ec4e",
+                                                  "id":  "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/2c9cc86c-7a06-4162-adc0-be71f93abb4d",
                                                   "type":  "Microsoft.BusinessAppPlatform/scopes/environments",
                                                   "location":  "usgov",
-                                                  "name":  "407cbeff-b477-e3b4-9ca7-097888a9ec4e",
+                                                  "name":  "2c9cc86c-7a06-4162-adc0-be71f93abb4d",
                                                   "properties":  "@{tenantId=ca08493a-c9c8-4db0-a9e8-d3b4bafac269; azureRegionHint=usgovtexas; displayName=Test-NonDefault; description=Testing MS.POWERPLATFORM.2.2; createdTime=2023-12-06T20:18:16.9766324Z; createdBy=; lastModifiedTime=2023-12-06T20:18:27.5107576Z; provisioningState=Succeeded; creationType=User; environmentSku=Sandbox; environmentType=Production; isDefault=False; permissions=; runtimeEndpoints=; linkedEnvironmentMetadata=; trialScenarioType=None; notificationMetadata=; retentionPeriod=P7D; states=; updateCadence=; retentionDetails=; protectionStatus=; cluster=; connectedGroups=System.Object[]; lifecycleOperationsEnforcement=; governanceConfiguration=; bingChatEnabled=False; m365Enabled=False; enableAnalyticsForMakers=True}"
                                               },
                                  "InternalCds":  null,

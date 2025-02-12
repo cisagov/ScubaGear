@@ -1881,14 +1881,14 @@
     },
     {
         "ActualValue":  [
-                            "407cbeff-b477-e3b4-9ca7-097888a9ec4e"
+                            "2c9cc86c-7a06-4162-adc0-be71f93abb4d"
                         ],
         "Commandlet":  [
                            "Get-DlpPolicy"
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.POWERPLATFORM.2.2v1",
-        "ReportDetails":  "1 Subsequent environments without DLP policies: 407cbeff-b477-e3b4-9ca7-097888a9ec4e",
+        "ReportDetails":  "1 Subsequent environments without DLP policies: 2c9cc86c-7a06-4162-adc0-be71f93abb4d",
         "RequirementMet":  false
     },
     {
