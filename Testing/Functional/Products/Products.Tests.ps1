@@ -334,7 +334,7 @@ Describe "Policy Checks for <ProductName>"{
                     }
                     #Currently checks to make sure there are 4 row headers
                     elseif ($Table.GetProperty("id") -eq "privileged-service-principals"){
-                        $RowHeaders = Get-SeElement -Element $Table -By TagName 'th'
+                        $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
                         $RowHeaders | Should -BeExactly 4
 
                     }
