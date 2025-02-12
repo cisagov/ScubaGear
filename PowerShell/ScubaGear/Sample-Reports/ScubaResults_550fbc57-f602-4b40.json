@@ -1,6 +1,6 @@
 ﻿{
     "MetaData": {
-    "TenantId":  "27ecc021-87f7-4346-9682-b62bf3966808",
+    "TenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
     "DisplayName":  "tqhjy",
     "DomainName":  "tqhjy.onmicrosoft.com",
     "ProductSuite":  "Microsoft 365",
@@ -22,14 +22,14 @@
                                    },
     "Tool":  "ScubaGear",
     "ToolVersion":  "1.5.0",
-    "TimestampZulu":  "2024-12-18T15:40:27.138Z",
+    "TimestampZulu":  "2025-02-12T14:30:40.420Z",
     "ReportUUID":  "550fbc57-f602-4b40-bb9a-7ad30a157208"
 },
     "Summary": {
     "AAD":  {
-                "Failures":  11,
+                "Failures":  12,
                 "Errors":  0,
-                "Passes":  11,
+                "Passes":  10,
                 "Warnings":  3,
                 "Manual":  5,
                 "Omits":  0
@@ -53,8 +53,8 @@
     "PowerPlatform":  {
                           "Failures":  0,
                           "Errors":  0,
-                          "Passes":  6,
-                          "Warnings":  0,
+                          "Passes":  5,
+                          "Warnings":  1,
                           "Manual":  2,
                           "Omits":  0
                       },
@@ -141,9 +141,9 @@
                                      {
                                          "Control ID":  "MS.AAD.3.3v1",
                                          "Requirement":  "If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.",
-                                         "Result":  "Pass",
+                                         "Result":  "Fail",
                                          "Criticality":  "Shall",
-                                         "Details":  "Requirement met"
+                                         "Details":  "Requirement not met"
                                      },
                                      {
                                          "Control ID":  "MS.AAD.3.4v1",
@@ -516,7 +516,7 @@
                                               "Requirement":  "Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.",
                                               "Result":  "Fail",
                                               "Criticality":  "Shall",
-                                              "Details":  "Requirement not met. 81 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName"
+                                              "Details":  "Requirement not met. 84 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName"
                                           },
                                           {
                                               "Control ID":  "MS.DEFENDER.6.3v1",
@@ -973,9 +973,9 @@
                                                {
                                                    "Control ID":  "MS.POWERPLATFORM.2.2v1",
                                                    "Requirement":  "Non-default environments SHOULD have at least one DLP policy affecting them.",
-                                                   "Result":  "Pass",
+                                                   "Result":  "Warning",
                                                    "Criticality":  "Should",
-                                                   "Details":  "Requirement met"
+                                                   "Details":  "1 Subsequent environments without DLP policies: 2c9cc86c-7a06-4162-adc0-be71f93abb4d"
                                                }
                                            ]
                           },
@@ -1324,8 +1324,8 @@
     "Raw": {
     "baseline_version":  "1",
     "module_version":  "1.5.0",
-    "date":  "12/18/2024 09:40:27 Central Standard Time",
-    "timestamp_zulu":  "2024-12-18T15:40:27.138Z",
+    "date":  "02/12/2025 08:30:40 Central Standard Time",
+    "timestamp_zulu":  "2025-02-12T14:30:40.420Z",
     "report_uuid":  "550fbc57-f602-4b40-bb9a-7ad30a157208",
     "tenant_details":  [
                            {
@@ -1805,7 +1805,7 @@
                                                          "DeletedDateTime":  null,
                                                          "DirectorySizeQuota":  {
                                                                                     "Total":  300000,
-                                                                                    "Used":  1207
+                                                                                    "Used":  1222
                                                                                 },
                                                          "DisplayName":  "tqhjy",
                                                          "Extensions":  null,
@@ -2074,7 +2074,7 @@
                                                                                                                ]
                                                                                   }
                                                      },
-                               "TenantId":  "27ecc021-87f7-4346-9682-b62bf3966808",
+                               "TenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
                                "DisplayName":  "tqhjy",
                                "DomainName":  "tqhjy.onmicrosoft.com"
                            }
@@ -3204,6 +3204,16 @@
                                                                           "OnPremisesImmutableId":  null
                                                                       }
                          },
+    "privileged_service_principals":  {
+                                          "754baa5d-03d8-401a-a3d4-c2178cac1adc":  {
+                                                                                       "AppId":  "98fa4c56-63ae-44e6-8120-252d2a9d94ab",
+                                                                                       "ServicePrincipalId":  "cb0ebc77-8cfa-413f-9f5b-3f6a9195b8f5",
+                                                                                       "DisplayName":  "Example Service Principal",
+                                                                                       "roles":  [
+                                                                                                     "Exchange Administrator"
+                                                                                                 ]
+                                                                                   }
+                                      },
     "privileged_roles":  [
                              {
                                  "DisplayName":  "Global Administrator",
@@ -3217,7 +3227,7 @@
                                                          "endDateTime":  null,
                                                          "roleAssignmentScheduleId":  "4616f5af-97e5-4849-b8a0-aa1111cee134",
                                                          "id":  "lAPpYvVpN0KRkAEhdxReEOpg3ULpV-pHikOiE9NqnLA-1",
-                                                         "principalId":  "f1c7e52c-7305-4852-8cb9-040f5c88a0ff",
+                                                         "principalId":  "42dd60ea-57e9-47ea-8a43-a213d36a9cb0",
                                                          "appScopeId":  null,
                                                          "memberType":  "Direct",
                                                          "roleDefinitionId":  "62e90394-69f5-4237-9190-012177145e10"
@@ -3230,7 +3240,7 @@
                                                          "endDateTime":  null,
                                                          "roleAssignmentScheduleId":  "lAPpYvVpN0KRkAEhdxReEKhQmi2IZutIhkaGrLdOLwU-1",
                                                          "id":  "lAPpYvVpN0KRkAEhdxReEKhQmi2IZutIhkaGrLdOLwU-1",
-                                                         "principalId":  "f1c7e52c-7305-4852-8cb9-040f5c88a0ff",
+                                                         "principalId":  "2d9a50a8-6688-48eb-8646-86acb74e2f05",
                                                          "appScopeId":  null,
                                                          "memberType":  "Direct",
                                                          "roleDefinitionId":  "62e90394-69f5-4237-9190-012177145e10"
@@ -3243,7 +3253,7 @@
                                                          "endDateTime":  null,
                                                          "roleAssignmentScheduleId":  "lAPpYvVpN0KRkAEhdxReEHwV0C627m1FobGeEeQDs5s-1",
                                                          "id":  "lAPpYvVpN0KRkAEhdxReEHwV0C627m1FobGeEeQDs5s-1",
-                                                         "principalId":  "8421e4d6-f585-4e7a-a7a3-b2749b97cae8",
+                                                         "principalId":  "2ed0157c-eeb6-456d-a1b1-9e11e403b39b",
                                                          "appScopeId":  null,
                                                          "memberType":  "Direct",
                                                          "roleDefinitionId":  "62e90394-69f5-4237-9190-012177145e10"
@@ -3659,13 +3669,13 @@
                                                                                                                                                     {
                                                                                                                                                         "@odata.type":  "#microsoft.graph.singleUser",
                                                                                                                                                         "isBackup":  false,
-                                                                                                                                                        "id":  "a48efc2a-eb97-415d-a29a-c6ff10f24b70",
-                                                                                                                                                        "description":  "John Public"
+                                                                                                                                                        "id":  "f2ac2257-956e-4892-8ced-ec29a4198321",
+                                                                                                                                                        "description":  "John Doe"
                                                                                                                                                     },
                                                                                                                                                     {
                                                                                                                                                         "@odata.type":  "#microsoft.graph.singleUser",
                                                                                                                                                         "isBackup":  false,
-                                                                                                                                                        "id":  "6ceb7ab2-3c57-4969-a425-f76e726e8ab4",
+                                                                                                                                                        "id":  "42dd60ea-57e9-47ea-8a43-a213d36a9cb0",
                                                                                                                                                         "description":  "John Doe"
                                                                                                                                                     }
                                                                                                                                                 ],
@@ -3802,7 +3812,7 @@
                                                          "endDateTime":  null,
                                                          "roleAssignmentScheduleId":  "5wuT_mJe20eRr5jDpJo4sXwV0C627m1FobGeEeQDs5s-1",
                                                          "id":  "5wuT_mJe20eRr5jDpJo4sXwV0C627m1FobGeEeQDs5s-1",
-                                                         "principalId":  "8421e4d6-f585-4e7a-a7a3-b2749b97cae8",
+                                                         "principalId":  "2ed0157c-eeb6-456d-a1b1-9e11e403b39b",
                                                          "appScopeId":  null,
                                                          "memberType":  "Direct",
                                                          "roleDefinitionId":  "fe930be7-5e62-47db-91af-98c3a49a38b1"
@@ -5905,7 +5915,7 @@
                                                          "endDateTime":  null,
                                                          "roleAssignmentScheduleId":  "b6624013-0364-471b-a861-00aad19e7415",
                                                          "id":  "uBph6InB6EaU4WAhOrH4FOpg3ULpV-pHikOiE9NqnLA-1",
-                                                         "principalId":  "f1c7e52c-7305-4852-8cb9-040f5c88a0ff",
+                                                         "principalId":  "42dd60ea-57e9-47ea-8a43-a213d36a9cb0",
                                                          "appScopeId":  null,
                                                          "memberType":  "Direct",
                                                          "roleDefinitionId":  "e8611ab8-c189-46e8-94e1-60213ab1f814"
@@ -8011,14 +8021,15 @@
                                                                                                                       "@odata.type":  "#microsoft.graph.fido2AuthenticationMethodConfiguration",
                                                                                                                       "isSelfServiceRegistrationAllowed":  true,
                                                                                                                       "isAttestationEnforced":  true,
-                                                                                                                      "defaultPasskeyProfile":  "00000000-0000-0000-0000-000000000001",
                                                                                                                       "keyRestrictions":  {
                                                                                                                                               "isEnforced":  true,
                                                                                                                                               "enforcementType":  "allow",
                                                                                                                                               "aaGuids":  [
                                                                                                                                                               "c1f9a0bc-1dd2-404a-b27f-8e29047a43fd",
                                                                                                                                                               "73bb0cd4-e502-49b8-9c6f-b59445bf720b",
-                                                                                                                                                              "85203421-48f9-4355-9bc8-8a53846e5083"
+                                                                                                                                                              "85203421-48f9-4355-9bc8-8a53846e5083",
+                                                                                                                                                              "90a3ccdf-635c-4729-a248-9b709135078f",
+                                                                                                                                                              "de1e552d-db1d-4423-a619-566b625cdc84"
                                                                                                                                                           ]
                                                                                                                                           },
                                                                                                                       "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Fido2')/microsoft.graph.fido2AuthenticationMethodConfiguration/includeTargets",
@@ -8026,29 +8037,9 @@
                                                                                                                                              {
                                                                                                                                                  "targetType":  "group",
                                                                                                                                                  "id":  "e426e4a9-2045-48fe-9949-774a999f7972",
-                                                                                                                                                 "isRegistrationRequired":  false,
-                                                                                                                                                 "allowedPasskeyProfiles":  [
-                                                                                                                                                                                "00000000-0000-0000-0000-000000000001"
-                                                                                                                                                                            ]
+                                                                                                                                                 "isRegistrationRequired":  false
                                                                                                                                              }
-                                                                                                                                         ],
-                                                                                                                      "passkeyProfiles":  [
-                                                                                                                                              {
-                                                                                                                                                  "id":  "00000000-0000-0000-0000-000000000001",
-                                                                                                                                                  "name":  "FIDO2 default profile",
-                                                                                                                                                  "passkeyTypes":  "deviceBound",
-                                                                                                                                                  "isAttestationEnforced":  true,
-                                                                                                                                                  "keyRestrictions":  {
-                                                                                                                                                                          "isEnforced":  true,
-                                                                                                                                                                          "enforcementType":  "allow",
-                                                                                                                                                                          "aaGuids":  [
-                                                                                                                                                                                          "c1f9a0bc-1dd2-404a-b27f-8e29047a43fd",
-                                                                                                                                                                                          "73bb0cd4-e502-49b8-9c6f-b59445bf720b",
-                                                                                                                                                                                          "85203421-48f9-4355-9bc8-8a53846e5083"
-                                                                                                                                                                                      ]
-                                                                                                                                                                      }
-                                                                                                                                              }
-                                                                                                                                          ]
+                                                                                                                                         ]
                                                                                                                   }
                                                                                      },
                                                                                      {
@@ -8059,7 +8050,7 @@
                                                                                          "State":  "enabled",
                                                                                          "AdditionalProperties":  {
                                                                                                                       "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
-                                                                                                                      "isSoftwareOathEnabled":  false,
+                                                                                                                      "isSoftwareOathEnabled":  true,
                                                                                                                       "featureSettings":  {
                                                                                                                                               "companionAppAllowedState":  {
                                                                                                                                                                                "state":  "default",
@@ -8129,7 +8120,7 @@
                                                                                                                       "includeTargets":  [
                                                                                                                                              {
                                                                                                                                                  "targetType":  "user",
-                                                                                                                                                 "id":  "f1c7e52c-7305-4852-8cb9-040f5c88a0ff",
+                                                                                                                                                 "id":  "42dd60ea-57e9-47ea-8a43-a213d36a9cb0",
                                                                                                                                                  "isRegistrationRequired":  false,
                                                                                                                                                  "isUsableForSignIn":  true
                                                                                                                                              }
@@ -8285,6 +8276,26 @@
                                                                                          "ExcludeTargets":  [
 
                                                                                                             ],
+                                                                                         "Id":  "QRCodePin",
+                                                                                         "State":  "disabled",
+                                                                                         "AdditionalProperties":  {
+                                                                                                                      "@odata.type":  "#microsoft.graph.qrCodePinAuthenticationMethodConfiguration",
+                                                                                                                      "standardQRCodeLifetimeInDays":  365,
+                                                                                                                      "pinLength":  8,
+                                                                                                                      "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('QRCodePin')/microsoft.graph.qrCodePinAuthenticationMethodConfiguration/includeTargets",
+                                                                                                                      "includeTargets":  [
+                                                                                                                                             {
+                                                                                                                                                 "targetType":  "group",
+                                                                                                                                                 "id":  "all_users",
+                                                                                                                                                 "isRegistrationRequired":  false
+                                                                                                                                             }
+                                                                                                                                         ]
+                                                                                                                  }
+                                                                                     },
+                                                                                     {
+                                                                                         "ExcludeTargets":  [
+
+                                                                                                            ],
                                                                                          "Id":  "FederatedIdentityCredential",
                                                                                          "State":  "disabled",
                                                                                          "AdditionalProperties":  {
@@ -8311,7 +8322,7 @@
                                                                            "Description":  "The tenant-wide policy that controls which authentication methods are allowed in the tenant, authentication method registration requirements, and self-service password reset settings",
                                                                            "DisplayName":  "Authentication Methods Policy",
                                                                            "Id":  "authenticationMethodsPolicy",
-                                                                           "LastModifiedDateTime":  "\/Date(1708376786872)\/",
+                                                                           "LastModifiedDateTime":  "\/Date(1738795686109)\/",
                                                                            "MicrosoftAuthenticatorPlatformSettings":  {
                                                                                                                           "EnforceAppPin":  {
                                                                                                                                                 "ExcludeTargets":  null,
@@ -8444,16 +8455,202 @@
                                 {
                                     "SkuId":  "e2be619b-b125-455f-8660-fb503e431a5d",
                                     "SkuPartNumber":  "M365_G5_GCC",
-                                    "ConsumedUnits":  25,
+                                    "ConsumedUnits":  26,
                                     "PrepaidUnits":  {
                                                          "Enabled":  30,
-                                                         "LockedOut":  0,
+                                                         "LockedOut":  30,
                                                          "Suspended":  0,
                                                          "Warning":  0
                                                      }
                                 }
                             ],
-    "total_user_count":  103,
+    "total_user_count":  107,
+    "risky_applications":  [
+                               {
+                                   "ObjectId":  {
+                                                    "Application":  "12bf46c3-bb2e-462a-a89e-9520273e018c",
+                                                    "ServicePrincipal":  "8b857956-a32f-4535-a46a-4289d0fe597a"
+                                                },
+                                   "AppId":  "6e34be13-97a9-4315-a913-9c87e453a7a9",
+                                   "DisplayName":  "Test Application 01",
+                                   "IsMultiTenantEnabled":  false,
+                                   "KeyCredentials":  {
+                                                          "KeyId":  "7f5dd60a-43e5-4072-81cc-b6256df80488",
+                                                          "DisplayName":  "E=contact@example.com, CN=alice, OU=example, O=www.example.com, S=Kansas, C=US",
+                                                          "StartDateTime":  "\/Date(1335522678000)\/",
+                                                          "EndDateTime":  "\/Date(1650882678000)\/",
+                                                          "IsFromApplication":  true
+                                                      },
+                                   "PasswordCredentials":  [
+                                                               {
+                                                                   "KeyId":  "003dbd58-0e7b-4d17-b5fb-61e79ce9b6ef",
+                                                                   "DisplayName":  "Test secret 2",
+                                                                   "StartDateTime":  "\/Date(1733964332825)\/",
+                                                                   "EndDateTime":  "\/Date(1749512732825)\/",
+                                                                   "IsFromApplication":  true
+                                                               },
+                                                               {
+                                                                   "KeyId":  "dd341f32-99c6-459c-b243-63ac90a1d165",
+                                                                   "DisplayName":  "Test secret 1",
+                                                                   "StartDateTime":  "\/Date(1733963922394)\/",
+                                                                   "EndDateTime":  "\/Date(1733990400000)\/",
+                                                                   "IsFromApplication":  true
+                                                               }
+                                                           ],
+                                   "FederatedCredentials":  {
+                                                                "Id":  "e5f56442-e602-4a64-b5c9-2f9beeb092fd",
+                                                                "Name":  "tmp-credential-1",
+                                                                "Description":  "",
+                                                                "Issuer":  "https://token.actions.githubusercontent.com",
+                                                                "Subject":  "repo:testorg/example-project:pull_request",
+                                                                "Audiences":  "api://AzureADTokenExchange\r\n"
+                                                            },
+                                   "RiskyPermissions":  [
+                                                            {
+                                                                "RoleId":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                                                                "RoleDisplayName":  "Directory.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  false
+                                                            },
+                                                            {
+                                                                "RoleId":  "75359482-378d-4052-8f01-80520e7db3cd",
+                                                                "RoleDisplayName":  "Files.ReadWrite.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  false
+                                                            },
+                                                            {
+                                                                "RoleId":  "62a82d76-70ea-41e2-9197-370581804d09",
+                                                                "RoleDisplayName":  "Group.ReadWrite.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  false
+                                                            },
+                                                            {
+                                                                "RoleId":  "e2a3a72e-5f79-4c64-b1b1-878b674786c9",
+                                                                "RoleDisplayName":  "Mail.ReadWrite",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "6931bccd-447a-43d1-b442-00a195474933",
+                                                                "RoleDisplayName":  "MailboxSettings.ReadWrite",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "01c0a623-fc9b-48e9-b794-0756f8e8f067",
+                                                                "RoleDisplayName":  "Policy.ReadWrite.ConditionalAccess",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "df021288-bdef-4463-88db-98f22de89214",
+                                                                "RoleDisplayName":  "User.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            }
+                                                        ]
+                               },
+                               {
+                                   "ObjectId":  {
+                                                    "Application":  "4e36b74e-3acc-4117-8a62-282bd156b249",
+                                                    "ServicePrincipal":  "d7790820-7a09-4792-b071-c1d97b4dcbb0"
+                                                },
+                                   "AppId":  "c1012570-2c2d-4740-9d13-3e209a2f6188",
+                                   "DisplayName":  "Phishing Email Sender",
+                                   "IsMultiTenantEnabled":  false,
+                                   "KeyCredentials":  [
+                                                          {
+                                                              "KeyId":  "65dd232a-9773-4109-a9f5-c56fb80ba1f4",
+                                                              "DisplayName":  "John Doe's laptop",
+                                                              "StartDateTime":  "\/Date(1712162249000)\/",
+                                                              "EndDateTime":  "\/Date(1743699449000)\/",
+                                                              "IsFromApplication":  true
+                                                          }
+                                                      ],
+                                   "PasswordCredentials":  null,
+                                   "FederatedCredentials":  null,
+                                   "RiskyPermissions":  [
+                                                            {
+                                                                "RoleId":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                                                                "RoleDisplayName":  "Directory.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "5b567255-7703-4780-807c-7be8301ae99b",
+                                                                "RoleDisplayName":  "Group.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "b633e1c5-b582-4048-a93e-9f11b44c7e96",
+                                                                "RoleDisplayName":  "Mail.Send",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+                                                                "RoleDisplayName":  "Policy.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  false
+                                                            },
+                                                            {
+                                                                "RoleId":  "a82116e5-55eb-4c41-a434-62fe8a61c773",
+                                                                "RoleDisplayName":  "Sites.FullControl.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            },
+                                                            {
+                                                                "RoleId":  "df021288-bdef-4463-88db-98f22de89214",
+                                                                "RoleDisplayName":  "User.Read.All",
+                                                                "ApplicationDisplayName":  "Microsoft Graph",
+                                                                "IsAdminConsented":  true
+                                                            }
+                                                        ]
+                               }
+                           ],
+    "risky_third_party_service_principals":  [
+                                                 {
+                                                     "ObjectId":  "ca22fbf9-07b8-440d-bc88-b1518072f779",
+                                                     "AppId":  "d4949ca2-2219-47a9-8a79-99e177d6421f",
+                                                     "DisplayName":  "ScubaConnect",
+                                                     "KeyCredentials":  null,
+                                                     "PasswordCredentials":  null,
+                                                     "FederatedCredentials":  null,
+                                                     "RiskyPermissions":  [
+                                                                              {
+                                                                                  "RoleId":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                                                                                  "RoleDisplayName":  "Directory.Read.All",
+                                                                                  "ApplicationDisplayName":  "Microsoft Graph",
+                                                                                  "IsAdminConsented":  true
+                                                                              },
+                                                                              {
+                                                                                  "RoleId":  "df021288-bdef-4463-88db-98f22de89214",
+                                                                                  "RoleDisplayName":  "User.Read.All",
+                                                                                  "ApplicationDisplayName":  "Microsoft Graph",
+                                                                                  "IsAdminConsented":  true
+                                                                              },
+                                                                              {
+                                                                                  "RoleId":  "98830695-27a2-44f7-8c18-0c3ebc9698f6",
+                                                                                  "RoleDisplayName":  "GroupMember.Read.All",
+                                                                                  "ApplicationDisplayName":  "Microsoft Graph",
+                                                                                  "IsAdminConsented":  true
+                                                                              },
+                                                                              {
+                                                                                  "RoleId":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+                                                                                  "RoleDisplayName":  "Policy.Read.All",
+                                                                                  "ApplicationDisplayName":  "Microsoft Graph",
+                                                                                  "IsAdminConsented":  true
+                                                                              },
+                                                                              {
+                                                                                  "RoleId":  "678536fe-1083-478a-9c59-b99265e6b0d3",
+                                                                                  "RoleDisplayName":  "Sites.FullControl.All",
+                                                                                  "ApplicationDisplayName":  "Office 365 SharePoint Online",
+                                                                                  "IsAdminConsented":  true
+                                                                              }
+                                                                          ]
+                                                 }
+                                             ],
     "aad_successful_commands":  [
                                     "Get-MgBetaIdentityConditionalAccessPolicy",
                                     "Get-MgBetaSubscribedSku",
@@ -8463,7 +8660,11 @@
                                     "Get-MgBetaPolicyAuthorizationPolicy",
                                     "Get-MgBetaDirectorySetting",
                                     "Get-MgBetaPolicyAuthenticationMethodPolicy",
-                                    "Get-MgBetaDomain"
+                                    "Get-MgBetaDomain",
+                                    "Get-ApplicationsWithRiskyPermissions",
+                                    "Get-ServicePrincipalsWithRiskyPermissions",
+                                    "Format-RiskyApplications",
+                                    "Format-RiskyThirdPartyServicePrincipals"
                                 ],
     "aad_unsuccessful_commands":  [
 
@@ -8504,7 +8705,7 @@
                                         "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                         "Name":  "Strict Preset Security Policy",
                                         "IsValid":  true,
-                                        "WhenChanged":  "\/Date(1734516882000)\/",
+                                        "WhenChanged":  "\/Date(1739363291000)\/",
                                         "ExchangeVersion":  "0.1 (8.0.535.0)",
                                         "ObjectState":  "Unchanged"
                                     },
@@ -8539,7 +8740,7 @@
                                         "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                         "Name":  "Standard Preset Security Policy",
                                         "IsValid":  true,
-                                        "WhenChanged":  "\/Date(1734516734000)\/",
+                                        "WhenChanged":  "\/Date(1739363137000)\/",
                                         "ExchangeVersion":  "0.1 (8.0.535.0)",
                                         "ObjectState":  "Unchanged"
                                     }
@@ -8579,7 +8780,7 @@
                                  "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                  "Name":  "Strict Preset Security Policy",
                                  "IsValid":  true,
-                                 "WhenChanged":  "\/Date(1734517038000)\/",
+                                 "WhenChanged":  "\/Date(1739363466000)\/",
                                  "ExchangeVersion":  "0.1 (8.0.535.0)",
                                  "ObjectState":  "Unchanged"
                              },
@@ -8613,7 +8814,7 @@
                                  "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                  "Name":  "Standard Preset Security Policy",
                                  "IsValid":  true,
-                                 "WhenChanged":  "\/Date(1734516962000)\/",
+                                 "WhenChanged":  "\/Date(1739363388000)\/",
                                  "ExchangeVersion":  "0.1 (8.0.535.0)",
                                  "ObjectState":  "Unchanged"
                              }
@@ -8780,170 +8981,6 @@
                                         "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com",
                                         "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration",
                                         "Guid":  "8cb4f574-1a54-45e1-bf58-73bbe023ebad",
-                                        "OriginatingServer":  "",
-                                        "ObjectState":  "Changed"
-                                    },
-                                    {
-                                        "Mode":  "Disable",
-                                        "DisplayName":  "tqhjy DLP Policy for PII",
-                                        "Type":  "Dlp",
-                                        "ExchangeLocation":  [
-                                                                 "All"
-                                                             ],
-                                        "SharePointLocation":  [
-                                                                   "All"
-                                                               ],
-                                        "SharePointLocationException":  [
-
-                                                                        ],
-                                        "OneDriveLocation":  [
-                                                                 "All"
-                                                             ],
-                                        "OneDriveLocationException":  [
-
-                                                                      ],
-                                        "ExchangeOnPremisesLocation":  [
-
-                                                                       ],
-                                        "SharePointOnPremisesLocation":  [
-
-                                                                         ],
-                                        "SharePointOnPremisesLocationException":  [
-
-                                                                                  ],
-                                        "TeamsLocation":  [
-                                                              "All"
-                                                          ],
-                                        "TeamsLocationException":  [
-
-                                                                   ],
-                                        "EndpointDlpLocation":  [
-
-                                                                ],
-                                        "EndpointDlpLocationException":  [
-
-                                                                         ],
-                                        "ThirdPartyAppDlpLocation":  [
-
-                                                                     ],
-                                        "ThirdPartyAppDlpLocationException":  [
-
-                                                                              ],
-                                        "OnPremisesScannerDlpLocation":  [
-
-                                                                         ],
-                                        "OnPremisesScannerDlpLocationException":  [
-
-                                                                                  ],
-                                        "PowerBIDlpLocation":  [
-
-                                                               ],
-                                        "PowerBIDlpLocationException":  [
-
-                                                                        ],
-                                        "Locations":  "",
-                                        "LocationInclusions":  [
-
-                                                               ],
-                                        "LocationExclusions":  [
-
-                                                               ],
-                                        "EndpointDlpExtendedLocations":  "",
-                                        "ExchangeSender":  [
-
-                                                           ],
-                                        "ExchangeSenderException":  [
-
-                                                                    ],
-                                        "PolicyTemplateInfo":  {
-
-                                                               },
-                                        "PolicyCategory":  "Unknown",
-                                        "MatchedItemsCount":  null,
-                                        "TotalItemsCount":  null,
-                                        "TopNLocationStatistics":  null,
-                                        "WorkloadStatistics":  null,
-                                        "IsSimulationPolicy":  false,
-                                        "SimulationStatus":  null,
-                                        "AutoEnableAfter":  null,
-                                        "IsFromSmartInsights":  null,
-                                        "IsColdDataSimulationPolicy":  false,
-                                        "ExtendedProperties":  null,
-                                        "Summary":  false,
-                                        "OneDriveSharedBy":  [
-
-                                                             ],
-                                        "ExceptIfOneDriveSharedBy":  [
-
-                                                                     ],
-                                        "OneDriveSharedByMemberOf":  [
-
-                                                                     ],
-                                        "ExceptIfOneDriveSharedByMemberOf":  [
-
-                                                                             ],
-                                        "ExchangeSenderMemberOf":  [
-
-                                                                   ],
-                                        "ExchangeSenderMemberOfException":  [
-
-                                                                            ],
-                                        "ExchangeAdaptiveScopes":  null,
-                                        "ExchangeAdaptiveScopesException":  null,
-                                        "SharePointAdaptiveScopes":  null,
-                                        "SharePointAdaptiveScopesException":  null,
-                                        "OneDriveAdaptiveScopes":  null,
-                                        "OneDriveAdaptiveScopesException":  null,
-                                        "TeamsAdaptiveScopes":  null,
-                                        "TeamsAdaptiveScopesException":  null,
-                                        "EndpointDlpAdaptiveScopes":  null,
-                                        "EndpointDlpAdaptiveScopesException":  null,
-                                        "ExpectedLocations":  0,
-                                        "CompletedLocations":  0,
-                                        "FailedLocations":  0,
-                                        "ItemStatistics":  null,
-                                        "RuleMatchBlob":  null,
-                                        "ErrorMetadata":  null,
-                                        "UserAdministrativeUnitMembershipMap":  null,
-                                        "ForceValidate":  false,
-                                        "PolicyRulesMetaData":  "{\"WhenRulesChangedUtc\":\"2023-06-14T14:36:08.0311995Z\"}",
-                                        "ReusableComponentType":  "Unknown",
-                                        "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams",
-                                        "Priority":  2,
-                                        "ObjectVersion":  "2100d11a-6dd8-4e2a-4776-08dbcf0f5618",
-                                        "CreatedBy":  "d459e626-e311-4242-bb40-263313097103",
-                                        "LastModifiedBy":  "John Doe",
-                                        "ReadOnly":  false,
-                                        "ExternalIdentity":  "",
-                                        "Comment":  "",
-                                        "Enabled":  false,
-                                        "DistributionStatus":  "Pending",
-                                        "DistributionSyncStatus":  "Unknown",
-                                        "DistributionResults":  null,
-                                        "LastStatusUpdateTime":  null,
-                                        "ModificationTimeUtc":  "\/Date(1697564897897)\/",
-                                        "CreationTimeUtc":  "\/Date(1618336038880)\/",
-                                        "PolicyRBACScopes":  [
-
-                                                             ],
-                                        "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration/tqhjy DLP Policy for PII",
-                                        "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration/tqhjy DLP Policy for PII",
-                                        "IsValid":  true,
-                                        "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                        "Name":  "tqhjy DLP Policy for PII",
-                                        "DistinguishedName":  "CN=tqhjy DLP Policy for PII,CN=Configuration,CN=tqhjy.onmicrosoft.com,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
-                                        "ObjectCategory":  null,
-                                        "ObjectClass":  [
-                                                            "msExchUnifiedPolicy"
-                                                        ],
-                                        "WhenChanged":  "\/Date(1697546897000)\/",
-                                        "WhenCreated":  "\/Date(1618318038000)\/",
-                                        "WhenChangedUTC":  "\/Date(1697546897000)\/",
-                                        "WhenCreatedUTC":  "\/Date(1618318038000)\/",
-                                        "ExchangeObjectId":  "b800d92f-a479-47a9-bcfa-306db665aaa1",
-                                        "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com",
-                                        "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration",
-                                        "Guid":  "b800d92f-a479-47a9-bcfa-306db665aaa1",
                                         "OriginatingServer":  "",
                                         "ObjectState":  "Changed"
                                     }
@@ -9271,6 +9308,368 @@
                                      "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration",
                                      "OriginatingServer":  "",
                                      "ObjectState":  "Changed",
+                                     "IsObjectUnderSystemOperation":  false,
+                                     "IsSummarizedPsRule":  false
+                                 },
+                                 {
+                                     "SubjectContainsWords":  [
+
+                                                              ],
+                                     "ExceptIfSubjectContainsWords":  [
+
+                                                                      ],
+                                     "SubjectOrBodyMatchesPatterns":  [
+
+                                                                      ],
+                                     "ExceptIfSubjectOrBodyMatchesPatterns":  [
+
+                                                                              ],
+                                     "SubjectOrBodyContainsWords":  [
+
+                                                                    ],
+                                     "ExceptIfSubjectOrBodyContainsWords":  [
+
+                                                                            ],
+                                     "DocumentMatchesPatterns":  [
+
+                                                                 ],
+                                     "ExceptIfDocumentMatchesPatterns":  [
+
+                                                                         ],
+                                     "DocumentContainsWords":  [
+
+                                                               ],
+                                     "ExceptIfDocumentContainsWords":  [
+
+                                                                       ],
+                                     "SenderADAttributeMatchesPatterns":  null,
+                                     "ExceptIfSenderADAttributeMatchesPatterns":  null,
+                                     "SenderADAttributeContainsWords":  null,
+                                     "ExceptIfSenderADAttributeContainsWords":  null,
+                                     "RecipientADAttributeMatchesPatterns":  null,
+                                     "ExceptIfRecipientADAttributeMatchesPatterns":  null,
+                                     "RecipientADAttributeContainsWords":  null,
+                                     "ExceptIfRecipientADAttributeContainsWords":  null,
+                                     "ContentCharacterSetContainsWords":  [
+
+                                                                          ],
+                                     "ExceptIfContentCharacterSetContainsWords":  [
+
+                                                                                  ],
+                                     "DocumentNameMatchesPatterns":  [
+
+                                                                     ],
+                                     "ExceptIfDocumentNameMatchesPatterns":  [
+
+                                                                             ],
+                                     "MessageSizeOver":  "",
+                                     "ExceptIfMessageSizeOver":  "",
+                                     "AttachmentCountOver":  null,
+                                     "MessageTypeMatches":  null,
+                                     "ExceptIfMessageTypeMatches":  null,
+                                     "UnscannableDocumentExtensionIs":  [
+
+                                                                        ],
+                                     "ExceptIfUnscannableDocumentExtensionIs":  [
+
+                                                                                ],
+                                     "HeaderContainsWords":  null,
+                                     "ExceptIfHeaderContainsWords":  null,
+                                     "HeaderContainsTokens":  null,
+                                     "ExceptIfHeaderContainsTokens":  null,
+                                     "DeviceManagementType":  null,
+                                     "ExceptIfDeviceManagementType":  null,
+                                     "AccessedBy":  [
+
+                                                    ],
+                                     "ExceptIfAccessedBy":  [
+
+                                                            ],
+                                     "AccessedByMemberOf":  [
+
+                                                            ],
+                                     "ExceptIfAccessedByMemberOf":  [
+
+                                                                    ],
+                                     "BlockAccess":  false,
+                                     "BlockAccessScope":  null,
+                                     "EncryptRMSTemplate":  null,
+                                     "EnforcePortalAccess":  true,
+                                     "ApplyBrandingTemplate":  "",
+                                     "RemoveRMSTemplate":  false,
+                                     "EndpointDlpRestrictions":  [
+                                                                     {
+                                                                         "setting":  "CloudEgress",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Audit",
+                                                                         "appgroup":  "none"
+                                                                     },
+                                                                     {
+                                                                         "setting":  "CopyPaste",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Audit",
+                                                                         "appgroup":  "none"
+                                                                     },
+                                                                     {
+                                                                         "setting":  "RemovableMedia",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Audit",
+                                                                         "appgroup":  "none"
+                                                                     },
+                                                                     {
+                                                                         "setting":  "NetworkShare",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Audit",
+                                                                         "appgroup":  "none"
+                                                                     },
+                                                                     {
+                                                                         "setting":  "UnallowedApps",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Block",
+                                                                         "appgroup":  "none"
+                                                                     },
+                                                                     {
+                                                                         "setting":  "Print",
+                                                                         "defaultmessage":  "none",
+                                                                         "value":  "Audit",
+                                                                         "appgroup":  "none"
+                                                                     }
+                                                                 ],
+                                     "EndpointDlpBrowserRestrictions":  null,
+                                     "ThirdPartyAppDlpRestrictions":  null,
+                                     "OnPremisesScannerDlpRestrictions":  null,
+                                     "PowerBIDlpRestrictions":  null,
+                                     "AlertProperties":  {
+                                                             "AggregationType":  "None"
+                                                         },
+                                     "GenerateAlert":  [
+                                                           "true"
+                                                       ],
+                                     "GenerateIncidentReport":  [
+
+                                                                ],
+                                     "IncidentReportContent":  null,
+                                     "NotifyUser":  [
+                                                        "LastModifier"
+                                                    ],
+                                     "NotifyAllowOverride":  null,
+                                     "NotifyEmailCustomText":  "",
+                                     "NotifyEmailCustomSubject":  "",
+                                     "NotifyEmailCustomSenderDisplayName":  "",
+                                     "NotifyEmailExchangeIncludeAttachment":  true,
+                                     "NotifyEmailOnedriveRemediationActions":  "NotSet",
+                                     "NotifyJustificationCustomText":  "",
+                                     "NotifyJustificationCustomTextTranslations":  [
+
+                                                                                   ],
+                                     "NotifyPolicyTipCustomText":  "",
+                                     "NotifyUserType":  "NotSet",
+                                     "NotifyPolicyTipCustomTextTranslations":  [
+
+                                                                               ],
+                                     "NotifyOverrideRequirements":  "None",
+                                     "NotifyPolicyTipDisplayOption":  "Tip",
+                                     "NotifyPolicyTipUrl":  "",
+                                     "NotifyPolicyTipCustomDialog":  "",
+                                     "NotifyEndpointUser":  null,
+                                     "RemoveHeader":  [
+
+                                                      ],
+                                     "AccessTimeControl":  null,
+                                     "StopPolicyProcessing":  false,
+                                     "SetHeader":  null,
+                                     "AddRecipients":  null,
+                                     "Moderate":  null,
+                                     "ModifySubject":  null,
+                                     "MapRecipients":  null,
+                                     "RedirectMessageTo":  null,
+                                     "PrependSubject":  "",
+                                     "ApplyHtmlDisclaimer":  null,
+                                     "Quarantine":  false,
+                                     "TriggerPowerAutomateFlow":  "",
+                                     "RestrictAccess":  null,
+                                     "MipRestrictAccess":  null,
+                                     "SourceType":  "",
+                                     "Guid":  "cb32ef11-441c-4536-a40e-a062000a55c5",
+                                     "AdvancedRuleBuilderContext":  null,
+                                     "ParentPolicyName":  "DevicePolicy_CCOnly",
+                                     "ReportSeverityLevel":  "Low",
+                                     "ActivationDate":  null,
+                                     "ExpiryDate":  null,
+                                     "SenderType":  null,
+                                     "SenderAddressLocation":  null,
+                                     "AdvancedRule":  "{\r\n  \"Version\": \"1.0\",\r\n  \"Condition\": {\r\n    \"Operator\": \"And\",\r\n    \"SubConditions\": [\r\n      {\r\n        \"ConditionName\": \"ContentContainsSensitiveInformation\",\r\n        \"Value\": [\r\n          {\r\n            \"Groups\": [\r\n              {\r\n                \"Name\": \"CCOnly\",\r\n                \"Operator\": \"Or\",\r\n                \"Sensitivetypes\": [\r\n                  {\r\n                    \"Name\": \"Credit Card Number\",\r\n                    \"Id\": \"50842eb7-edc8-4019-85dd-5a5c1f2bb085\",\r\n                    \"Mincount\": 1,\r\n                    \"Maxcount\": -1,\r\n                    \"Confidencelevel\": \"High\",\r\n                    \"Minconfidence\": 85,\r\n                    \"Maxconfidence\": 100\r\n                  }\r\n                ]\r\n              }\r\n            ],\r\n            \"Operator\": \"And\"\r\n          }\r\n        ]\r\n      }\r\n    ]\r\n  }\r\n}",
+                                     "ExecutionRuleGuids":  null,
+                                     "DisplayName":  "CreditCardsOnly",
+                                     "StorageBindings":  null,
+                                     "EvaluateRulePerComponent":  false,
+                                     "IsAdvancedRule":  true,
+                                     "ContentContainsSensitiveInformation":  null,
+                                     "ExceptIfContentContainsSensitiveInformation":  null,
+                                     "ContentMissingSensitivityLabel":  null,
+                                     "ContentIsNotLabeled":  false,
+                                     "AttachmentIsNotLabeled":  false,
+                                     "MessageIsNotLabeled":  false,
+                                     "DocumentCreatedBy":  [
+
+                                                           ],
+                                     "ExceptIfDocumentCreatedBy":  [
+
+                                                                   ],
+                                     "DocumentSizeOver":  "",
+                                     "ExceptIfDocumentSizeOver":  "",
+                                     "DocumentNameMatchesWords":  [
+
+                                                                  ],
+                                     "ExceptIfDocumentNameMatchesWords":  [
+
+                                                                          ],
+                                     "AccessScope":  null,
+                                     "NonBifurcatingAccessScope":  null,
+                                     "ExceptIfAccessScope":  null,
+                                     "FromScope":  null,
+                                     "ExceptIfFromScope":  null,
+                                     "WithImportance":  null,
+                                     "ExceptIfWithImportance":  null,
+                                     "ExternalScenarioDependancies":  {
+                                                                          "ProtectionAlertId":  "d46f69a5-6277-49fc-ad26-e0b701c034d0"
+                                                                      },
+                                     "ContentPropertyContainsWords":  [
+
+                                                                      ],
+                                     "ExceptIfContentPropertyContainsWords":  [
+
+                                                                              ],
+                                     "From":  null,
+                                     "ExceptIfFrom":  null,
+                                     "FromMemberOf":  null,
+                                     "ExceptIfFromMemberOf":  null,
+                                     "DocumentIsUnsupported":  false,
+                                     "ExceptIfDocumentIsUnsupported":  false,
+                                     "HasSenderOverride":  false,
+                                     "ExceptIfHasSenderOverride":  false,
+                                     "RestrictBrowserAccess":  false,
+                                     "ProcessingLimitExceeded":  false,
+                                     "ExceptIfProcessingLimitExceeded":  false,
+                                     "SentTo":  [
+
+                                                ],
+                                     "ExceptIfSentTo":  [
+
+                                                        ],
+                                     "RecipientDomainIs":  [
+
+                                                           ],
+                                     "ExceptIfRecipientDomainIs":  [
+
+                                                                   ],
+                                     "DocumentIsPasswordProtected":  false,
+                                     "ExceptIfDocumentIsPasswordProtected":  false,
+                                     "SenderIPRanges":  [
+
+                                                        ],
+                                     "ExceptIfSenderIPRanges":  [
+
+                                                                ],
+                                     "ContentExtensionMatchesWords":  [
+
+                                                                      ],
+                                     "ExceptIfContentExtensionMatchesWords":  [
+
+                                                                              ],
+                                     "ContentFileTypeMatches":  [
+
+                                                                ],
+                                     "ExceptIfContentFileTypeMatches":  [
+
+                                                                        ],
+                                     "HeaderMatchesPatterns":  null,
+                                     "ExceptIfHeaderMatchesPatterns":  null,
+                                     "SubjectMatchesPatterns":  [
+
+                                                                ],
+                                     "ExceptIfSubjectMatchesPatterns":  [
+
+                                                                        ],
+                                     "AnyOfRecipientAddressContainsWords":  [
+
+                                                                            ],
+                                     "ExceptIfAnyOfRecipientAddressContainsWords":  [
+
+                                                                                    ],
+                                     "AnyOfRecipientAddressMatchesPatterns":  [
+
+                                                                              ],
+                                     "ExceptIfAnyOfRecipientAddressMatchesPatterns":  [
+
+                                                                                      ],
+                                     "FromAddressMatchesPatterns":  [
+
+                                                                    ],
+                                     "ExceptIfFromAddressMatchesPatterns":  [
+
+                                                                            ],
+                                     "FromAddressContainsWords":  [
+
+                                                                  ],
+                                     "ExceptIfFromAddressContainsWords":  [
+
+                                                                          ],
+                                     "SenderDomainIs":  [
+
+                                                        ],
+                                     "ExceptIfSenderDomainIs":  [
+
+                                                                ],
+                                     "SentToMemberOf":  null,
+                                     "ExceptIfSentToMemberOf":  null,
+                                     "DocumentCreatedByMemberOf":  null,
+                                     "ExceptIfDocumentCreatedByMemberOf":  null,
+                                     "HasLabelDowngradedFrom":  [
+
+                                                                ],
+                                     "ContentIsShared":  false,
+                                     "ExceptIfContentIsShared":  false,
+                                     "SharedByIRMUserRisk":  [
+
+                                                             ],
+                                     "MessageLabelChangeDetected":  null,
+                                     "ExceptIfMessageLabelChangeDetected":  null,
+                                     "RuleErrorAction":  null,
+                                     "RuleXml":  "",
+                                     "ReadOnly":  false,
+                                     "ErrorMetadata":  null,
+                                     "ExternalIdentity":  "",
+                                     "ImmutableId":  "37de612f-186b-4069-918f-b4c6f90037a8",
+                                     "Priority":  0,
+                                     "Workload":  "Exchange, SharePoint, OneDriveForBusiness, EndpointDevices",
+                                     "Policy":  "2a4e7cb6-9da7-468f-a58e-42975ea7cd71",
+                                     "Comment":  "Rule that blocks access to credit card numbers on devices.",
+                                     "Disabled":  false,
+                                     "Mode":  "Enforce",
+                                     "ObjectVersion":  "69df3855-a67f-4b5a-1b8a-08dbfd7c0c88",
+                                     "MaximumBlobRuleLength":  0,
+                                     "CreatedBy":  "John Doe",
+                                     "LastModifiedBy":  "John Doe",
+                                     "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration/CreditCardsOnly",
+                                     "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration/CreditCardsOnly",
+                                     "IsValid":  true,
+                                     "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                     "Name":  "CreditCardsOnly",
+                                     "DistinguishedName":  "CN=CreditCardsOnly,CN=Configuration,CN=tqhjy.onmicrosoft.com,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                     "ObjectCategory":  null,
+                                     "ObjectClass":  [
+                                                         "msExchUnifiedRule"
+                                                     ],
+                                     "WhenChanged":  "\/Date(1702651343000)\/",
+                                     "WhenCreated":  "\/Date(1702651343000)\/",
+                                     "WhenChangedUTC":  "\/Date(1702651343000)\/",
+                                     "WhenCreatedUTC":  "\/Date(1702651343000)\/",
+                                     "ExchangeObjectId":  "cb32ef11-441c-4536-a40e-a062000a55c5",
+                                     "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com",
+                                     "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com/Configuration",
+                                     "OriginatingServer":  "",
+                                     "ObjectState":  "New",
                                      "IsObjectUnderSystemOperation":  false,
                                      "IsSummarizedPsRule":  false
                                  },
@@ -11139,9 +11538,9 @@
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
-                                    "WhenChanged":  "\/Date(1734517409000)\/",
+                                    "WhenChanged":  "\/Date(1739363850000)\/",
                                     "WhenCreated":  "\/Date(1681329956000)\/",
-                                    "WhenChangedUTC":  "\/Date(1734517409000)\/",
+                                    "WhenChangedUTC":  "\/Date(1739363850000)\/",
                                     "WhenCreatedUTC":  "\/Date(1681329956000)\/",
                                     "ExchangeObjectId":  "dd855979-da0e-4109-b218-cebf593d1771",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -11217,9 +11616,9 @@
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
-                                    "WhenChanged":  "\/Date(1734517409000)\/",
+                                    "WhenChanged":  "\/Date(1739363850000)\/",
                                     "WhenCreated":  "\/Date(1659535432000)\/",
-                                    "WhenChangedUTC":  "\/Date(1734517409000)\/",
+                                    "WhenChangedUTC":  "\/Date(1739363850000)\/",
                                     "WhenCreatedUTC":  "\/Date(1659535432000)\/",
                                     "ExchangeObjectId":  "c039f211-68f7-43e8-822f-91c1e0e018f7",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -11989,12 +12388,12 @@
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
                                   "Guid":  "b8f6b088-5487-4c70-037c-08d8d71a43fe",
-                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages removed after deliveryÃ¢â‚¬â€¹",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages removed after deliveryÃ¢â‚¬â€¹",
                                   "IsValid":  true,
                                   "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                  "Name":  "Email messages removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "DistinguishedName":  "CN=Email messages removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "Name":  "Email messages removed after deliveryÃ¢â‚¬â€¹",
+                                  "DistinguishedName":  "CN=Email messages removed after deliveryÃ¢â‚¬â€¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
                                   "ObjectCategory":  null,
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
@@ -12063,12 +12462,12 @@
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
                                   "Guid":  "c8522cbb-9368-4e25-4ee9-08d8d899dfab",
-                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages from a campaign removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages from a campaign removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages from a campaign removed after deliveryÃ¢â‚¬â€¹",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages from a campaign removed after deliveryÃ¢â‚¬â€¹",
                                   "IsValid":  true,
                                   "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                  "Name":  "Email messages from a campaign removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "DistinguishedName":  "CN=Email messages from a campaign removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "Name":  "Email messages from a campaign removed after deliveryÃ¢â‚¬â€¹",
+                                  "DistinguishedName":  "CN=Email messages from a campaign removed after deliveryÃ¢â‚¬â€¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
                                   "ObjectCategory":  null,
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
@@ -12213,12 +12612,12 @@
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
                                   "Guid":  "5453b67e-6c81-4a46-b96c-08d97b58d4ac",
-                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/A user clicked through to a potentially malicious URLÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/A user clicked through to a potentially malicious URLÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/A user clicked through to a potentially malicious URLÃ¢â‚¬â€¹",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/A user clicked through to a potentially malicious URLÃ¢â‚¬â€¹",
                                   "IsValid":  true,
                                   "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                  "Name":  "A user clicked through to a potentially malicious URLÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "DistinguishedName":  "CN=A user clicked through to a potentially malicious URLÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "Name":  "A user clicked through to a potentially malicious URLÃ¢â‚¬â€¹",
+                                  "DistinguishedName":  "CN=A user clicked through to a potentially malicious URLÃ¢â‚¬â€¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
                                   "ObjectCategory":  null,
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
@@ -12510,7 +12909,7 @@
                                   "Comment":  "This alert is triggered when a reply-all storm is detected and at least one reply-all to the mail thread has been blocked. See the Reply-all Storm Protection mail flow report for more information. -V1.0.0.0",
                                   "Disabled":  false,
                                   "Mode":  "Enforce",
-                                  "ObjectVersion":  "682e2101-73c2-43ed-08ff-08dd1f687ca5",
+                                  "ObjectVersion":  "dbbbda61-0fa4-413c-8d81-08dd4b5e8b33",
                                   "MaximumBlobRuleLength":  0,
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
@@ -12525,10 +12924,10 @@
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
                                                   ],
-                                  "WhenChanged":  "\/Date(1734528778000)\/",
-                                  "WhenCreated":  "\/Date(1734528778000)\/",
-                                  "WhenChangedUTC":  "\/Date(1734528778000)\/",
-                                  "WhenCreatedUTC":  "\/Date(1734528778000)\/",
+                                  "WhenChanged":  "\/Date(1739362359000)\/",
+                                  "WhenCreated":  "\/Date(1739362359000)\/",
+                                  "WhenChangedUTC":  "\/Date(1739362359000)\/",
+                                  "WhenCreatedUTC":  "\/Date(1739362359000)\/",
                                   "ExchangeObjectId":  "ce504573-4841-4e45-81e2-21e8a11ba221",
                                   "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e",
                                   "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration",
@@ -12663,12 +13062,12 @@
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
                                   "Guid":  "8e6ba277-ef39-404e-aaf1-294f6d9a2b88",
-                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious URL removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious URL removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious URL removed after deliveryÃ¢â‚¬â€¹",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious URL removed after deliveryÃ¢â‚¬â€¹",
                                   "IsValid":  true,
                                   "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                  "Name":  "Email messages containing malicious URL removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "DistinguishedName":  "CN=Email messages containing malicious URL removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "Name":  "Email messages containing malicious URL removed after deliveryÃ¢â‚¬â€¹",
+                                  "DistinguishedName":  "CN=Email messages containing malicious URL removed after deliveryÃ¢â‚¬â€¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
                                   "ObjectCategory":  null,
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
@@ -13193,12 +13592,12 @@
                                   "CreatedBy":  "",
                                   "LastModifiedBy":  "",
                                   "Guid":  "4b1820ec-39dc-45f3-abf6-5ee80df51fd2",
-                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious file removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious file removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious file removed after deliveryÃ¢â‚¬â€¹",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Email messages containing malicious file removed after deliveryÃ¢â‚¬â€¹",
                                   "IsValid":  true,
                                   "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                  "Name":  "Email messages containing malicious file removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹",
-                                  "DistinguishedName":  "CN=Email messages containing malicious file removed after deliveryÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "Name":  "Email messages containing malicious file removed after deliveryÃ¢â‚¬â€¹",
+                                  "DistinguishedName":  "CN=Email messages containing malicious file removed after deliveryÃ¢â‚¬â€¹,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
                                   "ObjectCategory":  null,
                                   "ObjectClass":  [
                                                       "msExchUnifiedRule"
@@ -13208,6 +13607,82 @@
                                   "WhenChangedUTC":  "\/Date(1649762442000)\/",
                                   "WhenCreatedUTC":  "\/Date(1612829714000)\/",
                                   "ExchangeObjectId":  "4b1820ec-39dc-45f3-abf6-5ee80df51fd2",
+                                  "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e",
+                                  "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration",
+                                  "OriginatingServer":  "",
+                                  "ObjectState":  "New"
+                              },
+                              {
+                                  "Filter":  null,
+                                  "Operation":  [
+                                                    "NoisyAlertPolicy"
+                                                ],
+                                  "LogicalOperationName":  null,
+                                  "NotificationEnabled":  true,
+                                  "NotifyUser":  [
+                                                     "TenantAdmins"
+                                                 ],
+                                  "Severity":  "Medium",
+                                  "Threshold":  null,
+                                  "VolumeThreshold":  null,
+                                  "ExternalScenarioData":  null,
+                                  "TimeWindow":  null,
+                                  "NotifyUserOnFilterMatch":  false,
+                                  "MergedRuleXml":  null,
+                                  "StreamType":  "Activity",
+                                  "ThreatType":  "Activity",
+                                  "PrivacyManagementScopedSensitiveInformationTypes":  null,
+                                  "PrivacyManagementScopedSensitiveInformationTypesForCounting":  null,
+                                  "PrivacyManagementScopedSensitiveInformationTypesThreshold":  null,
+                                  "AlertBy":  null,
+                                  "AlertFor":  null,
+                                  "AlertScenario":  "Activity",
+                                  "Scenario":  "AuditProtectionAlert",
+                                  "NotifyUserThrottleThreshold":  null,
+                                  "NotifyUserThrottleWindow":  null,
+                                  "NotifyUserSuppressionExpiryDate":  null,
+                                  "NotificationCulture":  null,
+                                  "AlertOverrideChangedUtc":  null,
+                                  "AggregationType":  "None",
+                                  "Category":  "Supervision",
+                                  "IsSystemRule":  true,
+                                  "TagFilter":  null,
+                                  "UserTags":  null,
+                                  "RecipientTags":  null,
+                                  "SenderTags":  null,
+                                  "CustomProperties":  null,
+                                  "UseCreatedDateTime":  null,
+                                  "CorrelationPolicyId":  "00000000-0000-0000-0000-000000000000",
+                                  "ReadOnly":  false,
+                                  "ErrorMetadata":  null,
+                                  "ExternalIdentity":  "",
+                                  "ImmutableId":  "22847b42-7f1e-40b7-a81a-5f134946c52d",
+                                  "Priority":  0,
+                                  "Workload":  "AuditAlerting",
+                                  "Policy":  "688fc22e-2627-4f39-85d0-4b700048dbbb",
+                                  "Comment":  "This alert is triggered when the noisy policy reach the warning limit -V1.0.0.0",
+                                  "Disabled":  false,
+                                  "Mode":  "Enforce",
+                                  "ObjectVersion":  "2a7a339b-8de0-4776-1c98-08dd49aff665",
+                                  "MaximumBlobRuleLength":  0,
+                                  "CreatedBy":  "",
+                                  "LastModifiedBy":  "",
+                                  "Guid":  "22847b42-7f1e-40b7-a81a-5f134946c52d",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Noisy Policy Throttled Warning",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Noisy Policy Throttled Warning",
+                                  "IsValid":  true,
+                                  "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                  "Name":  "Noisy Policy Throttled Warning",
+                                  "DistinguishedName":  "CN=Noisy Policy Throttled Warning,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "ObjectCategory":  null,
+                                  "ObjectClass":  [
+                                                      "msExchUnifiedRule"
+                                                  ],
+                                  "WhenChanged":  "\/Date(1739177425000)\/",
+                                  "WhenCreated":  "\/Date(1739177425000)\/",
+                                  "WhenChangedUTC":  "\/Date(1739177425000)\/",
+                                  "WhenCreatedUTC":  "\/Date(1739177425000)\/",
+                                  "ExchangeObjectId":  "22847b42-7f1e-40b7-a81a-5f134946c52d",
                                   "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e",
                                   "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration",
                                   "OriginatingServer":  "",
@@ -14504,6 +14979,82 @@
                               {
                                   "Filter":  null,
                                   "Operation":  [
+                                                    "ThrottledAlertPolicy"
+                                                ],
+                                  "LogicalOperationName":  null,
+                                  "NotificationEnabled":  true,
+                                  "NotifyUser":  [
+                                                     "TenantAdmins"
+                                                 ],
+                                  "Severity":  "Medium",
+                                  "Threshold":  null,
+                                  "VolumeThreshold":  null,
+                                  "ExternalScenarioData":  null,
+                                  "TimeWindow":  null,
+                                  "NotifyUserOnFilterMatch":  false,
+                                  "MergedRuleXml":  null,
+                                  "StreamType":  "Activity",
+                                  "ThreatType":  "Activity",
+                                  "PrivacyManagementScopedSensitiveInformationTypes":  null,
+                                  "PrivacyManagementScopedSensitiveInformationTypesForCounting":  null,
+                                  "PrivacyManagementScopedSensitiveInformationTypesThreshold":  null,
+                                  "AlertBy":  null,
+                                  "AlertFor":  null,
+                                  "AlertScenario":  "Activity",
+                                  "Scenario":  "AuditProtectionAlert",
+                                  "NotifyUserThrottleThreshold":  null,
+                                  "NotifyUserThrottleWindow":  null,
+                                  "NotifyUserSuppressionExpiryDate":  null,
+                                  "NotificationCulture":  null,
+                                  "AlertOverrideChangedUtc":  null,
+                                  "AggregationType":  "None",
+                                  "Category":  "Supervision",
+                                  "IsSystemRule":  true,
+                                  "TagFilter":  null,
+                                  "UserTags":  null,
+                                  "RecipientTags":  null,
+                                  "SenderTags":  null,
+                                  "CustomProperties":  null,
+                                  "UseCreatedDateTime":  null,
+                                  "CorrelationPolicyId":  "00000000-0000-0000-0000-000000000000",
+                                  "ReadOnly":  false,
+                                  "ErrorMetadata":  null,
+                                  "ExternalIdentity":  "",
+                                  "ImmutableId":  "99d9b569-462e-4ebd-a51c-d004144f3b5a",
+                                  "Priority":  0,
+                                  "Workload":  "AuditAlerting",
+                                  "Policy":  "7cbf42e0-266f-46e9-9d7f-770b4b8bc1eb",
+                                  "Comment":  "This alert is triggered when the noisy policy cross the threshold value and it is being throttled -V1.0.0.0",
+                                  "Disabled":  false,
+                                  "Mode":  "Enforce",
+                                  "ObjectVersion":  "fabaaf0c-9c91-4b4a-13ee-08dd49aff1d0",
+                                  "MaximumBlobRuleLength":  0,
+                                  "CreatedBy":  "",
+                                  "LastModifiedBy":  "",
+                                  "Guid":  "99d9b569-462e-4ebd-a51c-d004144f3b5a",
+                                  "Identity":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Noisy Policy Throttled",
+                                  "Id":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration/Noisy Policy Throttled",
+                                  "IsValid":  true,
+                                  "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                  "Name":  "Noisy Policy Throttled",
+                                  "DistinguishedName":  "CN=Noisy Policy Throttled,CN=Configuration,CN=f00ed340-8f84-4eb4-83f3-0075a22b262e,OU=Microsoft Exchange Hosted Organizations,DC=FFO,DC=extest,DC=microsoft,DC=com",
+                                  "ObjectCategory":  null,
+                                  "ObjectClass":  [
+                                                      "msExchUnifiedRule"
+                                                  ],
+                                  "WhenChanged":  "\/Date(1739177418000)\/",
+                                  "WhenCreated":  "\/Date(1739177418000)\/",
+                                  "WhenChangedUTC":  "\/Date(1739177418000)\/",
+                                  "WhenCreatedUTC":  "\/Date(1739177418000)\/",
+                                  "ExchangeObjectId":  "99d9b569-462e-4ebd-a51c-d004144f3b5a",
+                                  "OrganizationalUnitRoot":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e",
+                                  "OrganizationId":  "FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e - FFO.extest.microsoft.com/Microsoft Exchange Hosted Organizations/f00ed340-8f84-4eb4-83f3-0075a22b262e/Configuration",
+                                  "OriginatingServer":  "",
+                                  "ObjectState":  "New"
+                              },
+                              {
+                                  "Filter":  null,
+                                  "Operation":  [
                                                     "CompromisedTenantAccount"
                                                 ],
                                   "LogicalOperationName":  null,
@@ -15172,9 +15723,9 @@
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
-                                    "WhenChanged":  "\/Date(1734517495000)\/",
+                                    "WhenChanged":  "\/Date(1739363910000)\/",
                                     "WhenCreated":  "\/Date(1626469503000)\/",
-                                    "WhenChangedUTC":  "\/Date(1734517495000)\/",
+                                    "WhenChangedUTC":  "\/Date(1739363910000)\/",
                                     "WhenCreatedUTC":  "\/Date(1626469503000)\/",
                                     "ExchangeObjectId":  "2aaee10f-6955-4976-be8b-ac1952fcb627",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -15184,7 +15735,7 @@
                                     "ObjectState":  "Unchanged"
                                 }
                             ],
-    "total_users_without_advanced_audit":  81,
+    "total_users_without_advanced_audit":  84,
     "defender_license":  true,
     "defender_dlp_license":  true,
     "defender_successful_commands":  [
@@ -15237,9 +15788,9 @@
                                                    "top",
                                                    "msExchDomainContentConfig"
                                                ],
-                               "WhenChanged":  "\/Date(1734513819000)\/",
+                               "WhenChanged":  "\/Date(1739359543000)\/",
                                "WhenCreated":  "\/Date(1619484412000)\/",
-                               "WhenChangedUTC":  "\/Date(1734513819000)\/",
+                               "WhenChangedUTC":  "\/Date(1739359543000)\/",
                                "WhenCreatedUTC":  "\/Date(1619484412000)\/",
                                "ExchangeObjectId":  "2042facf-0e9e-4738-ad60-56d6c5d43b5d",
                                "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -15580,9 +16131,9 @@
                                                      "container",
                                                      "msExchTransportSettings"
                                                  ],
-                                 "WhenChanged":  "\/Date(1734514051000)\/",
+                                 "WhenChanged":  "\/Date(1739359805000)\/",
                                  "WhenCreated":  "\/Date(1619484398000)\/",
-                                 "WhenChangedUTC":  "\/Date(1734514051000)\/",
+                                 "WhenChangedUTC":  "\/Date(1739359805000)\/",
                                  "WhenCreatedUTC":  "\/Date(1619484398000)\/",
                                  "ExchangeObjectId":  "7ef195bd-4f88-46bc-97e6-db6c7665321b",
                                  "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -15832,7 +16383,7 @@
                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                "Name":  "Sender is located outside the organization prepend \"[External]\"",
                                "IsValid":  true,
-                               "WhenChanged":  "\/Date(1734514187000)\/",
+                               "WhenChanged":  "\/Date(1739359946000)\/",
                                "ExchangeVersion":  "0.1 (8.0.535.0)",
                                "ObjectState":  "Unchanged"
                            }
@@ -15860,9 +16411,9 @@
                                                 "top",
                                                 "msExchHostedConnectionFilterPolicy"
                                             ],
-                            "WhenChanged":  "\/Date(1734514523000)\/",
+                            "WhenChanged":  "\/Date(1739360298000)\/",
                             "WhenCreated":  "\/Date(1619484586000)\/",
-                            "WhenChangedUTC":  "\/Date(1734514523000)\/",
+                            "WhenChangedUTC":  "\/Date(1739360298000)\/",
                             "WhenCreatedUTC":  "\/Date(1619484586000)\/",
                             "ExchangeObjectId":  "7021b7cf-b9fa-4280-94ff-fba468dbb0ab",
                             "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
@@ -15931,7 +16482,7 @@
                          {
                              "value":  [
                                            {
-                                               "name":  "41c09ec8-1816-4577-8c00-36202b97d9b0",
+                                               "name":  "e933bc2a-8af2-40af-9d84-918d17a1146c",
                                                "displayName":  "DLP functional test",
                                                "defaultConnectorsClassification":  "General",
                                                "connectorGroups":  [
@@ -15965,12 +16516,12 @@
                                                "createdBy":  {
                                                                  "displayName":  "Service Principal (b757a8ea-3bfd-43eb-8f91-a0f9c05b5c27)"
                                                              },
-                                               "createdTime":  "2024-12-18T12:42:45.3804868Z",
+                                               "createdTime":  "2025-02-12T11:24:08.361204Z",
                                                "lastModifiedBy":  {
                                                                       "displayName":  "Service Principal (b757a8ea-3bfd-43eb-8f91-a0f9c05b5c27)"
                                                                   },
-                                               "lastModifiedTime":  "2024-12-18T12:42:45.3804868Z",
-                                               "etag":  "65d6baba-0020-497e-b65e-b45bf0fd436b",
+                                               "lastModifiedTime":  "2025-02-12T11:24:08.361204Z",
+                                               "etag":  "cf19605c-61ad-4795-bf9d-25e289394ebb",
                                                "isLegacySchemaVersion":  true
                                            }
                                        ]
@@ -15979,7 +16530,7 @@
     "tenant_isolation":  [
                              {
                                  "properties":  {
-                                                    "tenantId":  "27ecc021-87f7-4346-9682-b62bf3966808",
+                                                    "tenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
                                                     "isDisabled":  false,
                                                     "allowedTenants":  ""
                                                 }
@@ -15987,8 +16538,41 @@
                          ],
     "environment_list":  [
                              {
+                                 "EnvironmentName":  "2c9cc86c-7a06-4162-adc0-be71f93abb4d",
+                                 "DisplayName":  "Test-NonDefault",
+                                 "Description":  "Testing MS.POWERPLATFORM.2.2",
+                                 "IsDefault":  false,
+                                 "Location":  "usgov",
+                                 "CreatedTime":  "2023-12-06T20:18:16.9766324Z",
+                                 "CreatedBy":  {
+                                                   "id":  "c8975770-8c3d-43ef-8466-678584a32de5",
+                                                   "displayName":  "John Doe",
+                                                   "email":  "johndoe@example.com",
+                                                   "type":  "User",
+                                                   "tenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
+                                                   "userPrincipalName":  "johndoe@example.com"
+                                               },
+                                 "LastModifiedTime":  "2023-12-06T20:18:27.5107576Z",
+                                 "LastModifiedBy":  null,
+                                 "CreationType":  "User",
+                                 "EnvironmentType":  "Sandbox",
+                                 "CommonDataServiceDatabaseProvisioningState":  "Succeeded",
+                                 "CommonDataServiceDatabaseType":  "Common Data Service for Apps",
+                                 "Internal":  {
+                                                  "id":  "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/2c9cc86c-7a06-4162-adc0-be71f93abb4d",
+                                                  "type":  "Microsoft.BusinessAppPlatform/scopes/environments",
+                                                  "location":  "usgov",
+                                                  "name":  "2c9cc86c-7a06-4162-adc0-be71f93abb4d",
+                                                  "properties":  "@{tenantId=ca08493a-c9c8-4db0-a9e8-d3b4bafac269; azureRegionHint=usgovtexas; displayName=Test-NonDefault; description=Testing MS.POWERPLATFORM.2.2; createdTime=2023-12-06T20:18:16.9766324Z; createdBy=; lastModifiedTime=2023-12-06T20:18:27.5107576Z; provisioningState=Succeeded; creationType=User; environmentSku=Sandbox; environmentType=Production; isDefault=False; permissions=; runtimeEndpoints=; linkedEnvironmentMetadata=; trialScenarioType=None; notificationMetadata=; retentionPeriod=P7D; states=; updateCadence=; retentionDetails=; protectionStatus=; cluster=; connectedGroups=System.Object[]; lifecycleOperationsEnforcement=; governanceConfiguration=; bingChatEnabled=False; m365Enabled=False; enableAnalyticsForMakers=True}"
+                                              },
+                                 "InternalCds":  null,
+                                 "OrganizationId":  "af751393-6f94-ee11-8175-001dd804a214",
+                                 "SecurityGroupId":  "f13e38d1-c8bb-486e-aa73-f0383d04050d",
+                                 "RetentionPeriod":  7
+                             },
+                             {
                                  "EnvironmentName":  "Default-3c19c757-3b55-411f-b03f-2bcc514a598d",
-                                 "DisplayName":  "tqhjy (default) (org8537b7dc)",
+                                 "DisplayName":  "tqhjy (default)",
                                  "Description":  null,
                                  "IsDefault":  true,
                                  "Location":  "usgov",
@@ -16009,7 +16593,7 @@
                                                   "type":  "Microsoft.BusinessAppPlatform/scopes/environments",
                                                   "location":  "usgov",
                                                   "name":  "Default-3c19c757-3b55-411f-b03f-2bcc514a598d",
-                                                  "properties":  "@{tenantId=27ecc021-87f7-4346-9682-b62bf3966808; azureRegionHint=usgovtexas; displayName=tqhjy (default) (org8537b7dc); createdTime=2021-12-13T20:40:14.1749137Z; createdBy=; provisioningState=Succeeded; creationType=DefaultTenant; environmentSku=Default; environmentType=Production; isDefault=True; permissions=; runtimeEndpoints=; linkedEnvironmentMetadata=; trialScenarioType=None; retentionPeriod=P7D; states=; updateCadence=; retentionDetails=; protectionStatus=; cluster=; connectedGroups=System.Object[]; lifecycleOperationsEnforcement=; governanceConfiguration=; bingChatEnabled=False; enableAnalyticsForMakers=True}"
+                                                  "properties":  "@{tenantId=ca08493a-c9c8-4db0-a9e8-d3b4bafac269; azureRegionHint=usgovtexas; displayName=tqhjy (default); createdTime=2021-12-13T20:40:14.1749137Z; createdBy=; provisioningState=Succeeded; creationType=DefaultTenant; environmentSku=Default; environmentType=Production; isDefault=True; permissions=; runtimeEndpoints=; linkedEnvironmentMetadata=; trialScenarioType=None; retentionPeriod=P7D; states=; updateCadence=; retentionDetails=; protectionStatus=; cluster=; connectedGroups=System.Object[]; lifecycleOperationsEnforcement=; governanceConfiguration=; bingChatEnabled=False; m365Enabled=False; enableAnalyticsForMakers=True}"
                                               },
                                  "InternalCds":  null,
                                  "OrganizationId":  "ff4adc41-8f11-42a1-9e5a-d208f91a6db4",
@@ -16085,7 +16669,7 @@
                            "ShowPeoplePickerSuggestionsForGuestUsers":  false,
                            "AppOnlyBypassPeoplePickerPolicies":  false,
                            "EnableDiscoverableByOrganizationForVideos":  true,
-                           "FileAnonymousLinkType":  2,
+                           "FileAnonymousLinkType":  1,
                            "FolderAnonymousLinkType":  2,
                            "NotifyOwnersWhenItemsReshared":  true,
                            "NotifyOwnersWhenInvitationsAccepted":  false,
@@ -16176,7 +16760,7 @@
                            "HideSyncButtonOnTeamSite":  false,
                            "AllowGuestUserShareToUsersNotInSiteCollection":  false,
                            "DisableOutlookPSTVersionTrimming":  false,
-                           "EnableVersionExpirationSetting":  true,
+                           "EnableVersionExpirationSetting":  false,
                            "EnableAutoExpirationVersionTrim":  false,
                            "ExpireVersionsAfterDays":  0,
                            "MajorVersionLimit":  500,
@@ -16219,7 +16803,7 @@
                    ],
     "SPO_site":  [
                      {
-                         "LastContentModifiedDate":  "\/Date(1733357138480)\/",
+                         "LastContentModifiedDate":  "\/Date(1738798459760)\/",
                          "Status":  "Active",
                          "ArchiveStatus":  "NotArchived",
                          "BonusDiskQuota":  3128,
@@ -16345,7 +16929,7 @@
                                   "DefaultPoolFqdn":  null,
                                   "DirSyncEnabled":  true,
                                   "DisplayName":  "tqhjy",
-                                  "LastSyncTimeStamp":  "\/Date(1729473077334)\/",
+                                  "LastSyncTimeStamp":  "\/Date(1738776907420)\/",
                                   "NameRecordingDisabled":  null,
                                   "Pools":  null,
                                   "PostalCode":  null,
@@ -16410,9 +16994,12 @@
                                   "TeamsUpgradeNotificationsEnabled":  false,
                                   "TeamsUpgradeOverridePolicy":  "UpgradeToTeams",
                                   "TeamsUpgradePolicyIsReadOnly":  "ModeAndNotifications",
-                                  "TenantId":  "27ecc021-87f7-4346-9682-b62bf3966808",
+                                  "TenantId":  "ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
                                   "TnmAccountId":  null,
                                   "VerifiedDomains":  [
+                                                          "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain",
+                                                          "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain",
+                                                          "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain",
                                                           "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain",
                                                           "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain",
                                                           "Microsoft.Teams.ConfigAPI.Cmdlets.Generated.Models.TenantVerifiedSipDomain"
@@ -16420,15 +17007,15 @@
                                   "WhenChanged":  null,
                                   "WhenCreated":  "\/Date(-62135596800000)\/",
                                   "LastProvisionTimeStamps":  {
-                                                                  "TenantSipDomains":  "2024-10-08T21:31:31.4706826+00:00",
-                                                                  "TenantRegistrarPool":  "2024-10-08T21:31:31.5618605+00:00",
+                                                                  "TenantSipDomains":  "2025-02-05T17:33:27.0893106+00:00",
+                                                                  "TenantRegistrarPool":  "2025-02-05T17:33:27.188599+00:00",
                                                                   "ConfigDistributionStatus":  "2023-08-16T12:22:12.1434748+00:00"
                                                               },
                                   "LastPublishTimeStamps":  {
                                                                 "ProvisionedPlanPublishAuthoredProps":  "2023-08-16T12:21:47.569208+00:00",
                                                                 "ProvisionCpcTenantConfigProcessor":  "2023-08-16T12:21:44.5681938+00:00",
                                                                 "PublishProvisionedPlanProcessor":  "2022-10-20T21:16:44.2365367+00:00",
-                                                                "UpdateBvdTenantProcessor":  "2024-10-08T21:31:37.6116444+00:00"
+                                                                "UpdateBvdTenantProcessor":  "2025-02-05T17:33:33.0783028+00:00"
                                                             }
                               }
                           ],
@@ -16528,7 +17115,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:Custom Policy 1",
@@ -16625,7 +17215,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:AllOn",
@@ -16722,7 +17315,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:RestrictedAnonymousAccess",
@@ -16819,7 +17415,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:AllOff",
@@ -16916,7 +17515,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:RestrictedAnonymousNoRecording",
@@ -17013,7 +17615,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:Default",
@@ -17110,7 +17715,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              },
                              {
                                  "Identity":  "Tag:Kiosk",
@@ -17207,7 +17815,10 @@
                                  "CaptchaVerificationForMeetingJoin":  "NotRequired",
                                  "UsersCanAdmitFromLobby":  "OrganizersAndPresentersOnly",
                                  "LobbyChat":  "Enabled",
-                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault"
+                                 "AnonymousUserAuthenticationMethod":  "OneTimePasscode",
+                                 "NoiseSuppressionForDialInParticipants":  "MicrosoftDefault",
+                                 "AIInterpreter":  "Enabled",
+                                 "VoiceSimulationInInterpreter":  "Disabled"
                              }
                          ],
     "federation_configuration":  [
@@ -17249,6 +17860,7 @@
                                  ],
     "client_configuration":  [
                                  {
+                                     "Identity":  "Global",
                                      "AllowEmailIntoChannel":  false,
                                      "RestrictedSenderList":  null,
                                      "AllowDropBox":  true,
@@ -17264,19 +17876,7 @@
                                      "AllowGuestUser":  true,
                                      "AllowScopedPeopleSearchandAccess":  false,
                                      "AllowRoleBasedChatPermissions":  false,
-                                     "DataSource":  null,
-                                     "Key":  {
-                                                 "ScopeClass":  "Global",
-                                                 "SchemaId":  "XName=",
-                                                 "AuthorityId":  "Class=Tenant;InstanceId=3c19c757-3b55-411f-b03f-2bcc514a598d;XmlRoot=",
-                                                 "DefaultXml":  "SchemaId=;Data=;ConfigObject=;Signature=00000000-0000-0000-0000-000000000000;IsModified=True",
-                                                 "XmlRoot":  "name={urn:schema:Microsoft.Rtc.Management.ScopeFramework.2008}AnchoredXmlKey"
-                                             },
-                                     "Identity":  "Global",
-                                     "ConfigMetadata":  {
-                                                            "Authority":  "Tenant"
-                                                        },
-                                     "ConfigId":  "Global"
+                                     "ExtendedWorkInfoInPeopleSearch":  false
                                  }
                              ],
     "app_policies":  [

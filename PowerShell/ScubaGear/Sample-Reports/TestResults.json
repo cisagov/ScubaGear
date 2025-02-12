@@ -117,7 +117,7 @@
                                                                                 }
                                                                             ],
                                                          "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
-                                                         "isSoftwareOathEnabled":  false
+                                                         "isSoftwareOathEnabled":  true
                                                      },
                             "ExcludeTargets":  [
 
@@ -130,8 +130,8 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.3v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  {
@@ -464,13 +464,13 @@
         "RequirementMet":  true
     },
     {
-        "ActualValue":  81,
+        "ActualValue":  84,
         "Commandlet":  [
                            "Get-MgBetaUser"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.DEFENDER.6.2v1",
-        "ReportDetails":  "Requirement not met. 81 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq \u0027Enabled\u0027)\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName",
+        "ReportDetails":  "Requirement not met. 84 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq \u0027Enabled\u0027)\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName",
         "RequirementMet":  false
     },
     {
@@ -1387,8 +1387,8 @@
                                 "TransportRuleSizeLimit":  "8 KB (8,192 bytes)",
                                 "VerifySecureSubmitEnabled":  false,
                                 "VoicemailJournalingEnabled":  true,
-                                "WhenChanged":  "/Date(1734514051000)/",
-                                "WhenChangedUTC":  "/Date(1734514051000)/",
+                                "WhenChanged":  "/Date(1739359805000)/",
+                                "WhenChangedUTC":  "/Date(1739359805000)/",
                                 "WhenCreated":  "/Date(1619484398000)/",
                                 "WhenCreatedUTC":  "/Date(1619484398000)/",
                                 "Xexch50Enabled":  true
@@ -1512,8 +1512,8 @@
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
                                 "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1734514523000)/",
-                                "WhenChangedUTC":  "/Date(1734514523000)/",
+                                "WhenChanged":  "/Date(1739360298000)/",
+                                "WhenChangedUTC":  "/Date(1739360298000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1556,8 +1556,8 @@
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
                                 "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1734514523000)/",
-                                "WhenChangedUTC":  "/Date(1734514523000)/",
+                                "WhenChanged":  "/Date(1739360298000)/",
+                                "WhenChangedUTC":  "/Date(1739360298000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1875,21 +1875,21 @@
                            "Get-DlpPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.POWERPLATFORM.2.2v1",
+        "PolicyId":  "MS.POWERPLATFORM.2.3v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
     {
         "ActualValue":  [
-
+                            "2c9cc86c-7a06-4162-adc0-be71f93abb4d"
                         ],
         "Commandlet":  [
                            "Get-DlpPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.POWERPLATFORM.2.3v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
+        "PolicyId":  "MS.POWERPLATFORM.2.2v1",
+        "ReportDetails":  "1 Subsequent environments without DLP policies: 2c9cc86c-7a06-4162-adc0-be71f93abb4d",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -2153,20 +2153,9 @@
                                                      "AllowScopedPeopleSearchandAccess":  false,
                                                      "AllowShareFile":  true,
                                                      "AllowSkypeBusinessInterop":  true,
-                                                     "ConfigId":  "Global",
-                                                     "ConfigMetadata":  {
-                                                                            "Authority":  "Tenant"
-                                                                        },
                                                      "ContentPin":  "RequiredOutsideScheduleMeeting",
-                                                     "DataSource":  null,
+                                                     "ExtendedWorkInfoInPeopleSearch":  false,
                                                      "Identity":  "Global",
-                                                     "Key":  {
-                                                                 "AuthorityId":  "Class=Tenant;InstanceId=3c19c757-3b55-411f-b03f-2bcc514a598d;XmlRoot=",
-                                                                 "DefaultXml":  "SchemaId=;Data=;ConfigObject=;Signature=00000000-0000-0000-0000-000000000000;IsModified=True",
-                                                                 "SchemaId":  "XName=",
-                                                                 "ScopeClass":  "Global",
-                                                                 "XmlRoot":  "name={urn:schema:Microsoft.Rtc.Management.ScopeFramework.2008}AnchoredXmlKey"
-                                                             },
                                                      "ResourceAccountContentAccess":  "NoAccess",
                                                      "RestrictedSenderList":  null
                                                  }
