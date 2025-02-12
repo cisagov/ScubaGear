@@ -336,7 +336,6 @@ Describe "Policy Checks for <ProductName>"{
                     elseif ($Table.GetProperty("id") -eq "privileged-service-principals"){
                         $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
                         $RowHeaders.Count | Should -BeExactly 4
-
                     }
                     else {
                         # Control report tables
