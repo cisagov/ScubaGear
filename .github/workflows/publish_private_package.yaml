@@ -1,4 +1,5 @@
 # Purpose: Publishes ScubaGear to a private repo and caches ScubaGear modules and OPA for reuse.
+# Note: To test this workflow, run the functional tests.
 
 name: Publish Private Package
 
@@ -56,6 +57,8 @@ jobs:
           KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
         # Do not attempt to access the Key Vault if logging into Azure failed.
         if: ${{ success() }}
+        # Do not attempt to access the Key Vault if logging into Azure failed.
+        if: ${{ success() }}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
@@ -67,23 +70,21 @@ jobs:
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
         id: sign-publish-module
+        id: sign-publish-module
         run: |
-            . repo/utils/workflow/Publish-ScubaGear.ps1
-            # Remove non-release files
-            Remove-Item -Recurse -Force repo -Include .git*
-            # Setup the parameters
-            $Parameters = @{
-              AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
-              CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
-              ModuleSourcePath = 'repo/PowerShell/ScubaGear'
-              GalleryName = $env:GalleryName
-            }
-            # This publishes to a private gallery, from which we will pull in a future step.
-            # This step helps us verify that ScubaGear is in a state where it can be
-            # published to PSGallery.
-            $ModuleVersion = Publish-ScubaGearModule @Parameters
-            Write-Output "The module version is $ModuleVersion"
-            echo "ModuleVersion=$ModuleVersion" >> $env:GITHUB_OUTPUT
+          . repo/utils/workflow/Publish-ScubaGear.ps1
+          Remove-NonReleaseFiles -RootFolderName "repo"
+          # Setup the parameters
+          $Parameters = @{
+            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+            ModuleSourcePath = 'repo/PowerShell/ScubaGear'
+            GalleryName = $env:GalleryName
+          }
+          # This publishes to a private gallery, from which we will pull in a future step.
+          # This step helps us verify that ScubaGear is in a state where it can be
+          # published to PSGallery.
+          Publish-ScubaGearModule @Parameters
       - name: Test Module Publish
         run: |
           Get-Location
@@ -123,14 +124,43 @@ jobs:
             Write-Output "::error::The description of the published module should be $ExpectedDescription"
             exit 1
           }
+          # This step initializes SG and runs some checks to verify that it installed correctly.
+          $ExpectedName = 'ScubaGear'
+          # Read the description value from the manifest file (ScubaGear.psd1)
+          $ManifestFilePath = Join-Path -Path repo/PowerShell/ScubaGear -ChildPath 'ScubaGear.psd1' -Resolve
+          $Manifest = Import-PowerShellDataFile $ManifestFilePath
+          $ExpectedDescription = $Manifest.Description
+          # The -PassThru parameters allows us to read the output value from Install-Module
+          $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          # Check for the expected name.
+          if ($InstallOutput.Name -ne $ExpectedName) {
+            Write-Output "::error::The name of the published module should be $ExpectedName"
+            exit 1
+          }
+          # Because reasons, the description has a newline character.
+          # Strip all whitespace before comparing the descriptions.
+          $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
+          $ExpectedFixed = $ExpectedDescription -replace "\s", ""
+          # Check for the expected description.
+          if ($DescriptionFixed -ne $ExpectedFixed) {
+            Write-Output "::error::The description of the published module should be $ExpectedDescription"
+            exit 1
+          }
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # Check for expected version.
-          $VersionOutput = Invoke-SCuBA -Version
-          $ExpectedVersion = "SCuBA Gear v${{ steps.sign-publish-module.outputs.ModuleVersion }}"
-          if ($VersionOutput -ne $ExpectedVersion) {
-            Write-Output "::error::The version of the published module should be $ExpectedVersion"
+          # What follows are 2 quick tests to verify that ScubaGear initialized correctly.
+          # Test #1 - Version works
+          $ManifestFilePath = Join-Path -Path "repo\PowerShell\ScubaGear" -ChildPath "ScubaGear.psd1"
+          $ExpectedVersion = (Import-PowerShellDataFile $ManifestFilePath).ModuleVersion
+          $ActualVersion = Invoke-SCuBA -Version
+          if ($ActualVersion -notmatch $ExpectedVersion) {
+            Write-Output "::error::The module version should contain with $ExpectedVersion"
             exit 1
+          }
+          # Test #2 - Path exists
+          $PathExists = Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+          if ($PathExists -ne $true) {
+            Write-Output "::error::ScubaGear was not installed into the correct version."
           }
       - name: Install Selenium
         run: |
