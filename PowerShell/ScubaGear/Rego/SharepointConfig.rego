@@ -165,26 +165,6 @@ tests contains {
 }
 #--
 
-#
-# MS.SHAREPOINT.1.4v1
-#--
-
-# Based on the fact that Microsoft has removed the setting from the admin center
-# and you cannot set the value RequireAcceptingAccountMatchInvitedAccount from Set-SPOTenant anymore, 
-# we are setting this policy to not-implemented
-# and will likely remove it from the baseline in the next version.
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDeprecation,
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-}
-#--
-
 ###################
 # MS.SHAREPOINT.2 #
 ###################
