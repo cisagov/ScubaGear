@@ -4,6 +4,7 @@
     .DESCRIPTION
     Test script to execute Invoke-SCuBA against a given tenant using a service
     principal. Verifies that all expected products (i.e., files) are generated.
+    Sensitive data in output files is sanitized to prevent leaks.
     .PARAMETER Thumbprint
     Thumbprint of the certificate associated with the Service Principal.
     .PARAMETER Organization
@@ -15,7 +16,6 @@
     Invoke-Pester -Container $TestContainer -Output Detailed
     .EXAMPLE
     Invoke-Pester -Script .\Testing\Functional\SmokeTest\SmokeTest001.Tests.ps1 -Output Detailed
-
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
@@ -32,7 +32,7 @@ param (
     [ValidateNotNullOrEmpty()]
     [string]
     $Organization,
-    [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
     $AppId,
@@ -50,18 +50,53 @@ Import-Module $ScubaModulePath
 Describe "Smoke Test: Generate Output" {
     Context "Invoke Scuba for $Organization" {
         BeforeAll {
-            if ($PSCmdlet.ParameterSetName -eq 'Manual'){
-                { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON} |
+            if ($PSCmdlet.ParameterSetName -eq 'Manual') {
+                { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON } |
                 Should -Not -Throw
             }
             else {
-                { Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON} |
+                { Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON } |
                 Should -Not -Throw
             }
-            $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+            $ReportFolders = Get-ChildItem . -Directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutputFolder',
-            Justification = 'Variable is used in another scope')]
+                Justification = 'Variable is used in another scope')]
             $OutputFolder = $ReportFolders[0]
+
+            # Sanitize JSON output files to remove sensitive data
+            $filesToSanitize = @("TestResults.json", "ProviderSettingsExport.json")
+            foreach ($file in $filesToSanitize) {
+                $filePath = Join-Path -Path $OutputFolder -ChildPath $file
+                if (Test-Path $filePath) {
+                    $json = Get-Content $filePath -Raw | ConvertFrom-Json
+                    foreach ($entry in $json) {
+                        # Mask PII (e.g., names, emails)
+                        if ($entry.ActualValue -is [array] -and $entry.ActualValue -match "[a-zA-Z\s]+") {
+                            $entry.ActualValue = @("REDACTED_USER") * $entry.ActualValue.Count
+                        }
+                        # Mask tenant domains and detailed configs
+                        if ($entry.ActualValue -is [hashtable]) {
+                            $entry.ActualValue = $entry.ActualValue | ForEach-Object {
+                                $_.PSObject.Properties | ForEach-Object {
+                                    if ($_.Value -is [string] -and $_.Value -match "\.onmicrosoft\.com|johndoe@example\.com") {
+                                        $_.Value = "REDACTED"
+                                    }
+                                    elseif ($_.Value -is [array] -or $_.Value -is [hashtable]) {
+                                        $_.Value = "REDACTED_CONFIG"
+                                    }
+                                }
+                                $_
+                            }
+                        }
+                        # Update ReportDetails to remove sensitive references
+                        if ($entry.ReportDetails -match "\w+\.onmicrosoft\.com|Jane Doe|John Public|johndoe@example\.com") {
+                            $entry.ReportDetails = $entry.ReportDetails -replace "\w+\.onmicrosoft\.com", "REDACTED_DOMAIN" `
+                                                                        -replace "Jane Doe|John Public|johndoe@example\.com", "REDACTED_USER"
+                        }
+                    }
+                    $json | ConvertTo-Json -Depth 10 | Set-Content $filePath
+                }
+            }
         }
         It "Item, <Item>, exists" -ForEach @(
             @{Item = 'BaselineReports.html'; ItemType = 'Leaf'},
@@ -75,15 +110,15 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/images'; ItemType = 'Container'}
-        ){
+        ) {
             Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
                 Should -Be $true
         }
     }
     Context "Verify exported functions for ScubaGear module" {
-        BeforeAll{
+        BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaGearExportedFunctions',
-            Justification = 'Variable is used in another scope')]
+                Justification = 'Variable is used in another scope')]
             $ScubaGearExportedFunctions = @(
                 'Disconnect-SCuBATenant',
                 'Invoke-SCuBACached',
@@ -93,7 +128,7 @@ Describe "Smoke Test: Generate Output" {
                 'Copy-SCuBASampleReport'
             )
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExportedCommands',
-            Justification = 'Variable is used in another scope')]
+                Justification = 'Variable is used in another scope')]
             $ExportedCommands = (Get-Module -Name ScubaGear).ExportedCommands
         }
         It "Is <_> exported?" -ForEach $ScubaGearExportedFunctions {
@@ -119,7 +154,7 @@ Describe "Smoke Test: Generate Output" {
         @{Command='Copy-SCuBASampleReport'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports/BaselineReports.html")
         )}
-    ){
+    ) {
         It "Validate call to <Command>" {
             {& $Command -Force} | Should -Not -Throw
         }
