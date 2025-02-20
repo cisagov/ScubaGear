@@ -64,7 +64,7 @@ N/A
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
 - _Removal date:_ February 2025
-- _Removal rationale:_ The option to limit guest access to the email the inviation it was sent to found in policy MS.SHAREPOINT.1.4v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.
+- _Removal rationale:_ The option to limit guest access to the email the invitation was sent to found in policy MS.SHAREPOINT.1.4v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.
 
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).
