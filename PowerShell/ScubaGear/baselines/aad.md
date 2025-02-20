@@ -228,7 +228,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
     - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
     
-#### MS.AAD.3.3v2
+#### MS.AAD.3.3v1
 If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
