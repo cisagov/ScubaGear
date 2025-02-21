@@ -59,3 +59,11 @@ body:
       description: What did you expect to happen that didn't?
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Output from Initialize-SCuBA
+      description: |
+        Paste the results here:
+      placeholder: "Tip: Run Initialize-SCuBA on the client where you are running ScubaGear and copy/paste the output here."
+    validations:
+      required: false      
