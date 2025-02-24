@@ -1,7 +1,6 @@
 package sharepoint
 import rego.v1
 import data.utils.report.NotCheckedDetails
-import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsBooleanWarning
