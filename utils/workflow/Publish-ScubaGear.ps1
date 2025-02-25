@@ -130,10 +130,15 @@ function Publish-ScubaGearModule {
     # The parens and [-1] are designed to suppress everything but the module version number.
     # Yes, this is a kludge, but PowerShell doesn't have a graceful way of handling this.
     Write-Warning "Editing the manifest file..."
+    # $ModuleVersion = (Edit-ManifestFile `
+    # -ModuleDestinationPath $ModuleDestinationPath `
+    # -OverrideModuleVersion $OverrideModuleVersion `
+    # -PrereleaseTag $PrereleaseTag)[-1]
+
     $ModuleVersion = (Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
-    -PrereleaseTag $PrereleaseTag)[-1]
+    -PrereleaseTag $PrereleaseTag) | Select-Object -Last 1
 
     Write-Warning "Creating an array of the files to sign..."
     $ArrayOfFilePaths = New-ArrayOfFilePaths `

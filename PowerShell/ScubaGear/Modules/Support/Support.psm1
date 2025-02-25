@@ -122,7 +122,6 @@ function Initialize-SCuBA {
 
     if ($DoNotAutoTrustRepository) {
         $RepositoryDetails = Get-PSRepository -Name "PSGallery"
-        Get-PSRepository -Name "PSGallery"
         Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
     }
     else {
