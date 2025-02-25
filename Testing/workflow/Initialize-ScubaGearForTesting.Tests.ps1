@@ -14,7 +14,9 @@ BeforeDiscovery {
   $global:DownloadedOPAVersion = $false
   $global:SetupTime = $false
   $global:SetupTimeValue = 0
-  # Loop over the various outputs in the output array, looking for strings.
+  # Loop over the various outputs in the PowerShell pipeline, looking for outputs
+  # that start with these exact strings.  For more info:
+  # https://www.scriptrunner.com/en/blog/pipeline-ready-advanced-powershell
   foreach ($Output in $Outputs) {
     if ($Output.GetType().Name -eq "String") {
       Write-Warning $Output

@@ -127,14 +127,9 @@ function Publish-ScubaGearModule {
 
     # Somewhere in the Edit-ManifestFile method something is adding implicit expression output.
     # The only output that I want from this method is the module version number.
-    # The parens and [-1] are designed to suppress everything but the module version number.
+    # The Select-Object -Last 1 is designed to suppress everything but the module version number.
     # Yes, this is a kludge, but PowerShell doesn't have a graceful way of handling this.
     Write-Warning "Editing the manifest file..."
-    # $ModuleVersion = (Edit-ManifestFile `
-    # -ModuleDestinationPath $ModuleDestinationPath `
-    # -OverrideModuleVersion $OverrideModuleVersion `
-    # -PrereleaseTag $PrereleaseTag)[-1]
-
     $ModuleVersion = (Edit-ManifestFile `
     -ModuleDestinationPath $ModuleDestinationPath `
     -OverrideModuleVersion $OverrideModuleVersion `
