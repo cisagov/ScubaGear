@@ -26,8 +26,6 @@ body:
         Enter your operating system and version (e.g., Windows 10, Ubuntu 24.04 LTS, MacOS Big Sur)
     validations:
       required: true
-    validations:
-      required: true
   - type: dropdown
     attributes:
       label: PowerShell Version
@@ -77,4 +75,4 @@ body:
         Paste the results here:
       placeholder: "Tip: Run Initialize-SCuBA on the client where you are running ScubaGear and copy/paste the output here."
     validations:
-      required: false  
+      required: false
