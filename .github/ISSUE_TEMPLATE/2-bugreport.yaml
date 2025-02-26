@@ -72,7 +72,7 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Output from Initialize-SCuBA
+      label: Output from Initialize-SCuBA (optional)
       description: |
         Paste the results here:
       placeholder: "Tip: Run Initialize-SCuBA on the client where you are running ScubaGear and copy/paste the output here."
