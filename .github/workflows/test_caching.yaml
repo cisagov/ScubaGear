@@ -67,7 +67,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          now=$(date)
+          now=$(date +%Y%m%d)
           echo "The current date is"
           echo $now
           gh cache list --sort created_at --limit 100 --json createdAt -q (.[].createdAt)
