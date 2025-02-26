@@ -1,0 +1,75 @@
+# Purpose:  Test the use of caching to speed up workflows.
+
+name: Cache Tests
+
+on:
+  push:
+    paths:
+      - ".github/workflows/test_caching.yaml"
+  workflow_dispatch:
+  workflow_call:
+
+permissions: read-all
+
+jobs:
+  cache:
+    name: Test Caching
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Install ScubaGear
+        run: |
+          # Should be able to run ScubaGear b/c checkout.
+          # If so, just import:
+          Import-Module .\PowerShell\ScubaGear
+          # If not:
+          # Install-Module -Name ScubaGear
+      - name: Install Dependencies
+        run: |
+          . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
+          Initialize-ScubaGearForTesting
+      - name: Test Version
+        run: |
+          Invoke-SCuBA -Version
+      - name: Cache ScubaGear
+        id: scubagear-directory
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: "scubagear-directory-${{ github.workflow }}"
+      - name: Cache Dependencies
+        id: powershell-directory
+        uses: actions/cache/save@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: "powershell-directory-${{ github.workflow }}"
+  cleanup:
+    name: Test Cleanup
+    runs-on: ubuntu-latest
+    steps:
+      - name: List Caches
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache list --sort --limit 100
+          # gh actions-cache list --limit 100 | tail -n +5 | awk '{print $1}' | tr '\n' '\0' | xargs -0 -n1 gh actions-cache delete --confirm
+      # - name: Purge Caches
+      #   # https://github.com/MyAlbum/purge-cache
+      #   uses: MyAlbum/purge-cache@v2
+      #   with:
+      #     accessed: true # Purge caches by their last accessed time (default)
+      #     created: false # Purge caches by their created time (default)
+      #     max-age: 604800 # Leave only caches accessed in the last 7 days (default)
