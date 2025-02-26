@@ -70,7 +70,7 @@ jobs:
           now=$(date)
           echo "The current date is"
           echo $now
-          gh cache list --sort created_at --limit 100 --json createdAt -q createdAt < $now
+          gh cache list --sort created_at --limit 100 --json createdAt -q (.createdAt < $now)
           # gh actions-cache list --limit 100 | tail -n +5 | awk '{print $1}' | tr '\n' '\0' | xargs -0 -n1 gh actions-cache delete --confirm
       # - name: Purge Caches
       #   # https://github.com/MyAlbum/purge-cache
