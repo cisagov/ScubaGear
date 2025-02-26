@@ -39,11 +39,11 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Acceptance criteria (optional)
+      label: Acceptance criteria
       description: How do we know when this work is done?
       placeholder: |
         - [ ] The new feature is fully implemented based on x, y, z criteria
         - [ ] Additional unit test coverage is added
         - [ ] Any other criteria
     validations:
-      required: false
+      required: true
