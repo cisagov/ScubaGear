@@ -15,7 +15,8 @@ ScubaGear queries various M365 APIs to gather information about their security s
 | Sharepoint Online       | Global Reader (or SharePoint Administrator)                             |
 | Microsoft Teams         | Global Reader (or Teams Administrator)                                  |
 
-> **Note**: Users with the Global Administrator role always have the necessary user permissions to run the tool.
+> [!NOTE]
+> Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 [This article](https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/assign-admin-roles?view=o365-worldwide) explains how to assign user roles in M365.
 
@@ -30,15 +31,14 @@ This workflow-like process is sometimes referred to as the _application consent 
 The following API permissions are required for Microsoft Graph Powershell:
 
 - Directory.Read.All
-- GroupMember.Read.All
-- Organization.Read.All
 - Policy.Read.All
-- PrivilegedEligibilitySchedule.Read.AzureADGroup
 - PrivilegedAccess.Read.AzureADGroup
+- PrivilegedEligibilitySchedule.Read.AzureADGroup
 - RoleManagement.Read.Directory
 - RoleManagementPolicy.Read.AzureADGroup
 - User.Read.All
 
-> **Note**: Microsoft Graph PowerShell SDK [now appears as "verified"](https://devblogs.microsoft.com/microsoft365dev/microsoft-graph-powershell-and-cli-are-now-verified/) on the AAD application consent screen.
+> [!NOTE]
+> Microsoft Graph PowerShell SDK [now appears as "verified"](https://devblogs.microsoft.com/microsoft365dev/microsoft-graph-powershell-and-cli-are-now-verified/) on the AAD application consent screen.
 
 Once the user and application permissions have been set, ScubaGear can be [executed](../execution/execution.md) in interactive mode.
