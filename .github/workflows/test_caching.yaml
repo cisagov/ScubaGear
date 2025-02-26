@@ -47,14 +47,14 @@ jobs:
           Invoke-SCuBA -Version
       - name: Cache ScubaGear
         id: scubagear-directory
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v4.1.2
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: "scubagear-directory-${{ github.workflow }}"
 
       - name: Cache Dependencies
         id: powershell-directory
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v4.1.2
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: "powershell-directory-${{ github.workflow }}"
