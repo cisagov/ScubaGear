@@ -51,41 +51,9 @@ jobs:
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: "scubagear-directory-${{ github.workflow }}"
-
       - name: Cache Dependencies
         id: powershell-directory
         uses: actions/cache/save@v4.2.0
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: "powershell-directory-${{ github.workflow }}"
-  cleanup:
-    name: Test Cleanup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      # - name: List Caches
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     now=$(date +%Y-%m-%d)
-      #     echo "The current date is"
-      #     echo $now
-      #     # Created at: 2025-02-26T15:34:32.637437Z
-      #     declare -a dates=$(gh cache list --sort created_at --limit 100 --json createdAt )
-      #     echo "The dates are:"
-      #     echo $dates
-      #     # for theDate in $dates; do
-      #     #   echo "The date is:"
-      #     #   echo $theDate
-      #     # done
-      #     # gh actions-cache list --limit 100 | tail -n +5 | awk '{print $1}' | tr '\n' '\0' | xargs -0 -n1 gh actions-cache delete --confirm
-      - name: Purge Caches
-        # https://github.com/MyAlbum/purge-cache
-        uses: MyAlbum/purge-cache@v2
-        env:
-          GH_TOKEN: ${{ github.token }}
-        with:
-          accessed: true # Purge caches by their last accessed time (default)
-          created: false # Purge caches by their created time (default)
-          max-age: 604800 # Leave only caches accessed in the last 7 days (default)
