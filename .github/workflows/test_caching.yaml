@@ -65,8 +65,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh extension install actions/gh-actions-cache
-          gh actions-cache list --sort --limit 100
+          gh cache list --sort --limit 100
           # gh actions-cache list --limit 100 | tail -n +5 | awk '{print $1}' | tr '\n' '\0' | xargs -0 -n1 gh actions-cache delete --confirm
       # - name: Purge Caches
       #   # https://github.com/MyAlbum/purge-cache
