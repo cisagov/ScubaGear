@@ -62,6 +62,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: List Caches
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh extension install actions/gh-actions-cache
           gh actions-cache list --sort --limit 100
