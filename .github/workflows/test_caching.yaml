@@ -83,6 +83,8 @@ jobs:
       - name: Purge Caches
         # https://github.com/MyAlbum/purge-cache
         uses: MyAlbum/purge-cache@v2
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
           accessed: true # Purge caches by their last accessed time (default)
           created: false # Purge caches by their created time (default)
