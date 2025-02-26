@@ -14,6 +14,7 @@ BeforeDiscovery {
   $global:DownloadedOPAVersion = $false
   $global:SetupTime = $false
   $global:SetupTimeValue = 0
+  $global:SetupTimeThreshold = 1000 # The max time it should take to initialize SG
   # Loop over the various outputs in the PowerShell pipeline, looking for outputs
   # that start with these exact strings.  For more info:
   # https://www.scriptrunner.com/en/blog/pipeline-ready-advanced-powershell
@@ -68,6 +69,6 @@ Describe "Initialize-ScubaGear Output Check" {
   }
   It "Setup time should be minimal" {
     $global:SetupTime | Should -Be $true
-    $global:SetupTimeValue | Should -BeLessThan 1000
+    $global:SetupTimeValue | Should -BeLessThan $global:SetupTimeThreshold
   }
 }
