@@ -28,11 +28,22 @@ body:
       required: true
     validations:
       required: true
-  - type: input
+  - type: dropdown
     attributes:
       label: PowerShell Version
       description: Which PowerShell version are you using?
-      placeholder: Enter PowerShell version (e.g., 5.1, 7.0)
+      options:
+        - "5.1"
+        - "7.0+"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: M365 Environment and License(s)
+      description: Which M365 environment and license type(s) are you using?
+      placeholder: |
+        M365 Environment: gcc, gcc high, dod, etc.
+        License type: Microsoft 365 E3/E5, G3/G5, Microsoft Defender for Office 365 Plan 1 & 2, Microsoft Entra P1/P2, etc.
     validations:
       required: true
   - type: textarea
@@ -66,4 +77,4 @@ body:
         Paste the results here:
       placeholder: "Tip: Run Initialize-SCuBA on the client where you are running ScubaGear and copy/paste the output here."
     validations:
-      required: false      
+      required: false  
