@@ -72,8 +72,8 @@ jobs:
           echo "The current date is"
           echo $now
           # Created at: 2025-02-26T15:34:32.637437Z
-          declare -a dates=$(gh cache list --sort created_at --limit 100 --json createdAt -q .
-          [].createdAt)
+          declare -a dates=$(gh cache list --sort created_at --limit 100 --json createdAt -q [.
+          [].createdAt | keys])
           echo "The dates are:"
           echo $dates
           for theDate in $dates; do
