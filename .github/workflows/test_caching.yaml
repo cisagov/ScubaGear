@@ -40,7 +40,7 @@ jobs:
           # Install-Module -Name ScubaGear
       - name: Install Dependencies
         run: |
-          . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
+          . utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
       - name: Test Version
         run: |
