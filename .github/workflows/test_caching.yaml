@@ -50,13 +50,13 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: "scubagear-directory-${{ github.workflow }}"
+          key: "scubagear-directory-cache"
       - name: Cache Dependencies
         id: powershell-directory
         uses: actions/cache/save@v4
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: "powershell-directory-${{ github.workflow }}"
+          key: "powershell-directory-cache"
   cleanup:
     name: Test Cleanup
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh cache list --sort created_at --limit 100
+          gh cache list --sort created_at --limit 100 -q created_at
           # gh actions-cache list --limit 100 | tail -n +5 | awk '{print $1}' | tr '\n' '\0' | xargs -0 -n1 gh actions-cache delete --confirm
       # - name: Purge Caches
       #   # https://github.com/MyAlbum/purge-cache
