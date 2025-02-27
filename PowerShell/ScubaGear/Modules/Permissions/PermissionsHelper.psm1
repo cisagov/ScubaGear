@@ -276,7 +276,7 @@ Function Get-ScubaGearPermissions {
             }
             'appId'{
                 Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty resourceAPIAppId -Unique"
-                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique
+                $output += ($collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique).Split('#')[0]
             }
             'role' {
                 Try{
@@ -296,7 +296,7 @@ Function Get-ScubaGearPermissions {
                     foreach ($property in $properties) {
                         if ($property.Value -is [string]) {
                             # Replace in string values
-                            $property.Value = $property.Value -replace '{id}',$Id -replace '{domain}',$Domain
+                            $property.Value = ($property.Value -replace '{id}',$Id -replace '{domain}',$Domain -split '#')[0]
                         } elseif ($property.Value -is [array]) {
                             # Replace in array values while keeping it as an array
                             $property.Value = @($property.Value | ForEach-Object {
