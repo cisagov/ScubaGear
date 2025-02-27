@@ -1020,7 +1020,7 @@
             "gcchigh",
             "dod"
         ],
-        "resourceAPIAppId": "ab3be6b7-f5df-413d-ac2d-abf1e3fd9c0b",
+        "resourceAPIAppId": "ab3be6b7-f5df-413d-ac2d-abf1e3fd9c0b#gitleaks:allow",
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/teams/connect-microsoftteams?view=teams-ps"
         ],
