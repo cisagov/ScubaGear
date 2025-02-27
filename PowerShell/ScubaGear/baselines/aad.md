@@ -298,6 +298,17 @@ Managed Devices SHOULD be required to register MFA.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
 
+#### MS.AAD.3.9v1
+Device code authentication SHOULD be blocked.
+
+<!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
+- _Rationale:_ The device code authentication protocol has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
+- _Last modified:_ February 2025
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+
 ### Resources
 
 - [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)
@@ -313,6 +324,8 @@ Managed Devices SHOULD be required to register MFA.
 - [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
 
 - [Enable passkeys (FIDO2) for your organization](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2)
+
+- [Storm-2372 conducts device code phishing campaign](https://www.microsoft.com/en-us/security/blog/2025/02/13/storm-2372-conducts-device-code-phishing-campaign/)
 
 ### License Requirements
 
@@ -397,6 +410,20 @@ If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator 
   Target resources > User actions > <b>Register security information</b>
 
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
+</pre>
+
+#### MS.AAD.3.9v1 Instructions
+
+1. Create a Conditional Access policy to block device code flow
+
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+
+  Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>
+
+  Access controls > Grant > <b>Block Access</b>
 </pre>
 
 ## 4. Centralized Log Collection
