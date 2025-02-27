@@ -466,7 +466,12 @@ function Get-ScubaDmarcRecord {
     $NLowConf = 0
 
     foreach ($d in $Domains) {
-    $LogEntries = @()
+        if ($d.IsCoexistenceDomain) {
+            # Skip the coexistence domain (e.g., contoso.mail.onmicrosoft.com).
+            # See https://github.com/cisagov/ScubaGear/issues/1514.
+            continue
+        }
+        $LogEntries = @()
         # First check to see if the record is available at the full domain level
         $DomainName = $d.DomainName
         $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName"
