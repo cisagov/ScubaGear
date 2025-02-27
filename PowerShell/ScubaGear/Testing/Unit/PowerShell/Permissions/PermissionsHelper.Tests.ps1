@@ -1,6 +1,6 @@
 BeforeDiscovery {
-    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Permissions'
-    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath "\PermissionsHelper.psm1") -Force
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Permissions' -resolve
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'PermissionsHelper.psm1') -Force
 }
 
 InModuleScope PermissionsHelper {
@@ -9,7 +9,8 @@ InModuleScope PermissionsHelper {
 
             Mock -ModuleName PermissionsHelper Get-ScubaGearPermissions -MockWith {
                 param ($Product)
-                    $permissionSet = Get-Content -Path "$($ProviderPath)/ScubaGearPermissions.json" | ConvertFrom-Json
+                    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+                    $permissionSet = Get-Content -Path "$($ResourceRoot)/../../../../Modules/Permissions/ScubaGearPermissions.json" | ConvertFrom-Json
                     $collection = $permissionSet | Where-Object { $_.scubaGearProduct -contains $product -and $_.supportedEnv -contains "commercial" }
                     $results = $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique | sort-object
                     return $results
@@ -57,10 +58,6 @@ InModuleScope PermissionsHelper {
                 $result = Get-ScubaGearPermissions -Product exo -servicePrincipal
                 $result | Should -Be $expected
             }
-        }
-
-        AfterAll {
-            Remove-Module PermissionsHelper -Force -ErrorAction SilentlyContinue
         }
     }
 }
