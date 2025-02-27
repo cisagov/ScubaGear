@@ -502,7 +502,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     Policies := PoliciesBlockingDefaultApps
-    String := "meeting policy(ies) found that does not restrict installation of Microsoft Apps by default:"
+    String := "app permission policy(ies) found that does not restrict installation of Microsoft Apps by default:"
     Status := count(Policies) == 0
 }
 #--
@@ -528,7 +528,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingGlobalApps
-    String := "meeting policy(ies) found that does not restrict installation of third-party apps by default:"
+    String := "app permission policy(ies) found that does not restrict installation of third-party apps by default:"
     Status := count(Policies) == 0
 }
 #--
@@ -555,7 +555,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingCustomApps
-    String := "meeting policy(ies) found that does not restrict installation of custom apps by default:"
+    String := "app permission policy(ies) found that does not restrict installation of custom apps by default:"
     Status := count(Policies) == 0
 }
 #--
