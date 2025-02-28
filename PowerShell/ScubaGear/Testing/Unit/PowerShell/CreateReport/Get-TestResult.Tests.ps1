@@ -1,4 +1,5 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/CreateReport')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/CreateReport') `
+    -Function 'Get-TestResult' -Force
 
 InModuleScope CreateReport {
     Describe -Tag CreateReport -Name 'Get-TestResult' {
