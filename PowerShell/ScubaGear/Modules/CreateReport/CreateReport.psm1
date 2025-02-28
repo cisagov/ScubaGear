@@ -170,7 +170,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-                $Result = Get-TestResult $Test $MissingCommands
+                $Result = Get-TestResult $Test $MissingCommands $Control
 
                 # Check if the config file indicates the control should be omitted
                 $Config = $SettingsExport.scuba_config
@@ -205,6 +205,8 @@ function New-Report {
                     "Result"= $Result.DisplayString
                     "Criticality"=if ($Control.Deleted -or $Control.MalformedDescription) {"-"} else {$Test.Criticality}
                     "Details"= $Result.Details
+                    "OmittedEvaluationResult"="N/A"
+                    "OmittedEvaluationDetails"="N/A"
                 }
             }
             else {
@@ -216,6 +218,8 @@ function New-Report {
                     "Result"= "Error - Test results missing"
                     "Criticality"= "-"
                     "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                    "OmittedEvaluationResult"="N/A"
+                    "OmittedEvaluationDetails"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
@@ -228,6 +232,8 @@ function New-Report {
         $GroupAnchor = New-MarkdownAnchor -GroupNumber $BaselineGroup.GroupNumber -GroupName $BaselineGroup.GroupName
         $GroupReferenceURL = "$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$GroupAnchor"
         $MarkdownLink = "<a class='control_group' href=`"$($GroupReferenceURL)`" target=`"_blank`">$Name</a>"
+        # Create a version of the object without the omitted evaluation keys, otherwise they
+        # would show up as columns on the HTML report.
         $FragmentWithoutOmitted = $Fragment | ForEach-Object -Process {[pscustomobject]@{
             "Control ID" = $_."Control ID";
             "Requirement" = $_."Requirement";
