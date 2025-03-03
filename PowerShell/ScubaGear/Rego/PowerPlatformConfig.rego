@@ -5,6 +5,7 @@ import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsArray
 import data.utils.key.FilterArray
+import data.utils.key.Count
 
 
 ######################
@@ -119,7 +120,33 @@ EnvWithPolicies contains Env.name if {
     some Env in Policies.environments
 }
 
-# Pass if all envoirments have a policy applied to them
+PolicyApplicableToAllEnvironments contains {
+    Policy.name,
+    Policy.displayName
+} if {
+    some Policies in input.dlp_policies
+    some Policy in Policies
+    Policy.environmentType == "AllEnvironments"
+}
+
+# Pass if at least one policy is set to all environments
+tests contains {
+    "PolicyId": "MS.POWERPLATFORM.2.2v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-DlpPolicy"],
+    "ActualValue": PolicyApplicableToAllEnvironments,
+    "ReportDetails": ReportDetailsArray(Status, PolicyApplicableToAllEnvironments, ErrorMessage),
+    "RequirementMet": Status
+} if {
+    some DLPPolicies in input.dlp_policies
+    count(DLPPolicies.value) > 0
+    Count(PolicyApplicableToAllEnvironments) > 0
+    ErrorMessage := "No policies found set to all environments"
+
+    Status := Count(PolicyApplicableToAllEnvironments) > 0,
+}
+
+# Pass if all environments have a policy applied to them
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
@@ -130,11 +157,12 @@ tests contains {
 } if {
     some DLPPolicies in input.dlp_policies
     count(DLPPolicies.value) > 0
+    Count(PolicyApplicableToAllEnvironments) == 0
     ErrorMessage := "Subsequent environments without DLP policies:"
 
     # finds the environments with no policies applied to them
     EnvWithoutPolicies := AllEnvironments - EnvWithPolicies
-    Status := count(EnvWithoutPolicies) == 0
+    Status := Count(EnvWithoutPolicies) == 0
 }
 
 # Edge case where no policies are found
