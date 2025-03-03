@@ -29,7 +29,9 @@ function Confirm-OpaUpdateRequirements {
     # Check if our current OPA version is outdated
     $OPAVersionPath = Join-Path -Path $RepoPath PowerShell/ScubaGear/Modules/Support/Support.psm1
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $ExpectedVersionPattern = "ExpectedVersion = $OPAVerRegex"
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $SupportModule = Get-Content $OPAVersionPath -Raw
 
     # Find our current OPA version using some dirty string
