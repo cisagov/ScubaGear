@@ -48,12 +48,12 @@ function Determine-OpaUpdateRequirements {
         $UpdateRequired = $true
     }
     if ($UpdateRequired) {
-        Write-Warning "OPA version update required."
+        Write-Output "OPA version update required."
     }
     else {
-        Write-Warning "OPA version update is not required. Update branch already exists or OPA version is already up to date."
+        Write-Output "OPA version update is not required. Update branch already exists or OPA version is already up to date."
     }
-    Write-Warning "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
+    # Write-Warning "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
 
     # Return values in a hashtable
     $ReturnValues = @{
