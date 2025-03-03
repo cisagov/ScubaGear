@@ -15,14 +15,18 @@ permissions: read-all
 
 jobs:
     update-opa-dependency:
+        name: Update OPA Dependency
         runs-on: windows-latest
         permissions:
             contents: write
             pull-requests: write
+        defaults:
+            run:
+                shell: powershell
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         steps:
-            - name: Checkout code
+            - name: Checkout
               uses: actions/checkout@v4
               with:
                 path: repo
