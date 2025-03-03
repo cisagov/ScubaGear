@@ -143,8 +143,10 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       $InitialDomain = (Get-MgBetaOrganization).VerifiedDomains | Where-Object {$_.isInitial}
-                       $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
+                       # Extract SharePoint tenant domain shortname from site URL
+                       $SPOWebURL = (Get-MgBetaSite -SiteId "root").WebUrl
+                       $DomainPrefix = $SPOWebURL -replace "^https://", "" `
+                                        -replace "\.sharepoint(-mil)?\.(com|us)$", ""
                        $SPOParams = @{
                            'ErrorAction' = 'Stop';
                        }
@@ -154,29 +156,29 @@ function Connect-Tenant {
                        switch ($M365Environment) {
                            {($_ -eq "commercial") -or ($_ -eq "gcc")} {
                                $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.com";
+                                   'Url'= "https://$($DomainPrefix)-admin.sharepoint.com";
                                }
                                $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint.com";
+                                   'Url'= "$($DomainPrefix)-admin.sharepoint.com";
                                }
                            }
                            "gcchigh" {
                                $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint.us";
+                                   'Url'= "https://$($DomainPrefix)-admin.sharepoint.us";
                                    'Region' = "ITAR";
                                }
                                $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint.us";
+                                   'Url'= "$($DomainPrefix)-admin.sharepoint.us";
                                    'AzureEnvironment' = 'USGovernmentHigh'
                                }
                            }
                            "dod" {
                                $SPOParams += @{
-                                   'Url'= "https://$($InitialDomainPrefix)-admin.sharepoint-mil.us";
+                                   'Url'= "https://$($DomainPrefix)-admin.sharepoint-mil.us";
                                    'Region' = "ITAR";
                                }
                                $PnPParams += @{
-                                   'Url'= "$($InitialDomainPrefix)-admin.sharepoint-mil.us";
+                                   'Url'= "$($DomainPrefix)-admin.sharepoint-mil.us";
                                    'AzureEnvironment' = 'USGovernmentDoD'
                                }
                            }

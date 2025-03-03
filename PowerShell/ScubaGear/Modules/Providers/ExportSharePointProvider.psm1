@@ -23,13 +23,13 @@ function Export-SharePointProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPOSiteHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    #Get InitialDomainPrefix
-    $InitialDomain = ($Tracker.TryCommand("Get-MgBetaOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
-    $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
+    # Get SharePoint tenant domain shortname from site URL
+    $SPOWebURL = ($Tracker.TryCommand("Get-MgBetaSite", @{"SiteId"="root";})).WebUrl
+    $DomainPrefix = $SPOWebURL -replace "^https://", "" `
+                        -replace "\.sharepoint(-mil)?\.(com|us)$", ""
 
-    #Get SPOSiteIdentity
-    $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
-
+    # Construct SPO admin site URL from tenant prefix and environment
+    $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -DomainPrefix $DomainPrefix
 
     $SPOTenant = ConvertTo-Json @()
     $SPOSite = ConvertTo-Json @()
