@@ -28,14 +28,14 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-              with:
-                path: repo
+            #   with:
+            #     path: repo
             - name: Determine if OPA update is required
               id: determine-update-required
               continue-on-error: true
               shell: powershell
               run: |
-                . repo/utils/workflow/Update-Ops.ps1
+                . utils/workflow/Update-Opa.ps1
                 $ReturnValues = Determine-OpaUpdateRequirements -RepoPath "repo"
 
                 # $UpdateRequired = $false
