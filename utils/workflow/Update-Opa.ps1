@@ -21,7 +21,7 @@ function Confirm-OpaUpdateRequirements {
     $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
     # [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     # $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
-    Invoke-Expression "git ls-remote --exit-code --heads origin $(OPAVersionBumpBranch)"
+    Invoke-Expression "git ls-remote --exit-code --heads origin $OPAVersionBumpBranch"
     $OPAVersionBranchExists = $false
     if ($LASTEXITCODE -eq 0) {
         $OPAVersionBranchExists = $true
