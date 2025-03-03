@@ -32,7 +32,8 @@ function Confirm-OpaUpdateRequirements {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
     $ExpectedVersionPattern = "ExpectedVersion = $OPAVerRegex"
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $SupportModule = Get-Content $OPAVersionPath -Raw
+    # $SupportModule = Get-Content $OPAVersionPath -Raw
+    Get-Content $OPAVersionPath -Raw
 
     # Find our current OPA version using some dirty string
     # manipulation
