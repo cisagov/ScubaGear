@@ -36,7 +36,7 @@ jobs:
               shell: powershell
               run: |
                 . utils/workflow/Update-Opa.ps1
-                $ReturnValues = Determine-OpaUpdateRequirements -RepoPath .
+                $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath .
 
                 $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
                 $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
