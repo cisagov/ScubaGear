@@ -5,7 +5,7 @@ Describe "Update OPA" {
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Invoke-PSSA.ps1' -Resolve
         . $ScriptPath
-        $ReturnValues = Determine-OpaUpdateRequirements
+        $ReturnValues = Determine-OpaUpdateRequirements -RepoPath $RepoRootPath
         $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
         $LatestOPAVersion | Should -Be "1.2.0"
     }

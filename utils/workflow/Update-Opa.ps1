@@ -1,4 +1,4 @@
-function Determine-OpaUpdateRequirements {
+function Confirm-OpaUpdateRequirements {
     <#
         .SYNOPSIS
             Determine if OPA update is required
@@ -68,7 +68,7 @@ function Update-OpaVersion {
         $RepoPath
     )
     # Replace Default version in Config Module
-    $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+    $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
     $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
     $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
