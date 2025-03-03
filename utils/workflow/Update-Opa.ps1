@@ -20,7 +20,7 @@ function Confirm-OpaUpdateRequirements {
     # Check if there is already an update branch
     $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
+    $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
     $OPAVersionBranchExists = $false
     if ($LASTEXITCODE -eq 0) {
         $OPAVersionBranchExists = $true
