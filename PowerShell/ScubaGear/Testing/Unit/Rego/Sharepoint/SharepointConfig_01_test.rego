@@ -2,7 +2,6 @@ package sharepoint_test
 import rego.v1
 import data.sharepoint
 import data.utils.report.NotCheckedDetails
-import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
@@ -190,17 +189,5 @@ test_SharingDomainRestrictionMode_SharingCapability_Anyone_Incorrect if {
         "see the baseline policy for instructions on a manual check."
     ])
     TestResult("MS.SHAREPOINT.1.3v1", Output, ReportDetailString, false) == true
-}
-#--
-
-#
-# Policy MS.SHAREPOINT.1.4v1
-#--
-test_RequireAcceptingAccountMatchInvitedAccount_NotImplemented_V1 if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
-
-    Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
-
-    TestResult(PolicyId, Output, NotCheckedDeprecation, false) == true
 }
 #--
