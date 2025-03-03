@@ -29,8 +29,8 @@ jobs:
               continue-on-error: true
               shell: powershell
               run: |
-                . ./utils/workflow/Update-Ops.ps1
-                $ReturnValues = Determine-OpaUpdateRequirements -RepoPath "repo"
+                . utils/workflow/Update-Ops.ps1
+                $ReturnValues = Determine-OpaUpdateRequirements -RepoPath .
 
                 # $UpdateRequired = $false
                 # $LatestOPAVersion = Invoke-RestMethod -Uri "https://api.github.com/repos/open-policy-agent/opa/releases/latest" | Select-Object -ExpandProperty tag_name
