@@ -64,6 +64,44 @@ function New-PrivateGallery {
   Write-Output "The gallery was registered..."
 }
 
+function Initialize-ParametersForPublishing {
+  <#
+  #>
+  param (
+
+  )
+  # Remove non-release files
+  Remove-Item -Recurse -Force repo -Include .git*
+  # Extract the API key used to publish to PSGallery
+  $ApiKey = az keyvault secret show --id '${{ steps.key-vault-info.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
+  if (-Not $ApiKey)
+  {
+    Write-Error "Failed to retrieve API key"
+  }
+  # Setup the parameters
+  $Parameters = @{
+    AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+    CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+    ModuleSourcePath = 'repo/PowerShell/ScubaGear'
+    GalleryName = 'PSGallery'
+    NuGetApiKey = $ApiKey
+  }
+  if ('true' -eq '${{ inputs.IsPrerelease }}')
+  {
+    Write-Output "Adding IsPrerelease"
+    Write-Output ${{ inputs.IsPrerelease }}
+    $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
+  }
+  if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
+  {
+    Write-Output "Adding OverrideModuleVersion"
+    Write-Output ${{ inputs.OverrideModuleVersion }}
+    $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
+  }
+  # This publishes to PSGallery.
+  Publish-ScubaGearModule @Parameters
+}
+
 function Publish-ScubaGearModule {
   <#
     .Description
