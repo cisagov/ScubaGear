@@ -38,54 +38,6 @@ jobs:
                 . utils/workflow/Update-Opa.ps1
                 $ReturnValues = Determine-OpaUpdateRequirements -RepoPath .
 
-                # $UpdateRequired = $false
-                # $LatestOPAVersion = Invoke-RestMethod -Uri "https://api.github.com/repos/open-policy-agent/opa/releases/latest" | Select-Object -ExpandProperty tag_name
-                # $LatestOPAVersion = $LatestOPAVersion -replace "v", ""
-
-                # # Check if there is already an update branch
-                # $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
-                # $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
-                # $OPAVersionBranchExists = $false
-                # if ($LASTEXITCODE -eq 0) {
-                #     $OPAVersionBranchExists = $true
-                # }
-
-                # # Check if our current OPA version is outdated
-                # $OPAVersionPath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
-                # $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-                # $ExpectedVersionPattern = "ExpectedVersion = $OPAVerRegex"
-                # $SupportModule = Get-Content $OPAVersionPath -Raw
-
-                # # Find our current OPA version using some dirty string
-                # # manipulation
-                # $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
-                # $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-                # $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
-                # $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
-                # $CurrentOPAVersion = '0.0.0'
-                # if ($ScubaConfigModule -match $DefaultVersionPattern) {
-                #     $CurrentOPAVersion = ($Matches[0] -split "=")[1] -replace " ", ""
-                #     $CurrentOPAVersion = $CurrentOPAVersion -replace "'", ""
-                # }
-
-                # if (($LatestOPAVersion -gt $CurrentOPAVersion) -and (-not $OPAVersionBranchExists)) {
-                #     $UpdateRequired = $true
-                # }
-
-                # if ($UpdateRequired) {
-                #     Write-Output "OPA version update required."
-                # }
-                # else {
-                #     Write-Output "OPA version update is not required. Update branch already exists or OPA version is already up to date."
-                # }
-                # Write-Output "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
-
-                # pass variables to the next steps
-                # echo latestopaversion=$LatestOPAVersion >> $env:GITHUB_OUTPUT
-                # echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
-                # echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
-                # echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
-
                 $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
                 $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
                 $UpdateRequired = $ReturnValues["UpdateRequired"]

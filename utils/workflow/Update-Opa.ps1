@@ -26,7 +26,6 @@ function Determine-OpaUpdateRequirements {
     }
 
     # Check if our current OPA version is outdated
-    # $OPAVersionPath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
     $OPAVersionPath = Join-Path -Path $RepoPath PowerShell/ScubaGear/Modules/Support/Support.psm1
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
     $ExpectedVersionPattern = "ExpectedVersion = $OPAVerRegex"
@@ -34,7 +33,6 @@ function Determine-OpaUpdateRequirements {
 
     # Find our current OPA version using some dirty string
     # manipulation
-    # $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
     $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
     $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
@@ -53,7 +51,6 @@ function Determine-OpaUpdateRequirements {
     else {
         Write-Warning "OPA version update is not required. Update branch already exists or OPA version is already up to date."
     }
-    # Write-Warning "Current ScubaGear default OPA Version: v$($CurrentOPAVersion) Latest OPA version: v$($LatestOPAVersion)"
 
     # Return values in a hashtable
     $ReturnValues = @{
@@ -66,5 +63,67 @@ function Determine-OpaUpdateRequirements {
 }
 
 function Update-OpaVersion {
+    <#
+        .SYNOPSIS
+            Update OPA version in ScubaGear
+        .PARAMETER RepoPath
+            Path to the repo
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $RepoPath
+    )
+    # Replace Default version in Config Module
+    $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+    $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
+    $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
+    $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
+    if ($ScubaConfigModule -match $DefaultVersionPattern) {
+        $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOPAVersion'"
+        Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
+    }
+    else {
+        throw "Fatal Error: Couldn't find the default OPA version in the ScubaConfig."
+    }
 
+    # Update Acceptable Versions in Support Module
+    $SupportModulePath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
+    $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
+    $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
+    $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
+    $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
+
+    (Get-Content -Path $SupportModulePath) | ForEach-Object {
+        $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
+        if ($EndAcceptableVarMatch) {
+            $VersionsLength = ($_ -split ",").length
+
+            # Split the line if we reach our version limit per line
+            # in the the file. This is to prevent long lines.
+            if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
+                # Splitting lines; Current and latest OPA Version will start on the next line
+                $VersionsArr = $_ -split ","
+                # Create a new line
+                # Then add the new version on the next line
+                ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
+                "    '$CurrentOPAVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
+            }
+            elseif ($VersionsLength -eq 1) {
+                # if the default version is the only acceptable version
+                # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
+                $VersionsArr = $_ -split "="
+                $VersionsArr[0] + "= '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+            }
+            else {
+                # No Splitting lines; Appending new Current OPA version to acceptable version
+                $VersionsArr = $_ -split ","
+                $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
+                $NewVersions + ", '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+            }
+        }
+        else {
+            $_
+        }
+    } | Set-Content $SupportModulePath
 }
