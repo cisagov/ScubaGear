@@ -325,6 +325,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                                 FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
                                 RiskyPermissions     = $MappedPermissions
+                                AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
                     }
@@ -432,12 +433,15 @@ function Format-RiskyThirdPartyServicePrincipals {
     process {
         try {
             $ServicePrincipals = @()
+            $OrgInfo = Get-MgBetaOrganization -ErrorAction "Stop"
+
             foreach ($ServicePrincipal in $RiskySPs) {
                 if ($null -eq $ServicePrincipal) {
                     continue;
                 }
                 
-                if ($ServicePrincipal.SignInAudience -ne "AzureADMyOrg") {
+                # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
+                if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
                     $ServicePrincipals += $ServicePrincipal
                 }
             }
