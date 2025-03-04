@@ -318,6 +318,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 ObjectId             = $ServicePrincipal.Id
                                 AppId                = $ServicePrincipal.AppId
                                 DisplayName          = $ServicePrincipal.DisplayName
+                                SignInAudience       = $ServicePrincipal.SignInAudience
                                 # Credentials from application and service principal objects may get merged in other cmdlets.
                                 # Differentiate between the two by setting IsFromApplication=$false
                                 KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
@@ -424,9 +425,9 @@ function Format-RiskyThirdPartyServicePrincipals {
     #Internal
     ##>
     param (
-        [ValidateNotNullOrEmpty()]
-        [Object[]]
-        $RiskyApps,
+        #[ValidateNotNullOrEmpty()]
+        #[Object[]]
+        #$RiskyApps,
 
         [ValidateNotNullOrEmpty()]
         [Object[]]
@@ -434,13 +435,17 @@ function Format-RiskyThirdPartyServicePrincipals {
     )
     process {
         try {
+            #ConvertTo-Json -Depth 10 $RiskySPs > testsps.json 
             $ServicePrincipals = @()
             foreach ($ServicePrincipal in $RiskySPs) {
-                $MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
+                #$MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
 
                 # If a service principal does not have an associated application registration,
                 # then it is owned by an external organization.
-                if ($null -eq $MatchedApplication) {
+                #if ($null -eq $MatchedApplication) {
+                #    $ServicePrincipals += $ServicePrincipal
+                #}
+                if ($ServicePrincipal.SignInAudience -ne "AzureADMyOrg") {
                     $ServicePrincipals += $ServicePrincipal
                 }
             }
