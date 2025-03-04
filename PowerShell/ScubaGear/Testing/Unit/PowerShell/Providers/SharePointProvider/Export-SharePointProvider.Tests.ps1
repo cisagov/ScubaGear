@@ -33,6 +33,20 @@ InModuleScope -ModuleName ExportSharePointProvider {
                                     )
                                 }
                             }
+                            "Get-MgBetaSite" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{
+                                    WebUrl = "https://contoso.sharepoint.com";
+                                }
+                            }
+                            { ($_ -eq "Get-SPOSite") -or ($_ -eq "Get-PnPTenantSite") } {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            { ($_ -eq "Get-SPOTenant") -or ($_ -eq "Get-PnPTenant") } {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             { ($_ -eq "Get-SPOSite") -or ($_ -eq "Get-PnPTenantSite") } {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
