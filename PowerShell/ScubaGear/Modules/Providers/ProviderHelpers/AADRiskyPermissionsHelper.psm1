@@ -425,29 +425,18 @@ function Format-RiskyThirdPartyServicePrincipals {
     #Internal
     ##>
     param (
-        #[ValidateNotNullOrEmpty()]
-        #[Object[]]
-        #$RiskyApps,
-
         [ValidateNotNullOrEmpty()]
         [Object[]]
         $RiskySPs
     )
     process {
         try {
-            #ConvertTo-Json -Depth 10 $RiskySPs > testsps.json 
             $ServicePrincipals = @()
             foreach ($ServicePrincipal in $RiskySPs) {
                 if ($null -eq $ServicePrincipal) {
                     continue;
                 }
-                #$MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
-
-                # If a service principal does not have an associated application registration,
-                # then it is owned by an external organization.
-                #if ($null -eq $MatchedApplication) {
-                #    $ServicePrincipals += $ServicePrincipal
-                #}
+                
                 if ($ServicePrincipal.SignInAudience -ne "AzureADMyOrg") {
                     $ServicePrincipals += $ServicePrincipal
                 }
