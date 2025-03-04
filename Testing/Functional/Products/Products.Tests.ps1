@@ -269,14 +269,12 @@ Describe "Policy Checks for <ProductName>" {
             $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
-            Write-Warning "The URL is"
-            Write-Warning $Url
             try {
                 $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
             }
             catch {
                 # Sometimes Selenium fails to start in a timely manner.  When that happens,
-                # simple try again.  This is a very simplistic attempt to solve the problem,
+                # simply try again.  This is a very simplistic attempt to solve the problem,
                 # but it seems to work.
                 $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
             }
