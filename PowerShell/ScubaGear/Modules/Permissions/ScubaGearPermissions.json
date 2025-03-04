@@ -556,6 +556,36 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaPolicyAuthenticationMethodPolicy",
+        "apiResource": "/beta/policies/authenticationMethodsPolicy",
+        "poshModule": [
+            "Microsoft.Graph.Beta.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "Policy.Read.All"
+        ],
+        "higherPermissions": [
+            "Policy.ReadWrite.AuthenticationMethod"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAuthenticationMethodPolicy?view=graph-powershell-beta",
+            "https://learn.microsoft.com/en-us/graph/api/authenticationmethodspolicy-get?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": ""
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaPolicyAuthorizationPolicy",
         "apiResource": "/beta/policies/authorizationPolicy",
         "poshModule": [
