@@ -46,10 +46,9 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
-            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
