@@ -205,8 +205,6 @@ function Export-AADProvider {
     else {
         $RiskyThirdPartySPs = "{}"
     }
-
-    Write-Output $RiskyThirdPartySPs
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
