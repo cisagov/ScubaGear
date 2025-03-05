@@ -40,6 +40,11 @@ InModuleScope Connection {
                     )
                 }
             }
+            Mock Get-MgBetaSite -MockWith {
+                return [pscustomobject]@{
+                    DisplayName     = "contoso.onmicrosoft.com";
+                }
+            }
             Mock -CommandName Write-Progress {
             }
         }
