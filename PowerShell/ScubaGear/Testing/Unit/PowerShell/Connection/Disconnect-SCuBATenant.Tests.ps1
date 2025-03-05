@@ -12,6 +12,8 @@ InModuleScope Connection {
             Mock -ModuleName Connection Disconnect-ExchangeOnline {}
             function Disconnect-SPOService {throw 'this will be mocked'}
             Mock -ModuleName Connection Disconnect-SPOService {}
+            function Disconnect-PnPOnline {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-PnPOnline {}
             function Remove-PowerAppsAccount {throw 'this will be mocked'}
             Mock  -ModuleName Connection Remove-PowerAppsAccount {}
             function Disconnect-MicrosoftTeams {throw 'this will be mocked'}
