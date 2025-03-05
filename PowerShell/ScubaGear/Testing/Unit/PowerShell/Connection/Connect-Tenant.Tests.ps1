@@ -40,6 +40,7 @@ InModuleScope Connection {
                     )
                 }
             }
+            function Get-MgBetaSite {throw 'this will be mocked'}
             Mock Get-MgBetaSite -MockWith {
                 return [pscustomobject]@{
                     DisplayName     = "contoso.onmicrosoft.com";
