@@ -10,7 +10,6 @@ function Export-SharePointProvider {
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        #[ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
@@ -23,13 +22,11 @@ function Export-SharePointProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPOSiteHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    # Get SharePoint tenant domain shortname from site URL
-    $SPOWebURL = ($Tracker.TryCommand("Get-MgBetaSite", @{"SiteId"="root";})).WebUrl
-    $DomainPrefix = $SPOWebURL -replace "^https://", "" `
-                        -replace "\.sharepoint(-mil)?\.(com|us)$", ""
-
     # Construct SPO admin site URL from tenant prefix and environment
-    $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -DomainPrefix $DomainPrefix
+    $SPOWebURL = $Tracker.TryCommand("Invoke-MgGraphRequest", @{"Uri"="/beta/sites/root";}).WebUrl
+    $TenantName = $SPOWebURL -replace "^https://", "" `
+                    -replace "\.sharepoint(-mil)?\.(com|us)$", ""
+    $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -TenantName $TenantName
 
     $SPOTenant = ConvertTo-Json @()
     $SPOSite = ConvertTo-Json @()

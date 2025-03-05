@@ -15,18 +15,18 @@ function Get-SPOSiteHelper {
         [Parameter(Mandatory = $true, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [string]
-        $DomainPrefix
+        $TenantName
     )
     $SPOSiteIdentity = ""
     switch ($M365Environment) {
         {"commercial" -or "gcc"} {
-            $SPOSiteIdentity = "https://$($DomainPrefix).sharepoint.com/"
+            $SPOSiteIdentity = "https://$($TenantName).sharepoint.com/"
         }
         "gcchigh" {
-            $SPOSiteIdentity = "https://$($DomainPrefix).sharepoint.us/"
+            $SPOSiteIdentity = "https://$($TenantName).sharepoint.us/"
         }
         "dod" {
-            $SPOSiteIdentity = "https://$($DomainPrefix).sharepoint-mil.us/"
+            $SPOSiteIdentity = "https://$($TenantName).sharepoint-mil.us/"
         }
         default {
             Write-Error -Message "Unsupported or invalid M365Environment argument"
