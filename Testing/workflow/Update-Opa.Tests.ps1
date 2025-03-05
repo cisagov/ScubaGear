@@ -3,7 +3,9 @@
 Describe "Update OPA" {
     It "Determine if OPA needs to be updated" {
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+        Write-Warning "The repo root path is $RepoRootPath"
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
+        Write-Warning "The script path is $ScriptPath"
         . $ScriptPath
         $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath $RepoRootPath
         # The latest version of OPA is found here:
@@ -13,7 +15,8 @@ Describe "Update OPA" {
         # The current version of OPA used in SG is found
         # in PowerShell/ScubaGear/ScubaGear.psm1
         # in the variable DefaultOPAVersion
-        $ScubaConfigPath = Join-Path -Path $RepoPath -ChildPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
+        $ScubaConfigPath = Join-Path -Path $RepoRootPath -ChildPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
+        Write-Warning "The Scuba Config path is $ScubaConfigPath"
         $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
         $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
         $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
