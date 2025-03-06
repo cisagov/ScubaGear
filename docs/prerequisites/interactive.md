@@ -38,6 +38,7 @@ The following API permissions are required for Microsoft Graph Powershell:
 - RoleManagement.Read.Directory
 - RoleManagementPolicy.Read.AzureADGroup
 - User.Read.All
+- Sites.Read.All
 
 > **Note**: Microsoft Graph PowerShell SDK [now appears as "verified"](https://devblogs.microsoft.com/microsoft365dev/microsoft-graph-powershell-and-cli-are-now-verified/) on the AAD application consent screen.
 

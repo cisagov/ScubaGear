@@ -29,15 +29,17 @@ The minimum permissions and roles that must be assigned to the service principal
 | Product                 | API Permissions                                 | Role          |
 | ----------------------- | ----------------------------------------------- | ------------- |
 | Entra ID                | Directory.Read.All, GroupMember.Read.All,       |               |
-|                         | Organization.Read.All, Policy.Read.All,         |               |
-|                         | RoleManagement.Read.Directory, User.Read.All    |               |
-|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |
-|                         | PrivilegedAccess.Read.AzureADGroup              |               |
-|                         | RoleManagementPolicy.Read.AzureADGroup          |               |
+|                         | Policy.Read.All,                                |               |
+|                         | PrivilegedAccess.Read.AzureADGroup,             |               |
+|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup,|               |
+|                         | Organization.Read.All,                          |               |
+|                         | RoleManagementPolicy.Read.AzureADGroup,         |               |
+|                         | RoleManagement.Read.Directory, Sites.Read.All,  |               |
+|                         | User.Read.All                                   |               |
 | Defender for Office 365 | Exchange.ManageAsApp                            | Global Reader |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader |
 | Power Platform          | (see below)                                     |               |
-| SharePoint Online       | Sites.FullControl.All, Organization.Read.All    |               |
+| SharePoint Online       | Organization.Read.All, Sites.FullControl.All    |               |
 | Microsoft Teams         |                                                 | Global Reader |
 
 > **Note** Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.
