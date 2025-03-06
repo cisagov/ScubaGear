@@ -22,28 +22,11 @@ InModuleScope Connection {
             Mock Add-PowerAppsAccount -MockWith {}
             function Connect-EXOHelper {throw 'this will be mocked'}
             Mock -ModuleName Connection Connect-EXOHelper -MockWith {}
-            function Get-MgBetaOrganization {throw 'this will be mocked'}
-            Mock Get-MgBetaOrganization -MockWith {
+
+            function Invoke-MgGraphRequest {throw 'this will be mocked'}
+            Mock Invoke-MgGraphRequest -MockWith {
                 return [pscustomobject]@{
-                    DisplayName     = "DisplayName";
-                    Name            = "DomainName";
-                    Id              = "TenantId";
-                    VerifiedDomains = @(
-                        @{
-                            isInitial = $false;
-                            Name      = "example.onmicrosoft.com"
-                        },
-                        @{
-                            isInitial = $true;
-                            Name      = "contoso.onmicrosoft.com"
-                        }
-                    )
-                }
-            }
-            function Get-MgBetaSite {throw 'this will be mocked'}
-            Mock Get-MgBetaSite -MockWith {
-                return [pscustomobject]@{
-                    DisplayName     = "contoso.onmicrosoft.com";
+                    WebUrl     = "https://contoso.sharepoint.com";
                 }
             }
             Mock -CommandName Write-Progress {
