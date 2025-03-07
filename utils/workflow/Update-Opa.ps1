@@ -14,6 +14,7 @@ function Confirm-OpaUpdateRequirements {
     Write-Warning "Determining if OPA needs to be updated..."
 
     $UpdateRequired = $false
+    # Get latest version via REST
     $LatestOPAVersion = Invoke-RestMethod -Uri "https://api.github.com/repos/open-policy-agent/opa/releases/latest" | Select-Object -ExpandProperty tag_name
     $LatestOPAVersion = $LatestOPAVersion -replace "v", ""
 
@@ -28,6 +29,7 @@ function Confirm-OpaUpdateRequirements {
 
     # Find our current OPA version using some dirty string manipulation
     $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
+
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
     $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
     $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw

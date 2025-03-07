@@ -48,6 +48,10 @@ class ScubaConfig {
         return [ScubaConfig]::ScubaDefaults[$Name]
     }
 
+    [string] GetOpaVersion() {
+        return $ScubaDefaults('DefaultOPAVersion')
+    }
+
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
