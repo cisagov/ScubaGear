@@ -48,8 +48,8 @@ class ScubaConfig {
         return [ScubaConfig]::ScubaDefaults[$Name]
     }
 
-    [string] GetOpaVersion() {
-        return $ScubaDefaults('DefaultOPAVersion')
+    [string]GetOpaVersion() {
+        return $this.ScubaDefaults('DefaultOPAVersion')
     }
 
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
