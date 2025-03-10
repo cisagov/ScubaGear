@@ -31,7 +31,7 @@ function Confirm-OpaUpdateRequirements {
             Write-Warning "OPA version update required."
         }
         else {
-            Write-Warning "Update branch $($OPAVersionBumpBranch) already exists; no update required."
+            Write-Warning "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."
         }
     }
     else {
