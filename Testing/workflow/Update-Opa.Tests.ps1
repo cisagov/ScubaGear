@@ -20,7 +20,7 @@ Describe "Update OPA" {
         # in the variable DefaultOPAVersion
         # $ScubaConfigPath = Join-Path -Path $RepoRootPath -ChildPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
         # Write-Warning "The Scuba Config path is $ScubaConfigPath"
-        $ScubaConfig = [ScubaConfig]::GetInstance()
+        # $ScubaConfig = [ScubaConfig]::GetInstance()
         # $Version = $ScubaConfig.GetOpaVersion()
         # $Version = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
         $Version = [ScubaConfig]::GetOpaVersion()
