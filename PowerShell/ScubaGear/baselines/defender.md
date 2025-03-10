@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Defender
+# CISA M365 Secure Configuration Baseline for Defender
 
 Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that coordinates prevention, detection, investigation, and response. This set of tools and features are used to detect many types of attacks.
 
@@ -401,15 +401,15 @@ confidence levels or adjust the levels in custom DLP policies to fit
 their environment and needs.
 
 ### Policies
-#### MS.DEFENDER.4.1v1
-A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency. At a minimum, credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) SHALL be blocked.
+#### MS.DEFENDER.4.1v2
+A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
 
-<!--Policy: MS.DEFENDER.4.1v1; Criticality: SHALL -->
+<!--Policy: MS.DEFENDER.4.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
                others who should not have access to it. DLP policies
                provide a way for agencies to detect and prevent
                unauthorized disclosures.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2024
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -424,7 +424,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
                affected locations to be effective.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -440,7 +440,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
                on agency policies and valid business justifications.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -456,7 +456,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
                accessing sensitive information.
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+          configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -489,7 +489,7 @@ information by restricted apps and unwanted Bluetooth applications.
 - _Last modified:_ June 2023
 - _Note:_
   - The custom policy referenced here is the same policy
-    configured in [MS.DEFENDER.4.1v1](#msdefender41v1).
+    configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
   - This action can only be included if at least one device is onboarded
     to the agency tenant. Otherwise, the option to block restricted apps will
     not be available.
@@ -532,7 +532,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 ### Implementation
 
-#### MS.DEFENDER.4.1v1 Instructions
+#### MS.DEFENDER.4.1v2 Instructions
 
 1. Sign in to the **Microsoft Purview compliance portal**.
 
@@ -595,18 +595,18 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.2v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) step 8
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) step 8
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.DEFENDER.4.3v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps
    15-17 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.DEFENDER.4.4v1 Instructions
 
-See [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) steps
+See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps
    18-19 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
@@ -645,7 +645,7 @@ before the instructions below can be completed.
 3. Select **Policies** from the top of the page.
 
 4. Find the custom DLP policy configured under
-   [MS.DEFENDER.4.1v1 Instructions](#msdefender41v1-instructions) in the list
+   [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) in the list
    and click the Policy name to select.
 
 5. Select **Edit Policy**.
@@ -679,13 +679,13 @@ before the instructions below can be completed.
 
 There are several pre-built alert policies available pertaining to
 various apps in the M365 suite. These alerts give administrators better
-real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Security Configuration Baseline for Exchange Online.
+real-time insight into possible security incidents. Guidance on specific alerts to configure can be found in the linked section of the CISA M365 Secure Configuration Baseline for Exchange Online.
 
-- [MS.EXO.16.1v1 \| CISA M365 Security Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
+- [MS.EXO.16.1v1 \| CISA M365 Secure Configuration Baseline for Exchange Online](./exo.md#msexo161v1)
 
 ### Policies
 #### MS.DEFENDER.5.1v1
-At a minimum, the alerts required by the CISA M365 Security Configuration Baseline for Exchange Online SHALL be enabled.
+At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
@@ -725,7 +725,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 
 4. Select the checkbox next to each alert to enable as determined by the
    agency and at a minimum those referenced in the
-   [_CISA M365 Security Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
+   [_CISA M365 Secure Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:
 
    a. **Suspicious email sending patterns detected.**
 

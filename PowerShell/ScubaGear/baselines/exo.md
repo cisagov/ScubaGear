@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Security Configuration Baseline for Exchange Online
+# CISA M365 Secure Configuration Baseline for Exchange Online
 
 Microsoft 365 (M365) Exchange Online is a cloud-based messaging platform that gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
 
@@ -548,9 +548,9 @@ the requirements outlined in this baseline setting. The DLP solution selected by
 should offer services comparable to those offered by Microsoft.
 
 Though use of Microsoft's DLP solution is not strictly
-required, guidance for configuring Microsoft's DLP solution can be found in the following section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+required, guidance for configuring Microsoft's DLP solution can be found in the following section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
 
-- [Data Loss Prevention \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
+- [Data Loss Prevention \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
 
 ### Policies
 
@@ -621,14 +621,14 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 #### MS.EXO.8.2v2 Instructions
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.
 
 #### MS.EXO.8.3v1 Instructions
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
 
 #### MS.EXO.8.4v1 Instructions
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v1-instructions) for additional guidance.
+Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.
 
 ## 9. Attachment File Type
 
@@ -642,9 +642,9 @@ those offered by Microsoft.
 
 Though using Microsoft Defender's solution is not strictly required for
 this purpose, guidance for configuring the Common Attachment Filter in
-Microsoft Defender can be found in the follow section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Microsoft Defender can be found in the follow section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
 
-- [Preset Security Policies \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
+- [Preset Security Policies \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#1-preset-security-profiles)
 
 ### Policies
 
@@ -772,12 +772,12 @@ that were already delivered to users are also scanned and removed.
 Using Microsoft Defender for this purpose is not required. However,
 the solution selected by an agency should offer services comparable to
 those offered by Microsoft. If the agency uses Microsoft Defender to
-implement malware scanning, see the following policies of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+implement malware scanning, see the following policies of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
+- [MS.DEFENDER.1.2v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
-- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
+- [MS.DEFENDER.1.3v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1)
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -868,15 +868,15 @@ Any product meeting the requirements outlined in this baseline
 policy group may be used. If the agency uses Exchange Online Protection
 (EOP), which is included in all Microsoft 365 subscriptions containing
 Exchange Online mailboxes, see the following policy and section of the CISA
-M365 Security Configuration Baseline for Defender for Office 365.
+M365 Secure Configuration Baseline for Defender for Office 365.
 
-- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1).
+- [MS.DEFENDER.1.2v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1).
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 EOP alone does not support impersonation protection, but this is provided through
-Defender for Office 365. If using Defender for Office 365 for impersonation protection, see the following policy and section of the CISA M365 Security Configuration Baseline for Defender for Office 365.
+Defender for Office 365. If using Defender for Office 365 for impersonation protection, see the following policy and section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
 
-- [Impersonation Protection \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#2-impersonation-protection)
+- [Impersonation Protection \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#2-impersonation-protection)
 
 ### Policies
 
@@ -1075,7 +1075,7 @@ Mailbox auditing SHALL be enabled.
     - [T1586.002: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)
   - [T1564: Hide Artifacts](https://attack.mitre.org/techniques/T1564/)
   - [T1564.008: Email Hiding Rules](https://attack.mitre.org/techniques/T1564/008/)
-    
+
 ### Resources
 
 - [Manage mailbox auditing in Office 365 \| Microsoft
@@ -1126,10 +1126,10 @@ capabilities for protecting against inbound spam emails. Using Microsoft
 Defender is not strictly required for this purpose; any product that
 fulfills the requirements outlined in this baseline policy group may be
 used. If the agency uses Microsoft Defender to meet this baseline policy
-group, see the following policy of the CISA M365 Security Configuration
+group, see the following policy of the CISA M365 Secure Configuration
 Baseline for Defender for Office 365.
 
-- [MS.DEFENDER.1.2v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
+- [MS.DEFENDER.1.2v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender12v1)
   - All users SHALL be added to Exchange Online Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -1244,9 +1244,9 @@ If all checks pass, the user is redirected to the original URL.
 Microsoft Defender for Office 365 includes link scanning capabilities.
 Using Microsoft Defender is not strictly required for this purpose;
 any product fulfilling the requirements outlined in this baseline policy group may be used.
-If the agency uses Microsoft Defender for Office 365 to meet this baseline policy group, see the following policy of the CISA M365 Security Configuration Baseline for Defender for Office 365 for additional guidance.
+If the agency uses Microsoft Defender for Office 365 to meet this baseline policy group, see the following policy of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
 
-- [MS.DEFENDER.1.3v1 \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
+- [MS.DEFENDER.1.3v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
   - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
 
 ### Policies
@@ -1331,10 +1331,10 @@ any product fulfilling the requirements outlined in this baseline policy
 group may be used. If the agency uses Microsoft 365 alert policies, this
 includes several prebuilt alert policies, many of which pertain to Exchange
 Online. Guidance for configuring alerts in Microsoft 365 is
-given in the following section of the CISA M365 Security Configuration Baseline
+given in the following section of the CISA M365 Secure Configuration Baseline
 for Defender for Office 365.
 
-- [Alerts \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#5-alerts)
+- [Alerts \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#5-alerts)
 
 ### Policies
 
@@ -1431,10 +1431,10 @@ Unified Audit Log.
 
 Audit logging is managed from the Microsoft Purview compliance portal. For
 implementation guidance for configuring audit logging, see the following
-section of the CISA M365 Security Configuration Baseline for Defender for
+section of the CISA M365 Secure Configuration Baseline for Defender for
 Office 365.
 
-- [Audit Logging \| CISA M365 Security Configuration Baseline for Defender for Office 365](./defender.md#6-audit-logging)
+- [Audit Logging \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#6-audit-logging)
 
 ### Policies
 

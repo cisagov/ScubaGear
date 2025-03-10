@@ -387,7 +387,7 @@ tests contains {
 #################
 
 #
-# MS.DEFENDER.4.1v1
+# MS.DEFENDER.4.1v2
 #--
 SensitiveContent := [
     "U.S. Social Security Number (SSN)",
@@ -479,7 +479,7 @@ error_rules contains SensitiveContent[2] if count(Rules.Credit_Card) == 0
 # If error_rules contains any value, then some sensitive content
 # is not protected by any policy & check should fail.
 tests contains {
-    "PolicyId": "MS.DEFENDER.4.1v1",
+    "PolicyId": "MS.DEFENDER.4.1v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpComplianceRule"],
     "ActualValue": Rules,

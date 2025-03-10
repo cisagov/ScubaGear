@@ -19,7 +19,13 @@ ConditionalAccessPolicies := {
             ],
             "ExcludeUsers": [],
             "ExcludeGroups": [],
-            "ExcludeRoles": []
+            "ExcludeRoles": [],
+            "ExcludeGuestsOrExternalUsers":  {
+                "ExternalTenants":  {
+                    "MembershipKind":  null
+                },
+                "GuestOrExternalUserTypes":  null
+            },
         },
         "UserRiskLevels": [
             "high"
@@ -89,10 +95,6 @@ DirectorySettings := {
         {
             "Name":  "EnableAdminConsentRequests",
             "Value":  "true"
-        },
-        {
-            "Name": "EnableGroupSpecificConsent",
-            "Value": "false"
         }
     ]
 }

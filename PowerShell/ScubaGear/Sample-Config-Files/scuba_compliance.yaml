@@ -1,0 +1,80 @@
+Description: |
+  This is a ScubaGear sample configuration file for compliance use.
+  In order to pass/omit certain policy checks made during a ScubaGear assessment run, necessary action
+  is required to provide specific values unique to both your organization and M365 tenant in the fields below.
+  Please read and understand the full ScubaGear configuration file documentation for both adding additional fields or modifying the fields below.
+  The documentation can be found here: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md
+
+# The list of M365 Product/SCuBA baselines ScubaGear will assess.
+ProductNames:
+  - aad
+  - defender
+  - exo
+  - powerplatform
+  - sharepoint
+  - teams
+
+# This parameter is used to authenticate to the different commercial/government environments.
+# See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#m365environment
+# for list of acceptable values
+M365Environment: commercial
+
+# The following fields are used to document what organization this configuration file belongs to.
+OrgName: Department of Example
+OrgUnitName: Subdepartment of Example
+
+# The OmitPolicy field can be used to exclude policies from the SCuBA assessment
+# results (e.g., for controls that are met using a third party tool).
+# See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#omit-policies
+# for in depth details
+OmitPolicy: {}
+
+# For product specific details on filling out the fields below, see:
+# https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
+# For specifics about YAML syntax: https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#anchors-and-aliases
+Aad:
+  MS.AAD.1.1v1: &OrgCapExclusions
+    CapExclusions:
+      Groups:
+        - ""
+      Users:
+        - ""
+  MS.AAD.2.1v1: *OrgCapExclusions
+  MS.AAD.2.3v1: *OrgCapExclusions
+  MS.AAD.3.1v1: *OrgCapExclusions
+  MS.AAD.3.2v1: *OrgCapExclusions
+  MS.AAD.3.3v1: *OrgCapExclusions
+  MS.AAD.3.6v1: *OrgCapExclusions
+  MS.AAD.3.7v1: *OrgCapExclusions
+  MS.AAD.3.8v1: *OrgCapExclusions
+  MS.AAD.7.4v1:
+    RoleExclusions:
+      Groups:
+        - ""
+      Users:
+        - ""
+Defender:
+  MS.DEFENDER.1.4v1: &OrgSensitiveAccountFilter
+    SensitiveAccounts:
+      ExcludedUsers:
+        - ""
+      IncludedGroups:
+        - ""
+      IncludedDomains:
+        - ""
+      ExcludedDomains:
+        - ""
+      ExcludedGroups:
+        - ""
+      IncludedUsers:
+        - ""
+  MS.DEFENDER.1.5v1: *OrgSensitiveAccountFilter
+  MS.DEFENDER.2.1v1:
+    SensitiveUsers:
+      - ""
+  MS.DEFENDER.2.2v1:
+    AgencyDomains:
+      - ""
+  MS.DEFENDER.2.3v1:
+    PartnerDomains:
+      - ""

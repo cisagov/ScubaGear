@@ -1,6 +1,6 @@
 function Invoke-PSSA {
 	<#
-		.DESCRIPTION
+		.SYNOPSIS
 			Allows a GitHub workflow to install and use PSScriptAnalyzer (PSSA).
 		.PARAMETER DebuggingMode
 			When the debug parameter is true, extra debugging information is available.
@@ -17,8 +17,8 @@ function Invoke-PSSA {
 		$RepoPath
 	)
 
-	Write-Output "Testing PowerShell files with PSScriptAnalyzer..."
-	Write-Output " "
+	Write-Warning "Testing PowerShell files with PSScriptAnalyzer..."
+	Write-Warning " "
 
 	# Install PSScriptAnalyzer
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
@@ -26,6 +26,7 @@ function Invoke-PSSA {
 
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
+
 	# Find the PSScriptAnalyzer config file
 	$ConfigPath = Join-Path -Path $RepoPath -ChildPath Testing/Linting/PSSA/.powershell-psscriptanalyzer.psd1
 
@@ -38,33 +39,33 @@ function Invoke-PSSA {
 	foreach ($PsFile in $PsFiles) {
 		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
 		foreach ($Result in $Results) {
-			Write-Output "File:     $($Result.ScriptPath)"
-			Write-Output "Line:     $($Result.Line)"
-			Write-Output "Severity: $($Result.Severity)"
-			Write-Output "RuleName: $($Result.RuleName)"
+			Write-Warning "File:     $($Result.ScriptPath)"
+			Write-Warning "Line:     $($Result.Line)"
+			Write-Warning "Severity: $($Result.Severity)"
+			Write-Warning "RuleName: $($Result.RuleName)"
 			# Only create GitHub workflow annotation if warning or error
 			# The ::error:: notation is how a workflow annotation is created
 			if ($Result.Severity -eq 'Information') {
-				Write-Output "Message:  $($Result.Message)"
+				Write-Warning "Message:  $($Result.Message)"
 				$InfoCount++
 			}
 			elseif ($Result.Severity -eq 'Warning') {
-				Write-Output "::error::Message:  $($Result.Message)"
+				Write-Warning "::error::Message:  $($Result.Message)"
 				$WarningCount++
 			}
 			elseif ($Result.Severity -eq 'Error') {
-				Write-Output "::error::Message:  $($Result.Message)"
+				Write-Warning "::error::Message:  $($Result.Message)"
 				$ErrorCount++
 			}
-			Write-Output " "
+			Write-Warning " "
 		}
 	}
 
 	# Summarize results
-	Write-Output "Summary"
-	Write-Output "  Errors:       $ErrorCount"
-	Write-Output "  Warnings:     $WarningCount"
-	Write-Output "  Information:  $InfoCount"
+	Write-Warning "Summary"
+	Write-Warning "  Errors:       $ErrorCount"
+	Write-Warning "  Warnings:     $WarningCount"
+	Write-Warning "  Information:  $InfoCount"
 
 	# If it's important to verify the version of PSSA that is used, set DebuggingMode to true.
 	# This is not run every time because it takes too long.
@@ -72,14 +73,14 @@ function Invoke-PSSA {
 		Get-Module -ListAvailable | Where-Object { $_.Name -eq "PSScriptAnalyzer" } | Select-Object -Property Name, Version
 	}
 
-	Write-Output " "
+	Write-Warning " "
 
 	# Exit 1 if warnings or errors
-	if (($InfoCount -gt 0) -or ($WarningCount -gt 0)) {
-		Write-Output "Problems were found in the PowerShell scripts."
+	if (($ErrorCount -gt 0) -or ($WarningCount -gt 0)) {
+		Write-Warning "Problems were found in the PowerShell scripts."
 		exit 1
 	}
 	else {
-		Write-Output "No problems were found in the PowerShell scripts."
+		Write-Warning "No problems were found in the PowerShell scripts."
 	}
 }

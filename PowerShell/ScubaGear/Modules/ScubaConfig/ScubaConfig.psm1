@@ -18,12 +18,12 @@ class ScubaConfig {
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
     hidden static [hashtable]$ScubaDefaults = @{
-        DefaultOPAPath = (Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools")
+        DefaultOPAPath = try {Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"} catch {"."};
         DefaultProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
         AllProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
         DefaultM365Environment = "commercial"
         DefaultLogIn = $true
-        DefaultOutPath = $PWD | Select-Object -ExpandProperty Path
+        DefaultOutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
         DefaultOutFolderName = "M365BaselineConformance"
         DefaultOutProviderFileName = "ProviderSettingsExport"
         DefaultOutRegoFileName = "TestResults"
@@ -41,7 +41,7 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
-        DefaultOPAVersion = '0.70.0'
+        DefaultOPAVersion = '1.0.1'
     }
 
     static [object]ScubaDefault ([string]$Name){
@@ -54,7 +54,13 @@ class ScubaConfig {
         }
         [ScubaConfig]::ResetInstance()
         $Content = Get-Content -Raw -Path $Path
-        $this.Configuration = $Content | ConvertFrom-Yaml
+	try {
+        	$this.Configuration = $Content | ConvertFrom-Yaml
+	}
+	catch {
+               $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
+	       throw "Error loading config file: $ParseError"
+	}
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
@@ -178,3 +184,4 @@ class ScubaConfig {
         return [ScubaConfig]::_Instance
     }
 }
+

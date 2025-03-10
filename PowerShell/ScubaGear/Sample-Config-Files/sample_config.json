@@ -5,11 +5,9 @@
       "exo",
       "defender",
       "aad",
-      "sharepoint",
-      "onedrive"
+      "sharepoint"
     ],
     "M365Environment":"commercial",
-    "OPAPath":".",
     "LogIn":true,
     "DisconnectOnExit":false,
     "OutPath":".",

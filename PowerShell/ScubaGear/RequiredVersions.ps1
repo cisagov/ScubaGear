@@ -22,8 +22,8 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.0.194'
+        ModuleVersion = [version] '2.0.198'
+        MaximumVersion = [version] '2.0.203'
     },
     @{
         ModuleName = 'Microsoft.PowerApps.PowerShell'
@@ -32,6 +32,11 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
+        ModuleVersion = [version] '2.0.0'
+        MaximumVersion = [version] '2.99.99999'
+    },
+    @{
+        ModuleName = 'Microsoft.Graph.Beta.Applications'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.99.99999'
     },

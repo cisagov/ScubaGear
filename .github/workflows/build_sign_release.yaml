@@ -10,6 +10,13 @@ on:
         description: "Release Name"
         required: true
         type: string
+      # Note: This is NOT the ACTUAL release version for ScubaGear.
+      # That value is found in ScubaGear.psd1.
+      # This is only used for things like the release file name.
+      # Yes, this is a disconnect that violates DRY.
+      # Note: It's possible that this value could be retrieved from ScubaGear.psd1
+      # using a function similar to Set-ScubaGearVersionManifest in
+      # utils/workflow/Set-ScubaGearModuleVersion.psm1.
       version:
         description: "Release Version (e.g., 1.2.4)"
         required: true
@@ -27,8 +34,6 @@ jobs:
     name: Build and Draft Release
     runs-on: windows-latest
     environment: Development
-    env:
-      RELEASE_VERSION: ${{ inputs.version }}
     permissions:
       id-token: write
       contents: write
@@ -44,9 +49,10 @@ jobs:
           path: repo
       - name: Install Azure Signing Tool
         run: |
-          dotnet --version
-          dotnet tool install --global AzureSignTool --version 5.0.0
-      # OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+          # Source the function
+          . repo/utils/workflow/Install-AzureSignTool.ps1
+          Install-AzureSignTool
+      # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -64,25 +70,12 @@ jobs:
           echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign Module
         run: |
-          # Source the deploy utilities so the functions in it can be called.
-          . repo/utils/workflow/Publish-ScubaGear.ps1
-          # Remove non-release files
-          Remove-Item -Recurse -Force repo -Include .git*
-          Write-Output "Creating an array of the files to sign..."
-          $ArrayOfFilePaths = New-ArrayOfFilePaths `
-            -ModuleDestinationPath repo
-          Write-Output "Creating a file with a list of the files to sign..."
-          $FileListFileName = New-FileList `
-            -ArrayOfFilePaths $ArrayOfFilePaths
-          Write-Output "Calling AzureSignTool function to sign scripts, manifest, and modules..."
-          $AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
-          $CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
-          Use-AzureSignTool `
-            -AzureKeyVaultUrl $AzureKeyVaultUrl `
-            -CertificateName $CertificateName `
-            -FileList $FileListFileName
-          Move-Item  -Path repo -Destination "ScubaGear-${env:RELEASE_VERSION}" -Force
-          Compress-Archive -Path "ScubaGear-${env:RELEASE_VERSION}" -DestinationPath "ScubaGear-${env:RELEASE_VERSION}.zip"
+          . repo/utils/workflow/Build-SignRelease.ps1
+          New-ModuleSignature `
+            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
+            -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
+            -ReleaseVersion ${{ inputs.version }} `
+            -RootFolderName "repo"
       - name: Create Release
         uses: softprops/action-gh-release@v1
         id: create-release

@@ -120,7 +120,7 @@ function Get-EXOTenantDetail {
             $TenantId = (ConvertFrom-Json $Content).token_endpoint.Split("/")[3]
         }
         catch {
-            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution. $($_)"
+            Write-Warning "Unable to retrieve EXO Tenant ID with URI. This may be caused by proxy error see 'Running the Script Behind Some Proxies' in the README for a solution: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
 
         $EXOTenantInfo = @{
@@ -133,7 +133,7 @@ function Get-EXOTenantDetail {
         $EXOTenantInfo
     }
     catch {
-        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail $($_)"
+        Write-Warning "Error retrieving Tenant details using Get-EXOTenantDetail: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         $EXOTenantInfo = @{
             "DisplayName" = "Error retrieving Display name";
             "DomainName" = "Error retrieving Domain name";
@@ -466,7 +466,12 @@ function Get-ScubaDmarcRecord {
     $NLowConf = 0
 
     foreach ($d in $Domains) {
-    $LogEntries = @()
+        if ($d.IsCoexistenceDomain) {
+            # Skip the coexistence domain (e.g., contoso.mail.onmicrosoft.com).
+            # See https://github.com/cisagov/ScubaGear/issues/1514.
+            continue
+        }
+        $LogEntries = @()
         # First check to see if the record is available at the full domain level
         $DomainName = $d.DomainName
         $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName"

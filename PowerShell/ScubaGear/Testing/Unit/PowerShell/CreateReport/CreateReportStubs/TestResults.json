@@ -1037,7 +1037,7 @@
                            "Get-MalwareFilterPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.DEFENDER.4.1v1",
+        "PolicyId":  "MS.DEFENDER.4.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -1494,7 +1494,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
@@ -1527,7 +1527,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
@@ -1560,7 +1560,7 @@
                                 "Locations":  [
                                                   "All"
                                               ],
-                                "Name":  "MS.DEFENDER.4.1v1 Test",
+                                "Name":  "MS.DEFENDER.4.1v2 Test",
                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
                             }
                         ],
@@ -3098,18 +3098,6 @@
         "Commandlet":  [
 
                        ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.SHAREPOINT.4.1v1",
-        "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.1.4v1",
         "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/sharepoint.md#mssharepoint14v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
@@ -3138,19 +3126,6 @@
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.SHAREPOINT.1.3v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            2
-                        ],
-        "Commandlet":  [
-                           "Get-SPOSite",
-                           "Get-PnPTenantSite"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.SHAREPOINT.4.2v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },

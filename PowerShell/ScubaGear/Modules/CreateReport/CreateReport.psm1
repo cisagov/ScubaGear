@@ -225,9 +225,10 @@ function New-Report {
 
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
-    $AADWarning = "Exclusions must only be used if they are approved within an organization's security risk acceptance process.
-    Please reference <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the README file</a>
-    file for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
+    $AADWarning = "The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks.
+    Exclusions must only be used if they are approved within an organization's security risk acceptance process.
+    See <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`">this section in the product documentation</a>
+    for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
     <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
     $NoWarning = "<br/>"
     Add-Type -AssemblyName System.Web
@@ -270,6 +271,31 @@ function New-Report {
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
 
+        if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_service_principals) {
+
+            # Create a section for privileged service principals
+            $privilegedServicePrincipalsTable = $SettingsExport.privileged_service_principals.psobject.properties | ForEach-Object {
+                $principal = $_.Value
+                [pscustomobject]@{
+                    "Display Name" = $principal.DisplayName
+                    "Service Principal ID" = $principal.ServicePrincipalId
+                    "Roles" = ($principal.roles -join ", ")
+                    "App ID" = $principal.AppId
+
+                }
+            } | ConvertTo-Html -Fragment
+
+            $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
+
+            # Create a section header for the service principal information
+            $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
+            $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
+
+        }
+        else{
+            $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
+
+        }
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
@@ -277,6 +303,7 @@ function New-Report {
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
+        $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
         $CapJson = "null"
     }
 

@@ -1,0 +1,98 @@
+# Purpose: Converts the baseline Markdown files into HTML and text so that they can be ingested into Drupal.
+
+name: Convert Baseline to Text and HTML
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/convert_baselines.yaml"
+
+permissions: read-all
+
+jobs:
+  convert:
+    name: Convert
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Convert AAD to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/aad.md
+            --output=baselines/aad.txt
+      - name: Convert Defender to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/defender.md
+            --output=baselines/defender.txt
+      - name: Convert Exchange to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/exo.md
+            --output=baselines/exo.txt
+      - name: Convert Power BI to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/powerbi.md
+            --output=baselines/powerbi.txt
+      - name: Convert Power Platform to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/powerplatform.md
+            --output=baselines/powerflatform.txt
+      - name: Convert Sharepoint to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/sharepoint.md
+            --output=baselines/sharepoint.txt
+      - name: Convert Teams to Text
+        uses: docker://pandoc/core:3.5
+        with:
+          args: >-
+            --standalone
+            -f markdown
+            -t plain
+            PowerShell/ScubaGear/baselines/teams.md
+            --output=baselines/teams.txt
+      - name: Install HTML converter
+        run: npm i markdown-to-html-cli -g
+      - name: Convert to HTML
+        run: |
+          markdown-to-html --source PowerShell/ScubaGear/baselines/aad.md --output baselines/aad.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/defender.md --output baselines/defender.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/exo.md --output baselines/exo.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/powerbi.md --output baselines/powerbi.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/powerplatform.md --output baselines/powerplatform.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/sharepoint.md --output baselines/sharepoint.html
+          markdown-to-html --source PowerShell/ScubaGear/baselines/teams.md --output baselines/teams.html
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: output
+          path: baselines

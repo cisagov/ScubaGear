@@ -1,5 +1,6 @@
 Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaSpfRecord, Get-ScubaDkimRecord, Get-ScubaDmarcRecord
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
+Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals
 
 class CommandTracker {
     [string[]]$SuccessfulCommands = @()
@@ -24,7 +25,7 @@ class CommandTracker {
             return $Result
         }
         catch {
-            Write-Warning "Error running $($Command). $($_)"
+            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
             $this.UnSuccessfulCommands += $Command
             $Result = @()
             return $Result
