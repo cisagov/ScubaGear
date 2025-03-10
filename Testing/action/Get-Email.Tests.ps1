@@ -2,7 +2,6 @@
 
 Describe "Get Email Check" {
     It "Extracts the email from the params" {
-        $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/action/Get-Email.ps1' -Resolve
         . $ScriptPath
         # Setup dummy values
