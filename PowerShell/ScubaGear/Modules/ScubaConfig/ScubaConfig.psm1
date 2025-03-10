@@ -49,7 +49,7 @@ class ScubaConfig {
     }
 
     static [string]GetOpaVersion (){
-        return [ScubaConfig]::ScubaDefaults('DefaultOPAVersion')
+        return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     }
 
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
