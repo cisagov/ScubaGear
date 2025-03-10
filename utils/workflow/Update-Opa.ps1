@@ -54,14 +54,24 @@ function Confirm-OpaUpdateRequirements {
 function Update-OpaVersion {
     <#
         .SYNOPSIS
-            Update OPA version in ScubaGear
+            Update OPA version in ScubaGear config file
         .PARAMETER RepoPath
             Path to the repo
+        .PARAMETER CurrentOpaVersion
+            The old version in ScubaConfig that needs to be updated
+        .PARAMETER LatestOpaVersion
+            The new version in ScubaConfig used to update
     #>
     param (
         [Parameter(Mandatory = $true)]
         [string]
-        $RepoPath
+        $RepoPath,
+        [Parameter(Mandatory = $true)]
+        [string]
+        $CurrentOpaVersion,
+        [Parameter(Mandatory = $true)]
+        [string]
+        $LatestOpaVersion
     )
     # Replace Default version in Config Module
     $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
@@ -69,7 +79,7 @@ function Update-OpaVersion {
     $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
     $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
     if ($ScubaConfigModule -match $DefaultVersionPattern) {
-        $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOPAVersion'"
+        $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOpaVersion'"
         Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
     }
     else {
@@ -96,19 +106,19 @@ function Update-OpaVersion {
                 # Create a new line
                 # Then add the new version on the next line
                 ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
-                "    '$CurrentOPAVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
+                "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
             }
             elseif ($VersionsLength -eq 1) {
                 # if the default version is the only acceptable version
                 # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
                 $VersionsArr = $_ -split "="
-                $VersionsArr[0] + "= '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+                $VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
             }
             else {
                 # No Splitting lines; Appending new Current OPA version to acceptable version
                 $VersionsArr = $_ -split ","
                 $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
-                $NewVersions + ", '$CurrentOPAVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+                $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
             }
         }
         else {
