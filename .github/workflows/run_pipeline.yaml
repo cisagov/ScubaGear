@@ -9,7 +9,9 @@ on:
       - '.github/workflows/**'
       - '.github/actions/**'
       - 'Testing/workflow/**'
+      - 'Testing/action/**'
       - 'utils/workflow/**'
+      - 'utils/action/**'
   pull_request:
   workflow_dispatch:
 
