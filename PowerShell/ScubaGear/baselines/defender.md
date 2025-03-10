@@ -819,7 +819,10 @@ Microsoft 365 Advanced Auditing / Audit (Premium) SHALL be enabled for ALL users
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
-- _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
+- _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago. Increased log retention time
+gives an agency the necessary visibility to investigate incidents that occurred
+some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
+Audit Logs in the Cloud Azure log category.
 - _Last modified:_ March 2025
 - _Note_: Microsoft 365 Advanced Auditing / Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
