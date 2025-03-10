@@ -1439,24 +1439,24 @@ Office 365.
 ### Policies
 
 #### MS.EXO.17.1v1
-Unified Audit logging / Audit (Standard) logging SHALL be enabled.
+Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.EXO.17.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging / Audit (Standard) helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
 - _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
 #### MS.EXO.17.2v1
-Microsoft 365 Advanced Auditing / Audit (Premium) SHALL be enabled for ALL users.
+Microsoft 365 Advanced Auditing SHALL be enabled for ALL users.
 
 <!--Policy: MS.EXO.17.2v1; Criticality: SHALL -->
-- _Rationale:_ Unified Audit Logging / Audit (Standard) logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft 365 Advanced Auditing / Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
+- _Rationale:_ Unified Audit logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft 365 Advanced Auditing captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ March 2025
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
-          currently available in Microsoft 365 Advanced Auditing / Audit (Premium) available to Unified Audit logging / Audit (Standard) subscribers. After rollout of changes are complete, Unified Audit Logging / Audit (Standard) may be sufficient for agencies to meet basic logging requirements.
+          currently available in Microsoft 365 Advanced Auditing available to Unified Audit logging subscribers. After rollout of changes are complete, Unified Audit logging may be sufficient for agencies to meet basic logging requirements.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
@@ -1471,7 +1471,7 @@ gives an agency the necessary visibility to investigate incidents that occurred
 some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
 Audit Logs in the Cloud Azure log category.
 - _Last modified:_ March 2025
-- _Note_: Microsoft 365 Advanced Auditing / Audit (Premium) provides a default audit log retention policy,
+- _Note_: Microsoft 365 Advanced Auditing provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
           Business, and Microsoft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
@@ -1494,7 +1494,7 @@ Audit Logs in the Cloud Azure log category.
 
 ### License Requirements
 
-- Microsoft 365 Advanced Auditing / Audit (Premium) logging capabilities, including the creation of a custom audit
+- Microsoft 365 Advanced Auditing logging capabilities, including the creation of a custom audit
   log retention policy, requires E5/G5 licenses or E3/G3 licenses with
   add-on compliance licenses.
 
@@ -1506,11 +1506,11 @@ Audit Logs in the Cloud Azure log category.
 ### Implementation
 
 #### MS.EXO.17.1v1 Instructions
-See the following implementation steps for enabling [Unified Audit logging / Audit (Standard)](./defender.md#msdefender61v1-instructions) for additional
+See the following implementation steps for enabling [Unified Audit logging](./defender.md#msdefender61v1-instructions) for additional
 guidance.
 
 #### MS.EXO.17.2v1 Instructions
-See the following implementation steps for enabling [Micorosoft 365 Advanced Audting / Audit (Premium)](./defender.md#msdefender62v1-instructions) for additional
+See the following implementation steps for enabling [Micorosoft 365 Advanced Audting)](./defender.md#msdefender62v1-instructions) for additional
 guidance.
 
 #### MS.EXO.17.3v1 Instructions
