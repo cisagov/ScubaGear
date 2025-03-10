@@ -24,22 +24,14 @@ function Confirm-OpaUpdateRequirements {
 
     # Get the version of OPA defined in the config class.
     $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
-    # if (($LatestOPAVersion -gt $CurrentOPAVersion) -and (-not $OPAVersionBranchExists)) {
-    #     $UpdateRequired = $true
-    # }
-    # if ($UpdateRequired) {
-    #     Write-Warning "OPA version update required."
-    # }
-    # else {
-    #     Write-Warning "OPA version update is not required. Update branch already exists or OPA version is already up to date."
-    # }
 
+    # Check to see if updates are required, and if not, why not.
     if ($LatestOPAVersion -gt $CurrentOPAVersion) {
         if (-not $OPAVersionBranchExists) {
             Write-Warning "OPA version update required."
         }
         else {
-            Write-Warning "Update branch already exists; no update required."
+            Write-Warning "Update branch $($OPAVersionBumpBranch) already exists; no update required."
         }
     }
     else {
