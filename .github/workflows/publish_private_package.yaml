@@ -57,8 +57,6 @@ jobs:
           KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
         # Do not attempt to access the Key Vault if logging into Azure failed.
         if: ${{ success() }}
-        # Do not attempt to access the Key Vault if logging into Azure failed.
-        if: ${{ success() }}
         run: |
           $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
           echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
@@ -69,7 +67,6 @@ jobs:
           cd repo
           New-PrivateGallery -GalleryName $env:GalleryName -Trusted
       - name: Sign and Publish Module
-        id: sign-publish-module
         id: sign-publish-module
         run: |
           . repo/utils/workflow/Publish-ScubaGear.ps1
