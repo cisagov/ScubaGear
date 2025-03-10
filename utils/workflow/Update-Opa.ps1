@@ -1,3 +1,5 @@
+using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+
 function Confirm-OpaUpdateRequirements {
     <#
         .SYNOPSIS
