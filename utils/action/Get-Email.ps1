@@ -8,13 +8,14 @@ function Get-Email {
             The set of parameters stored as a secret.
     #>
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
         [string]
-        ProductAlias,
+        $ProductAlias,
         [Parameter(Mandatory = $true)]
         [string]
-        Params
+        $Params
     )
 
     Write-Warning "Getting the email..."
