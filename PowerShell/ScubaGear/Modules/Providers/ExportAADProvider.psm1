@@ -55,7 +55,8 @@ function Export-AADProvider {
 
     if ($ServicePlans) {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
-        $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+        #$RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+        $RequiredServicePlan = $null
 
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we also include calls to PIM APIs
@@ -152,6 +153,7 @@ function Export-AADProvider {
 
     $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
+    
 
     if ($RiskyApps -and $RiskySPs) {
         $AggregateRiskyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})

@@ -451,6 +451,10 @@ function Format-RiskyThirdPartyServicePrincipals {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
+
+        if ($null -eq $ServicePrincipals -or $ServicePrincipals.Count -eq 0) {
+            return "{}"
+        }
         return $ServicePrincipals
     }
 }
