@@ -16,13 +16,14 @@ Describe "Update OPA" {
         # https://github.com/open-policy-agent/opa/releases
         $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
         $LatestOPAVersion | Should -Be "1.2.0"
-        # The current version of OPA used in SG is found
-        # in PowerShell/ScubaGear/ScubaGear.psm1
+        # The current version of OPA used in SG is found in PowerShell/ScubaGear/ScubaGear.psm1
         # in the variable DefaultOPAVersion
-        $ScubaConfigPath = Join-Path -Path $RepoRootPath -ChildPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
-        Write-Warning "The Scuba Config path is $ScubaConfigPath"
-        $ScubaConfig = ScubaConfig.GetInstance()
+        # $ScubaConfigPath = Join-Path -Path $RepoRootPath -ChildPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
+        # Write-Warning "The Scuba Config path is $ScubaConfigPath"
+        $ScubaConfig = [ScubaConfig]::GetInstance()
         $Version = $ScubaConfig.GetOpaVersion()
+        # $Version = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
+        # $Version = [ScubaConfig]::GetOpaVersion()
         Write-Warning "The version from the getter is $Version"
 
         # $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
