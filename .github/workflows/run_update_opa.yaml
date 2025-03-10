@@ -55,7 +55,7 @@ jobs:
 
                 # Note that git-ls will always fail with exit code 1 when the branch does not exist.
                 # Setting exit 0 (success) at the end of this workflow to prevent that error
-                exit 0
+                # exit 0
             - name: Update OPA version in ScubaGear
               id: update-opa-version
               if: steps.determine-update-required.outputs.updaterequired == 'true'

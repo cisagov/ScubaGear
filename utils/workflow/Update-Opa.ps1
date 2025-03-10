@@ -29,17 +29,7 @@ function Confirm-OpaUpdateRequirements {
         $OPAVersionBranchExists = $true
     }
 
-    # # Find our current OPA version using some dirty string manipulation
-    # $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
-
-    # $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-    # $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
-    # $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
-    # $CurrentOPAVersion = '0.0.0'
-    # if ($ScubaConfigModule -match $DefaultVersionPattern) {
-    #     $CurrentOPAVersion = ($Matches[0] -split "=")[1] -replace " ", ""
-    #     $CurrentOPAVersion = $CurrentOPAVersion -replace "'", ""
-    # }
+    # Get the version of OPA defined in the config class.
     $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
     if (($LatestOPAVersion -gt $CurrentOPAVersion) -and (-not $OPAVersionBranchExists)) {
         $UpdateRequired = $true
