@@ -347,7 +347,7 @@ Managed Devices SHOULD be required to register MFA.
 #### MS.AAD.3.3v1 Instructions
 If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In ** Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
+1. In **Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
