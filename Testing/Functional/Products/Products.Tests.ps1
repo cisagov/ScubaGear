@@ -209,7 +209,19 @@ BeforeAll {
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
     }
+    
+    #Created a function for easier debugging (TODO: Remove and integrate into beforeeach )
+    function GetLatestReportFolder {
+    $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+    if ($ReportFolders.Count -gt 0) {
+        return $ReportFolders[0].Name
+    }
+    return $null
 }
+}
+
+# Shared cache folder for RunCached operations
+$script:CachedOutputFolder = $null
 
 Describe "Policy Checks for <ProductName>" {
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan {
@@ -246,15 +258,31 @@ Describe "Policy Checks for <ProductName>" {
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            # Ensure case matches driver in test plan
+            # # Ensure case matches driver in test plan
+            # elseif ('ScubaCached' -eq $TestDriver){
+            #     Write-Debug "Driver: ScubaCached"
+            #     RunScuba
+            #     $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+            #     $OutputFolder = $ReportFolders[0].Name
+            #     SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
+            #     Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+            # }
+            # ScubaCached driver using shared cache
             elseif ('ScubaCached' -eq $TestDriver){
-                Write-Debug "Driver: ScubaCached"
-                RunScuba
-                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
-                $OutputFolder = $ReportFolders[0].Name
-                SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+                # Check if we already have a cached output folder
+                if ($null -eq $script:CachedOutputFolder) {
+                    # No cached folder exists, run ScubaGear to create one
+                    RunScuba
+                    $script:CachedOutputFolder = GetLatestReportFolder
+                }
+                # Apply preconditions to the cached data
+                if ($Preconditions.Count -gt 0) {
+                    SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:CachedOutputFolder
+                }
+                # Run ScubaCached with the existing folder
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $script:CachedOutputFolder -OutProviderFileName "ModifiedProviderSettingsExport" -Quiet -KeepIndividualJSON
             }
+            
             else {
                 Write-Debug "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
