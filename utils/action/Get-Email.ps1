@@ -14,7 +14,7 @@ function Get-Email {
         ProductAlias,
         [Parameter(Mandatory = $true)]
         [string]
-        Params,
+        Params
     )
 
     Write-Warning "Getting the email..."
