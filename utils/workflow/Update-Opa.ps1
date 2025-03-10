@@ -4,14 +4,7 @@ function Confirm-OpaUpdateRequirements {
     <#
         .SYNOPSIS
             Determine if OPA update is required
-        .PARAMETER RepoPath
-            Path to the repo
     #>
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]
-        $RepoPath
-    )
 
     Write-Warning "Determining if OPA needs to be updated..."
 
