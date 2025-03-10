@@ -7,6 +7,7 @@ function Get-Email {
         .PARAMETER Params
             The set of parameters stored as a secret.
     #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]
