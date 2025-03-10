@@ -9,7 +9,7 @@ runs:
     - run: |
         $productAlias = $env:Alias
         $params = $env:TestParams
-        . repo/utils/action/Get-Email.ps1
+        . repo/utils/actions/Get-Email.ps1
         $Email = Get-Email -ProductAlias $productAlias -Params $params
         # Pass emails to later job for notification.
         echo emails=$Emails >> $env:GITHUB_OUTPUT
