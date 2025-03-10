@@ -41,7 +41,7 @@ function Get-Email {
         if($alias -eq $ProductAlias)
         {
             # Pass emails to later job for notification.
-            echo emails=$emails >> $env:GITHUB_OUTPUT
+            # echo emails=$emails >> $env:GITHUB_OUTPUT
             return emails
         break
         }
