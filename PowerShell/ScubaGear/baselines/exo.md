@@ -59,8 +59,8 @@ forwarding rules to exfiltrate data to external recipients.
 
 ### Policies
 
-#### MS.EXO.1.1v1
-Automatic forwarding to external domains SHALL be disabled.
+#### MS.EXO.1.1v2
+Automatic forwarding to external domains SHALL only be enabled on a per-domain basis.
 
 <!--Policy: MS.EXO.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
@@ -101,8 +101,9 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
-6.  Return to **Remote domains** and repeat steps 4 and 5 for each
-    additional remote domain in the list.
+6.  Return to **Remote domains** and review each
+    additional remote domain in the list, ensuring that automatic forwarding
+    is only allowed for approved domains.
 
 ## 2. Sender Policy Framework
 
