@@ -794,7 +794,7 @@ types to the Unified Audit Log.
 Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit logging is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
 - _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
@@ -805,7 +805,7 @@ Unified Audit logging SHALL be enabled.
 Microsoft 365 Advanced Auditing SHALL be enabled for ALL users.
 
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Unified Audit Logging logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft 365 Advanced Auditing captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
+- _Rationale:_ Unified Audit logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft 365 Advanced Auditing captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
 - _Last modified:_ March 2025
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
