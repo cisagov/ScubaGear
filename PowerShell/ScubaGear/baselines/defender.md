@@ -809,7 +809,7 @@ Microsoft 365 Advanced Auditing / Audit (Premium) SHALL be enabled for ALL users
 - _Last modified:_ March 2025
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
-          currently available in Microsoft 365 Advanced Auditing / Audit( Premium) available to Unified Audit logging / Audit (Standard) subscribers. After rollout of changes are complete,
+          currently available in Microsoft 365 Advanced Auditing / Audit (Premium) available to Unified Audit logging / Audit (Standard) subscribers. After rollout of changes are complete,
           Unified Audit Logging / Audit (Standard) may be sufficient for agencies to meet basic
           logging requirements.
 - _MITRE ATT&CK TTP Mapping:_
