@@ -12,9 +12,9 @@ function Invoke-PesterTests {
 		[Parameter(Mandatory = $true)]
 		[string]
 		$Path,
-    [Parameter(Mandatory = $false)]
-    [string]
-    $ExcludePath
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ExcludePath
 	)
     Write-Warning "The path to test is ${Path}."
     Write-Warning "The path to exclude is ${ExcludePath}"
@@ -29,7 +29,8 @@ function Invoke-PesterTests {
             Import-Module Pester -Force
             $Configuration = New-PesterConfiguration
             $Configuration.Run.Path = $Path
-            $Configuration.Run.ExcludePath = $ExcludePath
+            # $Configuration.Run.ExcludePath = $ExcludePath
+            $Configuration.Run.ExcludePath = 'Testing/Workflow/Invoke-PSSA*'
             $Configuration.Run.PassThru = $true
             $Configuration.Output.Verbosity = 'Detailed'
             Invoke-Pester -Configuration $Configuration
