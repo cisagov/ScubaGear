@@ -19,8 +19,15 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
-      - name: Run Invoke PSSA Pester Tests
+      - name: Invoke workflow Pester tests
         run: |
-          # Source the function
           . utils/workflow/Invoke-PesterTests.ps1
-          Invoke-PesterTests -Path 'Testing/workflow'
+          # Do not run the PSSA tests again, as they are part of
+          # a previous test in the workflow
+          Invoke-PesterTests -Path 'Testing/workflow' -ExcludePath 'Testing/workflow/Invoke-PSSA.Tests.ps1'
+      - name: Invoke action Pester tests
+        run: |
+          . utils/workflow/Invoke-PesterTests.ps1
+          # Do not run the PSSA tests again, as they are part of
+          # a previous test in the workflow
+          Invoke-PesterTests -Path 'Testing/action'
