@@ -23,7 +23,8 @@ function Invoke-PesterTests {
   $result = Try {
     Import-Module Pester
     # get default from static property
-    $Configuration = [PesterConfiguration]::Default
+    # $Configuration = [PesterConfiguration]::Default
+    $Configuration = New-PesterConfiguration
     $Configuration.Run.ExcludePath = $ExcludePath
     Invoke-Pester -Output 'Detailed' -Path $Path -Configuration $Configuration -PassThru
     # if ([string]::IsNullOrEmpty($ExcludePath)) {
