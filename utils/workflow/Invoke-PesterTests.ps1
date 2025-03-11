@@ -22,7 +22,7 @@ function Invoke-PesterTests {
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
     Import-Module Pester -Force
-    get default from static property
+    # get default from static property
     # $Configuration = [PesterConfiguration]::Default
     # $Configuration = New-PesterConfiguration
     # $Configuration.Run.ExcludePath = $ExcludePath
