@@ -4,18 +4,30 @@ function Invoke-PesterTests {
       Calls the Invoke-Pester command to test the PowerShell files in some location.
     .PARAMETER Path
       The path to the PowerShell.  This can be a directory or a file.
+    .PARAMETER ExcludePath
+      The path to any Pester tests to exclude.  The intention is to avoid running the PSSA tests again, as they are run in a previous step in the workflow.
   #>
 	[CmdletBinding()]
 	param(
 		[Parameter(Mandatory = $true)]
 		[string]
-		$Path
+		$Path,
+    [Parameter(Mandatory = $false)]
+    [string]
+    $ExcludePath
 	)
   Write-Warning "The path to test is ${Path}."
+  Write-Warning "The path to exclude is ${ExcludePath}"
   # The -PassThru parameter is what allows the output to be passed to the $result output.
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
-    Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
+    if ([string]::IsNullOrEmpty($ExcludePath)) {
+      # Don't use the exclude path if it's not used.
+      Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
+    }
+    else {
+      Invoke-Pester -Output 'Detailed' -Path $Path -ExcludePath $ExcludePath -PassThru
+    }
   } Catch {
     # This catches an error with the Pester tests.
     Write-Warning "An error occurred while running the Pester tests:"
