@@ -210,18 +210,7 @@ BeforeAll {
         }
     }
     
-    #Created a function for easier debugging (TODO: Remove and integrate into beforeeach )
-    function GetLatestReportFolder {
-    $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
-    if ($ReportFolders.Count -gt 0) {
-        return $ReportFolders[0].Name
-    }
-    return $null
 }
-}
-
-# Shared cache folder for RunCached operations
-$script:CachedOutputFolder = $null
 
 Describe "Policy Checks for <ProductName>" {
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan {
@@ -269,18 +258,37 @@ Describe "Policy Checks for <ProductName>" {
             # }
             # ScubaCached driver using shared cache
             elseif ('ScubaCached' -eq $TestDriver){
-                # Check if we already have a cached output folder
-                if ($null -eq $script:CachedOutputFolder) {
-                    # No cached folder exists, run ScubaGear to create one
+                Write-Debug "Driver: ScubaCached"
+
+                # If this is the first time calling ScubaCached in this test plan, we need to call the tenant to create the tenant
+                if ($null -eq $script:CachedCreated) {
+                    $script:CachedCreated = $false
+                }
+
+                if ($script:CachedCreated -ne $true) {
+                    Write-Host "Creating the cache now"
+                    # The first time that RunScuba is called the ProviderSettingsExport.json is created
+                    # ProviderSettingsExport.json then serves as the "cached" file when another cached test scenario is executed in the test plan
+                    # Since the file is cached we don't need to get the data from the tenant again
                     RunScuba
-                    $script:CachedOutputFolder = GetLatestReportFolder
+                    $script:CachedCreated = $true
                 }
-                # Apply preconditions to the cached data
-                if ($Preconditions.Count -gt 0) {
-                    SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:CachedOutputFolder
+                else {
+                    Write-Host "Using the cached provider settings."
                 }
-                # Run ScubaCached with the existing folder
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $script:CachedOutputFolder -OutProviderFileName "ModifiedProviderSettingsExport" -Quiet -KeepIndividualJSON
+
+                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                $OutputFolder = $ReportFolders[0].Name
+
+                # Call functions like UpdateConditionalAccessPolicyByName to modify the cached JSON and create a new file ModifiedProviderSettingsExport.json
+                SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
+                
+                # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+                
+                # Delete the modified JSON
+                # This is necessary so that when the next test scenario executes, it will start with a fresh cached file ProviderSettingsExport.json
+                Remove-Item -Path "$OutputFolder/ModifiedProviderSettingsExport.json"
             }
             
             else {
