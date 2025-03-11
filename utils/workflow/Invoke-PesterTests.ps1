@@ -21,7 +21,11 @@ function Invoke-PesterTests {
   # The -PassThru parameter is what allows the output to be passed to the $result output.
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
-    Invoke-Pester -Output 'Detailed' -Path $Path -ExcludePath $ExcludePath -PassThru
+    Import-Module Pester
+    # get default from static property
+    $Configuration = [PesterConfiguration]::Default
+    $Configuration.Run.ExcludePath = $ExcludePath
+    Invoke-Pester -Output 'Detailed' -Path $Path -Configuration $Configuration -PassThru
     # if ([string]::IsNullOrEmpty($ExcludePath)) {
     #   # Don't use the exclude path if it's not used.
     #   Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
@@ -40,4 +44,6 @@ function Invoke-PesterTests {
   if ($null -eq $result) {
     throw "The Pester tests failed to run."
   }
+  Write-Warning "The results of invoking Pester are:"
+  Write-Warning $result
 }
