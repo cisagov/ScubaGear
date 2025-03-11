@@ -19,7 +19,7 @@ AllDomains := {Domain.domain | some Domain in input.spf_records}
 ############
 
 #
-# MS.EXO.1.1v1
+# MS.EXO.1.1v2
 #--
 
 # Loop through each domain & check if Auto Forwarding is enabled
@@ -30,7 +30,7 @@ RemoteDomainsAllowingForwarding contains Domain.DomainName if {
 }
 
 tests contains {
-    "PolicyId": "MS.EXO.1.1v1",
+    "PolicyId": "MS.EXO.1.1v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-RemoteDomain"],
     "ActualValue": Domains,
