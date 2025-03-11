@@ -1,4 +1,4 @@
-# Purpose: Run unit tests for the code used in workflows
+# Purpose: Run unit tests for the code used in workflows and in actions
 
 name: Unit Test Workflow
 
@@ -24,7 +24,8 @@ jobs:
           . utils/workflow/Invoke-PesterTests.ps1
           # Do not run the PSSA tests again, as they are part of
           # a previous test in the workflow
-          Invoke-PesterTests -Path 'Testing/workflow' -ExcludePath 'Invoke-PSSA.Tests.ps1'
+          $FilesToExclude = @('Testing/workflow/Invoke-PSSA.Tests.ps1')
+          Invoke-PesterTests -Path 'Testing/workflow' -ExcludePath $FilesToExclude
   action-tests:
     name: Action Unit Tests
     runs-on: windows-latest
@@ -37,6 +38,4 @@ jobs:
       - name: Invoke action Pester tests
         run: |
           . utils/workflow/Invoke-PesterTests.ps1
-          # Do not run the PSSA tests again, as they are part of
-          # a previous test in the workflow
           Invoke-PesterTests -Path 'Testing/action'
