@@ -560,6 +560,8 @@ tests contains {
     Status := Count(RequireManagedDeviceMFA) > 0
 }
 #--
+
+#--
 # MS.AAD.3.9v1
 #--
 
@@ -568,22 +570,17 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    ### We don't check IncludeApplications and ExcludeApplications because they are not relevant when you have an IncludeUserActions node
     # Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Contains(CAPolicy.Conditions.AuthenticationFlows.TransferMethods, "deviceCodeFlow") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    ### "block" in CAPolicy.GrantControls.BuiltInControls
-    ### "deviceCodeFlow" in CAPolicy.Conditions.AuthenticationMethods.TransferMethods
+    CAPolicy.Conditions.AuthenticationFlows.TransferMethods == "deviceCodeFlow"
+    "block" in CAPolicy.GrantControls.BuiltInControls
     ###
-
-    Conditions := [     
-        "block" in CAPolicy.GrantControls.BuiltInControls,
-    ]
-    Count(FilterArray(Conditions, true)) > 0    
 
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
