@@ -3,7 +3,7 @@ import rego.v1
 
 RemoteDomains := {
     "AutoForwardEnabled": false,
-    "DomainName": "Test name"
+    "DomainName": "example.com"
 }
 SpfRecords := {
     "rdata": [
