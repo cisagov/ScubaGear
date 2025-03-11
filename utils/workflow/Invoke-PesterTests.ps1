@@ -21,8 +21,8 @@ function Invoke-PesterTests {
   # The -PassThru parameter is what allows the output to be passed to the $result output.
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
-    # Import-Module Pester
-    # get default from static property
+    Import-Module Pester
+    get default from static property
     # $Configuration = [PesterConfiguration]::Default
     # $Configuration = New-PesterConfiguration
     # $Configuration.Run.ExcludePath = $ExcludePath
