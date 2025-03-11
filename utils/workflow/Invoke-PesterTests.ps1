@@ -27,19 +27,11 @@ function Invoke-PesterTests {
         }
         else {
             Import-Module Pester -Force
-            # get default from static property
-            # $Configuration = [PesterConfiguration]::Default
             $Configuration = New-PesterConfiguration
             $Configuration.Run.Path = $Path
             $Configuration.Run.ExcludePath = $ExcludePath
             $Configuration.Run.PassThru = $true
             $Configuration.Output.Verbosity = 'Detailed'
-            # $Configuration = [PesterConfiguration]@{
-            #     Run = @{
-            #         ExcludePath = $ExcludePath
-            #     }
-            # }
-            # Invoke-Pester -Output 'Detailed' -Path $Path -Configuration $Configuration -PassThru
             Invoke-Pester -Configuration $Configuration
         }
     } Catch {
