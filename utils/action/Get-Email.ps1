@@ -44,7 +44,7 @@ function Get-Email {
         {
             # Pass emails to later job for notification.
             # echo emails=$emails >> $env:GITHUB_OUTPUT
-            return emails
+            return $emails
         break
         }
     }
