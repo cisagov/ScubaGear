@@ -9,7 +9,8 @@ import data.utils.key.TestResult
 #--
 
 NoteAboutConfig := concat("", [
-    "NOTE: specific domains that have a legitimate need to allow remote forwarding can be configured in a ScubaGear ", "config file."
+    "NOTE: specific domains that have a legitimate need to allow remote forwarding can be configured in a ScubaGear ",
+    "config file."
 ])
 
 WarningAboutDefaultDomain := concat("", [
@@ -103,7 +104,7 @@ test_AutoForwardEnabled_Incorrect_V3 if {
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
-test_AutoForwardEnabled_Incorrect_V3 if {
+test_AutoForwardEnabled_Incorrect_V4 if {
     # 4 domains allow forwarding but two have been allow-listed
     Domain := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true}])
     Domain2 := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true},
@@ -124,7 +125,7 @@ test_AutoForwardEnabled_Incorrect_V3 if {
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
-test_AutoForwardEnabled_Incorrect_V4 if {
+test_AutoForwardEnabled_Incorrect_V5 if {
     # User attempts to allow-list the default domain ("*")
     Domain := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true},
                                             {"op": "add", "path": "DomainName", "value": "*"}])
@@ -137,7 +138,7 @@ test_AutoForwardEnabled_Incorrect_V4 if {
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
-test_AutoForwardEnabled_Incorrect_V5 if {
+test_AutoForwardEnabled_Incorrect_V6 if {
     # User attempts to allow-list the default domain ("*") and also allow-lists a different domain.
     Domain := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true}])
     Domain2 := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true},
@@ -148,7 +149,8 @@ test_AutoForwardEnabled_Incorrect_V5 if {
         with input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains as ["*", "example.com"]
 
     ReportDetailString := concat("", [
-        "1 remote domain allows automatic forwarding: *. NOTE: additionally, 1 remote domain allows forwarding but is ", "allowed per the ScubaGear config file: example.com. ",
+        "1 remote domain allows automatic forwarding: *. NOTE: additionally, 1 remote domain allows forwarding but is ",
+        "allowed per the ScubaGear config file: example.com. ",
         WarningAboutDefaultDomain
     ])
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
