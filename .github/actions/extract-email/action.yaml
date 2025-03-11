@@ -9,11 +9,11 @@ runs:
     - run: |
         $productAlias = $env:Alias
         $params = $env:TestParams
-        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/action/Get-Email.ps1' -Resolve
+        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../utils/action/Get-Email.ps1' -Resolve
         . $ScriptPath
         $Email = Get-Email -ProductAlias $productAlias -Params $params
         # Pass emails to later job for notification.
-        echo emails=$Emails >> $env:GITHUB_OUTPUT
+        echo emails=$Email >> $env:GITHUB_OUTPUT
 
         # $products = $params.split("|")
         # foreach ($product in $products)
