@@ -24,7 +24,7 @@ jobs:
           . utils/workflow/Invoke-PesterTests.ps1
           # Do not run the PSSA tests again, as they are part of
           # a previous test in the workflow
-          Invoke-PesterTests -Path 'Testing/workflow' -ExcludePath 'Testing/workflow/Install-AzureSignTool.Tests.ps1'
+          Invoke-PesterTests -Path 'Testing/workflow' -ExcludePath 'Testing/workflow/Invoke-PSSA.Tests.ps1'
   action-tests:
     name: Action Unit Tests
     runs-on: windows-latest
