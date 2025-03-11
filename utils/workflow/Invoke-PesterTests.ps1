@@ -21,13 +21,14 @@ function Invoke-PesterTests {
   # The -PassThru parameter is what allows the output to be passed to the $result output.
   # https://pester.dev/docs/commands/Invoke-Pester#-passthru
   $result = Try {
-    if ([string]::IsNullOrEmpty($ExcludePath)) {
-      # Don't use the exclude path if it's not used.
-      Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
-    }
-    else {
-      Invoke-Pester -Output 'Detailed' -Path $Path -ExcludePath $ExcludePath -PassThru
-    }
+    Invoke-Pester -Output 'Detailed' -Path $Path -ExcludePath $ExcludePath -PassThru
+    # if ([string]::IsNullOrEmpty($ExcludePath)) {
+    #   # Don't use the exclude path if it's not used.
+    #   Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
+    # }
+    # else {
+    #   Invoke-Pester -Output 'Detailed' -Path $Path -ExcludePath $ExcludePath -PassThru
+    # }
   } Catch {
     # This catches an error with the Pester tests.
     Write-Warning "An error occurred while running the Pester tests:"
