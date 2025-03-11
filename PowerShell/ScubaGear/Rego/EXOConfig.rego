@@ -29,41 +29,66 @@ RemoteDomainsAllowingForwarding contains Domain.DomainName if {
     Domain.AutoForwardEnabled == true
 }
 
-# Collect the set of domains that are allowed per the config file
-ConfiguredAllowedForwardingDomains := input.scuba_config.Defender["MS.EXO.1.1v2"].AllowedForwardingDomains
+# Note explaining that the config option is available / warning if they misuse it
+NoticeAboutConfigFile := Notice if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    count(Domains) == 0
+    Notice := concat("", [
+        "NOTE: specific domains that have a legitimate need to allow remote forwarding can be configured in a ",
+        "ScubaGear config file."
+    ])
+} else := Notice if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    count(Domains) > 0
+    "*" in Domains
+    "*" in RemoteDomainsAllowingForwarding
+    Notice := concat("", [
+        "WARNING: the default domain, \"*\", was included in the 'AllowedForwardingDomains' list in the config file ", "but only specific domains can be allow-listed per the SCuBA baseline."
+    ])
+} else := "" # No notice needed, the user knows about the config option and isn't misusing it
+
+# Collect the set of domains that are allowed per the config file, excluding the default domain if needed
+ConfiguredAllowedForwardingDomains := Domains-{"*"} if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    "*" in Domains
+} else := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+
 
 # Get the domains allowing forwarding that haven't been allow-listed
 NonCompForwardingDomains = RemoteDomainsAllowingForwarding - ConfiguredAllowedForwardingDomains
 
 # Get the domains allowing forwarding that have been allow-listed
-AllowedForwardingDomains := intersection(RemoteDomainsAllowingForwarding, ConfiguredAllowedForwardingDomains)
+AllowedForwardingDomains := intersection({RemoteDomainsAllowingForwarding, ConfiguredAllowedForwardingDomains})
 
 # Helper functions for pretty grammer
-PluralDomains(N) := "domain" if N == 1 else "domains"
-PluralToBe(N) := "is" if N == 1 else "are"
-PluralAllow(N) := "allows" if N == 1 else "allow"
+PluralDomains(N) := "domain" if N == 1 else := "domains"
+PluralToBe(N) := "is" if N == 1 else := "are"
+PluralAllow(N) := "allows" if N == 1 else := "allow"
 
 # Sentence summarizing the non-compliant domains
-NonCompDomainsSummary := concat(" ", [
+NonCompDomainsSummary := concat("", [
     ArraySizeStr(NonCompForwardingDomains),
-    "remote",
+    " remote ",
     PluralDomains(count(NonCompForwardingDomains)),
+    " ",
     PluralAllow(count(NonCompForwardingDomains)),
-    "automatic forwarding:",
+    " automatic forwarding: ",
     concat(", ", NonCompForwardingDomains),
     "."
 ])
 
 # Sentence summarizing the domains the domains that allow forwarding but have been allow-listed
-AllowedDomainsSummary := concat(" ", [
+AllowedDomainsSummary := concat("", [
     ArraySizeStr(AllowedForwardingDomains),
-    "remote",
+    " remote ",
     PluralDomains(count(AllowedForwardingDomains)),
+    " ",
     PluralAllow(count(AllowedForwardingDomains)),
-    "forwarding but",
+    " forwarding but ",
     PluralToBe(count(AllowedForwardingDomains)),
-    "allowed per the ScubaGear config file:",
-    concat(", ", AllowedForwardingDomains)
+    " allowed per the ScubaGear config file: ",
+    concat(", ", AllowedForwardingDomains),
+    "."
 ])
 
 # Details string for MS.EXO.1.1v2 that takes into account both the forwarding domains that have
@@ -77,22 +102,22 @@ ReportDetails1_2 := Details if {
     count(AllowedForwardingDomains) > 0
     Details := concat(" ", [
         NonCompDomainsSummary,
-        "NOTE: additionally",
+        "NOTE: additionally,",
         AllowedDomainsSummary,
+        NoticeAboutConfigFile
     ])
 } else := Details if {
     count(NonCompForwardingDomains) > 0
     count(AllowedForwardingDomains) == 0
         Details := concat(" ", [
             NonCompDomainsSummary,
-            "NOTE: domains that have a legitimate need to allow remote",
-            "forwarding can be configured in a ScubaGear config file."
+            NoticeAboutConfigFile
         ])
 } else := Details if {
     # Note that even though this case is compliant, we still have valuable details we can present in the report
-    count(NonCompForwardingDomains) > 0
-    count(AllowedForwardingDomains) == 0
-    Details := AllowedDomainsSummary
+    count(NonCompForwardingDomains) == 0
+    count(AllowedForwardingDomains) > 0
+    Details := concat(" ", [AllowedDomainsSummary, NoticeAboutConfigFile])
 }
 
 tests contains {
