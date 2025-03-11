@@ -10,6 +10,7 @@ runs:
         $productAlias = $env:Alias
         $params = $env:TestParams
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../utils/action/Get-Email.ps1' -Resolve
+        Write-Debug "The script path is $ScriptPath."
         . $ScriptPath
         $Email = Get-Email -ProductAlias $productAlias -Params $params
         # Pass emails to later job for notification.
