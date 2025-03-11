@@ -32,14 +32,13 @@ function Invoke-PesterTests {
             $Configuration = New-PesterConfiguration
             $Configuration.Run.Path = $Path
             $Configuration.Run.ExcludePath = $ExcludePath
-            $Configuration.Output = 'Detailed'
             # $Configuration = [PesterConfiguration]@{
             #     Run = @{
             #         ExcludePath = $ExcludePath
             #     }
             # }
             # Invoke-Pester -Output 'Detailed' -Path $Path -Configuration $Configuration -PassThru
-            Invoke-Pester -Configuration $Configuration -PassThru
+            Invoke-Pester -Configuration $Configuration -Output 'Detailed' -PassThru
         }
     } Catch {
         # This catches an error with the Pester tests.
