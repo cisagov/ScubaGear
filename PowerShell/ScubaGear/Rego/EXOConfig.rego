@@ -30,6 +30,7 @@ RemoteDomainsAllowingForwarding contains Domain.DomainName if {
 }
 
 # Note explaining that the config option is available / warning if they misuse it
+default NoticeAboutConfigFile := "" # No notice needed, the user knows about the config option and isn't misusing it
 NoticeAboutConfigFile := Notice if {
     Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
     count(Domains) == 0
@@ -45,7 +46,7 @@ NoticeAboutConfigFile := Notice if {
     Notice := concat("", [
         "WARNING: the default domain, \"*\", was included in the 'AllowedForwardingDomains' list in the config file ", "but only specific domains can be allow-listed per the SCuBA baseline."
     ])
-} else := "" # No notice needed, the user knows about the config option and isn't misusing it
+}
 
 # Collect the set of domains that are allowed per the config file, excluding the default domain if needed
 ConfiguredAllowedForwardingDomains := Domains-{"*"} if {
@@ -55,7 +56,7 @@ ConfiguredAllowedForwardingDomains := Domains-{"*"} if {
 
 
 # Get the domains allowing forwarding that haven't been allow-listed
-NonCompForwardingDomains = RemoteDomainsAllowingForwarding - ConfiguredAllowedForwardingDomains
+NonCompForwardingDomains := RemoteDomainsAllowingForwarding - ConfiguredAllowedForwardingDomains
 
 # Get the domains allowing forwarding that have been allow-listed
 AllowedForwardingDomains := intersection({RemoteDomainsAllowingForwarding, ConfiguredAllowedForwardingDomains})
