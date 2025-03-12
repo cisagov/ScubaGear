@@ -9,7 +9,7 @@ runs:
     - run: |
         . utils/action/Get-Email.ps1
         $Email = Get-Email -ProductAlias $env:Alias -Params $env:TestParams
-        # Pass emails to later job for notification.
+        # Pass email(s) to later job for notification.
         echo emails=$Email >> $env:GITHUB_OUTPUT
       id: emails-output
       shell: powershell
