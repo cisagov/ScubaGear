@@ -2,7 +2,8 @@
 
 Running ScubaGear in a non-interactive (automated) fashion requires an application with a service principal identity that has been assigned various permissions and roles, depending upon which M365 products are being tested, and associated with a certificate.
 
-> **Note**: While there are many ways to authenticate with a service principal, ScubaGear only authenticates via a certificate identified by its certificate thumbprint.
+> [!NOTE]
+> While there are many ways to authenticate with a service principal, ScubaGear only authenticates via a certificate identified by its certificate thumbprint.
 
 ## Overview
 
@@ -20,27 +21,32 @@ Configuring a service principal is beyond the scope of these instructions, but M
 * [Create a service principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) in the Azure console.
 * Associate a [certificate with a service principal](https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-3)
 
-> **Note**: Take note of the AppId and the name of your tenant, as these values will be required to execute ScubaGear in non-interactive mode.
+> [!NOTE]
+> Take note of the AppId and the name of your tenant, as these values will be required to execute ScubaGear in non-interactive mode.
 
 The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
 
-> **Important**: Permissions that have "write" privileges are included in the [Power Platform](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals) and [SharePoint](https://learn.microsoft.com/en-us/graph/permissions-selected-overview?tabs=http#what-permissions-do-i-need-to-manage-permissions) permissions list below. Those permissions are the minimum required by ScubaGear to be able to read admin center configurations for those two services and is a limitation of the underlying APIs of these services. ScubaGear itself **does not exercise the use of the write privileges** for its assessments.
+> [!IMPORTANT]
+> Permissions that have "write" privileges are included in the [Power Platform](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals) and [SharePoint](https://learn.microsoft.com/en-us/graph/permissions-selected-overview?tabs=http#what-permissions-do-i-need-to-manage-permissions) permissions list below. Those permissions are the minimum required by ScubaGear to be able to read admin center configurations for those two services and is a limitation of the underlying APIs of these services. ScubaGear itself **does not exercise the use of the write privileges** for its assessments.
 
-| Product                 | API Permissions                                 | Role          |
-| ----------------------- | ----------------------------------------------- | ------------- |
-| Entra ID                | Directory.Read.All, GroupMember.Read.All,       |               |
-|                         | Organization.Read.All, Policy.Read.All,         |               |
-|                         | RoleManagement.Read.Directory, User.Read.All    |               |
-|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |
-|                         | PrivilegedAccess.Read.AzureADGroup              |               |
-|                         | RoleManagementPolicy.Read.AzureADGroup          |               |
-| Defender for Office 365 | Exchange.ManageAsApp                            | Global Reader |
-| Exchange Online         | Exchange.ManageAsApp                            | Global Reader |
-| Power Platform          | (see below)                                     |               |
-| SharePoint Online       | Sites.FullControl.All, Organization.Read.All    |               |
-| Microsoft Teams         |                                                 | Global Reader |
+| Product                 | API Permissions                                 | Role          | API Name                              | API APPID                             |
+| ----------------------- | ----------------------------------------------- | ------------- | ------------------------------------- | ------------------------------------- |
+| Entra ID                | Directory.Read.All                              |               | Microsoft.Graph                       | 00000003-0000-0000-c000-000000000000  |
+|                         | Policy.Read.All                                 |               |                                       |                                       |
+|                         | PrivilegedAccess.Read.AzureADGroup              |               |                                       |                                       |
+|                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |                                       |                                       |
+|                         | RoleManagement.Read.Directory                   |               |                                       |                                       |
+|                         | RoleManagementPolicy.Read.AzureADGroup          |               |                                       |                                       |
+|                         | User.Read.All                                   |               |                                       |                                       |
+| Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
+| Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
+| Power Platform          | (see below)                                     |               |                                       |                                       |
+| SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
+| Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
 
-> **Note** Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.
+
+> [!NOTE]
+> Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.<sup>1</sup>
 
 ## Certificate Thumbprint
 
@@ -65,7 +71,8 @@ Add-PowerAppsAccount `
   -TenantID 22f22c70-de09-4d21-b82f-af8ad73391d9
 ```
 
-> **Note**: When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.
+> [!NOTE]
+> When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.
 
 ```powershell
 # Register the service principal, giving it the
@@ -73,7 +80,8 @@ Add-PowerAppsAccount `
 New-PowerAppManagementApp -ApplicationId abcdef0123456789abcde01234566789
 ```
 
-> **Note**:  These commands must be run from an account with the Power Platform Administrator or Global Administrator roles.
+> [!NOTE]
+> These commands must be run from an account with the Power Platform Administrator or Global Administrator roles.
 
 ## Certificate Location
 
