@@ -44,7 +44,8 @@ NoticeAboutConfigFile := Notice if {
     "*" in Domains
     "*" in RemoteDomainsAllowingForwarding
     Notice := concat("", [
-        "WARNING: the default domain, \"*\", was included in the 'AllowedForwardingDomains' list in the config file ", "but only specific domains can be allow-listed per the SCuBA baseline."
+        "WARNING: the default domain, \"*\", was included in the 'AllowedForwardingDomains' list in the config file ",
+        "but only specific domains can be allow-listed per the SCuBA baseline."
     ])
 }
 
