@@ -22,10 +22,12 @@ function Invoke-PesterTests {
     # https://pester.dev/docs/commands/Invoke-Pester#-passthru
     $result = Try {
         if ([string]::IsNullOrEmpty($ExcludePath)) {
-        # Don't use the exclude path if it's not passed in.
-        Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
+            Write-Warning "Running Pester tests on the path..."
+            # Don't use the exclude path if it's not passed in.
+            Invoke-Pester -Output 'Detailed' -Path $Path -PassThru
         }
         else {
+            Write-Warning "Running Pester tests while excluding..."
             Import-Module Pester -Force
             $Configuration = New-PesterConfiguration
             $Configuration.Run.Path = $Path
