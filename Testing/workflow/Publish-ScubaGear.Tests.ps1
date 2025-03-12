@@ -12,6 +12,24 @@ BeforeAll {
   $global:ModuleDestinationPath = ""
 }
 
+Describe "Remove-NonReleaseFiles" {
+  It "removes the files in the .git folder" {
+    $CurrentLocation = Get-Location
+    Write-Warning "The location is $Location"
+    $TempLocation = Join-Path -Path $CurrentLocation -ChildPath "/tempfolder"
+    $GitLocation = Join-Path -Path $TempLocation -ChildPath ".git"
+    $TestFileLocation = Join-Path -Path $GitLocation -ChildPath "test.txt"
+    # Create a dummy .git directory
+    New-Item -ItemType "directory" -Path $GitLocation
+    # Create a dummy file in .git directory
+    New-Item -ItemType "file" -Path $TestFileLocation
+    Test-Path -Path $GitLocation | Should -Be $true
+    # This should remove the dummy .git directory
+    Remove-NonReleaseFiles -RootFolderName $TempLocation
+    Test-Path -Path $GitLocation | Should -Be $false
+  }
+}
+
 Describe "Copy-ModuleToTempLocation" {
   It "copies the ScubaGear module to the specified location" {
     $Location = Get-Location
