@@ -35,7 +35,7 @@ function Invoke-PesterTests {
             # the file that is passed in here.
             # Info about configuration can be found here:
             # https://pester.dev/docs/usage/configuration
-            # Even though this isn't work, I am leaving this code in, hoping to figure this
+            # Even though this isn't working, I am leaving this code in, hoping to figure this
             # out eventually.
             $Configuration.Run.ExcludePath = $ExcludePath
             $Configuration.Run.PassThru = $true
