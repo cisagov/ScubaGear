@@ -5,7 +5,7 @@ function Get-Email {
         .PARAMETER ProductAlias
             The alias used in the parameters secret to denote a given tenant, product, variant combo.
         .PARAMETER Params
-            The set of parameters stored as a secret.
+            The set of parameters (typically stored as a secret) from which the email is extracted.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -42,8 +42,6 @@ function Get-Email {
         }
         if($alias -eq $ProductAlias)
         {
-            # Pass emails to later job for notification.
-            # echo emails=$emails >> $env:GITHUB_OUTPUT
             return $emails
         break
         }

@@ -31,6 +31,12 @@ function Invoke-PesterTests {
             Import-Module Pester -Force
             $Configuration = New-PesterConfiguration
             $Configuration.Run.Path = $Path
+            # Note: This exclude path doesn't work.  For reasons unknown, it doesn't exclude
+            # the file that is passed in here.
+            # Info about configuration can be found here:
+            # https://pester.dev/docs/usage/configuration
+            # Even though this isn't work, I am leaving this code in, hoping to figure this
+            # out eventually.
             $Configuration.Run.ExcludePath = $ExcludePath
             $Configuration.Run.PassThru = $true
             $Configuration.Output.Verbosity = 'Detailed'
