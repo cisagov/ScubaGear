@@ -7,7 +7,7 @@ on:
   push:
     paths-ignore:
       - '.github/workflows/**'
-      - '.github/actions/**'
+      - '.github/actions/extract-email/action.yaml'
       - 'Testing/workflow/**'
       - 'Testing/action/**'
       - 'utils/workflow/**'
