@@ -6,7 +6,7 @@ function Confirm-OpaUpdateRequirements {
             Determine if OPA update is required
     #>
 
-    Write-Warning "Determining if OPA needs to be updated..."
+    Write-Information -MessageData "Determining if OPA needs to be updated..."
 
     $UpdateRequired = $false
     # Get latest version via REST
@@ -28,14 +28,14 @@ function Confirm-OpaUpdateRequirements {
     # Check to see if updates are required, and if not, why not.
     if ($LatestOPAVersion -gt $CurrentOPAVersion) {
         if (-not $OPAVersionBranchExists) {
-            Write-Warning "OPA version update required."
+            Write-Information -MessageData "OPA version update required."
         }
         else {
-            Write-Warning "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."
+            Write-Information -MessageData "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."
         }
     }
     else {
-        Write-Warning "OPA version is already up to date; no update required."
+        Write-Information -MessageData "OPA version is already up to date; no update required."
     }
 
 
