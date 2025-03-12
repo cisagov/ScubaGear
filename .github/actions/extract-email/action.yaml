@@ -7,13 +7,8 @@ runs:
   using: "composite"
   steps:
     - run: |
-        $productAlias = $env:Alias
-        $params = $env:TestParams
-        Write-Debug "The script path is $PSScriptRoot."
-        # $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'utils/action/Get-Email.ps1' -Resolve
-        # Write-Debug "The script path is $ScriptPath."
         . utils/action/Get-Email.ps1
-        $Email = Get-Email -ProductAlias $productAlias -Params $params
+        $Email = Get-Email -ProductAlias $env:Alias -Params $env:TestParams
         # Pass emails to later job for notification.
         echo emails=$Email >> $env:GITHUB_OUTPUT
       id: emails-output
