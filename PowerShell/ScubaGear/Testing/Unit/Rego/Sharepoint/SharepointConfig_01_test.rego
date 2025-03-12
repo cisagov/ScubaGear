@@ -102,7 +102,7 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if the external sharing slider",
-        "on the admin page is not set to Only People In Your Organization.",
+        "in the SharePoint admin center is not set to Only People In Your Organization.",
         "See %v for more info"
         ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
