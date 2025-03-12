@@ -58,7 +58,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only people in your organization**.
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only people in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
@@ -71,7 +71,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 <!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin page is set to any value other than **Only People in your organization**.
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only People in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
