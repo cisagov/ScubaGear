@@ -221,7 +221,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
@@ -234,7 +234,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 <!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone**.
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
@@ -246,7 +246,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
 - _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the external sharing slider on the admin center sharing page is set to **Anyone** or **New and existing guests**.
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
