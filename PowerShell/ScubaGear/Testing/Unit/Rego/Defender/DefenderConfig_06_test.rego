@@ -5,7 +5,6 @@ import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
-import data.utils.report.PolicyLink
 
 #
 # Policy MS.DEFENDER.6.1v1
