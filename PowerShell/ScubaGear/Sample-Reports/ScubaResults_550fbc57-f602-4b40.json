@@ -505,13 +505,6 @@
                                               "Details":  "Requirement met"
                                           },
                                           {
-                                              "Control ID":  "MS.DEFENDER.6.2v1",
-                                              "Requirement":  "Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.",
-                                              "Result":  "Fail",
-                                              "Criticality":  "Shall",
-                                              "Details":  "Requirement not met. 84 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq 'Enabled')\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName"
-                                          },
-                                          {
                                               "Control ID":  "MS.DEFENDER.6.3v1",
                                               "Requirement":  "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.",
                                               "Result":  "N/A",
@@ -911,13 +904,6 @@
                                          "Result":  "N/A",
                                          "Criticality":  "Shall/3rd Party",
                                          "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1 for instructions on a manual check."
-                                     },
-                                     {
-                                         "Control ID":  "MS.EXO.17.2v1",
-                                         "Requirement":  "Microsoft Purview Audit (Premium) logging SHALL be enabled.",
-                                         "Result":  "N/A",
-                                         "Criticality":  "Shall/3rd Party",
-                                         "Details":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/exo.md#msexo172v1 for instructions on a manual check."
                                      },
                                      {
                                          "Control ID":  "MS.EXO.17.3v1",
