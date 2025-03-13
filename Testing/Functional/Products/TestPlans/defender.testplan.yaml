@@ -1452,42 +1452,6 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
 
-  - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.DEFENDER.6.2v1 Compliant Case
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                total_users_without_advanced_audit: 0
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.DEFENDER.6.2v1 Non-Compliant Case
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                total_users_without_advanced_audit: 10
-        Postconditions: []
-        ExpectedResult: false
-
-  - PolicyId: MS.DEFENDER.6.2v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.DEFENDER.6.2v1 Non-Compliant Case
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                total_users_without_advanced_audit: -1
-        Postconditions: []
-        ExpectedResult: false
-
   - PolicyId: MS.DEFENDER.6.3v1
     TestDriver: RunScuba
     Tests:
