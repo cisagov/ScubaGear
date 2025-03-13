@@ -472,31 +472,6 @@ An admin consent workflow SHALL be configured for applications.
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
-#### MS.AAD.5.4v1
-Group owners SHALL NOT be allowed to consent to applications.
-
-<!--Policy: MS.AAD.5.4v1; Criticality: SHALL -->
-- _Rationale:_ In M365, group owners and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval workflow, risk of exposure to malicious applications is reduced.
-- _Last modified:_ June 2023
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-
-### Resources
-
-- [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
-
-- [Enforce Administrators to Provide Consent for Apps Before Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)
-
-- [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
 #### MS.AAD.5.1v1 Instructions
 
 1.  In **Microsoft Entra admin center**, under **Manage**, select **Users**.
@@ -530,16 +505,6 @@ Group owners SHALL NOT be allowed to consent to applications.
 5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
 6. Click **Save**.
-
-#### MS.AAD.5.4v1 Instructions
-
-1.  In **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.
-
-2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
-
-3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent**.
-
-4. Click **Save**.
 
 ## 6. Passwords
 
