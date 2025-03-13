@@ -452,16 +452,6 @@
         "RequirementMet":  true
     },
     {
-        "ActualValue":  84,
-        "Commandlet":  [
-                           "Get-MgBetaUser"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.DEFENDER.6.2v1",
-        "ReportDetails":  "Requirement not met. 84 tenant users without M365 Advanced Auditing feature assigned. To review and assign users the Microsoft 365 Advanced Auditing feature, see \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/defender.md#msdefender62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e. To get a list of all users without the license feature run the following: Get-MgBetaUser -Filter \"not assignedPlans/any(a:a/servicePlanId eq 2f442157-a11c-46b9-ae5b-6e39ff4e5849 and a/capabilityStatus eq \u0027Enabled\u0027)\" -ConsistencyLevel eventual -Count UserCount -All | Select-Object DisplayName,UserPrincipalName",
-        "RequirementMet":  false
-    },
-    {
         "ActualValue":  [
 
                         ],
@@ -866,18 +856,6 @@
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.1v1",
         "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.17.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/exo.md#msexo172v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
