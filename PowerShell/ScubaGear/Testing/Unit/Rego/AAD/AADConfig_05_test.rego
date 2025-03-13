@@ -133,15 +133,3 @@ test_IsEnabled_Incorrect if {
     TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
 }
 #--
-
-#
-# Policy MS.AAD.5.4v1
-#--
-test_TeamsGroupConsentDisabled_NotImplemented_V1 if {
-    PolicyId := "MS.AAD.5.4v1"
-
-    Output := aad.tests with input.directory_settings as [DirectorySettings]
-
-    TestResult(PolicyId, Output, NotCheckedDeprecation, false) == true
-}
-#--

@@ -423,22 +423,6 @@
         "RequirementMet":  true
     },
     {
-        "ActualValue":  [
-                            {
-                                "Name":  "EnableGroupSpecificConsent",
-                                "SettingsGroup":  "Consent Policy Settings",
-                                "Value":  "false"
-                            }
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaDirectorySetting"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.4v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
         "ActualValue":  true,
         "Commandlet":  [
                            "Get-AntiPhishPolicy"
