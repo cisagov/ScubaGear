@@ -3,6 +3,7 @@ import rego.v1
 import data.teams
 import data.utils.key.TestResult
 import data.utils.key.TestResultContains
+import data.utils.report.NotCheckedDetails
 import data.utils.key.FAIL
 import data.utils.key.PASS
 
@@ -296,4 +297,18 @@ test_BroadcastRecordingMode_Multiple if {
 
     TestResult("MS.TEAMS.1.7v1", Output, PASS, true) == true
 }
+#--
+#
+# Policy MS.TEAMS.1.8v1
+# Unit test to be added through issue 1619
+#--
+test_NotImplemented_Correct_V1 if {
+    PolicyId := "MS.TEAMS.1.8v1"
+
+    Output := teams.tests with input as {}
+
+    ReportDetailString := NotCheckedDetails(PolicyId)
+    TestResult(PolicyId, Output, ReportDetailString, false) == true
+}
+
 #--

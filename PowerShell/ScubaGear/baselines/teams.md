@@ -115,11 +115,22 @@ Meeting recording SHOULD be disabled.
   - None
 
 #### MS.TEAMS.1.7v1
-Record an event SHOULD be set to Organizer can record.
+Record an event SHOULD NOT be set to Always record.
 
 <!--Policy: MS.TEAMS.1.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of the default settings for Live Events is Live Events can be recorded by all participants by default. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events.
-- _Last modified:_ July 2023
+- _Rationale:_ Allowing to always record Live Events can pose data leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
+- _Last modified:_ March 2025
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
+- _MITRE ATT&CK TTP Mapping:_
+  - None
+
+
+#### MS.TEAMS.1.8v1
+Tenant users SHOULD be restricted in joining externally organized Teams meetings.
+
+<!--Policy: MS.TEAMS.1.8v1; Criticality: SHOULD -->
+- _Rationale:_ M365 tenant users joining meetings organized by unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal users joining meetings from unmanaged/unknown users.
+- _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -222,7 +233,6 @@ To configure settings for anonymous users:
 
 5.  Select **Save**.
 
-
 #### MS.TEAMS.1.7v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin
@@ -232,12 +242,23 @@ To configure settings for anonymous users:
 
 3.  Select **Global (Org-wide default)** policy.
 
-4.  Set **Record an event** to **Organizer can record**.
+4.  Set **Record an event** to either  **Organizer can record** or **Never record**
 
 5.  Click **Save**.
 
 6.  If custom policies were created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
+
+#### MS.TEAMS.1.8v1 Instructions
+
+1.	Sign in to the **Microsoft Teams admin center**.
+
+2.	Select **Meetings** > **Meeting policies**.
+
+3.	Select the **Global (Org-wide default)** policy.
+
+4.	Under the **Meeting join & lobby** section, set **People can join external meetings hosted by** to either **Only people in trusted orgs** or **No one**.
+
 
 ## 2. External User Access
 This section helps reduce security risks related to external and unmanaged user access. In this instance, external users refer to members of a different M365 tenant, and unmanaged users refer to users who are not members of any M365 tenant or organization.

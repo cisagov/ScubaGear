@@ -46,7 +46,7 @@ InModuleScope CreateReport {
             @{Product = 'exo'; WarningCount = 0},
             @{Product = 'powerplatform'; WarningCount = 2},
             @{Product = 'sharepoint'; WarningCount = 0},
-            @{Product = 'teams'; WarningCount = 11}
+            @{Product = 'teams'; WarningCount = 12} 
         ){
             $CreateReportParams += @{
                 'BaselineName'    = $ArgToProd[$Product];
