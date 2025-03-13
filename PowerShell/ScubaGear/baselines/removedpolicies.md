@@ -26,7 +26,7 @@ Additional terminology in this document specific to their respective SCBs are to
 
 ## Azure Active Directory / Entra ID
 
-### Removed Policies 
+### Removed Policies
 
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
@@ -35,34 +35,42 @@ Group owners SHALL NOT be allowed to consent to applications.
 
 ## Defender
 
-### Removed Policies 
+### Removed Policies
 
-N/A
+#### MS.DEFENDER.6.2v1
+Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
+- _Removal date:_ March 2025
+- _Removal rationale:_ MS.DEFENDER.6.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes has been completed, Purview (Standard) includes the necessary auditing which is addressed by MS.DEFENDER.6.1v1.
 
 ## Exchange Online
 
-### Removed Policies 
+### Removed Policies
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
 - _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
-## Power BI
+#### MS.EXO.17.2v1
+Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
+- _Removal date:_ March 2025
+- _Removal rationale:_ MS.EXO.17.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes has been completed, Purview (Standard) includes the necessary auditing which is addressed by MS.EXO.17.2v1
 
-### Removed Policies 
+# Power BI
+
+### Removed Policies
 
 N/A
 
 
 ## PowerPlatform
 
-### Removed Policies 
+### Removed Policies
 
 N/A
 
 ## SharePoint Online
 
-### Removed Policies 
+### Removed Policies
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
