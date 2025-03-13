@@ -800,22 +800,6 @@ Unified Audit logging SHALL be enabled.
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
-
-#### MS.DEFENDER.6.2v1
-Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
-
-<!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
-- _Last modified:_ June 2023
-- _Note:_ At the time of this writing, Microsoft has announced upcoming changes
-          to its Purview Audit service that include making audit events
-          currently available in Purview Audit (Premium) available to Purview
-          Audit (Standard) subscribers. After rollout of changes are complete,
-          Purview (Standard) may be sufficient for agencies to meet basic
-          logging requirements.
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
-
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
