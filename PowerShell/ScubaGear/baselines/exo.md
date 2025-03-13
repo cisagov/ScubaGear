@@ -1496,14 +1496,9 @@ Audit Logs in the Cloud Azure log category.
 See the following implementation steps for enabling [Unified Audit logging](./defender.md#msdefender61v1-instructions) for additional
 guidance.
 
-#### MS.EXO.17.2v1 Instructions
-See the following implementation steps for enabling [Microsoft Purview
-(Premium)](./defender.md#msdefender62v1-instructions) for additional
-guidance.
-
 #### MS.EXO.17.3v1 Instructions
 See the following implementation steps to
-[create an audit retention policy](./defender.md#msdefender62v1-instructions)
+[create an audit retention policy](./defender.md#msdefender63v1-instructions)
 for additional guidance.
 
 **`TLP:CLEAR`**
