@@ -229,11 +229,11 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
     
 #### MS.AAD.3.3v1
-If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
+If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
-- _Rationale:_ This stopgap security policy helps protect the tenant when phishing-resistant MFA has not been enforced and Microsoft Authenticator is used. This policy helps improve the security of Microsoft Authenticator by showing user context information, which helps reduce MFA phishing compromises.
-- _Last modified:_ June 2023
+- _Rationale:_ This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.
+- _Last modified:_ February 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
     - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
@@ -345,9 +345,9 @@ Managed Devices SHOULD be required to register MFA.
 </pre>
 
 #### MS.AAD.3.3v1 Instructions
-If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
+If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In ** Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
+1. In **Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
