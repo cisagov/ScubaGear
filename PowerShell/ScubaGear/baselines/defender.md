@@ -867,11 +867,6 @@ administrator to start recording user and admin activity.
 
 4. Click the **Start recording user and admin activity**.
 
-#### MS.DEFENDER.6.2v1 Instructions
-To set up Microsoft Purview Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
-Microsoft
-Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
-
 #### MS.DEFENDER.6.3v1 Instructions
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
 Ensure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. 
