@@ -11,7 +11,6 @@ import data.utils.defender.SensitiveAccountsSetting
 import data.utils.key.FilterArray
 import data.utils.key.PASS
 import data.utils.report.NotCheckedDetails
-import data.utils.report.PolicyLink
 import data.utils.report.ReportDetailsArray
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
