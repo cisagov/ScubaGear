@@ -120,7 +120,7 @@ points.
 #### MS.EXO.2.2v2
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
-<!--Policy: MS.EXO.2.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
@@ -1449,25 +1449,6 @@ actions. Furthermore, Microsoft Purview Audit (Standard) is required for
 government agencies by OMB M-21-31 (referred to therein by its former
 name, Unified Audit Logs).
 - _Last modified:_ June 2023
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
-    - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
-
-#### MS.EXO.17.2v1
-Microsoft Purview Audit (Premium) logging SHALL be enabled.
-
-<!--Policy: MS.EXO.17.2v1; Criticality: SHALL -->
-- _Rationale:_ Standard logging may not include relevant details necessary for
-visibility into user actions during an incident. Enabling Microsoft Purview Audit
-(Premium) captures additional event types not included with Standard.
-Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs w/Advanced Features).
-- _Last modified:_ June 2023
-- _Note:_ At the time of this writing, Microsoft has announced upcoming changes
-          to its Purview Audit service that include making audit events
-          currently available in Purview Audit (Premium) available to Purview
-          Audit (Standard) subscribers. After rollout of changes are complete,
-          Purview (Standard) may be sufficient for agencies to meet basic
-          logging requirements.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
