@@ -570,7 +570,7 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    # Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
@@ -583,6 +583,7 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
+    print(CAPolicy.DisplayName)
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
 }
