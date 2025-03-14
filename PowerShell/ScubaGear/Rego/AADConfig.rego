@@ -583,7 +583,6 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    print(CAPolicy.DisplayName)
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
 }
