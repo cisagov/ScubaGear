@@ -68,7 +68,7 @@ persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
-- _Last modified:_ June 2023
+- _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -87,7 +87,7 @@ internal forwarding.
 
 ### Implementation
 
-#### MS.EXO.1.1v1 Instructions
+#### MS.EXO.1.1v2 Instructions
 To disallow automatic forwarding to external domains:
 
 1.  Sign in to the **Exchange admin center**.
