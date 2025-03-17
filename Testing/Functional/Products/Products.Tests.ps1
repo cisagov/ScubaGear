@@ -209,7 +209,7 @@ BeforeAll {
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
         }
     }
-    
+
 }
 
 Describe "Policy Checks for <ProductName>" {
