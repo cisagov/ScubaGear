@@ -81,7 +81,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.2.2v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.2.2v1 Not Checked
         Preconditions: []
@@ -529,7 +529,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.4.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.4.1v1 Not Checked
         Preconditions: []
@@ -1170,7 +1170,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.AAD.8.3v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.8.3v1 Not Checked
         Preconditions: []

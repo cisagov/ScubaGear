@@ -247,50 +247,36 @@ Describe "Policy Checks for <ProductName>" {
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
             }
-            # # Ensure case matches driver in test plan
-            # elseif ('ScubaCached' -eq $TestDriver){
-            #     Write-Debug "Driver: ScubaCached"
-            #     RunScuba
-            #     $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
-            #     $OutputFolder = $ReportFolders[0].Name
-            #     SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
-            #     Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
-            # }
             # ScubaCached driver using shared cache
             elseif ('ScubaCached' -eq $TestDriver){
                 Write-Debug "Driver: ScubaCached"
 
-                # If this is the first time calling ScubaCached in this test plan, we need to call the tenant to create the tenant
-                if ($null -eq $script:CachedCreated) {
-                    $script:CachedCreated = $false
+                if ($null -eq $script:OutputFolder) {
+                    Write-Host "Creating the cache now"
+                    #RunScuba creates the ProviderSettingsExport.json
+                    RunScuba
+                    $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                    $script:OutputFolder = $ReportFolders[0].Name
                 }
 
-                if ($script:CachedCreated -ne $true) {
-                    Write-Host "Creating the cache now"
-                    # The first time that RunScuba is called the ProviderSettingsExport.json is created
-                    # ProviderSettingsExport.json then serves as the "cached" file when another cached test scenario is executed in the test plan
-                    # Since the file is cached we don't need to get the data from the tenant again
-                    RunScuba
-                    $script:CachedCreated = $true
-                }
                 else {
                     Write-Host "Using the cached provider settings."
                 }
+                SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:OutputFolder
 
-                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
-                $OutputFolder = $ReportFolders[0].Name
+                if (-not (Test-Path -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
+                    Copy-Item -Path "$script:OutputFolder/ProviderSettingsExport.json" -Destination "$script:OutputFolder/ModifiedProviderSettingsExport.json"
+                }
 
-                # Call functions like UpdateConditionalAccessPolicyByName to modify the cached JSON and create a new file ModifiedProviderSettingsExport.json
-                SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $OutputFolder
-                
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
-                
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $script:OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+
                 # Delete the modified JSON
                 # This is necessary so that when the next test scenario executes, it will start with a fresh cached file ProviderSettingsExport.json
-                Remove-Item -Path "$OutputFolder/ModifiedProviderSettingsExport.json"
+                Remove-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json"
+                # }
             }
-            
+
             else {
                 Write-Debug "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
