@@ -252,7 +252,7 @@ Describe "Policy Checks for <ProductName>" {
                 Write-Debug "Driver: ScubaCached"
 
                 if ($null -eq $script:OutputFolder) {
-                    Write-Host "Creating the cache now"
+                    Write-Debug "Creating the cache now"
                     #RunScuba creates the ProviderSettingsExport.json
                     RunScuba
                     $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
@@ -260,7 +260,7 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 else {
-                    Write-Host "Using the cached provider settings."
+                    Write-Debug "Using the cached provider settings."
                 }
                 SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:OutputFolder
 
