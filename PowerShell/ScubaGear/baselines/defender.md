@@ -802,27 +802,30 @@ Unified Audit logging SHALL be enabled.
 
 
 #### MS.DEFENDER.6.2v1
-Microsoft 365 Advanced Auditing SHALL be enabled for ALL users.
+Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 
 <!--Policy: MS.DEFENDER.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Unified Audit logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft 365 Advanced Auditing captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
-- _Last modified:_ March 2025
+- _Rationale:_ Standard logging may not include relevant details necessary for visibility into user actions during an incident. Enabling Microsoft Purview Audit (Premium) captures additional event types not included with Standard. Furthermore, it is required for government agencies by OMB M-21-31 (referred to therein as by its former name, Unified Audit Logs w/Advanced Features).
+- _Last modified:_ June 2023
 - _Note:_ At the time of this writing, Microsoft has announced upcoming changes
           to its Purview Audit service that include making audit events
-          currently available in Microsoft 365 Advanced Auditing available to Unified Audit logging subscribers. After rollout of changes are complete, Unified Audit Logging may be sufficient for agencies to meet basic logging requirements.
+          currently available in Purview Audit (Premium) available to Purview
+          Audit (Standard) subscribers. After rollout of changes are complete,
+          Purview (Standard) may be sufficient for agencies to meet basic
+          logging requirements.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
+#### MS.DEFENDER.6.3v1
+Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
+
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
-- _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago. Increased log retention time
-gives an agency the necessary visibility to investigate incidents that occurred
-some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
-Audit Logs in the Cloud Azure log category.
-- _Last modified:_ March 2025
-- _Note_: Microsoft 365 Advanced Auditing provides a default audit log retention policy,
+- _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
+- _Last modified:_ June 2023
+- _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
           Business, and Microsoft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
@@ -830,7 +833,6 @@ Audit Logs in the Cloud Azure log category.
           to meet audit log retention needs.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
-
 
 ### Resources
 
@@ -861,7 +863,7 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 ### License Requirements
 
-- Microsoft 365 Advanced Auditing logging capabilities, including the creation of a custom audit
+- Microsoft Purview Audit (Premium) logging capabilities, including the creation of a custom audit
   log retention policy, requires E5/G5 licenses or E3/G3 licenses with
   add-on compliance licenses.
 
@@ -885,9 +887,9 @@ administrator to start recording user and admin activity.
 4. Click the **Start recording user and admin activity**.
 
 #### MS.DEFENDER.6.2v1 Instructions
-To set up Micorosoft 365 Advanced Audting, see [Get started with auditing solutions \|
+To set up Microsoft Purview Audit (Premium), see [Set up Microsoft Purview Audit (Premium) \|
 Microsoft
-Learn.](https://learn.microsoft.com/en-us/purview/audit-get-started?view=o365-worldwide)
+Learn.](https://learn.microsoft.com/en-us/purview/audit-premium-setup?view=o365-worldwide)
 
 #### MS.DEFENDER.6.3v1 Instructions
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
