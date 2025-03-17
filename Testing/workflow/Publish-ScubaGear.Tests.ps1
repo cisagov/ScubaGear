@@ -14,6 +14,8 @@ BeforeAll {
 
 Describe "Remove-NonReleaseFiles" {
   It "removes the files in the .git folder" {
+    Write-Warning "Where is test drive?"
+    Write-Warning $TestDrive
     $CurrentLocation = Get-Location
     Write-Warning "The location is $Location"
     $TempLocation = Join-Path -Path $CurrentLocation -ChildPath "/tempfolder"
