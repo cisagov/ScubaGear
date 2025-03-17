@@ -129,6 +129,9 @@ jobs:
           $ExpectedDescription = $Manifest.Description
           # The -PassThru parameters allows us to read the output value from Install-Module
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
+          $module = Get-Module -ListAvailable -Name $global:ModuleName
+          $module | Should -Not -BeNullOrEmpty
+          
           # Check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
             Write-Output "The actual name of the output"
