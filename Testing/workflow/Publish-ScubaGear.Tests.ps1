@@ -15,11 +15,6 @@ BeforeAll {
 
 Describe "Remove-NonReleaseFiles" {
   It "removes the files in the .git folder" {
-    # Write-Warning "Where is test drive?"
-    # Write-Warning $TestDrive
-    # # C:\Users\runneradmin\AppData\Local\Temp\14555e24-544a-4887-b1da-18bdc71c8ae3
-    # $CurrentLocation = Get-Location
-    # Write-Warning "The location is $CurrentLocation"
     $TempLocation = Join-Path -Path $TestDrive -ChildPath "/tempfolder"
     $GitLocation = Join-Path -Path $TempLocation -ChildPath ".git"
     $TestFileLocation = Join-Path -Path $GitLocation -ChildPath "test.txt"
@@ -31,6 +26,9 @@ Describe "Remove-NonReleaseFiles" {
     # This should remove the dummy .git directory
     Remove-NonReleaseFiles -RootFolderName $TempLocation
     Test-Path -Path $GitLocation | Should -Be $false
+  }
+  It "gracefully handles a non-existent folder" {
+    { Remove-NonReleaseFiles -RootFolderName "thispathdoesnotexist" } | Should -Throw
   }
 }
 

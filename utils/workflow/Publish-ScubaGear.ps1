@@ -78,6 +78,11 @@ function Remove-NonReleaseFiles {
     $RootFolderName
   )
   Write-Output "Removing non-release files..."
+  # Verify that folder exists
+  if (-not (Test-Path -Path $RootFolderName)) {
+    Write-Output "The root folder doesn't exist: $RootFolderName"
+    throw [System.IO.DirectoryNotFoundException] "Directory not found: $RootFolderName"
+  }
   Remove-Item -Recurse -Force $RootFolderName -Include .git*
 }
 
