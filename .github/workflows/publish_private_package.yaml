@@ -109,6 +109,11 @@ jobs:
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check #1 - verify that module was installed
           $module = Get-Module -ListAvailable -Name $ExpectedName
+          if (-not ($module -ne $null -and -not [string]::IsNullOrEmpty($module)))
+          {
+            Write-Output "::error::The ScubaGear module was not installed."
+            exit 1
+          }
           # Check #2 - check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
             Write-Output "The actual name of the output"
