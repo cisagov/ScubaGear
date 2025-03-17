@@ -228,12 +228,12 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
     - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
     
-#### MS.AAD.3.3v1
+#### MS.AAD.3.3v2
 If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 <!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
 - _Rationale:_ This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.
-- _Last modified:_ February 2025
+- _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
     - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
