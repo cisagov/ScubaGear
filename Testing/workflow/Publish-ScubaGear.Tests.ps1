@@ -1,4 +1,5 @@
 # The purpose of this test is to verify that (most of) the Publish-ScubaGear functions are working correctly.
+# To run these tests, run the Workflow Pipeline.
 
 # Suppress PSSA warnings here at the root of the test file.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -14,11 +15,12 @@ BeforeAll {
 
 Describe "Remove-NonReleaseFiles" {
   It "removes the files in the .git folder" {
-    Write-Warning "Where is test drive?"
-    Write-Warning $TestDrive
-    $CurrentLocation = Get-Location
-    Write-Warning "The location is $Location"
-    $TempLocation = Join-Path -Path $CurrentLocation -ChildPath "/tempfolder"
+    # Write-Warning "Where is test drive?"
+    # Write-Warning $TestDrive
+    # # C:\Users\runneradmin\AppData\Local\Temp\14555e24-544a-4887-b1da-18bdc71c8ae3
+    # $CurrentLocation = Get-Location
+    # Write-Warning "The location is $CurrentLocation"
+    $TempLocation = Join-Path -Path $TestDrive -ChildPath "/tempfolder"
     $GitLocation = Join-Path -Path $TempLocation -ChildPath ".git"
     $TestFileLocation = Join-Path -Path $GitLocation -ChildPath "test.txt"
     # Create a dummy .git directory
