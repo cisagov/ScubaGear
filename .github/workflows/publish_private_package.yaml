@@ -142,9 +142,11 @@ jobs:
             exit 1
           }
           # Check #4 - see if the path exists
-          $PathExists = Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
-          # $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
-          # $PathExists = Test-Path -Path "$ModulePath"
+          # $PathExists = Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+          $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
+          Write-Output "The module path"
+          Write-Output $ModulePath
+          $PathExists = Test-Path -Path "$ModulePath"
           if ($PathExists -ne $true) {
             Write-Output "::error::ScubaGear was not installed into the correct version."
           }
