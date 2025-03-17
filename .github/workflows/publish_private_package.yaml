@@ -107,32 +107,9 @@ jobs:
           $ExpectedDescription = $Manifest.Description
           # The -PassThru parameters allows us to read the output value from Install-Module
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          # Check for the expected name.
-          if ($InstallOutput.Name -ne $ExpectedName) {
-            Write-Output "::error::The name of the published module should be $ExpectedName"
-            exit 1
-          }
-          # Because reasons, the description has a newline character.
-          # Strip all whitespace before comparing the descriptions.
-          $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
-          $ExpectedFixed = $ExpectedDescription -replace "\s", ""
-          # Check for the expected description.
-          if ($DescriptionFixed -ne $ExpectedFixed) {
-            Write-Output "::error::The description of the published module should be $ExpectedDescription"
-            exit 1
-          }
-          # This step initializes SG and runs some checks to verify that it installed correctly.
-          $ExpectedName = 'ScubaGear'
-          # Read the description value from the manifest file (ScubaGear.psd1)
-          $ManifestFilePath = Join-Path -Path repo/PowerShell/ScubaGear -ChildPath 'ScubaGear.psd1' -Resolve
-          $Manifest = Import-PowerShellDataFile $ManifestFilePath
-          $ExpectedDescription = $Manifest.Description
-          # The -PassThru parameters allows us to read the output value from Install-Module
-          $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
-          $module = Get-Module -ListAvailable -Name $global:ModuleName
-          $module | Should -Not -BeNullOrEmpty
-          
-          # Check for the expected name.
+          # Check #1 - verify that module was installed
+          $module = Get-Module -ListAvailable -Name $ExpectedName
+          # Check #2 - check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
             Write-Output "The actual name of the output"
             Write-Output $InstallOutput.Name
@@ -145,23 +122,21 @@ jobs:
           # Strip all whitespace before comparing the descriptions.
           $DescriptionFixed = $InstallOutput.Description -replace "\s", ""
           $ExpectedFixed = $ExpectedDescription -replace "\s", ""
-          # Check for the expected description.
+          # Check #3 - check for the expected description.
           if ($DescriptionFixed -ne $ExpectedFixed) {
             Write-Output "::error::The description of the published module should be $ExpectedDescription"
             exit 1
           }
           . repo/utils/workflow/Initialize-ScubaGearForTesting.ps1
           Initialize-ScubaGearForTesting
-          # What follows are 2 quick tests to verify that ScubaGear initialized correctly.
-          # Test #1 - Version works
-          $ManifestFilePath = Join-Path -Path "repo\PowerShell\ScubaGear" -ChildPath "ScubaGear.psd1"
+          # Check #3 - verify that the version flag works
           $ExpectedVersion = (Import-PowerShellDataFile $ManifestFilePath).ModuleVersion
           $ActualVersion = Invoke-SCuBA -Version
           if ($ActualVersion -notmatch $ExpectedVersion) {
             Write-Output "::error::The module version should contain with $ExpectedVersion"
             exit 1
           }
-          # Test #2 - Path exists
+          # Check #4 - see if the path exists
           $PathExists = Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
           # $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
           # $PathExists = Test-Path -Path "$ModulePath"
