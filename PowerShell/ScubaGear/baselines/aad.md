@@ -344,7 +344,7 @@ Managed Devices SHOULD be required to register MFA.
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
 </pre>
 
-#### MS.AAD.3.3v1 Instructions
+#### MS.AAD.3.3v2 Instructions
 If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
 1. In **Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
