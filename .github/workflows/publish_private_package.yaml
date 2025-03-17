@@ -131,6 +131,10 @@ jobs:
           $InstallOutput = Install-Module -Name ScubaGear -Repository $env:GalleryName -SkipPublisherCheck -PassThru
           # Check for the expected name.
           if ($InstallOutput.Name -ne $ExpectedName) {
+            Write-Output "The actual name of the output"
+            Write-Output $InstallOutput.Name
+            Write-Output "Entire object"
+            Write-Output $InstallOutput
             Write-Output "::error::The name of the published module should be $ExpectedName"
             exit 1
           }
@@ -156,6 +160,8 @@ jobs:
           }
           # Test #2 - Path exists
           $PathExists = Test-Path -Path "C:\Program Files\WindowsPowerShell\Modules\ScubaGear"
+          # $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
+          # $PathExists = Test-Path -Path "$ModulePath"
           if ($PathExists -ne $true) {
             Write-Output "::error::ScubaGear was not installed into the correct version."
           }
