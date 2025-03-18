@@ -79,7 +79,7 @@ NonCompDomainsSummary := concat("", [
     "."
 ])
 
-# Sentence summarizing the domains the domains that allow forwarding but have been allow-listed
+# Sentence summarizing the domains that allow forwarding but have been allow-listed
 AllowedDomainsSummary := concat("", [
     ArraySizeStr(AllowedForwardingDomains),
     " remote ",
