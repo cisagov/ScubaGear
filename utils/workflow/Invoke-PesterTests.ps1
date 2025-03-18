@@ -16,8 +16,7 @@ function Invoke-PesterTests {
         [string]
         $ExcludePath
 	)
-    Write-Warning "The path to test is ${Path}."
-    Write-Warning "The path to exclude is ${ExcludePath}"
+
     # The -PassThru parameter is what allows the output to be passed to the $result output.
     # https://pester.dev/docs/commands/Invoke-Pester#-passthru
     $result = Try {
@@ -53,6 +52,4 @@ function Invoke-PesterTests {
     if ($null -eq $result) {
         throw "The Pester tests failed to run."
     }
-    Write-Warning "The results of invoking Pester are:"
-    Write-Warning $result
 }

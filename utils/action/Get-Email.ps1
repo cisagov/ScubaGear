@@ -43,7 +43,7 @@ function Get-Email {
         if($alias -eq $ProductAlias)
         {
             return $emails
-        break
+            break
         }
     }
     return ""
