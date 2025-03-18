@@ -58,15 +58,15 @@ jobs:
                 # and intentionally ignore it, because the return value will
                 # handle the problem of a missing branch.
                 exit 0
-            # - name: Update OPA version in ScubaGear
-            #   id: update-opa-version
-            #   if: steps.determine-update-required.outputs.updaterequired == 'true'
-            #   run: |
-            #     $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
-            #     $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+            - name: Update OPA version in ScubaGear
+              id: update-opa-version
+              if: steps.determine-update-required.outputs.updaterequired == 'true'
+              run: |
+                $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+                $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
 
-            #     . utils/workflow/Update-Opa.ps1
-            #     $ReturnValues = Update-OpaVersion -RepoPath . -LatestOpaVersion $LatestOPAVersion
+                . utils/workflow/Update-Opa.ps1
+                $ReturnValues = Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
 
             #     # # Replace Default version in Config Module
             #     # $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
