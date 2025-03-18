@@ -60,7 +60,7 @@ forwarding rules to exfiltrate data to external recipients.
 ### Policies
 
 #### MS.EXO.1.1v2
-Automatic forwarding to external domains SHALL only be enabled on a per-domain basis.
+Automatic forwarding to external domains SHALL be disabled.
 
 <!--Policy: MS.EXO.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
@@ -69,6 +69,10 @@ external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
 - _Last modified:_ March 2025
+- _Note:_ Automatic forwarding MAY be enabled with specific, agency-approved domains.
+There may be cases where an external domain is operationally needed and has an acceptable
+degree of risk, e.g., a domain controlled by the same agency but that hasn't been added
+as an accepted domain in M365.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
