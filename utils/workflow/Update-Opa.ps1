@@ -16,7 +16,16 @@ function Confirm-OpaUpdateRequirements {
     # Check if there is already an update branch
     $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification='$Temp required to avoid having PS eat the return code from git.')]
-    $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
+    try {
+        $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
+    }
+    catch {
+        # Note that git-ls will always fail with exit code 1 when the
+        # branch does not exist. This try-catch will catch that error
+        # and intentionally ignore it, because the return value will
+        # handle the problem of a missing branch.
+    }
+
     $OPAVersionBranchExists = $false
     if ($LASTEXITCODE -eq 0) {
         $OPAVersionBranchExists = $true
@@ -38,7 +47,6 @@ function Confirm-OpaUpdateRequirements {
         Write-Warning "OPA version is already up to date; no update required."
     }
 
-
     # Return values in a hashtable
     $ReturnValues = @{
         "LatestOPAVersion" = $LatestOPAVersion
@@ -47,6 +55,10 @@ function Confirm-OpaUpdateRequirements {
         "CurrentOPAVersion" = $CurrentOPAVersion
     }
     return $ReturnValues
+    # Note that git-ls will always fail with exit code 1 when the
+    # branch does not exist. Setting exit 0 (success) at the end
+    # of this workflow to prevent that error.
+    exit 0
 }
 
 function Update-OpaVersion {
