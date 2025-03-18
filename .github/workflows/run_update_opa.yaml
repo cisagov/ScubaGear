@@ -52,6 +52,8 @@ jobs:
                 echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
                 echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
                 echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
+
+                exit 0
             # - name: Update OPA version in ScubaGear
             #   id: update-opa-version
             #   if: steps.determine-update-required.outputs.updaterequired == 'true'
