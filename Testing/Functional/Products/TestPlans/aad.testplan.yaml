@@ -197,10 +197,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.3v1
+  - PolicyId: MS.AAD.3.3v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.3v1 Not-applicable case - MS Auth Disabled
+      - TestDescription: MS.AAD.3.3v2 Not-applicable case - MS Auth Disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -211,7 +211,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.3v1 Non-Compliant case - MS Auth App name and Geolocation disabled
+      - TestDescription: MS.AAD.3.3v2 Non-Compliant case - MS Auth App name and Geolocation disabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -229,7 +229,7 @@ TestPlan:
                         - id: "all_users"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.3v1 Compliant case - MS Auth Configured Correctly
+      - TestDescription: MS.AAD.3.3v2 Compliant case - MS Auth Configured Correctly
         Preconditions:
           - Command: UpdateProviderExport
             Splat:

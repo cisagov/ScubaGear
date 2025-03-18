@@ -586,7 +586,7 @@ test_State_Incorrect_V1 if {
 #--
 
 #
-# Policy MS.AAD.3.3v1
+# Policy MS.AAD.3.3v2
 #--
 # Test 1: MicrosoftAuthDisabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
 # displayLocationInformationRequiredState enabled for all_users
@@ -600,7 +600,7 @@ test_MicrosoftAuthDisabled_NotApplicable if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    PolicyId := "MS.AAD.3.3v1"
+    PolicyId := "MS.AAD.3.3v2"
     ReportDetailStr := concat(" ", [
         "This policy is only applicable if MS Authenticator is enabled.",
         "See %v for more info"])
@@ -619,7 +619,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_1 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 # Test 3: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
 #         displayLocationInformationRequiredState enabled for all_users
@@ -633,7 +633,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_2 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 4: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users, 
@@ -648,7 +648,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 5: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -664,7 +664,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 6: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState disabled for all_users,
@@ -679,7 +679,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 7: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users,
@@ -694,7 +694,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}    
         ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 
@@ -710,7 +710,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 9: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -725,7 +725,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 10: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for all_users,
@@ -740,7 +740,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 
@@ -756,7 +756,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 12: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -771,7 +771,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 13: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -787,7 +787,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 14: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -803,7 +803,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 15: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -819,7 +819,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 16: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -835,7 +835,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 17: MicrosoftAuthEnabled, isSoftwareOathEnabled true, 
@@ -851,7 +851,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_16 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 18: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -867,7 +867,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 
@@ -884,7 +884,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 20: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -900,7 +900,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 21: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -916,7 +916,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 22: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -932,7 +932,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 23: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -948,7 +948,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 24: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -964,7 +964,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 25: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -980,7 +980,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 26: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -996,7 +996,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 27: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -1012,7 +1012,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 28: MicrosoftAuthEnabled, isSoftwareOathEnabled false,
@@ -1028,7 +1028,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 29: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -1044,7 +1044,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 30: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -1060,7 +1060,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, PASS, true) == true
+    TestResult("MS.AAD.3.3v2", Output, PASS, true) == true
 }
 
 # Test 31: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -1076,7 +1076,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 # Test 32: MicrosoftAuthEnabled, isSoftwareOathEnabled false, 
@@ -1092,7 +1092,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 
@@ -1109,7 +1109,7 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_16 if {
         {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
-    TestResult("MS.AAD.3.3v1", Output, FAIL, false) == true
+    TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
 }
 
 #--

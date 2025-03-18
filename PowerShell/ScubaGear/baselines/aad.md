@@ -231,7 +231,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 #### MS.AAD.3.3v2
 If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
-<!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.3v2; Criticality: SHALL -->
 - _Rationale:_ This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
