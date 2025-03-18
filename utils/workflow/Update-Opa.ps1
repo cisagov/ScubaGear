@@ -38,6 +38,7 @@ function Confirm-OpaUpdateRequirements {
     if ($LatestOPAVersion -gt $CurrentOPAVersion) {
         if (-not $OPAVersionBranchExists) {
             Write-Warning "OPA version update required."
+            $UpdateRequired = $true
         }
         else {
             Write-Warning "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."

@@ -38,20 +38,20 @@ jobs:
                 . utils/workflow/Update-Opa.ps1
                 $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath .
 
-                Write-Output "LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
-                Write-Output "OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
-                Write-Output "UpdateRequired = $ReturnValues["UpdateRequired"]
-                Write-Output "CurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
+                $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
+                $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
+                $UpdateRequired = $ReturnValues["UpdateRequired"]
+                $CurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
+
+                Write-Output "LatestOPAVersion = $LatestOPAVersion"
+                Write-Output "OPAVersionBumpBranch = $OPAVersionBumpBranch"
+                Write-Output "UpdateRequired = $UpdateRequired"
+                Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
 
                 echo latestopaversion=$LatestOPAVersion >> $env:GITHUB_OUTPUT
                 echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
                 echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
                 echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
-
-                # Note that git-ls will always fail with exit code 1 when the
-                # branch does not exist. Setting exit 0 (success) at the end
-                # of this workflow to prevent that error.
-                # exit 0
             # - name: Update OPA version in ScubaGear
             #   id: update-opa-version
             #   if: steps.determine-update-required.outputs.updaterequired == 'true'
