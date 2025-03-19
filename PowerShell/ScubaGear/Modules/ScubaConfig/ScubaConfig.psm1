@@ -49,11 +49,11 @@ class ScubaConfig {
     }
 
     static [string]GetOpaVersion() {
-        return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
+        return [ScubaConfig]::ScubaDefaults('DefaultOPAVersion')
     }
 
     static SetOpaVersion([string]$NewVersion) {
-        [ScubaConfig]::ScubaDefault('DefaultOPAVersion') = $NewVersion
+        [ScubaConfig]::ScubaDefaults('DefaultOPAVersion') = $NewVersion
         return
     }
 

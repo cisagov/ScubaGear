@@ -96,6 +96,8 @@ function Update-OpaVersion {
     # }
 
     Write-Warning "Done.."
+    $NewCurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
+    Write-Warning "New version is $NewCurrentOPAVersion"
 
     # # Update Acceptable Versions in Support Module
     # $SupportModulePath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
