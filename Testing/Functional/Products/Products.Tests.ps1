@@ -243,9 +243,11 @@ Describe "Policy Checks for <ProductName>" {
             }
             # Ensure case matches driver in test plan
             elseif ('RunScuba' -eq $TestDriver){
-                Write-Debug "Driver: RunScuba"
+                Write-Warning "Driver: RunScuba"
                 SetConditions -Conditions $Preconditions.ToArray()
                 RunScuba
+                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                $script:OutputFolder = $ReportFolders[0].Name
             }
             # ScubaCached driver using shared cache
             elseif ('ScubaCached' -eq $TestDriver){
