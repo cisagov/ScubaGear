@@ -1,0 +1,1 @@
+Connect-EXOHelper [-M365Environment] <string> [[-ServicePrincipalParams] <hashtable>] [<CommonParameters>]
