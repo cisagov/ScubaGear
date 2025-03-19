@@ -69,7 +69,7 @@ jobs:
                 Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
 
                 . utils/workflow/Update-Opa.ps1
-                $ReturnValues = Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
+                Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
 
             #     # # Replace Default version in Config Module
             #     # $ScubaConfigPath = '.\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'

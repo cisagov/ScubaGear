@@ -175,7 +175,6 @@ class ScubaConfig {
         if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
             $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
         }
-
         return
     }
 
@@ -185,7 +184,6 @@ class ScubaConfig {
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
-
         return
     }
 

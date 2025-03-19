@@ -83,59 +83,45 @@ function Update-OpaVersion {
     # Set the version of OPA defined in the config class.
     [ScubaConfig]::SetOpaVersion($LatestOpaVersion)
 
-    # $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
-    # $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-    # $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
-    # $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
-    # if ($ScubaConfigModule -match $DefaultVersionPattern) {
-    #     $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOpaVersion'"
-    #     Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
-    # }
-    # else {
-    #     throw "Fatal Error: Couldn't find the default OPA version in the ScubaConfig."
-    # }
-
-    Write-Warning "Done.."
-    $NewCurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
-    Write-Warning "New version is $NewCurrentOPAVersion"
-
-    # # Update Acceptable Versions in Support Module
+    # Update Acceptable Versions in Support Module
     # $SupportModulePath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
-    # $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
-    # $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
-    # $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
-    # $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
+    $SupportModulePath = Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear/Modules/Support/Support.psm1'
+    Write-Warning "spt mod path $SupportModulePath"
+    $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
+    $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
+    $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
+    $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
 
-    # (Get-Content -Path $SupportModulePath) | ForEach-Object {
-    #     $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
-    #     if ($EndAcceptableVarMatch) {
-    #         $VersionsLength = ($_ -split ",").length
+    (Get-Content -Path $SupportModulePath) | ForEach-Object {
+        $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
+        if ($EndAcceptableVarMatch) {
+            $VersionsLength = ($_ -split ",").length
 
-    #         # Split the line if we reach our version limit per line
-    #         # in the the file. This is to prevent long lines.
-    #         if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
-    #             # Splitting lines; Current and latest OPA Version will start on the next line
-    #             $VersionsArr = $_ -split ","
-    #             # Create a new line
-    #             # Then add the new version on the next line
-    #             ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
-    #             "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
-    #         }
-    #         elseif ($VersionsLength -eq 1) {
-    #             # if the default version is the only acceptable version
-    #             # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
-    #             $VersionsArr = $_ -split "="
-    #             $VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-    #         }
-    #         else {
-    #             # No Splitting lines; Appending new Current OPA version to acceptable version
-    #             $VersionsArr = $_ -split ","
-    #             $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
-    #             $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-    #         }
-    #     }
-    #     else {
-    #         $_
-    #     }
-    # } | Set-Content $SupportModulePath
+            # Split the line if we reach our version limit per line
+            # in the the file. This is to prevent long lines.
+            if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
+                # Splitting lines; Current and latest OPA Version will start on the next line
+                $VersionsArr = $_ -split ","
+                # Create a new line
+                # Then add the new version on the next line
+                ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
+                "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
+            }
+            elseif ($VersionsLength -eq 1) {
+                # if the default version is the only acceptable version
+                # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
+                $VersionsArr = $_ -split "="
+                $VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+            }
+            else {
+                # No Splitting lines; Appending new Current OPA version to acceptable version
+                $VersionsArr = $_ -split ","
+                $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
+                $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
+            }
+        }
+        else {
+            $_
+        }
+    } | Set-Content $SupportModulePath
 }
