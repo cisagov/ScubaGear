@@ -52,6 +52,7 @@ The standard and strict preset security policies SHALL be enabled.
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-6a, SI-3a, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -69,6 +70,7 @@ All users SHALL be added to Exchange Online Protection (EOP) in either the stand
   - The standard and strict preset security policies must be enabled as directed
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming, as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-6a, SI-3a, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -85,6 +87,7 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
   - The standard and strict preset security policies must be enabled as directed
     by [MS.DEFENDER.1.1v1](#msdefender11v1) for protections to be applied.
   - Specific user accounts, except for sensitive accounts, MAY be exempt from the preset policies, provided they are added to one or more custom policies offering comparable protection. These users might need flexibility not offered by the preset policies. Their accounts should be added to a custom policy conforming as closely as possible to the settings used by the preset policies. See the **Resources** section for more details on configuring policies.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-6a, SI-3a, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -99,6 +102,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-6a, SI-3a, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -112,6 +116,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
           sensitive accounts.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-6a, SI-3a, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -224,6 +229,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -238,6 +244,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -252,6 +259,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -344,6 +352,7 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
 <!--Policy: MS.DEFENDER.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -410,6 +419,7 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
                provide a way for agencies to detect and prevent
                unauthorized disclosures.
 - _Last modified:_ November 2024
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -425,6 +435,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -441,6 +452,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-3, SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -457,6 +469,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 - _Last modified:_ June 2023
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.DEFENDER.4.1v2](#msdefender41v2).
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AT-2b
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -470,6 +483,7 @@ A list of apps that are restricted from accessing files protected by DLP policy 
                possible to use DLP policies to restrict those apps' access
                to sensitive information on endpoints using Defender.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
   - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
@@ -493,6 +507,7 @@ information by restricted apps and unwanted Bluetooth applications.
   - This action can only be included if at least one device is onboarded
     to the agency tenant. Otherwise, the option to block restricted apps will
     not be available.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-19a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
   - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
@@ -690,6 +705,7 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
@@ -700,6 +716,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
@@ -796,6 +813,7 @@ Unified Audit logging SHALL be enabled.
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
 - _Last modified:_ March 2025
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
@@ -812,6 +830,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
           Additional record types require custom audit retention policies.
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AU-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
