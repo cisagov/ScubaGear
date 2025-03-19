@@ -39,7 +39,7 @@ Describe "Update OPA" {
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
         # Find the updated line
-        $UpdatedLine = Select-String -Path $SupportPath -Pattern # End Versions
+        $UpdatedLine = Select-String -Path $SupportPath -Pattern "# End Versions"
         Write-Warning "The updated line is $UpdatedLine"
         $UpdatedLine | Should -Contain "1.0.2"
     }
