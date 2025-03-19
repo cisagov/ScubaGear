@@ -38,13 +38,12 @@ Describe "Update OPA" {
         # Call the function
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
-        # Find the specific lines
+        # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
         # There should be only 1 line in the support module that matches
         $MatchedLines.Count | Should -Be 1
-        # Get that 1 line and test
+        # Get that 1 line and test to see if it contains the new value.
         $UpdatedLine = $MatchedLines[0].Line
-        Write-Warning "The updated line is $UpdatedLine"
-        $UpdatedLine | Should -Match ".1.0.2"
+        $UpdatedLine | Should -Match ".1.0.2"  # This is a regex test.
     }
 }

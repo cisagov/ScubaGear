@@ -102,14 +102,12 @@ function Update-OpaVersion {
                 # Create a new line
                 # Then add the new version on the next line
                 ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
-                # "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
-                "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
+                "    '$CurrentOpaVersion', $LatestOpaVersion $END_VERSIONS_COMMENT" # 4 space indentation
             }
             elseif ($VersionsLength -eq 1) {
                 # if the default version is the only acceptable version
                 # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
                 $VersionsArr = $_ -split "="
-                # $VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
                 VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $LatestOpaVersion $END_VERSIONS_COMMENT"
             }
             else {
