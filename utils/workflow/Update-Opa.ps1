@@ -87,7 +87,6 @@ function Update-OpaVersion {
     $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
     $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
     $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
-    $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
 
     (Get-Content -Path $SupportModulePath) | ForEach-Object {
         $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
@@ -134,6 +133,7 @@ function New-OpaUpdatePr {
         .PARAMETER LatestOpaVersion
             The new version in ScubaConfig used to update
         .PARAMETER OpaVersionBumpBranch
+            The branch in the repo that will update the version of OPA
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -160,7 +160,6 @@ function New-OpaUpdatePr {
     $NewMotivation = "- Bump to the latest OPA version v$($LatestOpaVersion) `n"
     $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
 
-    $Body = "This is a test body fear me"
     $PrTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
         $DescriptionRegex = $_ -match $Description
         $MotivationRegex = $_ -match $Motivation
