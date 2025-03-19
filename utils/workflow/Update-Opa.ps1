@@ -76,6 +76,9 @@ function Update-OpaVersion {
         [string]
         $LatestOpaVersion
     )
+
+    Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
+
     # Replace Default version in Config Module
     $ScubaConfigPath = Join-Path -path $RepoPath PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"

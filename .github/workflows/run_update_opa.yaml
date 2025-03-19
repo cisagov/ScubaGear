@@ -65,6 +65,9 @@ jobs:
                 $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
                 $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
 
+                Write-Output "LatestOPAVersion = $LatestOPAVersion"
+                Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
+
                 . utils/workflow/Update-Opa.ps1
                 $ReturnValues = Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
 
