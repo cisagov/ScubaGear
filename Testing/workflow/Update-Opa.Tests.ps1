@@ -20,4 +20,14 @@ Describe "Update OPA" {
         $LatestOPAVersion | Should -Be "1.2.0"
         $ActualCurrentOPAVersion | Should -Be $ExpectedCurrentOPAVersion
     }
+    It "Update OPA version in config module" {
+        # Setup important paths
+        $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
+        # Call the function
+        . $ScriptPath
+        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.0" -LatestOpaVersion "1.1.1"
+        $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
+        $CurrentOPAVersion | Should -Be "1.1.1"
+    }
 }
