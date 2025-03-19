@@ -46,4 +46,5 @@ Describe "Update OPA" {
         $UpdatedLine = $MatchedLines[0].Line
         $UpdatedLine | Should -Match ".1.0.2"  # This is a regex test.
     }
+    # TODO add unit test for New-OpaUpdatePr, if possible.
 }

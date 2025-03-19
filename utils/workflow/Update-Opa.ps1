@@ -175,12 +175,15 @@ function New-OpaUpdatePr {
             $_ -replace $Testing, $NewTesting
         }
         elseif ($RemoveHeaderRegex) {
-        $_ -replace $RemoveHeader, ""
+            $_ -replace $RemoveHeader, ""
         }
         else {
             $_ + "`n"
-            }
+        }
     }
+    # Remove UTF-8 content from the template emoji, which is not being rendered correctly.
+    $PrTemplateContent = $PrTemplateContent -replace '[^\x00-\x7F]', ''
+
     git config --global user.email "action@github.com"
     git config --global user.name "GitHub Action"
     git checkout -b "$($OpaVersionBumpBranch)"
