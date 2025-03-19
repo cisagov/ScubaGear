@@ -26,8 +26,21 @@ Describe "Update OPA" {
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
         # Call the function
         . $ScriptPath
-        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.0" -LatestOpaVersion "1.1.1"
+        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
         $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
-        $CurrentOPAVersion | Should -Be "1.1.1"
+        $CurrentOPAVersion | Should -Be "1.0.2"
+    }
+    It "Update acceptable versions in support module" {
+        # Setup important paths
+        $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
+        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
+        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Suport/Support.psm1'
+        # Call the function
+        . $ScriptPath
+        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
+        # Find the updated line
+        $UpdatedLine = Select-String -Path $SupportPath -Pattern # End Versions
+        Write-Warning "The updated line is $UpdatedLine"
+        $UpdatedLine | Should -Contain "1.0.2"
     }
 }

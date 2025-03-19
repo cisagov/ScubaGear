@@ -79,14 +79,11 @@ function Update-OpaVersion {
 
     Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
 
-    # Replace Default version in Config Module
     # Set the version of OPA defined in the config class.
     [ScubaConfig]::SetOpaVersion($LatestOpaVersion)
 
     # Update Acceptable Versions in Support Module
-    # $SupportModulePath = '.\PowerShell\ScubaGear\Modules\Support\Support.psm1'
     $SupportModulePath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/Support/Support.psm1'
-    Write-Warning "spt mod path $SupportModulePath"
     $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
     $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
     $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
