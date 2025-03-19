@@ -45,6 +45,6 @@ Describe "Update OPA" {
         # Get that 1 line and test
         $UpdatedLine = $MatchedLines[0].Line
         Write-Warning "The updated line is $UpdatedLine"
-        $UpdatedLine | Should -Contain "1.0.2"
+        $UpdatedLine | Should -Match ".1.0.2"
     }
 }
