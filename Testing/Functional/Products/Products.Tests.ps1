@@ -240,6 +240,9 @@ Describe "Policy Checks for <ProductName>" {
                 Set-Content -Path $TestConfigFilePath -Value ($ScubaConfig | ConvertTo-Yaml)
                 SetConditions -Conditions $Preconditions.ToArray()
                 Invoke-SCuBA -ConfigFilePath $TestConfigFilePath -Quiet -KeepIndividualJSON
+                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                $script:OutputFolder = $ReportFolders[0].Name
+
             }
             # Ensure case matches driver in test plan
             elseif ('RunScuba' -eq $TestDriver){
@@ -248,6 +251,8 @@ Describe "Policy Checks for <ProductName>" {
                 RunScuba
                 $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                 $script:OutputFolder = $ReportFolders[0].Name
+                Write-Warning "Created Output folder (RunScuba) $script:OutputFolder"
+
             }
             # ScubaCached driver using shared cache
             elseif ('ScubaCached' -eq $TestDriver){
@@ -259,6 +264,7 @@ Describe "Policy Checks for <ProductName>" {
                     RunScuba
                     $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
                     $script:OutputFolder = $ReportFolders[0].Name
+                    Write-Warning "Created Output folder (ScubaCached) $script:OutputFolder"
                 }
 
                 else {
@@ -280,7 +286,7 @@ Describe "Policy Checks for <ProductName>" {
                     Write-Warning "ModifiedProviderSettingsExport.json file was created at $CreationTime."
                 }
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath $script:OutputFolder -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
 
                 # Delete the modified JSON
                 # This is necessary so that when the next test scenario executes, it will start with a fresh cached file ProviderSettingsExport.json
