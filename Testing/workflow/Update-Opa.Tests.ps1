@@ -34,7 +34,7 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Suport/Support.psm1'
+        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1'
         # Call the function
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
