@@ -122,3 +122,71 @@ function Update-OpaVersion {
         }
     } | Set-Content $SupportModulePath
 }
+
+function New-OpaUpdatePr {
+    <#
+        .SYNOPSIS
+            Creates a new PR with the changes
+        .PARAMETER RepoPath
+            Path to the repo
+        .PARAMETER CurrentOpaVersion
+            The old version in ScubaConfig that needs to be updated
+        .PARAMETER LatestOpaVersion
+            The new version in ScubaConfig used to update
+        .PARAMETER OpaVersionBumpBranch
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $RepoPath,
+        [Parameter(Mandatory = $true)]
+        [string]
+        $CurrentOpaVersion,
+        [Parameter(Mandatory = $true)]
+        [string]
+        $LatestOpaVersion,
+        [Parameter(Mandatory = $true)]
+        [string]
+        $OpaVersionBumpBranch
+    )
+
+    # Create the PR Body
+    $PRTemplatePath = Join-Path -Path $RepoPath -ChildPath '.github/pull_request_template.md'
+    $Description = '<!-- Describe the "what" of your changes in detail. -->'
+    $Motivation = '<!-- Why is this change required\? -->'
+    $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
+    $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
+    $NewDescription = "- This pull request was created by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
+    $NewMotivation = "- Bump to the latest OPA version v$($LatestOpaVersion) `n"
+    $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
+
+    $Body = "This is a test body fear me"
+    $PrTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
+        $DescriptionRegex = $_ -match $Description
+        $MotivationRegex = $_ -match $Motivation
+        $TestingRegex = $_ -match $Testing
+        $RemoveHeaderRegex = $_ -match $RemoveHeader # removes unneeded new line
+        if ($DescriptionRegex) {
+            $_ -replace $Description, $NewDescription
+        }
+        elseif ($MotivationRegex) {
+            $_ -replace $Motivation, $NewMotivation
+        }
+        elseif ($TestingRegex) {
+            $_ -replace $Testing, $NewTesting
+        }
+        elseif ($RemoveHeaderRegex) {
+        $_ -replace $RemoveHeader, ""
+        }
+        else {
+            $_ + "`n"
+            }
+    }
+    git config --global user.email "action@github.com"
+    git config --global user.name "GitHub Action"
+    git checkout -b "$($OpaVersionBumpBranch)"
+    git add .
+    git commit -m "Bump OPA version from v$($CurrentOpaVersion) to  v$($LatestOpaVersion)"
+    git push origin $OpaVersionBumpBranch
+    gh pr create -B main -H $OpaVersionBumpBranch --title "Bump OPA version from v$($CurrentOpaVersion) to v$($LatestOpaVersion)" --body "${PrTemplateContent}" --label "version bump"
+}

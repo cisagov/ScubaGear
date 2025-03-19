@@ -62,11 +62,8 @@ jobs:
               id: update-opa-version
               if: steps.determine-update-required.outputs.updaterequired == 'true'
               run: |
-                $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
-                $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
-
-                Write-Output "LatestOPAVersion = $LatestOPAVersion"
-                Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
+                $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+                $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
 
                 . utils/workflow/Update-Opa.ps1
                 Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
@@ -74,50 +71,53 @@ jobs:
             - name: Create the OPA update PR
               if: steps.determine-update-required.outputs.updaterequired == 'true'
               run: |
-                $LatestOPAVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
-                $CurrentOPAVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
-                $OPAVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
+                $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+                $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+                $OpaVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
 
-                #
-                # Create the PR Body
-                #
-                $PRTemplatePath = '.\.github\pull_request_template.md'
+                . utils/workflow/Update-Opa.ps1
+                New-OpaUpdatePr -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion -OpaVersionBumpBranch $OpaVersionBumpBranch
 
-                $Description = '<!-- Describe the "what" of your changes in detail. -->'
-                $Motivation = '<!-- Why is this change required\? -->'
-                $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
-                $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
+                # #
+                # # Create the PR Body
+                # #
+                # $PRTemplatePath = '.\.github\pull_request_template.md'
 
-                $NewDescription = "- This pull request was created by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
-                $NewMotivation = "- Bump to the latest OPA version v$($LatestOPAVersion) `n"
-                $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
+                # $Description = '<!-- Describe the "what" of your changes in detail. -->'
+                # $Motivation = '<!-- Why is this change required\? -->'
+                # $Testing = '<!-- see how your change affects other areas of the code, etc. -->'
+                # $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
 
-                $Body = "This is a test body fear me"
-                $PRTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
-                    $DescriptionRegex = $_ -match $Description
-                    $MotivationRegex = $_ -match $Motivation
-                    $TestingRegex = $_ -match $Testing
-                    $RemoveHeaderRegex = $_ -match $RemoveHeader # removes unneeded new line
-                    if ($DescriptionRegex) {
-                        $_ -replace $Description, $NewDescription
-                    }
-                    elseif ($MotivationRegex) {
-                        $_ -replace $Motivation, $NewMotivation
-                    }
-                    elseif ($TestingRegex) {
-                        $_ -replace $Testing, $NewTesting
-                    }
-                    elseif ($RemoveHeaderRegex) {
-                    $_ -replace $RemoveHeader, ""
-                    }
-                    else {
-                        $_ + "`n"
-                        }
-                }
-                git config --global user.email "action@github.com"
-                git config --global user.name "GitHub Action"
-                git checkout -b "$($OPAVersionBumpBranch)"
-                git add .
-                git commit -m "Bump OPA version from v$($CurrentOPAVersion) to  v$($LatestOPAVersion)"
-                git push origin $OPAVersionBumpBranch
-                gh pr create -B main -H $OPAVersionBumpBranch --title "Bump OPA version from v$($CurrentOPAVersion) to v$($LatestOPAVersion)" --body "${PRTemplateContent}" --label "version bump"
+                # $NewDescription = "- This pull request was created by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
+                # $NewMotivation = "- Bump to the latest OPA version v$($LatestOPAVersion) `n"
+                # $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
+
+                # $Body = "This is a test body fear me"
+                # $PRTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
+                #     $DescriptionRegex = $_ -match $Description
+                #     $MotivationRegex = $_ -match $Motivation
+                #     $TestingRegex = $_ -match $Testing
+                #     $RemoveHeaderRegex = $_ -match $RemoveHeader # removes unneeded new line
+                #     if ($DescriptionRegex) {
+                #         $_ -replace $Description, $NewDescription
+                #     }
+                #     elseif ($MotivationRegex) {
+                #         $_ -replace $Motivation, $NewMotivation
+                #     }
+                #     elseif ($TestingRegex) {
+                #         $_ -replace $Testing, $NewTesting
+                #     }
+                #     elseif ($RemoveHeaderRegex) {
+                #     $_ -replace $RemoveHeader, ""
+                #     }
+                #     else {
+                #         $_ + "`n"
+                #         }
+                # }
+                # git config --global user.email "action@github.com"
+                # git config --global user.name "GitHub Action"
+                # git checkout -b "$($OPAVersionBumpBranch)"
+                # git add .
+                # git commit -m "Bump OPA version from v$($CurrentOPAVersion) to  v$($LatestOPAVersion)"
+                # git push origin $OPAVersionBumpBranch
+                # gh pr create -B main -H $OPAVersionBumpBranch --title "Bump OPA version from v$($CurrentOPAVersion) to v$($LatestOPAVersion)" --body "${PRTemplateContent}" --label "version bump"
