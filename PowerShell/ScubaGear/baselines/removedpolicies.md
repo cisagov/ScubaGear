@@ -28,7 +28,10 @@ Additional terminology in this document specific to their respective SCBs are to
 
 ### Removed Policies 
 
-N/A
+#### MS.AAD.5.4v1
+Group owners SHALL NOT be allowed to consent to applications.
+- _Removal date:_ March 2025
+- _Removal rationale:_ Microsoft announced via MC712143 that it will no longer be possible for group owners to consent to applications. All references including the policy, implementation steps, and section have been removed as the setting is no longer present.
 
 # Defender
 
@@ -70,10 +73,5 @@ Users SHALL be prevented from running custom scripts on personal sites (aka OneD
 Users SHALL be prevented from running custom scripts on self-service created sites.
 - _Removal date:_ November 2024
 - _Removal rationale:_ Microsoft has noted that after November 2024 it will no longer be possible to prevent SharePoint in resetting custom script settings to its original value (disabled) for all sites. All references including the policy, implementation steps, and section, by direction of CISA and Microsoft, have been removed as the setting will be automatically reverted back to **Blocked** within 24 hours.
-
-#### MS.AAD.5.4v1
-Group owners SHALL NOT be allowed to consent to applications.
-- _Removal date:_ March 2025
-- _Removal rationale:_ Microsoft announced via MC712143 that it will no longer be possible for group owners to consent to applications. All references including the policy, implementation steps, and section have been removed as the setting is no longer present.
 
 **`TLP:CLEAR`**
