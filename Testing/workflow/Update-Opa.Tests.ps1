@@ -43,7 +43,7 @@ Describe "Update OPA" {
         # There should be only 1 line in the support module that matches
         $MatchedLines.Count | Should -Be 1
         # Get that 1 line and test
-        $UpdatedLine = $MatchedLines[0]
+        $UpdatedLine = $MatchedLines[0].Line
         Write-Warning "The updated line is $UpdatedLine"
         $UpdatedLine | Should -Contain "1.0.2"
     }
