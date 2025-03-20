@@ -24,19 +24,19 @@ Additional terminology in this document specific to their respective SCBs are to
 6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
 7. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
 
-# Azure Active Directory / Entra ID
+## Azure Active Directory / Entra ID
 
 ### Removed Policies 
 
 N/A
 
-# Defender
+## Defender
 
 ### Removed Policies 
 
 N/A
 
-# Exchange Online
+## Exchange Online
 
 ### Removed Policies 
 #### MS.EXO.2.1v1
@@ -44,20 +44,20 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
 - _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
-# Power BI
+## Power BI
 
 ### Removed Policies 
 
 N/A
 
 
-# PowerPlatform
+## PowerPlatform
 
 ### Removed Policies 
 
 N/A
 
-# SharePoint Online
+## SharePoint Online
 
 ### Removed Policies 
 
