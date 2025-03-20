@@ -48,10 +48,6 @@ function Confirm-OpaUpdateRequirements {
         "CurrentOPAVersion" = $CurrentOPAVersion
     }
     return $ReturnValues
-    # Note that git-ls will always fail with exit code 1 when the
-    # branch does not exist. Setting exit 0 (success) at the end
-    # of this workflow to prevent that error.
-    exit 0
 }
 
 function Update-OpaVersion {
@@ -181,7 +177,8 @@ function New-OpaUpdatePr {
             $_ + "`n"
         }
     }
-    # Remove UTF-8 content from the template emoji, which is not being rendered correctly.
+    # Remove UTF-8 content from the template that comes from the emoji,
+    # because it is not being rendered correctly.
     $PrTemplateContent = $PrTemplateContent -replace '[^\x00-\x7F]', ''
 
     git config --global user.email "action@github.com"

@@ -14,63 +14,64 @@ on:
 permissions: read-all
 
 jobs:
-    update-opa-dependency:
-        name: Update OPA Dependency
-        runs-on: windows-latest
-        permissions:
-            contents: write
-            pull-requests: write
-        defaults:
-            run:
-                shell: powershell
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Determine if OPA update is required
-              id: determine-update-required
-              continue-on-error: true
-              shell: powershell
-              run: |
-                . utils/workflow/Update-Opa.ps1
-                $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath .
+  update-opa-dependency:
+    name: Update OPA Dependency
+    runs-on: windows-latest
+    permissions:
+        contents: write
+        pull-requests: write
+    defaults:
+        run:
+            shell: powershell
+    env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Determine if OPA update is required
+        id: determine-update-required
+        continue-on-error: true
+        shell: powershell
+        run: |
+            . utils/workflow/Update-Opa.ps1
+            $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath .
 
-                $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
-                $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
-                $UpdateRequired = $ReturnValues["UpdateRequired"]
-                $CurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
+            $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
+            $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
+            $UpdateRequired = $ReturnValues["UpdateRequired"]
+            $CurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
 
-                Write-Output "LatestOPAVersion = $LatestOPAVersion"
-                Write-Output "OPAVersionBumpBranch = $OPAVersionBumpBranch"
-                Write-Output "UpdateRequired = $UpdateRequired"
-                Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
+            Write-Output "LatestOPAVersion = $LatestOPAVersion"
+            Write-Output "OPAVersionBumpBranch = $OPAVersionBumpBranch"
+            Write-Output "UpdateRequired = $UpdateRequired"
+            Write-Output "CurrentOPAVersion = $CurrentOPAVersion"
 
-                echo latestopaversion=$LatestOPAVersion >> $env:GITHUB_OUTPUT
-                echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
-                echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
-                echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
+            echo latestopaversion=$LatestOPAVersion >> $env:GITHUB_OUTPUT
+            echo opaversionbumpbranch=$OPAVersionBumpBranch >> $env:GITHUB_OUTPUT
+            echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
+            echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
 
-                # Note that git-ls will always fail with exit code 1 when the
-                # branch does not exist. This try-catch will catch that error
-                # and intentionally ignore it, because the return value will
-                # handle the problem of a missing branch.
-                exit 0
-            - name: Update OPA version in ScubaGear
-              if: steps.determine-update-required.outputs.updaterequired == 'true'
-              run: |
-                $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
-                $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+            # Note that git-ls will always fail with exit code 1 when the
+            # branch does not exist. This try-catch will catch that error
+            # and intentionally ignore it, because the return value will
+            # handle the problem of a missing branch.
+            exit 0
 
-                . utils/workflow/Update-Opa.ps1
-                Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
+      - name: Update OPA version in ScubaGear
+        if: steps.determine-update-required.outputs.updaterequired == 'true'
+        run: |
+            $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+            $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
 
-            - name: Create the OPA update PR
-              if: steps.determine-update-required.outputs.updaterequired == 'true'
-              run: |
-                $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
-                $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
-                $OpaVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
+            . utils/workflow/Update-Opa.ps1
+            Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
 
-                . utils/workflow/Update-Opa.ps1
-                New-OpaUpdatePr -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion -OpaVersionBumpBranch $OpaVersionBumpBranch
+      - name: Create the OPA update PR
+        if: steps.determine-update-required.outputs.updaterequired == 'true'
+        run: |
+            $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
+            $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
+            $OpaVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
+
+            . utils/workflow/Update-Opa.ps1
+            New-OpaUpdatePr -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion -OpaVersionBumpBranch $OpaVersionBumpBranch

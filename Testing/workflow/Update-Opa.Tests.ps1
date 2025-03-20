@@ -1,6 +1,6 @@
 using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 
-# The purpose of this test is to verify that the functions used to update OPA are working.
+# The purpose of these tests is to verify that the functions used to update OPA are working.
 
 Describe "Update OPA" {
     It "Determine if OPA needs to be updated" {
@@ -13,6 +13,7 @@ Describe "Update OPA" {
         # Call the function
         . $ScriptPath
         $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath $RepoRootPath
+        # Check the results
         $ActualCurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
         $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
         # The latest version of OPA is found here:
@@ -27,6 +28,7 @@ Describe "Update OPA" {
         # Call the function
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
+        # Check the results
         $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
         $CurrentOPAVersion | Should -Be "1.0.2"
     }
@@ -38,6 +40,7 @@ Describe "Update OPA" {
         # Call the function
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
+        # Check the results
         # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
         # There should be only 1 line in the support module that matches
@@ -46,5 +49,4 @@ Describe "Update OPA" {
         $UpdatedLine = $MatchedLines[0].Line
         $UpdatedLine | Should -Match ".1.0.2"  # This is a regex test.
     }
-    # TODO add unit test for New-OpaUpdatePr, if possible.
 }
