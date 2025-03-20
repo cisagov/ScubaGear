@@ -15,6 +15,7 @@ on:
         paths:
             - ".github/workflows/run_smoke_test.yaml"
             - "utils/workflow/Invoke-SmokeTests.ps1"
+            - "Testing/Functional/SmokeTest/**"
         branches:
             - "main"
             - "*smoke*"
