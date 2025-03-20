@@ -16,6 +16,7 @@
 #>
 
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationName', Justification = 'False positive as rule does not scan child scopes')]
 param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
@@ -29,7 +30,6 @@ param (
 
 Import-Module Selenium
 
-# Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
 Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for this organization" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
 ){

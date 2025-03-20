@@ -15,6 +15,7 @@ on:
         paths:
             - ".github/workflows/run_smoke_test.yaml"
             - "utils/workflow/Invoke-SmokeTests.ps1"
+            - "Testing/Functional/SmokeTest/**"
         branches:
             - "main"
             - "*smoke*"
@@ -31,7 +32,7 @@ jobs:
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         defaults:
             run:
-                shell: powershell
+                shell: pwsh  # Powershell 7 required for hashtable
         permissions:
             contents: read
         steps:
@@ -39,7 +40,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Execute tests
               run: |
-                $AutomationCredentials = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
-                $TestTenants = $AutomationCredentials.TestTenants
                 . utils/workflow/Invoke-SmokeTests.ps1
-                Invoke-SmokeTests -TestTenants $TestTenants
+                # Use a hash table, as it is easy to extract data for configuring
+                # the smoke tests.
+                $Tenants = ConvertFrom-Json -InputObject $env:SCUBA_GITHUB_AUTOMATION_CREDS -AsHashTable
+                Invoke-SmokeTests -Tenants $Tenants
