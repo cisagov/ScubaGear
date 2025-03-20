@@ -60,6 +60,7 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 - _Rationale:_ An external participant with control of a shared screen could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-17a
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -70,6 +71,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
@@ -81,6 +83,7 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
 - _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility. For example, B2B guest users and trusted partner members may be admitted automatically into meetings organized by authorized users.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -91,6 +94,7 @@ Internal users SHOULD be admitted automatically.
 - _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.  
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -101,6 +105,7 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 - _Rationale:_ Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.  
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -111,6 +116,7 @@ Meeting recording SHOULD be disabled.
 - _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-7
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -121,6 +127,7 @@ Record an event SHOULD NOT be set to Always record.
 - _Rationale:_ Allowing to always record Live Events can pose data leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-21a
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -270,6 +277,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 <!--Policy: MS.TEAMS.2.1v1; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -282,6 +290,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
@@ -293,6 +302,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
@@ -384,6 +394,7 @@ Contact with Skype users SHALL be blocked.
 - _Rationale:_ Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk.  By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
 - _Last modified:_ July 2023
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SA-22
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
 
@@ -423,6 +434,7 @@ Teams email integration SHALL be disabled.
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-8, SC-7(10)(a), AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
@@ -469,6 +481,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 - _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
 
@@ -479,6 +492,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 - _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
@@ -490,6 +504,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
@@ -596,6 +611,7 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -608,6 +624,7 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
@@ -652,6 +669,7 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 <!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -662,6 +680,7 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 <!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
@@ -726,6 +745,7 @@ URL comparison with a blocklist SHOULD be enabled.
 <!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
@@ -740,6 +760,7 @@ User click tracking SHOULD be enabled.
 <!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AU-12c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
