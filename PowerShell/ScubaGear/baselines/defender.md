@@ -819,9 +819,6 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
-#### MS.DEFENDER.6.3v1
-Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
-
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2023
