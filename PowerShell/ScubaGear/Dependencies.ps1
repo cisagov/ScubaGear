@@ -52,6 +52,7 @@ if ($MissingModules.Count -gt 0){
 
     Write-Warning "
     The required supporting PowerShell modules are not installed with a supported version.
+    ScubaGear may not function properly until the supporting modules are installed.
     Run Initialize-SCuBA to install all required dependencies.
     See Get-Help Initialize-SCuBA for more help."
 
