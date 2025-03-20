@@ -1500,7 +1500,7 @@ Audit Logs in the Cloud Azure log category.
 
 ### License Requirements
 
-- Microsoft 365 Advanced Auditing logging capabilities, including the creation of a custom audit
+- Microsoft 365 Audit (Premium) capabilities, including the creation of a custom audit
   log retention policy, requires E5/G5 licenses or E3/G3 licenses with
   add-on compliance licenses.
 
