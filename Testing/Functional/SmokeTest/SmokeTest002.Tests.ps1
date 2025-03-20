@@ -29,7 +29,8 @@ param (
 
 Import-Module Selenium
 
-Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
+# Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
+Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for this organization" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
 ){
 	BeforeAll {
