@@ -1477,7 +1477,7 @@ gives an agency the necessary visibility to investigate incidents that occurred
 some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
 Audit Logs in the Cloud Azure log category.
 - _Last modified:_ June 2023
-- _Note_: Microsoft 365 Advanced Auditing provides a default audit log retention policy,
+- _Note_: Microsoft 365 Purview (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
           Business, and Microsoft Entra ID audit records for one year.
           Additional record types require custom audit retention policies.
