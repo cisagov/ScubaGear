@@ -51,18 +51,6 @@
 
                         ],
         "Commandlet":  [
-                           "Get-MgBetaDirectorySetting"
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.AAD.5.4v1",
-        "ReportDetails":  "This configuration setting has been deprecated and we are in the process of removing it from the baseline.",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
                            "Get-MgBetaPolicyAuthenticationMethodPolicy"
                        ],
         "Criticality":  "Shall/Not-Implemented",
