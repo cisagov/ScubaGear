@@ -26,7 +26,7 @@ jobs:
         name: Smoke Tests
         runs-on: windows-latest
         env:
-            SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_CREDS }}
+            SCUBA_GITHUB_AUTOMATION_CREDS: ${{ secrets.SCUBA_GITHUB_AUTOMATION_TEDTEST  }}
         # This condition prevents duplicate runs.
         if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
         defaults:

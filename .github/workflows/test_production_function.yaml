@@ -66,8 +66,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST  }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
@@ -87,8 +87,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
@@ -108,8 +108,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
@@ -129,8 +129,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
@@ -150,8 +150,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
@@ -171,8 +171,8 @@ jobs:
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
     secrets:
-      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
-      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX_TEDTEST }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW_TEDTEST }}
       TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
       TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
       NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
