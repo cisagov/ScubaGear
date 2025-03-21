@@ -26,11 +26,11 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1'
-        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1'
+        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
+        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
         $MockCurrentVersion = "1.1.1"
-        $MockLatestVersion = "33.44.55" # This is a fairly unique value.
+        $MockLatestVersion = "33.44.55" # This is a rather unique value.
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
@@ -45,7 +45,7 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1'
+        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
         $MockCurrentVersion = "1.0.1"
         $MockLatestVersion = "1.0.2"
