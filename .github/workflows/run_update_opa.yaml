@@ -1,3 +1,5 @@
+# Purpose: Update ScubaConfig and Support with the current version of OPA.
+
 name: Update OPA executable version if necessary
 
 # Run this workflow M-F at 2:11 a.m UTC 10:11 p.m Eastern Daylight Time
@@ -28,7 +30,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Determine if OPA update is required
+      - name: Determine if update required
         id: determine-update-required
         continue-on-error: true
         shell: powershell
@@ -36,11 +38,13 @@ jobs:
           . utils/workflow/Update-Opa.ps1
           $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath .
 
+          $Summary = $ReturnValues["Summary"]
           $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
           $OPAVersionBumpBranch = $ReturnValues["OPAVersionBumpBranch"]
           $UpdateRequired = $ReturnValues["UpdateRequired"]
           $CurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
 
+          Write-Output $Summary
           Write-Output "LatestOPAVersion = $LatestOPAVersion"
           Write-Output "OPAVersionBumpBranch = $OPAVersionBumpBranch"
           Write-Output "UpdateRequired = $UpdateRequired"
@@ -57,16 +61,19 @@ jobs:
           # handle the problem of a missing branch.
           exit 0
 
-      - name: Update OPA version in ScubaGear
+      - name: Update OPA version
         if: steps.determine-update-required.outputs.updaterequired == 'true'
         run: |
           $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
           $CurrentOpaVersion = "${{ steps.determine-update-required.outputs.currentopaversion }}"
 
           . utils/workflow/Update-Opa.ps1
-          Update-OpaVersion -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion
+          Update-OpaVersion `
+            -RepoPath . `
+            -CurrentOpaVersion $CurrentOpaVersion `
+            -LatestOpaVersion $LatestOPAVersion
 
-      - name: Create the OPA update PR
+      - name: Create new PR
         if: steps.determine-update-required.outputs.updaterequired == 'true'
         run: |
           $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
@@ -74,4 +81,8 @@ jobs:
           $OpaVersionBumpBranch = "${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
 
           . utils/workflow/Update-Opa.ps1
-          New-OpaUpdatePr -RepoPath . -CurrentOpaVersion $CurrentOpaVersion  -LatestOpaVersion $LatestOPAVersion -OpaVersionBumpBranch $OpaVersionBumpBranch
+          New-OpaUpdatePr `
+            -RepoPath . `
+            -CurrentOpaVersion $CurrentOpaVersion `
+            -LatestOpaVersion $LatestOPAVersion `
+            -OpaVersionBumpBranch $OpaVersionBumpBranch
