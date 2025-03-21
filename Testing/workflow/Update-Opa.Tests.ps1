@@ -54,6 +54,8 @@ Describe "Update OPA" {
         $MatchedLines.Count | Should -Be 1
         # Get that 1 line and test to see if it contains the new value.
         $UpdatedLine = $MatchedLines[0].Line
+        Write-Warning "The updated line is"
+        Write-Warning $UpdatedLine
         $UpdatedLine | Should -Match ".`'$global:VersionInScubaConfig`'."  # This is a regex test.
     }
 }
