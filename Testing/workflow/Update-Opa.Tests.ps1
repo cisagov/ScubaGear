@@ -29,8 +29,8 @@ Describe "Update OPA" {
         $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1' -Resolve
         $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
-        $MockCurrentVersion = "1.1.1"
-        $MockLatestVersion = "33.44.55"
+        $MockCurrentVersion = "1.1.1"  # The version inserted into Support
+        $MockLatestVersion = "33.44.55"  # The version inserted into Config
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
@@ -47,8 +47,6 @@ Describe "Update OPA" {
         $MatchedLines.Count | Should -Be 1
         # Get that 1 line and test to see if it contains the new value.
         $UpdatedLine = $MatchedLines[0].Line
-        Write-Warning "The updated line is"
-        Write-Warning $UpdatedLine
         $UpdatedLine | Should -Match ".`'$MockCurrentVersion`'."  # This is a regex test.
     }
 }
