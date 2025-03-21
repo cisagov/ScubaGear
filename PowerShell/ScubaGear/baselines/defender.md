@@ -791,11 +791,11 @@ types to the Unified Audit Log.
 
 ### Policies
 #### MS.DEFENDER.6.1v1
-Microsoft Purview Audit (Standard) logging SHALL be enabled.
+Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Microsoft Purview Audit (Standard) helps ensure agencies have visibility into user actions. Furthermore, enabling the unified audit log is required for government agencies by OMB M-21-31 (referred to therein by its former name, Unified Audit Logs).
-- _Last modified:_ June 2023
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
+- _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
@@ -830,7 +830,6 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
           to meet audit log retention needs.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
-
 
 ### Resources
 
