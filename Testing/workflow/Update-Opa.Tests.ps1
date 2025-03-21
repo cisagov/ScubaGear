@@ -31,7 +31,6 @@ Describe "Update OPA" {
         # Setup mock values
         $MockCurrentVersion = "1.1.1"
         $MockLatestVersion = "33.44.55"
-        $ExpectedCurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
