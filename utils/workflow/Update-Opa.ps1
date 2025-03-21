@@ -8,8 +8,9 @@ function Confirm-OpaUpdateRequirements {
 
     Write-Warning "Determining if OPA needs to be updated..."
 
+    # Assume it does not need to be update until proven otherwise
     $UpdateRequired = $false
-    # Get latest version via REST
+    # Get latest version of OPA via REST
     $LatestOPAVersion = Invoke-RestMethod -Uri "https://api.github.com/repos/open-policy-agent/opa/releases/latest" | Select-Object -ExpandProperty tag_name
     $LatestOPAVersion = $LatestOPAVersion -replace "v", ""
 
@@ -17,7 +18,6 @@ function Confirm-OpaUpdateRequirements {
     $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification='$Temp required to avoid having PS eat the return code from git.')]
     $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
-
     $OPAVersionBranchExists = $false
     if ($LASTEXITCODE -eq 0) {
         $OPAVersionBranchExists = $true
@@ -27,21 +27,23 @@ function Confirm-OpaUpdateRequirements {
     $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
 
     # Check to see if updates are required, and if not, why not.
+    $Summary = ''
     if ($LatestOPAVersion -gt $CurrentOPAVersion) {
         if (-not $OPAVersionBranchExists) {
-            Write-Warning "OPA version update required."
+            $Summary = "OPA version update required."
             $UpdateRequired = $true
         }
         else {
-            Write-Warning "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."
+            $Summary = "Update branch ($($OPAVersionBumpBranch)) already exists; no update required."
         }
     }
     else {
-        Write-Warning "OPA version is already up to date; no update required."
+        $Summary = "OPA version is already up to date; no update required."
     }
 
     # Return values in a hashtable
     $ReturnValues = @{
+        "Summary" = $Summary
         "LatestOPAVersion" = $LatestOPAVersion
         "OPAVersionBumpBranch" = $OPAVersionBumpBranch
         "UpdateRequired" = $UpdateRequired
@@ -75,7 +77,7 @@ function Update-OpaVersion {
 
     Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
 
-    # Replace Default version in Config Module
+    # Replace default version in Config module
     $ScubaConfigPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1'
     $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
     $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
@@ -91,7 +93,7 @@ function Update-OpaVersion {
     Write-Warning "Updating the version of OPA in Support.psm1..."
 
     # Update Acceptable Versions in Support Module
-    # The update is roll the default to the latest version, then put the 
+    # The update is roll the default to the latest version, then put the
     # previous default right before the var in the ACCEPTABLEVERSIONS string
     $SupportModulePath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/Support/Support.psm1'
     $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
@@ -106,10 +108,9 @@ function Update-OpaVersion {
             # Split the line if we reach our version limit per line
             # in the the file. This is to prevent long lines.
             if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
-                # Splitting lines; Current and latest OPA Version will start on the next line
+                # Splitting lines; current and latest OPA Version will start on the next line
                 $VersionsArr = $_ -split ","
-                # Create a new line
-                # Then add the new version on the next line
+                # Create a new line, then add the new version on the next line
                 ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
                 "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
             }
@@ -120,7 +121,7 @@ function Update-OpaVersion {
                 VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
             }
             else {
-                # No Splitting lines; Appending new Current OPA version to acceptable version
+                # No splitting lines; appending new current OPA version to acceptable version
                 $VersionsArr = $_ -split ","
                 $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
                 $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
@@ -160,7 +161,7 @@ function New-OpaUpdatePr {
         $OpaVersionBumpBranch
     )
 
-    # Create the PR Body
+    # Create the PR body
     $PRTemplatePath = Join-Path -Path $RepoPath -ChildPath '.github/pull_request_template.md'
     $Description = '<!-- Describe the "what" of your changes in detail. -->'
     $Motivation = '<!-- Why is this change required\? -->'
