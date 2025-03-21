@@ -40,7 +40,7 @@ Describe "Update OPA" {
             -LatestOpaVersion $MockLatestVersion
         # Check the results at the file level
         $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
-        # $SupportPath | Should -FileContentMatchExactly $ExpectedCurrentOPAVersion
+        $SupportPath | Should -FileContentMatchExactly $MockCurrentVersion
         # For support, check specifically.
         # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
@@ -50,6 +50,6 @@ Describe "Update OPA" {
         $UpdatedLine = $MatchedLines[0].Line
         Write-Warning "The updated line is"
         Write-Warning $UpdatedLine
-        $UpdatedLine | Should -Match ".`'$ExpectedCurrentOPAVersion`'."  # This is a regex test.
+        $UpdatedLine | Should -Match ".`'$MockCurrentVersion`'."  # This is a regex test.
     }
 }
