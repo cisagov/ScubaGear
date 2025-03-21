@@ -52,11 +52,6 @@ class ScubaConfig {
         return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     }
 
-    static SetOpaVersion([string]$NewVersion) {
-        [ScubaConfig]::ScubaDefaults['DefaultOPAVersion'] = $NewVersion
-        return
-    }
-
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
@@ -64,10 +59,10 @@ class ScubaConfig {
         [ScubaConfig]::ResetInstance()
         $Content = Get-Content -Raw -Path $Path
         try {
-                $this.Configuration = $Content | ConvertFrom-Yaml
+            $this.Configuration = $Content | ConvertFrom-Yaml
         }
         catch {
-                $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
+            $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
             throw "Error loading config file: $ParseError"
         }
 
