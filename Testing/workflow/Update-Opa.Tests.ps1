@@ -30,7 +30,8 @@ Describe "Update OPA" {
         $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
         $MockCurrentVersion = "1.1.1"
-        $MockLatestVersion = "33.44.55" # This is a rather unique value.
+        $MockLatestVersion = "33.44.55"
+        $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
@@ -39,7 +40,7 @@ Describe "Update OPA" {
             -LatestOpaVersion $MockLatestVersion
         # Check the results at the file level
         $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
-        $SupportPath | Should -FileContentMatchExactly $MockLatestVersion
+        $SupportPath | Should -FileContentMatchExactly $DefaultOPAVersionVar
         # For support, check specifically.
         # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
@@ -49,6 +50,6 @@ Describe "Update OPA" {
         $UpdatedLine = $MatchedLines[0].Line
         Write-Warning "The updated line is"
         Write-Warning $UpdatedLine
-        $UpdatedLine | Should -Match ".`'$MockCurrentVersion`'."  # This is a regex test.
+        $UpdatedLine | Should -Match ".`'$DefaultOPAVersionVar`'."  # This is a regex test.
     }
 }
