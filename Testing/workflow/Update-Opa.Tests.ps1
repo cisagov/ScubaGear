@@ -1,13 +1,6 @@
 using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 
 # The purpose of these tests is to verify that the functions used to update OPA are working.
-# Suppress PSSA warnings here at the root of the test file.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
-param()
-BeforeAll {
-    # This is the version of OPA that is currently defined in ScubaConfg.psm1
-    $global:VersionInScubaConfig = "1.1.0"
-}
 
 Describe "Update OPA" {
     It "Determine if OPA needs to be updated" {
@@ -32,21 +25,33 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
+        # Setup mock values
+        $MockCurrentVersion = "1.0.1"
+        $MockLatestVersion = "1.0.2"
         # Call the function
         . $ScriptPath
-        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion $global:VersionInScubaConfig
+        Update-OpaVersion `
+            -RepoPath $RepoRootPath `
+            -CurrentOpaVersion $MockCurrentVersion `
+            -LatestOpaVersion $MockLatestVersion
         # Check the results
         $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
-        $CurrentOPAVersion | Should -Be $global:VersionInScubaConfig
+        $CurrentOPAVersion | Should -Be $MockLatestVersion
     }
     It "Update acceptable versions in support module" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
         $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1'
+        # Setup mock values
+        $MockCurrentVersion = "1.0.1"
+        $MockLatestVersion = "1.0.2"
         # Call the function
         . $ScriptPath
-        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
+        Update-OpaVersion `
+            -RepoPath $RepoRootPath `
+            -CurrentOpaVersion $MockCurrentVersion `
+            -LatestOpaVersion $MockLatestVersion
         # Check the results
         # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
@@ -56,6 +61,6 @@ Describe "Update OPA" {
         $UpdatedLine = $MatchedLines[0].Line
         Write-Warning "The updated line is"
         Write-Warning $UpdatedLine
-        $UpdatedLine | Should -Match ".`'$global:VersionInScubaConfig`'."  # This is a regex test.
+        $UpdatedLine | Should -Match ".`'$MockCurrentVersion`'."  # This is a regex test.
     }
 }
