@@ -22,11 +22,11 @@ Describe "Update OPA" {
         $LatestOPAVersion | Should -Be "1.2.0"
         $ActualCurrentOPAVersion | Should -Be $ExpectedCurrentOPAVersion
     }
-    It "Update OPA version in config module" {
+    It "Update OPA version in config and support" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
+        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1' -Resolve
         $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
         $MockCurrentVersion = "1.1.1"
@@ -37,25 +37,10 @@ Describe "Update OPA" {
             -RepoPath $RepoRootPath `
             -CurrentOpaVersion $MockCurrentVersion `
             -LatestOpaVersion $MockLatestVersion
-        # Check the results
+        # Check the results at the file level
         $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
         $SupportPath | Should -FileContentMatchExactly $MockLatestVersion
-    }
-    It "Update acceptable versions in support module" {
-        # Setup important paths
-        $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
-        $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
-        # Setup mock values
-        $MockCurrentVersion = "1.0.1"
-        $MockLatestVersion = "1.0.2"
-        # Call the function
-        . $ScriptPath
-        Update-OpaVersion `
-            -RepoPath $RepoRootPath `
-            -CurrentOpaVersion $MockCurrentVersion `
-            -LatestOpaVersion $MockLatestVersion
-        # Check the results
+        # For support, check specifically.
         # Find all specific lines with this comment.
         $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
         # There should be only 1 line in the support module that matches
