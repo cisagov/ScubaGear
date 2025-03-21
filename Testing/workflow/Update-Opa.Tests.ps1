@@ -25,7 +25,7 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $VersionInScubaConfig = "1.0.2"
+        $VersionInScubaConfig = "1.1.0"
         # Call the function
         . $ScriptPath
         Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion $VersionInScubaConfig
