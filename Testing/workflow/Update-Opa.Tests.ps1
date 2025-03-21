@@ -25,12 +25,13 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
+        $VersionInScubaConfig = "1.0.2"
         # Call the function
         . $ScriptPath
-        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion "1.0.2"
+        Update-OpaVersion -RepoPath $RepoRootPath -CurrentOpaVersion "1.0.1" -LatestOpaVersion $VersionInScubaConfig
         # Check the results
         $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
-        $CurrentOPAVersion | Should -Be "1.0.2"
+        $CurrentOPAVersion | Should -Be $VersionInScubaConfig
     }
     It "Update acceptable versions in support module" {
         # Setup important paths
