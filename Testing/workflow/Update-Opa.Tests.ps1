@@ -40,7 +40,7 @@ Describe "Update OPA" {
         # Check the results
         $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
         $SupportPath | Should -FileContentMatchExactly $MockLatestVersion
-
+    }
     It "Update acceptable versions in support module" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
