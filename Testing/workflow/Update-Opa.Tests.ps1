@@ -1,7 +1,9 @@
 using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 
 # The purpose of these tests is to verify that the functions used to update OPA are working.
-
+# Suppress PSSA warnings here at the root of the test file.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
+param()
 BeforeAll {
     # This is the version of OPA that is currently defined in ScubaConfg.psm1
     $global:VersionInScubaConfig = "1.1.0"
