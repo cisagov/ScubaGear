@@ -18,6 +18,7 @@ Describe "Update OPA" {
         $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
         # The latest version of OPA is found here:
         # https://github.com/open-policy-agent/opa/releases
+        # This value will need to be updated from time to time.
         $LatestOPAVersion | Should -Be "1.2.0"
         $ActualCurrentOPAVersion | Should -Be $ExpectedCurrentOPAVersion
     }
@@ -26,8 +27,8 @@ Describe "Update OPA" {
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
         # Setup mock values
-        $MockCurrentVersion = "1.0.1"
-        $MockLatestVersion = "1.0.2"
+        $MockCurrentVersion = "1.1.1"
+        $MockLatestVersion = "2.2.2"
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
