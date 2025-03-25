@@ -70,7 +70,7 @@ Guest access SHALL be limited to the email the invitation was sent to.
 
 <!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
 - _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
-- _Last modified:_ June 2023
+- _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only People in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
