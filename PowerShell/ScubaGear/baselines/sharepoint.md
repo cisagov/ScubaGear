@@ -245,7 +245,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
 - _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
-- _Last modified:_ June 2023
+- _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
