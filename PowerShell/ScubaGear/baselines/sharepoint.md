@@ -220,7 +220,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
-- _Last modified:_ June 2023
+- _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
