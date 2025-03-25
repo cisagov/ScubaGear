@@ -215,12 +215,12 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 
-#### MS.AAD.3.3v1
-If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
+#### MS.AAD.3.3v2
+If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
-<!--Policy: MS.AAD.3.3v1; Criticality: SHALL -->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced and Microsoft Authenticator is being used. This policy helps improve the security of Microsoft Authenticator by showing the user context information, which helps reduce MFA phishing compromises.
-- _Last modified:_ June 2023
+<!--Policy: MS.AAD.3.3v2; Criticality: SHALL -->
+- _Rationale:_ This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.
+- _Last modified:_ March 2025
 
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
@@ -304,8 +304,8 @@ Managed Devices SHOULD be required to register MFA.
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
 </pre>
 
-#### MS.AAD.3.3v1 instructions:
-If phishing-resistant MFA has not been deployed yet and Microsoft Authenticator is in use, configure Authenticator to display context information to users when they login.
+#### MS.AAD.3.3v2 instructions:
+If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
 1. In **Azure Active Directory**, click **Security > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.

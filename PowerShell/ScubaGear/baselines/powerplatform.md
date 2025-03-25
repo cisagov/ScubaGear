@@ -330,7 +330,8 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
-- _Last Modified:_ June 2023
+- _Last Modified:_ March 2025
+- _Note:_ This policy is only applicable to environments using Dataverse.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
 

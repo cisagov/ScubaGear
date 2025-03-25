@@ -66,7 +66,7 @@
 
                        ],
         "Criticality":  "Should/Not-Implemented",
-        "PolicyId":  "MS.AAD.3.3v1",
+        "PolicyId":  "MS.AAD.3.3v2",
         "ReportDetails":  "Not currently checked automatically. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/0.3.0/baselines/aad.md#msaad33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
