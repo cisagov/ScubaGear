@@ -1319,7 +1319,7 @@ User click tracking SHOULD be enabled.
 <!--Policy: MS.EXO.15.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
-- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ AU-12c
+- _NIST SP 800-53 Rev. 5 High Baseline Mapping:_ SI-3, AU-12c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
