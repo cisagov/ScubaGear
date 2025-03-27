@@ -33,6 +33,7 @@ function Invoke-SmokeTests {
         # The alias is the key for each tenant, a string that represents the tenant
         # that is being smoke tested.
         $Alias = $Tenant.Keys[0]
+        Write-Warning "Testing $Alias..."
         $OrgName = $Tenant.$Alias.DisplayName
         $DomainName = $Tenant.$Alias.DomainName
         $AppId = $Tenant.$Alias.AppId
