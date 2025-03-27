@@ -109,7 +109,7 @@ Meeting recording SHOULD be disabled.
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
-- _Last modified:_ July 2023
+- _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
   - None
