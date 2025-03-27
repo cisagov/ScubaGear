@@ -1,7 +1,8 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force   
 
 InModuleScope Connection {
-
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Permissions/PermissionsHelper.psm1") -Force
+    
     Describe -Tag 'Connection' -Name "Connect-Tenant as <Endpoint>" -ForEach @(
         @{Endpoint = 'commercial'},
         @{Endpoint = 'gcc'},
