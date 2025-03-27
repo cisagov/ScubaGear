@@ -42,10 +42,13 @@ jobs:
                 # Use a hash table, as it is easy to extract data for configuring
                 # the smoke tests.
                 $Tenants = ConvertFrom-Json -InputObject $env:SCUBA_GITHUB_AUTOMATION_CREDS -AsHashTable
-                echo Tenants=$Tenants >> $env:GITHUB_OUTPUT
+                # Convert hash table to string, b/c GITHUB_OUTPUT can only accept strings
+                $TenantsAsString = $Tenants | Out-String
+                echo TenantsAsString=$TenantsAsString >> $env:GITHUB_OUTPUT
             - name: Execute tests
               shell: powershell  # ScubaGear requires 5
               run: |
-                $Tenants = "${{ steps.extract-tenants.outputs.Tenants }}"
+                $TenantsAsString = "${{ steps.extract-tenants.outputs.TenantsAsString }}"
+                $Tenants = ConvertFrom-StringData -StringData $TenantsAsString
                 . utils/workflow/Invoke-SmokeTests.ps1
                 Invoke-SmokeTests -Tenants $Tenants
