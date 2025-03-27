@@ -42,13 +42,13 @@ Tenant := input.SPO_tenant[0] if {
 SharingCapability := Tenant.SharingCapability
 
 NAString(SharingSetting, Negation) := concat("", [
-    "This policy is only applicable if the external sharing slider on the admin page is set to ",
+    "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to ",
     SharingSetting,
     ". ",
     "See %v for more info"
 ]) if Negation == false
 else := concat("", [
-    "This policy is only applicable if the external sharing slider on the admin page is not set to ",
+    "This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to ",
     SharingSetting,
     ". ",
     "See %v for more info"
