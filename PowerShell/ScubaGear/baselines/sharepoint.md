@@ -65,18 +65,6 @@ External sharing SHALL be restricted to approved external domains and/or users i
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
-#### MS.SHAREPOINT.1.4v1
-Guest access SHALL be limited to the email the invitation was sent to.
-
-<!--Policy: MS.SHAREPOINT.1.4v1; Criticality: SHALL -->
-- _Rationale:_ Email invitations allow external guests to access shared information. By requiring guests to sign in using the same account where the invite was sent, administrators help ensure only the intended guest can use the invite.
-- _Last modified:_ March 2025
-- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only People in your organization**.
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-    - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 ### Resources
 
@@ -132,20 +120,6 @@ Note: If SharePoint external sharing is set to its most restrictive setting of "
 8. Add each approved security group. Members of these groups will be allowed to share files externally.
 
 9.  Select **Save**.
-
-#### MS.SHAREPOINT.1.4v1 Instructions
-
-Note: If SharePoint external sharing is set to its most restrictive setting of "Only people in your organization", then no external sharing is allowed and no implementation changes are required for this policy item.
-
-1.  Sign in to the **SharePoint admin center**.
-
-2.  Select **Policies** \> **Sharing**.
-
-3.  Expand **More external sharing settings**.
-
-4. Select **Guests must sign in using the same account to which sharing invitations are sent**.
-
-5. Select **Save**.
 
 ## 2. File and Folder Default Sharing Settings
 

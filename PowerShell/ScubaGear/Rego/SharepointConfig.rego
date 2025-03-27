@@ -1,7 +1,6 @@
 package sharepoint
 import rego.v1
 import data.utils.report.NotCheckedDetails
-import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsBooleanWarning
@@ -162,26 +161,6 @@ tests contains {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
     Reason := NAString(SliderSettings(0), true)
-}
-#--
-
-#
-# MS.SHAREPOINT.1.4v1
-#--
-
-# Based on the fact that Microsoft has removed the setting from the admin center
-# and you cannot set the value RequireAcceptingAccountMatchInvitedAccount from Set-SPOTenant anymore, 
-# we are setting this policy to not-implemented
-# and will likely remove it from the baseline in the next version.
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDeprecation,
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.SHAREPOINT.1.4v1"
 }
 #--
 
