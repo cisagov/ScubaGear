@@ -15,14 +15,14 @@ function Invoke-SmokeTests {
 
     Write-Warning "Invoking smoke tests..."
 
-    # Access certificate functions
-    . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
-    # Install Selenium
-    . utils/workflow/Install-SeleniumForTesting.ps1
-    Install-SeleniumForTesting
-    # Install ScubaGear modules
-    Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-    Initialize-SCuBA
+    # # Access certificate functions
+    # . Testing/Functional/SmokeTest/SmokeTestUtils.ps1
+    # # Install Selenium
+    # . utils/workflow/Install-SeleniumForTesting.ps1
+    # Install-SeleniumForTesting
+    # # Install ScubaGear modules
+    # Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
+    # Initialize-SCuBA
 
     Write-Warning "Identified $($Tenants['TestTenants'].Count) test tenants..."
 

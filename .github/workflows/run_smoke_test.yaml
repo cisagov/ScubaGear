@@ -53,6 +53,6 @@ jobs:
               shell: powershell  # ScubaGear requires 5
               run: |
                 $TenantsAsString = "${{ steps.extract-tenants.outputs.TenantsAsString }}"
-                $Tenants = ConvertFrom-StringData -StringData $TenantsAsString
+                $Tenants = ConvertFrom-StringData -StringData $TenantsAsString -Delimiter ';'
                 . utils/workflow/Invoke-SmokeTests.ps1
                 Invoke-SmokeTests -Tenants $Tenants
