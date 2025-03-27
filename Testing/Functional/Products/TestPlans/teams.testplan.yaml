@@ -206,10 +206,10 @@ TestPlan:
               AllowCloudRecording: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.1.7v1
+  - PolicyId: MS.TEAMS.1.7v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.1.7v1 Non-compliant - BroadcastRecordingMode = AlwaysEnabled
+      - TestDescription: MS.TEAMS.1.7v2 Non-compliant - BroadcastRecordingMode = AlwaysEnabled
         Preconditions:
           - Command: Set-CsTeamsMeetingBroadcastPolicy
             Splat:
@@ -217,7 +217,7 @@ TestPlan:
               BroadcastRecordingMode: AlwaysEnabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.7v1 Non-compliant - BroadcastRecordingMode = AlwaysDisabled
+      - TestDescription: MS.TEAMS.1.7v2 Non-compliant - BroadcastRecordingMode = AlwaysDisabled
         Preconditions:
           - Command: Set-CsTeamsMeetingBroadcastPolicy
             Splat:
@@ -225,7 +225,7 @@ TestPlan:
               BroadcastRecordingMode: AlwaysDisabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.7v1 Compliant - BroadcastRecordingMode = UserOverride
+      - TestDescription: MS.TEAMS.1.7v2 Compliant - BroadcastRecordingMode = UserOverride
         Preconditions:
           - Command: Set-CsTeamsMeetingBroadcastPolicy
             Splat:

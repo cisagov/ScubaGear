@@ -269,12 +269,12 @@ test_AllowCloudRecording_Multiple if {
 #--
 
 #
-# Policy MS.TEAMS.1.7v1
+# Policy MS.TEAMS.1.7v2
 #--
 test_BroadcastRecordingMode_Correct if {
     Output := teams.tests with input.broadcast_policies as [BroadcastPolicies]
 
-    TestResult("MS.TEAMS.1.7v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.1.7v2", Output, PASS, true) == true
 }
 
 test_BroadcastRecordingMode_Incorrect if {
@@ -283,7 +283,7 @@ test_BroadcastRecordingMode_Incorrect if {
 
     Output := teams.tests with input.broadcast_policies as [Policy]
 
-    TestResult("MS.TEAMS.1.7v1", Output, FAIL, false) == true
+    TestResult("MS.TEAMS.1.7v2", Output, FAIL, false) == true
 }
 
 # Ignores non global identities
@@ -294,6 +294,6 @@ test_BroadcastRecordingMode_Multiple if {
 
     Output := teams.tests with input.broadcast_policies as [BroadcastPolicies, Policy]
 
-    TestResult("MS.TEAMS.1.7v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.1.7v2", Output, PASS, true) == true
 }
 #--

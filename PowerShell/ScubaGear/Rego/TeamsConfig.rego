@@ -3,6 +3,7 @@ import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
+#import data.utils.report.NotCheckedDetails
 import data.utils.key.FilterArray
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -234,12 +235,12 @@ tests contains {
 #--
 
 #
-# MS.TEAMS.1.7v1
+# MS.TEAMS.1.7v2
 #--
 
 # Pass if BroadcastRecordingMode is set to UserOverride for global policy
 tests contains {
-    "PolicyId": "MS.TEAMS.1.7v1",
+    "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
     "ActualValue": Policy.BroadcastRecordingMode,
@@ -255,7 +256,7 @@ tests contains {
 
 # Edge case where pulling configuration from tenant fails
 tests contains {
-    "PolicyId": "MS.TEAMS.1.7v1",
+    "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
     "ActualValue": "PowerShell Error",
@@ -265,6 +266,8 @@ tests contains {
     count(input.broadcast_policies) == 0
 }
 #--
+
+
 
 
 ##############
