@@ -19,19 +19,6 @@ test_3rdParty_Correct_V1 if {
 #--
 
 #
-# Policy MS.EXO.17.2v1
-#--
-test_3rdParty_Correct_V2 if {
-    PolicyId := "MS.EXO.17.2v1"
-
-    Output := exo.tests with input as { }
-
-    ReportDetailString := DefenderMirrorDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailString, false) == true
-}
-#--
-
-#
 # Policy MS.EXO.17.3v1
 #--
 test_3rdParty_Correct_V3 if {
