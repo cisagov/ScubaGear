@@ -67,6 +67,7 @@ jobs:
       - name: Sign and Publish Module
         run: |
           . repo/utils/workflow/Publish-ScubaGear.ps1
+          # TODO Update and test with new function in utils/workflow
           # Remove non-release files
           Remove-Item -Recurse -Force repo -Include .git*
           # Extract the API key used to publish to PSGallery

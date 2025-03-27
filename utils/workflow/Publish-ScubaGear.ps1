@@ -64,6 +64,28 @@ function New-PrivateGallery {
   Write-Output "The gallery was registered..."
 }
 
+function Remove-NonReleaseFiles {
+  <#
+    .SYNOPSIS
+      Removes files from the repo that should not be published, such at git files.
+    .PARAMETER $RootFolderName
+      The name of the root folder.
+  #>
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]
+    $RootFolderName
+  )
+  Write-Output "Removing non-release files..."
+  # Verify that folder exists
+  if (-not (Test-Path -Path $RootFolderName)) {
+    Write-Output "The root folder doesn't exist: $RootFolderName"
+    throw [System.IO.DirectoryNotFoundException] "Directory not found: $RootFolderName"
+  }
+  Remove-Item -Recurse -Force $RootFolderName -Include .git*
+}
+
 function Publish-ScubaGearModule {
   <#
     .Description
