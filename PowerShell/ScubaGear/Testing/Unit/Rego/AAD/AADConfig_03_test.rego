@@ -1738,3 +1738,102 @@ test_ApplicationExclusions_Incorrect_V4 if {
     TestResult("MS.AAD.3.8v1", Output, ReportDetailStr, false) == true
 }
 #--
+
+#
+# Policy MS.AAD.3.9v1
+#--
+test_Entra_3_9_Correct_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.9v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_Entra_3_9_User_Group_Exclusions_Correct_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson1", "SpecialPerson2"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["SpecialGroup1", "SpecialGroup2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.Users as ["SpecialPerson1", "SpecialPerson2"]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.Groups as ["SpecialGroup1", "SpecialGroup2"]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.9v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_Entra_3_9_User_Exclusions_Incorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson1", "SpecialPerson2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.Users as ["SpecialPerson1", "SomeOtherPerson"]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+test_Entra_3_9_Group_Exclusions_Incorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["SpecialGroup1", "SpecialGroup2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.Users as ["SomeOtherGroup", "SpecialGroup2"]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+test_Entra_3_9_Report_Only_Incorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "replace", "path": "State", "value": "enabledForReportingButNotEnforced"}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+test_Entra_3_9_Policy_Missing_Incorrect_V1 if {
+    Output := aad.tests with input.conditional_access_policies as []
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+test_Entra_3_9_Role_Exclusion_Incorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeRoles", "value": ["SomeRole"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+test_Entra_3_9_Application_Exclusion_Incorrect_V1 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["SomeApp1","SomeApp2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+#--
