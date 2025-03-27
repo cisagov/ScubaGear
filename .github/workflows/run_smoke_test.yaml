@@ -43,7 +43,11 @@ jobs:
                 # the smoke tests.
                 $Tenants = ConvertFrom-Json -InputObject $env:SCUBA_GITHUB_AUTOMATION_CREDS -AsHashTable
                 # Convert hash table to string, b/c GITHUB_OUTPUT can only accept strings
-                $TenantsAsString = $Tenants | Out-String
+                $TenantsAsString = "@{"
+                foreach ($key in $Tenants.Keys) {
+                    $TenantsAsString += "$key='$($Tenants[$key])';"
+                }
+                $TenantsAsString += "}"
                 echo TenantsAsString=$TenantsAsString >> $env:GITHUB_OUTPUT
             - name: Execute tests
               shell: powershell  # ScubaGear requires 5
