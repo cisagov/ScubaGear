@@ -1439,16 +1439,11 @@ Office 365.
 ### Policies
 
 #### MS.EXO.17.1v1
-Microsoft Purview Audit (Standard) logging SHALL be enabled.
+Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.EXO.17.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about
-activities that took place slows response actions. Enabling Microsoft
-Purview Audit (Standard) helps ensure agencies have visibility into user
-actions. Furthermore, Microsoft Purview Audit (Standard) is required for
-government agencies by OMB M-21-31 (referred to therein by its former
-name, Unified Audit Logs).
-- _Last modified:_ June 2023
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
+- _Last modified:_ March 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
@@ -1482,8 +1477,15 @@ gives an agency the necessary visibility to investigate incidents that occurred
 some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
 Audit Logs in the Cloud Azure log category.
 - _Last modified:_ June 2023
+- _Note_: Microsoft 365 Purview (Premium) provides a default audit log retention policy,
+          retaining Exchange Online, SharePoint Online, OneDrive for
+          Business, and Microsoft Entra ID audit records for one year.
+          Additional record types require custom audit retention policies.
+          Agencies may also consider alternate storage locations and services
+          to meet audit log retention needs.
 - _MITRE ATT&CK TTP Mapping:_
-  - None
+  - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
+
 
 ### Resources
 
@@ -1498,9 +1500,9 @@ Audit Logs in the Cloud Azure log category.
 
 ### License Requirements
 
-- Microsoft Purview Audit (Premium) logging capabilities, including creating
-  a custom audit log retention policy, requires E5/G5 licenses or
-  E3/G3 licenses with add-on compliance licenses.
+- Microsoft 365 Audit (Premium) capabilities, including the creation of a custom audit
+  log retention policy, requires E5/G5 licenses or E3/G3 licenses with
+  add-on compliance licenses.
 
 - Additionally, maintaining logs in the M365 environment for longer than one
   year requires an add-on license. For more information, see
@@ -1510,8 +1512,7 @@ Audit Logs in the Cloud Azure log category.
 ### Implementation
 
 #### MS.EXO.17.1v1 Instructions
-See the following implementation steps for enabling [Microsoft Purview
-(Standard)](./defender.md#msdefender61v1-instructions) for additional
+See the following implementation steps for enabling [Unified Audit logging](./defender.md#msdefender61v1-instructions) for additional
 guidance.
 
 #### MS.EXO.17.2v1 Instructions
