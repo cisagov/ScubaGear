@@ -43,16 +43,17 @@ jobs:
                 # the smoke tests.
                 $Tenants = ConvertFrom-Json -InputObject $env:SCUBA_GITHUB_AUTOMATION_CREDS -AsHashTable
                 # Convert hash table to string, b/c GITHUB_OUTPUT can only accept strings
-                $TenantsAsString = "@{"
+                $TenantsAsString = ""
                 foreach ($key in $Tenants.Keys) {
-                    $TenantsAsString += "$key='$($Tenants[$key])';"
+                    $TenantsAsString += "$key=$($Tenants[$key]);"
                 }
-                $TenantsAsString += "}"
+                # Remove the trailing semicolon
+                $TenantsAsString = $TenantsAsString.TrimEnd(';')
                 echo TenantsAsString=$TenantsAsString >> $env:GITHUB_OUTPUT
             - name: Execute tests
               shell: powershell  # ScubaGear requires 5
               run: |
                 $TenantsAsString = "${{ steps.extract-tenants.outputs.TenantsAsString }}"
-                $Tenants = ConvertFrom-StringData -StringData $TenantsAsString -Delimiter ';'
+                $Tenants = ConvertFrom-StringData ($TenantsAsString -replace ';', "`n")
                 . utils/workflow/Invoke-SmokeTests.ps1
                 Invoke-SmokeTests -Tenants $Tenants
