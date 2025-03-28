@@ -12,7 +12,7 @@ InModuleScope CreateReport {
                 # should mark the policy as not omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MS.EXO.1.1v1" = [PSCustomObject]@{ "Rationale" = "Example rationale" }
+                        "MS.EXO.1.1v2" = [PSCustomObject]@{ "Rationale" = "Example rationale" }
                     }
                 }
                 $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
