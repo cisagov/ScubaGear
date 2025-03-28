@@ -99,6 +99,7 @@ The following sections should be read in order.
 ### Misc
 
 - [Assumptions](docs/misc/assumptions.md)
+- [Mappings](docs/misc/mappings.md)
 
 ## Project License
 
