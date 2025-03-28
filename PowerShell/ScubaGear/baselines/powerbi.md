@@ -67,7 +67,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 <!--Policy: MS.POWERBI.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.
 - _Last modified:_ June 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_ CM-7, SC-7(10)(a)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
