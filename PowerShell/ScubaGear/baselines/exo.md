@@ -62,7 +62,7 @@ forwarding rules to exfiltrate data to external recipients.
 #### MS.EXO.1.1v2
 Automatic forwarding to external domains SHALL be disabled.
 
-<!--Policy: MS.EXO.1.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
 persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
