@@ -1,7 +1,7 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
 function Get-RegoResult {
-     <#
+    <#
     .Description
     Given the Rego output for a specific test, determine the result (e.g. "Pass"/"Fail").
     .Functionality
