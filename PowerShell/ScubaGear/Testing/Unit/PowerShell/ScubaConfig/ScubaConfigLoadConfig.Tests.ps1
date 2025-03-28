@@ -48,7 +48,7 @@ InModuleScope ScubaConfig {
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('exo');
-                        OmitPolicy=@{"MS.EXO.1.1v1"=@{"Rationale"="Example rationale"}}
+                        OmitPolicy=@{"MS.EXO.1.1v2"=@{"Rationale"="Example rationale"}}
                     }
                 }
                 [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
@@ -59,7 +59,7 @@ InModuleScope ScubaConfig {
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('exo');
-                        OmitPolicy=@{"MSEXO.1.1v1"=@{"Rationale"="Example rationale"}}
+                        OmitPolicy=@{"MSEXO.1.1v2"=@{"Rationale"="Example rationale"}}
                     }
                 }
                 [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
