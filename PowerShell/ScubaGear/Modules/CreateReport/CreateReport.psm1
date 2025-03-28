@@ -1,6 +1,6 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
-function Get-TestResult {
+function Get-RegoResult {
      <#
     .Description
     Given the Rego output for a specific test, determine the result (e.g. "Pass"/"Fail").
@@ -170,7 +170,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-                $Result = Get-TestResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult $Test $MissingCommands $Control
 
                 # Check if the config file indicates the control should be omitted
                 $Config = $SettingsExport.scuba_config

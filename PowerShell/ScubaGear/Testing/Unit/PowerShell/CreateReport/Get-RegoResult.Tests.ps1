@@ -1,8 +1,8 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/CreateReport') `
-    -Function 'Get-TestResult' -Force
+    -Function 'Get-RegoResult' -Force
 
 InModuleScope CreateReport {
-    Describe -Tag CreateReport -Name 'Get-TestResult' {
+    Describe -Tag CreateReport -Name 'Get-RegoResult' {
         Context "When the control is valid" {
             BeforeAll {
                 # PS Script Analyzer doesn't play well with Pester scoping and can't tell that
@@ -23,7 +23,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "Pass"
                     $Result.SummaryKey | Should -Be "Passes"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -36,7 +36,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "Pass"
                     $Result.SummaryKey | Should -Be "Passes"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -49,7 +49,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "Fail"
                     $Result.SummaryKey | Should -Be "Failures"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -62,7 +62,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "Warning"
                     $Result.SummaryKey | Should -Be "Warnings"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -77,7 +77,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "N/A"
                     $Result.SummaryKey | Should -Be "Manual"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -90,7 +90,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "N/A"
                     $Result.SummaryKey | Should -Be "Manual"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -103,7 +103,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "N/A"
                     $Result.SummaryKey | Should -Be "Manual"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -116,7 +116,7 @@ InModuleScope CreateReport {
                     }
                     $MissingCommands = $null
                     $Control = $NormalControl
-                    $Result = Get-TestResult $Test $MissingCommands $Control
+                    $Result = Get-RegoResult $Test $MissingCommands $Control
                     $Result.DisplayString | Should -Be "N/A"
                     $Result.SummaryKey | Should -Be "Manual"
                     $Result.Details | Should -Be $ExampleReportDetails
@@ -143,7 +143,7 @@ InModuleScope CreateReport {
                     MalformedDescription=$false;
                     Deleted=$false;
                 }
-                $Result = Get-TestResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult $Test $MissingCommands $Control
                 $Result.DisplayString | Should -Be "Error"
                 $Result.SummaryKey | Should -Be "Errors"
                 $Result.Details | Should -Be $ExampleMissingDetails
@@ -159,7 +159,7 @@ InModuleScope CreateReport {
                     MalformedDescription=$false;
                     Deleted=$false;
                 }
-                $Result = Get-TestResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult $Test $MissingCommands $Control
                 $Result.DisplayString | Should -Be "Error"
                 $Result.SummaryKey | Should -Be "Errors"
                 $Result.Details | Should -Be $ExampleMissingDetails
@@ -175,7 +175,7 @@ InModuleScope CreateReport {
                     MalformedDescription=$false;
                     Deleted=$true;
                 }
-                $Result = Get-TestResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult $Test $MissingCommands $Control
                 $Result.DisplayString | Should -Be "-"
                 $Result.SummaryKey | Should -Be "-"
                 $Result.Details | Should -Be "-"
@@ -191,7 +191,7 @@ InModuleScope CreateReport {
                     MalformedDescription=$true;
                     Deleted=$true;
                 }
-                $Result = Get-TestResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult $Test $MissingCommands $Control
                 $Result.DisplayString | Should -Be "Error"
                 $Result.SummaryKey | Should -Be "Errors"
                 $Result.Details | Should -Be "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
