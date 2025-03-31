@@ -3,7 +3,6 @@ import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
-#import data.utils.report.NotCheckedDetails
 import data.utils.key.FilterArray
 import data.utils.key.FAIL
 import data.utils.key.PASS
