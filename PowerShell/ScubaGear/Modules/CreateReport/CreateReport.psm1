@@ -227,7 +227,7 @@ function New-Report {
     $Title = "$($FullName) Baseline Report"
     $AADWarning = "The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks.
     Exclusions must only be used if they are approved within an organization's security risk acceptance process.
-    See <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank` "class=`"aad-link`">this section in the product documentation</a>
+    See <a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/docs/configuration/configuration.md#entra-id-configuration`" target=`"_blank`" class=`"aad-link`">this section in the product documentation</a>
     for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
     <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i>"
     $NoWarning = "<br/>"
