@@ -117,7 +117,7 @@ Meeting recording SHOULD be disabled.
 #### MS.TEAMS.1.7v2
 Record an event SHOULD NOT be set to Always record.
 
-<!--Policy: MS.TEAMS.1.7v1; Criticality: SHOULD -->
+<!--Policy: MS.TEAMS.1.7v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing to always record Live Events can pose data leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
