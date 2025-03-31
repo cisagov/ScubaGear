@@ -302,7 +302,7 @@ Managed Devices SHOULD be required to register MFA.
 Device code authentication SHOULD be blocked.
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
-- _Rationale:_ The device code authentication protocol has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
+- _Rationale:_ The device code authentication flow has been abused by threat actors to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk of this attack vector.
 - _Last modified:_ February 2025
 - _MITRE ATT&CK TTP Mapping:_
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
@@ -326,6 +326,10 @@ Device code authentication SHOULD be blocked.
 - [Enable passkeys (FIDO2) for your organization](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2)
 
 - [Storm-2372 conducts device code phishing campaign](https://www.microsoft.com/en-us/security/blog/2025/02/13/storm-2372-conducts-device-code-phishing-campaign/)
+
+- [Microsoft 365 Device Code Phishing Cyber Attack – Demonstration, Analysis and Mitigation](https://github.com/cisagov/ScubaGear/issues/1599)
+
+- [Block device code flow](https://learn.microsoft.com/en-us/entra/identity/conditional-access/managed-policies#block-device-code-flow)
 
 ### License Requirements
 
