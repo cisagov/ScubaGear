@@ -24,7 +24,7 @@ Additional terminology in this document specific to their respective SCBs are to
 6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
 7. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
 
-# Azure Active Directory / Entra ID
+## Azure Active Directory / Entra ID
 
 ### Removed Policies 
 
@@ -33,13 +33,13 @@ Group owners SHALL NOT be allowed to consent to applications.
 - _Removal date:_ March 2025
 - _Removal rationale:_ Microsoft announced via MC712143 that it will no longer be possible for group owners to consent to applications. All references including the policy, implementation steps, and section have been removed as the setting is no longer present.
 
-# Defender
+## Defender
 
 ### Removed Policies 
 
 N/A
 
-# Exchange Online
+## Exchange Online
 
 ### Removed Policies 
 #### MS.EXO.2.1v1
@@ -47,22 +47,27 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
 - _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
-# Power BI
+## Power BI
 
 ### Removed Policies 
 
 N/A
 
 
-# PowerPlatform
+## PowerPlatform
 
 ### Removed Policies 
 
 N/A
 
-# SharePoint Online
+## SharePoint Online
 
 ### Removed Policies 
+
+#### MS.SHAREPOINT.1.4v1
+Guest access SHALL be limited to the email the invitation was sent to.
+- _Removal date:_ February 2025
+- _Removal rationale:_ The option to limit guest access to the email the invitation was sent to found in policy MS.SHAREPOINT.1.4v1 has been deprecated by Microsoft. All references including the policy and its implementation steps have been removed as the setting is no longer present.
 
 #### MS.SHAREPOINT.4.1v1
 Users SHALL be prevented from running custom scripts on personal sites (aka OneDrive).

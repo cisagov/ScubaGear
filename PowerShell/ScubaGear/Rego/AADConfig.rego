@@ -278,7 +278,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.3v1
+# MS.AAD.3.3v2
 #--
 
 # Returns the MS Authenticator configuration settings
@@ -333,7 +333,7 @@ tests contains {
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false
 } if {
-    PolicyId := "MS.AAD.3.3v1"
+    PolicyId := "MS.AAD.3.3v2"
     # regal ignore:line-length
     Reason := "This policy is only applicable if MS Authenticator is enabled. See %v for more info"
     AAD_3_3_Not_Applicable == true
@@ -341,7 +341,7 @@ tests contains {
 
 # If policy is not N/A then we check that the configuration matches the baseline
 tests contains {
-    "PolicyId": "MS.AAD.3.3v1",
+    "PolicyId": "MS.AAD.3.3v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": MSAuth,
