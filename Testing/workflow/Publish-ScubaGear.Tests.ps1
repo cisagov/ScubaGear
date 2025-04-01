@@ -1,4 +1,5 @@
 # The purpose of this test is to verify that (most of) the Publish-ScubaGear functions are working correctly.
+# To run these tests, run the Workflow Pipeline.
 
 # Suppress PSSA warnings here at the root of the test file.
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '')]
@@ -10,6 +11,25 @@ BeforeAll {
   . $PSScriptRoot/../../utils/workflow/Publish-ScubaGear.ps1
   # Global variables, so that one Pester test can reuse the output of previous tests.
   $global:ModuleDestinationPath = ""
+}
+
+Describe "Remove-NonReleaseFiles" {
+  It "removes the files in the .git folder" {
+    $TempLocation = Join-Path -Path $TestDrive -ChildPath "/tempfolder"
+    $GitLocation = Join-Path -Path $TempLocation -ChildPath ".git"
+    $TestFileLocation = Join-Path -Path $GitLocation -ChildPath "test.txt"
+    # Create a dummy .git directory
+    New-Item -ItemType "directory" -Path $GitLocation
+    # Create a dummy file in .git directory
+    New-Item -ItemType "file" -Path $TestFileLocation
+    Test-Path -Path $GitLocation | Should -Be $true
+    # This should remove the dummy .git directory
+    Remove-NonReleaseFiles -RootFolderName $TempLocation
+    Test-Path -Path $GitLocation | Should -Be $false
+  }
+  It "gracefully handles a non-existent folder" {
+    { Remove-NonReleaseFiles -RootFolderName "thispathdoesnotexist" } | Should -Throw
+  }
 }
 
 Describe "Copy-ModuleToTempLocation" {
