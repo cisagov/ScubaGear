@@ -265,7 +265,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7b
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7b, IA-5c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
