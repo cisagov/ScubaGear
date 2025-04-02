@@ -139,7 +139,7 @@
                                          "Details":  "1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users. "
                                      },
                                      {
-                                         "Control ID":  "MS.AAD.3.3v1",
+                                         "Control ID":  "MS.AAD.3.3v2",
                                          "Requirement":  "If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.",
                                          "Result":  "Fail",
                                          "Criticality":  "Shall",
