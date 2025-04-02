@@ -1,0 +1,934 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+        <title>Azure Active Directory Baseline Report</title>
+        <style>
+        :root {
+    --background-primary: white;
+    --background-secondary: #b9bec2;
+    --test-pass: #d5ebd5;
+    --test-fail: #E5C7C7;
+    --test-warning: #fff7d6;
+    --test-other: #ebebf2;
+    --test-deleted-bg: #b2beb5;
+    --test-deleted-color: #6f7478;
+    --test-bug-color: #e80b0b;
+    --test-error-color: #DD4803;
+    --cap-even: #0052882d;
+    --cap-hover: #00528850;
+    --header-color: #005288;
+    --note-color: #ee4e04;
+    --header-bottom: black;
+    --link-color: #85B065;
+    --unvisited-link-color: #0092CC;
+    --text-color: black;
+    --uuid-color: #424242;
+    --border-color: black;
+    --toggle-height: 1.563em;
+    --toggle-width: 2.875em;
+    --toggle-radius: 1.125em;
+}
+
+html[data-theme='dark'] {
+    --background-primary: #10171D;
+    --background-secondary: #121212;
+    --test-pass: #1C361C;
+    --test-fail: #381919;
+    --test-warning: #524100;
+    --test-other: #414141;
+    --cap-even: #0052882d;
+    --cap-hover: #007ccf50;
+    --test-error-color: #FD885D;
+    --header-color: #b7c8d2;
+    --note-color: #ee4e04;
+    --header-bottom: rgb(221, 221, 221);
+    --link-color: #85B065;
+    --unvisited-link-color: #0092CC;
+    --text-color: #bdbdbd;
+    --uuid-color: #999999;
+    --border-color: #7b7b7b;
+}
+
+body {
+    background-color: var(--background-secondary);
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+    color: var(--text-color);
+}
+
+table {
+    width: 1000px;
+    margin: 0.5em 3.125em 3em 3.125em;
+    font-size: 0.8125em;
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+}
+
+h3 {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--header-color);
+}
+
+h4 {
+    text-align: center;
+    justify-content: start;
+    font-size: 0.625em;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--note-color);
+    margin-left:20%;
+    margin-right: 20%;
+    margin-bottom: 0.313em;
+}
+
+
+.links {
+    display: flex;
+}
+
+header {
+    width: 1000px;
+    margin: 0 1.563em 1.563em 1.563em;
+    border-bottom: 0.063em solid var(--header-bottom);
+    margin-bottom: 1.563em;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    padding: 0.313em;
+}
+
+header h3 {
+    padding: 0.625em;
+    text-align: center;
+    border-bottom: 0.313em solid rgba(0, 0, 0, 0);
+    color: var(--header-color);
+    display: table-cell;
+    vertical-align: bottom;
+}
+
+header a {
+    text-decoration: none;
+}
+
+header h3:hover {
+    border-bottom: 0.313em solid var(--header-color);
+}
+
+td {
+    padding: 0.25em;
+    margin: 0em;
+    overflow-wrap: break-word;
+}
+
+td a {
+    color: var(--header-color);
+}
+
+table, th, td {
+    border: 0.063em solid;
+    border-color: var(--border-color);
+    white-space: pre-wrap;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: var(--background-primary);
+    width: 1100px;
+    margin: auto;
+    position: relative;
+    padding-bottom: 3.125em;
+}
+
+h1 {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--header-color);
+    margin-top: 0.625em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--header-color);
+    font-size: 1em;
+}
+
+img {
+    width: 6.25em;
+}
+
+#caps h2 {
+    margin-top: 3.125em;
+}
+
+#caps tr:nth-child(even){
+    background-color: var(--cap-even);
+}
+
+#caps tr:hover{
+    background-color: var(--cap-hover);
+}
+
+#caps ul {
+    padding: 0;
+    padding-left: 0.125em;
+    list-style-position: inside;
+}
+
+#caps img:hover {
+    cursor: pointer;
+}
+
+#caps td:nth-child(1), #caps th:nth-child(1) {
+    border-right: none;
+}
+
+#caps td:nth-child(2), #caps th:nth-child(2) {
+    border-left: none;
+}
+
+#caps span {
+    cursor: pointer;
+    color: var(--header-color);
+    text-decoration:underline;
+}
+
+.caps_table {
+    width: 1000px;
+    margin: 1em 3.125em 0 3.125em;
+}
+
+.buttons {
+    display: flex;
+    width: 12.5em;
+    justify-content: space-between;
+    margin: 0.313em 3.125em;
+}
+
+button {
+    cursor: pointer;
+}
+
+th.state {
+    text-align: center;
+}
+
+th.apps_actions {
+    width: 15%;
+}
+
+th.users {
+    width: 25%;
+}
+
+th.conditions {
+    width: 25%;
+}
+
+#toggle-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#toggle-text {
+    color: #7b7b7b;
+    margin: 0.313em 3.125em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.875em;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--toggle-width);
+    height: var(--toggle-height);
+    left: 3.125em;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch input:focus,
+.switch input:focus:active,
+.switch input:focus + .slider {
+    outline: 0.125em solid var(--text-color);
+    border-radius: var(--toggle-height);
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #b9bec2;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: var(--toggle-radius);
+    width: var(--toggle-radius);
+    left: 0.25em;
+    bottom: 0.219em;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #005288ad;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 0.063em #005288ad;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(var(--toggle-radius));
+    -ms-transform: translateX(var(--toggle-radius));
+    transform: translateX(var(--toggle-radius));
+}
+
+.slider.round {
+    border-radius: var(--toggle-height);
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+a.control_group:link {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--unvisited-link-color);
+    text-decoration: underline;
+}
+
+a.control_group:visited {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+}
+
+a.control_group:hover {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a.control_group:active {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+
+.chevron, .truncated-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    color: inherit; 
+    border: none;
+}
+    </style>
+        <script>
+        let darkMode = false;
+        const caps = [
+    {
+        "Name":  "Live - Session Length SHALL be Limited",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "Client apps included: all"
+                       ],
+        "Block/Grant Access":  "None",
+        "Session Controls":  [
+                                 "Sign-in frequency (every 4 days)"
+                             ]
+    },
+    {
+        "Name":  "Live - Browser Sessions SHALL NOT be Persistent",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "Client apps included: all"
+                       ],
+        "Block/Grant Access":  "None",
+        "Session Controls":  [
+                                 "Persistent browser session (never persistent)"
+                             ]
+    },
+    {
+        "Name":  "MS.AAD.1.1v1 Legacy authentication SHALL be blocked",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "Client apps included: Exchange ActiveSync Clients, Other clients"
+                       ],
+        "Block/Grant Access":  "Block access",
+        "Session Controls":  [
+                                 "None"
+                             ]
+    },
+    {
+        "Name":  "MS.AAD.2.1v1 Users detected as high risk SHALL be blocked",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "User risk levels: high",
+                           "Client apps included: all"
+                       ],
+        "Block/Grant Access":  "Block access",
+        "Session Controls":  [
+                                 "None"
+                             ]
+    },
+    {
+        "Name":  "MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "Sign-in risk levels: high",
+                           "Client apps included: all"
+                       ],
+        "Block/Grant Access":  "Block access",
+        "Session Controls":  [
+                                 "None"
+                             ]
+    },
+    {
+        "Name":  "MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users",
+        "State":  "On",
+        "Users":  [
+                      "Users included: All",
+                      "Users excluded: None"
+                  ],
+        "Apps/Actions":  [
+                             "Policy applies to: apps",
+                             "Apps included: All",
+                             "Apps excluded: None"
+                         ],
+        "Conditions":  [
+                           "Client apps included: all"
+                       ],
+        "Block/Grant Access":  "Allow access but require multifactor authentication",
+        "Session Controls":  [
+                                 "None"
+                             ]
+    }
+];
+/**
+ * Adds the red, green, yellow, and gray coloring to the individual report pages.
+ */
+const colorRows = () => {
+    //Adjusted the querySelector to only use the rows which have policy data within them instead of every table in report
+    let rows = document.querySelectorAll('.policy-data tr');
+    const requirementCol = 1;
+    const statusCol = 2;
+    const criticalityCol = 3;
+    for (let i = 0; i < rows.length; i++) {
+        try {
+            if (rows[i].children[requirementCol].innerHTML.startsWith("[DELETED]")) {
+                rows[i].style.color = "var(--test-deleted-color)";
+                rows[i].style.background = "var(--test-other)";
+            }
+            else if (rows[i].children[statusCol].innerHTML.startsWith("Bug")){
+                rows[i].style.background = "var(--test-bug-color)";
+            }
+            else if (rows[i].children[statusCol].innerHTML === "Fail") {
+                rows[i].style.background = "var(--test-fail)";
+            }
+            else if (rows[i].children[statusCol].innerHTML === "Warning") {
+                rows[i].style.background = "var(--test-warning)";
+            }
+            else if (rows[i].children[statusCol].innerHTML === "Pass") {
+                rows[i].style.background = "var(--test-pass)";
+            }
+            else if (rows[i].children[statusCol].innerHTML === "Omitted") {
+                rows[i].style.background = "var(--test-other)";
+            }
+            else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
+                rows[i].style.background = "var(--test-other)";
+            }
+            else if (rows[i].children[criticalityCol].innerHTML.includes("3rd Party")) {
+                rows[i].style.background = "var(--test-other)";
+            }
+            else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
+                rows[i].style.background = "var(--test-fail)";
+                rows[i].querySelectorAll('td')[statusCol].style.borderColor = "var(--border-color)";
+                rows[i].querySelectorAll('td')[statusCol].style.color = "var(--test-error-color)";
+            }
+        }
+        catch (error) {
+            console.error(`Error in colorRows, i = ${i}`, error);
+        }
+    }
+}
+
+/**
+ * For the conditional access policy table. For AAD only.
+ * The "" column is used for the nameless column that holds the
+ * "Show more" / "Show less" buttons.
+ */
+const capColNames = ["", "Name", "State", "Users", "Apps/Actions", "Conditions", "Block/Grant Access", "Session Controls"];
+
+/**
+ * Creates the conditional access policy table at the end of the AAD report.
+ * For all other reports (e.g., teams), this function does nothing.
+ */
+const fillCAPTable = () => {
+    if (caps === undefined || caps === null) {
+        /*  The CAP table is only displayed for the AAD baseline, but
+            this js file applies to all baselines. If caps is null,
+            then the current baseline is not AAD and we don't need to
+            do anything.
+
+            Also, note that caps isn't declared in the static version of
+            this file. It is prepended to the version rendered in the html
+            by CreateReport.ps1.
+        */
+       return;
+    }
+    try {
+        let capDiv = document.createElement("section");
+        capDiv.setAttribute("id", "caps");
+        document.querySelector("main").appendChild(capDiv);
+
+        capDiv.appendChild(document.createElement("hr"));
+        h2 = document.createElement("h2");
+        h2.innerHTML = "Conditional Access Policies";
+        capDiv.appendChild(h2);
+
+        let buttons = document.createElement("div");
+        buttons.classList.add("buttons");
+        capDiv.appendChild(buttons);
+
+        let expandAll = document.createElement("button");
+        expandAll.appendChild(document.createTextNode("+ Expand all"));
+        expandAll.title = "Expands all rows in the conditional access policy table below";
+        expandAll.addEventListener("click", expandAllCAPs);
+        buttons.appendChild(expandAll);
+
+        let collapseAll = document.createElement("button");
+        collapseAll.appendChild(document.createTextNode("− Collapse all"));
+        collapseAll.title = "Collapses all rows in the conditional access policy table below";
+        collapseAll.addEventListener("click", collapseAllCAPs);
+        buttons.appendChild(collapseAll);
+
+        let table = document.createElement("table");
+        table.setAttribute("class", "caps_table");
+        capDiv.appendChild(table);
+
+        let tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+
+        let header = document.createElement("tr");
+        for (let i = 0; i < capColNames.length; i++) {
+            let th = document.createElement("th");
+            if (capColNames[i] === "Apps/Actions") {
+                th.setAttribute("class", "apps_actions");
+            }
+            else if (capColNames[i] === "State") {
+                th.setAttribute("class", "state");
+            }
+            else if (capColNames[i] === "Users") {
+                th.setAttribute("class", "users");
+            }
+            else if (capColNames[i] === "Conditions") {
+                th.setAttribute("class", "conditions");
+            }
+            th.innerHTML = capColNames[i];
+            header.appendChild(th);
+        }
+        tbody.appendChild(header);
+
+        for (let i = 0; i < caps.length; i++) {
+            let tr = document.createElement("tr");
+            for (let j = 0; j < capColNames.length; j++) {
+                let td = document.createElement("td");
+                fillTruncatedCell(td, i,j);
+                tr.appendChild(td);
+            }
+
+            // Create chevron icon in the DOM 
+            let img = document.createElement("img");
+            img.setAttribute('src', 'images/angle-right-solid.svg');
+            img.setAttribute('alt', `Chevron arrow pointing right`);
+            img.style.width = '10px';
+
+            //Append the above image as a child 
+            let expandRowButton = document.createElement("button");
+            expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
+            expandRowButton.classList.add("chevron");
+            expandRowButton.addEventListener("click", expandCAPRow);
+            expandRowButton.rowNumber = i;
+            expandRowButton.appendChild(img);
+            tr.querySelectorAll('td')[0].appendChild(expandRowButton);
+            tbody.appendChild(tr);
+        }
+    }
+    catch (error) {
+        console.error(`Error in fillCAPTable`, error);
+    }
+}
+
+/**
+ * Fills in the truncated version of the given cell of the AAD conditional
+ * access policy table. For AAD only.
+ * @param {HTMLElement} td The specific td that will be populated.
+ * @param {number} i The row number (0-indexed, not counting the header row).
+ * @param {number} j The the column number (0-indexed).
+ */
+const fillTruncatedCell = (td, i, j) => {
+    try {
+        const charLimit = 50;
+        let content = "";
+        let truncated = false;
+        if (capColNames[j] === "") {
+            content = ""
+        }
+        else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
+            content = caps[i][capColNames[j]][0];
+            truncated = true;
+        }
+        else {
+            content = caps[i][capColNames[j]];
+        }
+
+        if (content.length > charLimit) {
+            td.innerHTML = content.substring(0, charLimit);
+            truncated = true;
+        }
+        else {
+            td.innerHTML = content;
+        }
+
+        // Don't apply truncated cell to "Name" column 
+        if (j === 1) {
+            td.innerHTML = content;
+            truncated = false;
+        }
+
+    
+        if (truncated) {
+            let span = document.createElement("span");
+            span.appendChild(document.createTextNode("..."));
+
+            let threeDotsButton = document.createElement("button");
+            threeDotsButton.title = `Three dots that expands row ${i + 1} of the CAP table`;
+            threeDotsButton.classList.add("truncated-dots");
+            threeDotsButton.addEventListener("click", expandCAPRow);
+            threeDotsButton.rowNumber = i;
+            threeDotsButton.appendChild(span);
+            td.appendChild(threeDotsButton);
+        }
+    }
+    catch (error) {
+        console.error(`Error in fillTruncatedCell, i = ${i}, j = ${j}`, error);
+    }
+}
+
+/**
+ * Fills in the row of the conditional access policy table indicated by the
+ * event with the truncated version of the row. For AAD only.
+ * @param {HTMLElement} event The target of the event.
+ */
+const hideCAPRow = (event) => {
+    try {
+        let i = event.currentTarget.rowNumber;
+        let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
+        because nth-of-type is indexed from 1 and to account for the header row */
+        for (let j = 0; j < capColNames.length; j++) {
+            let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
+            fillTruncatedCell(td, i, j);
+        }
+        let img = document.createElement("img");
+        img.setAttribute('src', 'images/angle-right-solid.svg');
+        img.setAttribute('alt', `Chevron arrow pointing right`);
+        img.style.width = '10px';
+
+        let expandRowButton = document.createElement("button");
+        expandRowButton.title = `Show more info for the ${tr.children[1].innerText} policy`;
+        expandRowButton.classList.add("chevron");
+        expandRowButton.addEventListener("click", expandCAPRow);
+        expandRowButton.rowNumber = i;
+        expandRowButton.appendChild(img);
+        tr.querySelectorAll('td')[0].appendChild(expandRowButton);
+    }
+    catch (error) {
+        console.error(`Error in hideCAPRow`, error);
+    }
+}
+
+/**
+ * Expands all rows of the conditional access policy table to the full version.
+ * For AAD only.
+ */
+const expandAllCAPs = () => {
+    try {
+        let buttons = document.querySelectorAll("img[src*='angle-right-solid.svg']");
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].parentNode.click();
+        }
+    }
+    catch (error) {
+        console.error(`Error in expandAllCAPs`, error);
+    }
+}
+
+/**
+ * Shrinks all rows of the conditional access policy table to the truncated
+ * version. For AAD only.
+ */
+const collapseAllCAPs = () => {
+    try {
+        let buttons = document.querySelectorAll("img[src*='angle-down-solid.svg']");
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].parentNode.click();
+        }
+    }
+    catch (error) {
+        console.error(`Error in collapseAllCAPs`, error);
+    }
+}
+
+/**
+ * Fills in the row of the conditional access policy table indicated by the
+ * event with the full version of the row. For AAD only.
+ * @param {HTMLElement} event The target of the event.
+ */
+const expandCAPRow = (event) => {
+    try {
+        let i = event.currentTarget.rowNumber;
+        let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
+        because nth-of-type is indexed from 1 and to account for the header row */
+        for (let j = 0; j < capColNames.length; j++) {
+            let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
+            fillTruncatedCell(td, i, j);
+            td.innerHTML = "";
+            if (capColNames[j] === "") {
+                td.innerHTML = "";
+                let img = document.createElement("img");
+                img.setAttribute('src', 'images/angle-down-solid.svg');
+                img.setAttribute('alt', `Chevron arrow pointing down`);
+                img.style.width = '14px';
+
+                // For accessibility append the above image as a child 
+                let collapseRowButton = document.createElement("button");
+                collapseRowButton.title = `Show less info for the ${tr.children[1].innerText} policy`;
+                collapseRowButton.classList.add("chevron");
+                collapseRowButton.addEventListener("click", hideCAPRow);
+                collapseRowButton.rowNumber = i;
+                collapseRowButton.appendChild(img);
+                tr.querySelectorAll('td')[0].appendChild(collapseRowButton);
+            }
+            else if (caps[i][capColNames[j]].constructor === Array && caps[i][capColNames[j]].length > 1) {
+                let ul = document.createElement("ul");
+                for (let k = 0; k < caps[i][capColNames[j]].length; k++) {
+                    let li = document.createElement("li");
+                    li.innerHTML = caps[i][capColNames[j]][k];
+                    ul.appendChild(li);
+                }
+                td.appendChild(ul);
+            }
+            else {
+                td.innerHTML = caps[i][capColNames[j]];
+            }
+        }
+    }
+    catch (error) {
+        console.error(`Error in expandCAPRow`, error);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    colorRows();
+    fillCAPTable();
+    applyScopeAttributes();
+    mountDarkMode("Individual Report");
+});
+/**
+ * Checks if Dark Mode session storage variable exists. Creates one if it does not exist.
+ * Sets the report's default Dark Mode state using the $DarkMode (JavaScript darkMode) PowerShell variable.
+ * @param {string} pageLocation The page where this function is called.
+ */
+const mountDarkMode = (pageLocation) => {
+    try {
+        let darkModeCookie = sessionStorage.getItem("darkMode");
+        if (darkModeCookie === undefined || darkModeCookie === null) {
+            if (darkMode) {
+                sessionStorage.setItem("darkMode", 'true');
+            }
+            else {
+                sessionStorage.setItem("darkMode", 'false');
+            }
+            darkModeCookie = sessionStorage.getItem("darkMode");
+        }
+        setDarkMode(darkModeCookie);
+        document.getElementById('toggle').checked = (darkModeCookie === 'true');
+    }
+    catch (error) {
+        console.error("Error applying dark mode to the " + pageLocation + ": " + error)
+    }
+}
+
+/**
+ * Set the report CSS to light mode or dark mode.
+ * @param {string} state true for Dark Mode or false for Light Mode
+ */
+const setDarkMode = (state) => {
+    if (state === 'true') {
+        document.getElementsByTagName('html')[0].dataset.theme = "dark";
+        document.querySelector("#toggle-text").innerHTML = "Dark Mode";
+        sessionStorage.setItem("darkMode", 'true');
+    }
+    else {
+        document.getElementsByTagName('html')[0].dataset.theme = "light";
+        document.querySelector("#toggle-text").innerHTML = "Light Mode";
+        sessionStorage.setItem("darkMode", 'false');
+    }
+}
+
+/**
+ * Toggles light and dark mode
+ */
+const toggleDarkMode = () => {
+    if (document.getElementById('toggle').checked) {
+        setDarkMode('true');
+    }
+    else {
+        setDarkMode('false');
+    }
+}
+
+/**
+ * For each table present in a report, the function adds scope attributes for columns and rows. 
+ */
+const applyScopeAttributes = () => {
+    try {
+        const tables = document.querySelectorAll("table");
+        for(let i = 0; i < tables.length; i++) {
+            // each table has two children, <colgroup> and <tbody>
+            let tbody = tables[i].querySelector("tbody");
+            if(!tbody) throw new Error(
+                `Invalid HTML structure, <table id='${tables[i].getAttribute("id")}'> does not have a <tbody> tag.`
+            );
+            
+            /**
+             * the first <tr> in <tbody> represents columns. Label each nested <th> as scope="col"
+             * 
+             * second <tr> + ... are the rows
+             * for each <tr>, the first <td> should be labeled as scope="row", leave the rest
+             */
+            let cols, rows;
+            if(tbody.children && tbody.children.length > 1) {
+                cols = tbody.children[0].querySelectorAll("th");
+                for(let th = 0; th < cols.length; th++) {
+                    cols[th].setAttribute("scope", "col");
+                }
+
+                // change location of scope="row" if necessary (may have to adjust for structure of license info?)
+                let trIdx = (tables[i].classList.contains("caps_table")) ? 1 : 0;
+
+                // skip column <tr>; for each remaining <tr> set the scope 
+                rows = tbody.children;
+                for(let tr = 1; tr < rows.length; tr++) {
+                    rows[tr].querySelectorAll("td")[trIdx].setAttribute("scope", "row");
+                }
+            }
+            else throw new Error(
+                `Unable to apply scope attributes to columns/rows, 
+                <tbody> of <table id='${tables[i].getAttribute("id")}'> does not contain children or has no rows.`
+            );
+        }
+    }
+    catch (error) {
+        console.error(`Error in applyScopeAttributes, ${error}`);
+    }
+}
+    </script>
+    </head>
+    <body>
+        <main>
+            <header>
+                <a href="../BaselineReports.html" title="Return to the report summary"><img src="images/cisa_logo.png" alt="Cybersecurity and Infrastructure Security Agency Logo"></a>
+                <div class="links">
+                    <a href="https://www.cisa.gov/scuba" target="_blank"><h3 style="width: 210px;">Secure Cloud Business Applications (SCuBA)</h3></a>
+                    <div style="width:10px;"></div>
+                    <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md" target="_blank"><h3 style="width: 100px;">Baseline Documents</h3></a>
+                </div>
+            </header>
+            <div id="toggle-container">
+                <p id="toggle-text">Light mode</p>
+                <label class="switch">
+                    <input id="toggle" type="checkbox" autocomplete="off" onclick="toggleDarkMode()" aria-labelledby="toggle-text">
+                    <span class="slider round"></span>
+              </label>
+            </div>
+            <h1>Azure Active Directory Baseline Report</h1>
+            <h4>The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks.
+    Exclusions must only be used if they are approved within an organization's security risk acceptance process.
+    See <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/docs/configuration/configuration.md#entra-id-configuration" target="_blank">this section in the product documentation</a>
+    for a list of the policies that accept exclusions and the instructions for setting up exclusions in the configuration file.
+    <i>Exclusions can introduce grave risks to your system and must be managed carefully.</i></h4>
+            <table id="tenant-data" style = "text-align:center;"> <colgroup><col/><col/><col/><col/></colgroup> <tr><th>Tenant Display Name</th><th>Report Date</th><th>Baseline Version</th><th>Module Version</th></tr> <tr><td>tqhjy</td><td>02/12/2025 08:30:40 Central Standard Time</td><td>1</td><td>1.5.0</td></tr> </table> <h2>AAD-1 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#1-legacy-authentication" target="_blank">Legacy Authentication</a></h2> <table class='policy-data' id='AAD-1'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.1.1v1</td><td>Legacy authentication SHALL be blocked.</td><td>Pass</td><td>Shall</td><td>1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.1.1v1 Legacy authentication SHALL be blocked. <a href='#caps'>View all CA policies</a>.</td></tr> </table> <h2>AAD-2 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#2-risk-based-policies" target="_blank">Risk Based Policies</a></h2> <table class='policy-data' id='AAD-2'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.2.1v1</td><td>Users detected as high risk SHALL be blocked.</td><td>Pass</td><td>Shall</td><td>1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.1v1 Users detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>.</td></tr> <tr><td>MS.AAD.2.2v1</td><td>A notification SHOULD be sent to the administrator when high-risk users are detected.</td><td>N/A</td><td>Should/Not-Implemented</td><td>This product does not currently have the capability to check compliance for this policy. See <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1" target="_blank">Secure Configuration Baseline policy</a> for instructions on manual check</td></tr> <tr><td>MS.AAD.2.3v1</td><td>Sign-ins detected as high risk SHALL be blocked.</td><td>Pass</td><td>Shall</td><td>1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>.</td></tr> </table> <h2>AAD-3 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#3-strong-authentication-and-a-secure-registration-process" target="_blank">Strong Authentication and a Secure Registration Process</a></h2> <table class='policy-data' id='AAD-3'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.3.1v1</td><td>Phishing-resistant MFA SHALL be enforced for all users.</td><td>Fail</td><td>Shall</td><td>0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.</td></tr> <tr><td>MS.AAD.3.2v1</td><td>If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.</td><td>Pass</td><td>Shall</td><td>1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users. <a href='#caps'>View all CA policies</a>.</td></tr> <tr><td>MS.AAD.3.3v2</td><td>If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.</td><td>Fail</td><td>Shall</td><td>Requirement not met</td></tr> <tr><td>MS.AAD.3.4v1</td><td>The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.</td><td>Fail</td><td>Shall</td><td>Requirement not met</td></tr> <tr><td>MS.AAD.3.5v1</td><td>The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.</td><td>N/A</td><td>Shall/Not-Implemented</td><td>This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1" target="_blank">Secure Configuration Baseline policy</a> for more info</td></tr> <tr><td>MS.AAD.3.6v1</td><td>Phishing-resistant MFA SHALL be required for highly privileged roles.</td><td>Fail</td><td>Shall</td><td>0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.</td></tr> <tr><td>MS.AAD.3.7v1</td><td>Managed devices SHOULD be required for authentication.</td><td>Warning</td><td>Should</td><td>0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.</td></tr> <tr><td>MS.AAD.3.8v1</td><td>Managed Devices SHOULD be required to register MFA.</td><td>Warning</td><td>Should</td><td>0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.</td></tr> </table> <h2>AAD-4 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#4-centralized-log-collection" target="_blank">Centralized Log Collection</a></h2> <table class='policy-data' id='AAD-4'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.4.1v1</td><td>Security logs SHALL be sent to the agency's security operations center for monitoring.</td><td>N/A</td><td>Shall/Not-Implemented</td><td>This product does not currently have the capability to check compliance for this policy. See <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1" target="_blank">Secure Configuration Baseline policy</a> for instructions on manual check</td></tr> </table> <h2>AAD-5 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#5-application-registration-and-consent" target="_blank">Application Registration and Consent</a></h2> <table class='policy-data' id='AAD-5'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.5.1v1</td><td>Only administrators SHALL be allowed to register applications.</td><td>Pass</td><td>Shall</td><td>0 authorization policies found that allow non-admin users to register third-party applications</td></tr> <tr><td>MS.AAD.5.2v1</td><td>Only administrators SHALL be allowed to consent to applications.</td><td>Fail</td><td>Shall</td><td>1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy</td></tr> <tr><td>MS.AAD.5.3v1</td><td>An admin consent workflow SHALL be configured for applications.</td><td>Fail</td><td>Shall</td><td>Requirement not met</td></tr>  </table> <h2>AAD-6 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#6-passwords" target="_blank">Passwords</a></h2> <table class='policy-data' id='AAD-6'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.6.1v1</td><td>User passwords SHALL NOT expire.</td><td>Fail</td><td>Shall</td><td>Requirement not met</td></tr> </table> <h2>AAD-7 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#7-highly-privileged-user-access" target="_blank">Highly Privileged User Access</a></h2> <table class='policy-data' id='AAD-7'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.7.1v1</td><td>A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.</td><td>Pass</td><td>Shall</td><td>2 global admin(s) found:<br/>Jane Doe, John Public</td></tr> <tr><td>MS.AAD.7.2v1</td><td>Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.</td><td>Fail</td><td>Shall</td><td>Requirement not met: Least Privilege Score = 2 (should be 1 or less)</td></tr> <tr><td>MS.AAD.7.3v1</td><td>Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.</td><td>Pass</td><td>Shall</td><td>0 admin(s) that are not cloud-only found</td></tr> <tr><td>MS.AAD.7.4v1</td><td>Permanent active role assignments SHALL NOT be allowed for highly privileged roles.</td><td>Fail</td><td>Shall</td><td>6 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator</td></tr> <tr><td>MS.AAD.7.5v1</td><td>Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.</td><td>Fail</td><td>Shall</td><td>4 role(s) assigned to users outside of PIM:<br/>Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator</td></tr> <tr><td>MS.AAD.7.6v1</td><td>Activation of the Global Administrator role SHALL require approval.</td><td>Fail</td><td>Shall</td><td>1 role(s) or group(s) allowing activation without approval found:<br/>Global Administrator(Directory Role)</td></tr> <tr><td>MS.AAD.7.7v1</td><td>Eligible and Active highly privileged role assignments SHALL trigger an alert.</td><td>Fail</td><td>Shall</td><td>6 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Global Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)</td></tr> <tr><td>MS.AAD.7.8v1</td><td>User activation of the Global Administrator role SHALL trigger an alert.</td><td>Pass</td><td>Shall</td><td>0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found</td></tr> <tr><td>MS.AAD.7.9v1</td><td>User activation of other highly privileged roles SHOULD trigger an alert.</td><td>Warning</td><td>Should</td><td>5 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)</td></tr> </table> <h2>AAD-8 <a class='control_group' href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#8-guest-user-access" target="_blank">Guest User Access</a></h2> <table class='policy-data' id='AAD-8'> <colgroup><col/><col/><col/><col/><col/></colgroup> <tr><th>Control ID</th><th>Requirement</th><th>Result</th><th>Criticality</th><th>Details</th></tr> <tr><td>MS.AAD.8.1v1</td><td>Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.</td><td>Pass</td><td>Should</td><td>Permission level set to "Limited access" (authorizationPolicy)</td></tr> <tr><td>MS.AAD.8.2v1</td><td>Only users with the Guest Inviter role SHOULD be able to invite guest users.</td><td>Pass</td><td>Should</td><td>Permission level set to "adminsAndGuestInviters" (authorizationPolicy)</td></tr> <tr><td>MS.AAD.8.3v1</td><td>Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.</td><td>N/A</td><td>Should/Not-Implemented</td><td>This product does not currently have the capability to check compliance for this policy. See <a href="https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1" target="_blank">Secure Configuration Baseline policy</a> for instructions on manual check</td></tr> </table>
+            <h2>Tenant Licensing Information</h2><table id="license-info" style = "text-align:center;"> <colgroup><col/><col/><col/><col/></colgroup> <tr><th>Product Name</th><th>License SKU Identifier</th><th>Licenses in Use</th><th>Total Licenses</th></tr> <tr><td>Common Data Service Database Capacity for Government</td><td>CDS_DB_CAPACITY_GOV</td><td>0</td><td>1</td></tr> <tr><td>Microsoft 365 GCC G5</td><td>M365_G5_GCC</td><td>26</td><td>30</td></tr> </table>
+            <h2>Privileged Service Principal Table</h2><table id="privileged-service-principals" style="text-align:center;"> <colgroup><col/><col/><col/><col/></colgroup> <tr><th>Display Name</th><th>Service Principal ID</th><th>Roles</th><th>App ID</th></tr> <tr><td>Example Service Principal</td><td>cb0ebc77-8cfa-413f-9f5b-3f6a9195b8f5</td><td>Exchange Administrator</td><td>98fa4c56-63ae-44e6-8120-252d2a9d94ab</td></tr> </table>            
+        </main>
+    </body>
+</html>

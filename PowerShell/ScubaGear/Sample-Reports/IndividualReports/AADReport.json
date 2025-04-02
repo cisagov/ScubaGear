@@ -1,0 +1,280 @@
+[
+    {
+        "ReportSummary":  {
+                              "Failures":  12,
+                              "Errors":  0,
+                              "Passes":  10,
+                              "Warnings":  3,
+                              "Manual":  5,
+                              "Date":  "02/12/2025 08:30:40 Central Standard Time",
+                              "Omits":  0
+                          },
+        "Results":  [
+                        {
+                            "GroupName":  "Legacy Authentication",
+                            "GroupNumber":  "1",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#1-legacy-authentication",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.1.1v1",
+                                                 "Requirement":  "Legacy authentication SHALL be blocked.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.1.1v1 Legacy authentication SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Risk Based Policies",
+                            "GroupNumber":  "2",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#2-risk-based-policies",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.2.1v1",
+                                                 "Requirement":  "Users detected as high risk SHALL be blocked.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.1v1 Users detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.2.2v1",
+                                                 "Requirement":  "A notification SHOULD be sent to the administrator when high-risk users are detected.",
+                                                 "Result":  "N/A",
+                                                 "Criticality":  "Should/Not-Implemented",
+                                                 "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.2.3v1",
+                                                 "Requirement":  "Sign-ins detected as high risk SHALL be blocked.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked. <a href='#caps'>View all CA policies</a>."
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Strong Authentication and a Secure Registration Process",
+                            "GroupNumber":  "3",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#3-strong-authentication-and-a-secure-registration-process",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.3.1v1",
+                                                 "Requirement":  "Phishing-resistant MFA SHALL be enforced for all users.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.2v1",
+                                                 "Requirement":  "If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users. <a href='#caps'>View all CA policies</a>."
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.3v2",
+                                                 "Requirement":  "If phishing-resistant MFA has not been enforced and Microsoft Authenticator is enabled, it SHALL be configured to show login context information.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "Requirement not met"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.4v1",
+                                                 "Requirement":  "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "Requirement not met"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.5v1",
+                                                 "Requirement":  "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.",
+                                                 "Result":  "N/A",
+                                                 "Criticality":  "Shall/Not-Implemented",
+                                                 "Details":  "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.6v1",
+                                                 "Requirement":  "Phishing-resistant MFA SHALL be required for highly privileged roles.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.7v1",
+                                                 "Requirement":  "Managed devices SHOULD be required for authentication.",
+                                                 "Result":  "Warning",
+                                                 "Criticality":  "Should",
+                                                 "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.3.8v1",
+                                                 "Requirement":  "Managed Devices SHOULD be required to register MFA.",
+                                                 "Result":  "Warning",
+                                                 "Criticality":  "Should",
+                                                 "Details":  "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Centralized Log Collection",
+                            "GroupNumber":  "4",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#4-centralized-log-collection",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.4.1v1",
+                                                 "Requirement":  "Security logs SHALL be sent to the agency's security operations center for monitoring.",
+                                                 "Result":  "N/A",
+                                                 "Criticality":  "Shall/Not-Implemented",
+                                                 "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Application Registration and Consent",
+                            "GroupNumber":  "5",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#5-application-registration-and-consent",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.5.1v1",
+                                                 "Requirement":  "Only administrators SHALL be allowed to register applications.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "0 authorization policies found that allow non-admin users to register third-party applications"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.5.2v1",
+                                                 "Requirement":  "Only administrators SHALL be allowed to consent to applications.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 authorization policies found that allow non-admin users to consent to third-party applications:<br/>authorizationPolicy"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.5.3v1",
+                                                 "Requirement":  "An admin consent workflow SHALL be configured for applications.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "Requirement not met"
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Passwords",
+                            "GroupNumber":  "6",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#6-passwords",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.6.1v1",
+                                                 "Requirement":  "User passwords SHALL NOT expire.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "Requirement not met"
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Highly Privileged User Access",
+                            "GroupNumber":  "7",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#7-highly-privileged-user-access",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.7.1v1",
+                                                 "Requirement":  "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "2 global admin(s) found:<br/>Jane Doe, John Public"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.2v1",
+                                                 "Requirement":  "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.3v1",
+                                                 "Requirement":  "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "0 admin(s) that are not cloud-only found"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.4v1",
+                                                 "Requirement":  "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "6 role(s) that contain users with permanent active assignment:<br/>Application Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.5v1",
+                                                 "Requirement":  "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "4 role(s) assigned to users outside of PIM:<br/>Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.6v1",
+                                                 "Requirement":  "Activation of the Global Administrator role SHALL require approval.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "1 role(s) or group(s) allowing activation without approval found:<br/>Global Administrator(Directory Role)"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.7v1",
+                                                 "Requirement":  "Eligible and Active highly privileged role assignments SHALL trigger an alert.",
+                                                 "Result":  "Fail",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "6 role(s) or group(s) without notification e-mail configured for role assignments found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Global Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.8v1",
+                                                 "Requirement":  "User activation of the Global Administrator role SHALL trigger an alert.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Shall",
+                                                 "Details":  "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.7.9v1",
+                                                 "Requirement":  "User activation of other highly privileged roles SHOULD trigger an alert.",
+                                                 "Result":  "Warning",
+                                                 "Criticality":  "Should",
+                                                 "Details":  "5 role(s) or group(s) without notification e-mail configured for role activations found:<br/>Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)"
+                                             }
+                                         ]
+                        },
+                        {
+                            "GroupName":  "Guest User Access",
+                            "GroupNumber":  "8",
+                            "GroupReferenceURL":  "https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#8-guest-user-access",
+                            "Controls":  [
+                                             {
+                                                 "Control ID":  "MS.AAD.8.1v1",
+                                                 "Requirement":  "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Should",
+                                                 "Details":  "Permission level set to \"Limited access\" (authorizationPolicy)"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.8.2v1",
+                                                 "Requirement":  "Only users with the Guest Inviter role SHOULD be able to invite guest users.",
+                                                 "Result":  "Pass",
+                                                 "Criticality":  "Should",
+                                                 "Details":  "Permission level set to \"adminsAndGuestInviters\" (authorizationPolicy)"
+                                             },
+                                             {
+                                                 "Control ID":  "MS.AAD.8.3v1",
+                                                 "Requirement":  "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.",
+                                                 "Result":  "N/A",
+                                                 "Criticality":  "Should/Not-Implemented",
+                                                 "Details":  "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.5.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check"
+                                             }
+                                         ]
+                        }
+                    ],
+        "MetaData":  {
+                         "Tenant Display Name":  "tqhjy",
+                         "Report Date":  "02/12/2025 08:30:40 Central Standard Time",
+                         "Baseline Version":  "1",
+                         "Module Version":  "1.5.0"
+                     }
+    }
+]
