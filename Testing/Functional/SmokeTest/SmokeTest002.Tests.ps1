@@ -14,7 +14,7 @@
     The test expects the Scuba output files to exists from a previous run of Invoke-Scuba for the same tenant and all products.
 
 #>
-
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Alias', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
 param (
     [Parameter(Mandatory = $false)]
