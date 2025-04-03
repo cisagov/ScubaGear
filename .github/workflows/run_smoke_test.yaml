@@ -42,4 +42,5 @@ jobs:
                 $AutomationCredentials = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
                 $TestTenants = $AutomationCredentials.TestTenants
                 . utils/workflow/Invoke-SmokeTests.ps1
-                Invoke-SmokeTests -TestTenants $TestTenants
+                $FailedTestCount = Invoke-SmokeTests -TestTenants $TestTenants
+                exit $FailedTestCount
