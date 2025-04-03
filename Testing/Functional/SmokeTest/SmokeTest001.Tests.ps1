@@ -24,6 +24,12 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
 [CmdletBinding(DefaultParameterSetName='Manual')]
 param (
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $Alias = 'TenantAlias',
     [Parameter(Mandatory = $true, ParameterSetName = 'Auto')]
     [ValidateNotNullOrEmpty()]
     [string]
@@ -48,7 +54,7 @@ $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell
 Import-Module $ScubaModulePath
 
 Describe "Smoke Test: Generate Output" {
-    Context "Invoke Scuba for $Organization" {
+    Context "Invoke Scuba for $Alias" {
         BeforeAll {
             if ($PSCmdlet.ParameterSetName -eq 'Manual'){
                 { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON} |
