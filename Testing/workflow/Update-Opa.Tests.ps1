@@ -4,10 +4,6 @@ using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "Update OPA" {
 
-    BeforeAll {
-        function Invoke-RestMethod {  [PSCustomObject]@{'tag_name' = 'v1.3.0'} }
-    }
-
     It "Determine if OPA needs to be updated" {
         Mock -CommandName Invoke-RestMethod -MockWith {
             [PSCustomObject]@{'tag_name' = 'v9.9.0'}
