@@ -15,6 +15,7 @@
 
 #>
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationName', Justification = 'False positive as rule does not scan child scopes')]
 param (
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
