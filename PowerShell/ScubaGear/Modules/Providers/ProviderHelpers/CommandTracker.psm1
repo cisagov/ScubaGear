@@ -1,6 +1,8 @@
 Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaSpfRecord, Get-ScubaDkimRecord, Get-ScubaDmarcRecord
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals
+Import-Module -name $PSScriptRoot/../../Permissions/PermissionsHelper.psm1 -Function Get-ScubaGearPermissions
+Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
 class CommandTracker {
     [string[]]$SuccessfulCommands = @()
@@ -15,20 +17,53 @@ class CommandTracker {
         .Functionality
         Internal
         #>
+
         if (-Not $CommandArgs.ContainsKey("ErrorAction")) {
             $CommandArgs.ErrorAction = "Stop"
         }
 
-        try {
-            $Result = & $Command @CommandArgs
-            $this.SuccessfulCommands += $Command
-            return $Result
-        }
-        catch {
-            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-            $this.UnSuccessfulCommands += $Command
-            $Result = @()
-            return $Result
+        if ($CommandArgs['GraphDirect'] -eq $true) {
+            # This will pull the Graph API vice the PowerShell module
+            try {
+                # Remove GraphDirect Key, this is just needed to trigger the logic
+                $CommandArgs.Remove("GraphDirect")
+                Write-Verbose "Running $($Command) API Call"
+                $ModCommand = Invoke-GraphDirectly -Commandlet $Command @CommandArgs
+                $Result = $ModCommand
+                $this.SuccessfulCommands += $Command
+
+                # Check if $Result.value exists, if it does, return it if not return just $Result
+                if ($Result.value) {
+                    $Result = $Result.value
+                }else{
+                    $Result = $Result
+                }
+
+                return $Result
+            }
+            catch {
+                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+                $this.UnSuccessfulCommands += $Command
+                $Result = @()
+                return $Result
+            }
+        }else{
+            if($CommandArgs.Contains("GraphDirect")) {
+                $CommandArgs.Remove("M365Environment")
+                $CommandArgs.Remove("GraphDirect") # Remove the GraphDirect key to avoid confusion when calling PowerShell commands. This should only be used for API calls.
+            }
+            try {
+                Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
+                $Result = & $Command @CommandArgs
+                $this.SuccessfulCommands += $Command
+                return $Result
+            }
+            catch {
+                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+                $this.UnSuccessfulCommands += $Command
+                $Result = @()
+                return $Result
+            }
         }
     }
 

@@ -114,7 +114,7 @@ Function Get-ScubaGearPermissions {
         [string]$Domain,
 
         [Parameter(Mandatory = $false)]
-        [guid]$Id,
+        [string]$Id,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('least', 'higher')]
@@ -126,7 +126,7 @@ Function Get-ScubaGearPermissions {
         [string]$Environment = 'commercial',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('perms','modules', 'api', 'endpoint', 'support', 'role' , 'appId', 'all')]
+        [ValidateSet('perms','modules', 'api', 'endpoint', 'support', 'role' , 'appId', 'all', 'apiHeader')]
         [string]$OutAs ='perms'
     )
     Begin{
@@ -263,12 +263,28 @@ Function Get-ScubaGearPermissions {
                     #$apiResource = $_.'apiResource'
 
                     If($_.apifilter){
-                        $connecturi + ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + '?$filter=' + $_.apifilter
+                        if($_.apifilter -match '{id}'){
+                            #if the apifilter contains {id}, then replace it with the id
+                            $connecturi + ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + $_.apifilter -replace '{id}',$Id
+                        }else{
+                            $connecturi + ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + $_.apifilter
+                        }
                     }else{
                         $connecturi + $_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain
                     }
                 } | Select-Object -Unique
 
+            }
+            'apiHeader'{
+                If ($PSBoundParameters.ContainsKey('CmdletName') -and $CmdletName -match '-Mg') {
+                    # if cmdlet is a graph cmdlet, then get the connect-* cmdlet
+                    Write-Verbose -Message "Command: `$connecturi = `$permissionSet | Where-Object {`$_.moduleCmdlet -eq 'Connect-MgGraph' -and `$_.supportedEnv -eq '$Environment'} | foreach-object {`$_.apiResource} | Select-Object -Unique"
+                    $apiHeader = $permissionSet | Where-Object { $_.moduleCmdlet -eq 'Connect-MgGraph' -and $_.supportedEnv -eq $Environment } | foreach-object { $_.apiResource } | Select-Object -Unique
+                    $output += $apiHeader
+                }
+                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty apiHeader -Unique
+                # Filter out any unwanted values
+                $output = $output | Where-Object { $_ -isnot [string] -or $_ -notlike 'https://*graph.microsoft.*' }
             }
             'support' {
                 Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty supportLinks -Unique"
@@ -322,10 +338,10 @@ Function Get-ScubaGearPermissions {
 Function Get-ScubaGearEntraMinimumPermissions{
     <#
     .SYNOPSIS
-        This Function is used to retrieve the minimum permissions of the ScubaGear module
+        This Function is used to retrieve the redundant permissions of the SCuBAGear module
 
     .DESCRIPTION
-        This Function is used to retrieve the minimum permissions of the ScubaGear module for aad only
+        This Function is used to retrieve the redundant permissions of the SCuBAGear module for aad only
 
     .PARAMETER Environment
         The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
@@ -360,9 +376,11 @@ Function Get-ScubaGearEntraMinimumPermissions{
         }
     }
 
-    # Build a new list of permissions that includes the least permissions and the higher permissions that overwrite them
     $NewPermissions = @()
+    # Build a new list of permissions that includes the least permissions and the higher permissions that overwrite them
+
     $NewPermissions += $filteredPermissions | Select-Object -ExpandProperty leastPermissions -Unique
+
     # include overwrite higher permissions
     $NewPermissions += $OverwriteHigherPermissions
     $NewPermissions = $NewPermissions | Sort-Object -Unique
@@ -371,4 +389,51 @@ Function Get-ScubaGearEntraMinimumPermissions{
     return $NewPermissions
 }
 
-Export-ModuleMember -Function Get-ScubaGearPermissions,Get-ScubaGearEntraMinimumPermissions
+Function Get-ServicePrincipalPermissions {
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+
+    # Create a list to hold the filtered permissions
+    $filteredPermissions = @()
+
+    # get all modules with least and higher permissions
+    $allPermissions = "aad","exo","sharepoint" | Get-ScubaGearPermissions -OutAs all -Environment $Environment -servicePrincipal
+
+    # filter to get the higher overwriting permissions
+    $OverwriteHigherPermissions = Get-ScubaGearEntraMinimumPermissions -Environment $Environment
+
+    # if the ServicePrincipal switch is used, then add the appropriate resourceAPIAppId to $OverwriteHigherPermissions from line 356 by looking at the $allPermissions
+    $newOverwriteHigherPermissions = @()
+    ForEach($permission in $OverwriteHigherPermissions) {
+        $resourceAPIAppId = ($allPermissions | Where-Object { $_.leastPermissions -contains $permission } | Select-Object -ExpandProperty resourceAPIAppId -Unique)
+        $newObject = [PSCustomObject]@{
+            resourceAPIAppId   = $resourceAPIAppId
+            leastPermissions   = $permission
+        }
+        $newOverwriteHigherPermissions += $newObject
+    }
+
+    # loop thru each module and grab the least permissions unless the higher permissions is one from the $overriteHigherPermissions
+    # Don't include the least permissions that are overwriten by the higher permissions
+    foreach($permission in $allPermissions){
+        if( (Compare-Object $permission.higherPermissions -DifferenceObject $OverwriteHigherPermissions -IncludeEqual).SideIndicator -notcontains "=="){
+            $filteredPermissions += $permission
+        }
+    }
+
+    $NewPermissions = @()
+    # Build a new list of permissions that includes the least permissions and the higher permissions that overwrite them
+
+    $NewPermissions += $filteredPermissions
+
+    # include overwrite higher permissions
+    $NewPermissions += $newOverwriteHigherPermissions
+
+    # Display the filtered permissions
+    return $NewPermissions | Select-Object -Property LeastPermissions,ResourceAPiAppID -Unique
+}
+
+Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions
