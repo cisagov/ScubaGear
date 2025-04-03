@@ -1,7 +1,6 @@
 package aad_test
 import rego.v1
 import data.aad
-import data.utils.report.NotCheckedDeprecation
 import data.utils.key.TestResult
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -131,17 +130,5 @@ test_IsEnabled_Incorrect if {
     Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
-}
-#--
-
-#
-# Policy MS.AAD.5.4v1
-#--
-test_TeamsGroupConsentDisabled_NotImplemented_V1 if {
-    PolicyId := "MS.AAD.5.4v1"
-
-    Output := aad.tests with input.directory_settings as [DirectorySettings]
-
-    TestResult(PolicyId, Output, NotCheckedDeprecation, false) == true
 }
 #--

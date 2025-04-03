@@ -1,7 +1,6 @@
 package aad
 import rego.v1
 import data.utils.report.NotCheckedDetails
-import data.utils.report.NotCheckedDeprecation
 import data.utils.report.CheckedSkippedDetails
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
@@ -704,24 +703,6 @@ tests contains {
         Count(GoodAdminConsentSettings) > 0
     ]
     Status := Count(FilterArray(Conditions, false)) == 0
-}
-#--
-
-#
-# MS.AAD.5.4v1
-#--
-
-# Microsoft has removed this configuration option
-# We are setting this policy to not-implemented and will likely remove it 
-# from the baseline in the next version.
-
-tests contains {
-    "PolicyId": "MS.AAD.5.4v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-MgBetaDirectorySetting"],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDeprecation,
-    "RequirementMet": false
 }
 #--
 

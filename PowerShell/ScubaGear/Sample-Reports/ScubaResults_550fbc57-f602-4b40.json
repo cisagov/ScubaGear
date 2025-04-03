@@ -221,13 +221,6 @@
                                          "Result":  "Fail",
                                          "Criticality":  "Shall",
                                          "Details":  "Requirement not met"
-                                     },
-                                     {
-                                         "Control ID":  "MS.AAD.5.4v1",
-                                         "Requirement":  "Group owners SHALL NOT be allowed to consent to applications.",
-                                         "Result":  "N/A",
-                                         "Criticality":  "Shall/Not-Implemented",
-                                         "Details":  "This configuration setting has been deprecated and we are in the process of removing it from the baseline."
                                      }
                                  ]
                 },
