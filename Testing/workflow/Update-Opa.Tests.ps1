@@ -3,25 +3,36 @@ using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 # The purpose of these tests is to verify that the functions used to update OPA are working.
 
 Describe "Update OPA" {
+
+    BeforeAll {
+        function Invoke-RestMethod {  [PSCustomObject]@{'tag_name' = 'v1.3.0'} }
+    }
+
     It "Determine if OPA needs to be updated" {
+        Mock -CommandName Invoke-RestMethod -MockWith {
+            [PSCustomObject]@{'tag_name' = 'v9.9.0'}
+        }
+
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
         # The current version of OPA used in SG is found in PowerShell/ScubaGear/ScubaGear.psm1
         # in the variable DefaultOPAVersion
         $ExpectedCurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
+
         # Call the function
         . $ScriptPath
         $ReturnValues = Confirm-OpaUpdateRequirements -RepoPath $RepoRootPath
+
         # Check the results
         $ActualCurrentOPAVersion = $ReturnValues["CurrentOPAVersion"]
         $LatestOPAVersion = $ReturnValues["LatestOPAVersion"]
-        # The latest version of OPA is found here:
-        # https://github.com/open-policy-agent/opa/releases
-        # This value will need to be updated from time to time.
-        $LatestOPAVersion | Should -Be "1.2.0"
+
+        # Should match mocked version returned from Invoke-RestMethod
+        $LatestOPAVersion | Should -Be "9.9.0"
         $ActualCurrentOPAVersion | Should -Be $ExpectedCurrentOPAVersion
     }
+
     It "Update OPA version in config and support" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
