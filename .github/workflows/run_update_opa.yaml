@@ -55,12 +55,6 @@ jobs:
                   echo updaterequired=$UpdateRequired >> $env:GITHUB_OUTPUT
                   echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
 
-                  # Note that git-ls will always fail with exit code 1 when the
-                  # branch does not exist. This try-catch will catch that error
-                  # and intentionally ignore it, because the return value will
-                  # handle the problem of a missing branch.
-                  exit 0
-
             - name: Update OPA version
               if: steps.determine-update-required.outputs.updaterequired == 'true'
               run: |
