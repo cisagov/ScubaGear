@@ -11,7 +11,7 @@
     .PARAMETER AppId
     The Application Id associated with the Service Principal and certificate.
     .EXAMPLE
-    $TestContainer = New-PesterContainer -Path "SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "cisaent.onmicrosoft.com"; AppId = $AppId }
+    $TestContainer = New-PesterContainer -Path "SmokeTest001.Tests.ps1" -Data @{ Thumbprint = $Thumbprint; Organization = "example.onmicrosoft.com"; AppId = $AppId }
     Invoke-Pester -Container $TestContainer -Output Detailed
     .EXAMPLE
     Invoke-Pester -Script .\Testing\Functional\SmokeTest\SmokeTest001.Tests.ps1 -Output Detailed
