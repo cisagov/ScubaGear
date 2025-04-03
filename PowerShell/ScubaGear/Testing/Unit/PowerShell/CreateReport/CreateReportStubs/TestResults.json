@@ -2964,7 +2964,7 @@
                            "Get-RemoteDomain"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.EXO.1.1v1",
+        "PolicyId":  "MS.EXO.1.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },

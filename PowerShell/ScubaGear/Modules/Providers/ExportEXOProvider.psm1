@@ -19,7 +19,7 @@ function Export-EXOProvider {
     $Tracker = Get-CommandTracker
 
     <#
-    MS.EXO.1.1v1
+    MS.EXO.1.1v2
     #>
     $RemoteDomains = ConvertTo-Json @($Tracker.TryCommand("Get-RemoteDomain"))
 

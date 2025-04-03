@@ -1,14 +1,14 @@
 ProductName: exo
 TestPlan:
-  - PolicyId: MS.EXO.1.1v1
+  - PolicyId: MS.EXO.1.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.EXO.1.1v1 Non-Compliant case - domains have auto forwarding Enabled
+      - TestDescription: MS.EXO.1.1v2 Non-Compliant case - domains have auto forwarding Enabled
         Preconditions:
           - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.EXO.1.1v1 Compliant case - domains have auto forwarding Disabled
+      - TestDescription: MS.EXO.1.1v2 Compliant case - domains have auto forwarding Disabled
         Preconditions:
           - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false"
         Postconditions: []

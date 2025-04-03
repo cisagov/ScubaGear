@@ -78,3 +78,7 @@ Defender:
   MS.DEFENDER.2.3v1:
     PartnerDomains:
       - ""
+Exo:
+  MS.EXO.1.1v2:
+    AllowedForwardingDomains:
+      - ""
