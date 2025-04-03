@@ -89,13 +89,13 @@ function LoadProviderExport() {
       [string]
       $OutputFolder
   )
-    # If this is the first time, create the ModifiedProviderSettings file from ProviderSettings and load that into memory
-    # If this is the second time, load the ModifiedProviderSettings because it was previously modified with UpdateConditionalAccessByName or other ScubaCached precondition functions
+    # Create new settings file to use for modifications if one does not already exist
+    # If modified settings file already exists, use as is.
   if (-not (Test-Path -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
 
-  # The reason ModifiedProviderSettingsExport is used is because the file may have been modified in a previous call to a PreCondition like UpdateConditionalAccess
+  # Load the modified settings file as it may contain changes from preconditions
   $Content = Get-Utf8NoBom -FilePath "$OutputFolder/ModifiedProviderSettingsExport.json"
 
   $ProviderExport = $Content | ConvertFrom-Json
