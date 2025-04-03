@@ -7,11 +7,6 @@ on:
     schedule:
         - cron: "11 2 * * 1-5"
     workflow_dispatch:
-    push:
-        paths:
-            - ".github/workflows/run_update_opa.yaml"
-            - "utils/workflow/Update-Opa.ps1"
-            - "Testing/workflow/Update-Opa.Tests.ps1"
 
 permissions: read-all
 
