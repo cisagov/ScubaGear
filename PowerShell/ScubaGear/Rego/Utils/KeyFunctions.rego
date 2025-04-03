@@ -85,7 +85,7 @@ TestResultContains(PolicyId, Output, ReportDetailArrayStrings, RequirementMet) :
 
     # regal ignore: print-or-trace-call
     print("** Checking RequirementMet **")
-    assert.Equals(RuleOutput[0].RequirementMet, RequirementMet)
+    assert.Equals(RequirementMet, RuleOutput[0].RequirementMet)
 
     # regal ignore: print-or-trace-call
     print("** Checking ReportDetails **")

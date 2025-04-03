@@ -1177,3 +1177,57 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
+  - PolicyId: MS.AAD.3.9v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.3.9v1 Non-Compliant case - Device code block disabled
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                state: disabled
+                Conditions:
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  AuthenticationFlows:
+                    TransferMethods: "deviceCodeFlow"
+                GrantControls:
+                  BuiltInControls:
+                    - block
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.9v1 Compliant case - Device code block enabled
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                state: enabled
+                Conditions:
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  AuthenticationFlows:
+                    TransferMethods: "deviceCodeFlow"
+                GrantControls:
+                  BuiltInControls:
+                    - block
+        Postconditions: []
+        ExpectedResult: true

@@ -863,7 +863,8 @@ function New-SCuBAConfig {
         "MS.AAD.3.2v1",
         "MS.AAD.3.6v1",
         "MS.AAD.3.7v1",
-        "MS.AAD.3.8v1"
+        "MS.AAD.3.8v1",
+        "MS.AAD.3.9v1"
         )
     $RoleExclusionNamespace = "MS.AAD.7.4v1"
 

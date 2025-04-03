@@ -560,6 +560,46 @@ tests contains {
 }
 #--
 
+#--
+# MS.AAD.3.9v1
+#--
+
+# Checks to ensure a managed device is required to perform MFA registration
+RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
+    CAPolicy.Conditions.AuthenticationFlows.TransferMethods == "deviceCodeFlow"
+    "block" in CAPolicy.GrantControls.BuiltInControls
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
+}
+
+# Pass if at least 1 policy meets all conditions
+tests contains {
+    "PolicyId": "MS.AAD.3.9v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": RequireDeviceCodeBlock,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString), CAPLINK]),
+    "RequirementMet": Status
+} if {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := Count(RequireDeviceCodeBlock) > 0
+}
+#--
+
 ############
 # MS.AAD.4 #
 ############
