@@ -69,6 +69,8 @@ function Invoke-SmokeTests {
         Remove-MyCertificates
         $Index = $Index + 1
     }
-    # Return sum of return codes, which if non-zero indicates a test failure.
+
+    # Return sum of return codes, which if non-zero is the number of failed tests.
+    Write-Output "Smoke tests failed: $ReturnCode"
     $ReturnCode
 }
