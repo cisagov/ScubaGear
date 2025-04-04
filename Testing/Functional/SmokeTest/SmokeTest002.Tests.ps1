@@ -4,19 +4,23 @@
     .DESCRIPTION
     Test script to test Scuba HTML reports validity.
     .PARAMETER OrganizationDomain
-    The Organizations domain name (e.g., abd.onmicrosoft.com)
+    The Organizations domain name (e.g., abc.onmicrosoft.com)
     .PARAMETER OrganizationName
     The Organizations friendly name (e.g., The ABC Corporation)
     .EXAMPLE
-    $TestContainer = New-PesterContainer -Path "SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "cisaent.onmicrosoft.com"; OrganizationName = "Cybersecurity and Infrastructure Security Agency" }
+    $TestContainer = New-PesterContainer -Path "SmokeTest002.Tests.ps1" -Data @{ OrganizationDomain = "example.onmicrosoft.com"; OrganizationName = "Example Tenant" }
     Invoke-Pester -Container $TestContainer -Output Detailed
     .NOTES
     The test expects the Scuba output files to exists from a previous run of Invoke-Scuba for the same tenant and all products.
 
 #>
-
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationDomain', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OrganizationName', Justification = 'False positive as rule does not scan child scopes')]
 param (
+    [Parameter(Mandatory = $false)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $Alias = 'TenantAlias',
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
@@ -29,7 +33,7 @@ param (
 
 Import-Module Selenium
 
-Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $OrganizationName" -ForEach @(
+Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEach @(
     @{ Browser = "Chrome"; Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') 2>$null }
 ){
 	BeforeAll {
