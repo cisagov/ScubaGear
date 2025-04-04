@@ -71,6 +71,5 @@ function Invoke-SmokeTests {
     }
 
     # Return sum of return codes, which if non-zero is the number of failed tests.
-    Write-Output "Smoke tests failed: $ReturnCode"
     $ReturnCode
 }
