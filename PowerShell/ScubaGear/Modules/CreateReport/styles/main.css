@@ -1,21 +1,22 @@
 :root {
     --background-primary: white;
     --background-secondary: #b9bec2;
-    --test-pass: #d5ebd5;
-    --test-fail: #E5C7C7;
-    --test-warning: #fff7d6;
+    --test-pass: #88C388;
+    --test-fail: #FD6868;
+    --test-warning: #ffea94;
     --test-other: #ebebf2;
     --test-deleted-bg: #b2beb5;
     --test-deleted-color: #6f7478;
-    --test-bug-color: #e80b0b;
-    --test-error-color: #DD4803;
+    --test-bug-color: #ea462a;
+    --test-error-color: #2e2e2e;
     --cap-even: #0052882d;
     --cap-hover: #00528850;
-    --header-color: #005288;
-    --note-color: #ee4e04;
+    --header-color: #007cad;
+    --note-color: #D34503;
     --header-bottom: black;
-    --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --link-color: #007700;
+    --unvisited-link-color: #007099;
+    --fail-link-color: #123540;
     --text-color: black;
     --uuid-color: #424242;
     --border-color: black;
@@ -27,19 +28,22 @@
 html[data-theme='dark'] {
     --background-primary: #10171D;
     --background-secondary: #121212;
-    --test-pass: #1C361C;
-    --test-fail: #381919;
-    --test-warning: #524100;
-    --test-other: #414141;
-    --cap-even: #0052882d;
+    --test-pass: #57A857;
+    --test-fail: #8B4141;
+    --test-warning: #D6AB00;
+    --test-other: #d1d1d1;
+    --cap-even: #00528d;
     --cap-hover: #007ccf50;
-    --test-error-color: #FD885D;
-    --header-color: #b7c8d2;
+    --cap-table-color: #c2c2c2;
+    --cap-notimplemented-link:#004EC2;
+    --test-nonerror-color: #2E2E2E;
+    --test-error-color: #CFCFCF;
+    --header-color: #008BC2;
     --note-color: #ee4e04;
-    --header-bottom: rgb(221, 221, 221);
-    --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
-    --text-color: #bdbdbd;
+    --link-color: #0000E6;
+    --unvisited-link-color: #A3C8FF;
+    --fail-link-color: #B3D1FF;
+    --text-color: #969696;
     --uuid-color: #999999;
     --border-color: #7b7b7b;
 }
@@ -74,6 +78,26 @@ h4 {
     margin-left:20%;
     margin-right: 20%;
     margin-bottom: 0.313em;
+}
+
+h4 a {
+   color: var(--unvisited-link-color)
+}
+
+h4 .aad-link {
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: underline;
+}
+
+h4 .aad-link:visited {
+    font-family: Arial, Helvetica, sans-serif;
+    /* color: var(--link-color); */
+}
+
+h4 .aad-link:hover {
+    font-family: Arial, Helvetica, sans-serif;
+    /* color: var(--link-color); */
+    text-decoration: none;
 }
 
 
@@ -115,8 +139,62 @@ td {
     overflow-wrap: break-word;
 }
 
+tr[data-state="pass"] {
+    background:var(--test-pass);  
+    color:var(--test-nonerror-color);  
+}
+
+tr[data-state="fail"] {
+    background:var(--test-fail);
+    color:var(--test-error-color);
+    td a {
+        color:var(--fail-link-color);
+    }
+}
+
+tr[data-state="bug"] {
+    background:var(--test-bug-color);    
+}
+
+tr[data-state="warning"] {
+    background:var(--test-warning); 
+    color:var(--test-nonerror-color);   
+}
+
+tr[data-state="deleted"] {
+    background:var(--test-other);
+    color:var(--test-deleted-color);    
+}
+
+tr[data-state="omitted"]{
+    background:var(--test-other);
+    color:var(--test-nonerror-color);  
+}
+
+tr[data-state="notimplemented"]{
+    background:var(--test-other);
+    color:var(--test-nonerror-color);    
+}
+
+tr[data-state="notimplemented"] a {
+    color:var(--cap-notimplemented-link);    
+}
+
+tr[data-state="thirdparty"]{
+    background:var(--test-other);
+    color:var(--test-nonerror-color);    
+}
+
+tr[data-state="error"]{
+    background:var(--test-fail);
+    td {
+        border-color:var(--border-color);
+        color:var(--test-error-color);
+    }
+}
+
 td a {
-    color: var(--header-color);
+    color: var(--link-color);
 }
 
 table, th, td {
@@ -155,6 +233,11 @@ h2 {
 img {
     width: 6.25em;
 }
+
+tr[data-state="pass"] a[href="#caps"] {
+    color: #3D1C6D;
+}
+
 
 #caps h2 {
     margin-top: 3.125em;
@@ -195,6 +278,7 @@ img {
 .caps_table {
     width: 1000px;
     margin: 1em 3.125em 0 3.125em;
+    color:var(--cap-table-color);
 }
 
 .buttons {
@@ -232,7 +316,7 @@ th.conditions {
 }
 
 #toggle-text {
-    color: #7b7b7b;
+    color: var(--text-color);
     margin: 0.313em 3.125em;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.875em;
@@ -287,11 +371,11 @@ th.conditions {
 }
 
 input:checked + .slider {
-    background-color: #005288ad;
+    background-color: #0795F2;
 }
 
 input:focus + .slider {
-    box-shadow: 0 0 0.063em #005288ad;
+    box-shadow: 0 0 0.063em #0795F2;
 }
 
 input:checked + .slider:before {
