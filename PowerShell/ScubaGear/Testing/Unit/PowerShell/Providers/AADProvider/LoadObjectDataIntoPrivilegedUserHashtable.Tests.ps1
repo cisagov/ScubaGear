@@ -1,82 +1,70 @@
 $ProviderPath = '../../../../../Modules/Providers'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportAADProvider.psm1") -Function 'LoadObjectDataIntoPrivilegedUserHashtable' -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ProviderHelpers/CommandTracker.psm1") -Force
 
 InModuleScope ExportAADProvider {
     Describe -Tag 'LoadObjectDataIntoPrivilegedUserHashtable' -Name 'Not Found' {
         BeforeAll {
-            # Create a custom class that implements the TryCommand method
-            class MockCommandTracker {
-                [object] TryCommand([string]$CommandName, [hashtable]$Parameters) {
-                    $result = switch ($CommandName) {
+            Mock Invoke-GraphDirectly -MockWith {
+                param ($Commandlet, $M365Environment, $ID)
+                    switch ($Commandlet) {
                         "Get-MgBetaUser" {
-                            # If an ID parameter is provided, use it in the user name
-                            $userId = if ($Parameters.ContainsKey('id')) { $Parameters['id'] } else { "default" }
-                            [PSCustomObject]@{
-                                DisplayName = "User $userId"
-                                OnPremisesImmutableId = "ImmutableId-$userId"
+                            if($Null -eq $ID) {
+                                [PSCustomObject]@{
+                                DisplayName            = "John Doe"
+                                OnPremisesImmutableId  = "ABC123"
+                                }
+                            }else{
+                                [PSCustomObject]@{
+                                    DisplayName            = "User $ID"
+                                    OnPremisesImmutableId  = "ImmutableId-$ID"  # Simulates a user with a unique ID
+                                }
                             }
-                            break
                         }
                         "Get-MgBetaGroupMember" {
-                            # Return exactly 2 members
-                            @(
+                           $Value = @(
                                 [PSCustomObject]@{
                                     Id = [Guid]::NewGuid().Guid
-                                    "@odata.type" = "#microsoft.graph.user"
+                                    "@odata.type" = "#microsoft.graph.user"  # First user in the group
                                 },
                                 [PSCustomObject]@{
                                     Id = [Guid]::NewGuid().Guid
-                                    "@odata.type" = "#microsoft.graph.user"
+                                    "@odata.type" = "#microsoft.graph.user"  # Second user in the group
                                 }
                             )
-                            break
+                            [PSCustomObject]@{
+                                Value = $Value
+                            }
                         }
                         "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
-                            # Return empty array for normal tests to avoid recursion
-                            @()
-                            break
+                            # Simulate a PIM eligible group member
+                            @(
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # First PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                },
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # Second PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                }
+                            )
                         }
                         default {
-                            Write-Warning "ERROR you forgot to create a mock method for this cmdlet: $($CommandName)"
-                            @()
-                            break
+                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
                         }
                     }
-                    return $result
-                }
-
-                # Overload for TryCommand with just one parameter
-                [object] TryCommand([string]$CommandName) {
-                    return $this.TryCommand($CommandName, @{})
-                }
             }
-
-            # Create an instance of our mock tracker and assign it to $script:Tracker
-            $script:Tracker = [MockCommandTracker]::new()
-
-            # Mock the Get-CommandTracker function to return our $Tracker
-            Mock Get-CommandTracker { return $script:Tracker }
-
-            # Define Get-MgBetaDirectoryObject here so we can mock it properly
-            function Get-MgBetaDirectoryObject { }
-
-            # Define other functions that might be called
-            function Get-MgBetaServicePrincipal { }
-            function Get-MgBetaUser { }
-            function Get-MgBetaGroupMember { }
-            function Invoke-GraphDirectly { }
         }
 
         It 'Deleted user triggers Request_ResourceNotFound exception' {
             # Set up the parameters for the test
-            $RoleName = "Global Administrator"
-            $PrivilegedUsers = @{}
-            $ObjectId = [Guid]::NewGuid().Guid
+            $RoleName = "Global Administrator"  # Mock role
+            $PrivilegedUsers = @{}  # Empty hashtable for privileged users
+            $ObjectId = [Guid]::NewGuid().Guid  # Random GUID for ObjectId
             $TenantHasPremiumLicense = $true
             $M365Environment = "commercial"
 
             # Simulate the "Request_ResourceNotFound" exception
+            function  Get-MgBetaDirectoryObject { }
             Mock Get-MgBetaDirectoryObject {
                 throw [System.Exception]::new("Request_ResourceNotFound")
             }
@@ -96,167 +84,165 @@ InModuleScope ExportAADProvider {
 
         It 'Objecttype is a user' {
             # Set up the parameters for the test
-            $RoleName = "Global Administrator"
-            $PrivilegedUsers = @{}
-            $ObjectId = [Guid]::NewGuid().Guid
+            $RoleName = "Global Administrator"  # Mock role
+            $PrivilegedUsers = @{}  # Empty hashtable for privileged users
+            $ObjectId = [Guid]::NewGuid().Guid  # Random GUID for ObjectId
             $TenantHasPremiumLicense = $true
             $M365Environment = "commercial"
 
             # Mock Get-MgBetaDirectoryObject to return a user-type object
+            function  Get-MgBetaDirectoryObject { }
             Mock Get-MgBetaDirectoryObject {
                 [PSCustomObject]@{
                     AdditionalProperties = @{
-                        "@odata.type" = "#microsoft.graph.user"
+                        "@odata.type" = "#microsoft.graph.user"  # Simulates a user type
                     }
                 }
+            }
+
+            Mock Invoke-GraphDirectly -MockWith {
+                param ($Commandlet, $M365Environment, $ID)
+                    switch ($Commandlet) {
+                        "Get-MgBetaUser" {
+                            [PSCustomObject]@{
+                            DisplayName            = "John Doe"
+                            OnPremisesImmutableId  = "ABC123"
+                            }
+                        }
+                        default {
+                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
+                        }
+                    }
             }
 
             # Test 1 - Do NOT pass ObjectType
             LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
-
             # Assertions to ensure the user was processed correctly
-            $PrivilegedUsers[$ObjectId].DisplayName | Should -Match "User"
-            $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Match "ImmutableId"
-            $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
+             $PrivilegedUsers[$ObjectId].DisplayName | Should -Be "John Doe"
+             $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Be "ABC123"
+             $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
 
             # Test 2 - Pass ObjectType
             $PrivilegedUsers = @{}
             $Objecttype = "user"
-            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense  -M365Environment $M365Environment
 
             # Assertions to ensure the user was processed correctly
-            $PrivilegedUsers[$ObjectId].DisplayName | Should -Match "User"
-            $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Match "ImmutableId"
+            $PrivilegedUsers[$ObjectId].DisplayName | Should -Be "John Doe"
+            $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Be "ABC123"
             $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
         }
 
-        Context 'Group tests' {
-            It 'Non-recursive group members' {
-                # Set up the parameters for the test
-                $RoleName = "Global Administrator"
-                $PrivilegedUsers = @{}
-                $ObjectId = [Guid]::NewGuid().Guid
-                $TenantHasPremiumLicense = $true
-                $M365Environment = "commercial"
+        It 'Objecttype is a group' {
+            # Set up the parameters for the test
+            $RoleName = "Global Administrator"  # Mock role
+            $PrivilegedUsers = @{}  # Empty hashtable for privileged users
+            $ObjectId = [Guid]::NewGuid().Guid  # Random GUID for ObjectId, simulating a group ID
+            $TenantHasPremiumLicense = $true
+            $M365Environment = "commercial"
 
-                # Mock Get-MgBetaDirectoryObject to return a group-type object
-                Mock Get-MgBetaDirectoryObject {
-                    [PSCustomObject]@{
-                        AdditionalProperties = @{
-                            "@odata.type" = "#microsoft.graph.group"
-                        }
+            # Mock Get-MgBetaDirectoryObject to return a group-type object
+            function  Get-MgBetaDirectoryObject { }
+            Mock Get-MgBetaDirectoryObject {
+                [PSCustomObject]@{
+                    AdditionalProperties = @{
+                        "@odata.type" = "#microsoft.graph.group"  # Simulates a group type
                     }
-                }
-
-                # Test 1 - Do NOT pass ObjectType
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
-
-                # Assertions to ensure the group members were processed correctly
-                $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
-
-                # Ensure both users have their properties set correctly
-                $PrivilegedUsers.Values | ForEach-Object {
-                    $_.roles | Should -Contain $RoleName
-                    $_.DisplayName | Should -Match "User"
-                    $_.OnPremisesImmutableId | Should -Match "ImmutableId"
-                }
-
-                # Test 2 - Pass ObjectType
-                $PrivilegedUsers = @{}
-                $Objecttype = "group"
-                LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
-
-                # Assertions to ensure the group members were processed correctly
-                $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
-
-                # Ensure both users have their properties set correctly
-                $PrivilegedUsers.Values | ForEach-Object {
-                    $_.roles | Should -Contain $RoleName
-                    $_.DisplayName | Should -Match "User"
-                    $_.OnPremisesImmutableId | Should -Match "ImmutableId"
                 }
             }
 
-            It 'Recursive group members (PIM)' {
-                # Set up the parameters for the test
-                $RoleName = "Global Administrator"
-                $PrivilegedUsers = @{}
-                $ObjectId = "TestGroupId"  # Use a fixed ID for easier debugging
-                $TenantHasPremiumLicense = $true
-                $M365Environment = "commercial"
-                $Objecttype = "group"  # Explicitly set the object type
-
-                # Mock Get-MgBetaDirectoryObject to return a group-type object
-                Mock Get-MgBetaDirectoryObject {
-                    [PSCustomObject]@{
-                        AdditionalProperties = @{
-                            "@odata.type" = "#microsoft.graph.group"
+            Mock Invoke-GraphDirectly -MockWith {
+                param ($Commandlet, $M365Environment, $ID)
+                    switch ($Commandlet) {
+                        "Get-MgBetaUser" {
+                            [PSCustomObject]@{
+                                DisplayName            = "User $ID"
+                                OnPremisesImmutableId  = "ImmutableId-$ID"  # Simulates a user with a unique ID
+                            }
                         }
-                    }
-                }
-
-                # Create a custom tracker for this test specifically
-                $customTracker = [PSCustomObject]@{
-                    TryCommand = {
-                        param($CommandName, $Parameters = @{})
-
-                        switch ($CommandName) {
-                            "Get-MgBetaUser" {
-                                $userId = if ($Parameters.ContainsKey('id')) { $Parameters['id'] } else { "default" }
-                                return [PSCustomObject]@{
-                                    DisplayName = "User $userId"
-                                    OnPremisesImmutableId = "ImmutableId-$userId"
+                        "Get-MgBetaGroupMember" {
+                           $Value = @(
+                                [PSCustomObject]@{
+                                    Id = [Guid]::NewGuid().Guid
+                                    "@odata.type" = "#microsoft.graph.user"  # First user in the group
+                                },
+                                [PSCustomObject]@{
+                                    Id = [Guid]::NewGuid().Guid
+                                    "@odata.type" = "#microsoft.graph.user"  # Second user in the group
                                 }
-                            }
-                            "Get-MgBetaGroupMember" {
-                                return @(
-                                    [PSCustomObject]@{
-                                        Id = "user1"
-                                        "@odata.type" = "#microsoft.graph.user"
-                                    },
-                                    [PSCustomObject]@{
-                                        Id = "user2"
-                                        "@odata.type" = "#microsoft.graph.user"
-                                    }
-                                )
-                            }
-                            "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
-                                # Return PIM members with fixed IDs
-                                return @(
-                                    [PSCustomObject]@{ PrincipalId = "pim1"; AccessId = "member" },
-                                    [PSCustomObject]@{ PrincipalId = "pim2"; AccessId = "member" },
-                                    [PSCustomObject]@{ PrincipalId = "pim3"; AccessId = "member" },
-                                    [PSCustomObject]@{ PrincipalId = "pim4"; AccessId = "member" }
-                                )
-                            }
-                            default {
-                                return @()
+                            )
+                            [PSCustomObject]@{
+                                Value = $Value
                             }
                         }
+                        "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
+                            # Simulate a PIM eligible group member
+                            @(
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # First PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                },
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # Second PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                }
+                            )
+                        }
+                        default {
+                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
+                        }
                     }
-                }
+            }
 
-                # Mock Get-CommandTracker using our custom tracker
-                Mock Get-CommandTracker { return $customTracker }
+            ########## Test 1 - Do NOT pass ObjectType
+            LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
 
-                # Run the actual function
-                LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+            # Assertions to ensure the group members were processed correctly
+            $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
 
-                # We've learned from our debugging that the function doesn't call the PIM API
-                # in our test context, so adjust expectations accordingly
-                $PrivilegedUsers.Count | Should -Be 2
+            # Ensure both users have their properties set correctly
+            $PrivilegedUsers.Values | ForEach-Object {
+                $_.roles | Should -Contain $RoleName
+                $_.DisplayName | Should -Match "User"
+                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
+            }
 
-                # Verify that the regular group members were processed
-                $PrivilegedUsers.Values | ForEach-Object {
-                    $_.roles | Should -Contain $RoleName
-                    $_.DisplayName | Should -Match "User"
-                    $_.OnPremisesImmutableId | Should -Match "ImmutableId"
-                }
+            ########## Test 2 - Pass ObjectType
+            $PrivilegedUsers = @{}
+            $Objecttype = "group"
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+
+            # Assertions to ensure the group members were processed correctly
+            $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
+
+            # Ensure both users have their properties set correctly
+            $PrivilegedUsers.Values | ForEach-Object {
+                $_.roles | Should -Contain $RoleName
+                $_.DisplayName | Should -Match "User"
+                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
+            }
+
+            ########## Test 3 - Trigger recursion by mocking Invoke-GraphDirectly to return some users
+            $PrivilegedUsers = @{}
+            $Objecttype = "group"
+
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+
+            # Two group members that each trigger the recursion 2 levels deep = 2 + 2 + 2 = 6
+            $PrivilegedUsers.Count | Should -Be 6
+
+            # Ensure all users have their properties set correctly
+            $PrivilegedUsers.Values | ForEach-Object {
+                $_.roles | Should -Contain $RoleName
+                $_.DisplayName | Should -Match "User"
+                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
             }
         }
     }
+}
 
-    AfterAll {
-        Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
-    }
+AfterAll {
+    Remove-Module ExportAADProvider -Force -ErrorAction SilentlyContinue
 }
