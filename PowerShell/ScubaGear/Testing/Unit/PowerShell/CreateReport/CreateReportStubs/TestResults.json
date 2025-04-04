@@ -279,6 +279,18 @@
     },
     {
         "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.3.9v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
                         ],
         "Commandlet":  [
                            "Get-MgBetaSubscribedSku",
@@ -420,22 +432,6 @@
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.6v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - MFA SHALL be required for Highly Privileged Roles. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            {
-                                "Name":  "EnableGroupSpecificConsent",
-                                "SettingsGroup":  "Consent Policy Settings",
-                                "Value":  "false"
-                            }
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaDirectorySetting"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.5.4v1",
-        "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
     {

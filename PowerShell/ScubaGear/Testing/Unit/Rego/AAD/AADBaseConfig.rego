@@ -36,7 +36,10 @@ ConditionalAccessPolicies := {
         "ClientAppTypes": [
             "other",
             "exchangeActiveSync"
-        ]
+        ],
+        "AuthenticationFlows": {
+            "TransferMethods":  null
+        },
     },
     "GrantControls": {
         "BuiltInControls": [

@@ -28,7 +28,10 @@ Additional terminology in this document specific to their respective SCBs are to
 
 ### Removed Policies 
 
-N/A
+#### MS.AAD.5.4v1
+Group owners SHALL NOT be allowed to consent to applications.
+- _Removal date:_ March 2025
+- _Removal rationale:_ Microsoft announced via MC712143 that it will no longer be possible for group owners to consent to applications. All references including the policy, implementation steps, and section have been removed as the setting is no longer present.
 
 ## Defender
 
