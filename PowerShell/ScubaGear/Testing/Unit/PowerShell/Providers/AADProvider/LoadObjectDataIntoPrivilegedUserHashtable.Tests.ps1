@@ -4,55 +4,6 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 InModuleScope ExportAADProvider {
     Describe -Tag 'LoadObjectDataIntoPrivilegedUserHashtable' -Name 'Not Found' {
         BeforeAll {
-            Mock Invoke-GraphDirectly -MockWith {
-                param ($Commandlet, $M365Environment, $ID)
-                    switch ($Commandlet) {
-                        "Get-MgBetaUser" {
-                            if($Null -eq $ID) {
-                                [PSCustomObject]@{
-                                DisplayName            = "John Doe"
-                                OnPremisesImmutableId  = "ABC123"
-                                }
-                            }else{
-                                [PSCustomObject]@{
-                                    DisplayName            = "User $ID"
-                                    OnPremisesImmutableId  = "ImmutableId-$ID"  # Simulates a user with a unique ID
-                                }
-                            }
-                        }
-                        "Get-MgBetaGroupMember" {
-                           $Value = @(
-                                [PSCustomObject]@{
-                                    Id = [Guid]::NewGuid().Guid
-                                    "@odata.type" = "#microsoft.graph.user"  # First user in the group
-                                },
-                                [PSCustomObject]@{
-                                    Id = [Guid]::NewGuid().Guid
-                                    "@odata.type" = "#microsoft.graph.user"  # Second user in the group
-                                }
-                            )
-                            [PSCustomObject]@{
-                                Value = $Value
-                            }
-                        }
-                        "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
-                            # Simulate a PIM eligible group member
-                            @(
-                                [PSCustomObject]@{
-                                    PrincipalId = [Guid]::NewGuid().Guid  # First PIM eligible user
-                                    AccessId    = "member"  # Simulates eligible PIM member
-                                },
-                                [PSCustomObject]@{
-                                    PrincipalId = [Guid]::NewGuid().Guid  # Second PIM eligible user
-                                    AccessId    = "member"  # Simulates eligible PIM member
-                                }
-                            )
-                        }
-                        default {
-                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
-                        }
-                    }
-            }
         }
 
         It 'Deleted user triggers Request_ResourceNotFound exception' {
@@ -101,7 +52,7 @@ InModuleScope ExportAADProvider {
             }
 
             Mock Invoke-GraphDirectly -MockWith {
-                param ($Commandlet, $M365Environment, $ID)
+                param ($Commandlet)
                     switch ($Commandlet) {
                         "Get-MgBetaUser" {
                             [PSCustomObject]@{
@@ -152,7 +103,7 @@ InModuleScope ExportAADProvider {
             }
 
             Mock Invoke-GraphDirectly -MockWith {
-                param ($Commandlet, $M365Environment, $ID)
+                param ($Commandlet, $ID)
                     switch ($Commandlet) {
                         "Get-MgBetaUser" {
                             [PSCustomObject]@{
