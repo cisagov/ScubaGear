@@ -316,6 +316,7 @@ Device code authentication SHOULD be blocked.
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
 - _Rationale:_ The device code authentication flow has been abused by threat actors to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk of this attack vector.
 - _Last modified:_ February 2025
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
 - _MITRE ATT&CK TTP Mapping:_
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
