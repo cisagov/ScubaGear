@@ -43,5 +43,4 @@ jobs:
                 $TestTenants = $AutomationCredentials.TestTenants
                 . utils/workflow/Invoke-SmokeTests.ps1
                 $FailedTestCount = Invoke-SmokeTests -TestTenants $TestTenants
-                Write-Output "Smoke Tests Failed: $FailedTestCount"
                 exit $FailedTestCount
