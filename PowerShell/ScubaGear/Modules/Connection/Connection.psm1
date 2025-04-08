@@ -68,18 +68,6 @@ function Connect-Tenant {
                    $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
-                   if($_ -eq "defender" -and $AADAuthRequired) {
-                       $GraphScopes = Get-ScubaGearPermissions -Product "defender"
-                       $GraphParams = @{
-                           'M365Environment' = $M365Environment;
-                           'Scopes'          = $GraphScopes;
-                       }
-                       if($ServicePrincipalParams) {
-                        $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                       }
-                       Connect-GraphHelper @GraphParams
-                       $AADAuthRequired = $false
-                   }
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
                            M365Environment = $M365Environment;

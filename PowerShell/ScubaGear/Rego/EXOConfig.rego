@@ -996,21 +996,7 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.17.1v1"),
     "RequirementMet": false
 }
-#--
 
-#
-# MS.EXO.17.2v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.EXO.17.2v1",
-    "Criticality": "Shall/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.17.2v1"),
-    "RequirementMet": false
-}
 #--
 
 #
