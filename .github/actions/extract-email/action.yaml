@@ -7,34 +7,9 @@ runs:
   using: "composite"
   steps:
     - run: |
-        $productAlias = $env:Alias
-        $params = $env:TestParams
-        $products = $params.split("|")
-        foreach ($product in $products)
-        {
-          [String]$emails = ""
-          $attributes = $product.split(",")
-          foreach ($attribute in $attributes)
-          {
-            # Split the key from the value
-            $keyAndValue = $attribute.split("=")
-            $key = $keyAndValue[0]
-            $value = $keyAndValue[1]
-            if($key.ToLower() -eq "alias")
-            {
-              $alias = $value
-            }
-            elseif($key.ToLower() -eq "emails")
-            {
-              $emails = $value
-            }
-          }
-          if($alias -eq $productAlias)
-          {
-            # Pass emails to later job for notification.
-            echo emails=$emails >> $env:GITHUB_OUTPUT
-            break
-          }
-        }
+        . utils/action/Get-Email.ps1
+        $Email = Get-Email -ProductAlias $env:Alias -Params $env:TestParams
+        # Pass email(s) to later job for notification.
+        echo emails=$Email >> $env:GITHUB_OUTPUT
       id: emails-output
       shell: powershell
