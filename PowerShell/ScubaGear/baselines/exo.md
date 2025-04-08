@@ -59,16 +59,20 @@ forwarding rules to exfiltrate data to external recipients.
 
 ### Policies
 
-#### MS.EXO.1.1v1
+#### MS.EXO.1.1v2
 Automatic forwarding to external domains SHALL be disabled.
 
-<!--Policy: MS.EXO.1.1v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
 persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
-- _Last modified:_ June 2023
+- _Last modified:_ March 2025
+- _Note:_ Automatic forwarding MAY be enabled with specific, agency-approved domains.
+There may be cases where an external domain is operationally needed and has an acceptable
+degree of risk, e.g., a domain controlled by the same agency but that hasn't been added
+as an accepted domain in M365.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -87,7 +91,7 @@ internal forwarding.
 
 ### Implementation
 
-#### MS.EXO.1.1v1 Instructions
+#### MS.EXO.1.1v2 Instructions
 To disallow automatic forwarding to external domains:
 
 1.  Sign in to the **Exchange admin center**.
@@ -101,8 +105,9 @@ To disallow automatic forwarding to external domains:
 5.  Clear the checkbox next to **Allow automatic forwarding**, then
     click **Save**.
 
-6.  Return to **Remote domains** and repeat steps 4 and 5 for each
-    additional remote domain in the list.
+6.  Return to **Remote domains** and review each
+    additional remote domain in the list, ensuring that automatic forwarding
+    is only allowed for approved domains.
 
 ## 2. Sender Policy Framework
 
