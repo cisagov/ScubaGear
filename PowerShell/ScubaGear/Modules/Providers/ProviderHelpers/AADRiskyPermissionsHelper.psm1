@@ -452,9 +452,9 @@ function Format-RiskyThirdPartyServicePrincipals {
             throw $_
         }
 
-        if ($null -eq $ServicePrincipals -or $ServicePrincipals.Count -eq 0) {
-            return "{}"
-        }
+        #if ($null -eq $ServicePrincipals -or $ServicePrincipals.Count -eq 0) {
+        #    return "{}"
+        #}
         return $ServicePrincipals
     }
 }
