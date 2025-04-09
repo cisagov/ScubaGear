@@ -363,12 +363,10 @@ TestPlan:
         Preconditions:
           # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
-                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
-                      $Domain = '@' + $Domain
-                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $User = (Get-MailUser)[0].UserPrincipalName
                       $Group = (Get-UnifiedGroup)[0].alias
-                      Set-ATPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
-                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+                      Set-ATPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.3v1 Compliant -- std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
@@ -411,11 +409,9 @@ TestPlan:
               ErrorAction: Continue
           # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
-                      $Domain = (@(Get-MgBetaDomain | Where-Object {$_.IsDefault -eq $true})[0]).Id
-                      $Domain = '@' + $Domain
-                      $User = (Get-MgBetaUser -ConsistencyLevel eventual -Count userCount -Filter "endsWith(UserPrincipalName, '$Domain')")[0]
+                      $User = (Get-MailUser)[0].UserPrincipalName
                       $Group = (Get-UnifiedGroup)[0].alias
-                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $User.UserPrincipalName -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.DEFENDER.1.5v1 Compliant Matched Recipient Domains
