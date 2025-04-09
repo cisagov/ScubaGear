@@ -363,7 +363,7 @@ TestPlan:
         Preconditions:
           # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
-                      $User = (Get-MailUser)[0].UserPrincipalName
+                      $User = (Get-EXOMailbox)[0].UserPrincipalName
                       $Group = (Get-UnifiedGroup)[0].alias
                       Set-ATPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
                       Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
@@ -409,7 +409,7 @@ TestPlan:
               ErrorAction: Continue
           # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
           - Command: |
-                      $User = (Get-MailUser)[0].UserPrincipalName
+                      $User = (Get-EXOMailbox)[0].UserPrincipalName
                       $Group = (Get-UnifiedGroup)[0].alias
                       Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
         Postconditions: []
