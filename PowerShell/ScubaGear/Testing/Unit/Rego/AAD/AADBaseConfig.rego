@@ -143,43 +143,41 @@ AuthenticationMethod := {
             "Id":  "MicrosoftAuthenticator",
             "State": "enabled",
             "ExcludeTargets":  [],
-            "AdditionalProperties":  {
-                "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
-                "isSoftwareOathEnabled":  false,
-                "featureSettings":  {
-                    "displayAppInformationRequiredState":  {
-                        "state":  "enabled",
-                        "includeTarget":  {
-                            "targetType":  "group",
-                            "id":  "all_users"
-                        },
-                        "excludeTarget":  {
-                            "targetType":  "group",
-                            "id":  "00000000-0000-0000-0000-000000000000"
-                        }
+            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+            "IsSoftwareOathEnabled":  false,
+            "FeatureSettings":  {
+                "DisplayAppInformationRequiredState":  {
+                    "State":  "enabled",
+                    "IncludeTarget":  {
+                        "TargetType":  "group",
+                        "Id":  "all_users"
                     },
-                    "displayLocationInformationRequiredState":  {
-                        "state":  "enabled",
-                        "includeTarget":  {
-                            "targetType":  "group",
-                            "id":  "all_users"
-                        },
-                        "excludeTarget":  {
-                            "targetType":  "group",
-                            "id":  "00000000-0000-0000-0000-000000000000"
-                        }
+                    "ExcludeTarget":  {
+                        "TargetType":  "group",
+                        "Id":  "00000000-0000-0000-0000-000000000000"
                     }
                 },
-                "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
-                "includeTargets":  [
-                    {
-                        "targetType":  "group",
-                        "id":  "all_users",
-                        "isRegistrationRequired":  false,
-                        "authenticationMode":  "any"
+                "DisplayLocationInformationRequiredState":  {
+                    "State":  "enabled",
+                    "IncludeTarget":  {
+                        "TargetType":  "group",
+                        "Id":  "all_users"
+                    },
+                    "ExcludeTarget":  {
+                        "TargetType":  "group",
+                        "Id":  "00000000-0000-0000-0000-000000000000"
                     }
-                ]
-            }
+                }
+            },
+            "IncludeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+            "IncludeTargets":  [
+                {
+                    "TargetType":  "group",
+                    "Id":  "all_users",
+                    "IsRegistrationRequired":  false,
+                    "AuthenticationMode":  "any"
+                }
+            ]
         },
         {
             "Id": "Sms",
@@ -202,9 +200,9 @@ PrivilegedRoles := [
         "DisplayName": "Global Administrator",
         "Assignments": [
             {
-                "startDateTime": "/Date(1660328610000)/",
-                "endDateTime": "/Date(1691006065170)/",
-                "principalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                "StartDateTime": "/Date(1660328610000)/",
+                "EndDateTime": "/Date(1691006065170)/",
+                "PrincipalId": "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
             }
         ],
         "Rules": [
@@ -212,28 +210,24 @@ PrivilegedRoles := [
                 "Id": "Expiration_Admin_Assignment",
                 "RuleSource": "Global Administrator",
                 "RuleSourceType": "Directory Role",
-                "AdditionalProperties": {
-                    "isExpirationRequired": true,
-                    "maximumDuration": "P30D",
-                    "setting": {
-                        "isApprovalRequired": true
-                    },
-                    "notificationType": "Email",
-                    "notificationRecipients": [
-                        "test@example.com"
-                    ]
-                }
+                "IsExpirationRequired": true,
+                "MaximumDuration": "P30D",
+                "Setting": {
+                    "IsApprovalRequired": true
+                },
+                "NotificationType": "Email",
+                "NotificationRecipients": [
+                    "test@example.com"
+                ]
             },
             {
                 "Id": "Notification_Admin_Admin_Eligibility",
                 "RuleSource":  "Global Administrator",
                 "RuleSourceType":  "Directory Role",
-                "AdditionalProperties": {
-                    "notificationType": "Email",
-                    "notificationRecipients": [
-                        "test@example.com"
-                    ]
-                }
+                "NotificationType": "Email",
+                "NotificationRecipients": [
+                    "test@example.com"
+                ]
             }
         ]
     },
@@ -242,8 +236,8 @@ PrivilegedRoles := [
         "DisplayName": "Privileged Role Administrator",
         "Assignments": [
             {
-                "endDateTime": "/Date(1691006065170)/",
-                "principalId": "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
+                "EndDateTime": "/Date(1691006065170)/",
+                "PrincipalId": "e54ac846-1f5a-4afe-aa69-273b42c3b0c1"
             }
         ],
         "Rules": [
@@ -251,16 +245,14 @@ PrivilegedRoles := [
                 "Id": "Expiration_Admin_Assignment",
                 "RuleSource": "Global Administrator",
                 "RuleSourceType": "Directory Role",
-                "AdditionalProperties": {
-                    "isExpirationRequired": true,
-                    "maximumDuration": "P30D",
-                    "setting": {
-                        "isApprovalRequired": true
-                    },
-                    "notificationRecipients": [
-                        "test@example.com"
-                    ]
-                }
+                "IsExpirationRequired": true,
+                "MaximumDuration": "P30D",
+                "Setting": {
+                    "IsApprovalRequired": true
+                },
+                "NotificationRecipients": [
+                    "test@example.com"
+                ]
             }
         ]
     }
