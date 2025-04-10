@@ -154,20 +154,15 @@ function Export-AADProvider {
     $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
     
+    $AggregateRiskyApps = if ($RiskyApps -and $RiskySPs) {
+        ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs}))
+    }
+    else { "{}" }
 
-    if ($RiskyApps -and $RiskySPs) {
-        $AggregateRiskyApps = ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs}))
+    $RiskyThirdPartySPs = if ($RiskySPs) {
+        ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs}))
     }
-    else {
-        $AggregateRiskyApps = "{}"
-    }
-
-    if ($RiskySPs) {
-        $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs}))
-    }
-    else {
-        $RiskyThirdPartySPs = "{}"
-    }
+    else { "{}" }
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
