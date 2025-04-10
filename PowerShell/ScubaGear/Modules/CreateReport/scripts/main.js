@@ -10,34 +10,31 @@ const colorRows = () => {
     for (let i = 0; i < rows.length; i++) {
         try {
             if (rows[i].children[requirementCol].innerHTML.startsWith("[DELETED]")) {
-                rows[i].style.color = "var(--test-deleted-color)";
-                rows[i].style.background = "var(--test-other)";
+                rows[i].dataset.state = "deleted";
             }
             else if (rows[i].children[statusCol].innerHTML.startsWith("Bug")){
-                rows[i].style.background = "var(--test-bug-color)";
+                rows[i].dataset.state = "bug";
             }
             else if (rows[i].children[statusCol].innerHTML === "Fail") {
-                rows[i].style.background = "var(--test-fail)";
+                rows[i].dataset.state = "fail";
             }
             else if (rows[i].children[statusCol].innerHTML === "Warning") {
-                rows[i].style.background = "var(--test-warning)";
+                rows[i].dataset.state = "warning";
             }
             else if (rows[i].children[statusCol].innerHTML === "Pass") {
-                rows[i].style.background = "var(--test-pass)";
+                rows[i].dataset.state = "pass";
             }
             else if (rows[i].children[statusCol].innerHTML === "Omitted") {
-                rows[i].style.background = "var(--test-other)";
+                rows[i].dataset.state = "omitted";
             }
             else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
-                rows[i].style.background = "var(--test-other)";
+                rows[i].dataset.state = "notimplemented";
             }
             else if (rows[i].children[criticalityCol].innerHTML.includes("3rd Party")) {
-                rows[i].style.background = "var(--test-other)";
+                rows[i].dataset.state = "thirdparty";
             }
             else if (rows[i].children[statusCol].innerHTML.includes("Error")) {
-                rows[i].style.background = "var(--test-fail)";
-                rows[i].querySelectorAll('td')[statusCol].style.borderColor = "var(--border-color)";
-                rows[i].querySelectorAll('td')[statusCol].style.color = "var(--test-error-color)";
+                rows[i].dataset.state = "error";
             }
         }
         catch (error) {
