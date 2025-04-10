@@ -1,7 +1,7 @@
 ProductName: aad
 TestPlan:
   - PolicyId: MS.AAD.2.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.2.1v1 No P2 license case
         Preconditions: []
@@ -9,7 +9,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.2.3v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.2.3v1 No P2 license case
         Preconditions: []
@@ -17,7 +17,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.4v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.4v1 No P2 license case
         Preconditions: []
@@ -25,7 +25,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.5v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.5v1 No P2 license case
         Preconditions: []
@@ -33,7 +33,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.6v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.6v1 No P2 license case
         Preconditions: []
@@ -41,7 +41,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.7v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.7v1 No P2 license case
         Preconditions: []
@@ -49,7 +49,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.8v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.8v1 No P2 license case
         Preconditions: []
@@ -57,7 +57,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.AAD.7.9v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.AAD.7.9v1 No P2 license case
         Preconditions: []
