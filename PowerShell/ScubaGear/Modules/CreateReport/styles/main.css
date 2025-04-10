@@ -1,24 +1,26 @@
 :root {
     --background-primary: white;
     --background-secondary: #b9bec2;
-    --test-pass: #88C388;
-    --test-fail: #FD6868;
-    --test-warning: #ffea94;
+    --test-pass: #afe8af;
+    --test-fail: #e39c9c;
+    --test-warning: #f9e79c;
     --test-other: #ebebf2;
     --test-deleted-bg: #b2beb5;
     --test-deleted-color: #6f7478;
     --test-bug-color: #ea462a;
-    --test-error-color: #2e2e2e;
+    --test-error-color: #000000;
     --cap-even: #0052882d;
     --cap-hover: #00528850;
     --header-color: #007cad;
     --note-color: #D34503;
     --header-bottom: black;
-    --link-color: #007700;
+    --link-color: #002d3d;
+    --header-link-color: #007099;
     --unvisited-link-color: #007099;
-    --fail-link-color: #123540;
+    --fail-link-color: #002d3d;
     --text-color: black;
     --uuid-color: #424242;
+    --pass-caps: #3D1C6D;
     --border-color: black;
     --toggle-height: 1.563em;
     --toggle-width: 2.875em;
@@ -28,22 +30,25 @@
 html[data-theme='dark'] {
     --background-primary: #10171D;
     --background-secondary: #121212;
-    --test-pass: #57A857;
+    --test-pass: #8DC48D;
     --test-fail: #8B4141;
-    --test-warning: #D6AB00;
-    --test-other: #d1d1d1;
+    --test-warning: #f9e79c;
+    --test-other: #a8a8a8;
     --cap-even: #00528d;
     --cap-hover: #007ccf50;
     --cap-table-color: #c2c2c2;
-    --cap-notimplemented-link:#004EC2;
+    --cap-notimplemented-link: #00425C;
     --test-nonerror-color: #2E2E2E;
     --test-error-color: #CFCFCF;
+    --header-bottom: white;
+    --header-link-color: #008BC2;
+    --pass-caps: color: #3D1C6D;
     --header-color: #008BC2;
     --note-color: #ee4e04;
     --link-color: #0000E6;
-    --unvisited-link-color: #A3C8FF;
-    --fail-link-color: #B3D1FF;
-    --text-color: #969696;
+    --unvisited-link-color: #66A3FF;
+    --fail-link-color: #B3D1FE;
+    --text-color: #B0B0B0;
     --uuid-color: #999999;
     --border-color: #7b7b7b;
 }
@@ -87,6 +92,7 @@ h4 a {
 h4 .aad-link {
     font-family: Arial, Helvetica, sans-serif;
     text-decoration: underline;
+    color: var(--header-link-color);
 }
 
 h4 .aad-link:visited {
@@ -177,7 +183,7 @@ tr[data-state="notimplemented"]{
 }
 
 tr[data-state="notimplemented"] a {
-    color:var(--cap-notimplemented-link);    
+    color:var(--cap-not-implemented-link);  
 }
 
 tr[data-state="thirdparty"]{
@@ -235,7 +241,7 @@ img {
 }
 
 tr[data-state="pass"] a[href="#caps"] {
-    color: #3D1C6D;
+    color: var(--pass-caps);
 }
 
 
@@ -394,7 +400,7 @@ input:checked + .slider:before {
 
 a.control_group:link {
     font-family: Arial, Helvetica, sans-serif;
-    color: var(--unvisited-link-color);
+    color: var(--header-link-color);
     text-decoration: underline;
 }
 
