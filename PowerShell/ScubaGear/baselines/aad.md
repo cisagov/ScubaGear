@@ -298,6 +298,17 @@ Managed Devices SHOULD be required to register MFA.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
 
+#### MS.AAD.3.9v1
+Device code authentication SHOULD be blocked.
+
+<!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
+- _Rationale:_ The device code authentication flow has been abused by threat actors to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk of this attack vector.
+- _Last modified:_ February 2025
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+
 ### Resources
 
 - [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)
@@ -313,6 +324,12 @@ Managed Devices SHOULD be required to register MFA.
 - [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)
 
 - [Enable passkeys (FIDO2) for your organization](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2)
+
+- [Storm-2372 conducts device code phishing campaign](https://www.microsoft.com/en-us/security/blog/2025/02/13/storm-2372-conducts-device-code-phishing-campaign/)
+
+- [Microsoft 365 Device Code Phishing Cyber Attack – Demonstration, Analysis and Mitigation](https://github.com/cisagov/ScubaGear/issues/1599)
+
+- [Block device code flow](https://learn.microsoft.com/en-us/entra/identity/conditional-access/managed-policies#block-device-code-flow)
 
 ### License Requirements
 
@@ -399,6 +416,20 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
 
+#### MS.AAD.3.9v1 Instructions
+
+1. Create a Conditional Access policy to block device code flow
+
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+
+  Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>
+
+  Access controls > Grant > <b>Block Access</b>
+</pre>
+
 ## 4. Centralized Log Collection
 
 This section provides policies to reduce security risks related to the lack of security logs, which hampers security visibility.
@@ -472,17 +503,6 @@ An admin consent workflow SHALL be configured for applications.
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
-#### MS.AAD.5.4v1
-Group owners SHALL NOT be allowed to consent to applications.
-
-<!--Policy: MS.AAD.5.4v1; Criticality: SHALL -->
-- _Rationale:_ In M365, group owners and team owners can consent to applications accessing data in the tenant. By requiring consent requests to go through an approval workflow, risk of exposure to malicious applications is reduced.
-- _Last modified:_ June 2023
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-    - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
-
 ### Resources
 
 - [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
@@ -530,16 +550,6 @@ Group owners SHALL NOT be allowed to consent to applications.
 5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
 6. Click **Save**.
-
-#### MS.AAD.5.4v1 Instructions
-
-1.  In **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.
-
-2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
-
-3. Under **Group owner consent for apps accessing data**, select **Do not allow group owner consent**.
-
-4. Click **Save**.
 
 ## 6. Passwords
 

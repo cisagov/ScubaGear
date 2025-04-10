@@ -39,7 +39,7 @@
             Container = $TestContainers
         }
         Filter = @{
-            Tag = @("MS.AAD.5.4v1")
+            Tag = @("MS.AAD.2.1v1")
         }
         Output = @{
             Verbosity = 'Detailed'

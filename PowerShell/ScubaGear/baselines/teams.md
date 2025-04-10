@@ -109,20 +109,22 @@ Meeting recording SHOULD be disabled.
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
-- _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
+- _Last modified:_ March 2025
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
-#### MS.TEAMS.1.7v1
-Record an event SHOULD be set to Organizer can record.
+#### MS.TEAMS.1.7v2
+Record an event SHOULD NOT be set to Always record.
 
-<!--Policy: MS.TEAMS.1.7v1; Criticality: SHOULD -->
-- _Rationale:_ The security risk of the default settings for Live Events is Live Events can be recorded by all participants by default. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events.
-- _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies. Custom policies MAY be created to allow more flexibility for specific users.
+<!--Policy: MS.TEAMS.1.7v2; Criticality: SHOULD -->
+- _Rationale:_ Allowing to always record Live Events can pose data leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
+- _Last modified:_ March 2025
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _MITRE ATT&CK TTP Mapping:_
   - None
+
+
 
 ### Resources
 
@@ -222,8 +224,7 @@ To configure settings for anonymous users:
 
 5.  Select **Save**.
 
-
-#### MS.TEAMS.1.7v1 Instructions
+#### MS.TEAMS.1.7v2 Instructions
 
 1.  Sign in to the **Microsoft Teams admin
     center**.
@@ -232,12 +233,14 @@ To configure settings for anonymous users:
 
 3.  Select **Global (Org-wide default)** policy.
 
-4.  Set **Record an event** to **Organizer can record**.
+4.  Set **Record an event** to either  **Organizer can record** or **Never record**
 
 5.  Click **Save**.
 
 6.  If custom policies were created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
+
+
 
 ## 2. External User Access
 This section helps reduce security risks related to external and unmanaged user access. In this instance, external users refer to members of a different M365 tenant, and unmanaged users refer to users who are not members of any M365 tenant or organization.
