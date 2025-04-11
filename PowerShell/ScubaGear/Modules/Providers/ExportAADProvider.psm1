@@ -151,18 +151,24 @@ function Export-AADProvider {
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
 
-    $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
-    $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
-    
-    $AggregateRiskyApps = if ($RiskyApps -and $RiskySPs) {
-        ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs}))
-    }
-    else { "{}" }
+    $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { @() } else { $RiskyApps }
+    $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { @() } else { $RiskySPs }
 
-    $RiskyThirdPartySPs = if ($RiskySPs) {
-        ConvertTo-Json -Depth 3 @($Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs}))
-    }
-    else { "{}" }
+    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+        if ($RiskyApps.Count -gt 0 -and $RiskySPs.Count -gt 0) {
+            $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+        } else { 
+            @()
+        }
+    )
+
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+        if ($RiskySPs.Count -gt 0) {
+            $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
+        } else { 
+            @()
+        }
+    )
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
