@@ -155,11 +155,20 @@ InModuleScope -ModuleName ExportAADProvider {
                 $ValidJson
             }
         }
+        
         It "With a AAD P2 license, returns valid JSON" {
-                $Json = Export-AADProvider
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
+            $Json = Export-AADProvider
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+
+        It "returns valid JSON if Format-ThirdPartyServicePrincipals returns null" {
+            mock Format-RiskyThirdPartyServicePrincipals { $null }
+
+            $Json = Export-AADProvider
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
     }
 }
 AfterAll {
