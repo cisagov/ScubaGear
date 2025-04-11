@@ -163,9 +163,10 @@ InModuleScope -ModuleName ExportAADProvider {
         }
 
         It "returns valid JSON if Format-ThirdPartyServicePrincipals returns null" {
-            mock Format-RiskyThirdPartyServicePrincipals { $null }
+            Mock Format-RiskyThirdPartyServicePrincipals { $null }
 
             $Json = Export-AADProvider
+            #Write-Output $Json > testjsonoutput.json
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
