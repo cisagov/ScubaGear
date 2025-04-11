@@ -45,13 +45,17 @@ InModuleScope AADRiskyPermissionsHelper {
                     )
                 }
             }
-
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
-            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
+            Mock Get-MgBetaOrganization {
+                return @{
+                    "Id" = "00000000-0000-0000-0000-000000000000"
+                }
+            }
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
+
             $ThirdPartySPs | Should -HaveCount 3
 
             $ThirdPartySPs[0].DisplayName | Should -Match "Test SP 3"
@@ -78,6 +82,10 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[2].FederatedCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[2].RiskyPermissions | Should -HaveCount 8
         }
+
+        #It "throws a ParameterBindingValidationException if the $RiskySPs value is null" {
+        #    { Format-RiskyThirdPartyServicePrincipals -RiskySPs $null } | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException
+        #}
     }
 }
 
