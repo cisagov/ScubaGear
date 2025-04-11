@@ -14,6 +14,7 @@ InModuleScope AADRiskyPermissionsHelper {
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            function Get-MgBetaOrganization {}
 
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
