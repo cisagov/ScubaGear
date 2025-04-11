@@ -315,16 +315,16 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         # Exclude service principals without risky permissions
                         if ($MappedPermissions.Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
-                                ObjectId             = $ServicePrincipal.Id
-                                AppId                = $ServicePrincipal.AppId
-                                DisplayName          = $ServicePrincipal.DisplayName
-                                SignInAudience       = $ServicePrincipal.SignInAudience
+                                ObjectId                = $ServicePrincipal.Id
+                                AppId                   = $ServicePrincipal.AppId
+                                DisplayName             = $ServicePrincipal.DisplayName
+                                SignInAudience          = $ServicePrincipal.SignInAudience
                                 # Credentials from application and service principal objects may get merged in other cmdlets.
                                 # Differentiate between the two by setting IsFromApplication=$false
-                                KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                                PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                                FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
-                                RiskyPermissions     = $MappedPermissions
+                                KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                                PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                                FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                                RiskyPermissions        = $MappedPermissions
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
@@ -451,6 +451,8 @@ function Format-RiskyThirdPartyServicePrincipals {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
+
+        if ($null -eq $ServicePrincipals -or $ServicePrincipals.Count -eq 0) { return }
 
         return $ServicePrincipals
     }
