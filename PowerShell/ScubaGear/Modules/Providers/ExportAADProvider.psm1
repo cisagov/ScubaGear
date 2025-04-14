@@ -155,7 +155,7 @@ function Export-AADProvider {
     $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { @() } else { $RiskySPs }
 
     $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
-        if ($RiskyApps.Count -gt 0 -and $RiskySPs.Count -gt 0) {
+        if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
         } else { 
             @()
@@ -163,7 +163,7 @@ function Export-AADProvider {
     )
 
     $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
-        if ($RiskySPs.Count -gt 0) {
+        if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
         } else { 
             @()
