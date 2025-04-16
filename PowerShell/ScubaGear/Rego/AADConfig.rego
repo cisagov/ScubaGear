@@ -298,18 +298,18 @@ MSAuthEnabled := true if {
 # Returns true if MS Authenticator is configured per the baseline, false if it is not
 default MSAuthProperlyConfigured := false
 MSAuthProperlyConfigured := true if {
-    MSAuthEnabled == true 
-    MSAuth.AdditionalProperties.isSoftwareOathEnabled == false
+    MSAuthEnabled == true
+    MSAuth.IsSoftwareOathEnabled == false
     # Make sure that MS Auth shows the app name and geographic location
-    Settings := MSAuth.AdditionalProperties.featureSettings
-    Settings.displayAppInformationRequiredState.state == "enabled"
-    Settings.displayLocationInformationRequiredState.state == "enabled"
+    Settings := MSAuth.FeatureSettings
+    Settings.DisplayAppInformationRequiredState.State == "enabled"
+    Settings.DisplayLocationInformationRequiredState.State == "enabled"
 
-    # Make sure that the configuration applies to all users 
-    # if the following settings are not set to "all_users", 
+    # Make sure that the configuration applies to all users
+    # if the following settings are not set to "all_users",
     # they will be set to the group id of the selected groups
-    Settings.displayAppInformationRequiredState.includeTarget.id == "all_users"
-    Settings.displayLocationInformationRequiredState.includeTarget.id == "all_users"    
+    Settings.DisplayAppInformationRequiredState.IncludeTarget.Id == "all_users"
+    Settings.DisplayLocationInformationRequiredState.IncludeTarget.Id == "all_users"
 }
 
 default AAD_3_3_Not_Applicable := false
@@ -746,7 +746,6 @@ tests contains {
 }
 #--
 
-
 ############
 # MS.AAD.6 #
 ############
@@ -920,7 +919,7 @@ default PrivilegedRoleExclusions(_, _) := false
 # for users & groups. If there are users with permenant assignment
 # return true if all users + groups are in the config.
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    PrivilegedRoleAssignedPrincipals := {x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}
+    PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}
 
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
@@ -931,7 +930,7 @@ PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
 
 # if no users with permenant assignment & config empty, return true
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
-    Count({x.principalId | some x in PrivilegedRole.Assignments; x.endDateTime == null}) > 0
+    Count({x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}) > 0
     Count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}) == 0
     Count({y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}) == 0
 }
@@ -966,7 +965,7 @@ tests contains {
 # Get all privileged roles that do not have a start date
 RolesAssignedOutsidePim contains Role.DisplayName if {
     some Role in input.privileged_roles
-    NoStartAssignments := {is_null(X.startDateTime) | some X in Role.Assignments}
+    NoStartAssignments := {is_null(X.StartDateTime) | some X in Role.Assignments}
 
     Count(FilterArray(NoStartAssignments, true)) > 0
 }
@@ -1002,7 +1001,7 @@ RolesWithoutApprovalRequired contains Offender if {
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     Role.DisplayName == "Global Administrator"
     Rule.Id == "Approval_EndUser_Assignment"
-    Rule.AdditionalProperties.setting.isApprovalRequired == false
+    Rule.Setting.IsApprovalRequired == false
 }
 
 # If you have the correct license & Global Administor
@@ -1036,7 +1035,7 @@ RolesWithoutActiveAssignmentAlerts contains Offender if {
 
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     Rule.Id == "Notification_Admin_Admin_Assignment"
-    Count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.NotificationRecipients) == 0
 }
 
 # Save role name if id is a specific string and no
@@ -1047,7 +1046,7 @@ RolesWithoutEligibleAssignmentAlerts contains Offender if {
 
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     Rule.Id == "Notification_Admin_Admin_Eligibility"
-    Count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Count(Rule.NotificationRecipients) == 0
 }
 
 # If you have the correct license & all roles have assignment
@@ -1083,8 +1082,8 @@ GlobalAdminsWithoutActivationAlert contains Offender if {
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     Role.DisplayName == "Global Administrator"
     Rule.Id == "Notification_Admin_EndUser_Assignment"
-    Rule.AdditionalProperties.notificationType == "Email"
-    Count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Rule.NotificationType == "Email"
+    Count(Rule.NotificationRecipients) == 0
 }
 
 # If you have the correct license & Global Admin
@@ -1117,8 +1116,8 @@ OtherAdminsWithoutActivationAlert contains Offender if {
     Offender := sprintf("%v(%v)", [Rule.RuleSource, Rule.RuleSourceType])
     not Role.DisplayName == "Global Administrator"
     Rule.Id == "Notification_Admin_EndUser_Assignment"
-    Rule.AdditionalProperties.notificationType == "Email"
-    Count(Rule.AdditionalProperties.notificationRecipients) == 0
+    Rule.NotificationType == "Email"
+    Count(Rule.NotificationRecipients) == 0
 }
 
 # If there are no roles without activation alert &
