@@ -151,14 +151,12 @@ function Invoke-GraphDirectly {
         [System.Collections.Hashtable]
         $queryParams,
 
-        [switch]$apiHeader,
-
         [string]$ID
     )
 
-    Write-Debug "Replacing Cmdlet: $commandlet"
+    Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
 
-    #use Get-ScubaGearPermissions to convert cmdlets to API calls
+    # Use Get-ScubaGearPermissions to convert cmdlets to API calls
     if($ID){
         $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment -id $ID
     } else {
@@ -182,11 +180,12 @@ function Invoke-GraphDirectly {
     }
     Write-Debug "Graph Api direct: $endpoint"
 
-    if($apiHeader) {
+    $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
+    if($Null -ne $apiHeader.PSObject.Properties.Name) {
         # If the API header is passed in, we add it to the request.
         $headers = @{}
-        $header = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
-        foreach ($property in $header.PSObject.Properties) {
+
+        foreach ($property in $apiHeader.PSObject.Properties) {
             $headers[$property.Name] = $property.Value
         }
         $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers
@@ -211,12 +210,15 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
+            # Check if the item is a hashtable, if so convert it to a PSObject.
+            # This function reduces code changes to the AADConditionalAccessHelper module and REGO.
             if ($Item -is [hashtable]) {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
                 # Process each property in the hashtable
                 foreach ($property in $Item.GetEnumerator()) {
+                    # Capitalize the first letter of the property key
                     $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
                     if ($property.Value -is [hashtable]) {
                         # Recursive call to process nested hashtables
@@ -245,7 +247,7 @@ Function ConvertFrom-GraphHashtable {
                 [void]$GraphObject.Add($Object)
             }
             else {
-                # Handle normal objects
+                # Handle normal objects, no conversion needed just return the results
                 [void]$GraphObject.Add($Item)
             }
         }

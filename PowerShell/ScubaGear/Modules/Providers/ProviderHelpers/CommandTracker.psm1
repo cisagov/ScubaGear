@@ -1,7 +1,7 @@
 Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaSpfRecord, Get-ScubaDkimRecord, Get-ScubaDmarcRecord
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals
-Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, New-Exception
 
 class CommandTracker {
     [string[]]$SuccessfulCommands = @()
@@ -21,49 +21,48 @@ class CommandTracker {
             $CommandArgs.ErrorAction = "Stop"
         }
 
-        if ($CommandArgs['GraphDirect'] -eq $true) {
-            # This will pull the Graph API vice the PowerShell module
-            try {
-                # Remove GraphDirect Key, this is just needed to trigger the logic
-                $CommandArgs.Remove("GraphDirect")
+        $isGraphDirect = $false
+        $Result = @()
+
+        # Pre-process command arguments
+        if ($CommandArgs.ContainsKey("GraphDirect")) {
+            # Check if GraphDirect is set to true, if so set $isGraphDirect to true and remove the key. This will make a Graph API call using Invoke-GraphDirectly
+            $isGraphDirect = $CommandArgs['GraphDirect'] -eq $true
+            $CommandArgs.Remove("GraphDirect") # Remove GraphDirect as it is not needed for the command, its just a flag to indicate we want to use the Graph API directly
+
+            if (-not $isGraphDirect) {
+                # For standard PowerShell commands, remove M365Environment if present
+                $CommandArgs.Remove("M365Environment")
+            }
+        }
+
+        try {
+            if ($isGraphDirect) {
+                # This will pull the Graph API vice the PowerShell module
                 Write-Verbose "Running $($Command) API Call"
                 $ModCommand = Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 $Result = $ModCommand
-                $this.SuccessfulCommands += $Command
 
                 # Check if $Result.value exists, if it does, return it if not return just $Result
                 if ($Result.value) {
                     $Result = $Result.value
-                }else{
-                    $Result = $Result
                 }
-
-                return $Result
             }
-            catch {
-                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-                $this.UnSuccessfulCommands += $Command
-                $Result = @()
-                return $Result
-            }
-        }else{
-            if($CommandArgs.Contains("GraphDirect")) {
-                $CommandArgs.Remove("M365Environment")
-                $CommandArgs.Remove("GraphDirect") # Remove the GraphDirect key to avoid confusion when calling PowerShell commands. This should only be used for API calls.
-            }
-            try {
+            else {
                 Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
                 $Result = & $Command @CommandArgs
-                $this.SuccessfulCommands += $Command
-                return $Result
             }
-            catch {
-                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-                $this.UnSuccessfulCommands += $Command
-                $Result = @()
-                return $Result
-            }
+
+            $this.SuccessfulCommands += $Command
         }
+        catch {
+            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+
+            $this.UnSuccessfulCommands += $Command
+            $Result = @()
+        }
+
+        return $Result
     }
 
     [System.Object[]] TryCommand([string]$Command) {
