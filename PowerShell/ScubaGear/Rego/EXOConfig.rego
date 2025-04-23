@@ -146,26 +146,39 @@ tests contains {
 # MS.EXO.2.2v2
 #--
 
-# Loop through domain DNS responses & loop through the policies associated
-# with the domain. Save the records that start with string "v=spf1". If
-# records does not exist, save domain name in DomainsWithoutSpf array.
-DomainsWithoutSpf contains DNSResponse.domain if {
+# Loop through domains and save the details for domains without proper SPF records
+DomainsWithoutSpf contains Details if {
     some DNSResponse in input.spf_records
-    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "-all")} | 
-        {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "redirect")}
-    count(SpfRecords) == 0
+    not DNSResponse.compliant
+    Details := concat("", [
+        "<li>",
+        DNSResponse.domain,
+        ": ",
+        DNSResponse.message,
+        "</li>"
+    ])
 }
+
+SpfStatusMessage := Message if {
+    count(DomainsWithoutSpf) == 0
+    Message := "Requirement met."
+} else := concat("", [
+        format_int(count(DomainsWithoutSpf), 10),
+        " failing domain(s):",
+        "<ul>",
+        concat("", DomainsWithoutSpf),
+        "</ul>"
+    ])
 
 tests contains {
     "PolicyId": "MS.EXO.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
-    "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ActualValue": DomainsWithoutSpf,
+    "ReportDetails": SpfStatusMessage,
     "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutSpf
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutSpf) == 0
 }
 #--
 
