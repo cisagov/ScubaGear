@@ -351,6 +351,47 @@ function New-Report {
         $CapJson = "null"
     }
 
+    # Handle EXO-specific reporting
+    if ($BaselineName -eq "exo") {
+        $LogHtml = "<hr><h2 id=`"dns-logs`">DNS Logs</h2>"
+        $LogHtml += "<p>DNS queries ScubaGear made while identifying SPF, DKIM, and `
+        DMARC records. Note: if DNS queries unexepectedly return 0 txt records, it `
+        may be a sign the system-default resolver is unable to resolve the domain `
+        names (e.g., due to a split horizon setup).</p>"
+        $LogTypes = @("SPF", "DKIM", "DMARC")
+        foreach ($LogType in $LogTypes) {
+            $LogHtml += "<h3>$LogType</h3>"
+            $DnsLogs = @()
+            foreach ($Domain in $SettingsExport."$($LogType.ToLower())_records") {
+                foreach ($DnsQuery in $Domain.log) {
+                    $TruncatedAnswers = @()
+                    $Qname = $DnsQuery.query_name
+                    # Inserting the &#8203; tells the browser it can break these "words"
+                    # where ever it needs to. There are some really long domain names
+                    # and one-word txt records (e.g., DKIM records) that would really
+                    # skew the table otherwise
+                    $Qname = $($Qname -split '(.)') -join "&#8203;"
+                    foreach ($Answer in $DnsQuery.query_answers) {
+                        $TruncatedAnswers += $($Answer -split '(.)') -join "&#8203;"
+                    }
+                    $Answers = $TruncatedAnswers -join "<br>"
+                    $DnsLogs += [pscustomobject]@{
+                        "Query Name"=$Qname;
+                        "Query Method"=$DnsQuery.query_method;
+                        "Summary"=$DnsQuery.query_result;
+                        "Answers"=$Answers;
+                    }
+                }
+            }
+            $LogTable = $DnsLogs | ConvertTo-Html -As Table -Fragment
+            $LogHtml += $LogTable
+        }
+        $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", $LogHTML)
+    }
+    else {
+        $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", "")
+    }
+
     $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
     $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
     $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>
