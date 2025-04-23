@@ -159,6 +159,9 @@ DomainsWithoutSpf contains Details if {
     ])
 }
 
+# Link used for SPF, DKIM, and DMARC related logs
+DNSLink = "<a href=\"#dns-logs\">View DNS logs</a> for more details."
+
 SpfStatusMessage := Message if {
     count(DomainsWithoutSpf) == 0
     Message := "Requirement met."
@@ -175,7 +178,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": DomainsWithoutSpf,
-    "ReportDetails": SpfStatusMessage,
+    "ReportDetails": concat(". ", [SpfStatusMessage, DNSLink]),
     "RequirementMet": Status
 } if {
     Status := count(DomainsWithoutSpf) == 0
@@ -214,7 +217,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [input.dkim_records, input.dkim_config],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
@@ -249,7 +255,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -278,7 +287,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -318,8 +330,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
-    "RequirementMet": Status
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),    "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
     Status := count(Domains) == 0
@@ -374,8 +388,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
-    "RequirementMet": Status
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),    "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
     Status := count(Domains) == 0
