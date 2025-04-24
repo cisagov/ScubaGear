@@ -437,7 +437,7 @@ function Format-RiskyThirdPartyServicePrincipals {
 
             foreach ($ServicePrincipal in $RiskySPs) {
                 if ($null -eq $ServicePrincipal) {
-                    continue;
+                    continue
                 }
                 
                 # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
