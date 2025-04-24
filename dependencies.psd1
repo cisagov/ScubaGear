@@ -18,7 +18,7 @@
         },
         @{
             Name    = 'ExchangeOnlineManagement'
-            Version = '3.7.2'
+            Version = '2.7.2'
         },
         @{
             Name    = 'Microsoft.Online.SharePoint.PowerShell'
