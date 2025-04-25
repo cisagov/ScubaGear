@@ -23,7 +23,7 @@ InModuleScope -ModuleName ExportAADProvider {
                             $this.SuccessfulCommands += $Command
                             $MockFunction = $this.MockCommands[$Command]
                             return & $MockFunction $CommandArgs
-                        } 
+                        }
                         else {
                             Write-Warning "A mock function does not exist for $($Command). $($_)"
                             throw $_
@@ -60,7 +60,7 @@ InModuleScope -ModuleName ExportAADProvider {
                     $this.MockCommands[$CommandName] = $MockFunction
                 }
             }
-            
+
             $MockCommandTracker = [MockCommandTracker]::New()
             function Get-CommandTracker {}
             Mock -ModuleName 'ExportAADProvider' Get-CommandTracker {
@@ -83,12 +83,10 @@ InModuleScope -ModuleName ExportAADProvider {
                 )
 
                 $Tracker.AddMockCommand("Get-MgBetaIdentityConditionalAccessPolicy", {
-                    param($CmdArgs)
                     return [pscustomobject]@{}
                 })
 
                 $Tracker.AddMockCommand("Get-MgBetaSubscribedSku", {
-                    param($cmdArgs)
                     return [pscustomobject]@{
                         ServicePlans = @(
                             @{
@@ -108,61 +106,50 @@ InModuleScope -ModuleName ExportAADProvider {
                 })
 
                 $Tracker.AddMockCommand("Get-MgBetaUserCount", {
-                    param($cmdArgs)
                     return 10
                 })
             
                 $Tracker.AddMockCommand("Get-PrivilegedUser", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-PrivilegedRole", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-MgBetaPolicyAuthorizationPolicy", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-MgBetaDirectorySetting", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-MgBetaDomain", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-ApplicationsWithRiskyPermissions", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Get-ServicePrincipalsWithRiskyPermissions", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Format-RiskyApplications", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
-            
+
                 $Tracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", {
-                    param($cmdArgs)
                     return [pscustomobject]@{}
                 })
             }
-            
+
             Add-DefaultMockCommands -Tracker $MockCommandTracker
 
             function Test-SCuBAValidProviderJson {
@@ -191,15 +178,9 @@ InModuleScope -ModuleName ExportAADProvider {
 
         It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals return $null" {
             # Override defaults
-            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", {
-                param($cmdArgs)
-                return $null
-            })
+            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return $null })
 
-            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", {
-                param($cmdArgs)
-                return $null
-            })
+            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", { return $null })
 
             $Json = Export-AADProvider
             Write-Output $Json > testjsonoutput.json
