@@ -38,5 +38,3 @@ jobs:
           git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
           git branch bump-dependencies-$(date +%Y%m%d%H%M%S)
           git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
-          git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
-
