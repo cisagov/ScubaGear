@@ -132,11 +132,19 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "throws a ParameterBindingValidationException if the -RiskyApps value is null" {
-            { Format-RiskyApplications -RiskyApps $null -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+            { Format-RiskyApplications -RiskyApps $null -RiskySPs @( @{} ) | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+        }
+
+        It "throws a ParameterBindingValidationException if the -RiskyApps value is empty" {
+            { Format-RiskyApplications -RiskyApps @() -RiskySPs @( @{} ) | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
 
         It "throws a ParameterBindingValidationException if the -RiskySPs value is null" {
-            { Format-RiskyApplications -RiskyApps @() -RiskySPs $null | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+            { Format-RiskyApplications -RiskyApps @( @{} ) -RiskySPs $null | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+        }
+
+        It "throws a ParameterBindingValidationException if the -RiskySPs value is empty" {
+            { Format-RiskyApplications -RiskyApps @( @{} ) -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
     }
 }
