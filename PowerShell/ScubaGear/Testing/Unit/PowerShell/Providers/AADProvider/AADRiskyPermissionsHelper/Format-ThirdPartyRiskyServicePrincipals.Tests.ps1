@@ -84,9 +84,9 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[2].RiskyPermissions | Should -HaveCount 8
         }
 
-        #It "throws a ParameterBindingValidationException if the $RiskySPs value is null" {
-        #    { Format-RiskyThirdPartyServicePrincipals -RiskySPs $null } | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException
-        #}
+        It "throws a ParameterBindingValidationException if the -RiskySPs value is null" {
+            { Format-RiskyThirdPartyServicePrincipals -RiskySPs $null | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+        }
     }
 }
 

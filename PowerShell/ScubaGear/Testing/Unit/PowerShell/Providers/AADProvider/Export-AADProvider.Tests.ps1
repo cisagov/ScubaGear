@@ -179,29 +179,20 @@ InModuleScope -ModuleName ExportAADProvider {
         It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals return $null" {
             # Override defaults
             $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return $null })
-
             $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", { return $null })
 
             $Json = Export-AADProvider
-            Write-Output $Json > testjsonoutput.json
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
 
         It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals both return @($null)" {
             # Override defaults
-            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", {
-                param($cmdArgs)
-                return @($null)
-            })
+            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return @($null) })
 
-            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", {
-                param($cmdArgs)
-                return @($null)
-            })
+            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", { return @($null) })
 
             $Json = Export-AADProvider
-            Write-Output $Json > testjsonoutput.json
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }

@@ -56,7 +56,6 @@ function Export-AADProvider {
     if ($ServicePlans) {
         # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
-        #RequiredServicePlan = $null
 
         if ($RequiredServicePlan) {
             # If the tenant has the premium license then we also include calls to PIM APIs
@@ -151,22 +150,18 @@ function Export-AADProvider {
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
 
-    $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { @() } else { $RiskyApps }
-    $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { @() } else { $RiskySPs }
+    $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
+    $RiskySPs = if ($null -eq $RiskySPs -or @($RiskySPs).Count -eq 0) { @() } else { $RiskySPs }
 
     $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-        } else { 
-            @()
         }
     )
 
     $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
-        } else { 
-            @()
         }
     )
     ##### End block
