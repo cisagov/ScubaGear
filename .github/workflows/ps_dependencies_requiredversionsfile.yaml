@@ -4,13 +4,16 @@ name: Bump RequiredVersions PowerShell Dependencies
 # The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
 
 on:
+  # Run this workflow at 12:15 (or 1:15) am
+  # on every Mon to Fri (b/c GMT -5 or -4)
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight
+    - cron: "15 6 * * 1-5" # in GMT
+    
   workflow_dispatch:
 
 jobs:
   bump-dependencies:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -23,7 +26,7 @@ jobs:
 
       - name: Bump PowerShell dependencies
         run: |
-          pwsh -File ./WorkflowScripts/BumpPsDependencies.ps1
+          pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
       - name: Commit changes
         if: success()
