@@ -33,8 +33,7 @@ InModuleScope -ModuleName ExportAADProvider {
                             return & $MockFunction $CommandArgs
                         }
                         else {
-                            Write-Warning "A mock function does not exist for $($Command). $($_)"
-                            throw $_
+                            throw "A mock function does not exist for $($Command). $($_)"
                         }
                     }
                     catch {
