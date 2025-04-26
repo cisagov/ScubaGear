@@ -436,7 +436,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
             $PIMGroupMembers = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" -M365Environment $M365Environment -Id $GroupId).Value
 
             foreach ($GroupMember in $PIMGroupMembers) {
-                # Write-Warning "Processing role: $($RoleName) PIM group Eligible member: $($GroupMember.PrincipalId)"
 
                 # If the user is not a member of the PIM group (i.e. they are an owner) then skip them
                 if ($GroupMember.AccessId -ne "member") { continue }
