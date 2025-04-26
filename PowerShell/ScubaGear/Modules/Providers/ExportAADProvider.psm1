@@ -366,7 +366,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
             # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
             $AADUser = Invoke-GraphDirectly -Commandlet "Get-MgBetaUser" -M365Environment $M365Environment -id $ObjectId
             $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
-            # Write-Warning "Processing role: $($RoleName) User: $($AADUser.DisplayName)"
         }
         # If the current role has not already been added to the user's roles array then add the role
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
