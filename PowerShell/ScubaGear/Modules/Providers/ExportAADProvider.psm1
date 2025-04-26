@@ -396,7 +396,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         $GroupId = $ObjectId
         # Get all of the group members that are transitively assigned to the current role via group membership, this will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
         $GroupMembers = (Invoke-GraphDirectly -Commandlet "Get-MgBetaGroupMember" -M365Environment $M365Environment -id $GroupId).Value
-        # Write-Warning "Processing role: $($RoleName) Group: $($GroupId)"
 
         foreach ($GroupMember in $GroupMembers) {
             $Membertype = $GroupMember."@odata.type" -replace "#microsoft.graph."
