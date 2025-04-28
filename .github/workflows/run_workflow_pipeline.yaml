@@ -7,9 +7,11 @@ on:
   push:
     paths:
       - '.github/workflows/**'
-      - '.github/actions/**'
+      - '.github/actions/extract-email/action.yaml'
       - 'Testing/workflow/**'
+      - 'Testing/action/**'
       - 'utils/workflow/**'
+      - 'utils/action/**'
   pull_request:
   workflow_dispatch:
 

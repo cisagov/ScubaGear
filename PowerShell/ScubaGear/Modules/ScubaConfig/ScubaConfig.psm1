@@ -1,7 +1,7 @@
 class ScubaConfig {
     <#
     .SYNOPSIS
-    This class stores Scuba config data loaded from a file.
+    This singleton class stores Scuba config data loaded from a file.
     .DESCRIPTION
     This class is designed to function as a singleton. The singleton instance
     is cached on the ScubaConfig type itself. In the context of tests, it may be
@@ -41,11 +41,15 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
-        DefaultOPAVersion = '1.1.0'
+        DefaultOPAVersion = '1.3.0'
     }
 
     static [object]ScubaDefault ([string]$Name){
         return [ScubaConfig]::ScubaDefaults[$Name]
+    }
+
+    static [string]GetOpaVersion() {
+        return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     }
 
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
@@ -54,13 +58,13 @@ class ScubaConfig {
         }
         [ScubaConfig]::ResetInstance()
         $Content = Get-Content -Raw -Path $Path
-	try {
-        	$this.Configuration = $Content | ConvertFrom-Yaml
-	}
-	catch {
-               $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
-	       throw "Error loading config file: $ParseError"
-	}
+        try {
+            $this.Configuration = $Content | ConvertFrom-Yaml
+        }
+        catch {
+            $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
+            throw "Error loading config file: $ParseError"
+        }
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
@@ -166,7 +170,6 @@ class ScubaConfig {
         if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
             $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
         }
-
         return
     }
 
@@ -176,7 +179,6 @@ class ScubaConfig {
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
-
         return
     }
 

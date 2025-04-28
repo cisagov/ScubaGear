@@ -19,7 +19,7 @@ AllDomains := {Domain.domain | some Domain in input.spf_records}
 ############
 
 #
-# MS.EXO.1.1v1
+# MS.EXO.1.1v2
 #--
 
 # Loop through each domain & check if Auto Forwarding is enabled
@@ -29,18 +29,111 @@ RemoteDomainsAllowingForwarding contains Domain.DomainName if {
     Domain.AutoForwardEnabled == true
 }
 
+# Note explaining that the config option is available / warning if they misuse it
+default NoticeAboutConfigFile := "" # No notice needed, the user knows about the config option and isn't misusing it
+NoticeAboutConfigFile := Notice if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    count(Domains) == 0
+    Notice := concat("", [
+        "NOTE: specific domains that have a legitimate need to allow remote forwarding can be configured in a ",
+        "ScubaGear config file."
+    ])
+} else := Notice if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    count(Domains) > 0
+    "*" in Domains
+    "*" in RemoteDomainsAllowingForwarding
+    Notice := concat("", [
+        "WARNING: the default domain, \"*\", was included in the 'AllowedForwardingDomains' list in the config file ",
+        "but only specific domains can be allow-listed per the SCuBA baseline."
+    ])
+}
+
+# Collect the set of domains that are allowed per the config file, excluding the default domain if needed
+ConfiguredAllowedForwardingDomains := Domains-{"*"} if {
+    Domains := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+    "*" in Domains
+} else := {Domain | some Domain in input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains}
+
+
+# Get the domains allowing forwarding that haven't been allow-listed
+NonCompForwardingDomains := RemoteDomainsAllowingForwarding - ConfiguredAllowedForwardingDomains
+
+# Get the domains allowing forwarding that have been allow-listed
+AllowedForwardingDomains := intersection({RemoteDomainsAllowingForwarding, ConfiguredAllowedForwardingDomains})
+
+# Helper functions for pretty grammer
+PluralDomains(N) := "domain" if N == 1 else := "domains"
+PluralToBe(N) := "is" if N == 1 else := "are"
+PluralAllow(N) := "allows" if N == 1 else := "allow"
+
+# Sentence summarizing the non-compliant domains
+NonCompDomainsSummary := concat("", [
+    ArraySizeStr(NonCompForwardingDomains),
+    " remote ",
+    PluralDomains(count(NonCompForwardingDomains)),
+    " ",
+    PluralAllow(count(NonCompForwardingDomains)),
+    " automatic forwarding: ",
+    concat(", ", NonCompForwardingDomains),
+    "."
+])
+
+# Sentence summarizing the domains that allow forwarding but have been allow-listed
+AllowedDomainsSummary := concat("", [
+    ArraySizeStr(AllowedForwardingDomains),
+    " remote ",
+    PluralDomains(count(AllowedForwardingDomains)),
+    " ",
+    PluralAllow(count(AllowedForwardingDomains)),
+    " forwarding but ",
+    PluralToBe(count(AllowedForwardingDomains)),
+    " allowed per the ScubaGear config file: ",
+    concat(", ", AllowedForwardingDomains),
+    "."
+])
+
+# Details string for MS.EXO.1.1v2 that takes into account both the forwarding domains that have
+# been allow-listed and the domains that have not
+ReportDetails1_2 := Details if {
+    count(NonCompForwardingDomains) == 0
+    count(AllowedForwardingDomains) == 0
+    Details := "No domains allow automatic forwarding."
+} else := Details if {
+    count(NonCompForwardingDomains) > 0
+    count(AllowedForwardingDomains) > 0
+    Details := concat(" ", [
+        NonCompDomainsSummary,
+        "NOTE: additionally,",
+        AllowedDomainsSummary,
+        NoticeAboutConfigFile
+    ])
+} else := Details if {
+    count(NonCompForwardingDomains) > 0
+    count(AllowedForwardingDomains) == 0
+        Details := concat(" ", [
+            NonCompDomainsSummary,
+            NoticeAboutConfigFile
+        ])
+} else := Details if {
+    # Note that even though this case is compliant, we still have valuable details we can present in the report
+    count(NonCompForwardingDomains) == 0
+    count(AllowedForwardingDomains) > 0
+    Details := concat(" ", [AllowedDomainsSummary, NoticeAboutConfigFile])
+}
+
 tests contains {
-    "PolicyId": "MS.EXO.1.1v1",
+    "PolicyId": "MS.EXO.1.1v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-RemoteDomain"],
-    "ActualValue": Domains,
-    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "ActualValue": {
+        "RemoteDomainsAllowingForwarding": RemoteDomainsAllowingForwarding,
+        "AllowedForwardingDomainsFromConfig": AllowedForwardingDomains
+    },
+    "ReportDetails": ReportDetails1_2,
     "RequirementMet": Status
 } if {
-    Domains := RemoteDomainsAllowingForwarding
-    ErrString := "remote domain(s) that allows automatic forwarding:"
-    ErrMessage := Description([ArraySizeStr(Domains), ErrString , concat(", ", Domains)])
-    Status := count(Domains) == 0
+    Status := count(NonCompForwardingDomains) == 0
 }
 #--
 
@@ -903,21 +996,7 @@ tests contains {
     "ReportDetails": DefenderMirrorDetails("MS.EXO.17.1v1"),
     "RequirementMet": false
 }
-#--
 
-#
-# MS.EXO.17.2v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.EXO.17.2v1",
-    "Criticality": "Shall/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.EXO.17.2v1"),
-    "RequirementMet": false
-}
 #--
 
 #

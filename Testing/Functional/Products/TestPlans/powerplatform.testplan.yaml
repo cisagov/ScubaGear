@@ -100,7 +100,7 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.POWERPLATFORM.3.2v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.POWERPLATFORM.3.2v1 Not Checked
         Preconditions: []
@@ -109,7 +109,7 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.POWERPLATFORM.4.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.POWERPLATFORM.4.1v1 Not Checked
         Preconditions: []

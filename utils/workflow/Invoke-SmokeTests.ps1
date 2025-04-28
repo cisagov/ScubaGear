@@ -25,16 +25,17 @@ function Invoke-SmokeTests {
     Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
     Initialize-SCuBA
 
-    # ScubaGear currently requires the provisioning of a certificate for using a ServicePrinicpal, rather than
+    # ScubaGear currently requires the provisioning of a certificate for using a ServicePrincipal, rather than
     # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from
     # GitHub actions.
-    $index = 1
+    $Index = 1
+    $ReturnCode = 0
     ForEach ($TestTenantObj in $TestTenants) {
         $TestContainers = @()
-        $Properties = Get-Member -InputObject $TestTenantObj -MemberType NoteProperty
-        $TestTenant = $TestTenantObj | Select-Object -ExpandProperty $Properties.Name
+        $TenantAlias = $TestTenantObj.PSObject.Properties.Name
+        $TestTenant = $TestTenantObj.$TenantAlias
         $OrgName = $TestTenant.DisplayName
-        Write-Warning "Testing tenant $index..."
+        Write-Warning "Testing tenant $TenantAlias..."
         $DomainName = $TestTenant.DomainName
         $AppId = $TestTenant.AppId
         $PlainTextPassword = $TestTenant.CertificatePassword
@@ -53,13 +54,25 @@ function Invoke-SmokeTests {
         }
         $TestContainers += New-PesterContainer `
                 -Path "Testing/Functional/SmokeTest/SmokeTest001.Tests.ps1" `
-                -Data @{ Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
+                -Data @{ Alias = $TenantAlias; Thumbprint = $Thumbprint; Organization = $DomainName; AppId = $AppId; M365Environment = $M365Env }
         $TestContainers += New-PesterContainer `
             -Path "Testing/Functional/SmokeTest/SmokeTest002.Tests.ps1" `
-            -Data @{ OrganizationDomain = $DomainName; OrganizationName = $OrgName }
+            -Data @{ Alias = $TenantAlias; OrganizationDomain = $DomainName; OrganizationName = $OrgName }
         # Run the smoke tests just for this tenant.
-        Invoke-Pester -Container $TestContainers -Output Detailed
+        $PesterConfig = New-PesterConfiguration
+        $PesterConfig.Run.Exit = $true
+        $PesterConfig.Run.Container = $TestContainers
+        $PesterConfig.Output.Verbosity = 'Detailed'
+        Invoke-Pester -Configuration $PesterConfig
+        $ReturnCode += $LASTEXITCODE
+
         Remove-MyCertificates
-        $index = $index + 1
+        $Index = $Index + 1
     }
+
+    # Return sum of return codes, which if non-zero is the number of failed tests.
+    if($ReturnCode) {
+        Write-Warning "Smoke Tests Failed: $ReturnCode"
+    }
+    $ReturnCode
 }

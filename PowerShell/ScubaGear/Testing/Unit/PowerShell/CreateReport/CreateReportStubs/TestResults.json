@@ -562,16 +562,6 @@
         "RequirementMet":  true
     },
     {
-        "ActualValue":  "MoveToJmf",
-        "Commandlet":  [
-                           "Get-HostedContentFilterPolicy"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.DEFENDER.6.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
         "ActualValue":  "Quarantine",
         "Commandlet":  [
                            "Get-AntiPhishPolicy"
@@ -1678,18 +1668,6 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.1v1",
-        "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/3rd Party",
-        "PolicyId":  "MS.EXO.17.2v1",
         "ReportDetails":  "Custom implementation allowed. If you are using Defender to fulfill this requirement, run the Defender version of this script. Otherwise, use a 3rd party tool OR manually check",
         "RequirementMet":  false
     },
@@ -2964,7 +2942,7 @@
                            "Get-RemoteDomain"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.EXO.1.1v1",
+        "PolicyId":  "MS.EXO.1.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
