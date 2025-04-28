@@ -219,14 +219,13 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                    AdditionalProperties:
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: disabled
-                        displayLocationInformationRequiredState:
-                          state: disabled
-                      includeTargets:
-                        - id: "all_users"
+                    FeatureSettings:
+                      DisplayAppInformationRequiredState:
+                        State: disabled
+                      DisplayLocationInformationRequiredState:
+                        State: disabled
+                    includeTargets:
+                      - Id: "all_users"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.3v2 Compliant case - MS Auth Configured Correctly
@@ -237,17 +236,16 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                    AdditionalProperties:
-                      isSoftwareOathEnabled: false
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: enabled
-                          includeTarget:
-                            id: "all_users"
-                        displayLocationInformationRequiredState:
-                          state: enabled
-                          includeTarget:
-                            id: "all_users"
+                    isSoftwareOathEnabled: false
+                    FeatureSettings:
+                      DisplayAppInformationRequiredState:
+                        State: enabled
+                        includeTarget:
+                          Id: "all_users"
+                      DisplayLocationInformationRequiredState:
+                        State: enabled
+                        includeTarget:
+                          Id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
