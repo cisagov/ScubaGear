@@ -204,18 +204,16 @@ TestPlan:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: false
+                        Setting:
+                          IsApprovalRequired: false
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: true
+                        Setting:
+                          IsApprovalRequired: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.6v1 Non-Compliant case - Global admin activation does not require approval (pim group)
@@ -230,18 +228,16 @@ TestPlan:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "Teds PIM Group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: false
+                        Setting:
+                          IsApprovalRequired: false
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: true
+                        Setting:
+                          IsApprovalRequired: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.6v1 Compliant case - Global admin activation requires approval (role)
