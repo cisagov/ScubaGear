@@ -18,7 +18,7 @@ $ModuleList = @(
     @{
         ModuleName = 'PnP.PowerShell' # alternate for SharePoint PowerShell
         ModuleVersion = [version] '1.12.0'
-        MaximumVersion = [version] '3.1.0'
+        MaximumVersion = [version] '1.12.0'
     },
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
