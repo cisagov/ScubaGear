@@ -117,13 +117,13 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - endDateTime: "/Date(1672947244397)/"
-                        principalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - endDateTime: null
-                        principalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+                      - EndDateTime: null
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.4v1 Compliant case - No users with permanent assignment
@@ -135,13 +135,13 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - endDateTime: "/Date(1672947244397)/"
-                        principalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - endDateTime: "/Date(1672947244397)/"
-                        principalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+                      - EndDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: true
 
@@ -158,14 +158,14 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - startDateTime: "/Date(1672947244397)/"
-                        principalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     Rules: []
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - startDateTime: null
-                        principalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+                      - StartDateTime: null
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.5v1 Compliant case - No users assigned outside of PIM
@@ -177,14 +177,14 @@ TestPlan:
                   - DisplayName: Global Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e10"
                     Assignments:
-                      - startDateTime: "/Date(1672947244397)/"
-                        principalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ae71e61c-f465-4db6-8d26-5f3e52bdd800"
                     Rules: []
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Assignments:
-                      - startDateTime: "/Date(1672947244397)/"
-                        principalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
+                      - StartDateTime: "/Date(1672947244397)/"
+                        PrincipalId: "ce71e61c-f465-4db6-8d26-5f3e52bdd801"
                     Rules: []
         Postconditions: []
         ExpectedResult: true

@@ -224,7 +224,7 @@ TestPlan:
                         State: disabled
                       DisplayLocationInformationRequiredState:
                         State: disabled
-                    includeTargets:
+                    IncludeTargets:
                       - Id: "all_users"
         Postconditions: []
         ExpectedResult: false
@@ -240,11 +240,11 @@ TestPlan:
                     FeatureSettings:
                       DisplayAppInformationRequiredState:
                         State: enabled
-                        includeTarget:
+                        IncludeTarget:
                           Id: "all_users"
                       DisplayLocationInformationRequiredState:
                         State: enabled
-                        includeTarget:
+                        IncludeTarget:
                           Id: "all_users"
         Postconditions: []
         ExpectedResult: true
