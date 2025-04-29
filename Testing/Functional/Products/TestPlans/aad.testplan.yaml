@@ -236,7 +236,7 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                    isSoftwareOathEnabled: false
+                    IsSoftwareOathEnabled: false
                     FeatureSettings:
                       DisplayAppInformationRequiredState:
                         State: enabled
