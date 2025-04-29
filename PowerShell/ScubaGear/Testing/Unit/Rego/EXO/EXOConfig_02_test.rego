@@ -2,7 +2,6 @@ package exo_test
 import rego.v1
 import data.exo
 import data.utils.key.TestResult
-import data.utils.key.TestResultContains
 import data.utils.key.PASS
 import data.exo.DNSLink
 
