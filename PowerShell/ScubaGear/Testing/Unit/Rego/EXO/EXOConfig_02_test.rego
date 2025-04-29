@@ -4,103 +4,70 @@ import data.exo
 import data.utils.key.TestResult
 import data.utils.key.TestResultContains
 import data.utils.key.PASS
-
+import data.exo.DNSLink
 
 #
 # Policy MS.EXO.2.2v2
 #--
-test_Rdata_Correct_V1 if {
+test_Spf_Correct_V1 if {
+    # Test "good" case
     Output := exo.tests with input.spf_records as [SpfRecords]
 
-
-    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
+    TestResult("MS.EXO.2.2v2", Output, concat(". ", [PASS, DNSLink]), true) == true
 }
 
-test_Rdata_Correct_V2 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["v=spf1 redirect"]}])
-    
-    Output := exo.tests with input.spf_records as [Record]
-
-    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
-}
-
-test_Rdata_Incorrect_V1 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]}])
-    
-    Output := exo.tests with input.spf_records as [Record]
-
-    ReportDetailString := "1 agency domain(s) found in violation: Test name"
-    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
-}
-
-test_Rdata_Incorrect_V2 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": [""]}])
-    
-    Output := exo.tests with input.spf_records as [Record]
-    
-    ReportDetailString := "1 agency domain(s) found in violation: Test name"
-    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
-}
-
-# if we can make any assumptions about the order these domains
-# will be printed in, hence the "contains" operator instead of ==
-test_Rdata_Incorrect_V3 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["v=spf1 -all"]},
-                                        {"op": "add", "path": "domain", "value": "good.com"}])
-    Record2 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": [""]},
-                                        {"op": "add", "path": "domain", "value": "bad.com"}])
-    Record3 := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": [""]},
-                                        {"op": "add", "path": "domain", "value": "2bad.com"}])
-
-    Output := exo.tests with input.spf_records as [Record, Record2, Record3]
-
-    ReportDetailArrayStrs := [
-        "2 agency domain(s) found in violation: ",
-        "bad.com", # I'm not sure
-        "2bad.com"
-    ]
-    TestResultContains("MS.EXO.2.2v2", Output, ReportDetailArrayStrs, false) == true
-}
-
-test_Rdata_Multiple_Correct_V1 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
-                                        "value": ["v=spf1 -all", "extra stuff that shouldn't matter"]},
-                                        {"op": "add", "path": "domain", "value": "good.com"}])
+test_Spf_Incorrect_V1 if {
+    # Test 1 bad domain
+    Message := "SPF record found, but it does not hardfail (\"-all\") or redirect to one that does."
+    Record := json.patch(SpfRecords, [
+        {"op": "add", "path": "compliant", "value": false},
+        {"op": "add", "path": "message", "value": Message}
+    ])
 
     Output := exo.tests with input.spf_records as [Record]
-
-    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.EXO.2.2v2"]
+    ReportDetailString := concat("", [
+        "1 failing domain(s):<ul>",
+        "<li>test.name: ",
+        Message,
+        "</li>",
+        "</ul>"
+    ])
+    TestResult("MS.EXO.2.2v2", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
 }
 
-test_Rdata_Multiple_Correct_V2 if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
-                                        "value": ["extra stuff that shouldn't matter", "v=spf1 -all"]},
-                                        {"op": "add", "path": "domain", "value": "good.com"}])
+test_Spf_Incorrect_V2 if {
+    # Test with 2 bad domains and one good domain
+    Message1 := "SPF record found, but it does not hardfail (\"-all\") or redirect to one that does."
+    Record1 := json.patch(SpfRecords, [
+        {"op": "add", "path": "domain", "value": "bad1.com"},
+        {"op": "add", "path": "compliant", "value": false},
+        {"op": "add", "path": "message", "value": Message1}
+    ])
+    Message2 := "SPF record found, but it does not hardfail (\"-all\") or redirect to one that does."
+    Record2 := json.patch(SpfRecords, [
+        {"op": "add", "path": "domain", "value": "bad2.com"},
+        {"op": "add", "path": "compliant", "value": false},
+        {"op": "add", "path": "message", "value": Message2}
+    ])
+    Record3 := json.patch(SpfRecords, [
+        {"op": "add", "path": "doamin", "value": "good1.com"},
+        {"op": "add", "path": "compliant", "value": true},
+        {"op": "add", "path": "message", "value": "SPF record found."}
+    ])
 
-    Output := exo.tests with input.spf_records as [Record]
+    Output := exo.tests with input.spf_records as [Record1, Record2, Record3]
 
-    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
-}
-
-test_Rdata_Multiple_Correct_V3 if {
-    # Test SPF redirect
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["v=spf1 redirect=_spf.example.com"]},
-                                        {"op": "add", "path": "domain", "value": "test1.name"}])
-
-    Output := exo.tests with input.spf_records as [Record]
-                        with input.domains as ["test1.name"]
-
-    TestResult("MS.EXO.2.2v2", Output, PASS, true) == true
-}
-
-test_Rdata_Multiple_Incorrect if {
-    Record := json.patch(SpfRecords, [{"op": "add", "path": "rdata", 
-                                        "value": ["extra stuff that shouldn't matter", "hello world"]},
-                                        {"op": "add", "path": "domain", "value": "bad.com"}])
-
-    Output := exo.tests with input.spf_records as [Record]
-
-    ReportDetailString := "1 agency domain(s) found in violation: bad.com"
-    TestResult("MS.EXO.2.2v2", Output, ReportDetailString, false) == true
+    ReportDetailString := concat("", [
+        "2 failing domain(s):<ul>",
+        "<li>bad1.com: ",
+        Message1,
+        "</li>",
+        "<li>bad2.com: ",
+        Message2,
+        "</li>",
+        "</ul>"
+    ])
+    TestResult("MS.EXO.2.2v2", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
 }
 #--
