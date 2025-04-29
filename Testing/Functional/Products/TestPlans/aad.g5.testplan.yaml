@@ -252,18 +252,16 @@ TestPlan:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: true
+                        Setting:
+                          IsApprovalRequired: true
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: false
+                        Setting:
+                          IsApprovalRequired: false
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.7.6v1 Compliant case - Global admin activation requires approval (pim group)
@@ -278,18 +276,16 @@ TestPlan:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM group"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: true
+                        Setting:
+                          IsApprovalRequired: true
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Approval_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          setting:
-                            isApprovalRequired: false
+                        Setting:
+                          IsApprovalRequired: false
         Postconditions: []
         ExpectedResult: true
 
@@ -308,49 +304,43 @@ TestPlan:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: []
+                        NotificationRecipients: []
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: []
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "ae930be7-5e62-47db-91af-98c3a49a38ba"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.org"]
+                        NotificationRecipients: ["test@example.org"]
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.7v1 Non-Compliant case - Roles with Eligible Active assignments without alert (pim group)
@@ -365,49 +355,43 @@ TestPlan:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients: []
+                        NotificationRecipients: []
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: []
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "ae930be7-5e62-47db-91af-98c3a49a38ba"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Teds PIM group 2"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Teds PIM group 2"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.org"]
+                        NotificationRecipients: ["test@example.org"]
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.7v1 Compliant case - Roles with Eligible Active assignments with alert (role)
@@ -422,32 +406,28 @@ TestPlan:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            ["test@example.com", "test2@example.com"]
+                        NotificationRecipients:
+                          ["test@example.com", "test2@example.com"]
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.7.7v1 Compliant case - Roles with Eligible Active assignments with alert (pim group)
@@ -462,32 +442,28 @@ TestPlan:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients: ["test@example.com"]
+                        NotificationRecipients: ["test@example.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "fe930be7-5e62-47db-91af-98c3a49a38b1"
                     Rules:
                       - Id: "Notification_Admin_Admin_Assignment"
                         RuleSource: "Teds PIM group 2"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            [
-                              "test@example.com",
-                              "test2@example.com",
-                              "test3@example.com",
-                            ]
+                        NotificationRecipients:
+                          [
+                            "test@example.com",
+                            "test2@example.com",
+                            "test3@example.com",
+                          ]
                       - Id: "Notification_Admin_Admin_Eligibility"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group 2"
-                        AdditionalProperties:
-                          notificationRecipients:
-                            ["test@example.com", "test2@example.com"]
+                        NotificationRecipients:
+                          ["test@example.com", "test2@example.com"]
         Postconditions: []
         ExpectedResult: true
 
@@ -506,19 +482,17 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.8v1 Non-Compliant case - activation Global Admin no alert (pim group)
@@ -533,25 +507,22 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: ["test@example.com"]
+                        NotificationType: Email
+                        NotificationRecipients: ["test@example.com"]
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.8v1 Compliant case - activation Global Admin triggers alert (role)
@@ -566,19 +537,17 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.7.8v1 Compliant case - activation Global Admin triggers alert (pim group)
@@ -593,26 +562,23 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
         Postconditions: []
         ExpectedResult: true
 
@@ -631,38 +597,34 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "52e90394-69f5-4237-9190-012177145e15"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
                   - DisplayName: Cloud Application Administrator
                     RoleTemplateId: "62e90394-69f5-4237-9190-012177145e16"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Cloud Application Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.9v1 Non-Compliant case - activation other roles do NOT trigger alert (pim group)
@@ -677,27 +639,24 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            []
+                        NotificationType: Email
+                        NotificationRecipients:
+                          []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.7.9v1 Compliant case - activation other roles trigger alert (role)
@@ -712,29 +671,26 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "52e90394-69f5-4237-9190-012177145e15"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "User Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["stopit@example.com", "erase@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["stopit@example.com", "erase@beanstalk.com"]
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.7.9v1 Compliant case - activation other roles trigger alert (pim group)
@@ -749,28 +705,25 @@ TestPlan:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Global Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients: []
+                        NotificationType: Email
+                        NotificationRecipients: []
                   - DisplayName: Privileged Role Administrator
                     RoleTemplateId: "12e90394-69f5-4237-9190-012177145e11"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Privileged Role Administrator"
                         RuleSourceType: "Directory Role"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["test@example.com", "jack@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["test@example.com", "jack@beanstalk.com"]
                   - DisplayName: User Administrator
                     RoleTemplateId: "52e90394-69f5-4237-9190-012177145e15"
                     Rules:
                       - Id: "Notification_Admin_EndUser_Assignment"
                         RuleSource: "Teds PIM group"
                         RuleSourceType: "PIM Group"
-                        AdditionalProperties:
-                          notificationType: Email
-                          notificationRecipients:
-                            ["stopit@example.com", "erase@beanstalk.com"]
+                        NotificationType: Email
+                        NotificationRecipients:
+                          ["stopit@example.com", "erase@beanstalk.com"]
         Postconditions: []
         ExpectedResult: true
