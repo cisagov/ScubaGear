@@ -384,6 +384,8 @@ function New-Report {
                 }
             }
             $LogTable = $DnsLogs | ConvertTo-Html -As Table -Fragment
+            # Add CSS class to get alternating row colors
+            $LogTable = $LogTable.Replace("<table>", "<table class='alternating'>")
             $LogHtml += $LogTable
         }
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", $LogHTML)
