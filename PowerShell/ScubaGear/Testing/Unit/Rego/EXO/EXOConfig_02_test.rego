@@ -32,7 +32,7 @@ test_Spf_Incorrect_V1 if {
         "</li>",
         "</ul>"
     ])
-    TestResult("MS.EXO.2.2v2", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.2.2v2", RuleOutput, concat(". ", [ReportDetailString, DNSLink]), false) == true
 }
 
 test_Spf_Incorrect_V2 if {
@@ -56,7 +56,7 @@ test_Spf_Incorrect_V2 if {
     ])
 
     Output := exo.tests with input.spf_records as [Record1, Record2, Record3]
-
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.EXO.2.2v2"]
     ReportDetailString := concat("", [
         "2 failing domain(s):<ul>",
         "<li>bad1.com: ",
@@ -67,6 +67,6 @@ test_Spf_Incorrect_V2 if {
         "</li>",
         "</ul>"
     ])
-    TestResult("MS.EXO.2.2v2", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.2.2v2", RuleOutput, concat(". ", [ReportDetailString, DNSLink]), false) == true
 }
 #--
