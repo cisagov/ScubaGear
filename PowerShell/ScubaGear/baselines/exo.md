@@ -73,6 +73,7 @@ internal forwarding.
 There may be cases where an external domain is operationally needed and has an acceptable
 degree of risk, e.g., a domain controlled by the same agency but that hasn't been added
 as an accepted domain in M365.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -131,6 +132,7 @@ of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
 - _Last modified:_ March 2024
 - _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Fail, as used in this baseline policy, refers to hardfail (i.e., `-`).
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2d
 - _MITRE ATT&CK TTP Mapping:_
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -200,6 +202,7 @@ of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Enabling DKIM is another means for
 recipients to detect spoofed emails and verify the integrity of email content.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -252,6 +255,7 @@ may improperly handle SPF and DKIM failures, possibly enabling spoofed
 emails to reach end users' mailboxes. Publishing DMARC records at the
 second-level domain protects the second-level domains and all subdomains.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -265,6 +269,7 @@ The DMARC message rejection option SHALL be p=reject.
 reject provides the strongest protection. Reject is the level of protection
 required by BOD 18-01 for FCEB departments and agencies.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -280,6 +285,7 @@ Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports 
 - _Last modified:_ June 2023
 - _Note:_ Only federal, executive branch, departments and agencies should
           include this email address in their DMARC record.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
 
@@ -292,6 +298,7 @@ owners. DMARC provides a mechanism to receive reports of spoofing attempts.
 Including an agency point of contact gives the agency insight into attempts
 to spoof their domains.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
 
@@ -378,6 +385,7 @@ SMTP AUTH SHALL be disabled.
 Therefore, disabling it as the global default conforms to the principle of
 least functionality.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -417,6 +425,7 @@ Contact folders SHALL NOT be shared with all domains.
 for specific legitimate use as needed.
 - _Last modified:_ June 2023
 - _Note:_ Contact folders MAY be shared with specific domains.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -430,6 +439,7 @@ Calendar details SHALL NOT be shared with all domains.
 for legitimate use as needed.
 - _Last modified:_ June 2023
 - _Note:_ Calendar details MAY be shared with specific domains.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -483,6 +493,7 @@ External sender warnings SHALL be implemented.
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
 - _Rationale:_ Phishing is an ever-present threat. Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
@@ -565,6 +576,7 @@ A DLP solution SHALL be used.
 <!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -577,6 +589,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 <!--Policy: MS.EXO.8.2v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -591,6 +604,7 @@ The selected DLP solution SHOULD offer services comparable to the native DLP sol
 <!--Policy: MS.EXO.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Any alternative DLP solution should be able to detect sensitive information in Exchange Online and block access to unauthorized entities.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -603,6 +617,7 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
 <!--Policy: MS.EXO.8.4v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -663,6 +678,7 @@ than email; the dangers of allowing them to be sent over email outweigh
 any potential benefits. Filtering email attachments based on file types can
 prevent spread of malware distributed via click-to-run email attachments.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -673,6 +689,7 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 <!--Policy: MS.EXO.9.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users can change a file extension at the end of a file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type. Verifying the file type and checking that this matches the designated file extension can help detect instances where the file extension was changed.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1036: Masquerading](https://attack.mitre.org/techniques/T1036/)
     - [T1036.006: Space after Filename](https://attack.mitre.org/techniques/T1036/006/)
@@ -688,6 +705,7 @@ though other file types can contain malicious content as well. As such,
 determining the full list of file types to block is left to each
 organization, to be made in accordance with their risk tolerance.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -703,6 +721,7 @@ than email; the dangers of allowing them to be sent over email outweigh
 any potential benefits. Filtering email attachments based on file types can
 prevent spread of malware distributed via click-to-run email attachments.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -715,6 +734,7 @@ At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
 Blocking a list of common executable files helps mitigate the risk of adversarial exploitation.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -795,6 +815,7 @@ Emails SHALL be scanned for malware.
 In many cases, malware can be detected through scanning, reducing
 the risk for end users.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -807,6 +828,7 @@ Emails identified as containing malware SHALL be quarantined or dropped.
 Preventing emails with known malware from reaching user mailboxes helps ensure
 users cannot interact with those emails.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -819,6 +841,7 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
@@ -894,6 +917,7 @@ if the `FROM` address is nearly indistinguishable from that of a known entity.
 By automatically identifying senders who appear to be impersonating known
 senders, the risk of a successful phishing attempt can be reduced.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -907,6 +931,7 @@ unusual characters in the `FROM` address or identifying a first-time sender.
 User warnings can handle these tasks, reducing the burden on end users and the risk of
 successful phishing attempts.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AT-2b, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -917,6 +942,7 @@ The phishing protection solution SHOULD include an AI-based phishing detection t
 <!--Policy: MS.EXO.11.3v1; Criticality: SHOULD -->
 - _Rationale:_ Phishing attacks can result in unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -975,6 +1001,7 @@ IP allow lists SHOULD NOT be created.
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
 security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -990,6 +1017,7 @@ blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ June 2023
 - _Note:_ A connection filter MAY be implemented to create an IP block list.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
@@ -1069,6 +1097,7 @@ Mailbox auditing SHALL be enabled.
 <!--Policy: MS.EXO.13.1v1; Criticality: SHALL -->
 - _Rationale:_ Exchange Online user accounts can be compromised or misused. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
     - [T1070.008: Clear Mailbox Data](https://attack.mitre.org/techniques/T1070/008/)
@@ -1145,6 +1174,7 @@ A spam filter SHALL be enabled.
 <!--Policy: MS.EXO.14.1v2; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
@@ -1156,6 +1186,7 @@ Spam and high confidence spam SHALL be moved to either the junk email folder or 
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
 Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
@@ -1170,6 +1201,7 @@ a common domain like office.com, however, provides for a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 - _Note:_ Allowed senders MAY be added.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
@@ -1179,6 +1211,7 @@ If a third-party party filtering solution is used, the solution SHOULD offer ser
 <!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ May 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
 
@@ -1262,6 +1295,7 @@ URL comparison with a block-list SHOULD be enabled.
 <!--Policy: MS.EXO.15.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
@@ -1274,6 +1308,7 @@ Direct download links SHOULD be scanned for malware.
 Scanning direct download links in real-time for known malware and blocking access can prevent
 users from infecting their devices.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
@@ -1284,6 +1319,7 @@ User click tracking SHOULD be enabled.
 <!--Policy: MS.EXO.15.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, AU-12c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
@@ -1366,6 +1402,7 @@ At a minimum, the following alerts SHALL be enabled:
   to alert administrators to events listed above draws attention to them
   to help minimize impact to users and the agency.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
@@ -1385,6 +1422,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a security
   malicious events are acted upon in a timely manner to limit overall
   impact.
 - _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(12)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)
@@ -1449,6 +1487,7 @@ Unified Audit logging SHALL be enabled.
 <!--Policy: MS.EXO.17.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
 - _Last modified:_ March 2025
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
@@ -1469,6 +1508,7 @@ Audit Logs in the Cloud Azure log category.
           Additional record types require custom audit retention policies.
           Agencies may also consider alternate storage locations and services
           to meet audit log retention needs.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
