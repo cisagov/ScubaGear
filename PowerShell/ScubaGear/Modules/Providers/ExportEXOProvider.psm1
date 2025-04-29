@@ -215,7 +215,7 @@ function Invoke-RobustDnsTxt {
         "Errors" = @()
     }
 
-    $TradResult = Invoke-TraditionalDns -Qname Qname -MaxTries MaxTries
+    $TradResult = Invoke-TraditionalDns -Qname $Qname -MaxTries $MaxTries
     $Results['Answers'] += $TradResult['Answers']
     $Results['NXDomain'] = $TradResult['NXDomain']
     $Results['LogEntries'] += $TradResult['LogEntries']
@@ -223,7 +223,7 @@ function Invoke-RobustDnsTxt {
 
     if ($Results.Answers.Length -eq 0 -and -not $Results.NXDomain) {
         # The traditional DNS query(ies) failed. Retry with DoH
-        $DoHResult = Invoke-DoH -Qname Qname -MaxTries MaxTries
+        $DoHResult = Invoke-DoH -Qname $Qname -MaxTries $MaxTries
         $Results['Answers'] += $DoHResult['Answers']
         $Results['NXDomain'] = $DoHResult['NXDomain']
         $Results['LogEntries'] += $DoHResult['LogEntries']
@@ -244,6 +244,19 @@ function Invoke-TraditionalDns {
     .Functionality
     Internal
     #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Qname,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]
+        $MaxTries = 2
+    )
 
     $Answers = @()
     $NXDomain = $false
@@ -331,6 +344,19 @@ function Invoke-DoH {
     .Functionality
     Internal
     #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Qname,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]
+        $MaxTries = 2
+    )
 
     $Answers = @()
     $NXDomain = $false
