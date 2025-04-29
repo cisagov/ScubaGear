@@ -175,7 +175,7 @@ img {
     margin-top: 3.125em;
 }
 
-#caps tr:nth-child(even){
+#caps tr:nth-child(even), .alternating tr:nth-child(even) {
     background-color: var(--cap-even);
 }
 
