@@ -160,7 +160,7 @@ DomainsWithoutSpf contains Details if {
 }
 
 # Link used for SPF, DKIM, and DMARC related logs
-DNSLink = "<a href=\"#dns-logs\">View DNS logs</a> for more details."
+DNSLink := "<a href=\"#dns-logs\">View DNS logs</a> for more details."
 
 SpfStatusMessage := Message if {
     count(DomainsWithoutSpf) == 0
