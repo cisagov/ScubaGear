@@ -96,8 +96,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
+              DisplayName: Automated Test 1 - DO NOT MODIFY
+              Updates:
                 State: enabled
                 Conditions:
                   Users:
@@ -151,8 +151,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
-              updates:
+              DisplayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              Updates:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: false
@@ -161,8 +161,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
+              DisplayName: Automated Test 1 - DO NOT MODIFY
+              Updates:
                 State: enabled
         Postconditions: []
         ExpectedResult: true
@@ -171,8 +171,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
+              DisplayName: Automated Test 1 - DO NOT MODIFY
+              Updates:
                 State: enabled
                 Conditions:
                   Users:
@@ -191,8 +191,8 @@ TestPlan:
                   - "x509CertificateMultiFactor"
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
-              updates:
+              DisplayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+              Updates:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: true
@@ -204,7 +204,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
-              updates:
+              Updates:
                 authentication_method[0].authentication_method_feature_settings:
                   Id: MicrosoftAuthenticator
                   State: disabled
@@ -357,8 +357,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
+              DisplayName: Automated Test 1 - DO NOT MODIFY
+              Updates:
                 State: enabled
                 Conditions:
                   Users:
@@ -391,8 +391,8 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
+              DisplayName: Automated Test 1 - DO NOT MODIFY
+              Updates:
                 State: enabled
                 Conditions:
                   Users:
