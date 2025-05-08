@@ -110,12 +110,14 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
-                  - "password,sms"
-                GrantControls.BuiltInControls: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,sms"
+                  BuiltInControls: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.1v1 Compliant case - Phishing-resistant MFA enabled
@@ -136,10 +138,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
         Postconditions: []
         ExpectedResult: true
 
@@ -185,10 +189,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               DisplayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
@@ -379,11 +385,13 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
-                  - "password,sms"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,sms"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.6v1 Compliant case
@@ -413,10 +421,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
         Postconditions: []
         ExpectedResult: true
 
