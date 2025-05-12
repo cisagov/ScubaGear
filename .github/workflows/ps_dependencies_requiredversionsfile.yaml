@@ -42,4 +42,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
-          pwsh -Command "Invoke-RestMethod -Method Post -Uri 'https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches' -Headers @{Authorization = 'Bearer $env:GITHUB_TOKEN'; Accept = 'application/vnd.github+json'} -Body (@{ref = '$env:BRANCH_NAME'} | ConvertTo-Json)"
+          pwsh -Command "Invoke-RestMethod -Method Post -Uri 'https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches' -Headers @{Authorization = 'Bearer $env:GITHUB_TOKEN'; Accept = 'application/vnd.github+json'} -Body (@{ref = "$env:BRANCH_NAME"} | ConvertTo-Json)"
