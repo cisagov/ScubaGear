@@ -2,21 +2,14 @@ name: Bump RequiredVersions PowerShell Dependencies
 # This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
 # It runs on a schedule and can also be triggered manually.
 # The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
-
 on:
-  # Run this workflow at 12:15 (or 1:15) am
-  # on every Mon to Fri (b/c GMT -5 or -4)
   schedule:
-    - cron: "15 6 * * 1-5" # in GMT
-    
+    - cron: "15 6 * * 1-5"
   workflow_dispatch:
 
 jobs:
   bump-dependencies:
     runs-on: windows-latest
-
-    outputs:
-      branch_name: ${{ steps.timestamp.outputs.ts }}
 
     steps:
       - name: Checkout repository
@@ -31,23 +24,22 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
-      - name: Set timestamp
-        id: timestamp
-        run: echo "ts=bump-dependencies-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+      - name: Commit changes and create new branch
+        id: create_branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
+          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+          $BRANCH_NAME="bump-dependencies-$(date +%Y%m%d%H%M%S)"
+          git branch $BRANCH_NAME
+          git push -u origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
-      - name: Commit changes
-        if: success()
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          git checkout -b ${{ steps.timestamp.outputs.ts }}
-          git push -u origin ${{ steps.timestamp.outputs.ts }}
-
-  call-smoke-test:
-    needs: bump-dependencies
-    uses: ./.github/workflows/run_smoke_test.yaml
-    with:
-      branch_name: ${{ needs.bump-dependencies.outputs.branch_name }}
-
+      - name: Trigger smoke test workflow
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        run: |
+          pwsh -Command "Invoke-RestMethod -Method Post -Uri 'https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches' -Headers @{Authorization = 'Bearer $env:GITHUB_TOKEN'; Accept = 'application/vnd.github+json'} -Body (@{ref = '$env:BRANCH_NAME'} | ConvertTo-Json)"
