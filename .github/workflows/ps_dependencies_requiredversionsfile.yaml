@@ -1,40 +1,46 @@
+
 name: Bump RequiredVersions PowerShell Dependencies
-# This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
-# It runs on a schedule and can also be triggered manually.
-# The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
 
 on:
-  # Run this workflow at 12:15 (or 1:15) am
-  # on every Mon to Fri (b/c GMT -5 or -4)
-  schedule:
-    - cron: "15 6 * * 1-5" # in GMT
-    
-  workflow_dispatch:
+  schedule:
+    - cron: "15 6 * * 1-5" # Runs at 12:15 AM ET Mon–Fri
+  workflow_dispatch:
 
 jobs:
-  bump-dependencies:
-    runs-on: windows-latest
+  bump-dependencies:
+    runs-on: windows-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    outputs:
+      branch_name: ${{ steps.timestamp.outputs.ts }}
 
-      - name: Install dependencies (if needed)
-        run: |
-          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser }"
-          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSDepend)) { Install-Module -Name PSDepend -Force -Scope CurrentUser }"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Bump PowerShell dependencies
-        run: |
-          pwsh -File ./utils/workflow/BumpPsDependencies.ps1
+      - name: Install dependencies (if needed)
+        run: |
+          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser }"
+          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSDepend)) { Install-Module -Name PSDepend -Force -Scope CurrentUser }"
 
+      - name: Bump PowerShell dependencies
+        run: pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
-      - name: Commit changes
-        if: success()
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          git branch bump-dependencies-$(date +%Y%m%d%H%M%S)
-          git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
+      - name: Set timestamp
+        id: timestamp
+        run: echo "ts=bump-dependencies-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
+          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+          git checkout -b ${{ steps.timestamp.outputs.ts }}
+          git push -u origin ${{ steps.timestamp.outputs.ts }}
+
+  call-smoke-test:
+    needs: bump-dependencies
+    uses: ./.github/workflows/run_smoke_test.yaml
+    with:
+      branch_name: ${{ needs.bump-dependencies.outputs.branch_name }}
