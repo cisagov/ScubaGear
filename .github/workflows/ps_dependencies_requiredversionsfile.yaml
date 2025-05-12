@@ -1,4 +1,7 @@
 name: Bump RequiredVersions PowerShell Dependencies
+# This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
+# It runs on a schedule and can also be triggered manually.
+# The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
 
 on:
   schedule:
@@ -40,8 +43,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.branch_name }}
         run: |
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches \
-            -d "{\"ref\":\"${{ env.BRANCH_NAME }}\"}"
+          pwsh -Command "Invoke-RestMethod -Method Post -Uri 'https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches' -Headers @{Authorization = 'Bearer $env:GITHUB_TOKEN'; Accept = 'application/vnd.github+json'} -Body (@{ref = '$env:BRANCH_NAME'} | ConvertTo-Json)"
