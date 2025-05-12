@@ -10,6 +10,7 @@ on:
     - cron: "15 6 * * 1-5" # in GMT
     
   workflow_dispatch:
+
 jobs:
   bump-dependencies:
     runs-on: windows-latest
