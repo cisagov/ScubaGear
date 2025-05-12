@@ -27,27 +27,30 @@ jobs:
 
       - name: Commit changes and create new branch
         id: create_branch
+        shell: pwsh
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./PowerShell/ScubaGear/RequiredVersions.ps1
           git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          BRANCH_NAME="bump-dependencies-$(date +%Y%m%d%H%M%S)"
-          git branch $BRANCH_NAME
-          git push -u origin $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          $timestamp = Get-Date -Format "yyyyMMddHHmmss"
+          $branchName = "bump-dependencies-$timestamp"
+          git branch $branchName
+          git push -u origin $branchName
+          echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Trigger smoke test workflow
         if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        shell: pwsh
         run: |
           $headers = @{
             Authorization = "Bearer $env:GITHUB_TOKEN"
             Accept = "application/vnd.github+json"
           }
           $body = @{
-            ref = "${{ env.BRANCH_NAME }}"
+            ref = "$env:BRANCH_NAME"
           } | ConvertTo-Json
           Invoke-RestMethod -Method Post `
             -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
