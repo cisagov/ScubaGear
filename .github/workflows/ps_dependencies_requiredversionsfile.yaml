@@ -7,39 +7,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  bump-dependencies:
+  bump-dependencies:
     runs-on: windows-latest
 
-    outputs:
-      branch_name: ${{ steps.timestamp.outputs.ts }}
+  outputs:
+  branch_name: ${{ steps.timestamp.outputs.ts }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Install dependencies (if needed)
-        run: |
-          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser }"
-          pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSDepend)) { Install-Module -Name PSDepend -Force -Scope CurrentUser }"
+    - name: Install dependencies (if needed)
+      run: |
+        pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser }"
+        pwsh -Command "if (-not (Get-Module -ListAvailable -Name PSDepend)) { Install-Module -Name PSDepend -Force -Scope CurrentUser }"
 
-      - name: Bump PowerShell dependencies
-        run: pwsh -File ./utils/workflow/BumpPsDependencies.ps1
+    - name: Bump PowerShell dependencies
+      run: pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
-      - name: Set timestamp
-        id: timestamp
-        run: echo "ts=bump-dependencies-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+    - name: Set timestamp
+      id: timestamp
+      run: echo "ts=bump-dependencies-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
-      - name: Commit changes
-        if: success()
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          git checkout -b ${{ steps.timestamp.outputs.ts }}
-          git push -u origin ${{ steps.timestamp.outputs.ts }}
+    - name: Commit changes
+      if: success()
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add ./PowerShell/ScubaGear/RequiredVersions.ps1
+        git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+        git checkout -b ${{ steps.timestamp.outputs.ts }}
+        git push -u origin ${{ steps.timestamp.outputs.ts }}
 
-  call-smoke-test:
+  call-smoke-test:
     needs: bump-dependencies
     uses: ./.github/workflows/run_smoke_test.yaml
     with:
