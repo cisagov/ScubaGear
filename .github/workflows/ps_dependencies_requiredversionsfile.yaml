@@ -15,6 +15,9 @@ jobs:
   bump-dependencies:
     runs-on: windows-latest
 
+    outputs:
+      branch_name: ${{ steps.timestamp.outputs.ts }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,13 +31,23 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
+      - name: Set timestamp
+        id: timestamp
+        run: echo "ts=bump-dependencies-$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
-      - name: Commit changes
-        if: success()
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          git branch bump-dependencies-$(date +%Y%m%d%H%M%S)
-          git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
+      - name: Commit changes
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add ./PowerShell/ScubaGear/RequiredVersions.ps1
+          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+          git checkout -b ${{ steps.timestamp.outputs.ts }}
+          git push -u origin ${{ steps.timestamp.outputs.ts }}
+
+  call-smoke-test:
+    needs: bump-dependencies
+    uses: ./.github/workflows/run_smoke_test.yaml
+    with:
+      branch_name: ${{ needs.bump-dependencies.outputs.branch_name }}
+
