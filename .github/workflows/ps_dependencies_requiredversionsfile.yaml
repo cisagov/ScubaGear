@@ -1,8 +1,14 @@
 name: Bump RequiredVersions PowerShell Dependencies
+# This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
+# It runs on a schedule and can also be triggered manually.
+# The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
 
 on:
+  # Run this workflow at 12:15 (or 1:15) am
+  # on every Mon to Fri (b/c GMT -5 or -4)
   schedule:
-    - cron: "15 6 * * 1-5"
+    - cron: "15 6 * * 1-5" # in GMT
+    
   workflow_dispatch:
 
 jobs:
@@ -22,25 +28,13 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
-      - name: Commit changes and create new branch
-        id: create_branch
+
+      - name: Commit changes
+        if: success()
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./PowerShell/ScubaGear/RequiredVersions.ps1
           git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
-          BRANCH_NAME=bump-dependencies-$(date +%Y%m%d%H%M%S)
-          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          git checkout -b $BRANCH_NAME
-          git push -u origin $BRANCH_NAME
-
-      - name: Trigger smoke test workflow
-        if: success()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches \
-            -d "{\"ref\":\"${{ steps.create_branch.outputs.branch_name }}\"}"
+          git branch bump-dependencies-$(date +%Y%m%d%H%M%S)
+          git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
