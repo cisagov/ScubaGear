@@ -28,7 +28,6 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
-
       - name: Commit changes
         if: success()
         run: |
@@ -38,3 +37,8 @@ jobs:
           git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
           git branch bump-dependencies-$(date +%Y%m%d%H%M%S)
           git push -u origin bump-dependencies-$(date +%Y%m%d%H%M%S)
+
+      - name: Call run_smoke_test workflow
+        uses: ./.github/workflows/run_smoke_test.yaml
+        with:
+          ref: bump-dependencies-$(date +%Y%m%d%H%M%S)
