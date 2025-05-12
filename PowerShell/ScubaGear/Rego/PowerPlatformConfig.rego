@@ -109,41 +109,50 @@ tests contains {
 #--
 
 # gets the list of all tenant environments
-AllEnvironments contains EnvironmentList.EnvironmentName if {
+AllEnvironments contains {
+    EnvironmentList.EnvironmentName,
+    EnvironmentList.IsDefault
+} if {
     some EnvironmentList in input.environment_list
 }
 
 # gets the list of all environments with policies applied to them
-EnvWithPolicies contains Env.name if {
+NonDefaultEnvWithPolicies contains {
+    Env.name,
+    Env.environmentType
+} if {
     # regal ignore:prefer-some-in-iteration
     some Policies in input.dlp_policies[_].value
     some Env in Policies.environments
 }
 
-PolicyApplicableToAllEnvironments contains {
+PoliciesSetToAllEnvironments contains {
     Policy.name,
     Policy.displayName
 } if {
     some Policies in input.dlp_policies
-    some Policy in Policies
+    some Policy in Policies.value
     Policy.environmentType == "AllEnvironments"
 }
+
+# environmentType == "AllEnvironments"
+# "ExceptEnvironments"
+# "OnlyEnvironments"
 
 # Pass if at least one policy is set to all environments
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpPolicy"],
-    "ActualValue": PolicyApplicableToAllEnvironments,
-    "ReportDetails": ReportDetailsArray(Status, PolicyApplicableToAllEnvironments, ErrorMessage),
+    "ActualValue": PoliciesSetToAllEnvironments,
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some DLPPolicies in input.dlp_policies
-    count(DLPPolicies.value) > 0
-    Count(PolicyApplicableToAllEnvironments) > 0
-    ErrorMessage := "No policies found set to all environments"
+    Count(DLPPolicies.value) > 0
+    Count(PoliciesSetToAllEnvironments) >= 1
 
-    Status := Count(PolicyApplicableToAllEnvironments) > 0,
+    Status := Count(PoliciesSetToAllEnvironments) >= 1
 }
 
 # Pass if all environments have a policy applied to them
@@ -156,12 +165,14 @@ tests contains {
     "RequirementMet": Status
 } if {
     some DLPPolicies in input.dlp_policies
-    count(DLPPolicies.value) > 0
-    Count(PolicyApplicableToAllEnvironments) == 0
-    ErrorMessage := "Subsequent environments without DLP policies:"
+    Count(DLPPolicies.value) > 0
+    Count(PoliciesSetToAllEnvironments) == 0
+    ErrorMessage := "subsequent environments without DLP policies:"
 
     # finds the environments with no policies applied to them
-    EnvWithoutPolicies := AllEnvironments - EnvWithPolicies
+    AllEnvNames := { e.EnvironmentName | e := AllEnvironments[_] }
+    NonDefaultEnvNames := { e.name | e := NonDefaultEnvWithPolicies[_] }
+    EnvWithoutPolicies := AllEnvNames - NonDefaultEnvNames
     Status := Count(EnvWithoutPolicies) == 0
 }
 
@@ -175,7 +186,7 @@ tests contains {
     "RequirementMet": false
 } if {
     some DLPPolicies in input.dlp_policies
-    count(DLPPolicies.value) <= 0
+    Count(DLPPolicies.value) <= 0
 }
 
 # Edge case where pulling configuration from tenant fails
@@ -187,7 +198,7 @@ tests contains {
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
 } if {
-    count(input.dlp_policies) <= 0
+    Count(input.dlp_policies) <= 0
 }
 #--
 
