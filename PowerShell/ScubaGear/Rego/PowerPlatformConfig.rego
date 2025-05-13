@@ -110,20 +110,19 @@ tests contains {
 
 # gets the list of all tenant environments
 AllEnvironments contains {
-    EnvironmentList.EnvironmentName,
-    EnvironmentList.IsDefault
+    "EnvironmentName": EnvironmentList.EnvironmentName,
+    "IsDefault": EnvironmentList.IsDefault
 } if {
     some EnvironmentList in input.environment_list
 }
 
 # gets the list of all environments with policies applied to them
 NonDefaultEnvWithPolicies contains {
-    Env.name,
-    Env.environmentType
+    "name": Env.name,
+    "environmentType": Env.environmentType
 } if {
-    # regal ignore:prefer-some-in-iteration
-    some Policies in input.dlp_policies[_].value
-    some Env in Policies.environments
+    some Policies in input.dlp_policies
+    some Env in Policies.value.environments
 }
 
 PoliciesSetToAllEnvironments contains {
@@ -160,7 +159,12 @@ tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpPolicy"],
-    "ActualValue": EnvWithoutPolicies,
+    "ActualValue": {
+        "AllEnvNames": AllEnvNames,
+        "NonDefaultEnvNames": NonDefaultEnvNames,
+        "AllEnvironments": AllEnvironments,
+        "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies
+    },
     "ReportDetails": ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
     "RequirementMet": Status
 } if {
@@ -170,8 +174,8 @@ tests contains {
     ErrorMessage := "subsequent environments without DLP policies:"
 
     # finds the environments with no policies applied to them
-    AllEnvNames := { e.EnvironmentName | e := AllEnvironments[_] }
-    NonDefaultEnvNames := { e.name | e := NonDefaultEnvWithPolicies[_] }
+    AllEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+    NonDefaultEnvNames := { e.name | some e in NonDefaultEnvWithPolicies }
     EnvWithoutPolicies := AllEnvNames - NonDefaultEnvNames
     Status := Count(EnvWithoutPolicies) == 0
 }
