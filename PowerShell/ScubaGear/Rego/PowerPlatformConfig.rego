@@ -82,7 +82,7 @@ tests contains {
 
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
-DefaultEnvPolicies contains {"PolicyName": Policy.displayName} if {
+DefaultEnvPolicies contains { "PolicyName": PolicyValue.displayName } if {
     some Policy in input.dlp_policies
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
