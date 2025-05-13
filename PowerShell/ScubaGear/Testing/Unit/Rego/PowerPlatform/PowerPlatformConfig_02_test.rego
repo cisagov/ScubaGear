@@ -10,7 +10,7 @@ import data.utils.key.PASS
 #--
 test_name_Correct if {
     Output := powerplatform.tests with input.tenant_id as "Test Id"
-                                    with input.dlp_policies as [DlpPolicies]
+                                  with input.dlp_policies as [DlpPolicies]
 
     TestResult("MS.POWERPLATFORM.2.1v1", Output, PASS, true) == true
 }
@@ -19,7 +19,7 @@ test_name_Incorrect if {
     Policies := json.patch(DlpPolicies, [{"op": "add", "path": "value/0/environments/0/name", "value": "NotDefault-Test Id"}])
 
     Output := powerplatform.tests with input.tenant_id as "Test Id"
-                                    with input.dlp_policies as [Policies]
+                                  with input.dlp_policies as [Policies]
 
     ReportDetailString := "No policy found that applies to default environment"
     TestResult("MS.POWERPLATFORM.2.1v1", Output, ReportDetailString, false) == true
@@ -31,18 +31,20 @@ test_name_Incorrect if {
 #--
 test_environment_list_Correct if {
     Output := powerplatform.tests with input.dlp_policies as [DlpPolicies]
-                                    with input.environment_list as [EnvironmentList]
+                                  with input.environment_list as [EnvironmentList]
 
     TestResult("MS.POWERPLATFORM.2.2v1", Output, PASS, true) == true
 }
 
 test_environment_list_Incorrect if {
-    Env := json.patch(EnvironmentList, [{"op": "add", "path": "EnvironmentName", "value": "Test1"}])
+    Env := json.patch(EnvironmentList, [
+        {"op": "add", "path": "0/EnvironmentName", "value": "Test1"}
+    ])
 
     Output := powerplatform.tests with input.dlp_policies as [DlpPolicies]
-                                    with input.environment_list as [EnvironmentList, Env]
+                                  with input.environment_list as [EnvironmentList, Env]
 
-    ReportDetailString := "1 Subsequent environments without DLP policies: Test1"
+    ReportDetailString := "1 subsequent environments without DLP policies: Test1"
     TestResult("MS.POWERPLATFORM.2.2v1", Output, ReportDetailString, false) == true
 }
 #--
