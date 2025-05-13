@@ -119,10 +119,11 @@ AllEnvironments contains {
 # gets the list of all environments with policies applied to them
 NonDefaultEnvWithPolicies contains {
     "name": Env.name,
-    "environmentType": Env.environmentType
+    "environmentType": PolicyValue.environmentType
 } if {
-    some Policies in input.dlp_policies
-    some Env in Policies.value.environments
+    some Policy in input.dlp_policies
+    some PolicyValue in Policy.value
+    some Env in PolicyValue.environments
 }
 
 PoliciesSetToAllEnvironments contains {
