@@ -82,11 +82,24 @@ tests contains {
 
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
-DefaultEnvPolicies contains {"PolicyName": Policies.displayName} if {
-    # regal ignore:prefer-some-in-iteration
-    some Policies in input.dlp_policies[_].value
-    some Env in Policies.environments
+DefaultEnvPolicies contains {"PolicyName": Policy.displayName} if {
+    some Policy in input.dlp_policies
+    some PolicyValue in Policy.value
+    some Env in PolicyValue.environments
     Env.name == concat("-", ["Default", input.tenant_id])
+}
+
+# The environmentType field can be set to the following values: 
+# "AllEnvironments", "ExceptEnvironments", or "OnlyEnvironments"
+# 
+# This variable is used for both "MS.POWERPLATFORM.2.1v1" and "MS.POWERPLATFORM.2.2v1"
+PoliciesSetToAllEnvironments contains {
+    Policy.name,
+    Policy.displayName
+} if {
+    some Policies in input.dlp_policies
+    some Policy in Policies.value
+    Policy.environmentType == "AllEnvironments"
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -100,7 +113,16 @@ tests contains {
     "RequirementMet": Status
 } if {
     ErrorMessage := "No policy found that applies to default environment"
-    Status := count(DefaultEnvPolicies) > 0
+
+    # Either a policy should exist to cover the default environment,
+    # or a policy should exist that covers all environments
+    Conditions := [
+        Count(DefaultEnvPolicies) > 0,
+        Count(PoliciesSetToAllEnvironments) >= 1
+    ]
+
+    # Check if at least one of the conditions passes
+    Status := Count(FilterArray(Conditions, true)) == 1
 }
 #--
 
@@ -125,19 +147,6 @@ NonDefaultEnvWithPolicies contains {
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
 }
-
-PoliciesSetToAllEnvironments contains {
-    Policy.name,
-    Policy.displayName
-} if {
-    some Policies in input.dlp_policies
-    some Policy in Policies.value
-    Policy.environmentType == "AllEnvironments"
-}
-
-# environmentType == "AllEnvironments"
-# "ExceptEnvironments"
-# "OnlyEnvironments"
 
 # Pass if at least one policy is set to all environments
 tests contains {
@@ -164,7 +173,8 @@ tests contains {
         "AllEnvNames": AllEnvNames,
         "NonDefaultEnvNames": NonDefaultEnvNames,
         "AllEnvironments": AllEnvironments,
-        "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies
+        "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies,
+        "EnvWithoutPolicies": EnvWithoutPolicies
     },
     "ReportDetails": ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
     "RequirementMet": Status
