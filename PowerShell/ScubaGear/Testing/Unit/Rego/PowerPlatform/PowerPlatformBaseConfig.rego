@@ -33,6 +33,9 @@ DlpPolicies := {
             "environments": [
                 {
                     "name": "Default-Test Id"
+                },
+                {
+                    "name": "Test1"
                 }
             ]
         }
@@ -41,8 +44,17 @@ DlpPolicies := {
 
 EnvironmentList := [
     {
-        "EnvironmentName": "Default-Test Id"
-    }
+        "EnvironmentName": "Default-Test Id",
+        "IsDefault": true,
+    },
+    {
+        "EnvironmentName": "Test1",
+        "IsDefault": false,
+    },
+    {
+        "EnvironmentName": "Test2",
+        "IsDefault": false,
+    },
 ]
 
 TenantIsolation := {

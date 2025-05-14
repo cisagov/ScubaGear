@@ -76,6 +76,19 @@ tests contains {
 # MS.POWERPLATFORM.2 #
 ######################
 
+# This variable is used for both "MS.POWERPLATFORM.2.1v1" and "MS.POWERPLATFORM.2.2v1"
+#
+# The environmentType field can be set to the following values: 
+# "AllEnvironments", "ExceptEnvironments", or "OnlyEnvironments"
+PoliciesSetToAllEnvironments contains {
+    PolicyValue.name,
+    PolicyValue.displayName
+} if {
+    some Policy in input.dlp_policies
+    some PolicyValue in Policy.value
+    PolicyValue.environmentType == "AllEnvironments"
+}
+
 #
 # MS.POWERPLATFORM.2.1v1
 #--
@@ -87,19 +100,9 @@ DefaultEnvPolicies contains { "PolicyName": PolicyValue.displayName } if {
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
     Env.name == concat("-", ["Default", input.tenant_id])
-}
 
-# The environmentType field can be set to the following values: 
-# "AllEnvironments", "ExceptEnvironments", or "OnlyEnvironments"
-# 
-# This variable is used for both "MS.POWERPLATFORM.2.1v1" and "MS.POWERPLATFORM.2.2v1"
-PoliciesSetToAllEnvironments contains {
-    Policy.name,
-    Policy.displayName
-} if {
-    some Policies in input.dlp_policies
-    some Policy in Policies.value
-    Policy.environmentType == "AllEnvironments"
+    # If a default policy is excluded, it will still show up under the "environments" key.
+    PolicyValue.environmentType != "ExceptEnvironments"
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -122,7 +125,7 @@ tests contains {
     ]
 
     # Check if at least one of the conditions passes
-    Status := Count(FilterArray(Conditions, true)) == 1
+    Status := Count(FilterArray(Conditions, true)) >= 1
 }
 #--
 
