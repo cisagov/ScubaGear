@@ -95,14 +95,17 @@ PoliciesSetToAllEnvironments contains {
 
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
-DefaultEnvPolicies contains { "PolicyName": PolicyValue.displayName } if {
+DefaultEnvPolicies contains { 
+    "PolicyName": PolicyValue.displayName,
+    "EnvironmentType": PolicyValue.environmentType
+} if {
     some Policy in input.dlp_policies
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
     Env.name == concat("-", ["Default", input.tenant_id])
 
     # If a default policy is excluded, it will still show up under the "environments" key.
-    PolicyValue.environmentType != "ExceptEnvironments"
+    #PolicyValue.environmentType != "ExceptEnvironments"
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -120,7 +123,8 @@ tests contains {
     # Either a policy should exist to cover the default environment,
     # or a policy should exist that covers all environments
     Conditions := [
-        Count(DefaultEnvPolicies) > 0,
+        #Count(DefaultEnvPolicies) > 0,
+        Count({e | some e in DefaultEnvPolicies; e.EnvironmentType != "ExceptEnvironments"}) > 0,
         Count(PoliciesSetToAllEnvironments) >= 1
     ]
 
