@@ -96,16 +96,31 @@ PoliciesSetToAllEnvironments contains {
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains { 
-    "PolicyName": PolicyValue.displayName,
+    "DisplayName": PolicyValue.displayName,
     "EnvironmentType": PolicyValue.environmentType
 } if {
     some Policy in input.dlp_policies
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
     Env.name == concat("-", ["Default", input.tenant_id])
+}
 
-    # If a default policy is excluded, it will still show up under the "environments" key.
-    #PolicyValue.environmentType != "ExceptEnvironments"
+# Pass if at least one policy is set to all environments
+tests contains {
+    "PolicyId": "MS.POWERPLATFORM.2.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-DlpPolicy"],
+    "ActualValue": {
+        "PoliciesSetToAllEnvironments": PoliciesSetToAllEnvironments
+    },
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    some DLPPolicies in input.dlp_policies
+    Count(DLPPolicies.value) > 0
+    Count(PoliciesSetToAllEnvironments) >= 1
+
+    Status := Count(PoliciesSetToAllEnvironments) >= 1
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -114,22 +129,17 @@ tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-DlpPolicy"],
-    "ActualValue": DefaultEnvPolicies,
+    "ActualValue": {
+        "DefaultEnvPolicies": DefaultEnvPolicies,
+    },
     "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     ErrorMessage := "No policy found that applies to default environment"
+    Count(PoliciesSetToAllEnvironments) == 0
 
-    # Either a policy should exist to cover the default environment,
-    # or a policy should exist that covers all environments
-    Conditions := [
-        #Count(DefaultEnvPolicies) > 0,
-        Count({e | some e in DefaultEnvPolicies; e.EnvironmentType != "ExceptEnvironments"}) > 0,
-        Count(PoliciesSetToAllEnvironments) >= 1
-    ]
-
-    # Check if at least one of the conditions passes
-    Status := Count(FilterArray(Conditions, true)) >= 1
+    # If a default policy is excluded, it will still show up under the "environments" key.
+    Status := Count({e | some e in DefaultEnvPolicies; e.EnvironmentType != "ExceptEnvironments"}) > 0
 }
 #--
 
@@ -137,7 +147,7 @@ tests contains {
 # MS.POWERPLATFORM.2.2v1
 #--
 
-# gets the list of all tenant environments
+# Gets the list of all tenant environments
 AllEnvironments contains {
     "EnvironmentName": EnvironmentList.EnvironmentName,
     "IsDefault": EnvironmentList.IsDefault
@@ -177,8 +187,6 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-DlpPolicy"],
     "ActualValue": {
-        "AllEnvNames": AllEnvNames,
-        "NonDefaultEnvNames": NonDefaultEnvNames,
         "AllEnvironments": AllEnvironments,
         "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies,
         "EnvWithoutPolicies": EnvWithoutPolicies
@@ -191,7 +199,7 @@ tests contains {
     Count(PoliciesSetToAllEnvironments) == 0
     ErrorMessage := "subsequent environments without DLP policies:"
 
-    # finds the environments with no policies applied to them
+    # Finds environments with no policies applied to them
     AllEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
     NonDefaultEnvNames := { e.name | some e in NonDefaultEnvWithPolicies }
     EnvWithoutPolicies := AllEnvNames - NonDefaultEnvNames
