@@ -27,6 +27,19 @@ test_name_Incorrect if {
     TestResult("MS.POWERPLATFORM.2.1v1", Output, ReportDetailString, false) == true
 }
 
+test_environmentType_AllEnvironments_Correct_V1 if {
+    Policies := json.patch(DlpPolicies, [
+        {"op": "add", "path": "value/0/environmentType", "value": "AllEnvironments"},
+        {"op": "add", "path": "value/0/environments", "value": []}
+    ])
+
+    Output := powerplatform.tests with input.tenant_id as "Test Id"
+                                  with input.dlp_policies as [Policies]
+                                  with input.environment_list as [EnvironmentList]
+
+    TestResult("MS.POWERPLATFORM.2.1v1", Output, PASS, true) == true
+}
+
 test_environmentType_OnlyEnvironments_environmentList_Correct if {
     Policies := json.patch(DlpPolicies, [
         {"op": "add", "path": "value/0/environmentType", "value": "OnlyEnvironments"},
@@ -39,22 +52,17 @@ test_environmentType_OnlyEnvironments_environmentList_Correct if {
     TestResult("MS.POWERPLATFORM.2.1v1", Output, PASS, true) == true
 }
 
-test_environmentType_AllEnvironments_Correct_V1 if {
-    Env := json.patch(EnvironmentList, [
-        {"op": "add", "path": "0/EnvironmentName", "value": "Default-Test Id"},
-        {"op": "add", "path": "0/IsDefault", "value": true}
-    ])
-
+test_environmentType_ExceptEnvironments_Incorrect if {
     Policies := json.patch(DlpPolicies, [
-        {"op": "add", "path": "value/0/environmentType", "value": "AllEnvironments"},
-        {"op": "add", "path": "value/0/environments", "value": []}
+        {"op": "add", "path": "value/0/environmentType", "value": "ExceptEnvironments"},
     ])
 
     Output := powerplatform.tests with input.tenant_id as "Test Id"
                                   with input.dlp_policies as [Policies]
-                                  with input.environment_list as [EnvironmentList] 
+                                  with input.environment_list as [EnvironmentList]
 
-    TestResult("MS.POWERPLATFORM.2.1v1", Output, PASS, true) == true
+    ReportDetailString := "No policy found that applies to default environment"
+    TestResult("MS.POWERPLATFORM.2.1v1", Output, ReportDetailString, false) == true
 }
 #--
 

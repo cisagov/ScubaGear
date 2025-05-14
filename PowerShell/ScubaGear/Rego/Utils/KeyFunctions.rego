@@ -59,7 +59,6 @@ ConvertToSetWithKey(Items, Key) := NewSet if {
 # Basic test that has anticipated string for Report Details
 TestResult(PolicyId, Output, ReportDetailStr, Status) := true  if {
     RuleOutput := [Result | some Result in Output; Result.PolicyId == PolicyId]
-    print(RuleOutput)
 
     # regal ignore: print-or-trace-call
     print("\n** Checking if only one test result **")
