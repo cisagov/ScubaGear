@@ -1,3 +1,4 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'moduleVersion')]
 # Purpose: Called by ps_dependencies_requiredversionsfile.yaml to update the MaximumVersion sections in the RequiredVersions.ps1 file.
 
 # Read the dependencies.ps1 file content
