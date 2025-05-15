@@ -110,12 +110,14 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
-                  - "password,sms"
-                GrantControls.BuiltInControls: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,sms"
+                  BuiltInControls: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.1v1 Compliant case - Phishing-resistant MFA enabled
@@ -136,10 +138,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
         Postconditions: []
         ExpectedResult: true
 
@@ -185,10 +189,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
@@ -219,14 +225,13 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                    AdditionalProperties:
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: disabled
-                        displayLocationInformationRequiredState:
-                          state: disabled
-                      includeTargets:
-                        - id: "all_users"
+                    FeatureSettings:
+                      DisplayAppInformationRequiredState:
+                        State: disabled
+                      DisplayLocationInformationRequiredState:
+                        State: disabled
+                    IncludeTargets:
+                      - Id: "all_users"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.3v2 Compliant case - MS Auth Configured Correctly
@@ -237,17 +242,16 @@ TestPlan:
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: MicrosoftAuthenticator
                     State: enabled
-                    AdditionalProperties:
-                      isSoftwareOathEnabled: false
-                      featureSettings:
-                        displayAppInformationRequiredState:
-                          state: enabled
-                          includeTarget:
-                            id: "all_users"
-                        displayLocationInformationRequiredState:
-                          state: enabled
-                          includeTarget:
-                            id: "all_users"
+                    IsSoftwareOathEnabled: false
+                    FeatureSettings:
+                      DisplayAppInformationRequiredState:
+                        State: enabled
+                        IncludeTarget:
+                          Id: "all_users"
+                      DisplayLocationInformationRequiredState:
+                        State: enabled
+                        IncludeTarget:
+                          Id: "all_users"
         Postconditions: []
         ExpectedResult: true
 
@@ -381,11 +385,13 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
-                  - "password,sms"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,sms"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.3.6v1 Compliant case
@@ -415,10 +421,12 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
-                GrantControls.AuthenticationStrength.AllowedCombinations:
-                  - "windowsHelloForBusiness"
-                  - "fido2"
-                  - "x509CertificateMultiFactor"
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
         Postconditions: []
         ExpectedResult: true
 
