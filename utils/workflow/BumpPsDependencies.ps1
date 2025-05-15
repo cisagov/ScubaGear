@@ -9,7 +9,6 @@ $lines = $dependenciesContent -split "`n"
 
 $updated = $false
 $moduleName = $null
-$moduleVersion = $null
 $maxVersion = $null
 
 # Iterate through each line and update the MaximumVersion if necessary
@@ -19,16 +18,12 @@ for ($i = 0; $i -lt $lines.Length; $i++) {
     if ($line -match "ModuleName\s*=\s*'([^']+)'") {
         $moduleName = $matches[1]
     }
-    if ($line -match "ModuleVersion\s*=\s*\[version\]\s*'([^']+)'") {
-        $moduleVersion = $matches[1]
-    }
     if ($line -match "MaximumVersion\s*=\s*\[version\]\s*'([^']+)'") {
         $maxVersion = $matches[1]
 
-
         $latestVersion = Find-Module -Name $moduleName | Select-Object -ExpandProperty Version
 
-        if ($latestVersion -ne $null -and $latestVersion -ne $maxVersion) {
+        if ($null -ne $latestVersion -and $maxVersion -ne $latestVersion) {
             $lines[$i] = $line -replace "MaximumVersion = \[version\] '$maxVersion'", "MaximumVersion = [version] '$latestVersion'"
             $updated = $true
         }
