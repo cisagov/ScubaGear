@@ -1,8 +1,4 @@
 name: Bump RequiredVersions PowerShell Dependencies
-# This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
-# It runs on a schedule and can also be triggered manually.
-# The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
-
 on:
   schedule:
     - cron: "15 6 * * 1-5"
@@ -62,7 +58,7 @@ jobs:
         if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+          BRANCH_NAME: ${{ env:BRANCH_NAME }}
         run: |
-          gh auth login --with-token <<< $env:GITHUB_TOKEN
+          echo $env:GITHUB_TOKEN | gh auth login --with-token
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body "This pull request updates the PowerShell dependencies in RequiredVersions.ps1."
