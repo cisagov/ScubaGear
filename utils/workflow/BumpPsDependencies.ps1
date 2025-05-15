@@ -33,6 +33,6 @@ for ($i = 0; $i -lt $lines.Length; $i++) {
 if ($updated) {
     # Join the lines back into a single string
     $updatedContent = $lines -join "`n"
-    # Write the updated content back to the dependencies.ps1 file
+    # Write the updated content back to the RequiredVersions.ps1 file
     Set-Content -Path './PowerShell/ScubaGear/RequiredVersions.ps1' -Value $updatedContent
 }
