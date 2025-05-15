@@ -27,7 +27,7 @@ for ($i = 0; $i -lt $lines.Length; $i++) {
 
         $latestVersion = Find-Module -Name $moduleName | Select-Object -ExpandProperty Version
 
-        if ($latestVersion -ne $null -and $latestVersion -ne $maxVersion) {
+        if ($null -ne $latestVersion -and $maxVersion -ne $latestVersion) {
             $lines[$i] = $line -replace "MaximumVersion = \[version\] '$maxVersion'", "MaximumVersion = [version] '$latestVersion'"
             $updated = $true
         }
