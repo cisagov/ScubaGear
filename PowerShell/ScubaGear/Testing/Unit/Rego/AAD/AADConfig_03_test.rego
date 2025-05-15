@@ -593,11 +593,11 @@ test_State_Incorrect_V1 if {
 test_MicrosoftAuthDisabled_NotApplicable if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     PolicyId := "MS.AAD.3.3v2"
@@ -612,11 +612,11 @@ test_MicrosoftAuthDisabled_NotApplicable if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -626,11 +626,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_1 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_2 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -641,11 +641,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_2 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -657,11 +657,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -672,11 +672,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -687,11 +687,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}    
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}    
         ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -703,11 +703,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -718,11 +718,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -733,11 +733,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -749,11 +749,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -764,11 +764,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -780,11 +780,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -796,11 +796,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -812,11 +812,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"} 
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -828,11 +828,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"} 
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -844,11 +844,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"} 
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"} 
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -860,11 +860,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_16 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -877,11 +877,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -893,11 +893,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -909,11 +909,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -925,11 +925,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -941,11 +941,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -957,11 +957,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -973,11 +973,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -989,11 +989,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1005,11 +1005,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1021,11 +1021,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1037,11 +1037,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1053,11 +1053,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/id", "value": "all_users"}
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, PASS, true) == true
@@ -1069,11 +1069,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}  
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1085,11 +1085,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "all_users"}  
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
@@ -1102,11 +1102,11 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
 test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/isSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/state", "value": "disabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayAppInformationRequiredState/includeTarget/id", "value": "not_all_users"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/state", "value": "enabled"},
-        {"op": "add", "path": "authentication_method_feature_settings/0/AdditionalProperties/featureSettings/displayLocationInformationRequiredState/includeTarget/id", "value": "not_all_users"}  
+        {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
+        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}  
     ])
     Output := aad.tests with input.authentication_method as [Auth]
     TestResult("MS.AAD.3.3v2", Output, FAIL, false) == true
