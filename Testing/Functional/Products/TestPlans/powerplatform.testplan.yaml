@@ -53,6 +53,13 @@ TestPlan:
           - Command: 'New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName ((Get-AdminPowerAppEnvironment -Default).EnvironmentName)'
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - DLP policy set to environmentType == AllEnvironments
+        Preconditions:
+          - Command: |
+                      $PolicyName = (Get-DlpPolicy).value | Where {$_.environments.name -eq (Get-AdminPowerAppEnvironment -Default).EnvironmentName} | Select-Object -ExpandProperty displayName
+                      Set-DlpPolicy -Identity $PolicyName -EnvironmentType AllEnvironments
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.POWERPLATFORM.2.2v1
     TestDriver: ScubaCached
