@@ -38,7 +38,8 @@ jobs:
           git branch $branchName
           git push -u origin $branchName
           echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Trigger smoke test workflow
+          
+           - name: Trigger smoke test workflow
         if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,3 +57,12 @@ jobs:
             -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
             -Headers $headers `
             -Body $body
+
+      - name: Create pull request
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        run: |
+          gh auth login --with-token <<< $env:GITHUB_TOKEN
+          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body "This pull request updates the PowerShell dependencies in RequiredVersions.ps1."
