@@ -143,6 +143,8 @@ jobs:
           }
           # Check #4 - see if the path exists
           $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
+          Write-Host This check looks fragile.
+          Write-Warning $env:PSModulePath
           $PathExists = Test-Path -Path "$ModulePath"
           if ($PathExists -ne $true) {
             Write-Output "::error::ScubaGear was not installed into the correct version."
