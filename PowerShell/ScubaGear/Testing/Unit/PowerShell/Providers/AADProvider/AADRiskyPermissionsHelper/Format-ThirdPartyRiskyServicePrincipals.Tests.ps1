@@ -14,6 +14,7 @@ InModuleScope AADRiskyPermissionsHelper {
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            function Get-MgBetaOrganization {}
 
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
@@ -45,14 +46,17 @@ InModuleScope AADRiskyPermissionsHelper {
                     )
                 }
             }
-
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
-            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
+            Mock Get-MgBetaOrganization {
+                return @{
+                    "Id" = "00000000-0000-0000-0000-000000000000"
+                }
+            }
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
+
             $ThirdPartySPs | Should -HaveCount 3
 
             $ThirdPartySPs[0].DisplayName | Should -Match "Test SP 3"
@@ -78,6 +82,14 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[2].PasswordCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[2].FederatedCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[2].RiskyPermissions | Should -HaveCount 8
+        }
+
+        It "throws a ParameterBindingValidationException if the -RiskySPs value is null" {
+            { Format-RiskyThirdPartyServicePrincipals -RiskySPs $null | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+        }
+
+        It "throws a ParameterBindingValidationException if the -RiskySPs value is empty" {
+            { Format-RiskyThirdPartyServicePrincipals -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
     }
 }

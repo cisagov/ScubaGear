@@ -315,15 +315,17 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         # Exclude service principals without risky permissions
                         if ($MappedPermissions.Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
-                                ObjectId             = $ServicePrincipal.Id
-                                AppId                = $ServicePrincipal.AppId
-                                DisplayName          = $ServicePrincipal.DisplayName
+                                ObjectId                = $ServicePrincipal.Id
+                                AppId                   = $ServicePrincipal.AppId
+                                DisplayName             = $ServicePrincipal.DisplayName
+                                SignInAudience          = $ServicePrincipal.SignInAudience
                                 # Credentials from application and service principal objects may get merged in other cmdlets.
                                 # Differentiate between the two by setting IsFromApplication=$false
-                                KeyCredentials       = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                                PasswordCredentials  = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                                FederatedCredentials = $ServicePrincipal.FederatedIdentityCredentials
-                                RiskyPermissions     = $MappedPermissions
+                                KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                                PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                                FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                                RiskyPermissions        = $MappedPermissions
+                                AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
                     }
@@ -426,21 +428,20 @@ function Format-RiskyThirdPartyServicePrincipals {
     param (
         [ValidateNotNullOrEmpty()]
         [Object[]]
-        $RiskyApps,
-
-        [ValidateNotNullOrEmpty()]
-        [Object[]]
         $RiskySPs
     )
     process {
         try {
             $ServicePrincipals = @()
-            foreach ($ServicePrincipal in $RiskySPs) {
-                $MatchedApplication = $RiskyApps | Where-Object { $_.AppId -eq $ServicePrincipal.AppId }
+            $OrgInfo = Get-MgBetaOrganization -ErrorAction "Stop"
 
-                # If a service principal does not have an associated application registration,
-                # then it is owned by an external organization.
-                if ($null -eq $MatchedApplication) {
+            foreach ($ServicePrincipal in $RiskySPs) {
+                if ($null -eq $ServicePrincipal) {
+                    continue
+                }
+                
+                # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
+                if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
                     $ServicePrincipals += $ServicePrincipal
                 }
             }
@@ -450,6 +451,7 @@ function Format-RiskyThirdPartyServicePrincipals {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
+
         return $ServicePrincipals
     }
 }
