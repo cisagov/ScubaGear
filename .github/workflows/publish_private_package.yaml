@@ -142,12 +142,13 @@ jobs:
             exit 1
           }
           # Check #4 - see if the path exists
+          # This check uses is a bit too fragile. It checks if ScubaGear is installed in the
+          # first path in env:PSModulePath. When ScubaGear could be installed in any of those paths.
+          # Will leave this check in for now but not make this an error message.
           $ModulePath = ($env:PSModulePath -split ';')[0] + '\ScubaGear'
-          Write-Host This check looks fragile.
-          Write-Warning $env:PSModulePath
           $PathExists = Test-Path -Path "$ModulePath"
           if ($PathExists -ne $true) {
-            Write-Output "::error::ScubaGear was not installed into the correct version."
+            Write-Output "ScubaGear was not installed into the first path."
           }
       - name: Install Selenium
         run: |
