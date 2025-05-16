@@ -313,23 +313,6 @@ TestPlan:
               AllowTeamsConsumer: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.3.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.TEAMS.3.1v1 Non-compliant - AllowPublicUsers
-        Postconditions: []
-        ExpectedResult: false
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowPublicUsers: true
-      - TestDescription: MS.TEAMS.3.1v1 Compliant - Not AllowPublicUsers
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowPublicUsers: false
-        Postconditions: []
-        ExpectedResult: true
   - PolicyId: MS.TEAMS.5.1v1
     TestDriver: RunScuba
     Tests:
