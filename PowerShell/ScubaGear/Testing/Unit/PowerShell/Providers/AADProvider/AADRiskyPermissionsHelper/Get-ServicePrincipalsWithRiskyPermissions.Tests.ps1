@@ -26,7 +26,7 @@ InModuleScope AADRiskyPermissionsHelper {
                     "@odata.context" = "https://graph.microsoft.com/beta/$metadata#ServicePrincipal"
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
-            function New-MockMgGraphResponse {
+            function Get-MockMgGraphResponse {
                 param (
                     [int] $Size,
                     [array] $MockBody
