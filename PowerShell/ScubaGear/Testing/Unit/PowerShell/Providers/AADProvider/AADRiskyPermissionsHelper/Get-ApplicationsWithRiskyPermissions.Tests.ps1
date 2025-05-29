@@ -14,18 +14,27 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             Mock Invoke-MgGraphRequest { $MockApplications }
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
             }
+
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockApplications
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
+              Mock Invoke-GraphDirectly {
+                param($commandlet, $M365Environment, $queryParams, $apiHeader, $ID, $Body, $Uri, $Method)
+                return @{
+                    "value" = $MockFederatedCredentials
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
         }
 
         It "returns a list of applications with valid properties" {
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-
             # Refer to $MockApplications in ./RiskyPermissionsSnippets,
             # we are comparing data stored there with the function's return value
             $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
@@ -72,8 +81,13 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "sets the list of federated credentials to null if no credentials exist" {
-            Mock Get-MgBetaApplication { $MockApplications[0] }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential {}
+            # Override to return empty federated credentials
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = @()
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
 
             $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $RiskyApps[0].FederatedCredentials | Should -BeNullOrEmpty

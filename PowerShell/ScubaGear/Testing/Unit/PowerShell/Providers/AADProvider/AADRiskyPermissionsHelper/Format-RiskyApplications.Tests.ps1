@@ -16,13 +16,26 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockApplications
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
+              Mock Invoke-GraphDirectly {
+                param($commandlet, $M365Environment, $queryParams, $apiHeader, $ID, $Body, $Uri, $Method)
+                return @{
+                    "value" = $MockFederatedCredentials
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
+                Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#servicePrincipals"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(

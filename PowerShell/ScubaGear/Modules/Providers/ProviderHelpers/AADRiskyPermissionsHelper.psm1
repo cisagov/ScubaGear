@@ -182,6 +182,57 @@ function Merge-Credentials {
     return $MergedCredentials
 }
 
+function Get-ServicePrincipalAll {
+    <#
+    .Description
+    Returns all service principals in the tenant, this is used to determine if they have risky permissions.
+
+    .PARAMETER
+    M365Environment
+
+    The M365 environment to use for the Graph API call. This is used to determine the correct endpoint for the API call.
+
+    .EXAMPLE
+    Get-ServicePrincipalAll -M365Environment commercial
+
+    Returns all service principals in the tenant for the commercial environment.
+
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    # Initialize an empty array to store all service principals
+    $allServicePrincipals = @()
+
+    # Get the first page of results
+    $result = Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment
+
+    # Add the current page of service principals to our collection
+    if ($result.Value) {
+        $allServicePrincipals += $result.Value
+    }
+
+    # Continue fetching next pages as long as there's a nextLink
+    while ($result.'@odata.nextLink') {
+
+        # Extract the URI from the nextLink
+        $nextLink = $result.'@odata.nextLink'
+
+        # Use the URI directly for the next request
+        $result = Invoke-MgGraphRequest -Uri $nextLink -Method "GET"
+
+        # Add the new page of results to our collection
+        if ($result.Value) {
+            $allServicePrincipals += $result.Value
+        }
+    }
+
+    return $allServicePrincipals
+}
+
 function Get-ApplicationsWithRiskyPermissions {
     <#
     .Description
@@ -201,7 +252,8 @@ function Get-ApplicationsWithRiskyPermissions {
     process {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
-            $Applications = Get-MgBetaApplication -All
+            # Get all applications in the tenant
+            $Applications = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment $M365Environment).Value
             $ApplicationResults = @()
             foreach ($App in $Applications) {
                 # `AzureADMyOrg` = single tenant; `AzureADMultipleOrgs` = multi tenant
@@ -256,7 +308,8 @@ function Get-ApplicationsWithRiskyPermissions {
                     }
                 }
 
-                $FederatedCredentials = Get-MgBetaApplicationFederatedIdentityCredential -All -ApplicationId $App.Id
+                # Get the application credentials via Invoke-GraphDirectly
+                $FederatedCredentials = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplicationFederatedIdentityCredential" -M365Environment $M365Environment -Id $App.Id).Value
                 $FederatedCredentialsResults = @()
 
                 if ($null -ne $FederatedCredentials) {
@@ -321,7 +374,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
             $ServicePrincipalResults = @()
             # Get all service principals including ones owned by Microsoft
-            $ServicePrincipals = Get-MgBetaServicePrincipal -All
+            $ServicePrincipals = Get-ServicePrincipalAll -M365Environment $M365Environment
 
             # Prepare service principal IDs for batch processing
             $ServicePrincipalIds = $ServicePrincipals.Id
