@@ -15,10 +15,9 @@ InModuleScope ExportAADProvider {
             $M365Environment = "commercial"
 
             # Simulate the "Request_ResourceNotFound" exception
-            function  Get-MgBetaDirectoryObject { }
-            Mock Get-MgBetaDirectoryObject {
+            Mock Invoke-GraphDirectly {
                 throw [System.Exception]::new("Request_ResourceNotFound")
-            }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaDirectoryObject" -or $Uri -match "/directoryObjects" } -ModuleName ExportAADProvider
 
             # Track warnings using Assert-MockCalled further down
             Mock Write-Warning { }
@@ -41,15 +40,11 @@ InModuleScope ExportAADProvider {
             $TenantHasPremiumLicense = $true
             $M365Environment = "commercial"
 
-            # Mock Get-MgBetaDirectoryObject to return a user-type object
-            function  Get-MgBetaDirectoryObject { }
-            Mock Get-MgBetaDirectoryObject {
-                [PSCustomObject]@{
-                    AdditionalProperties = @{
-                        "@odata.type" = "#microsoft.graph.user"  # Simulates a user type
-                    }
+            Mock Invoke-GraphDirectly {
+                return [PSCustomObject]@{
+                    "@odata.type" = "#microsoft.graph.user"  # Simulates a user type
                 }
-            }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaDirectoryObject" -or $Uri -match "/directoryObjects" } -ModuleName ExportAADProvider
 
             Mock Invoke-GraphDirectly -MockWith {
                 param ($Commandlet)
@@ -92,15 +87,11 @@ InModuleScope ExportAADProvider {
             $TenantHasPremiumLicense = $true
             $M365Environment = "commercial"
 
-            # Mock Get-MgBetaDirectoryObject to return a group-type object
-            function  Get-MgBetaDirectoryObject { }
-            Mock Get-MgBetaDirectoryObject {
-                [PSCustomObject]@{
-                    AdditionalProperties = @{
-                        "@odata.type" = "#microsoft.graph.group"  # Simulates a group type
-                    }
+            Mock Invoke-GraphDirectly {
+                return [PSCustomObject]@{
+                    "@odata.type" = "#microsoft.graph.group"  # Simulates a group type
                 }
-            }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaDirectoryObject" -or $Uri -match "/directoryObjects" } -ModuleName ExportAADProvider
 
             Mock Invoke-GraphDirectly -MockWith {
                 param ($Commandlet, $ID)

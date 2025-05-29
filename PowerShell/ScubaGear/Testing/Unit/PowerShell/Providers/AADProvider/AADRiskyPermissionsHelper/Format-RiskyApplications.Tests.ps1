@@ -11,13 +11,26 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockApplications
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
+              Mock Invoke-GraphDirectly {
+                param($commandlet, $M365Environment, $queryParams, $apiHeader, $ID, $Body, $Uri, $Method)
+                return @{
+                    "value" = $MockFederatedCredentials
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
+                Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#servicePrincipals"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(
@@ -39,8 +52,8 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment Commercial
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment Commercial
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AggregateRiskyApps')]
             $AggregateRiskyApps = Format-RiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }

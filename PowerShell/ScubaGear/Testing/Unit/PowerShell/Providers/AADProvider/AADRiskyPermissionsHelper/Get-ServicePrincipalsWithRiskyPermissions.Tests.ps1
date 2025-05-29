@@ -11,14 +11,20 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
             $MockSafePermissions = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockSafePermissions.json") | ConvertFrom-Json
-            
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+
+            #function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#ServicePrincipal"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
             function New-MockMgGraphResponse {
                 param (
                     [int] $Size,
                     [array] $MockBody
                 )
-                
+
                 $data = @()
                 for ($i = 1; $i -le $Size; $i++) {
                     $id = "00000000-0000-0000-0000-0000000000{0:D2}" -f ($i * 10)
@@ -31,13 +37,13 @@ InModuleScope AADRiskyPermissionsHelper {
                     }
                     $data += $mockResponse
                 }
-            
+
                 return $data
             }
         }
 
         It "returns a list of service principals with valid properties" {
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{
@@ -45,7 +51,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment Commercial
             $RiskySPs | Should -HaveCount 5
 
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
@@ -90,7 +96,7 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "excludes service principals with no risky permissions" {
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockSafePermissions
@@ -100,15 +106,15 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment Commercial
             $RiskySPs | Should -BeNullOrEmpty
         }
 
         It "excludes permissions not included in the RiskyPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
-            
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
+
+            #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{
@@ -116,7 +122,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment Commercial
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
             $RiskySPs[0].ObjectId | Should -Match "00000000-0000-0000-0000-000000000010"
             $RiskySPs[0].AppId | Should -Match "10000000-0000-0000-0000-000000000000"
