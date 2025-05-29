@@ -18,7 +18,10 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
               Mock Invoke-GraphDirectly {
-                param($commandlet, $M365Environment, $queryParams, $apiHeader, $ID, $Body, $Uri, $Method)
+                param($commandlet, $ID, $Uri)
+                # Suppress PSReviewUnusedParameter warnings
+                $null = $commandlet
+                $null = $Uri
                 return @{
                     "value" = $MockFederatedCredentials
                     "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"

@@ -19,7 +19,7 @@ InModuleScope AADRiskyPermissionsHelper {
                     "@odata.context" = "https://graph.microsoft.com/beta/$metadata#ServicePrincipal"
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
-            function New-MockMgGraphResponse {
+            function Get-MockMgGraphResponse {
                 param (
                     [int] $Size,
                     [array] $MockBody
@@ -44,7 +44,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "returns a list of service principals with valid properties" {
             #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
+            $Responses = Get-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = $Responses
@@ -99,7 +99,7 @@ InModuleScope AADRiskyPermissionsHelper {
             #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
-            $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockSafePermissions
+            $Responses = Get-MockMgGraphResponse -Size 5 -MockBody $MockSafePermissions
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = $Responses
@@ -115,7 +115,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
+            $Responses = Get-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = $Responses
