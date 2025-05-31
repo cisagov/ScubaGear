@@ -1,3 +1,26 @@
+function Get-ResourcePermissions {
+    param(
+        [object]
+        $ResourcePermissionCache,
+
+        [string]
+        $ResourceAppId
+    )
+    try {
+        if (-not $ResourcePermissionCache.ContainsKey($ResourceAppId)) {
+            $uri = "https://graph.microsoft.com/v1.0/servicePrincipals(AppId='$ResourceAppId')?`$select=AppRoles,Oauth2PermissionScopes"
+            $result = Invoke-MgGraphRequest -Uri $uri -Method GET
+            $ResourcePermissionCache[$ResourceAppId] = $result
+        }
+        return $ResourcePermissionCache[$ResourceAppId]
+    }
+    catch {
+        Write-Warning "An error occurred in Get-ResourcePermissions: $($_.Exception.Message)"
+        Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_
+    }
+}
+
 function Get-RiskyPermissionsJson {
     process {
         try {
@@ -15,7 +38,7 @@ function Get-RiskyPermissionsJson {
     }
 }
 
-function Format-RiskyPermission {
+function Format-Permission {
     <#
     .Description
     Returns an API permission from either application/service principal which maps
@@ -36,6 +59,12 @@ function Format-RiskyPermission {
         [string]
         $Id,
 
+        [string]
+        $RoleType,
+
+        [string]
+        $RoleDisplayName,
+
         [ValidateNotNullOrEmpty()]
         [boolean]
         $IsAdminConsented
@@ -43,13 +72,15 @@ function Format-RiskyPermission {
 
     $RiskyPermissions = $Json.permissions.$AppDisplayName.PSObject.Properties.Name
     $Map = @()
-    if ($RiskyPermissions -contains $Id) {
-        $Map += [PSCustomObject]@{
-            RoleId                 = $Id
-            RoleDisplayName        = $Json.permissions.$AppDisplayName.$Id
-            ApplicationDisplayName = $AppDisplayName
-            IsAdminConsented       = $IsAdminConsented
-        }
+    $IsRisky = $RiskyPermissions -contains $Id
+
+    $Map += [PSCustomObject]@{
+        RoleId                 = $Id
+        RoleType               = if ($null -ne $RoleType) { $RoleType } else { $null }
+        RoleDisplayName        = if ($null -ne $RoleDisplayName) { $RoleDisplayName } else { $null }
+        ApplicationDisplayName = $AppDisplayName
+        IsAdminConsented       = $IsAdminConsented
+        IsRisky                = $IsRisky
     }
     return $Map
 }
@@ -140,6 +171,10 @@ function Get-ApplicationsWithRiskyPermissions {
     .Functionality
     #Internal
     ##>
+    param (
+        [object]
+        $ResourcePermissionCache
+    )
     process {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
@@ -153,9 +188,18 @@ function Get-ApplicationsWithRiskyPermissions {
                 # Map application permissions against RiskyPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
-                    # Exclude delegated permissions with property Type="Scope"
-                    $Roles = $Resource.ResourceAccess | Where-Object { $_.Type -eq "Role" }
+                    # Returns both application and delegated permissions
+                    $Roles = $Resource.ResourceAccess
                     $ResourceAppId = $Resource.ResourceAppId
+
+                    $ResourceAppPermissions = Get-ResourcePermissions `
+                        -ResourcePermissionCache $ResourcePermissionCache `
+                        -ResourceAppId           $ResourceAppId
+
+                    if ($null -eq $ResourceAppPermissions) {
+                        Write-Warning "No permissions found for resource app ID: $ResourceAppId"
+                        continue
+                    }
 
                     # Additional processing is required to determine if a permission is admin consented.
                     # Initially assume admin consent is false since we reference the application's manifest,
@@ -164,13 +208,25 @@ function Get-ApplicationsWithRiskyPermissions {
 
                     # Only map on resources stored in RiskyPermissions.json file
                     if ($RiskyPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
-                        foreach($Role in $Roles) {
+                        foreach ($Role in $Roles) {
                             $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
                             $RoleId = $Role.Id
-                            $MappedPermissions += Format-RiskyPermission `
+
+                            if ($Role.Type -eq "Role") {
+                                $ReadableRoleType = "Application"
+                                $RoleDisplayName = ($ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }).value
+                            }
+                            else {
+                                $ReadableRoleType = "Delegated"
+                                $RoleDisplayName = ($ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }).value
+                            }
+
+                            $MappedPermissions += Format-Permission `
                                 -Json $RiskyPermissionsJson `
                                 -AppDisplayName $ResourceDisplayName `
                                 -Id $RoleId `
+                                -RoleType $ReadableRoleType `
+                                -RoleDisplayName $RoleDisplayName `
                                 -IsAdminConsented $IsAdminConsented
                         }
                     }
@@ -207,7 +263,7 @@ function Get-ApplicationsWithRiskyPermissions {
                         KeyCredentials       = Format-Credentials -AccessKeys $App.KeyCredentials -IsFromApplication $true
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = $FederatedCredentialsResults
-                        RiskyPermissions     = $MappedPermissions
+                        Permissions          = $MappedPermissions
                     }
                 }
             }
@@ -231,7 +287,10 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     param (
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [object]
+        $ResourcePermissionCache
     )
     process {
         try {
@@ -300,10 +359,42 @@ function Get-ServicePrincipalsWithRiskyPermissions {
 
                                     # Only map on resources stored in RiskyPermissions.json file
                                     if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
-                                        $MappedPermissions += Format-RiskyPermission `
+                                        # If entering this block, the $ResourceDisplayName is confirmed to exist in RiskyPermissions.json.
+                                        $ResourceAppId = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
+                                            $_.Value -eq $ResourceDisplayName
+                                        } | Select-Object -ExpandProperty Name
+    
+                                        $ResourceAppPermissions = Get-ResourcePermissions `
+                                            -ResourcePermissionCache $ResourcePermissionCache `
+                                            -ResourceAppId $ResourceAppId
+    
+                                        if ($null -eq $ResourceAppPermissions) {
+                                            Write-Warning "No permissions found for resource app ID: $ResourceAppId"
+                                            continue
+                                        }
+
+                                        $ReadableRoleType = $null
+                                        $RoleDisplayName = $null
+
+                                        $AppRole = $ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }
+                                        if ($null -ne $AppRole) {
+                                            $ReadableRoleType = "Application"
+                                            $RoleDisplayName = $AppRole.value
+                                        }
+                                        else {
+                                            $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
+                                            if ($null -ne $OauthScope) {
+                                                $ReadableRoleType = "Delegated"
+                                                $RoleDisplayName = $OauthScope.value
+                                            }
+                                        }
+                                        
+                                        $MappedPermissions += Format-Permission `
                                             -Json $RiskyPermissionsJson `
                                             -AppDisplayName $ResourceDisplayName `
                                             -Id $RoleId `
+                                            -RoleType $ReadableRoleType `
+                                            -RoleDisplayName $RoleDisplayName `
                                             -IsAdminConsented $IsAdminConsented
                                     }
                                 }
@@ -324,7 +415,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
                                 PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                                 FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
-                                RiskyPermissions        = $MappedPermissions
+                                Permissions             = $MappedPermissions
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
@@ -368,8 +459,8 @@ function Format-RiskyApplications {
                 $MergedObject = @{}
                 if ($MatchedServicePrincipal) {
                     # Determine if each risky permission was admin consented or not
-                    foreach ($Permission in $App.RiskyPermissions) {
-                        $ServicePrincipalRoleIds = $MatchedServicePrincipal.RiskyPermissions | Select-Object -ExpandProperty RoleId
+                    foreach ($Permission in $App.Permissions) {
+                        $ServicePrincipalRoleIds = $MatchedServicePrincipal.Permissions | Select-Object -ExpandProperty RoleId
                         if ($ServicePrincipalRoleIds -contains $Permission.RoleId) {
                             $Permission.IsAdminConsented = $true
                         }
@@ -400,7 +491,7 @@ function Format-RiskyApplications {
                         KeyCredentials           = $MergedKeyCredentials
                         PasswordCredentials      = $MergedPasswordCredentials
                         FederatedCredentials     = $MergedFederatedCredentials
-                        RiskyPermissions         = $App.RiskyPermissions
+                        Permissions              = $App.Permissions
                     }
                 }
                 else {

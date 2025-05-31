@@ -147,8 +147,16 @@ function Export-AADProvider {
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
-    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions")
-    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
+    # Microsoft does not provide a commandlet to retrieve the display name of delegated permissions out of the box.
+    # Each resource application, e.g. Microsoft Graph, Exchange Online, etc., can be queried to retrieve its application/delegated API scopes
+    # This cache is used to store the scopes for each resource application to avoid redundant calls to the Graph API for the same resource application.
+    $ResourcePermissionCache = @{}
+
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{"ResourcePermissionCache"=$ResourcePermissionCache})
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or @($RiskySPs).Count -eq 0) { @() } else { $RiskySPs }
@@ -164,7 +172,11 @@ function Export-AADProvider {
     # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
     $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
-            $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
+            $Tracker.TryCommand("Format-RiskyApplications", @{
+                "RiskyApps"=$RiskyApps; 
+                "RiskySPs"=$RiskySPs;
+                "ResourcePermissionCache"=$ResourcePermissionCache
+            })
         }
     )
 
