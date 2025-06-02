@@ -58,12 +58,11 @@ jobs:
             -Headers $headers `
             -Body $body
 
-
-      - name: Create pull request
-        if: success()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH_NAME: ${{ env.BRANCH_NAME }}
-        run: |
-          echo $env:GITHUB_TOKEN | gh auth login --with-token
-          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
+      - name: Create pull request
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        run: |
+          echo $env:GITHUB_TOKEN | gh auth login --with-token
+          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
