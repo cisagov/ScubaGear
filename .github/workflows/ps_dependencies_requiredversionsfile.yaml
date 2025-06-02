@@ -65,4 +65,5 @@ jobs:
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
-          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body "This pull request updates the PowerShell dependencies in RequiredVersions.ps1."
+          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies"
+
