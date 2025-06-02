@@ -142,7 +142,7 @@ function Export-AADProvider {
     ##### End block
 
     # Provides data on the password expiration policy
-    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain"))
+    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
@@ -202,7 +202,6 @@ function Get-AADTenantDetail {
         $M365Environment
     )
     try {
-        #$OrgInfo = Get-MgBetaOrganization -ErrorAction "Stop"
         # Retrieve tenant details using GraphDirectly to reduce reliance on the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
         $OrgInfo = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
         $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
@@ -253,7 +252,6 @@ function Get-PrivilegedUser {
     $PrivilegedRoles = [ScubaConfig]::ScubaDefault('DefaultPrivilegedRoles')
     # Get a list of the Id values for the privileged roles in the list above.
     # The Id value is passed to other cmdlets to construct a list of users assigned to privileged roles.
-    #$AADRolesOld = Get-MgBetaDirectoryRole -All -ErrorAction Stop | Where-Object { $_.DisplayName -in $PrivilegedRoles }
     $AADRoles = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRole" -M365Environment $M365Environment).Value | Where-Object { $_.DisplayName -in $PrivilegedRoles }
 
     # Construct a list of privileged users based on the Active role assignments
@@ -365,7 +363,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         }
 
         # Extract what type of object this is.
-        #$Objecttype = $DirectoryObject.AdditionalProperties."@odata.type" -replace "#microsoft.graph."
         $Objecttype = $DirectoryObject."@odata.type" -replace "#microsoft.graph."
     }
 
@@ -386,7 +383,6 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
 
         # In this section we need to add the service principal information to the "service principal" hashtable
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
-            #$AADServicePrincipal = Get-MgBetaServicePrincipal -ServicePrincipalId $ObjectId -ErrorAction Stop
             $AADServicePrincipal = Invoke-GraphDirectly -Commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment -id $ObjectId
             $PrivilegedUsers[$ObjectId] = @{
                 "DisplayName" = $AADServicePrincipal.DisplayName
@@ -544,7 +540,6 @@ function GetConfigurationsForPimGroups{
             $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.PolicyId).Value
             # Filter for the PIM group so we can grab its name
             $PIMGroup = $PIMGroups | Where-Object {$_.Id -eq $PrincipalId}
-            # $SourceGroup = Get-MgBetaGroup -Filter "id eq '$PrincipalId' " | Select-Object -Property DisplayName
             AddRuleSource -Source $PIMGroup.DisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
 
             $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
