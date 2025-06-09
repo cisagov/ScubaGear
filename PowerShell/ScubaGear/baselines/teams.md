@@ -373,61 +373,12 @@ To enable external access for only specific domains:
     organization can communicate with Teams users whose accounts aren't
     managed by an organization** to **Off**.
 
-## 3. Skype Users
 
-This section helps reduce security risks related to contact with Skype users. Microsoft is officially retiring Skype for Business Online and wants to give customers information and resources to plan and execute a successful upgrade to Teams. Below are the decommissioning dates by product:
-
-- Skype for Business Online: July 31, 2021
-- Skype for Business 2015: April 11, 2023
-- Skype for Business 2016: Oct. 14, 2025
-- Skype for Business 2019: Oct. 14, 2025
-- Skype for Business Server 2015: Oct. 14, 2025
-- Skype for Business Server 2019: Oct. 14, 2025
-- Skype for Business LTSC 2021: Oct. 13, 2026
-
-### Policies
-
-#### MS.TEAMS.3.1v1
-Contact with Skype users SHALL be blocked.
-
-<!--Policy: MS.TEAMS.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk.  By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.
-- _Last modified:_ July 2023
-- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SA-22
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
-
-### Resources
-
-- [Configure external meetings and chat with Skype for Business Server \| Microsoft
-Learn](https://learn.microsoft.com/en-us/microsoftteams/external-meetings-skype-for-business-server-hybrid)
-
-- [Skype for Business Online to Be Retired in 2021 \| Microsoft Teams
-Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-business-online-to-be-retired-in-2021/ba-p/777833)
-
-### License Requirements
-
-- N/A
-
-### Implementation
-
-#### MS.TEAMS.3.1v1 Instructions
-
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Users > External access**.
-
-3.  Under **Skype** users, set **Allow users in my organization to
-    communicate with Skype users** to **Off**.
-
-4.  Click **Save**.
-
-## 4. Teams Email Integration
+## 3. Teams Email Integration
 This section helps reduce security risks related to Teams email integration. Teams provides an optional feature allowing channels to have an email address and receive email.
 
 ### Policies
-#### MS.TEAMS.4.1v1
+#### MS.TEAMS.3.1v1
 Teams email integration SHALL be disabled.
 
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
@@ -451,7 +402,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 ### Implementation
 
-#### MS.TEAMS.4.1v1 Instructions
+#### MS.TEAMS.3.1v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin
     center**.
@@ -461,7 +412,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 3.  Under the **Email integration** section, set **Users can send
     emails to a channel email address** to **Off**.
 
-## 5. App Management
+## 4. App Management
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
 - *Microsoft apps*: apps published by Microsoft.
@@ -474,7 +425,7 @@ development, that users sideload into Teams.
 
 ### Policies
 
-#### MS.TEAMS.5.1v1
+#### MS.TEAMS.4.1v1
 Agencies SHOULD only allow installation of Microsoft apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.1v1; Criticality: SHOULD -->
@@ -485,7 +436,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
 
-#### MS.TEAMS.5.2v1
+#### MS.TEAMS.4.2v1
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.2v1; Criticality: SHOULD -->
@@ -497,7 +448,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
 
-#### MS.TEAMS.5.3v1
+#### MS.TEAMS.4.3v1
 Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.3v1; Criticality: SHOULD -->
@@ -521,7 +472,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 ### Implementation
 
-#### MS.TEAMS.5.1v1 Instructions
+#### MS.TEAMS.4.1v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
@@ -542,7 +493,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 9.  If custom policies have been created, repeat these steps for each
     policy, selecting the appropriate policy in step 3.
 
-#### MS.TEAMS.5.2v1 Instructions
+#### MS.TEAMS.4.2v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
@@ -565,7 +516,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 8.   If custom policies have been created, repeat steps 4 to 7 for each
     policy, selecting the appropriate policy in step 5.
 
-#### MS.TEAMS.5.3v1 Instructions
+#### MS.TEAMS.4.3v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
@@ -587,7 +538,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 8.  If custom policies have been created, repeat steps 4 to 7 for each
     policy, selecting the appropriate policy in step 5.
 
-## 6. Data Loss Prevention
+## 5. Data Loss Prevention
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
 sensitive information as well as intentional exfiltration of data. DLP
@@ -605,7 +556,7 @@ required, guidance for configuring Microsoft's DLP solution can be found in foll
 
 ### Policies
 
-#### MS.TEAMS.6.1v1
+#### MS.TEAMS.5.1v1
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
@@ -616,7 +567,7 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
-#### MS.TEAMS.6.2v1
+#### MS.TEAMS.5.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
 and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs),
 and Social Security numbers (SSNs) via email SHALL be restricted.
@@ -646,15 +597,15 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 
 ### Implementation
 
-#### MS.TEAMS.6.1v1 Instructions
+#### MS.TEAMS.5.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-#### MS.TEAMS.6.2v1 Instructions
+#### MS.TEAMS.5.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
 
-## 7. Malware Scanning
+## 6. Malware Scanning
 
 Malware scanning protects M365 Teams assets from malicious software. Several commercial anti-malware solutions detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
 
@@ -663,7 +614,7 @@ Malware scanning protects M365 Teams assets from malicious software. Several com
 
 ### Policies
 
-#### MS.TEAMS.7.1v1
+#### MS.TEAMS.6.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
 
 <!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
@@ -674,7 +625,7 @@ Attachments included with Teams messages SHOULD be scanned for malware.
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
-#### MS.TEAMS.7.2v1
+#### MS.TEAMS.6.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
 
 <!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
@@ -702,15 +653,15 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 
 ### Implementation
 
-#### MS.TEAMS.7.1v1 Instructions
+#### MS.TEAMS.6.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
-#### MS.TEAMS.7.2v1 Instructions
+#### MS.TEAMS.6.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
 
-## 8. Link Protection
+## 7. Link Protection
 
 Several technologies exist for protecting users from malicious links
 included in emails. For example, Microsoft Defender accomplishes this by
@@ -739,7 +690,7 @@ If the agency uses Microsoft Defender to meet this baseline policy group, see th
 
 ### Policies
 
-#### MS.TEAMS.8.1v1
+#### MS.TEAMS.7.1v1
 URL comparison with a blocklist SHOULD be enabled.
 
 <!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
@@ -754,7 +705,7 @@ URL comparison with a blocklist SHOULD be enabled.
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
   - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
 
-#### MS.TEAMS.8.2v1
+#### MS.TEAMS.7.2v1
 User click tracking SHOULD be enabled.
 
 <!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
@@ -782,11 +733,11 @@ User click tracking SHOULD be enabled.
 
 ### Implementation
 
-#### MS.TEAMS.8.1v1 Instructions
+#### MS.TEAMS.7.1v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
-#### MS.TEAMS.8.2v1 Instructions
+#### MS.TEAMS.7.2v1 Instructions
 
 Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
