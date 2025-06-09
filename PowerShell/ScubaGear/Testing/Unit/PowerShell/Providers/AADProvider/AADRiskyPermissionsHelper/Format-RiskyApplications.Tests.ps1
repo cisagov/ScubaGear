@@ -56,7 +56,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $AggregateRiskyApps[0].KeyCredentials | Should -HaveCount 3
             $AggregateRiskyApps[0].PasswordCredentials | Should -HaveCount 2
             $AggregateRiskyApps[0].FederatedCredentials | Should -HaveCount 2
-            $AggregateRiskyApps[0].RiskyPermissions | Should -HaveCount 2
+            $AggregateRiskyApps[0].Permissions | Should -HaveCount 2
 
             $AggregateRiskyApps[1].DisplayName | Should -Match "Test App 2"
             $AggregateRiskyApps[1].ObjectId.Application | Should -Match "00000000-0000-0000-0000-000000000002"
@@ -66,7 +66,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $AggregateRiskyApps[1].KeyCredentials | Should -HaveCount 2
             $AggregateRiskyApps[1].PasswordCredentials | Should -BeNullOrEmpty
             $AggregateRiskyApps[1].FederatedCredentials | Should -HaveCount 2
-            $AggregateRiskyApps[1].RiskyPermissions | Should -HaveCount 3
+            $AggregateRiskyApps[1].Permissions | Should -HaveCount 3
 
             # Application with no matching service principal results in slightly different format
             $AggregateRiskyApps[2].DisplayName | Should -Match "Test App 3"
@@ -76,7 +76,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $AggregateRiskyApps[2].KeyCredentials | Should -BeNullOrEmpty
             $AggregateRiskyApps[2].PasswordCredentials | Should -HaveCount 1
             $AggregateRiskyApps[2].FederatedCredentials | Should -HaveCount 2
-            $AggregateRiskyApps[2].RiskyPermissions | Should -HaveCount 4
+            $AggregateRiskyApps[2].Permissions | Should -HaveCount 4
         }
 
         It "matches service principals with applications that have the same AppId" {
@@ -111,7 +111,7 @@ InModuleScope AADRiskyPermissionsHelper {
             # KeyCredentials/PasswordCredentials/FederatedCredentials are merged into one list
             $ExpectedKeys = @(
                 "ObjectId", "AppId", "DisplayName", "IsMultiTenantEnabled", `
-                "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "RiskyPermissions"
+                "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions"
             )
             foreach ($App in $AggregateRiskyApps) {
                 # Check for correct properties

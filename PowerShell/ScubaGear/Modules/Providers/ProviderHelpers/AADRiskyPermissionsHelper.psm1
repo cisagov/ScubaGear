@@ -7,6 +7,9 @@ function Get-ResourcePermissions {
         $ResourceAppId
     )
     try {
+        if ($null -eq $ResourcePermissionCache) {
+            $ResourcePermissionCache = @{}
+        }
         if (-not $ResourcePermissionCache.ContainsKey($ResourceAppId)) {
             $uri = "https://graph.microsoft.com/v1.0/servicePrincipals(AppId='$ResourceAppId')?`$select=AppRoles,Oauth2PermissionScopes"
             $result = Invoke-MgGraphRequest -Uri $uri -Method GET

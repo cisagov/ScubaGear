@@ -11,14 +11,14 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
             $MockSafePermissions = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockSafePermissions.json") | ConvertFrom-Json
-            
+
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function New-MockMgGraphResponse {
                 param (
                     [int] $Size,
                     [array] $MockBody
                 )
-                
+
                 $data = @()
                 for ($i = 1; $i -le $Size; $i++) {
                     $id = "00000000-0000-0000-0000-0000000000{0:D2}" -f ($i * 10)
@@ -31,7 +31,7 @@ InModuleScope AADRiskyPermissionsHelper {
                     }
                     $data += $mockResponse
                 }
-            
+
                 return $data
             }
         }
@@ -54,7 +54,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[0].KeyCredentials | Should -HaveCount 1
             $RiskySPs[0].PasswordCredentials | Should -HaveCount 1
             $RiskySPs[0].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[0].Permissions | Should -HaveCount 8
 
             $RiskySPs[1].DisplayName | Should -Match "Test SP 2"
             $RiskySPs[1].ObjectId | Should -Match "00000000-0000-0000-0000-000000000020"
@@ -62,7 +62,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[1].KeyCredentials | Should -HaveCount 1
             $RiskySPs[1].PasswordCredentials | Should -BeNullOrEmpty
             $RiskySPs[1].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[1].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[1].Permissions | Should -HaveCount 8
 
             $RiskySPs[2].DisplayName | Should -Match "Test SP 3"
             $RiskySPs[2].ObjectId | Should -Match "00000000-0000-0000-0000-000000000030"
@@ -70,7 +70,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[2].KeyCredentials | Should -BeNullOrEmpty
             $RiskySPs[2].PasswordCredentials | Should -BeNullOrEmpty
             $RiskySPs[2].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[2].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[2].Permissions | Should -HaveCount 8
 
             $RiskySPs[3].DisplayName | Should -Match "Test SP 4"
             $RiskySPs[3].ObjectId | Should -Match "00000000-0000-0000-0000-000000000040"
@@ -78,7 +78,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[3].KeyCredentials | Should -BeNullOrEmpty
             $RiskySPs[3].PasswordCredentials | Should -HaveCount 2
             $RiskySPs[3].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[3].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[3].Permissions | Should -HaveCount 8
 
             $RiskySPs[4].DisplayName | Should -Match "Test SP 5"
             $RiskySPs[4].ObjectId | Should -Match "00000000-0000-0000-0000-000000000050"
@@ -86,7 +86,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs[4].KeyCredentials | Should -HaveCount 1
             $RiskySPs[4].PasswordCredentials | Should -BeNullOrEmpty
             $RiskySPs[4].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[4].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[4].Permissions | Should -HaveCount 8
         }
 
         It "excludes service principals with no risky permissions" {
@@ -100,14 +100,20 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = @()
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions) {
+                $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
+                if ($RiskyPerms.Count -gt 0) {
+                    $RiskySPs += $SP
+                }
+            }
             $RiskySPs | Should -BeNullOrEmpty
         }
 
         It "excludes permissions not included in the RiskyPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
-            
+
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $Responses = New-MockMgGraphResponse -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
@@ -116,14 +122,20 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = @()
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions) {
+                $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
+                if ($RiskyPerms.Count -gt 0) {
+                    $RiskySPs += $SP
+                }
+            }
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
             $RiskySPs[0].ObjectId | Should -Match "00000000-0000-0000-0000-000000000010"
             $RiskySPs[0].AppId | Should -Match "10000000-0000-0000-0000-000000000000"
             $RiskySPs[0].KeyCredentials | Should -HaveCount 1
             $RiskySPs[0].PasswordCredentials | Should -HaveCount 1
             $RiskySPs[0].FederatedCredentials | Should -BeNullOrEmpty
-            $RiskySPs[0].RiskyPermissions | Should -HaveCount 8
+            $RiskySPs[0].Permissions | Where-Object { $_.IsRisky } | Should -HaveCount 8
         }
     }
 }

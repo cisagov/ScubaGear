@@ -65,7 +65,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[0].KeyCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[0].PasswordCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[0].FederatedCredentials | Should -BeNullOrEmpty
-            $ThirdPartySPs[0].RiskyPermissions | Should -HaveCount 8
+            $ThirdPartySPs[0].Permissions | Should -HaveCount 8
 
             $ThirdPartySPs[1].DisplayName | Should -Match "Test SP 4"
             $ThirdPartySPs[1].ObjectId | Should -Match "00000000-0000-0000-0000-000000000040"
@@ -73,7 +73,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[1].KeyCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[1].PasswordCredentials | Should -HaveCount 2
             $ThirdPartySPs[1].FederatedCredentials | Should -BeNullOrEmpty
-            $ThirdPartySPs[1].RiskyPermissions | Should -HaveCount 8
+            $ThirdPartySPs[1].Permissions | Should -HaveCount 8
 
             $ThirdPartySPs[2].DisplayName | Should -Match "Test SP 5"
             $ThirdPartySPs[2].ObjectId | Should -Match "00000000-0000-0000-0000-000000000050"
@@ -81,7 +81,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ThirdPartySPs[2].KeyCredentials | Should -HaveCount 1
             $ThirdPartySPs[2].PasswordCredentials | Should -BeNullOrEmpty
             $ThirdPartySPs[2].FederatedCredentials | Should -BeNullOrEmpty
-            $ThirdPartySPs[2].RiskyPermissions | Should -HaveCount 8
+            $ThirdPartySPs[2].Permissions | Should -HaveCount 8
         }
 
         It "throws a ParameterBindingValidationException if the -RiskySPs value is null" {
