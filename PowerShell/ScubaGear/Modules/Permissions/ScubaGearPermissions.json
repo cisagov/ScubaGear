@@ -1,7 +1,7 @@
 [
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
-        "apiResource": "/roleManagement/directory/roleDefinitions/{id}",
+        "apiResource": "/v1.0/roleManagement/directory/roleDefinitions/{id}",
         "apiFilter": "",
         "apiHeader": [
             { }
@@ -183,7 +183,7 @@
 
     {
         "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
-        "apiResource": "/roleManagement/directory/roleAssignments",
+        "apiResource": "/v1.0/roleManagement/directory/roleAssignments",
         "apiFilter": "",
         "apiHeader": [
             { }
@@ -214,7 +214,7 @@
 
     {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/servicePrincipals/{id}/appRoleAssignments",
+        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
         "apiFilter": "",
         "apiHeader": [
             { }
