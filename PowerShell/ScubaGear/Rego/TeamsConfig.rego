@@ -373,37 +373,6 @@ tests contains {
 
 
 ##############
-# MS.TEAMS.3 #
-##############
-
-#
-# MS.TEAMS.3.1v1
-#--
-
-# Iterate through all meeting policies. For each, check if AllowPublicUsers
-# is true. If so, save the policy Identity to the SkypeBlocConfig list.
-SkypeBlocConfig contains Policy.Identity if {
-    some Policy in input.federation_configuration
-    Policy.AllowPublicUsers == true
-}
-
-# Pass if SkypeBlocConfig does not have any policies saved.
-tests contains {
-    "PolicyId": "MS.TEAMS.3.1v1",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
-    "RequirementMet": Status
-} if {
-    Policies := SkypeBlocConfig
-    String := "domains that allows contact with Skype users:"
-    Status := count(Policies) == 0
-}
-#--
-
-
-##############
 # MS.TEAMS.4 #
 ##############
 
