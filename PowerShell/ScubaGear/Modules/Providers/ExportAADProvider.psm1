@@ -152,7 +152,10 @@ function Export-AADProvider {
     # This cache is used to store the scopes for each resource application to avoid redundant calls to the Graph API for the same resource application.
     $ResourcePermissionCache = @{}
 
-    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{"ResourcePermissionCache"=$ResourcePermissionCache})
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
         "ResourcePermissionCache"=$ResourcePermissionCache
@@ -174,8 +177,7 @@ function Export-AADProvider {
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
                 "RiskyApps"=$RiskyApps; 
-                "RiskySPs"=$RiskySPs;
-                "ResourcePermissionCache"=$ResourcePermissionCache
+                "RiskySPs"=$RiskySPs
             })
         }
     )

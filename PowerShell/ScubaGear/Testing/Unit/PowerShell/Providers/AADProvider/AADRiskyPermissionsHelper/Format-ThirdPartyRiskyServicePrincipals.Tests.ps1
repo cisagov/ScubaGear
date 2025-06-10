@@ -54,7 +54,7 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc"
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
 
             $ThirdPartySPs | Should -HaveCount 3

@@ -39,8 +39,8 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc"
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc"
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AggregateRiskyApps')]
             $AggregateRiskyApps = Format-RiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }

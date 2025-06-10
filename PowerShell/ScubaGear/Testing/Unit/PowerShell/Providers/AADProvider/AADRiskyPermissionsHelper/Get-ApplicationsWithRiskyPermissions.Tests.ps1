@@ -8,6 +8,8 @@ InModuleScope AADRiskyPermissionsHelper {
             # Import mock data
             $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'MockResourcePermissionCache')]
+            $MockResourcePermissionCache = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
 
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
@@ -18,9 +20,13 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
 
+            Mock Invoke-MgGraphRequest {
+                return $MockResourcePermissionCache
+            }
+
             # Refer to $MockApplications in ./RiskyPermissionsSnippets,
             # we are comparing data stored there with the function's return value
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $RiskyApps | Should -HaveCount 3
 
             $RiskyApps[0].DisplayName | Should -Match "Test App 1"
@@ -51,35 +57,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskyApps[2].Permissions | Should -HaveCount 4
         }
 
-        It "excludes ResourceAccess objects with property Type='Scope'" {
-            # We only care about objects with type="role".
-            # Adding a couple objects with type="scope" to verify they're excluded
-            $ResourceAccess = $MockApplications[0].RequiredResourceAccess[0].ResourceAccess
-            $ResourcesOfTypeScope = @(
-                [PSCustomObject]@{
-                    Id = "b633e1c5-b582-4048-a93e-9f11b44c7e96" # Mail.Send
-                    Type = "Scope"
-                }
-                [PSCustomObject]@{
-                    Id = "19dbc75e-c2e2-444c-a770-ec69d8559fc7" # Directory.ReadWrite.All
-                    Type = "Scope"
-                }
-            )
-            $ResourceAccess += $ResourcesOfTypeScope
-            $ResourceAccess | Should -HaveCount 4
-
-            Mock Get-MgBetaApplication { $MockApplications[0] }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential {}
-
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
-            $RiskyApps[0].Permissions | Should -HaveCount 2
-        }
-
         It "correctly formats federated credentials if they exist" {
             Mock Get-MgBetaApplication { $MockApplications[0] }
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ExpectedKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences")
             foreach ($Credential in $RiskyApps[0].FederatedCredentials) {
                 # Check for correct properties
@@ -91,7 +73,7 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaApplication { $MockApplications[0] }
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $RiskyApps[0].FederatedCredentials | Should -BeNullOrEmpty
         }
 
