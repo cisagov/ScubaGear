@@ -385,7 +385,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                         $ResourceAppId = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
                                             $_.Value -eq $ResourceDisplayName
                                         } | Select-Object -ExpandProperty Name
-    
+
                                         $ResourceAppPermissions = Get-ResourcePermissions `
                                             -M365Environment $M365Environment `
                                             -ResourcePermissionCache $ResourcePermissionCache `
@@ -411,7 +411,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                                 $RoleDisplayName = $OauthScope.value
                                             }
                                         }
-                                        
+
                                         $MappedPermissions += Format-Permission `
                                             -Json $RiskyPermissionsJson `
                                             -AppDisplayName $ResourceDisplayName `
@@ -553,7 +553,7 @@ function Format-RiskyThirdPartyServicePrincipals {
                 if ($null -eq $ServicePrincipal) {
                     continue
                 }
-                
+
                 # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
                 if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
                     $ServicePrincipals += $ServicePrincipal

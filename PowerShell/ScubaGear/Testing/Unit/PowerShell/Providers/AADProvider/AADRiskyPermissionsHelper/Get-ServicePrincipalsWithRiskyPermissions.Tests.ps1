@@ -56,8 +56,6 @@ InModuleScope AADRiskyPermissionsHelper {
             }
 
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
-            
-            Write-Host $RiskySPs.count
             $RiskySPs | Should -HaveCount 5
 
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"

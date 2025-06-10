@@ -176,14 +176,14 @@ function Export-AADProvider {
     $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
-                "RiskyApps"=$RiskyApps; 
+                "RiskyApps"=$RiskyApps;
                 "RiskySPs"=$RiskySPs
             })
         }
     )
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
-    # It only returns risky service principals owned by external tenants. 
+    # It only returns risky service principals owned by external tenants.
     $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
