@@ -8,21 +8,23 @@ InModuleScope AADRiskyPermissionsHelper {
             # Import mock data
             $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'MockResourcePermissionCache')]
-            $MockResourcePermissionCache = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCacheJson = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCache = @{}
+            foreach ($prop in $MockResourcePermissionCacheJson.PSObject.Properties) {
+                $MockResourcePermissionCache[$prop.Name] = $prop.Value
+            }
 
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
             Mock Invoke-MgGraphRequest { $MockApplications }
+            Mock Invoke-GraphDirectly {
+                return $MockResourcePermissionCache
+            }
         }
 
         It "returns a list of applications with valid properties" {
             Mock Get-MgBetaApplication { $MockApplications }
             Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-
-            Mock Invoke-MgGraphRequest {
-                return $MockResourcePermissionCache
-            }
 
             # Refer to $MockApplications in ./RiskyPermissionsSnippets,
             # we are comparing data stored there with the function's return value
@@ -92,7 +94,7 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaApplicationFederatedIdentityCredential {}
 
             $RiskyApps = @()
-            foreach ($App in Get-ApplicationsWithRiskyPermissions) {
+            foreach ($App in Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
                 $RiskyPerms = $App.Permissions | Where-Object { $_.IsRisky }
                 if ($RiskyPerms.Count -gt 0) {
                     $RiskyApps += $App

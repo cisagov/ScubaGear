@@ -10,6 +10,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
+            $MockResourcePermissionCacheJson = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCache = @{}
+            foreach ($prop in $MockResourcePermissionCacheJson.PSObject.Properties) {
+                $MockResourcePermissionCache[$prop.Name] = $prop.Value
+            }
 
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
@@ -51,10 +56,13 @@ InModuleScope AADRiskyPermissionsHelper {
                     "Id" = "00000000-0000-0000-0000-000000000000"
                 }
             }
+            Mock Invoke-GraphDirectly {
+                return $MockResourcePermissionCache
+            }
         }
 
         It "returns a list of third-party risky service principals with valid properties" {
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc"
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
 
             $ThirdPartySPs | Should -HaveCount 3

@@ -6,7 +6,7 @@ function Get-ResourcePermissions {
         [string]
         $M365Environment,
 
-        [PSCustomObject]
+        [hashtable]
         $ResourcePermissionCache,
 
         [string]
@@ -16,14 +16,21 @@ function Get-ResourcePermissions {
         if ($null -eq $ResourcePermissionCache) {
             $ResourcePermissionCache = @{}
         }
-        
-        if ($ResourcePermissionCache -notcontains $ResourceAppId) {
-            $uri = "https://graph.microsoft.com/v1.0/servicePrincipals(AppId='$ResourceAppId')?`$select=AppRoles,Oauth2PermissionScopes"
-            $result = Invoke-MgGraphRequest -Uri $uri -Method GET
-            #$result = Invoke-GraphDirectly -Commandlet "Get-MgServicePrincipal" -M365Environment $M365Environment -Id $ResourceAppId -QueryParams @{'$select' = "appRoles,oauth2PermissionScopes"}
-            $ResourcePermissionCache.$ResourceAppId = $result
+
+        if (-not $ResourcePermissionCache.ContainsKey($ResourceAppId)) {
+            $result = (
+                Invoke-GraphDirectly `
+                    -Commandlet "Get-MgServicePrincipal" `
+                    -M365Environment $M365Environment `
+                    -QueryParams @{
+                        '$filter' = "appId eq '$ResourceAppId'"
+                        '$select' = "appRoles,oauth2PermissionScopes"
+                    }
+            ).Value
+
+            $ResourcePermissionCache[$ResourceAppId] = $result
         }
-        return $ResourcePermissionCache.$ResourceAppId
+        return $ResourcePermissionCache[$ResourceAppId]
     }
     catch {
         Write-Warning "An error occurred in Get-ResourcePermissions: $($_.Exception.Message)"
@@ -187,7 +194,7 @@ function Get-ApplicationsWithRiskyPermissions {
         [string]
         $M365Environment,
 
-        [PSCustomObject]
+        [hashtable]
         $ResourcePermissionCache
     )
     process {
@@ -208,9 +215,9 @@ function Get-ApplicationsWithRiskyPermissions {
                     $ResourceAppId = $Resource.ResourceAppId
 
                     $ResourceAppPermissions = Get-ResourcePermissions `
-                        -M365Environment         $M365Environment `
+                        -M365Environment $M365Environment `
                         -ResourcePermissionCache $ResourcePermissionCache `
-                        -ResourceAppId           $ResourceAppId
+                        -ResourceAppId $ResourceAppId
 
                     if ($null -eq $ResourceAppPermissions) {
                         Write-Warning "No permissions found for resource app ID: $ResourceAppId"
@@ -305,7 +312,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         [string]
         $M365Environment,
 
-        [object]
+        [hashtable]
         $ResourcePermissionCache
     )
     process {
@@ -380,9 +387,9 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                         } | Select-Object -ExpandProperty Name
     
                                         $ResourceAppPermissions = Get-ResourcePermissions `
-                                            -M365Environment         $M365Environment `
+                                            -M365Environment $M365Environment `
                                             -ResourcePermissionCache $ResourcePermissionCache `
-                                            -ResourceAppId           $ResourceAppId
+                                            -ResourceAppId $ResourceAppId
 
                                         if ($null -eq $ResourceAppPermissions) {
                                             Write-Warning "No permissions found for resource app ID: $ResourceAppId"

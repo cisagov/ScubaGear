@@ -11,8 +11,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockSafePermissions')]
             $MockSafePermissions = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockSafePermissions.json") | ConvertFrom-Json
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'MockResourcePermissionCache')]
-            $MockResourcePermissionCache = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCacheJson = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCache = @{}
+            foreach ($prop in $MockResourcePermissionCacheJson.PSObject.Properties) {
+                $MockResourcePermissionCache[$prop.Name] = $prop.Value
+            }
 
             function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function New-MockMgGraphResponseAppRoleAssignments {
@@ -36,6 +39,10 @@ InModuleScope AADRiskyPermissionsHelper {
 
                 return $data
             }
+
+            Mock Invoke-GraphDirectly {
+                return $MockResourcePermissionCache
+            }
         }
 
         It "returns a list of service principals with valid properties" {
@@ -43,18 +50,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
             Mock Invoke-MgGraphRequest {
-                param($Uri, $Method, $Body)
-                Write-Host "Mocking Invoke-MgGraphRequest with Uri: $Uri"
-                if ($Uri -like "*servicePrincipals(appId='*')*") {
-                    return $MockResourcePermissionCache
-                }
-                elseif ($Uri -like "*beta/$batch") {
-                    return @{
-                        responses = $MockAppRoleAssignmentResponses
-                    }
-                }
-                else {
-                    return $null
+                return @{
+                    responses = $MockAppRoleAssignmentResponses
                 }
             }
 
@@ -110,22 +107,13 @@ InModuleScope AADRiskyPermissionsHelper {
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
             Mock Invoke-MgGraphRequest {
-                param($Uri, $Method, $Body)
-                if ($Uri -like "*servicePrincipals(appId='*')*") {
-                    return $MockResourcePermissionCache
-                }
-                elseif ($Uri -like "*servicePrincipals/*/appRoleAssignments") {
-                    return @{
-                        responses = $MockAppRoleAssignmentResponses
-                    }
-                }
-                else {
-                    return $null
+                return @{
+                    responses = $MockAppRoleAssignmentResponses
                 }
             }
 
             $RiskySPs = @()
-            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions) {
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
                 $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
                 if ($RiskyPerms.Count -gt 0) {
                     $RiskySPs += $SP
@@ -141,22 +129,13 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
-                param($Uri, $Method, $Body)
-                if ($Uri -like "*servicePrincipals(appId='*')*") {
-                    return $MockResourcePermissionCache
-                }
-                elseif ($Uri -like "*servicePrincipals/*/appRoleAssignments") {
-                    return @{
-                        responses = $MockAppRoleAssignmentResponses
-                    }
-                }
-                else {
-                    return $null
+                return @{
+                    responses = $MockAppRoleAssignmentResponses
                 }
             }
 
             $RiskySPs = @()
-            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions) {
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
                 $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
                 if ($RiskyPerms.Count -gt 0) {
                     $RiskySPs += $SP

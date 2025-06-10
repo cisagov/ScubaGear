@@ -2,6 +2,9 @@ $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
+#$Utilities = "$($ModulesPath)/Utility/Utility.psm1"
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $Utilities) -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyApplications" {
         BeforeAll {
@@ -10,6 +13,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
+            $MockResourcePermissionCacheJson = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
+            $MockResourcePermissionCache = @{}
+            foreach ($prop in $MockResourcePermissionCacheJson.PSObject.Properties) {
+                $MockResourcePermissionCache[$prop.Name] = $prop.Value
+            }
 
             function Get-MgBetaApplication { $MockApplications }
             function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
@@ -39,8 +47,12 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             }
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc"
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc"
+            Mock Invoke-GraphDirectly {
+                return $MockResourcePermissionCache
+            }
+
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AggregateRiskyApps')]
             $AggregateRiskyApps = Format-RiskyApplications -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }
