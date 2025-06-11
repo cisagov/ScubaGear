@@ -2,9 +2,6 @@ $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
-#$Utilities = "$($ModulesPath)/Utility/Utility.psm1"
-#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $Utilities) -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
-
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyApplications" {
         BeforeAll {

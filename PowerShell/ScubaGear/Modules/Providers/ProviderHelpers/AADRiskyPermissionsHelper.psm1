@@ -18,6 +18,7 @@ function Get-ResourcePermissions {
         }
 
         if (-not $ResourcePermissionCache.ContainsKey($ResourceAppId)) {
+            # v1.0 Graph endpoint is used here because it contains the oauth2PermissionScopes property
             $result = (
                 Invoke-GraphDirectly `
                     -Commandlet "Get-MgServicePrincipal" `
