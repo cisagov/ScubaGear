@@ -147,20 +147,48 @@ function Export-AADProvider {
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
-    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
-    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{"M365Environment"=$M365Environment})
+    # Microsoft does not provide a commandlet to retrieve the display name of delegated permissions out of the box.
+    # Each resource application, e.g. Microsoft Graph, Exchange Online, etc., can be queried to retrieve its application/delegated API scopes
+    # This cache is used to store the scopes for each resource application to avoid redundant calls to the Graph API for the same resource application.
+    $ResourcePermissionCache = @{}
 
-    $RiskyApps = if ($null -eq $RiskyApps -or $RiskyApps.Count -eq 0) { $null } else { $RiskyApps }
-    $RiskySPs = if ($null -eq $RiskySPs -or $RiskySPs.Count -eq 0) { $null } else { $RiskySPs }
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
 
-    if ($RiskyApps -and $RiskySPs) {
-        $AggregateRiskyApps = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyApplications", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-        $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskyApps"=$RiskyApps; "RiskySPs"=$RiskySPs})
-    }
-    else {
-        $AggregateRiskyApps = "{}"
-        $RiskyThirdPartySPs = "{}"
-    }
+    $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
+    $RiskySPs = if ($null -eq $RiskySPs -or @($RiskySPs).Count -eq 0) { @() } else { $RiskySPs }
+
+    # There are four cases that can occur
+    # 1. Both risky apps and risky 3rd party SPs exist
+    # 2. Neither risky apps or risky 3rd party SPs exist
+    # 3. No risky apps exist but risky 3rd party SPs exist
+    # 4. Risky apps exist but no risky 3rd party SPs exist
+
+    # "Format-RiskyApplications" will match app registrations with and without a corresponding service principal object.
+    # If an app registration does not have a service principal object, only app registration data will be displayed.
+    # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+        if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
+            $Tracker.TryCommand("Format-RiskyApplications", @{
+                "RiskyApps"=$RiskyApps;
+                "RiskySPs"=$RiskySPs
+            })
+        }
+    )
+
+    # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
+    # It only returns risky service principals owned by external tenants.
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+        if (@($RiskySPs).Count -gt 0) {
+            $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
+        }
+    )
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
