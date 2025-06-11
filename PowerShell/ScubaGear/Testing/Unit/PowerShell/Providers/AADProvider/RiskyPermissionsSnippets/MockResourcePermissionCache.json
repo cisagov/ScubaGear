@@ -1,0 +1,145 @@
+{
+    "00000003-0000-0000-c000-000000000000": {
+        "oauth2PermissionScopes":  [],
+        "appRoles":  [
+            {
+                "displayName":  "Read and write all applications",
+                "id":  "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "Application.ReadWrite.All",
+                "description":  "Allows the app to create, read, update and delete applications and service principals without a signed-in user.  Does not allow management of consent grants."
+            },
+            {
+                "displayName":  "Read and write mail in all mailboxes",
+                "id":  "e2a3a72e-5f79-4c64-b1b1-878b674786c9",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "Mail.ReadWrite",
+                "description":  "Allows the app to create, read, update, and delete mail in all mailboxes without a signed-in user. Does not include permission to send mail."
+            },
+            {
+                "displayName":  "Read and write all directory RBAC settings",
+                "id":  "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "RoleManagement.ReadWrite.Directory",
+                "description":  "Allows the app to read and manage the role-based access control (RBAC) settings for your company\u0027s directory, without a signed-in user. This includes instantiating directory roles and managing directory role membership, and reading directory role templates, directory roles and memberships."
+            },
+            {
+                "displayName":  "Read all users\u0027 full profiles",
+                "id":  "df021288-bdef-4463-88db-98f22de89214",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "User.Read.All",
+                "description":  "Allows the app to read user profiles without a signed in user."
+            },
+            {
+                "displayName":  "Read and write all group memberships",
+                "id":  "dbaae8cf-10b5-4b86-a4a1-f871c94c6695",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "GroupMember.ReadWrite.All",
+                "description":  "Allows the app to list groups, read basic properties, read and update the membership of the groups this app has access to without a signed-in user. Group properties and owners cannot be updated and groups cannot be deleted."
+            },
+            {
+                "displayName":  "Read and write files in all site collections",
+                "id":  "75359482-378d-4052-8f01-80520e7db3cd",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "Files.ReadWrite.All",
+                "description":  "Allows the app to read, create, update and delete all files in all site collections without a signed in user."
+            }
+        ]
+    },
+    "c5393580-f805-4401-95e8-94b7a6ef2fc2": {
+        "oauth2PermissionScopes":  [
+            {
+                "userConsentDisplayName":  "Read DLP policy events including detected sensitive data",
+                "adminConsentDescription":  "Allows the application to read DLP policy events, including detected sensitive data, for your organization.",
+                "userConsentDescription":  "Allows the application to read DLP policy events, including detected sensitive data, for your organization.",
+                "value":  "ActivityFeed.ReadDlp",
+                "id":  "4807a72c-ad38-4250-94c9-4eabfe26cd55",
+                "adminConsentDisplayName":  "Read DLP policy events including detected sensitive data",
+                "type":  "Admin",
+                "isEnabled":  true
+            }
+        ],
+        "appRoles":  [
+            {
+                "displayName":  "Read DLP policy events including detected sensitive data",
+                "id":  "4807a72c-ad38-4250-94c9-4eabfe26cd55",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "ActivityFeed.ReadDlp",
+                "description":  "Allows the application to read DLP policy events, including detected sensitive data, for your organization."
+            }
+        ]
+    },
+    "00000002-0000-0ff1-ce00-000000000000": {
+        "oauth2PermissionScopes":  [
+            
+        ],
+        "appRoles":  [
+            {
+                "displayName":  "Read and write mail in all mailboxes",
+                "id":  "e2a3a72e-5f79-4c64-b1b1-878b674786c9",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "Mail.ReadWrite",
+                "description":  "Allows the app to create, read, update, and delete mail in all mailboxes without a signed-in user. Does not include permission to send mail."
+            },
+            {
+                "displayName":  "Use Exchange Web Services with full access to all mailboxes",
+                "id":  "dc890d15-9560-4a4c-9b7f-a736ec74ec40",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "full_access_as_app",
+                "description":  "Allows the app to have full access via Exchange Web Services to all mailboxes without a signed-in user."
+            }
+        ]
+    },
+    "00000003-0000-0ff1-ce00-000000000000": {
+        "oauth2PermissionScopes": [],
+        "appRoles": [
+            {
+                "displayName":  "Read user profiles",
+                "id":  "df021288-bdef-4463-88db-98f22de89214",
+                "isEnabled":  true,
+                "allowedMemberTypes":  [
+                                           "Application"
+                                       ],
+                "origin":  "Application",
+                "value":  "User.Read.All",
+                "description":  "Allows the app to read user profiles without a signed in user."
+            }
+        ]
+    }
+}

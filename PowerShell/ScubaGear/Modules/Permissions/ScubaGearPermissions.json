@@ -37,7 +37,7 @@
 
     {
         "moduleCmdlet": "Get-MgServicePrincipal",
-        "apiResource": "/servicePrincipals/{id}",
+        "apiResource": "/v1.0/servicePrincipals/{id}",
         "apiFilter": "",
         "apiHeader": [
             { }
