@@ -3,14 +3,14 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        function Get-MgBetaOrganization {}
-        Mock -ModuleName ExportAADProvider Get-MgBetaOrganization {
+        Mock Invoke-GraphDirectly {
             return [pscustomobject]@{
                 DisplayName = "DisplayName";
                 Name = "DomainName";
                 Id = "TenantId";
             }
-        }
+        } -ParameterFilter { $commandlet -eq "Get-MgBetaOrganization" -or $Uri -match "/organization" } -ModuleName ExportAADProvider
+
         function Test-SCuBAValidJson {
             param (
                 [string]
@@ -28,7 +28,7 @@ InModuleScope ExportAADProvider {
     }
     Describe -Tag 'AADProvider' -Name "Get-AADTenantDetail" {
         It "Returns valid JSON" {
-            $Json = Get-AADTenantDetail
+            $Json = Get-AADTenantDetail -M365Environment Commercial
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }

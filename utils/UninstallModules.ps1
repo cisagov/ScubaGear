@@ -22,8 +22,6 @@ $ModuleList = @(
     "Microsoft.PowerApps.Administration.PowerShell",
     "Microsoft.PowerApps.PowerShell",
     "Microsoft.Graph.Authentication", # starting here, MS Graph modules for AAD
-    "Microsoft.Graph.Beta.Identity.DirectoryManagement",
-    "Microsoft.Graph.Beta.DirectoryObjects",
     "powershell-yaml"
     )
 

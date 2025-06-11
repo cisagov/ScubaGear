@@ -1398,10 +1398,10 @@ function Get-TenantDetail {
 
     # organized by best tenant details information
     if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("teams")) {
         Get-TeamsTenantDetail -M365Environment $M365Environment
