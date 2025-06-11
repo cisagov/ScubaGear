@@ -3,7 +3,7 @@ $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRisky
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
 
 InModuleScope AADRiskyPermissionsHelper {
-    Describe "Format-RiskyPermission" {
+    Describe "Format-Permission" {
         BeforeAll {
             # Import mock data
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockApplicationPermissions')]
@@ -11,16 +11,17 @@ InModuleScope AADRiskyPermissionsHelper {
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockServicePrincipalAppRoleAssignments')]
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
-            
+
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'RiskyPermissionsJson')]
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
         }
 
         It "pulls risky permissions from the specified resource (application variant)" {
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockApplicationPermissions[0].ResourceDisplayName `
                 -Id $MockApplicationPermissions[0].RoleId `
+                -RoleDisplayName $MockApplicationPermissions[0].RoleDisplayName `
                 -IsAdminConsented $false
 
             $Output.RoleId | Should -Match "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9"
@@ -28,10 +29,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $Output.ApplicationDisplayName | Should -Match "Microsoft Graph"
             $Output.IsAdminConsented | Should -Be $false
 
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockApplicationPermissions[1].ResourceDisplayName `
                 -Id $MockApplicationPermissions[1].RoleId `
+                -RoleDisplayName $MockApplicationPermissions[1].RoleDisplayName `
                 -IsAdminConsented $false
 
             $Output.RoleId | Should -Match "4807a72c-ad38-4250-94c9-4eabfe26cd55"
@@ -39,10 +41,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $Output.ApplicationDisplayName | Should -Match "Office 365 Management APIs"
             $Output.IsAdminConsented | Should -Be $false
 
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockApplicationPermissions[2].ResourceDisplayName `
                 -Id $MockApplicationPermissions[2].RoleId `
+                -RoleDisplayName $MockApplicationPermissions[2].RoleDisplayName `
                 -IsAdminConsented $false
 
             $Output.RoleId | Should -Match "e2a3a72e-5f79-4c64-b1b1-878b674786c9"
@@ -52,9 +55,10 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "pulls risky permissions from the specified resource (service principal variant)" {
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockServicePrincipalAppRoleAssignments[1].ResourceDisplayName `
+                -RoleDisplayName $MockServicePrincipalAppRoleAssignments[1].RoleDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[1].AppRoleId `
                 -IsAdminConsented $true
 
@@ -63,9 +67,10 @@ InModuleScope AADRiskyPermissionsHelper {
             $Output.ApplicationDisplayName | Should -Match "Microsoft Graph"
             $Output.IsAdminConsented | Should -Be $true
 
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockServicePrincipalAppRoleAssignments[5].ResourceDisplayName `
+                -RoleDisplayName $MockServicePrincipalAppRoleAssignments[5].RoleDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[5].AppRoleId `
                 -IsAdminConsented $true
 
@@ -74,9 +79,10 @@ InModuleScope AADRiskyPermissionsHelper {
             $Output.ApplicationDisplayName | Should -Match "Microsoft Graph"
             $Output.IsAdminConsented | Should -Be $true
 
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockServicePrincipalAppRoleAssignments[6].ResourceDisplayName `
+                -RoleDisplayName $MockServicePrincipalAppRoleAssignments[6].RoleDisplayName `
                 -Id $MockServicePrincipalAppRoleAssignments[6].AppRoleId `
                 -IsAdminConsented $true
 
@@ -87,14 +93,29 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "formats the return output correctly" {
-            $Output = Format-RiskyPermission `
+            $Output = Format-Permission `
                 -Json $RiskyPermissionsJson `
                 -AppDisplayName $MockApplicationPermissions[0].ResourceDisplayName `
                 -Id $MockApplicationPermissions[0].RoleId `
                 -IsAdminConsented $false
 
-            $ExpectedKeys = @("RoleId", "RoleDisplayName", "ApplicationDisplayName", "IsAdminConsented")
+            $ExpectedKeys = @("RoleId", "RoleType", "RoleDisplayName", "ApplicationDisplayName", "IsAdminConsented", "IsRisky")
             $Output.PSObject.Properties.Name | Should -Be $ExpectedKeys
+        }
+
+        It "returns null when needed" {
+            $Output = Format-Permission `
+                -Json $RiskyPermissionsJson `
+                -AppDisplayName $MockApplicationPermissions[0].ResourceDisplayName `
+                -Id $MockApplicationPermissions[0].RoleId `
+                -IsAdminConsented $false
+                # RoleDisplayName and RoleType omitted
+
+            $Output.RoleId | Should -Match "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9"
+            $Output.RoleDisplayName | Should -BeNullOrEmpty
+            $Output.RoleType | Should -BeNullOrEmpty
+            $Output.ApplicationDisplayName | Should -Match "Microsoft Graph"
+            $Output.IsAdminConsented | Should -Be $false
         }
     }
 }

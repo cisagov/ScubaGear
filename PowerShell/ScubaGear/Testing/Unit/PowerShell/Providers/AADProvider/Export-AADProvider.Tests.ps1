@@ -13,93 +13,33 @@ InModuleScope -ModuleName ExportAADProvider {
         BeforeAll {
             function Get-MgBetaUserCount { 10 }
             class MockCommandTracker {
-                [string[]]$SuccessfulCommands = @()
-                [string[]]$UnSuccessfulCommands = @()
+                [hashtable]$MockCommands
+                [string[]]$SuccessfulCommands
+                [string[]]$UnSuccessfulCommands
+
+                MockCommandTracker() {
+                    $this.MockCommands = @{}
+                    $this.SuccessfulCommands = @()
+                    $this.UnSuccessfulCommands = @()
+
+                    $this.AddDefaultMockCommands()
+                }
 
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
-                    # This is where you decide where you mock functions called by CommandTracker :)
                     try {
-                        switch ($Command) {
-                            "Get-MgBetaIdentityConditionalAccessPolicy" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-MgBetaSubscribedSku" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{
-                                    ServicePlans = @(
-                                        @{
-                                            ProvisioningStatus = 'Success'
-                                        }
-                                    )
-                                    ServicePlanName = 'AAD_PREMIUM_P2'
-                                    SkuPartNumber = 'AAD_Tester'
-                                    SkuId = '00000-00000-00000-00000'
-                                    ConsumedUnits = 5
-                                    PrepaidUnits = @{
-                                        Enabled = 10
-                                        Suspended = 0
-                                        Warning = 0
-                                    }
-                                }
-                            }
-                            "Get-MgBetaUserCount" {
-                                $this.SuccessfulCommands += $Command
-                                return 10
-                            }
-                            "Get-PrivilegedUser" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-PrivilegedRole" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-MgBetaPolicyAuthorizationPolicy" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-MgBetaDirectorySetting" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                             "Get-MgBetaPolicyAuthenticationMethodPolicy" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-MgBetaDomain" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-ApplicationsWithRiskyPermissions" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-ServicePrincipalsWithRiskyPermissions" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Format-RiskyApplications" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Format-RiskyThirdPartyServicePrincipals" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            default {
-                                throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
-                            }
+                        if ($this.MockCommands.ContainsKey($Command)) {
+                            $this.SuccessfulCommands += $Command
+                            $MockFunction = $this.MockCommands[$Command]
+                            return & $MockFunction $CommandArgs
                         }
-                        $Result = @()
-                        $this.SuccessfulCommands += $Command
-                        return $Result
+                        else {
+                            throw "A mock function does not exist for $($Command). $($_)"
+                        }
                     }
                     catch {
-                        Write-Warning "Error running $($Command). $($_)"
+                        Write-Warning "Error occurred in mock TryCommand. $($_)"
                         $this.UnSuccessfulCommands += $Command
-                        $Result = @()
-                        return $Result
+                        return @()
                     }
                 }
 
@@ -122,10 +62,85 @@ InModuleScope -ModuleName ExportAADProvider {
                 [string[]] GetSuccessfulCommands() {
                     return $this.SuccessfulCommands
                 }
+
+                [void] AddMockCommand([string]$CommandName, [scriptblock]$MockFunction) {
+                    $this.MockCommands[$CommandName] = $MockFunction
+                }
+
+                [void] AddDefaultMockCommands() {
+                    $this.AddMockCommand("Get-MgBetaIdentityConditionalAccessPolicy", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaSubscribedSku", {
+                        return [pscustomobject]@{
+                            ServicePlans = @(
+                                @{
+                                    ProvisioningStatus = 'Success'
+                                }
+                            )
+                            ServicePlanName = 'AAD_PREMIUM_P2'
+                            SkuPartNumber = 'AAD_Tester'
+                            SkuId = '00000-00000-00000-00000'
+                            ConsumedUnits = 5
+                            PrepaidUnits = @{
+                                Enabled = 10
+                                Suspended = 0
+                                Warning = 0
+                            }
+                        }
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaUserCount", {
+                        return 10
+                    })
+
+                    $this.AddMockCommand("Get-PrivilegedUser", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-PrivilegedRole", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaPolicyAuthorizationPolicy", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaDirectorySetting", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaDomain", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-ApplicationsWithRiskyPermissions", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-ServicePrincipalsWithRiskyPermissions", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Format-RiskyApplications", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", {
+                        return [pscustomobject]@{}
+                    })
+                }
             }
+
+            $MockCommandTracker = [MockCommandTracker]::New()
             function Get-CommandTracker {}
             Mock -ModuleName 'ExportAADProvider' Get-CommandTracker {
-                return [MockCommandTracker]::New()
+                return $MockCommandTracker
             }
 
             class MockCapTracker {
@@ -133,6 +148,7 @@ InModuleScope -ModuleName ExportAADProvider {
                     return "[]"
                 }
             }
+
             function Get-CapTracker {}
             Mock -ModuleName 'ExportAADProvider' Get-CapTracker  {
                 return [MockCapTracker]::New()
@@ -150,16 +166,37 @@ InModuleScope -ModuleName ExportAADProvider {
                     ConvertFrom-Json $Json -ErrorAction Stop | Out-Null
                 }
                 catch {
-                    $ValidJson = $false;
+                    $ValidJson = $false
                 }
                 $ValidJson
             }
         }
+        
         It "With a AAD P2 license, returns valid JSON" {
-                $Json = Export-AADProvider
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
+            $Json = Export-AADProvider
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+
+        It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals return $null" {
+            # Override defaults
+            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return $null })
+            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", { return $null })
+
+            $Json = Export-AADProvider
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
+
+        It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals both return @($null)" {
+            # Override defaults
+            $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return @($null) })
+            $MockCommandTracker.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", { return @($null) })
+
+            $Json = Export-AADProvider
+            $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+            $ValidJson | Should -Be $true
+        }
     }
 }
 AfterAll {
