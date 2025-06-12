@@ -6,10 +6,9 @@ RemoteDomains := {
     "DomainName": "example.com"
 }
 SpfRecords := {
-    "rdata": [
-        "v=spf1 -all"
-    ],
-    "domain": "Test name"
+    "domain": "test.name",
+    "compliant": true,
+    "message": "SPF record found."
 }
 DkimConfig := {
     "Enabled": true,

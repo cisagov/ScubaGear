@@ -4,15 +4,13 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope 'ExportEXOProvider' {
     Describe -Tag 'ExportEXOProvider' -Name "Get-ScubaDmarcRecord" {
-        BeforeAll {
-            Mock -CommandName Write-Warning {}
-        }
-        Context "When high-confidence answers are available" {
+        Context "When answers are available at full domain" {
             BeforeAll {
                 Mock -CommandName Invoke-RobustDnsTxt {
                     @{
                         "Answers" = @("v=DMARC1...");
-                        "HighConfidence" = $true;
+                        "Errors" = @();
+                        "NXDomain" = $false;
                         "LogEntries" = @("some text")
                     }
                 }
@@ -26,7 +24,6 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 )
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
 
@@ -43,7 +40,6 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 )
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
 
@@ -61,29 +57,10 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 )
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
         }
-        Context "When high-confidence answers are not available" {
-            BeforeAll {
-                Mock -CommandName Invoke-RobustDnsTxt {
-                    @{
-                        "Answers" = @("v=DMARC1...");
-                        "HighConfidence" = $false;
-                        "LogEntries" = @("some text")
-                    }
-                }
-            }
-            It "Prints a warning" {
-                # If Invoke-RobustDnsTxt returns a low confidence answer, Get-ScubaDmarcRecord should print a
-                # warning.
-                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "example.com"})
-                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
-                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
-            }
-        }
+
         Context "When the DMARC record is unavailable at the full domain" {
             BeforeAll {
                 Mock -CommandName Invoke-RobustDnsTxt {
@@ -91,14 +68,16 @@ InModuleScope 'ExportEXOProvider' {
                         if ($Qname -eq "_dmarc.example.com") {
                             @{
                                 "Answers" = @("v=DMARC1...");
-                                "HighConfidence" = $true;
+                                "Errors" = @();
+                                "NXDomain" = $false;
                                 "LogEntries" = @("some text")
                             }
                         }
                         else {
                             @{
                                 "Answers" = @();
-                                "HighConfidence" = $true;
+                                "Errors" = @();
+                                "NXDomain" = $false;
                                 "LogEntries" = @("Query returned NXDomain")
                             }
                         }
@@ -110,7 +89,6 @@ InModuleScope 'ExportEXOProvider' {
                 # full domain level, GetScubaDmarcRecord should try again at the organization domain level
                 $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"})
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
         }
