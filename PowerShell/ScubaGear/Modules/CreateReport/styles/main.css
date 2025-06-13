@@ -75,6 +75,21 @@ p {
     text-align: center;
 }
 
+.show-more {
+    text-align: left;
+    margin-left: 40px;
+}
+
+button.show-more {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: var(--unvisited-link-color);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0;
+}
+
 hr {
     /* border-bottom: 0.063em solid var(--header-bottom); */
     width: 1000px;

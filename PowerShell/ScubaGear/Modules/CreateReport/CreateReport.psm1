@@ -360,6 +360,7 @@ function New-Report {
         names (e.g., due to a split horizon setup).</p>"
         $LogTypes = @("SPF", "DKIM", "DMARC")
         foreach ($LogType in $LogTypes) {
+            $LogHtml += "<div class='dns-logs'>"
             $LogHtml += "<h3>$LogType</h3>"
             $DnsLogs = @()
             foreach ($Domain in $SettingsExport."$($LogType.ToLower())_records") {
@@ -385,8 +386,9 @@ function New-Report {
             }
             $LogTable = $DnsLogs | ConvertTo-Html -As Table -Fragment
             # Add CSS class to get alternating row colors
-            $LogTable = $LogTable.Replace("<table>", "<table class='alternating'>")
+            $LogTable = $LogTable.Replace("<table>", "<table class='alternating dns-table'>")
             $LogHtml += $LogTable
+            $LogHtml += "</div>"
         }
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", $LogHTML)
     }

@@ -200,7 +200,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         }
                     }
                 }
-                elseif ($Table.GetProperty("id") -eq "dns-logs"){
+                elseif ($Table.GetProperty("class").Contains("dns-table")){
 
                     # Iterate through each row in the table ensuring there are 4 columns
                     foreach ($Row in $Rows) {
