@@ -475,8 +475,6 @@ function Get-ScubaSpfRecord {
         $Domains
     )
 
-    $Domains += @{"DomainName"="aweofijawoeifjaweoijfaoiwefjo.com"}
-    $Domains += @{"DomainName"="f"}
     $SPFRecords = @()
 
     foreach ($d in $Domains) {
