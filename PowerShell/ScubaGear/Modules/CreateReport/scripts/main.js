@@ -324,7 +324,7 @@ const expandCAPRow = (event) => {
 
 /**
  * Truncates the specified DNS table to the specified number of rows.
- * @param {number} tableIndex The index of the table in the list of DNS tables.
+ * @param {number} logIndex The index of the table in the list of DNS tables.
  * @param {number} maxRows The number of rows to truncate the table to.
  */
 const truncateDNSTable = (logIndex, maxRows) => {
@@ -360,14 +360,14 @@ const truncateDNSTable = (logIndex, maxRows) => {
 }
 
 /**
- * Truncates any DNS table that has more than MAX_ROWS rows.
+ * Truncates any DNS table that has more than maxRows rows.
+ * @param {number} maxRows The number of rows to truncate the tables to.
  */
-const truncateDNSTables = () => {
+const truncateDNSTables = (maxRows) => {
     try {
-        const MAX_ROWS = 20;
         let dnsLogs = document.querySelectorAll('.dns-logs');
         for (let i = 0; i < dnsLogs.length; i++) {
-            truncateDNSTable(i, MAX_ROWS);
+            truncateDNSTable(i, maxRows);
         }
     }
     catch (error) {
@@ -375,10 +375,54 @@ const truncateDNSTables = () => {
     }
 }
 
+
+/**
+ * Truncates list of domains without SPF to maxDomains.
+* @param {number} maxDomains The number of domains to truncate the list to.
+ */
+const truncateSPFList = (maxDomains) => {
+    try {
+        const ROW_INCREMENT = 10;
+        let spfList = document.querySelector('#spf-domains');
+        if (spfList === null) {
+            // No SPF list present so this report isn't for EXO
+            return;
+        }
+        let domains = spfList.querySelectorAll('li');
+        for (let i = 0; i < domains.length; i++) {
+            if (i > maxDomains) {
+                domains[i].style.display = 'none';
+            }
+            else {
+                domains[i].style.display = 'list-item';
+            }
+        }
+        spfList.querySelectorAll('.show-more').forEach(e => e.remove());
+        if (domains.length > maxDomains) {
+            let showMoreMessage = document.createElement('p');
+            showMoreMessage.classList.add('show-more');
+            showMoreMessage.innerHTML = `${domains.length-maxDomains} domains hidden. `;
+            showMore = document.createElement('button');
+            showMore.innerHTML = "Show more.";
+            showMore.setAttribute('type', 'button');
+            showMore.classList.add('show-more');
+            showMore.onclick = () => {truncateSPFList(maxDomains+ROW_INCREMENT);};
+            showMoreMessage.appendChild(showMore);
+            spfList.appendChild(showMoreMessage);
+        }
+    }
+    catch (error) {
+        console.error(`Error in truncateSPFList`, error);
+    }
+}
+
+
 window.addEventListener('DOMContentLoaded', () => {
+    const MAX_DNS_ENTRIES = 20;
     colorRows();
     fillCAPTable();
     applyScopeAttributes();
-    truncateDNSTables();
+    truncateSPFList(MAX_DNS_ENTRIES);
+    truncateDNSTables(MAX_DNS_ENTRIES);
     mountDarkMode("Individual Report");
 });
