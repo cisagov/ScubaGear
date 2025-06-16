@@ -168,7 +168,7 @@ SpfStatusMessage := Message if {
 } else := concat("", [
         format_int(count(DomainsWithoutSpf), 10),
         " failing domain(s):",
-        "<ul>",
+        "<ul id=\"spf-domains\">",
         concat("", DomainsWithoutSpf),
         "</ul>"
     ])
