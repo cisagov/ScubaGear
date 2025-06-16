@@ -18,6 +18,26 @@ InModuleScope AADRiskyPermissionsHelper {
             }
 
             function New-MockMgGraphResponseAppRoleAssignments {
+                param (
+                    [int] $Size,
+                    [array] $MockBody
+                )
+
+                $data = @()
+                for ($i = 1; $i -le $Size; $i++) {
+                    $id = "00000000-0000-0000-0000-0000000000{0:D2}" -f ($i * 10)
+                    $mockResponse = @{
+                        id     = $id
+                        status = 200
+                        body   = @{
+                            value = $MockBody
+                        }
+                    }
+                    $data += $mockResponse
+                }
+
+                return $data
+            }
 
             #function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Invoke-GraphDirectly {

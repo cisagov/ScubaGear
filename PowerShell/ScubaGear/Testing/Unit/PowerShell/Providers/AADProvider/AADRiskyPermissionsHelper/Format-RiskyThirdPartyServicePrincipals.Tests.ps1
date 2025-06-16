@@ -67,7 +67,7 @@ InModuleScope AADRiskyPermissionsHelper {
                     )
                 }
             }
-            
+
             Mock Get-MgBetaOrganization {
                 return @{
                     "Id" = "00000000-0000-0000-0000-000000000000"
@@ -77,8 +77,8 @@ InModuleScope AADRiskyPermissionsHelper {
                 return $MockResourcePermissionCache
             }
 
-            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment Commercial
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment Commercial
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }
