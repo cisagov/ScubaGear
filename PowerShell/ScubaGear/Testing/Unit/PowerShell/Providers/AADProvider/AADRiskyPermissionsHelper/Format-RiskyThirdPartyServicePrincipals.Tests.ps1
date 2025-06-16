@@ -16,14 +16,30 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function Get-MgBetaOrganization {}
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockApplications
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
+              Mock Invoke-GraphDirectly {
+                param($commandlet, $ID, $Uri)
+                # Suppress PSReviewUnusedParameter warnings
+                $null = $commandlet
+                $null = $Uri
+                return @{
+                    "value" = $MockFederatedCredentials
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
+                Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#servicePrincipals"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(
@@ -51,6 +67,7 @@ InModuleScope AADRiskyPermissionsHelper {
                     )
                 }
             }
+
             Mock Get-MgBetaOrganization {
                 return @{
                     "Id" = "00000000-0000-0000-0000-000000000000"
@@ -59,6 +76,11 @@ InModuleScope AADRiskyPermissionsHelper {
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
             }
+
+            $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ThirdPartySPs')]
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskyApps $RiskyApps -RiskySPs $RiskySPs
         }
 
         It "returns a list of third-party risky service principals with valid properties" {

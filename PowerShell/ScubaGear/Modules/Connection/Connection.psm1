@@ -32,6 +32,7 @@ function Connect-Tenant {
    $ServicePrincipalParams
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -120,7 +121,7 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       $InitialDomain = (Get-MgBetaOrganization).VerifiedDomains | Where-Object {$_.isInitial}
+                       $InitialDomain = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value.VerifiedDomains | Where-Object {$_.isInitial}
                        $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
                        $SPOParams = @{
                            'ErrorAction' = 'Stop';
