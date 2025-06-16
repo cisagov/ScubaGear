@@ -26,7 +26,7 @@ test_Spf_Incorrect_V1 if {
     Output := exo.tests with input.spf_records as [Record]
     RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.EXO.2.2v2"]
     ReportDetailString := concat("", [
-        "1 failing domain(s):<ul>",
+        "1 failing domain(s):<ul id=\"spf-domains\">",
         "<li>test.name: ",
         Message,
         "</li>",
@@ -58,7 +58,7 @@ test_Spf_Incorrect_V2 if {
     Output := exo.tests with input.spf_records as [Record1, Record2, Record3]
     RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.EXO.2.2v2"]
     ReportDetailString := concat("", [
-        "2 failing domain(s):<ul>",
+        "2 failing domain(s):<ul id=\"spf-domains\">",
         "<li>bad1.com: ",
         Message1,
         "</li>",
