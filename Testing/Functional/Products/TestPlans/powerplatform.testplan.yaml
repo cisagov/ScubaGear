@@ -56,8 +56,12 @@ TestPlan:
       - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - DLP policy set to environmentType == AllEnvironments
         Preconditions:
           - Command: |
-                      $PolicyName = (Get-DlpPolicy).value | Where {$_.environments.name -eq (Get-AdminPowerAppEnvironment -Default).EnvironmentName} | Select-Object -ExpandProperty displayName
-                      Set-DlpPolicy -Identity $PolicyName -EnvironmentType AllEnvironments
+                      $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
+                      $DlpPolicy = (Get-DlpPolicy).value | Where { $_.environments.name -eq $DefaultEnv }
+                      if ($DlpPolicy) {
+                        $DlpPolicy.EnvironmentType = "AllEnvironments"
+                        Set-DlpPolicy -PolicyName $DlpPolicy.displayName -UpdatedPolicy $DlpPolicy
+                      }
         Postconditions: []
         ExpectedResult: true
 
