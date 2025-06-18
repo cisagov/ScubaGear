@@ -138,7 +138,129 @@ function Invoke-ReadAllText {
     }
 }
 
+function Invoke-GraphDirectly {
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $commandlet,
+
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment,
+
+        [System.Collections.Hashtable]
+        $queryParams,
+
+        [string]$ID
+    )
+
+    Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
+
+    # Use Get-ScubaGearPermissions to convert cmdlets to API calls
+    if($ID){
+        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment -id $ID
+    } else {
+        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment
+    }
+
+    If($null -eq $endpoint){
+        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+    }
+
+    if ($queryParams) {
+        # If query params are passed in, we augment the endpoint URI to include the params.
+        $q = [System.Web.HttpUtility]::ParseQueryString([string]::Empty)
+        foreach ($item in $queryParams.GetEnumerator()) {
+            $q.Add($item.Key, $item.Value)
+        }
+        $uri = [System.UriBuilder]::new("", "", 443, $endpoint)
+        $uri.Query = $q.ToString()
+        $APIFilter = $uri.Query
+        $endpoint = $endpoint + $APIFilter
+    }
+    Write-Debug "Graph Api direct: $endpoint"
+
+    $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
+    if($Null -ne $apiHeader.PSObject.Properties.Name) {
+        # If the API header is passed in, we add it to the request.
+        $headers = @{}
+
+        foreach ($property in $apiHeader.PSObject.Properties) {
+            $headers[$property.Name] = $property.Value
+        }
+        $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers
+    } else {
+        $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint
+    }
+
+    return $resp | ConvertFrom-GraphHashtable
+
+}
+
+Function ConvertFrom-GraphHashtable {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+        $GraphData
+    )
+
+    Begin {
+        $GraphObject = [System.Collections.ArrayList]::new()
+    }
+
+    Process {
+        foreach ($Item in $GraphData) {
+            # Check if the item is a hashtable, if so convert it to a PSObject.
+            # This function reduces code changes to the AADConditionalAccessHelper module and REGO.
+            if ($Item -is [hashtable]) {
+                # Create a new object
+                $Object = New-Object -TypeName PSObject
+
+                # Process each property in the hashtable
+                foreach ($property in $Item.GetEnumerator()) {
+                    # Capitalize the first letter of the property key
+                    $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
+                    if ($property.Value -is [hashtable]) {
+                        # Recursive call to process nested hashtables
+                        $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
+
+                        $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $NestedObject
+                    }
+                    elseif ($property.Value -is [array]) {
+                        # Handle arrays (check if elements are hashtables)
+                        $ProcessedArray = @()
+                        foreach ($element in $property.Value) {
+                            if ($element -is [hashtable]) {
+                                $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
+                            } else {
+                                $ProcessedArray += $element
+                            }
+                        }
+                        $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $ProcessedArray
+                    }
+                    else {
+                        $Value = $property.Value
+                        $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $Value
+                    }
+                }
+
+                [void]$GraphObject.Add($Object)
+            }
+            else {
+                # Handle normal objects, no conversion needed just return the results
+                [void]$GraphObject.Add($Item)
+            }
+        }
+    }
+
+    End {
+        return $GraphObject
+    }
+}
+
 Export-ModuleMember -Function @(
     'Get-Utf8NoBom',
-    'Set-Utf8NoBom'
+    'Set-Utf8NoBom',
+    'Invoke-GraphDirectly',
+    'ConvertFrom-GraphHashtable'
 )
