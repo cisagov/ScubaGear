@@ -8,10 +8,14 @@ on:
     - cron: "15 6 * * 1-5"
   workflow_dispatch:
 
+permissions: read-all
+
 jobs:
   bump-dependencies:
     runs-on: windows-latest
-
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
