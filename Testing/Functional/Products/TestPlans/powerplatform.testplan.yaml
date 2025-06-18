@@ -120,33 +120,128 @@ TestPlan:
   - PolicyId: MS.POWERPLATFORM.2.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - subsequent environments without DLP policies
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - two environments without DLP policies
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 dlp_policies:
                   - value:
-                      - environments:
-                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    - displayName: "DLP functional test"
+                      environmentType: "OnlyEnvironments"
+                      environments:
+                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
                   - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - has DLP policies
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - all environments covered by one DLP policy
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 dlp_policies:
                   - value:
-                      - environments:
-                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    - displayName: "DLP functional test"
+                      environmentType: "OnlyEnvironments"
+                      environments:
+                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                        - name: "Test1"
+                        - name: "Test2"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - all environments covered by two DLP policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                    - displayName: "DLP functional test"
+                      environmentType: "OnlyEnvironments"
+                      environments:
+                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                        - name: "Test1"
+                        - name: "Test2"
+                    - displayName: "DLP functional test 2"
+                      environmentType: "OnlyEnvironments"
+                      environments:
+                        - name: "Test2"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - DLP policy set to environmentType AllEnvironments
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "AllEnvironments"
+                        environments: []
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - DLP policy set to environmentType ExceptEnvironments with all environments excluded
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                    - displayName: "DLP functional test"
+                      environmentType: "ExceptEnvironments"
+                      environments:
+                        - name: "Test1"
+                        - name: "Test2"
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - DLP policy set to environmentType ExceptEnvironments with one environment missing
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                    - displayName: "DLP functional test"
+                      environmentType: "ExceptEnvironments"
+                      environments:
+                        - name: "Test1"
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: false
 
   - PolicyId: MS.POWERPLATFORM.3.1v1
     TestDriver: RunScuba
