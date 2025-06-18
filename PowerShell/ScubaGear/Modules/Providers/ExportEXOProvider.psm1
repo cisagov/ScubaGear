@@ -275,10 +275,17 @@ function Invoke-TraditionalDns {
                 # Resolve-DnsName breaks long answers into multiple strings, we need to
                 # join them back together
                 $StringsJoined = ($Response | ForEach-Object { $_.Strings -Join "" } )
+                if ($StringsJoined -is [String]) {
+                    $NAnswers = 1
+                }
+                else {
+                    $NAnswers = $StringsJoined.Length
+                }
+
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
-                    "query_result"="Query returned $($Response.Strings.Length) txt records";
+                    "query_result"="Query returned $NAnswers txt records";
                     "query_answers"=$StringsJoined;
                 }
                 $Answers += $StringsJoined
@@ -485,7 +492,7 @@ function Get-ScubaSpfRecord {
             # We got some answers - are they SPF records?
             $SPFAnswers = ($Response.Answers | Where-Object { $_.StartsWith("v=spf1 ") }  )
             if ($SPFAnswers.Length -gt 0) {
-                # We an SPF record - does it hardfail?
+                # We have an SPF record - does it hardfail?
                 $SPFReject = ($SPFAnswers | Where-Object { $_.Contains("-all") -or $_.Contains("redirect") }  )
                 if ($SPFReject.Length -gt 0) {
                     # Yes! This is the "good" case
