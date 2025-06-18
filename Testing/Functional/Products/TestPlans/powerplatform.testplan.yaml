@@ -195,9 +195,10 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                      - displayName: "DLP functional test"
-                        environmentType: "AllEnvironments"
-                        environments: []
+                    - name: "00000000-0000-0000-0000-000000000000"
+                      displayName: "DLP functional test"
+                      environmentType: "AllEnvironments"
+                      environments: []
                 environment_list:
                   - EnvironmentName: "Test1"
                     IsDefault: false
