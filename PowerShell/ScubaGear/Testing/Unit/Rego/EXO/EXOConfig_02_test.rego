@@ -32,7 +32,7 @@ test_Spf_Incorrect_V1 if {
         "</li>",
         "</ul>"
     ])
-    TestResult("MS.EXO.2.2v2", RuleOutput, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.2.2v2", RuleOutput, concat("", [ReportDetailString, DNSLink]), false) == true
 }
 
 test_Spf_Incorrect_V2 if {
@@ -67,6 +67,6 @@ test_Spf_Incorrect_V2 if {
         "</li>",
         "</ul>"
     ])
-    TestResult("MS.EXO.2.2v2", RuleOutput, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.2.2v2", RuleOutput, concat("", [ReportDetailString, DNSLink]), false) == true
 }
 #--

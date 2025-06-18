@@ -164,7 +164,7 @@ DNSLink := "<a href=\"#dns-logs\">View DNS logs</a> for more details."
 
 SpfStatusMessage := Message if {
     count(DomainsWithoutSpf) == 0
-    Message := "Requirement met"
+    Message := "Requirement met. "
 } else := concat("", [
         format_int(count(DomainsWithoutSpf), 10),
         " failing domain(s):",
@@ -178,7 +178,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": DomainsWithoutSpf,
-    "ReportDetails": concat(". ", [SpfStatusMessage, DNSLink]),
+    "ReportDetails": concat("", [SpfStatusMessage, DNSLink]),
     "RequirementMet": Status
 } if {
     Status := count(DomainsWithoutSpf) == 0
