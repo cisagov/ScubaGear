@@ -4,143 +4,200 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope 'ExportEXOProvider' {
     Describe -Tag 'ExportEXOProvider' -Name "Invoke-RobustDnsTxt" {
-        BeforeAll {
-            Mock -CommandName Select-DohServer { "cloudflare-dns.com" }
-        }
-        Context 'When resolving a domain name' {
+        Context 'When a txt record exists' {
             It "Returns correct response when traditional DNS works" {
-                # Test where Resolve-DnsName works first try
-                Mock -CommandName Resolve-DnsName {
-                    @(
-                        @{
-                            "Strings" = @("v=spf1 include:spf.protection.outlook.com -all");
-                            "Section" = "Answer"
-                        }
-                        )
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @("v=spf1 include:spf.protection.outlook.com -all");
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
                     }
-                Mock -CommandName Invoke-WebRequest {}
-                Mock -CommandName ConvertFrom-Json {}
+                }
+                Mock -CommandName Invoke-DoH {}
                 $Response = Invoke-RobustDnsTxt -Qname "example.com"
-                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
-                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 0
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
-                $Response.HighConfidence | Should -Be $true
+                $Response.Errors.Length | Should -Be 0
+                $Response.NXDomain | Should -Be $false
             }
 
-            It "Handles NXDOMAIN" {
-                # Test where Resolve-DnsName returns NXDOMAIN
-                Mock -CommandName Resolve-DnsName {
-                    throw "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName"
+            It "Handles when traditional DNS doesn't return an answer but DoH does" {
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
                 }
-                Mock -CommandName Invoke-WebRequest {}
-                Mock -CommandName ConvertFrom-Json {}
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @("v=spf1 include:spf.protection.outlook.com -all");
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
                 $Response = Invoke-RobustDnsTxt -Qname "example.com"
-                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
-                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 0
-                $Response.Answers.Length | Should -Be 0
-                $Response.HighConfidence | Should -Be $true
-            }
-
-            It "Tries over DoH if traditional DNS is unavailable" {
-                # Test where Resolve-DnsName throws an exception. In this case, Invoke-RobustDnsTxt should try
-                # again over DoH
-                Mock -CommandName Resolve-DnsName { throw "Some error" }
-                $DohResponseHeaders = @(
-                    "HTTP/1.1 200 OK",
-                    "Connection: keep-alive",
-                    "Access-Control-Allow-Origin: *",
-                    "CF-RAY: some value",
-                    "Content-Length: 123",
-                    "Content-Type: application/dns-json",
-                    "Date: some date",
-                    "Server: cloudflare"
-                )
-                Mock -CommandName ConvertFrom-Json {
-                    @{
-                        "Status" = 0;
-                        "Answer" = @(@{
-                            "name" = "example.com";
-                            "type" = 16;
-                            "data" = "`"v=spf1 include:spf.protection.outlook.com -all`"";
-                        })
-                    }
-                }
-                Mock -CommandName Invoke-WebRequest {
-                    @{
-                        "RawContent" = ($DohResponseHeaders -Join "`r`n") + "`r`n" + "json encoded answer"
-                    }
-                }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com" -MaxTries 2
-                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 2
-                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
-                $Response.HighConfidence | Should -Be $true
+                $Response.Errors.Length | Should -Be 0
+                $Response.NXDomain | Should -Be $false
             }
 
-            It "Tries over DoH if traditional DNS gives an empty answer" {
-                # Test where Resolve-DnsName doesn't throw an exception but also doesn't return an answer.
-                # Invoke-RobustDnsTxt should try again over DoH in that this. For context, there are some
-                # cases where Resolve-DnsName won't throw an exception but won't actually return an answer.
-                # For example, in some cases where the answer can't be using the local resolver but trying
-                # over a public resolve will reveal the answer.
-                Mock -CommandName Resolve-DnsName { @(
+            It "Handles when traditional DNS has errors but DoH works" {
+                Mock -CommandName Invoke-TraditionalDns {
                     @{
-                        "Strings" = @("");
-                        "Section" = "Authority"
-                    }
-                    )
-                }
-                $DohResponseHeaders = @(
-                    "HTTP/1.1 200 OK",
-                    "Connection: keep-alive",
-                    "Access-Control-Allow-Origin: *",
-                    "CF-RAY: some value",
-                    "Content-Length: 123",
-                    "Content-Type: application/dns-json",
-                    "Date: some date",
-                    "Server: cloudflare"
-                )
-                Mock -CommandName ConvertFrom-Json {
-                    @{
-                        "Status" = 0;
-                        "Answer" = @(@{
-                            "name" = "example.com";
-                            "type" = 16;
-                            "data" = "`"v=spf1 include:spf.protection.outlook.com -all`"";
-                        })
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @("something went wrong");
                     }
                 }
-                Mock -CommandName Invoke-WebRequest {
+                Mock -CommandName Invoke-DoH {
                     @{
-                        "RawContent" = ($DohResponseHeaders -Join "`r`n") + "`r`n" + "json encoded answer"
+                        "Answers" = @("v=spf1 include:spf.protection.outlook.com -all");
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com" -MaxTries 2
-                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
-                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 1
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
-                $Response.HighConfidence | Should -Be $true
+                $Response.Errors.Length | Should -Be 1
+                $Response.NXDomain | Should -Be $false
+            }
+        }
+
+        Context 'When a txt record does not exist' {
+            It "Handles NXDomain when traditional DNS works" {
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $true;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $true;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
+                $Response.Answers.Length| Should -Be 0
+                $Response.Errors.Length | Should -Be 0
+                $Response.NXDomain | Should -Be $true
             }
 
-            It "Indicates low confidence if traditional DNS gives an empty answer and DoH unavailable" {
-                # There are some cases where Resolve-DnsName won't throw an exception but won't actually
-                # return an answer, but where trying over a public DNS resolver reveals the answer
-                # However, many systems block DoH. If Resolve-DnsName returns an empty answer and DoH
-                # fails, Invoke-RobustDnsTxt should indicate that the answer is not high-confidence.
-                Mock -CommandName Resolve-DnsName { @(
+            It "Handles NXDomain when traditional DNS does not work" {
+                Mock -CommandName Invoke-TraditionalDns {
                     @{
-                        "Strings" = @("");
-                        "Section" = "Authority"
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @("something went wrong");
                     }
-                    )
                 }
-                Mock -CommandName ConvertFrom-Json {}
-                Mock -CommandName Invoke-WebRequest { throw "some error" }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com" -MaxTries 2
-                Should -Invoke -CommandName Resolve-DnsName -Exactly -Times 1
-                Should -Invoke -CommandName Invoke-WebRequest -Exactly -Times 2
-                $Response.Answers.Length | Should -Be 0
-                $Response.HighConfidence | Should -Be $false
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $true;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
+                $Response.Answers.Length| Should -Be 0
+                $Response.Errors.Length | Should -Be 1
+                $Response.NXDomain | Should -Be $true
+            }
+
+            It "Handles NXDomain from DoH when traditional DNS gives empty answer" {
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $true;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
+                $Response.Answers.Length| Should -Be 0
+                $Response.Errors.Length | Should -Be 0
+                $Response.NXDomain | Should -Be $true
+            }
+
+            It "Handles empty answer from both traditional and DoH" {
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
+                $Response.Answers.Length| Should -Be 0
+                $Response.Errors.Length | Should -Be 0
+                $Response.NXDomain | Should -Be $false
+            }
+
+            It "Handles errors from both traditional and DoH" {
+                Mock -CommandName Invoke-TraditionalDns {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @("something went wrong");
+                    }
+                }
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @();
+                        "Errors" = @("something went wrong");
+                    }
+                }
+                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
+                $Response.Answers.Length| Should -Be 0
+                $Response.Errors.Length | Should -Be 2
+                $Response.NXDomain | Should -Be $false
             }
         }
     }
