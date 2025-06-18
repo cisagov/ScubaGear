@@ -84,10 +84,17 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                Mock -CommandName Invoke-DoH {}
+                Mock -CommandName Invoke-DoH {
+                    @{
+                        "Answers" = @();
+                        "NXDomain" = $true;
+                        "LogEntries" = @();
+                        "Errors" = @();
+                    }
+                }
                 $Response = Invoke-RobustDnsTxt -Qname "example.com"
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
-                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 0
+                Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0
                 $Response.Errors.Length | Should -Be 0
                 $Response.NXDomain | Should -Be $true
