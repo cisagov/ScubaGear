@@ -221,7 +221,7 @@ function Invoke-RobustDnsTxt {
     $Results['LogEntries'] += $TradResult['LogEntries']
     $Results['Errors'] += $TradResult['Errors']
 
-    if ($Results.Answers.Length -eq 0 -and -not $Results.NXDomain) {
+    if ($Results.Answers.Length -eq 0) {
         # The traditional DNS query(ies) failed. Retry with DoH
         $DoHResult = Invoke-DoH -Qname $Qname -MaxTries $MaxTries
         $Results['Answers'] += $DoHResult['Answers']
@@ -301,8 +301,8 @@ function Invoke-TraditionalDns {
         }
         catch {
             if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                # The server returned NXDomain, no need to retry the traditional query or retry with
-                # DoH, this was not a transient failure.
+                # The server returned NXDomain, no need to retry the traditional query,
+                # this was not a transient failure.
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
