@@ -47,7 +47,7 @@ TestPlan:
         Preconditions:
           - Command: |
               $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
-              (Get-DlpPolicy).value | Where { $_.environments.name -eq $DefaultEnv } | Select-Object @{ 
+              (Get-DlpPolicy).value | Where { $_.environments.name -eq $DefaultEnv } | Select-Object @{
                 Name="PolicyName"; Expression={$_.name}
               } | Remove-DlpPolicy
         Postconditions: []
@@ -62,7 +62,7 @@ TestPlan:
               }
         Postconditions: []
         ExpectedResult: true
-  
+
   - PolicyId: MS.POWERPLATFORM.2.1v1
     TestDriver: ScubaCached
     Tests:
@@ -89,10 +89,10 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "OnlyEnvironments"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 tenant_id: "ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
@@ -105,13 +105,13 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
-                    - displayName: "Exclude DefaultEnv Policy"
-                      environmentType: "ExceptEnvironments"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - displayName: "DLP functional test"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - displayName: "Exclude DefaultEnv Policy"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
         Postconditions: []
@@ -127,10 +127,10 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "OnlyEnvironments"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                     IsDefault: true
@@ -147,12 +147,12 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "OnlyEnvironments"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
-                        - name: "Test1"
-                        - name: "Test2"
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                          - name: "Test1"
+                          - name: "Test2"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                     IsDefault: true
@@ -169,16 +169,16 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "OnlyEnvironments"
-                      environments:
-                        - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
-                        - name: "Test1"
-                        - name: "Test2"
-                    - displayName: "DLP functional test 2"
-                      environmentType: "OnlyEnvironments"
-                      environments:
-                        - name: "Test2"
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                          - name: "Test1"
+                          - name: "Test2"
+                      - displayName: "DLP functional test 2"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Test2"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                     IsDefault: true
@@ -195,10 +195,10 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - name: "00000000-0000-0000-0000-000000000000"
-                      displayName: "DLP functional test"
-                      environmentType: "AllEnvironments"
-                      environments: []
+                      - name: "00000000-0000-0000-0000-000000000000"
+                        displayName: "DLP functional test"
+                        environmentType: "AllEnvironments"
+                        environments: []
                 environment_list:
                   - EnvironmentName: "Test1"
                     IsDefault: false
@@ -213,11 +213,11 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "ExceptEnvironments"
-                      environments:
-                        - name: "Test1"
-                        - name: "Test2"
+                      - displayName: "DLP functional test"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Test1"
+                          - name: "Test2"
                 environment_list:
                   - EnvironmentName: "Test1"
                     IsDefault: false
@@ -232,10 +232,10 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                    - displayName: "DLP functional test"
-                      environmentType: "ExceptEnvironments"
-                      environments:
-                        - name: "Test1"
+                      - displayName: "DLP functional test"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Test1"
                 environment_list:
                   - EnvironmentName: "Test1"
                     IsDefault: false
