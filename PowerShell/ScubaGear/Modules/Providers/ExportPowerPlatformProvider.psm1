@@ -25,9 +25,11 @@ function Export-PowerPlatformProvider {
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
 
-    $TenantDetails = $Tracker.TryCommand("Get-TenantDetailsFromGraph")
-    if ($TenantDetails.Count -gt 0) {
-        $TenantID = $TenantDetails.TenantId
+    #$TenantDetails = $Tracker.TryCommand("Get-TenantDetailsFromGraph")
+    #$TenantDetails = Get-MgBetaOrganization -ErrorAction "Stop"
+    $TenantDetails = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaOrganization"), @{ "GraphDirect"=$true })
+    if ($TenantDetails.Id) {
+        $TenantID = $TenantDetails.Id
     }
     else {
         $TenantID = ""
@@ -36,7 +38,7 @@ function Export-PowerPlatformProvider {
     # Check if M365Enviromment is set correctly
     $TenantIdConfig = ""
     try {
-        $Domains = $TenantDetails.Domains
+        $Domains = $TenantDetails.VerifiedDomains
         $TenantDomain = "Unretrievable"
         $TLD = ".com"
         if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
@@ -44,7 +46,7 @@ function Export-PowerPlatformProvider {
         }
         foreach ($Domain in $Domains) {
             $Name = $Domain.Name
-            $IsInitial = $Domain.initial
+            $IsInitial = $Domain.IsInitial
             $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
             if ($DomainChecker){
                 $TenantDomain = $Name
@@ -225,9 +227,11 @@ function Get-PowerPlatformTenantDetail {
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
     try {
-        $PowerTenantDetails = Get-TenantDetailsFromGraph -ErrorAction "Stop"
+        #$PowerTenantDetails = Get-TenantDetailsFromGraph -ErrorAction "Stop"
+        #$PowerTenantDetails = Get-MgBetaOrganization -ErrorAction "Stop"
+        $PowerTenantDetails = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
 
-        $Domains = $PowerTenantDetails.Domains
+        $Domains = $PowerTenantDetails.VerifiedDomains
         $TenantDomain = "PowerPlatform: Domain Unretrievable"
         $TLD = ".com"
         if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
@@ -235,7 +239,7 @@ function Get-PowerPlatformTenantDetail {
         }
         foreach ($Domain in $Domains) {
             $Name = $Domain.Name
-            $IsInitial = $Domain.initial
+            $IsInitial = $Domain.IsInitial
             $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
             if ($DomainChecker){
                 $TenantDomain = $Name
