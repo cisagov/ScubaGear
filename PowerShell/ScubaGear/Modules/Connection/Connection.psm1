@@ -106,6 +106,18 @@ function Connect-Tenant {
                        }
                    }
                    Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
+
+                   if ($AADAuthRequired) {
+                        $LimitedGraphParams = @{
+                            'M365Environment' = $M365Environment;
+                            'ErrorAction' = 'Stop';
+                        }
+                        if ($ServicePrincipalParams) {
+                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
+                        }
+                        Connect-GraphHelper @LimitedGraphParams
+                        $AADAuthRequired = $false
+                    }
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
