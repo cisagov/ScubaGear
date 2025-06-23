@@ -72,9 +72,6 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "correctly formats federated credentials if they exist" {
-            Mock Get-MgBetaApplication { $MockApplications[0] }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential {}
-
             $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ExpectedKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences")
             foreach ($Credential in $RiskyApps[0].FederatedCredentials) {
@@ -106,9 +103,6 @@ InModuleScope AADRiskyPermissionsHelper {
             )
             # Reset to empty list
             $MockApplications[1].RequiredResourceAccess[1].ResourceAccess = @()
-
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential {}
 
             $RiskyApps = @()
             foreach ($App in Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {

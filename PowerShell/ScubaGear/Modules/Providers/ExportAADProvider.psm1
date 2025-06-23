@@ -186,7 +186,9 @@ function Export-AADProvider {
     # It only returns risky service principals owned by external tenants.
     $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
         if (@($RiskySPs).Count -gt 0) {
-            $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{"RiskySPs"=$RiskySPs})
+            $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
+                "RiskySPs"=$RiskySPs;
+                "M365Environment"=$M365Environment})
         }
     )
     ##### End block

@@ -387,15 +387,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             }
 
             $endpoint = '/beta/$batch'
-            if ($M365Environment -eq "gcchigh") {
-                $endpoint = "https://graph.microsoft.us" + $endpoint
-            }
-            elseif ($M365Environment -eq "dod") {
-                $endpoint = "https://dod-graph.microsoft.us" + $endpoint
-            }
-            else {
-                $endpoint = "https://graph.microsoft.com" + $endpoint
-            }
+            $endpoint = (Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint) + $endpoint
 
             # Process each chunk
             foreach ($Chunk in $Chunks) {
@@ -596,12 +588,16 @@ function Format-RiskyThirdPartyServicePrincipals {
     param (
         [ValidateNotNullOrEmpty()]
         [Object[]]
-        $RiskySPs
+        $RiskySPs,
+
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
     )
     process {
         try {
             $ServicePrincipals = @()
-            $OrgInfo = Get-MgBetaOrganization -ErrorAction "Stop"
+            $OrgInfo = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
 
             foreach ($ServicePrincipal in $RiskySPs) {
                 if ($null -eq $ServicePrincipal) {

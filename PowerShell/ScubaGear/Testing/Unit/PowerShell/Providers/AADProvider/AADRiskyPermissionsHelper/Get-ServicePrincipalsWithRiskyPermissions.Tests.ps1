@@ -39,7 +39,8 @@ InModuleScope AADRiskyPermissionsHelper {
                 return $data
             }
 
-            #function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Get-ServicePrincipalAll { $MockServicePrincipals }
+
             Mock Invoke-GraphDirectly {
                 return @{
                     "value" = $MockServicePrincipals
@@ -74,7 +75,6 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns a list of service principals with valid properties" {
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
             Mock Invoke-MgGraphRequest {
@@ -128,7 +128,6 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "excludes service principals with no risky permissions" {
-            #Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
@@ -152,7 +151,6 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{

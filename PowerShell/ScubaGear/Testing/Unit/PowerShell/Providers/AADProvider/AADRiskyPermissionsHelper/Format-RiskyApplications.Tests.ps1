@@ -1,6 +1,8 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
+$PermissionsModule = "$($ModulesPath)/Permissions/PermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsModule)
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyApplications" {
@@ -23,10 +25,6 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
               Mock Invoke-GraphDirectly {
-                param($commandlet, $ID, $Uri)
-                # Suppress PSReviewUnusedParameter warnings
-                $null = $commandlet
-                $null = $Uri
                 return @{
                     "value" = $MockFederatedCredentials
                     "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
