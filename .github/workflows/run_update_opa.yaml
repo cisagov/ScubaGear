@@ -78,10 +78,10 @@ jobs:
                     -OpaVersionBumpBranch $OpaVersionBumpBranch
 
             - name: Trigger smoke test workflow
-              if: success()
+              if: steps.determine-update-required.outputs.updaterequired == 'true'
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BRANCH_NAME: ${{ steps.determine-update-required.outputs.opaversionbumpbranch }}"
+                  BRANCH_NAME: ${{ steps.determine-update-required.outputs.opaversionbumpbranch }}
               shell: pwsh
               run: |
                  $headers = @{
