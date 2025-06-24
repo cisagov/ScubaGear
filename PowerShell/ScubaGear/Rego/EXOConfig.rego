@@ -208,6 +208,11 @@ DomainsWithDkim contains DkimConfig.Domain if {
     count(ValidAnswers) > 0
 }
 
+CoexistenceDomain contains DkimConfig.Domain if {
+    some DkimConfig in input.dkim_config
+    endswith(DkimConfig.Domain, ".mail.onmicrosoft.com")
+}
+
 tests contains {
     "PolicyId": "MS.EXO.3.1v1",
     "Criticality": "Should",
@@ -224,7 +229,9 @@ tests contains {
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
-    DomainsWithoutDkim := AllDomains - DomainsWithDkim
+    # Ignore the coexistence domain, it's not possible to publish DNS DKIM
+    # record for this domain
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim - CoexistenceDomain
     Status := count(DomainsWithoutDkim) == 0
 }
 #--

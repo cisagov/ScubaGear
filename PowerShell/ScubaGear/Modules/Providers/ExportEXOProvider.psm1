@@ -549,6 +549,12 @@ function Get-ScubaDkimRecord {
     $DKIMRecords = @()
 
     foreach ($d in $domains) {
+        if ($d.IsCoexistenceDomain) {
+            # Skip the coexistence domain (e.g., contoso.mail.onmicrosoft.com).
+            # It's not actually possible to publish custom DNS records for this
+            # domain.
+            continue
+        }
         $DomainName = $d.DomainName
         $selectors = "selector1", "selector2"
         $selectors += "selector1.$DomainName" -replace "\.", "-"

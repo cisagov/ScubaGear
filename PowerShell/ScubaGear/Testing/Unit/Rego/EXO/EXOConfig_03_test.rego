@@ -67,6 +67,22 @@ test_Enabled_Correct_V4 if {
     TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
 }
 
+# Test with coexistence domain, should be ignored
+test_Enabled_Correct_V5 if {
+    DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Domain", "value": "example.mail.onmicrosoft.com"}])
+    DkimRecord1 := json.patch(DkimRecords, [{"op": "add", "path": "domain", "value": "example.mail.onmicrosoft.com"},
+                                            {"op": "add", "path": "rdata", "value": []}])
+    SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
+                                        {"op": "add", "path": "domain", "value": "example.mail.onmicrosoft.com"}])
+
+    Output := exo.tests with input.spf_records as [SPFRecord]
+                        with input.dkim_config as [DkimConfig1]
+                        with input.dkim_records as [DkimRecord1]
+
+
+    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+}
+
 test_Enabled_Incorrect if {
     DkimConfig1 := json.patch(DkimConfig, [{"op": "add", "path": "Enabled", "value": false}])
     SPFRecord := json.patch(SpfRecords, [{"op": "add", "path": "rdata", "value": ["spf1 "]},
