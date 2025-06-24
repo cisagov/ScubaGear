@@ -2,6 +2,10 @@
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
         "apiResource": "/roleManagement/directory/roleDefinitions/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Identity.Governance"
         ],
@@ -33,7 +37,11 @@
 
     {
         "moduleCmdlet": "Get-MgServicePrincipal",
-        "apiResource": "/servicePrincipals/{id}",
+        "apiResource": "/v1.0/servicePrincipals/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -67,6 +75,10 @@
     {
         "moduleCmdlet": "Get-MgBetaApplication",
         "apiResource": "/applications",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -100,6 +112,10 @@
     {
         "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
         "apiResource": "/roleManagement/directory/roleAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Identity.Governance"
         ],
@@ -127,6 +143,10 @@
     {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
         "apiResource": "/servicePrincipals/{id}/appRoleAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -155,6 +175,10 @@
     {
         "moduleCmdlet": "Invoke-MgGraphRequest",
         "apiResource": "/v1.0/me",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Applications"
         ],
@@ -184,6 +208,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyRule",
         "apiResource": "/beta/policies/roleManagementPolicies/{id}/rules",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],
@@ -209,12 +237,18 @@
             "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http",
             "https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ["Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."]
+        "notes": [
+            "Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."
+        ]
     },
 
     {
         "moduleCmdlet" : "Get-MgBetaDirectoryObject",
         "apiResource" : "/beta/directoryObjects/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule" : [
             "Microsoft.Graph.Beta.DirectoryObjects"
         ],
@@ -245,6 +279,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRole",
         "apiResource": "/beta/directoryRoles",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -275,6 +313,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRoleMember",
         "apiResource": "/beta/directoryRoles/{id}/members",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -307,6 +349,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectoryRoleTemplate",
         "apiResource": "/beta/directoryRoleTemplates",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -339,6 +385,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDirectorySetting",
         "apiResource": "/beta/settings",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -371,6 +421,10 @@
     {
         "moduleCmdlet": "Get-MgBetaDomain",
         "apiResource": "/beta/domains",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -402,6 +456,10 @@
     {
         "moduleCmdlet": "Get-MgBetaGroup",
         "apiResource": "/beta/groups",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Groups"
         ],
@@ -435,6 +493,10 @@
     {
         "moduleCmdlet": "Get-MgBetaGroupMember",
         "apiResource": "/beta/groups/{id}/members",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Groups"
         ],
@@ -468,6 +530,10 @@
     {
         "moduleCmdlet": "Get-MgBetaIdentityConditionalAccessPolicy",
         "apiResource": "/beta/identity/conditionalAccess/policies",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],
@@ -495,7 +561,11 @@
 
     {
         "moduleCmdlet": "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance",
-        "apiResource": "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances",
+        "apiResource": "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances/",
+        "apiFilter": "?$filter=groupId eq '{id}'",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.Governance"
         ],
@@ -526,6 +596,10 @@
     {
         "moduleCmdlet": "Get-MgBetaOrganization",
         "apiResource": "/beta/organization",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -558,6 +632,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPolicyAuthenticationMethodPolicy",
         "apiResource": "/beta/policies/authenticationMethodsPolicy",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],
@@ -588,6 +666,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPolicyAuthorizationPolicy",
         "apiResource": "/beta/policies/authorizationPolicy",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],
@@ -618,6 +700,10 @@
     {
         "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyAssignment",
         "apiResource": "/beta/policies/roleManagementPolicyAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.SignIns"
         ],
@@ -652,7 +738,11 @@
 
     {
         "moduleCmdlet": "Get-MgBetaPrivilegedAccessResource",
-        "apiResource": "/beta/privilegedAccess/aadGroups/resources",
+        "apiResource": "/beta/privilegedAccess/{id}/resources",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.Governance"
         ],
@@ -677,12 +767,21 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.governance/get-mgbetaprivilegedaccessresource?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccess?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": [
+            "There are 3 options for this API when it comes to pulling back information.",
+            "The first is aadgroups/resources, which will return all resources for privileged access management in Azure AD groups. This is the default and will return all resources.",
+            "The second is aadroles/resources, which will return Entra roles.",
+            "The third option is azureResources/resources, which will all azure resources that the user has access to."
+        ]
     },
 
     {
         "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
         "apiResource": "/beta/roleManagement/directory/roleAssignmentScheduleInstances",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.Governance"
         ],
@@ -716,6 +815,10 @@
     {
         "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance",
         "apiResource": "/beta/roleManagement/directory/roleEligibilityScheduleInstances",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.Governance"
         ],
@@ -749,6 +852,10 @@
     {
         "moduleCmdlet": "Get-MgBetaSubscribedSku",
         "apiResource": "/beta/subscribedSkus",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Identity.DirectoryManagement"
         ],
@@ -780,6 +887,10 @@
     {
         "moduleCmdlet": "Get-MgBetaUser",
         "apiResource": "/beta/users",
+        "apiFilter": "/{id}",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Users"
         ],
@@ -812,7 +923,13 @@
 
     {
         "moduleCmdlet": "Get-MgBetaUserCount",
-        "apiResource": "/beta/users",
+        "apiResource": "/beta/users/",
+        "apiFilter": "$count",
+        "apiHeader": [
+            {
+                "ConsistencyLevel" : "eventual"
+            }
+        ],
         "poshModule": [
             "Microsoft.Graph.Beta.Users"
         ],
@@ -839,12 +956,16 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Users/Get-MgBetaUserCount?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-beta&tabs=powershell#example-6-get-only-a-count-of-users"
         ],
-        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call."
+        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call header."
     },
 
     {
         "moduleCmdlet": "Connect-ExchangeOnline",
         "apiResource": "https://outlook.office365.com/powershell-liveid/",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -872,6 +993,10 @@
     {
         "moduleCmdlet": "Connect-ExchangeOnline",
         "apiResource": "https://outlook.office365.us/powershell-liveID",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -898,6 +1023,10 @@
     {
         "moduleCmdlet": "Connect-ExchangeOnline",
         "apiResource": "https://outlook.office365.us/powershell-liveID",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -925,6 +1054,10 @@
     {
         "moduleCmdlet": "Connect-ExchangeOnline",
         "apiResource": "https://webmail.apps.mil/powershell-liveID",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -951,6 +1084,10 @@
     {
         "moduleCmdlet": "Connect-IPPSSession",
         "apiResource": "https://ps.compliance.protection.outlook.com/powershell-liveid/",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -979,6 +1116,10 @@
     {
         "moduleCmdlet": "Connect-IPPSSession",
         "apiResource": "https://ps.compliance.protection.office365.us/powershell-liveid/",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -1006,6 +1147,10 @@
     {
         "moduleCmdlet": "Connect-IPPSSession",
         "apiResource": "https://l5.ps.compliance.protection.office365.us/powershell-liveid/",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
@@ -1033,6 +1178,10 @@
     {
         "moduleCmdlet": "Connect-MicrosoftTeams",
         "apiResource": "https://*.api.interfaces.records.teams.microsoft.com",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "MicrosoftTeams"
         ],
@@ -1060,6 +1209,10 @@
     {
         "moduleCmdlet": "Connect-SPOService",
         "apiResource": "https://{domain}-admin.sharepoint.com",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Online.SharePoint.PowerShell"
         ],
@@ -1085,6 +1238,10 @@
     {
         "moduleCmdlet": "Connect-SPOService",
         "apiResource": "https://{domain}-admin.sharepoint.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Online.SharePoint.PowerShell"
         ],
@@ -1109,6 +1266,10 @@
     {
         "moduleCmdlet": "Connect-SPOService",
         "apiResource": "https://{domain}-admin.sharepoint.mil.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Online.SharePoint.PowerShell"
         ],
@@ -1133,6 +1294,10 @@
     {
         "moduleCmdlet": "Connect-PnPOnline",
         "apiResource": "https://{domain}-admin.sharepoint.com",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "PnP.PowerShell"
         ],
@@ -1158,6 +1323,10 @@
     {
         "moduleCmdlet": "Connect-PnPOnline",
         "apiResource": "https://{domain}-admin.sharepoint.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "PnP.PowerShell"
         ],
@@ -1182,6 +1351,10 @@
     {
         "moduleCmdlet": "Connect-PnPOnline",
         "apiResource": "https://{domain}-admin.sharepoint.mil.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "PnP.PowerShell"
         ],
@@ -1206,6 +1379,10 @@
     {
         "moduleCmdlet": "Connect-MgGraph",
         "apiResource": "https://graph.microsoft.com",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Authentication"
         ],
@@ -1234,6 +1411,10 @@
     {
         "moduleCmdlet": "Connect-MgGraph",
         "apiResource": "https://graph.microsoft.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Authentication"
         ],
@@ -1261,6 +1442,10 @@
     {
         "moduleCmdlet": "Connect-MgGraph",
         "apiResource": "https://dod-graph.microsoft.us",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
         "poshModule": [
             "Microsoft.Graph.Authentication"
         ],

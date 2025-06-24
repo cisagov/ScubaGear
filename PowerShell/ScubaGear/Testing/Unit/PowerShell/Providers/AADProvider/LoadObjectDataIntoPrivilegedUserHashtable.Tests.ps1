@@ -33,7 +33,7 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers.Count | Should -Be 0
         }
 
-        It 'Objecttype is is a user' {
+        It 'Objecttype is a user' {
             # Set up the parameters for the test
             $RoleName = "Global Administrator"  # Mock role
             $PrivilegedUsers = @{}  # Empty hashtable for privileged users
@@ -51,13 +51,19 @@ InModuleScope ExportAADProvider {
                 }
             }
 
-            # Mock Get-MgBetaUser to return a user with DisplayName and OnPremisesImmutableId
-            function Get-MgBetaUser { }
-            Mock Get-MgBetaUser {
-                [PSCustomObject]@{
-                    DisplayName            = "John Doe"
-                    OnPremisesImmutableId  = "ABC123"
-                }
+            Mock Invoke-GraphDirectly -MockWith {
+                param ($Commandlet)
+                    switch ($Commandlet) {
+                        "Get-MgBetaUser" {
+                            [PSCustomObject]@{
+                            DisplayName            = "John Doe"
+                            OnPremisesImmutableId  = "ABC123"
+                            }
+                        }
+                        default {
+                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
+                        }
+                    }
             }
 
             # Test 1 - Do NOT pass ObjectType
@@ -96,39 +102,47 @@ InModuleScope ExportAADProvider {
                 }
             }
 
-            # Mock Get-MgBetaGroupMember to return two group members (users)
-            function Get-MgBetaGroupMember { }
-            Mock Get-MgBetaGroupMember {
-                @(
-                    [PSCustomObject]@{
-                        Id = [Guid]::NewGuid().Guid
-                        AdditionalProperties = @{
-                            "@odata.type" = "#microsoft.graph.user"  # First user in the group
+            Mock Invoke-GraphDirectly -MockWith {
+                param ($Commandlet, $ID)
+                    switch ($Commandlet) {
+                        "Get-MgBetaUser" {
+                            [PSCustomObject]@{
+                                DisplayName            = "User $ID"
+                                OnPremisesImmutableId  = "ImmutableId-$ID"  # Simulates a user with a unique ID
+                            }
                         }
-                    },
-                    [PSCustomObject]@{
-                        Id = [Guid]::NewGuid().Guid
-                        AdditionalProperties = @{
-                            "@odata.type" = "#microsoft.graph.user"  # Second user in the group
+                        "Get-MgBetaGroupMember" {
+                           $Value = @(
+                                [PSCustomObject]@{
+                                    Id = [Guid]::NewGuid().Guid
+                                    "@odata.type" = "#microsoft.graph.user"  # First user in the group
+                                },
+                                [PSCustomObject]@{
+                                    Id = [Guid]::NewGuid().Guid
+                                    "@odata.type" = "#microsoft.graph.user"  # Second user in the group
+                                }
+                            )
+                            [PSCustomObject]@{
+                                Value = $Value
+                            }
+                        }
+                        "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
+                            # Simulate a PIM eligible group member
+                            @(
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # First PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                },
+                                [PSCustomObject]@{
+                                    PrincipalId = [Guid]::NewGuid().Guid  # Second PIM eligible user
+                                    AccessId    = "member"  # Simulates eligible PIM member
+                                }
+                            )
+                        }
+                        default {
+                            throw [System.Exception]::new("Unknown Commandlet: $Commandlet")
                         }
                     }
-                )
-            }
-
-            # Mock Get-MgBetaUser to return a user object with DisplayName and OnPremisesImmutableId for both users
-            function Get-MgBetaUser { }
-            Mock Get-MgBetaUser {
-                param ($UserId)
-                [PSCustomObject]@{
-                    DisplayName            = "User $UserId"
-                    OnPremisesImmutableId  = "ImmutableId-$UserId"
-                }
-            }
-
-            # Mock Invoke-GraphDirectly to return no PIM eligible members
-            function Invoke-GraphDirectly { }
-            Mock Invoke-GraphDirectly {
-                @()  # Returns an empty array
             }
 
             ########## Test 1 - Do NOT pass ObjectType
@@ -162,20 +176,9 @@ InModuleScope ExportAADProvider {
             ########## Test 3 - Trigger recursion by mocking Invoke-GraphDirectly to return some users
             $PrivilegedUsers = @{}
             $Objecttype = "group"
-             # Mock Invoke-GraphDirectly to return two PIM eligible users (simulating a recursion case)
-             Mock Invoke-GraphDirectly {
-                @(
-                    [PSCustomObject]@{
-                        PrincipalId = [Guid]::NewGuid().Guid  # First PIM eligible user
-                        AccessId    = "member"  # Simulates eligible PIM member
-                    },
-                    [PSCustomObject]@{
-                        PrincipalId = [Guid]::NewGuid().Guid  # Second PIM eligible user
-                        AccessId    = "member"  # Simulates eligible PIM member
-                    }
-                )
-            }
 
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
             LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
 
             # Two group members that each trigger the recursion 2 levels deep = 2 + 2 + 2 = 6
