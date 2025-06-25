@@ -188,7 +188,8 @@ function Export-AADProvider {
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
-                "M365Environment"=$M365Environment})
+                "M365Environment"=$M365Environment
+            })
         }
     )
     ##### End block
