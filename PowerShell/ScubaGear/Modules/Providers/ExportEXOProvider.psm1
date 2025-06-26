@@ -27,18 +27,18 @@ function Export-EXOProvider {
     MS.EXO.2.1v1 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
-    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{"Domains"=$domains})) -Depth 3
+    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{"Domains"=$domains})) -Depth 4
 
     <#
     MS.EXO.3.1v1 DKIM
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
-    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{"Domains"=$domains})) -Depth 3
+    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{"Domains"=$domains})) -Depth 4
 
     <#
     MS.EXO.4.1v1 DMARC
     #>
-    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{"Domains"=$domains})) -Depth 3
+    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{"Domains"=$domains})) -Depth 4
 
     <#
     MS.EXO.5.1v1
@@ -207,26 +207,88 @@ function Invoke-RobustDnsTxt {
         [int]
         $MaxTries = 2
     )
+
+    $Results = @{
+        "Answers" = @();
+        "NXDomain" = $false;
+        "LogEntries" = @();
+        "Errors" = @()
+    }
+
+    $TradResult = Invoke-TraditionalDns -Qname $Qname -MaxTries $MaxTries
+    $Results['Answers'] += $TradResult['Answers']
+    $Results['NXDomain'] = $TradResult['NXDomain']
+    $Results['LogEntries'] += $TradResult['LogEntries']
+    $Results['Errors'] += $TradResult['Errors']
+
+    if ($Results.Answers.Length -eq 0) {
+        # The traditional DNS query(ies) failed. Retry with DoH
+        $DoHResult = Invoke-DoH -Qname $Qname -MaxTries $MaxTries
+        $Results['Answers'] += $DoHResult['Answers']
+        $Results['NXDomain'] = $DoHResult['NXDomain']
+        $Results['LogEntries'] += $DoHResult['LogEntries']
+        $Results['Errors'] += $DoHResult['Errors']
+    }
+    $Results
+
+}
+
+function Invoke-TraditionalDns {
+    <#
+    .Description
+    Requests the TXT record for the given qname over traditional DNS.
+    .Parameter Qname
+    The fully-qualified domain name to request.
+    .Parameter MaxTries
+    The number of times to retry the query.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Qname,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]
+        $MaxTries = 2
+    )
+
     $Answers = @()
+    $NXDomain = $false
+    $Errors = @()
     $LogEntries = @()
 
     $TryNumber = 0
-    $Success = $false
-    $TradEmpty = $false
     while ($TryNumber -lt $MaxTries) {
         $TryNumber += 1
         try {
             $Response = Resolve-DnsName $Qname txt -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
             if ($Response.Strings.Length -gt 0) {
-                # We got our answer, so break out of the retry loop and set $Success to $true, no
+                # We got our answer, so break out of the retry loop, no
                 # need to retry the traditional query or retry with DoH.
+
+                # Resolve-DnsName breaks long answers into multiple strings, we need to
+                # join them back together
+                $StringsJoined = ($Response | ForEach-Object { $_.Strings -Join "" } )
+                if ($StringsJoined -is [String]) {
+                    $NAnswers = 1
+                }
+                else {
+                    $NAnswers = $StringsJoined.Length
+                }
+
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
-                    "query_result"="Query returned $($Response.Strings.Length) txt records"
+                    "query_result"="Query returned $NAnswers txt records";
+                    "query_answers"=$StringsJoined;
                 }
-                $Answers += $Response.Strings
-                $Success = $true
+                $Answers += $StringsJoined
                 break
             }
             else {
@@ -238,22 +300,23 @@ function Invoke-RobustDnsTxt {
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
-                    "query_result"="Query returned 0 txt records"
+                    "query_result"="Query returned 0 txt records";
+                    "query_answers"=@();
                 }
-                $TradEmpty = $true
                 break
             }
         }
         catch {
             if ($_.FullyQualifiedErrorId -eq "DNS_ERROR_RCODE_NAME_ERROR,Microsoft.DnsClient.Commands.ResolveDnsName") {
-                # The server returned NXDomain, no need to retry the traditional query or retry with
-                # DoH, this was not a transient failure. Break out of loop and set $Success to $true
+                # The server returned NXDomain, no need to retry the traditional query,
+                # this was not a transient failure.
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
-                    "query_result"="Query returned NXDomain"
+                    "query_result"="Query returned NXDomain";
+                    "query_answers"=@();
                 }
-                $Success = $True
+                $NXDomain = $True
                 break
             }
             else {
@@ -261,96 +324,146 @@ function Invoke-RobustDnsTxt {
                 $LogEntries += @{
                     "query_name"=$Qname;
                     "query_method"="traditional";
-                    "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"
+                    "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)";
+                    "query_answers"=@();
                 }
+                $Errors += $_.FullyQualifiedErrorId
             }
         }
     }
 
-    if (-not $Success) {
-        # The traditional DNS query(ies) failed. Retry with DoH
-        if ($script:DohServer -eq "") {
-            # We haven't determined if DoH is available yet, select the first server that works
-            $script:DohServer = Select-DohServer
+    @{
+        "Answers" = $Answers;
+        "NXDomain" = $NXDomain;
+        "LogEntries" = $LogEntries;
+        "Errors" = $Errors;
+    }
+}
+
+function Invoke-DoH {
+    <#
+    .Description
+    Requests the TXT record for the given qname over traditional DNS.
+    .Parameter Qname
+    The fully-qualified domain name to request.
+    .Parameter MaxTries
+    The number of times to retry the query.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Qname,
+
+        [Parameter(Mandatory=$false)]
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]
+        $MaxTries = 2
+    )
+
+    $Answers = @()
+    $NXDomain = $false
+    $Errors = @()
+    $LogEntries = @()
+
+    if ($script:DohServer -eq "") {
+        # We haven't determined if DoH is available yet, select the first server that works
+        $script:DohServer = Select-DohServer
+    }
+    if ($null -eq $script:DohServer) {
+        # None of the DoH servers are accessible
+        $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="NA, DoH servers unreachable"}
+        return @{
+            "Answers" = $Answers;
+            "NXDomain" = $NXDomain;
+            "LogEntries" = $LogEntries;
+            "Errors" = $Errors;
         }
-        if ($null -eq $script:DohServer) {
-            # None of the DoH servers are accessible
-            $LogEntries += @{"query_name"=$Qname; "query_method"="DoH"; "query_result"="NA, DoH servers unreachable"}
-        }
-        else {
-            # DoH is available, query for the domain
-            $TryNumber = 0
-            while ($TryNumber -lt $MaxTries) {
-                $TryNumber += 1
-                try {
-                    $Uri = "https://$($script:DohServer)/dns-query?name=$($Qname)&type=txt"
-                    $Headers = @{"accept"="application/dns-json"}
-                    $RawResponse = $(Invoke-WebRequest -Headers $Headers -Uri $Uri -UseBasicParsing -ErrorAction "Stop").RawContent
-                    $ResponseLines = $RawResponse -Split "`n"
-                    $LastLine = $ResponseLines[$ResponseLines.Length - 1]
-                    $ResponseBody = ConvertFrom-Json $LastLine
-                    if ($ResponseBody.Status -eq 0) {
-                        # 0 indicates there was no error
-                        $LogEntries += @{
-                            "query_name"=$Qname;
-                            "query_method"="DoH";
-                            "query_result"="Query returned $($ResponseBody.Answer.data.Length) txt records"
-                        }
-                        $Answers += ($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')})
-                        $Success = $true
-                        break
-                    }
-                    elseif ($ResponseBody.Status -eq 3) {
-                        # 3 indicates NXDomain. The DNS query succeeded, but the domain did not exist.
-                        # Set $Success to $true, because event though the domain does not exist, the
-                        # query succeeded, and this came from an external resolver so split horizon is
-                        # not an issue here.
-                        $LogEntries += @{
-                            "query_name"=$Qname;
-                            "query_method"="DoH";
-                            "query_result"="Query returned NXDomain"
-                        }
-                        $Success = $true
-                        break
-                    }
-                    else {
-                        # The remainder of the response codes indicate that the query did not succeed.
-                        # Retry if we haven't reached $MaxTries.
-                        $LogEntries += @{
-                            "query_name"=$Qname;
-                            "query_method"="DoH";
-                            "query_result"="Query returned response code $($ResponseBody.Status)"
-                        }
-                    }
-                }
-                catch {
-                    # The DoH query failed, likely due to a network issue. Retry if we haven't reached
-                    # $MaxTries.
+    }
+
+    # DoH is available, query for the domain
+    $TryNumber = 0
+    while ($TryNumber -lt $MaxTries) {
+        $TryNumber += 1
+        try {
+            $Uri = "https://$($script:DohServer)/dns-query?name=$($Qname)&type=txt"
+            $Headers = @{"accept"="application/dns-json"}
+            $RawResponse = $(Invoke-WebRequest -Headers $Headers -Uri $Uri -UseBasicParsing -ErrorAction "Stop").RawContent
+            $ResponseLines = $RawResponse -Split "`n"
+            $LastLine = $ResponseLines[$ResponseLines.Length - 1]
+            $ResponseBody = ConvertFrom-Json $LastLine
+            if ($ResponseBody.Status -eq 0) {
+                # 0 indicates there was no error
+                if ($null -eq $ResponseBody.Answer) {
+                    # Edge case where the domain exists but there are no txt records available
                     $LogEntries += @{
                         "query_name"=$Qname;
                         "query_method"="DoH";
-                        "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)"
+                        "query_result"="Query returned 0 txt records";
+                        "query_answers"=@();
                     }
+                }
+                else {
+                    if ($ResponseBody.Answer.data -is [String]) {
+                        $Length = 1
+                    }
+                    else {
+                        $Length = $ResponseBody.Answer.data.Length
+                    }
+                    $LogEntries += @{
+                        "query_name"=$Qname;
+                        "query_method"="DoH";
+                        "query_result"="Query returned $Length txt records";
+                        "query_answers"=($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')});
+                    }
+                    $Answers += ($ResponseBody.Answer.data | ForEach-Object {$_.Replace('"', '')})
+                }
+                break
+            }
+            elseif ($ResponseBody.Status -eq 3) {
+                # 3 indicates NXDomain. The DNS query succeeded, but the domain did not exist.
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="DoH";
+                    "query_result"="Query returned NXDomain";
+                    "query_answers"=@();
+                }
+                $NXDomain = $true
+                break
+            }
+            else {
+                # The remainder of the response codes indicate that the query did not succeed.
+                # Retry if we haven't reached $MaxTries.
+                $LogEntries += @{
+                    "query_name"=$Qname;
+                    "query_method"="DoH";
+                    "query_result"="Query returned response code $($ResponseBody.Status)";
+                    "query_answers"=@();
                 }
             }
         }
+        catch {
+            # The DoH query failed, likely due to a network issue. Retry if we haven't reached
+            # $MaxTries.
+            $LogEntries += @{
+                "query_name"=$Qname;
+                "query_method"="DoH";
+                "query_result"="Query resulted in exception, $($_.FullyQualifiedErrorId)";
+                "query_answers"=@();
+            }
+            $Errors += $_.FullyQualifiedErrorId
+        }
     }
 
-    # There are three possible outcomes of this function:
-    # - Full confidence: we know conclusively that the domain exists or not, either via a non-empty
-    # answer from traditional DNS or an answer from DoH.
-    # - Medium confidence: domain likely doesn't exist, but there is some doubt (empty answer from
-    # traditonal DNS and DoH failed).
-    # No confidence: all queries failed. Throw an exception in this case.
-    if ($Success) {
-        @{"Answers" = $Answers; "HighConfidence" = $true; "LogEntries" = $LogEntries}
-    }
-    elseif ($TradEmpty) {
-        @{"Answers" = $Answers; "HighConfidence" = $false; "LogEntries" = $LogEntries}
-    }
-    else {
-        $Log = ($LogEntries | ForEach-Object {ConvertTo-Json $_ -Compress}) -Join "`n"
-        throw "Failed to resolve $($Qname). `n$($Log)"
+    @{
+        "Answers" = $Answers;
+        "NXDomain" = $NXDomain;
+        "LogEntries" = $LogEntries;
+        "Errors" = $Errors;
     }
 }
 
@@ -370,24 +483,51 @@ function Get-ScubaSpfRecord {
     )
 
     $SPFRecords = @()
-    $NLowConf = 0
 
     foreach ($d in $Domains) {
+        $Compliant = $false
         $Response = Invoke-RobustDnsTxt $d.DomainName
-        if (-not $Response.HighConfidence) {
-            $NLowConf += 1
-        }
         $DomainName = $d.DomainName
+        if ($Response.Answers.Length -gt 0) {
+            # We got some answers - are they SPF records?
+            $SPFAnswers = ($Response.Answers | Where-Object { $_.StartsWith("v=spf1 ") }  )
+            if ($SPFAnswers.Length -gt 0) {
+                # We have an SPF record - does it hardfail?
+                $SPFReject = ($SPFAnswers | Where-Object { $_.Contains("-all") -or $_.Contains("redirect") }  )
+                if ($SPFReject.Length -gt 0) {
+                    # Yes! This is the "good" case
+                    $Message = "SPF record found."
+                    $Compliant = $true
+                }
+                else {
+                    # There is an SPF record but it doesn't hardfail
+                    $Message = "SPF record found, but it does not hardfail (`"-all`") or redirect to one that does."
+                }
+            }
+            else {
+                # An answer was returned but it didn't start with "v=spf1 "
+                $Message = "Domain name exists but no SPF records returned."
+            }
+        }
+        # For the three remaining cases, we didn't get an answer
+        elseif ($Response.NXDomain) {
+            $Message = "Domain does not exist."
+        }
+        elseif ($Response.Errors -gt 0) {
+            $Message = "Exceptions other than NXDOMAIN returned."
+        }
+        else {
+            $Message = "Domain name exists but no answers returned."
+        }
         $SPFRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = $Response.Answers;
+            "compliant" = $Compliant;
+            "message" = $Message;
+            "rdata" = @($Response.Answers);
             "log" = $Response.LogEntries;
         }
     }
 
-    if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaSpfRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume SPF not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'spf_records' for more details."
-    }
     $SPFRecords
 }
 
@@ -407,9 +547,14 @@ function Get-ScubaDkimRecord {
     )
 
     $DKIMRecords = @()
-    $NLowConf = 0
 
     foreach ($d in $domains) {
+        if ($d.IsCoexistenceDomain) {
+            # Skip the coexistence domain (e.g., contoso.mail.onmicrosoft.com).
+            # It's not actually possible to publish custom DNS records for this
+            # domain.
+            continue
+        }
         $DomainName = $d.DomainName
         $selectors = "selector1", "selector2"
         $selectors += "selector1.$DomainName" -replace "\.", "-"
@@ -430,20 +575,13 @@ function Get-ScubaDkimRecord {
             }
         }
 
-        if (-not $Response.HighConfidence) {
-            $NLowConf += 1
-        }
-
         $DKIMRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = $Response.Answers;
+            "rdata" = @($Response.Answers);
             "log" = $LogEntries;
         }
     }
 
-    if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDkimRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DKIM not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dkim_records' for more details."
-    }
     $DKIMRecords
 }
 
@@ -463,7 +601,6 @@ function Get-ScubaDmarcRecord {
     )
 
     $DMARCRecords = @()
-    $NLowConf = 0
 
     foreach ($d in $Domains) {
         if ($d.IsCoexistenceDomain) {
@@ -487,9 +624,6 @@ function Get-ScubaDmarcRecord {
         }
 
         $DomainName = $d.DomainName
-        if (-not $Response.HighConfidence) {
-            $NLowConf += 1
-        }
         $DMARCRecords += [PSCustomObject]@{
             "domain" = $DomainName;
             "rdata" = @($Response.Answers);
@@ -497,8 +631,5 @@ function Get-ScubaDmarcRecord {
         }
     }
 
-    if ($NLowConf -gt 0) {
-        Write-Warning "Get-ScubaDmarcRecord: for $($NLowConf) domain(s), the tradtional DNS queries returned an empty answer section and the DoH queries failed. Will assume DMARC not configured, but can't guarantee that failure isn't due to something like split horizon DNS. See ProviderSettingsExport.json under 'dmarc_records' for more details."
-    }
     $DMARCRecords
 }

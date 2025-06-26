@@ -146,26 +146,42 @@ tests contains {
 # MS.EXO.2.2v2
 #--
 
-# Loop through domain DNS responses & loop through the policies associated
-# with the domain. Save the records that start with string "v=spf1". If
-# records does not exist, save domain name in DomainsWithoutSpf array.
-DomainsWithoutSpf contains DNSResponse.domain if {
+# Loop through domains and save the details for domains without proper SPF records
+DomainsWithoutSpf contains Details if {
     some DNSResponse in input.spf_records
-    SpfRecords := {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "-all")} | 
-        {Record | some Record in DNSResponse.rdata; startswith(Record, "v=spf1 "); contains(Record, "redirect")}
-    count(SpfRecords) == 0
+    not DNSResponse.compliant
+    Details := concat("", [
+        "<li>",
+        DNSResponse.domain,
+        ": ",
+        DNSResponse.message,
+        "</li>"
+    ])
 }
+
+# Link used for SPF, DKIM, and DMARC related logs
+DNSLink := "<a href=\"#dns-logs\">View DNS logs</a> for more details."
+
+SpfStatusMessage := Message if {
+    count(DomainsWithoutSpf) == 0
+    Message := "Requirement met. "
+} else := concat("", [
+        format_int(count(DomainsWithoutSpf), 10),
+        " failing domain(s):",
+        "<ul id=\"spf-domains\">",
+        concat("", DomainsWithoutSpf),
+        "</ul>"
+    ])
 
 tests contains {
     "PolicyId": "MS.EXO.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
-    "ActualValue": Domains,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ActualValue": DomainsWithoutSpf,
+    "ReportDetails": concat("", [SpfStatusMessage, DNSLink]),
     "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutSpf
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutSpf) == 0
 }
 #--
 
@@ -192,6 +208,11 @@ DomainsWithDkim contains DkimConfig.Domain if {
     count(ValidAnswers) > 0
 }
 
+CoexistenceDomain contains DkimConfig.Domain if {
+    some DkimConfig in input.dkim_config
+    endswith(DkimConfig.Domain, ".mail.onmicrosoft.com")
+}
+
 tests contains {
     "PolicyId": "MS.EXO.3.1v1",
     "Criticality": "Should",
@@ -201,11 +222,16 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [input.dkim_records, input.dkim_config],
-    "ReportDetails": ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, DomainsWithoutDkim, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     # Get domains that are not in DomainsWithDkim array
-    DomainsWithoutDkim := AllDomains - DomainsWithDkim
+    # Ignore the coexistence domain, it's not possible to publish DNS DKIM
+    # record for this domain
+    DomainsWithoutDkim := AllDomains - DomainsWithDkim - CoexistenceDomain
     Status := count(DomainsWithoutDkim) == 0
 }
 #--
@@ -236,7 +262,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDmarc
@@ -265,7 +294,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),
     "RequirementMet": Status
 } if {
     Domains := DomainsWithoutPreject
@@ -305,8 +337,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
-    "RequirementMet": Status
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),    "RequirementMet": Status
 } if {
     Domains := DomainsWithoutDHSContact
     Status := count(Domains) == 0
@@ -361,8 +395,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": input.dmarc_records,
-    "ReportDetails": ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
-    "RequirementMet": Status
+    "ReportDetails": concat(". ", [
+        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        DNSLink
+    ]),    "RequirementMet": Status
 } if {
     Domains := DomainsWithoutAgencyContact
     Status := count(Domains) == 0
