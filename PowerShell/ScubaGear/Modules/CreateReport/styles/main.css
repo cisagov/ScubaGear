@@ -63,6 +63,36 @@ h3 {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     color: var(--header-color);
+    font-size: 0.9em;
+}
+
+header h3 {
+    font-size: 1.17em;
+}
+
+p {
+    max-width: 700px;
+    text-align: center;
+}
+
+.show-more {
+    text-align: left;
+    margin-left: 40px;
+}
+
+button.show-more {
+  background: none!important;
+  border: none;
+  padding: 0!important;
+  color: var(--unvisited-link-color);
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0;
+}
+
+hr {
+    /* border-bottom: 0.063em solid var(--header-bottom); */
+    width: 1000px;
 }
 
 h4 {
@@ -160,7 +190,7 @@ img {
     margin-top: 3.125em;
 }
 
-#caps tr:nth-child(even){
+#caps tr:nth-child(even), .alternating tr:nth-child(even) {
     background-color: var(--cap-even);
 }
 
