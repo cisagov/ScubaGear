@@ -225,7 +225,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
-- _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent  unintended sustained access to links.
+- _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to links.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-11
