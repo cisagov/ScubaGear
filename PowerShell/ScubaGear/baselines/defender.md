@@ -811,7 +811,7 @@ types to the Unified Audit Log.
 Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit logging is required for government agencies by OMB M-21-31.
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
 - _Last modified:_ March 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
