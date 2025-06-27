@@ -36,21 +36,6 @@ $ModuleList = @(
         MaximumVersion = [version] '2.99.99999'
     },
     @{
-        ModuleName = 'Microsoft.Graph.Beta.Applications'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.Identity.DirectoryManagement'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Beta.DirectoryObjects'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.99.99999'
-    },
-    @{
         ModuleName = 'powershell-yaml'
         ModuleVersion = [version] '0.4.2'
         MaximumVersion = [version] '0.99.99999'

@@ -21,10 +21,11 @@ function Export-SharePointProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPOSiteHelper.psm1")
+    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
     $Tracker = Get-CommandTracker
 
     #Get InitialDomainPrefix
-    $InitialDomain = ($Tracker.TryCommand("Get-MgBetaOrganization")).VerifiedDomains | Where-Object {$_.isInitial}
+    $InitialDomain = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}).VerifiedDomains | Where-Object {$_.isInitial}
     $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
 
     #Get SPOSiteIdentity
