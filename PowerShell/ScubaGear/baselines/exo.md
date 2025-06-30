@@ -60,7 +60,7 @@ forwarding rules to exfiltrate data to external recipients.
 ### Policies
 
 #### MS.EXO.1.1v2
-Automatic forwarding to external domains SHALL only be enabled on a per-domain basis. 
+Automatic forwarding to external domains SHALL be disabled
 
 <!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
