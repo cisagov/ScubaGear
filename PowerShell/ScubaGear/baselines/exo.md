@@ -71,7 +71,7 @@ internal forwarding.
 - _Last modified:_ March 2025
 - _Note:_ Automatic forwarding MAY be enabled with specific, agency-approved domains.
 There may be cases where an external domain is operationally needed and has an acceptable
-degree of risk, e.g., a domain controlled by the same agency but that hasn't been added
+degree of risk, e.g., a domain controlled by the same agency that hasn't been added
 as an accepted domain in M365.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)

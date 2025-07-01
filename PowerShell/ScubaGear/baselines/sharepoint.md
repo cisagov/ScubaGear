@@ -44,7 +44,7 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only peop
 External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
 
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
-- _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized unauthorized access to information.
+- _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized access to information.
 - _Last modified:_ June 2023
 - _MITRE ATT&CK TTP Mapping:_
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
@@ -56,7 +56,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
-- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators help prevent sharing with unknown organizations and individuals.
+- _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only people in your organization**.
 - _MITRE ATT&CK TTP Mapping:_
@@ -193,7 +193,7 @@ Sharing files with external users via the usage of **Anyone links** or **Verific
 Expiration days for Anyone links SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators prevent unintended sustained access to information.
+- _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators can prevent unintended sustained access to the link.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
 - _MITRE ATT&CK TTP Mapping:_
@@ -218,7 +218,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
-- _Rationale:_ A verification code may be given out to provide access to information for a short period of time. By setting expiration timers for verification code access, administrators prevent  unintended sustained access to information.
+- _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
 - _MITRE ATT&CK TTP Mapping:_
