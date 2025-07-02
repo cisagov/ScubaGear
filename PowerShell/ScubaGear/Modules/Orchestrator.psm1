@@ -1085,9 +1085,10 @@ function Merge-JsonOutput {
                 $ProductAbbreviationMapping[$ProdToFullName[$BaselineName]] = $BaselineName
             }
 
-            # Extract the metadata
             $Results = [pscustomobject]@{}
             $Summary = [pscustomobject]@{}
+            $AnnotatedFailedPolicies = [pscustomobject]@{}
+            # Extract the metadata
             $MetaData = [pscustomobject]@{
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
@@ -1104,6 +1105,7 @@ function Merge-JsonOutput {
 
             # Aggregate the report results and summaries
             $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
+            $FailsNotAnnotated = @()
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
@@ -1117,6 +1119,22 @@ function Merge-JsonOutput {
                 $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
                 $Summary | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.ReportSummary
+
+                # Collect the annotated failed policies into a single object
+                foreach ($Annotation in $IndividualResults.ReportSummary.AnnotatedFailedPolicies.PSObject.Properties) {
+                    if ($null -eq $Annotation.Value.Comment) {
+                        $FailsNotAnnotated += $Annotation.Name
+                    }
+                    $AnnotatedFailedPolicies | Add-Member -NotePropertyName $Annotation.Name `
+                        -NotePropertyValue $Annotation.Value
+                }
+                $IndividualResults.ReportSummary.PSObject.Properties.Remove('AnnotatedFailedPolicies')
+            }
+            if ($FailsNotAnnotated.Length -gt 0) {
+                $Warning = "$($FailsNotAnnotated.Length) controls are failing and are not documented in the config file: "
+                $Warning += $FailsNotAnnotated -Join ", "
+                $Warning += ". See https://github.com/cisagov/scubagear/docs/documentation-that-i-havent-written-yet.md for more details."
+                Write-Warning $Warning
             }
             foreach ($Product in $Results.PSObject.Properties) {
                 foreach ($Group in $Product.Value) {
@@ -1131,10 +1149,12 @@ function Merge-JsonOutput {
             $MetaData = ConvertTo-Json $MetaData -Depth 3
             $Results = ConvertTo-Json $Results -Depth 5
             $Summary = ConvertTo-Json $Summary -Depth 3
+            $AnnotatedFailedPolicies = ConvertTo-Json $AnnotatedFailedPolicies -Depth 3
             $ReportJson = @"
 {
     "MetaData": $MetaData,
     "Summary": $Summary,
+    "AnnotatedFailedPolicies": $AnnotatedFailedPolicies,
     "Results": $Results,
     "Raw": $SettingsExport
 }
@@ -1284,6 +1304,7 @@ function Invoke-ReportCreation {
                 $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
                 $ManualSummary = "<div class='summary'></div>"
                 $OmitSummary = "<div class='summary'></div>"
+                $FalsePositiveSummary = "<div class='summary'></div>"
                 $ErrorSummary = ""
 
                 if ($Report.Passes -gt 0) {
@@ -1310,6 +1331,11 @@ function Invoke-ReportCreation {
                     $OmitSummary = "<div class='summary manual'>$($Report.Omits) omitted</div>"
                 }
 
+                if ($Report.FalsePositives -gt 0) {
+                    $Noun = Pluralize -SingularNoun "false positive" -PluralNoun "false positives" -Count $Report.FalsePositives
+                    $FalsePositiveSummary = "<div class='summary pass'>$($Report.FalsePositives) $Noun</div>"
+                }
+
                 if ($Report.Errors -gt 0) {
                     $Noun = Pluralize -SingularNoun "error" -PluralNoun "errors" -Count $Report.Errors
                     $ErrorSummary = "<div class='summary error'>$($Report.Errors) $($Noun)</div>"
@@ -1317,7 +1343,7 @@ function Invoke-ReportCreation {
 
                 $Fragment += [pscustomobject]@{
                 "Baseline Conformance Reports" = $Link;
-                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($OmitSummary) $($ErrorSummary)"
+                "Details" = "$PassesSummary $WarningsSummary $FailuresSummary $ManualSummary $OmitSummary $FalsePositiveSummary $ErrorSummary"
                 }
             }
             $TenantMetaData += [pscustomobject]@{
