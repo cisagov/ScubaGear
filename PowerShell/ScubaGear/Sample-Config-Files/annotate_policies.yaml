@@ -20,4 +20,5 @@ AnnotatePolicy:
     Comment: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
       horizon setup but is available publicly."
   MS.AAD.3.1v1:
-    Comment: Implementation in progress, anticipated completion date 8/1/2025.
+    Comment: Implementation in progress.
+    RemediationDate: 8/1/2025

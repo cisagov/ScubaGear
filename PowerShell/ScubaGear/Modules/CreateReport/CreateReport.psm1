@@ -93,6 +93,7 @@ function Add-Annotation {
     $Details = $Result.Details
 
     $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
+    $RemediationDateStr = $Config.AnnotatePolicy.$ControlId.RemediationDate
     $FalsePositive = Get-FalsePositive $Config $ControlId
 
     if ($FalsePositive -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
@@ -107,8 +108,25 @@ function Add-Annotation {
         }
     }
     elseif (-not [string]::IsNullOrEmpty($UserComment)) {
-        # Not failing, not false positive, just regular case, add comment if provided
+        # Not false positive, just regular case, add comment if provided
         $Details = $Result.Details + "<span class='comment-heading'>User comment</span>`"$UserComment`""
+        if (-not [string]::IsNullOrEmpty($RemediationDateStr)) {
+            $Details = $Details + "<span class='comment-heading'>Anticipated remediation date</span>`"$RemediationDateStr`""
+            # Warn if the remediation date is passed and it's still not passing
+            $Now = Get-Date
+            try {
+                $RemediationDate = Get-Date -Date $RemediationDateStr
+                if ($RemediationDate -lt $Now -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+                    $Warning = "Anticipated remediation date for $($ControlId), $RemediationDateStr, has passed."
+                    Write-Warning $Warning
+                }
+            }
+            catch {
+                $Warning = "Error parsing the remediation date for $($ControlId), $RemediationDateStr. "
+                $Warning += "The expected format is yyyy-mm-dd."
+                Write-Warning $Warning
+            }
+        }
     }
     else {
         # In all other cases return the details unchanged
@@ -261,9 +279,11 @@ function New-Report {
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
                 if ($Result.DisplayString -eq "Fail") {
                     $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                    $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].FalsePositive = $FalsePositive
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].RemediationDate = $RemediationDate
                 }
 
                 # Handle false positives
