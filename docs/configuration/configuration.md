@@ -125,6 +125,23 @@ For each omitted policy, the config file allows you to indicate the following:
 - `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
 - `Expiration`: Optional. A date after which the policy should no longer be omitted from the report. The expected format is yyyy-mm-dd.
 
+## Annotate Policies
+
+ScubaGear supports annotating results for individual policies. Annotated policies will be shown in the HTML with the
+annotation appended to the details column. Annotated policies are intended to:
+- Document action plans for any failed controls. ScubaGear will output a warning for any failing controls that are not
+documented in the config file, though this warning can be silenced with the `-SilenceBODWarnings` flag.
+- Allow users to identify false positives
+- Help contextualize results
+
+The `AnnotatePolicy` top-level key, shown in this [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/annotate_policies.yaml), allows the user to specify the policies that should be annotated.
+
+For each annotated policy, the config file allows you to indicate the following:
+- `FalsePositive`: Boolean, whether or not the result is a false positive. Optional, defaults to false.
+- `Comment`: The annotation to add to the report. A warning will be printed if control is marked false positive with no comment provided as justification.
+
+**Exercise care when marking false positives because this can inadvertently introduce blind spots when assessing your system.**
+
 ## Product-specific Configuration
 
 Config files can include a top-level level key for a given product whose values are related to that specific product. For example, look for the value of `Defender` in this [Defender config file](../../PowerShell/ScubaGear/Sample-Config-Files/defender_config.yaml). Currently, only Entra ID, Defender, and Exchange Online use this extra configuration.
