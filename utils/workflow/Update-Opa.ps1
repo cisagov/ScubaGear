@@ -16,7 +16,7 @@ function Confirm-OpaUpdateRequirements {
 
     # Check if there is already an update branch
     $OPAVersionBumpBranch = "opa-version-bump-$($LatestOPAVersion)"
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification='$Temp required to avoid having PS eat the return code from git.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '', Justification = '$Temp required to avoid having PS eat the return code from git.')]
     $Temp = git ls-remote --exit-code --heads origin $OPAVersionBumpBranch
     $OPAVersionBranchExists = $false
     if ($LASTEXITCODE -eq 0) {
@@ -43,11 +43,11 @@ function Confirm-OpaUpdateRequirements {
 
     # Return values in a hashtable
     $ReturnValues = @{
-        "Summary" = $Summary
-        "LatestOPAVersion" = $LatestOPAVersion
+        "Summary"              = $Summary
+        "LatestOPAVersion"     = $LatestOPAVersion
         "OPAVersionBumpBranch" = $OPAVersionBumpBranch
-        "UpdateRequired" = $UpdateRequired
-        "CurrentOPAVersion" = $CurrentOPAVersion
+        "UpdateRequired"       = $UpdateRequired
+        "CurrentOPAVersion"    = $CurrentOPAVersion
     }
     return $ReturnValues
 }
@@ -111,7 +111,7 @@ function Update-OpaVersion {
                 # Splitting lines; current and latest OPA Version will start on the next line
                 $VersionsArr = $_ -split ","
                 # Create a new line, then add the new version on the next line
-                ($VersionsArr[0..($VersionsArr.Length-2)] -join ",") + ","
+                ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",") + ","
                 "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
             }
             elseif ($VersionsLength -eq 1) {
@@ -123,7 +123,7 @@ function Update-OpaVersion {
             else {
                 # No splitting lines; appending new current OPA version to acceptable version
                 $VersionsArr = $_ -split ","
-                $NewVersions = ($VersionsArr[0..($VersionsArr.Length-2)] -join ",")
+                $NewVersions = ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",")
                 $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
             }
         }
@@ -131,6 +131,41 @@ function Update-OpaVersion {
             $_
         }
     } | Set-Content $SupportModulePath
+}
+
+function Invoke-UnitTestsWithNewOPAVersion {
+    <#
+    .SYNOPSIS
+    Run ScubaGear OPA unit tests with the latest version of an OPA executable
+    .PARAMETER LatestOpaVersion
+    The new version in ScubaConfig used to update
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $LatestOpaVersion
+    )
+
+    # Download the latest OPA version from the OPA website
+    $OPAExe = "opa_windows_amd64.exe"
+    $InstallUrl = "https://openpolicyagent.org/downloads/v$($LatestOpaVersion)/$OPAExe"
+    $OutFile = "./$($OPAExe)"
+    try {
+        Write-Information "Downloading $InstallUrl"
+        $WebClient = New-Object System.Net.WebClient
+        $WebClient.DownloadFile($InstallUrl, $OutFile)
+        Write-Information ""
+        Write-Information "`nDownload of `"$OutFile`" finished."
+    }
+    catch {
+        Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
+    }
+    finally {
+        $WebClient.Dispose()
+    }
+
+    # Run the unit test with the latest OPA version download
+    .\Testing\RunUnitTests.ps1 -OPAPath "./"
 }
 
 function New-OpaUpdatePr {
@@ -161,6 +196,8 @@ function New-OpaUpdatePr {
         $OpaVersionBumpBranch
     )
 
+    $UnitTestResults = Invoke-UnitTestsWithNewOPAVersion -LatestOpaVersion $LatestOpaVersion
+
     # Create the PR body
     $PRTemplatePath = Join-Path -Path $RepoPath -ChildPath '.github/pull_request_template.md'
     $Description = '<!-- Describe the "what" of your changes in detail. -->'
@@ -169,7 +206,7 @@ function New-OpaUpdatePr {
     $RemoveHeader = '# <!-- Use the title to describe PR changes in the imperative mood --> #'
     $NewDescription = "- This pull request was created by a GitHub Action to bump ScubaGear's Open Policy Agent (OPA) executable version dependency.`n - Please fill out the rest of the template that the Action did not cover. `n"
     $NewMotivation = "- Bump to the latest OPA version v$($LatestOpaVersion) `n"
-    $NewTesting = "- Currently a human should still check if bumping the OPA version affects ScubaGear.`n"
+    $NewTesting = "- Rego Unit Test results for OPA v$($LatestOpaVersion): `n $($UnitTestResults) `n - A smoke test is also being run against this branch. Check the [latest smoke test](https://github.com/cisagov/ScubaGear/actions/workflows/run_smoke_test.yaml) targeting branch: $($OpaVersionBumpBranch)"
 
     $PrTemplateContent = (Get-Content -Path $PRTemplatePath) | ForEach-Object {
         $DescriptionRegex = $_ -match $Description
