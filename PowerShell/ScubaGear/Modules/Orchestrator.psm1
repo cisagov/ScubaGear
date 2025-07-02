@@ -361,8 +361,8 @@ function Invoke-SCuBA {
             }
         }
 
-        if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgUnit) {
-            $Warning = "Config file option OrgUnit not provided. This option is required for BOD "
+        if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgName) {
+            $Warning = "Config file option OrgName not provided. This option is required for BOD "
             $Warning += "submissions. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use for more details. "
             $Warning += "This warning can be silenced with the -SilenceBODWarnings parameter"
             Write-Warning $Warning
