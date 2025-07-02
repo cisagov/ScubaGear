@@ -443,6 +443,23 @@ Invoke-SCuBA -ProductNames teams `
   -Quiet
 ```
 
+## SilenceBODWarnings
+
+**SilenceBODWarnings** silences warnings relating to BOD submissions requirements, e.g., the requirement to document `OrgUnit` in the config file.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |
+
+```powershell
+# Silence warning related to BOD submission requirements
+Invoke-SCuBA -SilenceBODWarnings
+```
+
+
 ## Version
 
 **Version** writes the current ScubaGear version to the console.  ScubaGear will not be run.  When the `Version` parameter is used, no other parameters should be included.
