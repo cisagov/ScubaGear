@@ -260,7 +260,7 @@ function New-Report {
 
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
                 if ($Result.DisplayString -eq "Fail") {
-                    $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
+                    $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].FalsePositive = $FalsePositive
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
