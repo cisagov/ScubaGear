@@ -65,6 +65,59 @@ function Get-RegoResult {
     $Result
 }
 
+function Add-Annotation {
+    <#
+    .Description
+    Adds the annotation provided by the user in the config file to the result details if applicable.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]
+        $Result,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+
+    $Details = $Result.Details
+
+    $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
+    $FalsePositive = Get-FalsePositive $Config $ControlId
+
+    if ($FalsePositive -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+        if ([string]::IsNullOrEmpty($UserComment)) {
+            # False positive, comment not provided
+            Write-Warning "Config file documents $($ControlId) as a false positive, but no justification provided."
+            $Details = "Test marked as false positive by user. <span class='comment-heading'>User justification not provided</span>"
+        }
+        else {
+            # False positive, comment provided
+            $Details = "Test marked as false positive by user. <span class='comment-heading'>User justification</span>`"$UserComment`""
+        }
+    }
+    elseif (-not [string]::IsNullOrEmpty($UserComment)) {
+        # Not failing, not false positive, just regular case, add comment if provided
+        $Details = $Result.Details + "<span class='comment-heading'>User comment</span>`"$UserComment`""
+    }
+    else {
+        # In all other cases return the details unchanged
+        $Details = $Result.Details
+    }
+
+    $Details
+}
+
 function New-Report {
      <#
     .Description
@@ -156,9 +209,11 @@ function New-Report {
         "Failures" = 0;
         "Passes" = 0;
         "Omits" = 0;
+        "FalsePositives" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
+        "AnnotatedFailedPolicies" = @{};
     }
 
     foreach ($BaselineGroup in $ProductSecureBaseline) {
@@ -172,32 +227,64 @@ function New-Report {
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
                 $Result = Get-RegoResult $Test $MissingCommands $Control
 
-                # Check if the config file indicates the control should be omitted
                 $Config = $SettingsExport.scuba_config
+
+                # Add annotation if applicable
+                $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
+
+                # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
-                        $OmitRationale = "Rationale not provided."
+                        $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
                     }
                     else {
-                        $OmitRationale = "`"$($OmitRationale)`""
+                        $Details = "Test omitted by user. <span class='comment-heading'>User justification</span>`"$OmitRationale`""
                     }
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
                         "Requirement"=$Control.Value
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
-                        "Details"= "Test omitted by user. $($OmitRationale)"
+                        "Details"= $Details
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
+                        "FalsePositiveResult"="N/A"
+                        "FalsePositiveDetails"="N/A"
                     }
                     continue
                 }
 
-                # This is the typical case, the test result is not missing or omitted
+                # If the user commented on a failed control, save the comment to the failed control to comment mapping
+                if ($Result.DisplayString -eq "Fail") {
+                    $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].FalsePositive = $FalsePositive
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
+                }
+
+                # Handle false positives
+                $FalsePositive = Get-FalsePositive $Config $Control.Id
+                if ($FalsePositive -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+                    $ReportSummary.FalsePositives += 1
+                    $Fragment += [pscustomobject]@{
+                        "Control ID"=$Control.Id
+                        "Requirement"=$Control.Value
+                        "Result"= "False positive"
+                        "Criticality"= $Test.Criticality
+                        "Details"= $Result.Details
+                        "OmittedEvaluationResult"="N/A"
+                        "OmittedEvaluationDetails"="N/A"
+                        "FalsePositiveResult"=$Result.DisplayString
+                        "FalsePositiveDetails"=$Result.Details
+                    }
+                    continue
+                }
+
+                # This is the typical case, the test result is not missing, omitted, or a false positive
                 $ReportSummary[$Result.SummaryKey] += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
@@ -207,6 +294,8 @@ function New-Report {
                     "Details"= $Result.Details
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
+                    "FalsePositiveResult"="N/A"
+                    "FalsePositiveDetails"="N/A"
                 }
             }
             else {
@@ -483,6 +572,36 @@ function Get-OmissionState {
         }
     }
     $Omit
+}
+
+function Get-FalsePositive {
+    <#
+    .Description
+    Determine if the supplied control was marked as a false positive in the config file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+    $FalsePositive = $false
+    if ($Config.psobject.properties.name -Contains "AnnotatePolicy") {
+        if ($Config.AnnotatePolicy.psobject.properties.name -Contains $ControlId) {
+            if ($Config.AnnotatePolicy.$($ControlId).FalsePositive) {
+                $FalsePositive = $true
+            }
+        }
+    }
+    $FalsePositive
 }
 
 function Import-SecureBaseline{
