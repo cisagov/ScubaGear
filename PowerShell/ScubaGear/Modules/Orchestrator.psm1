@@ -90,6 +90,8 @@ function Invoke-SCuBA {
     Set switch to enable report dark mode by default.
     .Parameter Quiet
     Do not launch external browser for report.
+    .Parameter SilenceBODWarnings
+    Do not warn for requirements specific to BOD compliance (e.g., documenting OrgName in the config file).
     .Parameter NumberOfUUIDCharactersToTruncate
     Controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
@@ -261,6 +263,11 @@ function Invoke-SCuBA {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $SilenceBODWarnings,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet(0, 13, 18, 36)]
         [int]
@@ -352,6 +359,13 @@ function Invoke-SCuBA {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
             }
+        }
+
+        if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgUnit) {
+            $Warning = "Config file option OrgUnit not provided. This option is required for BOD "
+            $Warning += "submissions. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use for more details. "
+            $Warning += "This warning can be silenced with the -SilenceBODWarnings parameter"
+            Write-Warning $Warning
         }
 
         if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutActionPlanFileName) {
@@ -456,6 +470,7 @@ function Invoke-SCuBA {
                     'ModuleVersion'        = $ModuleVersion;
                     'FullScubaResultsName' = $FullScubaResultsName;
                     'Guid'                 = $Guid;
+                    'SilenceBODWarnings' = $SilenceBODWarnings;
                 }
                 Merge-JsonOutput @JsonParams
             }
@@ -1062,7 +1077,11 @@ function Merge-JsonOutput {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Guid
+        $Guid,
+
+        [Parameter(Mandatory=$false)]
+        [boolean]
+        $SilenceBODWarnings
     )
     process {
         try {
@@ -1130,10 +1149,10 @@ function Merge-JsonOutput {
                 }
                 $IndividualResults.ReportSummary.PSObject.Properties.Remove('AnnotatedFailedPolicies')
             }
-            if ($FailsNotAnnotated.Length -gt 0) {
+            if (-not $SilenceBODWarnings -and $FailsNotAnnotated.Length -gt 0) {
                 $Warning = "$($FailsNotAnnotated.Length) controls are failing and are not documented in the config file: "
                 $Warning += $FailsNotAnnotated -Join ", "
-                $Warning += ". See https://github.com/cisagov/scubagear/docs/documentation-that-i-havent-written-yet.md for more details."
+                $Warning += ". See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#annotate-policies for more details."
                 Write-Warning $Warning
             }
             foreach ($Product in $Results.PSObject.Properties) {
@@ -1723,6 +1742,8 @@ function Invoke-SCuBACached {
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
+    .Parameter SilenceBODWarnings
+    Do not warn for requirements specific to BOD compliance (e.g., documenting OrgName in the config file).
     .Parameter NumberOfUUIDCharactersToTruncate
     Controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
@@ -1848,6 +1869,11 @@ function Invoke-SCuBACached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $DarkMode,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $SilenceBODWarnings,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -2015,6 +2041,7 @@ function Invoke-SCuBACached {
                     'ModuleVersion' = $ModuleVersion;
                     'FullScubaResultsName' = $FullScubaResultsName;
                     'Guid' = $Guid;
+                    'SilenceBODWarnings' = $SilenceBODWarnings;
                 }
                 Merge-JsonOutput @JsonParams
             }
