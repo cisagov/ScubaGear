@@ -26,6 +26,11 @@ TestPlan:
                 GrantControls:
                   BuiltInControls:
                     - block
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: "Microsoft-managed: Block legacy authentication"
+              updates:
+                state: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.1.1v1 Non-Compliant case - instead of blocking access, requires an approved application
@@ -51,6 +56,11 @@ TestPlan:
                 GrantControls:
                   BuiltInControls:
                     - approvedApplication
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: "Microsoft-managed: Block legacy authentication"
+              updates:
+                state: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.1.1v1 Compliant case
