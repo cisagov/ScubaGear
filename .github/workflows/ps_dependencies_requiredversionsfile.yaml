@@ -1,15 +1,12 @@
 name: Bump RequiredVersions PowerShell Dependencies
-# This workflow bumps the PowerShell dependencies in the PowerShell/ScubaGear/RequiredVersions.ps1 file.
-# It runs on a schedule and can also be triggered manually.
-# The workflow uses the PSScriptAnalyzer and PSDepend modules to analyze and update the dependencies.
-
-permissions:
-  contents: write
 
 on:
   schedule:
     - cron: "15 6 * * 1-5"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   bump-dependencies:
@@ -38,14 +35,14 @@ jobs:
           git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
           $timestamp = Get-Date -Format "yyyyMMddHHmmss"
           $branchName = "bump-dependencies-$timestamp"
-          git branch $branchName
-          git push -u origin $branchName
+          git checkout -b $branchName
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/cisagov/ScubaGear.git HEAD:$branchName
           echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Trigger smoke test workflow
         if: success()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         shell: pwsh
         run: |
@@ -64,7 +61,7 @@ jobs:
       - name: Create pull request
         if: success()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
