@@ -26,11 +26,6 @@ TestPlan:
                 GrantControls:
                   BuiltInControls:
                     - block
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: "Microsoft-managed: Block legacy authentication"
-              updates:
-                state: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.1.1v1 Non-Compliant case - instead of blocking access, requires an approved application
@@ -56,11 +51,6 @@ TestPlan:
                 GrantControls:
                   BuiltInControls:
                     - approvedApplication
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: "Microsoft-managed: Block legacy authentication"
-              updates:
-                state: disabled
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.1.1v1 Compliant case
@@ -1203,7 +1193,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
+              displayName: MS.AAD.3.9v1 Device code authentication SHOULD be blocked
               updates:
                 state: disabled
                 Conditions:
@@ -1228,7 +1218,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
+              displayName: MS.AAD.3.9v1 Device code authentication SHOULD be blocked
               updates:
                 state: enabled
                 Conditions:
