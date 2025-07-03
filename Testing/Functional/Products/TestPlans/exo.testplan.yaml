@@ -24,12 +24,12 @@ TestPlan:
               Updates:
                 spf_records:
                   - domain: bogus1.customdomain.com
+                    compliant: true
                     rdata:
                       - "v=spf1 include:spf.protection.outlook.com -all"
                       - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
                   - domain: bogus2.onmicrosoft.com
-                    rdata:
-                      - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
+                    compliant: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.2.2v2 Compliant case - SPF policy is published for the domains
@@ -39,10 +39,12 @@ TestPlan:
               Updates:
                 spf_records:
                   - domain: bogus1.customdomain.com
+                    compliant: true
                     rdata:
                       - "v=spf1 include:spf.protection.outlook.com -all"
                       - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="
                   - domain: bogus2.onmicrosoft.com
+                    compliant: true
                     rdata:
                       - "v=spf1 include:spf.protection.outlook.com -all"
                       - "mscid=Bn4gB0qhWRMD7Dh4RElnakA+/KDrYmzhXtdxOUlJcbSX7aCxUpA5DHeCW+8BvkeY5ioX8WqoM+Ay44R/m6qh3A=="

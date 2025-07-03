@@ -330,7 +330,7 @@ Describe "Policy Checks for <ProductName>" {
 
                 ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
-                    $Rows.Count | Should -BeGreaterThan 0
+                    #$Rows.Count | Should -BeGreaterThan 0
 
                     if ($Table.GetProperty("id") -eq "tenant-data"){
                         $Rows.Count | Should -BeExactly 2
@@ -339,6 +339,8 @@ Describe "Policy Checks for <ProductName>" {
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
                     }
                     elseif ($Table.GetAttribute("class") -eq "caps_table") {
+                        $Rows.Count | Should -BeGreaterThan 0
+
                         ForEach ($Row in $Rows){
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
@@ -358,13 +360,34 @@ Describe "Policy Checks for <ProductName>" {
                     }
                     elseif ($Table.GetProperty("id") -eq "license-info") {
                         #Currently empty to determine if necessary and what to test in section
+                        $Rows.Count | Should -BeGreaterThan 0
                     }
-                    #Currently checks to make sure there are 4 row headers
                     elseif ($Table.GetProperty("id") -eq "privileged-service-principals"){
+                        $Rows.Count | Should -BeGreaterThan 0
                         $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
                         $RowHeaders.Count | Should -BeExactly 4
                     }
+                    elseif ($null -ne $Table.GetAttribute("class") -and $Table.GetAttribute("class").Contains("dns-table")) {
+                        foreach ($Row in $Rows) {
+                            $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                            $RowData = Get-SeElement -Element $Row -By TagName 'td'
+    
+                            if ($RowHeaders.Count -gt 0){
+                                $RowHeaders.Count | Should -BeExactly 4
+                                $RowHeaders[0].text | Should -BeLikeExactly "Query Name"
+                                $RowHeaders[1].text | Should -BeLikeExactly "Query Method"
+                                $RowHeaders[2].text | Should -BeLikeExactly "Summary"
+                                $RowHeaders[3].text | Should -BeLikeExactly "Answers"
+                            }
+    
+                            if ($RowData.Count -gt 0){
+                                $RowData.Count | Should -BeExactly 4
+                            }
+                        }
+                    }
                     else {
+                        $Rows.Count | Should -BeGreaterThan 0
+
                         # Control report tables
                         ForEach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
