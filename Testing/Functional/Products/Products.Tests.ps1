@@ -330,7 +330,6 @@ Describe "Policy Checks for <ProductName>" {
 
                 ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
-                    #$Rows.Count | Should -BeGreaterThan 0
 
                     if ($Table.GetProperty("id") -eq "tenant-data"){
                         $Rows.Count | Should -BeExactly 2
