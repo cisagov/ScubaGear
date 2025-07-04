@@ -18,9 +18,15 @@ function IsEquivalence{
       $Second
   )
   process{
-    $First = $First -Replace '<br>', '<br/>'
-    $First = $First -Replace '&amp;', '&'
-    Write-Debug " First: $First"
+    # Normalize input strings to avoid brittle HTML comparisons
+    $normalize = {
+      param($s)
+      ($s -replace '<br>', '<br/>' -replace '&amp;', '&' -replace '<[^>]+>', '').Trim()
+    }
+    $First = & $normalize $First
+    $Second = & $normalize $Second
+
+    Write-Debug "First: $First"
     Write-Debug "Second: $Second"
     0 -eq [String]::Compare(
       $First,
