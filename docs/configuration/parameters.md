@@ -445,7 +445,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## SilenceBODWarnings
 
-**SilenceBODWarnings** silences warnings relating to BOD submissions requirements, e.g., the requirement to document `OrgUnit` in the config file.
+**SilenceBODWarnings** silences warnings relating to BOD submissions requirements, e.g., the requirement to document `OrgName` in the config file.
 
 | Parameter   | Value  |
 |-------------|--------|
