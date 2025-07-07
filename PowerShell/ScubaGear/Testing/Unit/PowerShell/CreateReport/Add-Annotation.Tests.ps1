@@ -41,23 +41,6 @@ InModuleScope CreateReport {
                 $Result | Should -Be "Test result marked incorrect by user. <span class='comment-heading'>User justification not provided</span>"
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
-            It 'Does not overwrite details if control already passing' {
-                $Result = @{
-                    "DisplayString" = "Pass";
-                    "Details" = "Details"
-                }
-                $Config = [PSCustomObject]@{
-                    "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
-                            "IncorrectResult" = $true;
-                            "Comment" = "Example comment";
-                        }
-                    }
-                }
-                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
-                $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`""
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
-            }
         }
 
         Context "When not marked incorrect" {

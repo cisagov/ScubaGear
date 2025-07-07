@@ -100,7 +100,7 @@ function Add-Annotation {
         if ([string]::IsNullOrEmpty($UserComment)) {
             # Result marked incorrect, comment not provided
             Write-Warning "Config file marks the result for $($ControlId) as incorrect, but no justification provided."
-            $Details = "Test result marked incorrect by user. <span clafss='comment-heading'>User justification not provided</span>"
+            $Details = "Test result marked incorrect by user. <span class='comment-heading'>User justification not provided</span>"
         }
         else {
             # Result marked incorrect, comment provided
