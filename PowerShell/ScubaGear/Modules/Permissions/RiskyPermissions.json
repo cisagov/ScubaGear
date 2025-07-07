@@ -81,6 +81,21 @@
                 "7f36b48e-542f-4d3b-9bcb-8406f0ab9fdb": "Bookings.Manage.All",
                 "948eb538-f19d-4ec5-9ccc-f059e1ea4c72": "Bookings.ReadWrite.All",
                 "02a5a114-36a6-46ff-a102-954d89d9ab02": "BookingsAppointment.ReadWrite.All",
+                "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42": "Calendars.Read",
+                "1ec239c2-d7c9-4623-a91a-a9775856bb36": "Calendars.ReadWrite",
+                "ff74d97f-43af-4b68-9f2a-b77ee6968c5d": "Contacts.Read",
+                "d56682ec-c09e-4743-aaf4-1a3aac4caa21": "Contacts.ReadWrite",
+                "570282fd-fa5c-430d-a7fd-fc8dc98a9dca": "Mail.Read",
+                "a4b8392a-d8d1-4954-a029-8e668a39a170": "Mail.ReadBasic",
+                "024d486e-b451-40bb-833d-3e66d98c5c73": "Mail.ReadWrite",
+                "e383f46e-2787-4529-855e-0e479a3ffac0": "Mail.Send",
+                "a367ab51-6b49-43bf-a716-a1fb06d2a174": "Mail.Send.Shared",
+                "87f447af-9fa4-4c32-9dfa-4a57a73d18ce": "MailboxSettings.Read",
+                "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All",
+                "204e0828-b5ca-4ad8-b9f3-f32a958e7cc4": "User.ReadWrite.All",
+                "405a51b5-8d8d-430b-9842-8be4b0e9f324": "User.Export.All",
+                "205e70e5-aba6-4c52-a976-6d2d46c48043": "Sites.Read.All",
+                "89fe6a52-be36-487e-b7d8-d061c450a026": "Sites.ReadWrite.All",
             }
         },
         "Office 365 Management APIs": {
@@ -88,26 +103,49 @@
             "4807a72c-ad38-4250-94c9-4eabfe26cd55": "ActivityFeed.ReadDlp"
         },
         "Office 365 Exchange Online": {
-            "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app",
-            "798ee544-9d2d-430c-a058-570e29e34338": "Calendars.Read",
-            "2dfdc6dc-2fa7-4a2c-a922-dbd4f85d17be": "Calendars.Read.All",
-            "ef54d2bf-783f-4e0f-bca1-3210c0444d99": "Calendars.ReadWrite.All",
-            "089fe4d0-434a-44c5-8827-41ba8a0b17f5": "Contacts.Read",
-            "6918b873-d17a-4dc1-b314-35f528134491": "Contacts.ReadWrite",
-            "e2a3a72e-5f79-4c64-b1b1-878b674786c9": "Mail.ReadWrite",
-            "810c84a8-4a9e-49e6-bf7d-12d183f40d01": "Mail.Read",
-            "b633e1c5-b582-4048-a93e-9f11b44c7e96": "Mail.Send",
-            "d45fa9f8-36e5-4cd2-b601-b063c7cf9ac2": "MailboxSettings.Read",
-            "f9156939-25cd-4ba8-abfe-7fabcf003749": "MailboxSettings.ReadWrite",
-            "bf24470f-10c1-436d-8d53-7b997eb473be": "User.Read.All",
-            "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
+            "Application": {
+                "dc890d15-9560-4a4c-9b7f-a736ec74ec40": "full_access_as_app",
+                "798ee544-9d2d-430c-a058-570e29e34338": "Calendars.Read",
+                "2dfdc6dc-2fa7-4a2c-a922-dbd4f85d17be": "Calendars.Read.All",
+                "ef54d2bf-783f-4e0f-bca1-3210c0444d99": "Calendars.ReadWrite.All",
+                "089fe4d0-434a-44c5-8827-41ba8a0b17f5": "Contacts.Read",
+                "6918b873-d17a-4dc1-b314-35f528134491": "Contacts.ReadWrite",
+                "e2a3a72e-5f79-4c64-b1b1-878b674786c9": "Mail.ReadWrite",
+                "810c84a8-4a9e-49e6-bf7d-12d183f40d01": "Mail.Read",
+                "b633e1c5-b582-4048-a93e-9f11b44c7e96": "Mail.Send",
+                "d45fa9f8-36e5-4cd2-b601-b063c7cf9ac2": "MailboxSettings.Read",
+                "f9156939-25cd-4ba8-abfe-7fabcf003749": "MailboxSettings.ReadWrite",
+                "bf24470f-10c1-436d-8d53-7b997eb473be": "User.Read.All",
+                "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
+            },
+            "Delegated": {
+                "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42": "Calendars.Read",
+                "ff74d97f-43af-4b68-9f2a-b77ee6968c5d": "Contacts.Read",
+                "d56682ec-c09e-4743-aaf4-1a3aac4caa21": "Contacts.ReadWrite",
+                "570282fd-fa5c-430d-a7fd-fc8dc98a9dca": "Mail.Read",
+                "024d486e-b451-40bb-833d-3e66d98c5c73": "Mail.ReadWrite",
+                "e383f46e-2787-4529-855e-0e479a3ffac0": "Mail.Send",
+                "87f447af-9fa4-4c32-9dfa-4a57a73d18ce": "MailboxSettings.Read",
+                "818c620a-27a9-40bd-a6a5-d96f7d610b4b": "MailboxSettings.ReadWrite",
+                "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All",
+                "b340eb25-3456-403f-be2f-af7a0d370277": "User.ReadBasic.All",
+            }
         },
         "Office 365 SharePoint Online": {
-            "fbcd29d2-fcca-4405-aded-518d457caae4": "Sites.ReadWrite.All",
-            "d13f72ca-a275-4b96-b789-48ebcc4da984": "Sites.Read.All",
-            "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All",
-            "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
-            "df021288-bdef-4463-88db-98f22de89214": "User.Read.All"
+            "Application": {
+                "fbcd29d2-fcca-4405-aded-518d457caae4": "Sites.ReadWrite.All",
+                "d13f72ca-a275-4b96-b789-48ebcc4da984": "Sites.Read.All",
+                "678536fe-1083-478a-9c59-b99265e6b0d3": "Sites.FullControl.All",
+                "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
+                "df021288-bdef-4463-88db-98f22de89214": "User.Read.All"
+            },
+            "Delegation": {
+                "205e70e5-aba6-4c52-a976-6d2d46c48043": "Sites.Read.All",
+                "89fe6a52-be36-487e-b7d8-d061c450a026": "Sites.ReadWrite.All",
+                "5a54b8b3-347c-476d-8f8e-42d5c7424d29": "Sites.FullControl.All",
+                "204e0828-b5ca-4ad8-b9f3-f32a958e7cc4": "User.ReadWrite.All",
+                "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All",
+            }
         }
     }
 }
