@@ -288,7 +288,7 @@ function New-Report {
                 }
 
                 # Handle incorrect result
-                if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+                if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning" -or $Result.DisplayString -eq "Pass")) {
                     $ReportSummary.IncorrectResults += 1
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
