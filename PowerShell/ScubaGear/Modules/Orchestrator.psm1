@@ -1323,7 +1323,7 @@ function Invoke-ReportCreation {
                 $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
                 $ManualSummary = "<div class='summary'></div>"
                 $OmitSummary = "<div class='summary'></div>"
-                $FalsePositiveSummary = "<div class='summary'></div>"
+                $IncorrectResultSummary = "<div class='summary'></div>"
                 $ErrorSummary = ""
 
                 if ($Report.Passes -gt 0) {
@@ -1350,9 +1350,9 @@ function Invoke-ReportCreation {
                     $OmitSummary = "<div class='summary manual'>$($Report.Omits) omitted</div>"
                 }
 
-                if ($Report.FalsePositives -gt 0) {
-                    $Noun = Pluralize -SingularNoun "false positive" -PluralNoun "false positives" -Count $Report.FalsePositives
-                    $FalsePositiveSummary = "<div class='summary pass'>$($Report.FalsePositives) $Noun</div>"
+                if ($Report.IncorrectResults -gt 0) {
+                    $Noun = Pluralize -SingularNoun "incorrect result" -PluralNoun "incorrect results" -Count $Report.IncorrectResults
+                    $IncorrectResultSummary = "<div class='summary incorrect'>$($Report.IncorrectResults) $Noun</div>"
                 }
 
                 if ($Report.Errors -gt 0) {
@@ -1362,7 +1362,7 @@ function Invoke-ReportCreation {
 
                 $Fragment += [pscustomobject]@{
                 "Baseline Conformance Reports" = $Link;
-                "Details" = "$PassesSummary $WarningsSummary $FailuresSummary $ManualSummary $OmitSummary $FalsePositiveSummary $ErrorSummary"
+                "Details" = "$PassesSummary $WarningsSummary $FailuresSummary $ManualSummary $OmitSummary $IncorrectResultSummary $ErrorSummary"
                 }
             }
             $TenantMetaData += [pscustomobject]@{

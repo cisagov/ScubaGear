@@ -94,21 +94,21 @@ function Add-Annotation {
 
     $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
     $RemediationDateStr = $Config.AnnotatePolicy.$ControlId.RemediationDate
-    $FalsePositive = Get-FalsePositive $Config $ControlId
+    $IncorrectResult = Get-IncorrectResult $Config $ControlId
 
-    if ($FalsePositive -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+    if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning" -or $Result.DisplayString -eq "Pass")) {
         if ([string]::IsNullOrEmpty($UserComment)) {
-            # False positive, comment not provided
-            Write-Warning "Config file documents $($ControlId) as a false positive, but no justification provided."
-            $Details = "Test marked as false positive by user. <span class='comment-heading'>User justification not provided</span>"
+            # Result marked incorrect, comment not provided
+            Write-Warning "Config file marks the result for $($ControlId) as incorrect, but no justification provided."
+            $Details = "Test result marked incorrect by user. <span clafss='comment-heading'>User justification not provided</span>"
         }
         else {
-            # False positive, comment provided
-            $Details = "Test marked as false positive by user. <span class='comment-heading'>User justification</span>`"$UserComment`""
+            # Result marked incorrect, comment provided
+            $Details = "Test result marked incorrect by user. <span class='comment-heading'>User justification</span>`"$UserComment`""
         }
     }
     elseif (-not [string]::IsNullOrEmpty($UserComment)) {
-        # Not false positive, just regular case, add comment if provided
+        # Not incorrect, just regular case, add comment if provided
         $Details = $Result.Details + "<span class='comment-heading'>User comment</span>`"$UserComment`""
         if (-not [string]::IsNullOrEmpty($RemediationDateStr)) {
             $Details = $Details + "<span class='comment-heading'>Anticipated remediation date</span>`"$RemediationDateStr`""
@@ -227,7 +227,7 @@ function New-Report {
         "Failures" = 0;
         "Passes" = 0;
         "Omits" = 0;
-        "FalsePositives" = 0;
+        "IncorrectResults" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -270,41 +270,41 @@ function New-Report {
                         "Details"= $Details
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
-                        "FalsePositiveResult"="N/A"
-                        "FalsePositiveDetails"="N/A"
+                        "IncorrectResult"="N/A"
+                        "IncorrectDetails"="N/A"
                     }
                     continue
                 }
 
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
+                $IncorrectResult = Get-IncorrectResult $Config $Control.Id
                 if ($Result.DisplayString -eq "Fail") {
                     $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                     $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
-                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].FalsePositive = $FalsePositive
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].RemediationDate = $RemediationDate
                 }
 
-                # Handle false positives
-                $FalsePositive = Get-FalsePositive $Config $Control.Id
-                if ($FalsePositive -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
-                    $ReportSummary.FalsePositives += 1
+                # Handle incorrect result
+                if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+                    $ReportSummary.IncorrectResults += 1
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
                         "Requirement"=$Control.Value
-                        "Result"= "False positive"
+                        "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
-                        "FalsePositiveResult"=$Result.DisplayString
-                        "FalsePositiveDetails"=$Result.Details
+                        "IncorrectResult"=$Result.DisplayString
+                        "IncorrectDetails"=$Result.Details
                     }
                     continue
                 }
 
-                # This is the typical case, the test result is not missing, omitted, or a false positive
+                # This is the typical case, the test result is not missing, omitted, or incorrect
                 $ReportSummary[$Result.SummaryKey] += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
@@ -314,8 +314,8 @@ function New-Report {
                     "Details"= $Result.Details
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
-                    "FalsePositiveResult"="N/A"
-                    "FalsePositiveDetails"="N/A"
+                    "IncorrectResult"="N/A"
+                    "IncorrectResultDetails"="N/A"
                 }
             }
             else {
@@ -329,6 +329,8 @@ function New-Report {
                     "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
+                    "IncorrectResult"="N/A"
+                    "IncorrectResultDetails"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
@@ -594,10 +596,10 @@ function Get-OmissionState {
     $Omit
 }
 
-function Get-FalsePositive {
+function Get-IncorrectResult {
     <#
     .Description
-    Determine if the supplied control was marked as a false positive in the config file.
+    Determine if the supplied control result was marked as incorrect in the config file.
     .Functionality
     Internal
     #>
@@ -613,15 +615,15 @@ function Get-FalsePositive {
         [string]
         $ControlId
     )
-    $FalsePositive = $false
+    $IncorrectResult = $false
     if ($Config.psobject.properties.name -Contains "AnnotatePolicy") {
         if ($Config.AnnotatePolicy.psobject.properties.name -Contains $ControlId) {
-            if ($Config.AnnotatePolicy.$($ControlId).FalsePositive) {
-                $FalsePositive = $true
+            if ($Config.AnnotatePolicy.$($ControlId).IncorrectResult) {
+                $IncorrectResult = $true
             }
         }
     }
-    $FalsePositive
+    $IncorrectResult
 }
 
 function Import-SecureBaseline{

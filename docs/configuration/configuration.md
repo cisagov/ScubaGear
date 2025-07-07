@@ -131,17 +131,17 @@ ScubaGear supports annotating results for individual policies. Annotated policie
 annotation appended to the details column. Annotated policies are intended to:
 - Document action plans for any failed controls. ScubaGear will output a warning for any failing controls that are not
 documented in the config file, though this warning can be silenced with the `-SilenceBODWarnings` flag.
-- Allow users to identify false positives
+- Allow users to identify incorrect results
 - Help contextualize results
 
 The `AnnotatePolicy` top-level key, shown in this [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/annotate_policies.yaml), allows the user to specify the policies that should be annotated.
 
 For each annotated policy, the config file allows you to indicate the following:
-- `FalsePositive`: Boolean, whether or not the result is a false positive. Optional, defaults to false.
-- `Comment`: The annotation to add to the report. A warning will be printed if control is marked false positive with no comment provided as justification.
+- `IncorrectResult`: Boolean, whether or not to mark the result incorrect. Optional, defaults to false.
+- `Comment`: The annotation to add to the report. A warning will be printed if control is marked incorrect with no comment provided as justification.
 - `RemediationDate`: Optional. The date a failing control is anticipated to be implemented. The expected format is yyy-mm-dd.
 
-**Exercise care when marking false positives because this can inadvertently introduce blind spots when assessing your system.**
+**Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.**
 
 ## Product-specific Configuration
 

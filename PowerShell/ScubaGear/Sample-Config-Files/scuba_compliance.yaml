@@ -29,7 +29,7 @@ OrgUnitName: Subdepartment of Example
 # for in-depth details
 OmitPolicy: {}
 
-# Policies can be annotated to mark false positives and document plans of action.
+# Policies can be annotated to mark incorrect results and document plans of action.
 # The annotation is appended in the Details column of the HTML report for the applicable
 # controls. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#annotate-policies
 # for in-depth details.

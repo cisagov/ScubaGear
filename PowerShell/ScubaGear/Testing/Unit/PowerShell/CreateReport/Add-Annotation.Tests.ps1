@@ -7,7 +7,7 @@ InModuleScope CreateReport {
             Mock -CommandName Write-Warning {}
         }
 
-        Context "When marked false positive" {
+        Context "When marked incorrect" {
             It 'Handles failing controls' {
                 $Result = @{
                     "DisplayString" = "Fail";
@@ -17,12 +17,12 @@ InModuleScope CreateReport {
                     "AnnotatePolicy" = [PSCustomObject]@{
                         "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
-                            "FalsePositive" = $true;
+                            "IncorrectResult" = $true;
                         }
                     }
                 }
                 $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
-                $Result | Should -Be "Test marked as false positive by user. <span class='comment-heading'>User justification</span>`"Example comment`""
+                $Result | Should -Be "Test result marked incorrect by user. <span class='comment-heading'>User justification</span>`"Example comment`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             It 'Warns if no justification provided' {
@@ -33,12 +33,12 @@ InModuleScope CreateReport {
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
                         "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
-                            "FalsePositive" = $true;
+                            "IncorrectResult" = $true;
                         }
                     }
                 }
                 $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
-                $Result | Should -Be "Test marked as false positive by user. <span class='comment-heading'>User justification not provided</span>"
+                $Result | Should -Be "Test result marked incorrect by user. <span class='comment-heading'>User justification not provided</span>"
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
             It 'Does not overwrite details if control already passing' {
@@ -49,7 +49,7 @@ InModuleScope CreateReport {
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
                         "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
-                            "FalsePositive" = $true;
+                            "IncorrectResult" = $true;
                             "Comment" = "Example comment";
                         }
                     }
@@ -60,7 +60,7 @@ InModuleScope CreateReport {
             }
         }
 
-        Context "When not false positive" {
+        Context "When not marked incorrect" {
             It 'Handles failing controls' {
                 $Result = @{
                     "DisplayString" = "Fail";

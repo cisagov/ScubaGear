@@ -16,8 +16,8 @@ OutRegoFileName: TestResults
 OutReportName: BaselineReports
 AnnotatePolicy:
   MS.EXO.2.2v1:
-    FalsePositive: true
-    Comment: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
+    IncorrectResult: true
+    Comment: "Known incorrect result; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
       horizon setup but is available publicly."
   MS.AAD.3.1v1:
     Comment: Implementation in progress.
