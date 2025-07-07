@@ -206,17 +206,36 @@ tests contains {
     Status := Count(EnvWithoutPolicies) == 0
 }
 
-# Edge case where no policies are found
+# Edge case where no non-default environments and no DLP policies are found
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpPolicy"],
-    "ActualValue": "No DLP Policies found",
-    "ReportDetails": "No DLP Policies found",
+    "ActualValue": "No non-default environments and no DLP policies found",
+    "ReportDetails": "No non-default environments and no DLP policies found",
+    "RequirementMet": true
+} if {
+    some DLPPolicies in input.dlp_policies
+    Count(DLPPolicies.value) <= 0
+
+    NonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+    Count(NonDefaultEnvNames) == 0
+}
+
+# Edge case where non-default environments exist but no DLP policies are found
+tests contains {
+    "PolicyId": "MS.POWERPLATFORM.2.2v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-DlpPolicy"],
+    "ActualValue": "No DLP policies found",
+    "ReportDetails": "No DLP policies found",
     "RequirementMet": false
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) <= 0
+
+    NonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+    Count(NonDefaultEnvNames) > 0
 }
 
 # Edge case where pulling configuration from tenant fails
