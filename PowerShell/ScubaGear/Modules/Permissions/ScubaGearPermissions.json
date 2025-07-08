@@ -1,7 +1,7 @@
 [
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
-        "apiResource": "/roleManagement/directory/roleDefinitions/{id}",
+        "apiResource": "/v1.0/roleManagement/directory/roleDefinitions/{id}",
         "apiFilter": "",
         "apiHeader": [
             { }
@@ -73,8 +73,44 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaServicePrincipal",
+        "apiResource": "/beta/servicePrincipals/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All",
+            "Directory.Read.All",
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
+        ],
+        "notes": ""
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaApplication",
-        "apiResource": "/applications",
+        "apiResource": "/beta/applications",
         "apiFilter": "",
         "apiHeader": [
             { }
@@ -110,8 +146,44 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaApplicationFederatedIdentityCredential",
+        "apiResource": "/beta/applications/{id}/federatedIdentityCredentials",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All",
+            "Directory.Read.All",
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/federatedidentitycredential-get?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": ""
+    },
+
+    {
         "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
-        "apiResource": "/roleManagement/directory/roleAssignments",
+        "apiResource": "/v1.0/roleManagement/directory/roleAssignments",
         "apiFilter": "",
         "apiHeader": [
             { }
@@ -142,7 +214,7 @@
 
     {
         "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/servicePrincipals/{id}/appRoleAssignments",
+        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
         "apiFilter": "",
         "apiHeader": [
             { }

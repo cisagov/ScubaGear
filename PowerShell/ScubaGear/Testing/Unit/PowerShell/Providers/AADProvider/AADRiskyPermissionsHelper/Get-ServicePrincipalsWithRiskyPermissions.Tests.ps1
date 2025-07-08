@@ -17,8 +17,37 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
             function New-MockMgGraphResponseAppRoleAssignments {
+                param (
+                    [int] $Size,
+                    [array] $MockBody
+                )
+
+                $data = @()
+                for ($i = 1; $i -le $Size; $i++) {
+                    $id = "00000000-0000-0000-0000-0000000000{0:D2}" -f ($i * 10)
+                    $mockResponse = @{
+                        id     = $id
+                        status = 200
+                        body   = @{
+                            value = $MockBody
+                        }
+                    }
+                    $data += $mockResponse
+                }
+
+                return $data
+            }
+
+            Mock Get-ServicePrincipalAll { $MockServicePrincipals }
+
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#ServicePrincipal"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
+            function Get-MockMgGraphResponse {
                 param (
                     [int] $Size,
                     [array] $MockBody
@@ -46,7 +75,6 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns a list of service principals with valid properties" {
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
             Mock Invoke-MgGraphRequest {
@@ -100,7 +128,6 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "excludes service principals with no risky permissions" {
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
@@ -124,7 +151,6 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
             Mock Invoke-MgGraphRequest {
                 return @{

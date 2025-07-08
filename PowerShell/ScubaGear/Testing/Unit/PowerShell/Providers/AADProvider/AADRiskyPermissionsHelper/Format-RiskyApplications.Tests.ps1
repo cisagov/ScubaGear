@@ -1,6 +1,8 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
+$PermissionsModule = "$($ModulesPath)/Permissions/PermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsModule)
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyApplications" {
@@ -16,13 +18,25 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockApplications
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplication" -or $Uri -match "/applications" } -ModuleName AADRiskyPermissionsHelper
+              Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockFederatedCredentials
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#applications/$ID/federatedIdentityCredentials"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaApplicationFederatedIdentityCredential" -or $Uri -match "/federatedIdentityCredentials" } -ModuleName AADRiskyPermissionsHelper
+                Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                    "@odata.context" = "https://graph.microsoft.com/beta/$metadata#servicePrincipals"
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(
