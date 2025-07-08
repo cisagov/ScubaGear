@@ -1,3 +1,5 @@
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+
 function Export-PowerPlatformProvider {
     <#
     .Description
@@ -24,112 +26,11 @@ function Export-PowerPlatformProvider {
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
+    $TenantDetails = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
 
-    $TenantDetails = $Tracker.TryCommand("Get-TenantDetailsFromGraph")
-    if ($TenantDetails.Count -gt 0) {
-        $TenantID = $TenantDetails.TenantId
-    }
-    else {
-        $TenantID = ""
-    }
-
-    # Check if M365Enviromment is set correctly
-    $TenantIdConfig = ""
-    try {
-        $Domains = $TenantDetails.Domains
-        $TenantDomain = "Unretrievable"
-        $TLD = ".com"
-        if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
-            $TLD = ".us"
-        }
-        foreach ($Domain in $Domains) {
-            $Name = $Domain.Name
-            $IsInitial = $Domain.initial
-            $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
-            if ($DomainChecker){
-                $TenantDomain = $Name
-            }
-        }
-        $Uri = "https://login.microsoftonline$($TLD)/$($TenantDomain)/.well-known/openid-configuration"
-        $TenantIdConfig = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction "Stop").Content
-    }
-    catch {
-        $EnvCheckWarning = @"
-    Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report.
-    See the 'Running the Script Behind Some Proxies' in the README.md for a possible solution to this warning.
-"@
-        Write-Warning $EnvCheckWarning
-    }
-
-    # Commercial: "tenant_region_scope":"NA"
-    # GCC: "tenant_region_scope":"NA","tenant_region_sub_scope":"GCC",
-    # GCCHigh: "tenant_region_scope":"USGov","tenant_region_sub_scope":"DODCON"
-    # DoD: "tenant_region_scope":"USGov","tenant_region_sub_scope":"DOD"
-    try {
-        if ($TenantIdConfig -ne "") {
-            $TenantIdConfigJson = ConvertFrom-Json $TenantIdConfig
-            $RegionScope = $TenantIdConfigJson.tenant_region_scope
-            $RegionSubScope = $TenantIdConfigJson.tenant_region_sub_scope
-            if (-not $RegionSubScope) {
-                $RegionSubScope = ""
-            }
-
-            $CheckRScope = $true
-            $CheckRSubScope = $true
-            if ($RegionScope -eq "NA" -or $RegionScope -eq "USGov" -or $RegionScope -eq "USG") {
-                switch ($M365Environment) {
-                    "commercial" {
-                        $CheckRScope = $RegionScope -eq "NA"
-                        $CheckRSubScope = $RegionSubScope -eq ""
-                    }
-                    "gcc" {
-                        $CheckRScope = $RegionScope -eq "NA"
-                        $CheckRSubScope = $RegionSubScope -eq "GCC"
-                    }
-                    "gcchigh" {
-                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
-                        $CheckRSubScope = $RegionSubScope -eq "DODCON"
-                    }
-                    "dod" {
-                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
-                        $CheckRSubScope = $RegionSubScope -eq "DOD"
-                    }
-                    default {
-                        throw "Unsupported or invalid M365Environment argument"
-                    }
-                }
-            }
-            # spacing is intentional
-            $EnvErrorMessage = @"
-"Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which WILL cause the Power Platform report to display incorrect values.
-            ---------------------------------------
-            M365Environment Parameter value: $($M365Environment)
-            Your tenant's OpenId-Configuration: tenant_region_scope: $($RegionScope), tenant_region_sub_scope: $($RegionSubScope)
-"@
-            if (-not ($CheckRScope -and $CheckRSubScope)) {
-                throw $EnvErrorMessage
-            }
-        }
-    }
-    catch {
-
-        $FullEnvErrorMessage = @"
-$($_)
-        ---------------------------------------
-        Rerun ScubaGear with the correct M365Environment parameter value
-        by looking at your tenant's OpenId-Configuration displayed above and
-        contrast it with the mapped values in the table below
-        M365Enviroment => OpenId-Configuration
-        ---------------------------------------
-        commercial: tenant_region_scope:NA, tenant_region_sub_scope:
-        gcc: tenant_region_scope:NA, tenant_region_sub_scope: GCC
-        gcchigh : tenant_region_scope:USGov, tenant_region_sub_scope: DODCON
-        dod: tenant_region_scope:USGov, tenant_region_sub_scope: DOD
-        ---------------------------------------
-        Example Rerun for gcc tenants: Invoke-Scuba -M365Environment gcc
-"@
-        throw $FullEnvErrorMessage
-    }
+    $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
+    Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
 
     # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1
     $EnvironmentCreation = ConvertTo-Json @($Tracker.TryCommand("Get-TenantSettings"))
@@ -207,6 +108,141 @@ $($_)
     $json
 }
 
+function Get-TenantDomainInfo {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [object]$TenantDetails,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    $TenantDomain = "Unretrievable"
+    $TLD = ".com"
+    if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
+        $TLD = ".us"
+    }
+
+    foreach ($Domain in $TenantDetails.VerifiedDomains) {
+        $Name = $Domain.Name
+        $IsInitial = $Domain.IsInitial
+        $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
+        if ($DomainChecker){
+            $TenantDomain = $Name
+        }
+    }
+
+    return @{
+        TenantDomain = $TenantDomain;
+        TLD = $TLD;
+    }
+}
+
+function Test-M365EnvironmentConfiguration {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TenantDomain,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TLD,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    $TenantIdConfig = ""
+    try {
+        $Uri = "https://login.microsoftonline$($TLD)/$($TenantDomain)/.well-known/openid-configuration"
+        $TenantIdConfig = (Invoke-WebRequest -Uri $Uri -UseBasicParsing -ErrorAction "Stop").Content
+    }
+    catch {
+        $EnvCheckWarning = @"
+    Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report.
+    See the 'Running the Script Behind Some Proxies' in the README.md for a possible solution to this warning.
+"@
+        Write-Warning $EnvCheckWarning
+    }
+
+    # Commercial: "tenant_region_scope":"NA"
+    # GCC: "tenant_region_scope":"NA","tenant_region_sub_scope":"GCC",
+    # GCCHigh: "tenant_region_scope":"USGov","tenant_region_sub_scope":"DODCON"
+    # DoD: "tenant_region_scope":"USGov","tenant_region_sub_scope":"DOD"
+    try {
+        if ($TenantIdConfig -ne "") {
+            $TenantIdConfigJson = ConvertFrom-Json $TenantIdConfig
+            $RegionScope = $TenantIdConfigJson.tenant_region_scope
+            $RegionSubScope = $TenantIdConfigJson.tenant_region_sub_scope
+            if (-not $RegionSubScope) {
+                $RegionSubScope = ""
+            }
+
+            $CheckRScope = $true
+            $CheckRSubScope = $true
+            if ($RegionScope -eq "NA" -or $RegionScope -eq "USGov" -or $RegionScope -eq "USG") {
+                switch ($M365Environment) {
+                    "commercial" {
+                        $CheckRScope = $RegionScope -eq "NA"
+                        $CheckRSubScope = $RegionSubScope -eq ""
+                    }
+                    "gcc" {
+                        $CheckRScope = $RegionScope -eq "NA"
+                        $CheckRSubScope = $RegionSubScope -eq "GCC"
+                    }
+                    "gcchigh" {
+                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
+                        $CheckRSubScope = $RegionSubScope -eq "DODCON"
+                    }
+                    "dod" {
+                        $CheckRScope = $RegionScope -eq "USGov" -or $RegionScope -eq "USG"
+                        $CheckRSubScope = $RegionSubScope -eq "DOD"
+                    }
+                    default {
+                        throw "Unsupported or invalid M365Environment argument"
+                    }
+                }
+            }
+
+            # spacing is intentional
+            $EnvErrorMessage = @"
+"Power Platform Provider ERROR: The M365Environment parameter value is not set correctly which WILL cause the Power Platform report to display incorrect values.
+            ---------------------------------------
+            M365Environment Parameter value: $($M365Environment)
+            Your tenant's OpenId-Configuration: tenant_region_scope: $($RegionScope), tenant_region_sub_scope: $($RegionSubScope)
+"@
+
+        if (-not ($CheckRScope -and $CheckRSubScope)) {
+                throw $EnvErrorMessage
+            }
+        }
+    }
+    catch {
+
+        $FullEnvErrorMessage = @"
+$($_)
+        ---------------------------------------
+        Rerun ScubaGear with the correct M365Environment parameter value
+        by looking at your tenant's OpenId-Configuration displayed above and
+        contrast it with the mapped values in the table below
+        M365Enviroment => OpenId-Configuration
+        ---------------------------------------
+        commercial: tenant_region_scope:NA, tenant_region_sub_scope:
+        gcc: tenant_region_scope:NA, tenant_region_sub_scope: GCC
+        gcchigh : tenant_region_scope:USGov, tenant_region_sub_scope: DODCON
+        dod: tenant_region_scope:USGov, tenant_region_sub_scope: DOD
+        ---------------------------------------
+        Example Rerun for gcc tenants: Invoke-Scuba -M365Environment gcc
+"@
+        throw $FullEnvErrorMessage
+    }
+}
+
 function Get-PowerPlatformTenantDetail {
     <#
     .Description
@@ -225,28 +261,14 @@ function Get-PowerPlatformTenantDetail {
     Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
     try {
-        $PowerTenantDetails = Get-TenantDetailsFromGraph -ErrorAction "Stop"
-
-        $Domains = $PowerTenantDetails.Domains
-        $TenantDomain = "PowerPlatform: Domain Unretrievable"
-        $TLD = ".com"
-        if (($M365Environment -eq "gcchigh") -or ($M365Environment -eq "dod")) {
-            $TLD = ".us"
-        }
-        foreach ($Domain in $Domains) {
-            $Name = $Domain.Name
-            $IsInitial = $Domain.initial
-            $DomainChecker = $Name.EndsWith(".onmicrosoft$($TLD)") -and !$Name.EndsWith(".mail.onmicrosoft$($TLD)") -and $IsInitial
-            if ($DomainChecker){
-                $TenantDomain = $Name
-            }
-        }
+        $TenantDetails = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
+        $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
 
         $PowerTenantInfo = @{
-            "DisplayName" = $PowerTenantDetails.DisplayName;
-            "DomainName" = $TenantDomain;
-            "TenantId" = $PowerTenantDetails.TenantId
-            "PowerPlatformAdditionalData" = $PowerTenantDetails;
+            "DisplayName" = $TenantDetails.DisplayName;
+            "DomainName" = $DomainInfo.TenantDomain;
+            "TenantId" = $TenantDetails.TenantId;
+            "PowerPlatformAdditionalData" = $TenantDetails;
         }
         $PowerTenantInfo = ConvertTo-Json @($PowerTenantInfo) -Depth 4
         $PowerTenantInfo
