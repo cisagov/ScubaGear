@@ -65,6 +65,77 @@ function Get-RegoResult {
     $Result
 }
 
+function Add-Annotation {
+    <#
+    .Description
+    Adds the annotation provided by the user in the config file to the result details if applicable.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]
+        $Result,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+
+    $Details = $Result.Details
+
+    $UserComment = $Config.AnnotatePolicy.$ControlId.Comment
+    $RemediationDateStr = $Config.AnnotatePolicy.$ControlId.RemediationDate
+    $IncorrectResult = Get-IncorrectResult $Config $ControlId
+
+    if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning" -or $Result.DisplayString -eq "Pass")) {
+        if ([string]::IsNullOrEmpty($UserComment)) {
+            # Result marked incorrect, comment not provided
+            Write-Warning "Config file marks the result for $($ControlId) as incorrect, but no justification provided."
+            $Details = "Test result marked incorrect by user. <span class='comment-heading'>User justification not provided</span>"
+        }
+        else {
+            # Result marked incorrect, comment provided
+            $Details = "Test result marked incorrect by user. <span class='comment-heading'>User justification</span>`"$UserComment`""
+        }
+    }
+    elseif (-not [string]::IsNullOrEmpty($UserComment)) {
+        # Not incorrect, just regular case, add comment if provided
+        $Details = $Result.Details + "<span class='comment-heading'>User comment</span>`"$UserComment`""
+        if (-not [string]::IsNullOrEmpty($RemediationDateStr)) {
+            $Details = $Details + "<span class='comment-heading'>Anticipated remediation date</span>`"$RemediationDateStr`""
+            # Warn if the remediation date is passed and it's still not passing
+            $Now = Get-Date
+            try {
+                $RemediationDate = Get-Date -Date $RemediationDateStr
+                if ($RemediationDate -lt $Now -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning")) {
+                    $Warning = "Anticipated remediation date for $($ControlId), $RemediationDateStr, has passed."
+                    Write-Warning $Warning
+                }
+            }
+            catch {
+                $Warning = "Error parsing the remediation date for $($ControlId), $RemediationDateStr. "
+                $Warning += "The expected format is yyyy-mm-dd."
+                Write-Warning $Warning
+            }
+        }
+    }
+    else {
+        # In all other cases return the details unchanged
+        $Details = $Result.Details
+    }
+
+    $Details
+}
+
 function New-Report {
      <#
     .Description
@@ -156,9 +227,11 @@ function New-Report {
         "Failures" = 0;
         "Passes" = 0;
         "Omits" = 0;
+        "IncorrectResults" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
+        "AnnotatedFailedPolicies" = @{};
     }
 
     foreach ($BaselineGroup in $ProductSecureBaseline) {
@@ -172,32 +245,66 @@ function New-Report {
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
                 $Result = Get-RegoResult $Test $MissingCommands $Control
 
-                # Check if the config file indicates the control should be omitted
                 $Config = $SettingsExport.scuba_config
+
+                # Add annotation if applicable
+                $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
+
+                # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
-                        $OmitRationale = "Rationale not provided."
+                        $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
                     }
                     else {
-                        $OmitRationale = "`"$($OmitRationale)`""
+                        $Details = "Test omitted by user. <span class='comment-heading'>User justification</span>`"$OmitRationale`""
                     }
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
                         "Requirement"=$Control.Value
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
-                        "Details"= "Test omitted by user. $($OmitRationale)"
+                        "Details"= $Details
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
+                        "IncorrectResult"="N/A"
+                        "IncorrectDetails"="N/A"
                     }
                     continue
                 }
 
-                # This is the typical case, the test result is not missing or omitted
+                # If the user commented on a failed control, save the comment to the failed control to comment mapping
+                $IncorrectResult = Get-IncorrectResult $Config $Control.Id
+                if ($Result.DisplayString -eq "Fail") {
+                    $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                    $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].RemediationDate = $RemediationDate
+                }
+
+                # Handle incorrect result
+                if ($IncorrectResult -and ($Result.DisplayString -eq "Fail" -or $Result.DisplayString -eq "Warning" -or $Result.DisplayString -eq "Pass")) {
+                    $ReportSummary.IncorrectResults += 1
+                    $Fragment += [pscustomobject]@{
+                        "Control ID"=$Control.Id
+                        "Requirement"=$Control.Value
+                        "Result"= "Incorrect result"
+                        "Criticality"= $Test.Criticality
+                        "Details"= $Result.Details
+                        "OmittedEvaluationResult"="N/A"
+                        "OmittedEvaluationDetails"="N/A"
+                        "IncorrectResult"=$Result.DisplayString
+                        "IncorrectDetails"=$Result.Details
+                    }
+                    continue
+                }
+
+                # This is the typical case, the test result is not missing, omitted, or incorrect
                 $ReportSummary[$Result.SummaryKey] += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
@@ -207,6 +314,8 @@ function New-Report {
                     "Details"= $Result.Details
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
+                    "IncorrectResult"="N/A"
+                    "IncorrectResultDetails"="N/A"
                 }
             }
             else {
@@ -220,6 +329,8 @@ function New-Report {
                     "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
+                    "IncorrectResult"="N/A"
+                    "IncorrectResultDetails"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
@@ -483,6 +594,36 @@ function Get-OmissionState {
         }
     }
     $Omit
+}
+
+function Get-IncorrectResult {
+    <#
+    .Description
+    Determine if the supplied control result was marked as incorrect in the config file.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Config,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ControlId
+    )
+    $IncorrectResult = $false
+    if ($Config.psobject.properties.name -Contains "AnnotatePolicy") {
+        if ($Config.AnnotatePolicy.psobject.properties.name -Contains $ControlId) {
+            if ($Config.AnnotatePolicy.$($ControlId).IncorrectResult) {
+                $IncorrectResult = $true
+            }
+        }
+    }
+    $IncorrectResult
 }
 
 function Import-SecureBaseline{

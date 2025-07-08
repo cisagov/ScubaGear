@@ -28,6 +28,18 @@ const colorRows = () => {
             else if (rows[i].children[statusCol].innerHTML === "Omitted") {
                 rows[i].style.background = "var(--test-other)";
             }
+            else if (rows[i].children[statusCol].innerHTML === "Incorrect result") {
+                if (rows[i].children[criticalityCol].innerHTML === "Shall") {
+                    rows[i].style.background = "linear-gradient(to right, var(--test-fail), var(--test-pass))";
+                }
+                else if (rows[i].children[criticalityCol].innerHTML === "Should") {
+                    rows[i].style.background = "linear-gradient(to right, var(--test-warning), var(--test-pass))";
+                }
+                else {
+                    // This should never happen
+                    console.log(`Unexpected criticality for incorrect result, ${rows[i].children[criticalityCol].innerHTML}.`);
+                }
+            }
             else if (rows[i].children[criticalityCol].innerHTML.includes("Not-Implemented")) {
                 rows[i].style.background = "var(--test-other)";
             }
