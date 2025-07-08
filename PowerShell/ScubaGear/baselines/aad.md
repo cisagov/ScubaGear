@@ -774,7 +774,7 @@ This policy is based on the ratio below:
 
 #### MS.AAD.7.4v1 Instructions
 
-1. In **Microsoft Entra admin center**  select **Roles and administrators**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
+1. In **Microsoft Entra admin center**  select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 2. Select the **Global administrator role**.
 
@@ -791,7 +791,7 @@ Exception cases:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Microsoft Entra admin center**  select **Roles and administrators**.
+2. In **Microsoft Entra admin center**  select **Roles and admins**.
 
 3. Select the **Global administrator role**.
 
