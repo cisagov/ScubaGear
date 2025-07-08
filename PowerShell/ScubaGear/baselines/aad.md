@@ -536,7 +536,7 @@ An admin consent workflow SHALL be configured for applications.
 
 #### MS.AAD.5.1v1 Instructions
 
-1.  In **Microsoft Entra admin center**, under **Manage**, select **Users**.
+1.  In **Microsoft Entra admin center**, select **Users**.
 
 2. Select **User settings**.
 
@@ -546,7 +546,7 @@ An admin consent workflow SHALL be configured for applications.
 
 #### MS.AAD.5.2v1 Instructions
 
-1.  In **Microsoft Entra admin center**  under **Manage**, select **Enterprise Applications**.
+1.  In **Microsoft Entra admin center** select **Enterprise Applications**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
 
@@ -801,7 +801,7 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal"**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -815,7 +815,7 @@ Exception cases:
 
 #### MS.AAD.7.7v1 Instructions
 
-1.  In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
+1.  In the **Microsoft Entra Portal"**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
@@ -835,7 +835,7 @@ Exception cases:
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In **Microsoft Entra Privileged Identity Management (PIM)**, under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal"**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -898,7 +898,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 ### Resources
 
-- [Configure external collaboration settings](https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure)
+- [Configure external collaboration settings for B2B in Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure)
 
 - [Compare member and guest default permissions](https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions)
 
