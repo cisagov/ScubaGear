@@ -45,45 +45,228 @@ TestPlan:
     Tests:
       - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
         Preconditions:
-          - Command: '(Get-DlpPolicy).value | Where {$_.environments.name -eq (Get-AdminPowerAppEnvironment -Default).EnvironmentName} | Select-Object @{Name="PolicyName"; Expression={$_.name}} | Remove-DlpPolicy'
+          - Command: |
+              $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
+              (Get-DlpPolicy).value | Where { $_.environments.name -eq $DefaultEnv } | Select-Object @{
+                Name="PolicyName"; Expression={$_.name}
+              } | Remove-DlpPolicy
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
         Preconditions:
-          - Command: 'New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName ((Get-AdminPowerAppEnvironment -Default).EnvironmentName)'
+          - Command: |
+              $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
+              $ExistingPolicy = (Get-DlpPolicy).value | Where-Object { $_.environments.name -eq $DefaultEnv }
+              if (-not $ExistingPolicy) {
+                New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName $DefaultEnv
+              }
         Postconditions: []
         ExpectedResult: true
+
+  - PolicyId: MS.POWERPLATFORM.2.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - DLP policy for default environment set to AllEnvironments
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "AllEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                tenant_id: "ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - DLP policy for default environment set to OnlyEnvironments
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                tenant_id: "ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - DLP policy for default environment set to ExceptEnvironments
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                      - displayName: "Exclude DefaultEnv Policy"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+        Postconditions: []
+        ExpectedResult: false
 
   - PolicyId: MS.POWERPLATFORM.2.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - subsequent environments without DLP policies
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - two environments without DLP policies
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 dlp_policies:
                   - value:
-                      - environments:
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
                           - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
                   - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - has DLP policies
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - all environments covered by one DLP policy
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 dlp_policies:
                   - value:
-                      - environments:
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
                           - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                          - name: "Test1"
+                          - name: "Test2"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - all environments covered by two DLP policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                          - name: "Test1"
+                          - name: "Test2"
+                      - displayName: "DLP functional test 2"
+                        environmentType: "OnlyEnvironments"
+                        environments:
+                          - name: "Test2"
+                environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - DLP policy set to environmentType AllEnvironments
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - name: "00000000-0000-0000-0000-000000000000"
+                        displayName: "DLP functional test"
+                        environmentType: "AllEnvironments"
+                        environments: []
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - DLP policy set to environmentType ExceptEnvironments with all environments excluded
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Test1"
+                          - name: "Test2"
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - DLP policy set to environmentType ExceptEnvironments with one environment missing
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value:
+                      - displayName: "DLP functional test"
+                        environmentType: "ExceptEnvironments"
+                        environments:
+                          - name: "Test1"
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Compliant - No non-default environments and no DLP policies found
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value: []
+                environment_list: []
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERPLATFORM.2.2v1 Non-compliant - Non-default environments exist but no DLP policies found
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                dlp_policies:
+                  - value: []
+                environment_list:
+                  - EnvironmentName: "Test1"
+                    IsDefault: false
+                  - EnvironmentName: "Test2"
+                    IsDefault: false
+        Postconditions: []
+        ExpectedResult: false
 
   - PolicyId: MS.POWERPLATFORM.3.1v1
     TestDriver: RunScuba
