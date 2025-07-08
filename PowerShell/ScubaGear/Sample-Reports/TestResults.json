@@ -72,45 +72,67 @@
     },
     {
         "ActualValue":  {
-                            "AdditionalProperties":  {
-                                                         "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
-                                                         "featureSettings":  {
-                                                                                 "companionAppAllowedState":  {
-                                                                                                                  "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
-                                                                                                                  "includeTarget":  "@{id=all_users; targetType=group}",
-                                                                                                                  "state":  "default"
-                                                                                                              },
-                                                                                 "displayAppInformationRequiredState":  {
-                                                                                                                            "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
-                                                                                                                            "includeTarget":  "@{id=all_users; targetType=group}",
-                                                                                                                            "state":  "enabled"
-                                                                                                                        },
-                                                                                 "displayLocationInformationRequiredState":  {
-                                                                                                                                 "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
-                                                                                                                                 "includeTarget":  "@{id=all_users; targetType=group}",
-                                                                                                                                 "state":  "enabled"
-                                                                                                                             },
-                                                                                 "numberMatchingRequiredState":  {
-                                                                                                                     "excludeTarget":  "@{id=00000000-0000-0000-0000-000000000000; targetType=group}",
-                                                                                                                     "includeTarget":  "@{id=all_users; targetType=group}",
-                                                                                                                     "state":  "enabled"
-                                                                                                                 }
-                                                                             },
-                                                         "includeTargets":  [
-                                                                                {
-                                                                                    "authenticationMode":  "any",
-                                                                                    "id":  "all_users",
-                                                                                    "isRegistrationRequired":  false,
-                                                                                    "targetType":  "group"
-                                                                                }
-                                                                            ],
-                                                         "includeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
-                                                         "isSoftwareOathEnabled":  true
-                                                     },
+                            "@odata.type":  "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
                             "ExcludeTargets":  [
 
                                                ],
+                            "FeatureSettings":  {
+                                                    "CompanionAppAllowedState":  {
+                                                                                     "ExcludeTarget":  {
+                                                                                                           "Id":  "00000000-0000-0000-0000-000000000000",
+                                                                                                           "TargetType":  "group"
+                                                                                                       },
+                                                                                     "IncludeTarget":  {
+                                                                                                           "Id":  "all_users",
+                                                                                                           "TargetType":  "group"
+                                                                                                       },
+                                                                                     "State":  "default"
+                                                                                 },
+                                                    "DisplayAppInformationRequiredState":  {
+                                                                                               "ExcludeTarget":  {
+                                                                                                                     "Id":  "00000000-0000-0000-0000-000000000000",
+                                                                                                                     "TargetType":  "group"
+                                                                                                                 },
+                                                                                               "IncludeTarget":  {
+                                                                                                                     "Id":  "all_users",
+                                                                                                                     "TargetType":  "group"
+                                                                                                                 },
+                                                                                               "State":  "enabled"
+                                                                                           },
+                                                    "DisplayLocationInformationRequiredState":  {
+                                                                                                    "ExcludeTarget":  {
+                                                                                                                          "Id":  "00000000-0000-0000-0000-000000000000",
+                                                                                                                          "TargetType":  "group"
+                                                                                                                      },
+                                                                                                    "IncludeTarget":  {
+                                                                                                                          "Id":  "all_users",
+                                                                                                                          "TargetType":  "group"
+                                                                                                                      },
+                                                                                                    "State":  "enabled"
+                                                                                                },
+                                                    "NumberMatchingRequiredState":  {
+                                                                                        "ExcludeTarget":  {
+                                                                                                              "Id":  "00000000-0000-0000-0000-000000000000",
+                                                                                                              "TargetType":  "group"
+                                                                                                          },
+                                                                                        "IncludeTarget":  {
+                                                                                                              "Id":  "all_users",
+                                                                                                              "TargetType":  "group"
+                                                                                                          },
+                                                                                        "State":  "enabled"
+                                                                                    }
+                                                },
                             "Id":  "MicrosoftAuthenticator",
+                            "IncludeTargets":  [
+                                                   {
+                                                       "AuthenticationMode":  "any",
+                                                       "Id":  "all_users",
+                                                       "IsRegistrationRequired":  false,
+                                                       "TargetType":  "group"
+                                                   }
+                                               ],
+                            "IncludeTargets@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations(\u0027MicrosoftAuthenticator\u0027)/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+                            "IsSoftwareOathEnabled":  false,
                             "State":  "enabled"
                         },
         "Commandlet":  [
@@ -118,8 +140,8 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.3.3v2",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  {
@@ -301,19 +323,6 @@
                            "Get-PrivilegedRole"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.7.6v1",
-        "ReportDetails":  "0 role(s) or group(s) allowing activation without approval found",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-MgBetaSubscribedSku",
-                           "Get-PrivilegedRole"
-                       ],
-        "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.8v1",
         "ReportDetails":  "0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found",
         "RequirementMet":  true
@@ -322,10 +331,7 @@
         "ActualValue":  [
                             "Application Administrator",
                             "Exchange Administrator",
-                            "Global Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
+                            "Global Administrator"
                         ],
         "Commandlet":  [
                            "Get-MgBetaSubscribedSku",
@@ -333,7 +339,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.4v1",
-        "ReportDetails":  "6 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Exchange Administrator, Global Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "ReportDetails":  "3 role(s) that contain users with permanent active assignment:\u003cbr/\u003eApplication Administrator, Exchange Administrator, Global Administrator",
         "RequirementMet":  false
     },
     {
@@ -373,10 +379,7 @@
     },
     {
         "ActualValue":  [
-                            "Global Administrator",
-                            "Privileged Role Administrator",
-                            "SharePoint Administrator",
-                            "User Administrator"
+                            "Global Administrator"
                         ],
         "Commandlet":  [
                            "Get-MgBetaSubscribedSku",
@@ -384,7 +387,20 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.5v1",
-        "ReportDetails":  "4 role(s) assigned to users outside of PIM:\u003cbr/\u003eGlobal Administrator, Privileged Role Administrator, SharePoint Administrator, User Administrator",
+        "ReportDetails":  "1 role(s) assigned to users outside of PIM:\u003cbr/\u003eGlobal Administrator",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            "Global Administrator(Directory Role)"
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaSubscribedSku",
+                           "Get-PrivilegedRole"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.7.6v1",
+        "ReportDetails":  "1 role(s) or group(s) allowing activation without approval found:\u003cbr/\u003eGlobal Administrator(Directory Role)",
         "RequirementMet":  false
     },
     {
@@ -1112,137 +1128,6 @@
     },
     {
         "ActualValue":  [
-                            [
-                                {
-                                    "domain":  "tqhjy.onmicrosoft.com",
-                                    "log":  [
-                                                "@{query_method=traditional; query_name=selector1._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=traditional; query_name=selector2._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=traditional; query_name=selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com; query_result=Query returned 2 txt records}"
-                                            ],
-                                    "rdata":  [
-                                                  "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAohoPDhGToRO8y7acaWL2w15wsCmwabxgTwODro2c1BeRYXfnUMStICo3w4ZrYDtGZDSA7hm0x7OHujF1CoQnXiBmrQ154wtomPyx3Op/VC6+b9di4z15XBvhXh/fLBUdEJ6wsybMLmQ+WPQA6vsM3UN5Cv5rl2SylFoM//eLmw5R6NmMIj3GQg9b+vQl2cKNX",
-                                                  "qII2gZrB07P6xt2wW1VA/LPjdRFUEys9YzBgOqM53VaODWDXDIvUH/nPRVAtOEsV19u66jyzZnzcz9a7ATxizix7DnySzI3koVlOGi/+dLx8FYIAZ/75wkH1O/gH8/n4C66uwRm/PMW+4JzVwLY+QIDAQAB;"
-                                              ]
-                                },
-                                {
-                                    "domain":  "tqhjy.mail.onmicrosoft.com",
-                                    "log":  [
-                                                "@{query_method=traditional; query_name=selector1._domainkey.tqhjy.mail.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=traditional; query_name=selector2._domainkey.tqhjy.mail.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=traditional; query_name=selector1-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.mail.onmicrosoft.com; query_result=Query returned NXDomain}",
-                                                "@{query_method=traditional; query_name=selector2-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.mail.onmicrosoft.com; query_result=Query returned NXDomain}"
-                                            ],
-                                    "rdata":  [
-
-                                              ]
-                                }
-                            ],
-                            [
-                                {
-                                    "AdminDisplayName":  "",
-                                    "Algorithm":  "RsaSHA256",
-                                    "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=tqhjy.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
-                                    "Domain":  "tqhjy.onmicrosoft.com",
-                                    "Enabled":  true,
-                                    "ExchangeObjectId":  "ea1866b3-b7fa-4dbe-b9c9-48087391a536",
-                                    "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                    "Guid":  "476371c0-bf15-4101-84a7-a3a03b4266f1",
-                                    "HeaderCanonicalization":  "Relaxed",
-                                    "Id":  "tqhjy.onmicrosoft.com",
-                                    "Identity":  "tqhjy.onmicrosoft.com",
-                                    "IncludeKeyExpiration":  false,
-                                    "IncludeSignatureCreationTime":  true,
-                                    "IsDefault":  true,
-                                    "IsValid":  true,
-                                    "KeyCreationTime":  "/Date(1653603718610)/",
-                                    "LastChecked":  "/Date(1653603718610)/",
-                                    "Name":  "tqhjy.onmicrosoft.com",
-                                    "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
-                                    "ObjectClass":  [
-                                                        "top",
-                                                        "msExchHostedContentFilterConfig"
-                                                    ],
-                                    "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
-                                    "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                    "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                    "RotateOnDate":  "/Date(1653949318610)/",
-                                    "Selector1CNAME":  "selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
-                                    "Selector1KeySize":  2048,
-                                    "Selector1PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
-                                    "Selector2CNAME":  "selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
-                                    "Selector2KeySize":  2048,
-                                    "Selector2PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
-                                    "SelectorAfterRotateOnDate":  "selector2",
-                                    "SelectorBeforeRotateOnDate":  "selector1",
-                                    "Status":  "Valid",
-                                    "WhenChanged":  "/Date(1723812070000)/",
-                                    "WhenChangedUTC":  "/Date(1723812070000)/",
-                                    "WhenCreated":  "/Date(1619484596000)/",
-                                    "WhenCreatedUTC":  "/Date(1619484596000)/"
-                                },
-                                {
-                                    "AdminDisplayName":  "",
-                                    "Algorithm":  "RsaSHA256",
-                                    "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=tqhjy.mail.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
-                                    "Domain":  "tqhjy.mail.onmicrosoft.com",
-                                    "Enabled":  true,
-                                    "ExchangeObjectId":  "7b3222de-5b72-4493-8491-930b8a85faa0",
-                                    "ExchangeVersion":  "0.20 (15.0.0.0)",
-                                    "Guid":  "7b3222de-5b72-4493-8491-930b8a85faa0",
-                                    "HeaderCanonicalization":  "Relaxed",
-                                    "Id":  "tqhjy.mail.onmicrosoft.com",
-                                    "Identity":  "tqhjy.mail.onmicrosoft.com",
-                                    "IncludeKeyExpiration":  false,
-                                    "IncludeSignatureCreationTime":  true,
-                                    "IsDefault":  false,
-                                    "IsValid":  true,
-                                    "KeyCreationTime":  "/Date(1701717485274)/",
-                                    "LastChecked":  "/Date(1739376129647)/",
-                                    "Name":  "tqhjy.mail.onmicrosoft.com",
-                                    "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
-                                    "ObjectClass":  [
-                                                        "top",
-                                                        "msExchHostedContentFilterConfig"
-                                                    ],
-                                    "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
-                                    "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                    "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                    "RotateOnDate":  "/Date(1701717485274)/",
-                                    "Selector1CNAME":  "selector1-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
-                                    "Selector1KeySize":  2048,
-                                    "Selector1PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
-                                    "Selector2CNAME":  "selector2-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
-                                    "Selector2KeySize":  2048,
-                                    "Selector2PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
-                                    "SelectorAfterRotateOnDate":  "selector1",
-                                    "SelectorBeforeRotateOnDate":  "selector2",
-                                    "Status":  "Valid",
-                                    "WhenChanged":  "/Date(1739376140000)/",
-                                    "WhenChangedUTC":  "/Date(1739376140000)/",
-                                    "WhenCreated":  "/Date(1701717486000)/",
-                                    "WhenCreatedUTC":  "/Date(1701717486000)/"
-                                }
-                            ]
-                        ],
-        "Commandlet":  [
-                           "Get-DkimSigningConfig",
-                           "Get-ScubaDkimRecord",
-                           "Get-AcceptedDomain"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.EXO.3.1v1",
-        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.mail.onmicrosoft.com",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
                             {
                                 "AddressBookPolicyRoutingEnabled":  false,
                                 "AdminDisplayName":  "",
@@ -1314,7 +1199,7 @@
                                 "OrganizationFederatedMailbox":  "johndoe@example.com",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
                                 "OtherWellKnownObjects":  [
 
                                                           ],
@@ -1365,8 +1250,8 @@
                                 "TransportRuleSizeLimit":  "8 KB (8,192 bytes)",
                                 "VerifySecureSubmitEnabled":  false,
                                 "VoicemailJournalingEnabled":  true,
-                                "WhenChanged":  "/Date(1744699173000)/",
-                                "WhenChangedUTC":  "/Date(1744699173000)/",
+                                "WhenChanged":  "/Date(1751995521000)/",
+                                "WhenChangedUTC":  "/Date(1751995521000)/",
                                 "WhenCreated":  "/Date(1619484398000)/",
                                 "WhenCreatedUTC":  "/Date(1619484398000)/",
                                 "Xexch50Enabled":  true
@@ -1405,9 +1290,9 @@
                                 "ObjectState":  "Changed",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1742335673000)/",
-                                "WhenChangedUTC":  "/Date(1742335673000)/",
+                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1742335677000)/",
+                                "WhenChangedUTC":  "/Date(1742335677000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
                                 "WhenCreatedUTC":  "/Date(1619484547000)/"
                             }
@@ -1445,9 +1330,9 @@
                                 "ObjectState":  "Changed",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1742335673000)/",
-                                "WhenChangedUTC":  "/Date(1742335673000)/",
+                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1742335677000)/",
+                                "WhenChangedUTC":  "/Date(1742335677000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
                                 "WhenCreatedUTC":  "/Date(1619484547000)/"
                             }
@@ -1489,9 +1374,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1744699720000)/",
-                                "WhenChangedUTC":  "/Date(1744699720000)/",
+                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1751996009000)/",
+                                "WhenChangedUTC":  "/Date(1751996009000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1533,9 +1418,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "BY1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1744699720000)/",
-                                "WhenChangedUTC":  "/Date(1744699720000)/",
+                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1751996009000)/",
+                                "WhenChangedUTC":  "/Date(1751996009000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1565,6 +1450,149 @@
         "RequirementMet":  true
     },
     {
+        "ActualValue":  [
+                            {
+                                "domain":  "tqhjy.onmicrosoft.com",
+                                "log":  [
+                                            {
+                                                "query_answers":  "",
+                                                "query_method":  "traditional",
+                                                "query_name":  "selector1._domainkey.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_answers":  "",
+                                                "query_method":  "DoH",
+                                                "query_name":  "selector1._domainkey.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_answers":  "",
+                                                "query_method":  "traditional",
+                                                "query_name":  "selector2._domainkey.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_answers":  "",
+                                                "query_method":  "DoH",
+                                                "query_name":  "selector2._domainkey.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned NXDomain"
+                                            },
+                                            {
+                                                "query_answers":  "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAohoPDhGToRO8y7acaWL2w15wsCmwabxgTwODro2c1BeRYXfnUMStICo3w4ZrYDtGZDSA7hm0x7OHujF1CoQnXiBmrQ154wtomPyx3Op/VC6+b9di4z15XBvhXh/fLBUdEJ6wsybMLmQ+WPQA6vsM3UN5Cv5rl2SylFoM//eLmw5R6NmMIj3GQg9b+vQl2cKNXqII2gZrB07P6xt2wW1VA/LPjdRFUEys9YzBgOqM53VaODWDXDIvUH/nPRVAtOEsV19u66jyzZnzcz9a7ATxizix7DnySzI3koVlOGi/+dLx8FYIAZ/75wkH1O/gH8/n4C66uwRm/PMW+4JzVwLY+QIDAQAB;",
+                                                "query_method":  "traditional",
+                                                "query_name":  "selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
+                                                "query_result":  "Query returned 1 txt records"
+                                            }
+                                        ],
+                                "rdata":  [
+                                              "v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAohoPDhGToRO8y7acaWL2w15wsCmwabxgTwODro2c1BeRYXfnUMStICo3w4ZrYDtGZDSA7hm0x7OHujF1CoQnXiBmrQ154wtomPyx3Op/VC6+b9di4z15XBvhXh/fLBUdEJ6wsybMLmQ+WPQA6vsM3UN5Cv5rl2SylFoM//eLmw5R6NmMIj3GQg9b+vQl2cKNXqII2gZrB07P6xt2wW1VA/LPjdRFUEys9YzBgOqM53VaODWDXDIvUH/nPRVAtOEsV19u66jyzZnzcz9a7ATxizix7DnySzI3koVlOGi/+dLx8FYIAZ/75wkH1O/gH8/n4C66uwRm/PMW+4JzVwLY+QIDAQAB;"
+                                          ]
+                            },
+                            [
+                                {
+                                    "AdminDisplayName":  "",
+                                    "Algorithm":  "RsaSHA256",
+                                    "BodyCanonicalization":  "Relaxed",
+                                    "DistinguishedName":  "CN=tqhjy.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "Domain":  "tqhjy.onmicrosoft.com",
+                                    "Enabled":  true,
+                                    "ExchangeObjectId":  "ea1866b3-b7fa-4dbe-b9c9-48087391a536",
+                                    "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                    "Guid":  "476371c0-bf15-4101-84a7-a3a03b4266f1",
+                                    "HeaderCanonicalization":  "Relaxed",
+                                    "Id":  "tqhjy.onmicrosoft.com",
+                                    "Identity":  "tqhjy.onmicrosoft.com",
+                                    "IncludeKeyExpiration":  false,
+                                    "IncludeSignatureCreationTime":  true,
+                                    "IsDefault":  true,
+                                    "IsValid":  true,
+                                    "KeyCreationTime":  "/Date(1653603718610)/",
+                                    "LastChecked":  "/Date(1653603718610)/",
+                                    "Name":  "tqhjy.onmicrosoft.com",
+                                    "NumberOfBytesToSign":  "All",
+                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectClass":  [
+                                                        "top",
+                                                        "msExchHostedContentFilterConfig"
+                                                    ],
+                                    "ObjectState":  "Unchanged",
+                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                    "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                    "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "RotateOnDate":  "/Date(1653949318610)/",
+                                    "Selector1CNAME":  "selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
+                                    "Selector1KeySize":  2048,
+                                    "Selector1PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
+                                    "Selector2CNAME":  "selector2-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
+                                    "Selector2KeySize":  2048,
+                                    "Selector2PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
+                                    "SelectorAfterRotateOnDate":  "selector2",
+                                    "SelectorBeforeRotateOnDate":  "selector1",
+                                    "Status":  "Valid",
+                                    "WhenChanged":  "/Date(1723812070000)/",
+                                    "WhenChangedUTC":  "/Date(1723812070000)/",
+                                    "WhenCreated":  "/Date(1619484596000)/",
+                                    "WhenCreatedUTC":  "/Date(1619484596000)/"
+                                },
+                                {
+                                    "AdminDisplayName":  "",
+                                    "Algorithm":  "RsaSHA256",
+                                    "BodyCanonicalization":  "Relaxed",
+                                    "DistinguishedName":  "CN=tqhjy.mail.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=tqhjy.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "Domain":  "tqhjy.mail.onmicrosoft.com",
+                                    "Enabled":  true,
+                                    "ExchangeObjectId":  "7b3222de-5b72-4493-8491-930b8a85faa0",
+                                    "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                    "Guid":  "7b3222de-5b72-4493-8491-930b8a85faa0",
+                                    "HeaderCanonicalization":  "Relaxed",
+                                    "Id":  "tqhjy.mail.onmicrosoft.com",
+                                    "Identity":  "tqhjy.mail.onmicrosoft.com",
+                                    "IncludeKeyExpiration":  false,
+                                    "IncludeSignatureCreationTime":  true,
+                                    "IsDefault":  false,
+                                    "IsValid":  true,
+                                    "KeyCreationTime":  "/Date(1701717485274)/",
+                                    "LastChecked":  "/Date(1739376129647)/",
+                                    "Name":  "tqhjy.mail.onmicrosoft.com",
+                                    "NumberOfBytesToSign":  "All",
+                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectClass":  [
+                                                        "top",
+                                                        "msExchHostedContentFilterConfig"
+                                                    ],
+                                    "ObjectState":  "Unchanged",
+                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
+                                    "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
+                                    "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "RotateOnDate":  "/Date(1701717485274)/",
+                                    "Selector1CNAME":  "selector1-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
+                                    "Selector1KeySize":  2048,
+                                    "Selector1PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
+                                    "Selector2CNAME":  "selector2-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
+                                    "Selector2KeySize":  2048,
+                                    "Selector2PublicKey":  "v=DKIM1; k=rsa; p=Tm90aGluZyB0byBzZWUgaGVyZS4gIE1vdmUgYWxvbmcuLi4gbW92ZSBhbG9uZy4;",
+                                    "SelectorAfterRotateOnDate":  "selector1",
+                                    "SelectorBeforeRotateOnDate":  "selector2",
+                                    "Status":  "Valid",
+                                    "WhenChanged":  "/Date(1739376140000)/",
+                                    "WhenChangedUTC":  "/Date(1739376140000)/",
+                                    "WhenCreated":  "/Date(1701717486000)/",
+                                    "WhenCreatedUTC":  "/Date(1701717486000)/"
+                                }
+                            ]
+                        ],
+        "Commandlet":  [
+                           "Get-DkimSigningConfig",
+                           "Get-ScubaDkimRecord",
+                           "Get-AcceptedDomain"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.EXO.3.1v1",
+        "ReportDetails":  "1 agency domain(s) found in violation: tqhjy.onmicrosoft.com. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
+        "RequirementMet":  false
+    },
+    {
         "ActualValue":  {
                             "AllowedForwardingDomainsFromConfig":  [
 
@@ -1586,12 +1614,34 @@
                             "domain":  "tqhjy.onmicrosoft.com",
                             "log":  [
                                         {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
                                             "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         },
                                         {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
+                                            "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
+                                            "query_name":  "_dmarc.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
                                             "query_name":  "_dmarc.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         }
@@ -1606,7 +1656,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.1v1",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement met. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
         "RequirementMet":  true
     },
     {
@@ -1614,12 +1664,34 @@
                             "domain":  "tqhjy.onmicrosoft.com",
                             "log":  [
                                         {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
                                             "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         },
                                         {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
+                                            "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
+                                            "query_name":  "_dmarc.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
                                             "query_name":  "_dmarc.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         }
@@ -1634,7 +1706,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.2v1",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement met. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
         "RequirementMet":  true
     },
     {
@@ -1642,12 +1714,34 @@
                             "domain":  "tqhjy.onmicrosoft.com",
                             "log":  [
                                         {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
                                             "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         },
                                         {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
+                                            "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
+                                            "query_name":  "_dmarc.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
                                             "query_name":  "_dmarc.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         }
@@ -1662,7 +1756,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.4.3v1",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement met. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
         "RequirementMet":  true
     },
     {
@@ -1670,12 +1764,34 @@
                             "domain":  "tqhjy.onmicrosoft.com",
                             "log":  [
                                         {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
                                             "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         },
                                         {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
+                                            "query_name":  "_dmarc.tqhjy.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
                                             "query_method":  "traditional",
+                                            "query_name":  "_dmarc.onmicrosoft.com",
+                                            "query_result":  "Query returned NXDomain"
+                                        },
+                                        {
+                                            "query_answers":  [
+
+                                                              ],
+                                            "query_method":  "DoH",
                                             "query_name":  "_dmarc.onmicrosoft.com",
                                             "query_result":  "Query returned NXDomain"
                                         }
@@ -1690,7 +1806,7 @@
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.EXO.4.4v1",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement met. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
         "RequirementMet":  true
     },
     {
@@ -1703,7 +1819,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.EXO.2.2v2",
-        "ReportDetails":  "Requirement met",
+        "ReportDetails":  "Requirement met. \u003ca href=\"#dns-logs\"\u003eView DNS logs\u003c/a\u003e for more details.",
         "RequirementMet":  true
     },
     {
@@ -1771,16 +1887,47 @@
         "RequirementMet":  false
     },
     {
-        "ActualValue":  [
+        "ActualValue":  {
+                            "AllEnvironments":  [
+                                                    {
+                                                        "EnvironmentName":  "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
+                                                        "IsDefault":  true
+                                                    }
+                                                ],
+                            "EnvWithoutPolicies":  [
 
-                        ],
+                                                   ],
+                            "NonDefaultEnvWithPolicies":  [
+                                                              {
+                                                                  "environmentType":  "SingleEnvironment",
+                                                                  "name":  "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                                                              }
+                                                          ]
+                        },
+        "Commandlet":  [
+                           "Get-DlpPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERPLATFORM.2.2v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "DefaultEnvPolicies":  [
+                                                       {
+                                                           "DisplayName":  "DLP functional test",
+                                                           "EnvironmentType":  "SingleEnvironment"
+                                                       }
+                                                   ]
+                        },
         "Commandlet":  [
                            "Get-DlpPolicy"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.POWERPLATFORM.2.1v1",
-        "ReportDetails":  "No policy found that applies to default environment",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  [
@@ -1796,16 +1943,14 @@
     },
     {
         "ActualValue":  [
-                            "407cbeff-b477-e3b4-9ca7-097888a9ec4e",
-                            "7ca609ea-489e-e863-9a4c-777cac1aaf8b",
-                            "Default-d6a2a21e-0745-46c1-91ea-5b4172ca8421"
+
                         ],
         "Commandlet":  [
-                           "Get-DlpPolicy"
+
                        ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.POWERPLATFORM.2.2v1",
-        "ReportDetails":  "3 Subsequent environments without DLP policies: 407cbeff-b477-e3b4-9ca7-097888a9ec4e, 7ca609ea-489e-e863-9a4c-777cac1aaf8b, Default-d6a2a21e-0745-46c1-91ea-5b4172ca8421",
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SHAREPOINT.1.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint12v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -1869,19 +2014,6 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.1.1v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-                            0
-                        ],
-        "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.SHAREPOINT.1.2v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
