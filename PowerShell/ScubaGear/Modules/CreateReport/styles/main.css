@@ -190,6 +190,12 @@ img {
     margin-top: 3.125em;
 }
 
+.comment-heading {
+    display: block;
+    font-style: italic;
+    margin-top: 10px;
+}
+
 #caps tr:nth-child(even), .alternating tr:nth-child(even) {
     background-color: var(--cap-even);
 }
