@@ -1,8 +1,8 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force   
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
 
 InModuleScope Connection {
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Permissions/PermissionsHelper.psm1") -Force
-    
+
     Describe -Tag 'Connection' -Name "Connect-Tenant as <Endpoint>" -ForEach @(
         @{Endpoint = 'commercial'},
         @{Endpoint = 'gcc'},
@@ -23,22 +23,18 @@ InModuleScope Connection {
             Mock Add-PowerAppsAccount -MockWith {}
             function Connect-EXOHelper {throw 'this will be mocked'}
             Mock -ModuleName Connection Connect-EXOHelper -MockWith {}
-            function Get-MgBetaOrganization {throw 'this will be mocked'}
-            Mock Get-MgBetaOrganization -MockWith {
+            function Invoke-GraphDirectly {throw 'this will be mocked'}
+            Mock Invoke-GraphDirectly -MockWith {
                 return [pscustomobject]@{
-                    DisplayName     = "DisplayName";
-                    Name            = "DomainName";
-                    Id              = "TenantId";
-                    VerifiedDomains = @(
-                        @{
-                            isInitial = $false;
-                            Name      = "example.onmicrosoft.com"
-                        },
-                        @{
-                            isInitial = $true;
-                            Name      = "contoso.onmicrosoft.com"
-                        }
-                    )
+                    Value = [pscustomobject]@{
+                        DisplayName     = "DisplayName";
+                        Name            = "DomainName";
+                        Id              = "TenantId";
+                        VerifiedDomains = @(
+                            @{ isInitial = $false; Name = "example.onmicrosoft.com" },
+                            @{ isInitial = $true; Name = "contoso.onmicrosoft.com" }
+                        )
+                    }
                 }
             }
             Mock -CommandName Write-Progress {

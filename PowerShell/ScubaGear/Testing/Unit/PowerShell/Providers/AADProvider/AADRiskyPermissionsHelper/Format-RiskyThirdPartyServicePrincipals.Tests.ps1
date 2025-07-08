@@ -1,13 +1,11 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper) -force
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Format-RiskyThirdPartyServicePrincipals" {
         BeforeAll {
             # Import mock data
-            $MockApplications = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockApplications.json") | ConvertFrom-Json
-            $MockFederatedCredentials = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockFederatedCredentials.json") | ConvertFrom-Json
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
             $MockServicePrincipalAppRoleAssignments = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipalAppRoleAssignments.json") | ConvertFrom-Json
             $MockResourcePermissionCacheJson = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockResourcePermissionCache.json") | ConvertFrom-Json
@@ -16,14 +14,9 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-MgBetaApplication { $MockApplications }
-            function Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            function Get-MgBetaServicePrincipal { $MockServicePrincipals }
-            function Get-MgBetaOrganization {}
+            function Get-ServicePrincipalAll { $MockServicePrincipals }
 
-            Mock Get-MgBetaApplication { $MockApplications }
-            Mock Get-MgBetaApplicationFederatedIdentityCredential { $MockFederatedCredentials }
-            Mock Get-MgBetaServicePrincipal { $MockServicePrincipals }
+            Mock Get-ServicePrincipalAll { $MockServicePrincipals }
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(
@@ -51,11 +44,13 @@ InModuleScope AADRiskyPermissionsHelper {
                     )
                 }
             }
-            Mock Get-MgBetaOrganization {
+            Mock Invoke-GraphDirectly {
                 return @{
-                    "Id" = "00000000-0000-0000-0000-000000000000"
+                    "Value" = @{
+                        "Id" = "00000000-0000-0000-0000-000000000000"
+                    }
                 }
-            }
+            } -ParameterFilter { $Commandlet -eq "Get-MgBetaOrganization" -and $M365Environment -eq "gcc" } -ModuleName AADRiskyPermissionsHelper
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
             }
@@ -63,7 +58,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "returns a list of third-party risky service principals with valid properties" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
-            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs
+            $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc"
 
             $ThirdPartySPs | Should -HaveCount 3
 
