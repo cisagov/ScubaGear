@@ -34,7 +34,7 @@ Microsoft Entra ID tenant.
 
 ## Highly Privileged Roles
 
-This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference). This list is referenced in numerous baseline policies throughout this document. Agencies should consider this reference as a minimum list and can apply the respective baseline policies to additional Microsoft Entra ID roles as necessary.
+This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference).
 
 - Global Administrator
 - Privileged Role Administrator
@@ -77,7 +77,7 @@ Legacy authentication SHALL be blocked.
 
 ### Resources
 
-- [Common Conditional Access policy: Block legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy)
+- [Block legacy authentication with Conditional Access](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy)
 
 - [Five steps to securing your identity infrastructure](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)
 
@@ -96,7 +96,7 @@ Legacy authentication SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
 
@@ -152,7 +152,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 - [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
 
-- [User experiences with Microsoft Entra Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
+- [Self-remediation experience with Microsoft Entra ID Protection and Conditional Access](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
 
 ### License Requirements
 
@@ -167,7 +167,7 @@ Sign-ins detected as high risk SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > User risk > <b>High</b>
 
@@ -185,7 +185,7 @@ Sign-ins detected as high risk SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Sign-in risk > <b>High</b>
 
@@ -326,7 +326,7 @@ Device code authentication SHOULD be blocked.
 
 - [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)
 
-- [How to use additional context in Microsoft Authenticator notifications - Authentication methods policy](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
+- [Use additional context in Authenticator notifications - Authentication methods policy](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)
 
 - [M-22-09 Federal Zero Trust Architecture Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)
 
@@ -357,7 +357,7 @@ Device code authentication SHOULD be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
@@ -369,7 +369,7 @@ Device code authentication SHOULD be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
 </pre>
@@ -377,7 +377,7 @@ Device code authentication SHOULD be blocked.
 #### MS.AAD.3.3v2 Instructions
 If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In **Microsoft Entra admin center**, click **Security > Authentication methods > Microsoft Authenticator**.
+1. In **Microsoft Entra admin center**, click **Protection > Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
@@ -390,7 +390,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
 #### MS.AAD.3.5v1 Instructions
-1. In **Microsoft Entra admin center** , click **Security > Authentication methods**
+1. In **Microsoft Entra admin center** , click **Protection > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
 #### MS.AAD.3.6v1 Instructions
@@ -400,7 +400,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > Select users and groups > Directory roles > <b>select each of the roles listed in the Highly Privileged Roles section at the top of this document</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
@@ -412,7 +412,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
@@ -436,7 +436,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Cloud apps >  Include > <b>All cloud apps</b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>
 
