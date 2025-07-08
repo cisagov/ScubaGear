@@ -17,6 +17,7 @@ jobs:
         permissions:
             contents: write
             pull-requests: write
+            actions: write
         defaults:
             run:
                 shell: powershell
@@ -75,3 +76,22 @@ jobs:
                     -CurrentOpaVersion $CurrentOpaVersion `
                     -LatestOpaVersion $LatestOPAVersion `
                     -OpaVersionBumpBranch $OpaVersionBumpBranch
+
+            - name: Trigger smoke test workflow
+              if: steps.determine-update-required.outputs.updaterequired == 'true'
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH_NAME: ${{ steps.determine-update-required.outputs.opaversionbumpbranch }}
+              shell: pwsh
+              run: |
+                 $headers = @{
+                   Authorization = "Bearer $env:GITHUB_TOKEN"
+                   Accept = "application/vnd.github+json"
+                 }
+                 $body = @{
+                    ref = "$env:BRANCH_NAME"
+                 } | ConvertTo-Json
+                 Invoke-RestMethod -Method Post `
+                 -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
+                 -Headers $headers `
+                 -Body $body
