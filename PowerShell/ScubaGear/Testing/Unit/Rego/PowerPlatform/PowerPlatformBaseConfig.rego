@@ -10,6 +10,7 @@ EnvironmentCreation := {
 DlpPolicies := {
     "value": [
         {
+            "name":  "00000000-0000-0000-0000-000000000000",
             "displayName": "Block Third-Party Connectors",
             "connectorGroups": [
                 {
@@ -29,18 +30,33 @@ DlpPolicies := {
                     ]
                 }
             ],
+            "environmentType": "OnlyEnvironments",
             "environments": [
                 {
                     "name": "Default-Test Id"
+                },
+                {
+                    "name": "Test1"
                 }
             ]
         }
     ]
 }
 
-EnvironmentList := {
-    "EnvironmentName": "Default-Test Id"
-}
+EnvironmentList := [
+    {
+        "EnvironmentName": "Default-Test Id",
+        "IsDefault": true,
+    },
+    {
+        "EnvironmentName": "Test1",
+        "IsDefault": false,
+    },
+    {
+        "EnvironmentName": "Test2",
+        "IsDefault": false,
+    }
+]
 
 TenantIsolation := {
     "properties": {
