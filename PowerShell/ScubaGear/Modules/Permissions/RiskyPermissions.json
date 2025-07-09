@@ -60,7 +60,7 @@
                 "a82116e5-55eb-4c41-a434-62fe8a61c773": "Sites.FullControl.All",
                 "01c0a623-fc9b-48e9-b794-0756f8e8f067": "Policy.ReadWrite.ConditionalAccess",
                 "246dd0d5-5bd0-4def-940b-0421030a5b68": "Policy.Read.All",
-                "e125258e-8c8a-42a8-8f55-ab502afa52f3"; "AttackSimulation.ReadWrite.All",
+                "e125258e-8c8a-42a8-8f55-ab502afa52f3": "AttackSimulation.ReadWrite.All",
                 "59a6b24b-4225-4393-8165-ebaec5f55d7a": "Channel.ReadBasic.All",
                 "d9c48af6-9ad9-47ad-82c3-63757137b9af": "Chat.Create",
                 "01d4889c-1287-42c6-ac1f-5d1e02578ef6": "Files.Read.All",
