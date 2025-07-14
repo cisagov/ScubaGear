@@ -801,7 +801,7 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In the **Microsoft Entra Portal"**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
