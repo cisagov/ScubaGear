@@ -89,7 +89,7 @@ function Format-Permission {
         $IsAdminConsented
     )
 
-    $RiskyPermissions = $Json.permissions.$AppDisplayName.PSObject.Properties.Name
+    $RiskyPermissions = $Json.permissions.$RoleType.$AppDisplayName.PSObject.Properties.Name
     $Map = @()
     $IsRisky = $RiskyPermissions -contains $Id
 
