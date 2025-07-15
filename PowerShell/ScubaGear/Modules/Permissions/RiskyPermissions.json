@@ -77,7 +77,7 @@
                 "bdfbf15f-ee85-4955-8675-146e8e5296b5": "Application.ReadWrite.All",
                 "84bccea3-f856-4a8a-967b-dbe0a3d53a64": "AppRoleAssignment.ReadWrite.All",
                 "6768d3af-4562-48ff-82d2-c5e19eb21b9c": "ApprovalSolution.ReadWrite",
-                "89d944f2-2011-44ad-830c-aa9bf5ef2319": "ApprovalSolutionResponse.ReadWrite", #TODO maybe this one?
+                "89d944f2-2011-44ad-830c-aa9bf5ef2319": "ApprovalSolutionResponse.ReadWrite", 
                 "ba6d575a-1344-4516-b777-1404f5593057": "AuthenticationContext.ReadWrite.All",
                 "a0244d16-171c-4496-8ffb-7b9b6954d339": "BackupRestore-Configuration.ReadWrite.All",
                 "96d46335-d92d-41b8-bc9f-273a692381ea": "BackupRestore-Control.ReadWrite.All",
