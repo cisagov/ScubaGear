@@ -88,11 +88,10 @@ function Format-Permission {
         [boolean]
         $IsAdminConsented
     )
+    $Map = @()
     if ( $RoleType -ne $null) {
         $RiskyPermissions = $Json.permissions.$RoleType.$AppDisplayName.PSObject.Properties.Name
-        $Map = @()
         $IsRisky = $RiskyPermissions -contains $Id
-    
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
             RoleType               = if ($null -ne $RoleType) { $RoleType } else { $null }
@@ -101,8 +100,8 @@ function Format-Permission {
             IsAdminConsented       = $IsAdminConsented
             IsRisky                = $IsRisky
         }
-        return $Map
     }
+    return $Map
 }
 
 function Format-Credentials {
