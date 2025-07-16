@@ -380,7 +380,7 @@ jobs:
     needs:
       - Def_Tenant7
     concurrency:
-      group: Defender_Tenant3
+      group: Defender_Tenant7
       cancel-in-progress: false
     steps:
       - name: Checkout Repo
@@ -416,7 +416,7 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant3_G5
+          Alias: Def_Tenant7_G5
           TestParams: ${{ secrets.TestParams }}
   email:
     name: Email
