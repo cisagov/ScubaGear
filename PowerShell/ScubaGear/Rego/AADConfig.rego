@@ -754,23 +754,40 @@ tests contains {
 # MS.AAD.6.1v1
 #--
 
-# User passwords are set to not expire if they equal INT_MAX
-UserPasswordsSetToNotExpire contains Domain.Id if {
-    some Domain in input.domain_settings
-    Domain.PasswordValidityPeriodInDays == INT_MAX
-    Domain.IsVerified == true
-
-    # Ignore federated domains
-    Domain.AuthenticationType == "Managed"
+RootDomains := {
+    d | some d in input.domain_settings; 
+    d.IsRoot == true; d.IsVerified == true; d.AuthenticationType == "Managed"
 }
 
-UserPasswordsSetToExpire contains Domain.Id if {
-    some Domain in input.domain_settings
-    Domain.PasswordValidityPeriodInDays != INT_MAX
-    Domain.IsVerified == true
+RootDomainFor(Domain) := Root.Id if {
+    some Root in RootDomains
+    endswith(Domain.Id, Root.Id)
+}
 
-    # Ignore federated domains
+IsDomainExpired(Domain) := true if {
+    Domain.IsRoot = true
+    Domain.PasswordValidotyPeriodInDays != INT_MAX
+} else := true if {
+    Domain.IsRoot == false
+    RootDomainFor(Domain) != null
+    some Root in RootDomains
+    Root.Id == RootDomainFor(Domain)
+    Root.PasswordValidityPeriodInDays != INT_MAX
+} else := false
+
+
+ValidDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
+    not IsDomainExpired(Domain)
+}
+
+InvalidDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
+    Domain.AuthenticationType == "Managed"
+    IsDomainExpired(Domain)
 }
 
 FederatedDomains contains Domain.Id if {
@@ -783,11 +800,10 @@ tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
-    # Track invalid/valid/federated domains for use in TestResults.json
-    "ActualValue": { 
-        "invalid_domains": UserPasswordsSetToExpire, 
-        "valid_domains": UserPasswordsSetToNotExpire,
-        "federated_domains": FederatedDomains
+    "ActualValue": {
+        "ValidDomains": ValidDomains,
+        "InvalidDomains": InvalidDomains,
+        "FederatedDomains": FederatedDomains
     },
     "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
@@ -796,12 +812,12 @@ tests contains {
     # User passwords for all domains shall not expire
     # Then check if at least 1 or more domains with user passwords set to expire exist
     Conditions := [
-        Count(UserPasswordsSetToExpire) == 0, 
-        Count(UserPasswordsSetToNotExpire) > 0
+        Count(InvalidDomains) == 0, 
+        Count(ValidDomains) > 0
     ]
     Status := Count(FilterArray(Conditions, true)) == 2
     Metadata := {
-        "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
+        "InvalidDomains": InvalidDomains,
         "FederatedDomains": FederatedDomains
     }
 }

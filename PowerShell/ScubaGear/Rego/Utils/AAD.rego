@@ -172,10 +172,10 @@ FederatedDomainWarning(domains) := concat("<br/><br/>", [
     FederatedDomainWarningString
 ])
 
-# Case 1: Pass; no user passwords set to expire, no federated domains 
-# Case 2: Pass; no user passwords set to expire, federated domains 
-# Case 3: Fail; user passwords set to expire, no federated domains 
-# Case 4: Fail; user passwords set to expire, federated domains 
+# Case 1: Pass; all valid domains, no federated domains
+# Case 2: Pass; all valid domains, federated domains
+# Case 3: Fail; invalid domains exist, no federated domains
+# Case 4: Fail; invalid domains exist, federated domains
 # Default: Fail
 
 DomainReportDetails(Status, Metadata) := PASS if {
@@ -191,15 +191,15 @@ DomainReportDetails(Status, Metadata) := PASS if {
     ])
 } else := Description if {
     Status == false
-    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.InvalidDomains) > 0
     count(Metadata.FederatedDomains) == 0
-    Description := ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString)
+    Description := ReportFullDetailsArray(Metadata.InvalidDomains, FailureString)
 } else := Description if {
     Status == false
-    count(Metadata.UserPasswordsSetToExpire) > 0
+    count(Metadata.InvalidDomains) > 0
     count(Metadata.FederatedDomains) > 0
     Description := concat("<br/><br/>", [
-        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString),
+        ReportFullDetailsArray(Metadata.InvalidDomains, FailureString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
