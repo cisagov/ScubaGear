@@ -323,6 +323,101 @@ jobs:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Ent_Tenant6_G5
           TestParams: ${{ secrets.TestParams }}
+  Ent_Tenant7:
+    name: Ent_Tenant7
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: Entra_Tenant7
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Ent_Tenant7
+          TestParams: ${{ secrets.TestParams }}
+  Ent_Tenant7_G5:
+    name: Ent_Tenant7_G5
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    if: ${{ always() }}
+    needs:
+      - Ent_Tenant7
+    concurrency:
+      group: Entra_Tenant7
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Ent_Tenant7_G5
+          TestParams: ${{ secrets.TestParams }}
   email:
     name: Email
     runs-on: windows-latest
@@ -333,6 +428,8 @@ jobs:
       - Ent_Tenant2_G3
       - Ent_Tenant6
       - Ent_Tenant6_G5
+      - Ent_Tenant7
+      - Ent_Tenant7_G5
     if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
     steps:
       - name: Checkout Repo
