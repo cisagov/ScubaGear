@@ -764,30 +764,33 @@ RootDomainFor(Domain) := Root.Id if {
     endswith(Domain.Id, Root.Id)
 }
 
-IsDomainExpired(Domain) := true if {
+IsDomainValid(Domain) := true if {
+    print("Domain: ", Domain.Id, "password validity is ", Domain.PasswordValidityPeriodInDays)
     Domain.IsRoot = true
-    Domain.PasswordValidotyPeriodInDays != INT_MAX
+    Domain.PasswordValidityPeriodInDays == INT_MAX
 } else := true if {
+    print("subdomain: ", Domain.Id)
     Domain.IsRoot == false
     RootDomainFor(Domain) != null
     some Root in RootDomains
     Root.Id == RootDomainFor(Domain)
-    Root.PasswordValidityPeriodInDays != INT_MAX
+    print(Root.Id, " should be equal to ", RootDomainFor(Domain))
+    Root.PasswordValidityPeriodInDays == INT_MAX
+    print("password validity is ", Root.PasswordValidityPeriodInDays)
 } else := false
-
 
 ValidDomains contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
-    not IsDomainExpired(Domain)
+    IsDomainValid(Domain)
 }
 
 InvalidDomains contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
-    IsDomainExpired(Domain)
+    not IsDomainValid(Domain)
 }
 
 FederatedDomains contains Domain.Id if {
@@ -808,18 +811,18 @@ tests contains {
     "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
-    # For the rule to pass:
-    # User passwords for all domains shall not expire
-    # Then check if at least 1 or more domains with user passwords set to expire exist
     Conditions := [
-        Count(InvalidDomains) == 0, 
-        Count(ValidDomains) > 0
+        Count(ValidDomains) > 0,
+        Count(InvalidDomains) == 0
     ]
     Status := Count(FilterArray(Conditions, true)) == 2
     Metadata := {
         "InvalidDomains": InvalidDomains,
         "FederatedDomains": FederatedDomains
     }
+
+    print(ValidDomains)
+    print(InvalidDomains)
 }
 #--
 
