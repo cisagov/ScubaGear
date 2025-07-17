@@ -821,8 +821,8 @@ tests contains {
         "FederatedDomains": FederatedDomains
     }
 
-    print(ValidDomains)
-    print(InvalidDomains)
+    print("valid domains: ", ValidDomains)
+    print("invalid domains: ", InvalidDomains)
 }
 #--
 
