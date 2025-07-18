@@ -754,9 +754,11 @@ tests contains {
 # MS.AAD.6.1v1
 #--
 
-RootDomains := {
-    d | some d in input.domain_settings; 
-    d.IsRoot == true; d.IsVerified == true; d.AuthenticationType == "Managed"
+RootDomains contains Domain if {
+    some Domain in input.domain_settings
+    Domain.IsRoot == true
+    Domain.IsVerified == true
+    Domain.AuthenticationType == "Managed"
 }
 
 RootDomainFor(Domain) := Root.Id if {
