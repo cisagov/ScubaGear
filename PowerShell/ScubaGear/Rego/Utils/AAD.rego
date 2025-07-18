@@ -180,10 +180,10 @@ FederatedDomainWarning(domains) := concat("<br/><br/>", [
 
 DomainReportDetails(Status, Metadata) := PASS if {
     Status == true
-    count(Metadata.FederatedDomains) == 0
+    Count(Metadata.FederatedDomains) == 0
 } else := Description if {
     Status == true
-    count(Metadata.FederatedDomains) > 0
+    Count(Metadata.FederatedDomains) > 0
     Description := concat("", [
         PASS, 
         "; however, there are ", 
@@ -191,13 +191,13 @@ DomainReportDetails(Status, Metadata) := PASS if {
     ])
 } else := Description if {
     Status == false
-    count(Metadata.InvalidDomains) > 0
-    count(Metadata.FederatedDomains) == 0
+    Count(Metadata.InvalidDomains) > 0
+    Count(Metadata.FederatedDomains) == 0
     Description := ReportFullDetailsArray(Metadata.InvalidDomains, FailureString)
 } else := Description if {
     Status == false
-    count(Metadata.InvalidDomains) > 0
-    count(Metadata.FederatedDomains) > 0
+    Count(Metadata.InvalidDomains) > 0
+    Count(Metadata.FederatedDomains) > 0
     Description := concat("<br/><br/>", [
         ReportFullDetailsArray(Metadata.InvalidDomains, FailureString),
         FederatedDomainWarning(Metadata.FederatedDomains)

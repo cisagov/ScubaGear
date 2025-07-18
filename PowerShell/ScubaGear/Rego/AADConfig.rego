@@ -764,33 +764,29 @@ RootDomainFor(Domain) := Root.Id if {
     endswith(Domain.Id, Root.Id)
 }
 
-IsDomainValid(Domain) := true if {
-    print("Domain: ", Domain.Id, "password validity is ", Domain.PasswordValidityPeriodInDays)
+IsValid(Domain) := true if {
     Domain.IsRoot = true
     Domain.PasswordValidityPeriodInDays == INT_MAX
 } else := true if {
-    print("subdomain: ", Domain.Id)
     Domain.IsRoot == false
     RootDomainFor(Domain) != null
     some Root in RootDomains
     Root.Id == RootDomainFor(Domain)
-    print(Root.Id, " should be equal to ", RootDomainFor(Domain))
     Root.PasswordValidityPeriodInDays == INT_MAX
-    print("password validity is ", Root.PasswordValidityPeriodInDays)
 } else := false
 
 ValidDomains contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
-    IsDomainValid(Domain)
+    IsValid(Domain)
 }
 
 InvalidDomains contains Domain.Id if {
     some Domain in input.domain_settings
     Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
-    not IsDomainValid(Domain)
+    not IsValid(Domain)
 }
 
 FederatedDomains contains Domain.Id if {
@@ -820,9 +816,6 @@ tests contains {
         "InvalidDomains": InvalidDomains,
         "FederatedDomains": FederatedDomains
     }
-
-    print("valid domains: ", ValidDomains)
-    print("invalid domains: ", InvalidDomains)
 }
 #--
 
