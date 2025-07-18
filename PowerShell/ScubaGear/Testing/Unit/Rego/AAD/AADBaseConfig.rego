@@ -104,33 +104,46 @@ DirectorySettings := {
 
 DomainSettings := [
     {
-        "Id": "test.url.com",
+        "Id": "root1.com",
         "PasswordValidityPeriodInDays": INT_MAX,
         "IsVerified": true,
-        "AuthenticationType": "Managed"
+        "AuthenticationType": "Managed",
+        "IsRoot": true
     },
     {
-        "Id": "test1.url.com",
+        "Id": "root2.com",
         "PasswordValidityPeriodInDays": INT_MAX,
         "IsVerified": true,
-        "AuthenticationType": "Managed"
+        "AuthenticationType": "Managed",
+        "IsRoot": true
     },
     {
-        "Id": "test2.url.com",
-        "PasswordValidityPeriodInDays": INT_MAX,
+        "Id": "sub.root1.com",
+        "PasswordValidityPeriodInDays": null,
         "IsVerified": true,
-        "AuthenticationType": "Managed"
+        "AuthenticationType": "Managed",
+        "IsRoot": false
     },
     {
-        "Id": "test3.url.com",
-        "PasswordValidityPeriodInDays": INT_MAX,
+        "Id": "sub.root2.com",
+        "PasswordValidityPeriodInDays": null,
         "IsVerified": true,
-        "AuthenticationType": "Managed"
+        "AuthenticationType": "Managed",
+        "IsRoot": false
     },
     {
-        "Id": "test4.url.com",
+        "Id": "unverified.domain.com",
+        "PasswordValidityPeriodInDays": null,
+        "IsVerified": false,
+        "AuthenticationType": "Managed",
+        "IsRoot": false
+    },
+    {
+        "Id": "federated.domain.com",
+        "PasswordValidityPeriodInDays": null,
         "IsVerified": true,
-        "AuthenticationType": "Federated"
+        "AuthenticationType": "Federated",
+        "IsRoot": false
     }
 ]
 
