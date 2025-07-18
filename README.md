@@ -58,7 +58,9 @@ To run ScubaGear:
 Invoke-SCuBA -ProductNames *
 ```
 
-> **Note**:  Successfully running ScubaGear requires certain prerequisites and configuration settings.  To learn more, read through the sections below.
+> **Note**:  Successfully running ScubaGear requires certain [prerequisites](https://github.com/cisagov/ScubaGear/tree/main?tab=readme-ov-file#prerequisites) and [configuration settings](https://github.com/cisagov/ScubaGear/tree/main?tab=readme-ov-file#configuration).  To learn more, read through the sections below.
+
+> **Note**:  The [SCuBA compliance](PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks. To learn more, read through the [SCuBA compliance use](https://github.com/cisagov/ScubaGear/edit/main/docs/configuration/configuration.md#scuba-compliance-use) section.
 
 ## Table of Contents
 
