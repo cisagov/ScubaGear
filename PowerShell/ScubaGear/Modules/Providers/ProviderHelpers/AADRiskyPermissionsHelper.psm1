@@ -53,7 +53,7 @@ function Get-RiskyPermissionsJson {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        Write-Error -Message $PermissionsJson
+        Write-Error -Message "This is the json: $($PermissionsJson)"
         return $PermissionsJson
     }
 }
