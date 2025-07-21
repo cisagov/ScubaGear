@@ -5,7 +5,7 @@
         "00000003-0000-0ff1-ce00-000000000000": "Office 365 SharePoint Online",
         "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs"
     },
-    "permissions": { 
+    "permissions": {
         "Microsoft Graph": {
             "Application": {
                 "9769393e-5a9f-4302-9e3d-7e018ecb64a7": "BookingsAppointment.ReadWrite.All",
@@ -34,7 +34,7 @@
                 "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
                 "df021288-bdef-4463-88db-98f22de89214": "User.Read.All",
                 "405a51b5-8d8d-430b-9842-8be4b0e9f324": "User.Export.All",
-                "5b567255-7703-4780-807c-7be8301ae99b": "Group.Read.All", 
+                "5b567255-7703-4780-807c-7be8301ae99b": "Group.Read.All",
                 "62a82d76-70ea-41e2-9197-370581804d09": "Group.ReadWrite.All",
                 "98830695-27a2-44f7-8c18-0c3ebc9698f6": "GroupMember.Read.All",
                 "dbaae8cf-10b5-4b86-a4a1-f871c94c6695": "GroupMember.ReadWrite.All",
@@ -77,7 +77,7 @@
                 "bdfbf15f-ee85-4955-8675-146e8e5296b5": "Application.ReadWrite.All",
                 "84bccea3-f856-4a8a-967b-dbe0a3d53a64": "AppRoleAssignment.ReadWrite.All",
                 "6768d3af-4562-48ff-82d2-c5e19eb21b9c": "ApprovalSolution.ReadWrite",
-                "89d944f2-2011-44ad-830c-aa9bf5ef2319": "ApprovalSolutionResponse.ReadWrite", 
+                "89d944f2-2011-44ad-830c-aa9bf5ef2319": "ApprovalSolutionResponse.ReadWrite",
                 "ba6d575a-1344-4516-b777-1404f5593057": "AuthenticationContext.ReadWrite.All",
                 "a0244d16-171c-4496-8ffb-7b9b6954d339": "BackupRestore-Configuration.ReadWrite.All",
                 "96d46335-d92d-41b8-bc9f-273a692381ea": "BackupRestore-Control.ReadWrite.All",
