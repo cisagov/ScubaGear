@@ -90,6 +90,8 @@ function Invoke-SCuBA {
     Set switch to enable report dark mode by default.
     .Parameter Quiet
     Do not launch external browser for report.
+    .Parameter SilenceBODWarnings
+    Do not warn for requirements specific to BOD compliance (e.g., documenting OrgName in the config file).
     .Parameter NumberOfUUIDCharactersToTruncate
     Controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
@@ -261,6 +263,11 @@ function Invoke-SCuBA {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $SilenceBODWarnings,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet(0, 13, 18, 36)]
         [int]
@@ -352,6 +359,13 @@ function Invoke-SCuBA {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
             }
+        }
+
+        if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgName) {
+            $Warning = "Config file option OrgName not provided. This option is required for BOD "
+            $Warning += "submissions. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use for more details. "
+            $Warning += "This warning can be silenced with the -SilenceBODWarnings parameter"
+            Write-Warning $Warning
         }
 
         if ($ScubaConfig.OutCsvFileName -eq $ScubaConfig.OutActionPlanFileName) {
@@ -456,6 +470,7 @@ function Invoke-SCuBA {
                     'ModuleVersion'        = $ModuleVersion;
                     'FullScubaResultsName' = $FullScubaResultsName;
                     'Guid'                 = $Guid;
+                    'SilenceBODWarnings' = $SilenceBODWarnings;
                 }
                 Merge-JsonOutput @JsonParams
             }
@@ -1062,7 +1077,11 @@ function Merge-JsonOutput {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Guid
+        $Guid,
+
+        [Parameter(Mandatory=$false)]
+        [boolean]
+        $SilenceBODWarnings
     )
     process {
         try {
@@ -1085,9 +1104,10 @@ function Merge-JsonOutput {
                 $ProductAbbreviationMapping[$ProdToFullName[$BaselineName]] = $BaselineName
             }
 
-            # Extract the metadata
             $Results = [pscustomobject]@{}
             $Summary = [pscustomobject]@{}
+            $AnnotatedFailedPolicies = [pscustomobject]@{}
+            # Extract the metadata
             $MetaData = [pscustomobject]@{
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
@@ -1104,6 +1124,7 @@ function Merge-JsonOutput {
 
             # Aggregate the report results and summaries
             $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
+            $FailsNotAnnotated = @()
             foreach ($Product in $ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
@@ -1117,6 +1138,22 @@ function Merge-JsonOutput {
                 $IndividualResults.ReportSummary.PSObject.Properties.Remove('Date')
                 $Summary | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.ReportSummary
+
+                # Collect the annotated failed policies into a single object
+                foreach ($Annotation in $IndividualResults.ReportSummary.AnnotatedFailedPolicies.PSObject.Properties) {
+                    if ($null -eq $Annotation.Value.Comment) {
+                        $FailsNotAnnotated += $Annotation.Name
+                    }
+                    $AnnotatedFailedPolicies | Add-Member -NotePropertyName $Annotation.Name `
+                        -NotePropertyValue $Annotation.Value
+                }
+                $IndividualResults.ReportSummary.PSObject.Properties.Remove('AnnotatedFailedPolicies')
+            }
+            if (-not $SilenceBODWarnings -and $FailsNotAnnotated.Length -gt 0) {
+                $Warning = "$($FailsNotAnnotated.Length) controls are failing and are not documented in the config file: "
+                $Warning += $FailsNotAnnotated -Join ", "
+                $Warning += ". See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#annotate-policies for more details."
+                Write-Warning $Warning
             }
             foreach ($Product in $Results.PSObject.Properties) {
                 foreach ($Group in $Product.Value) {
@@ -1131,10 +1168,12 @@ function Merge-JsonOutput {
             $MetaData = ConvertTo-Json $MetaData -Depth 3
             $Results = ConvertTo-Json $Results -Depth 5
             $Summary = ConvertTo-Json $Summary -Depth 3
+            $AnnotatedFailedPolicies = ConvertTo-Json $AnnotatedFailedPolicies -Depth 3
             $ReportJson = @"
 {
     "MetaData": $MetaData,
     "Summary": $Summary,
+    "AnnotatedFailedPolicies": $AnnotatedFailedPolicies,
     "Results": $Results,
     "Raw": $SettingsExport
 }
@@ -1284,6 +1323,7 @@ function Invoke-ReportCreation {
                 $BaselineURL = "<a href= `"https://github.com/cisagov/ScubaGear/blob/v$($ModuleVersion)/baselines`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
                 $ManualSummary = "<div class='summary'></div>"
                 $OmitSummary = "<div class='summary'></div>"
+                $IncorrectResultSummary = "<div class='summary'></div>"
                 $ErrorSummary = ""
 
                 if ($Report.Passes -gt 0) {
@@ -1310,6 +1350,11 @@ function Invoke-ReportCreation {
                     $OmitSummary = "<div class='summary manual'>$($Report.Omits) omitted</div>"
                 }
 
+                if ($Report.IncorrectResults -gt 0) {
+                    $Noun = Pluralize -SingularNoun "incorrect result" -PluralNoun "incorrect results" -Count $Report.IncorrectResults
+                    $IncorrectResultSummary = "<div class='summary incorrect'>$($Report.IncorrectResults) $Noun</div>"
+                }
+
                 if ($Report.Errors -gt 0) {
                     $Noun = Pluralize -SingularNoun "error" -PluralNoun "errors" -Count $Report.Errors
                     $ErrorSummary = "<div class='summary error'>$($Report.Errors) $($Noun)</div>"
@@ -1317,7 +1362,7 @@ function Invoke-ReportCreation {
 
                 $Fragment += [pscustomobject]@{
                 "Baseline Conformance Reports" = $Link;
-                "Details" = "$($PassesSummary) $($WarningsSummary) $($FailuresSummary) $($ManualSummary) $($OmitSummary) $($ErrorSummary)"
+                "Details" = "$PassesSummary $WarningsSummary $FailuresSummary $ManualSummary $OmitSummary $IncorrectResultSummary $ErrorSummary"
                 }
             }
             $TenantMetaData += [pscustomobject]@{
@@ -1398,10 +1443,10 @@ function Get-TenantDetail {
 
     # organized by best tenant details information
     if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("teams")) {
         Get-TeamsTenantDetail -M365Environment $M365Environment
@@ -1697,6 +1742,8 @@ function Invoke-SCuBACached {
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DarkMode
     Set switch to enable report dark mode by default.
+    .Parameter SilenceBODWarnings
+    Do not warn for requirements specific to BOD compliance (e.g., documenting OrgName in the config file).
     .Parameter NumberOfUUIDCharactersToTruncate
     Controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
@@ -1822,6 +1869,11 @@ function Invoke-SCuBACached {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
         $DarkMode,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $SilenceBODWarnings,
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -1989,6 +2041,7 @@ function Invoke-SCuBACached {
                     'ModuleVersion' = $ModuleVersion;
                     'FullScubaResultsName' = $FullScubaResultsName;
                     'Guid' = $Guid;
+                    'SilenceBODWarnings' = $SilenceBODWarnings;
                 }
                 Merge-JsonOutput @JsonParams
             }

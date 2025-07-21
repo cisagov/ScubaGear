@@ -6,7 +6,7 @@ Description: |
   and documented as part of an organization's cybersecurity risk management
   program process and practices.
 ProductNames:
-  - exo
+  - aad
   - teams
 M365Environment: commercial
 LogIn: true
@@ -17,9 +17,8 @@ OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
 OmitPolicy:
-  MS.EXO.2.2v1:
-    Rationale: "Known false positive; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
-      horizon setup but is available publicly."
+  MS.AAD.2.1v1:
+    Rationale: "Our tenant does not have the P2 licenses required for this feature; accepting risk."
     Expiration: "2023-12-31"
   MS.TEAMS.6.1v1:
     Rationale: &DLPRationale "The DLP capability required for Teams is implemented by third party product, [x],

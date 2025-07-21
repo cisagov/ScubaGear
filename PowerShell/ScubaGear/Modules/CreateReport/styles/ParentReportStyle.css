@@ -56,6 +56,7 @@ table.tenantdata tr:first-child {
 .failure { background-color: var(--test-fail); }
 .warning { background-color: var(--test-warning); }
 .pass { background-color: var(--test-pass); }
+.incorrect { background: linear-gradient(to right, var(--test-fail), var(--test-pass)) }
 .manual { background-color: var(--test-other); }
 .error {
     background-color: var(--test-fail);

@@ -24,10 +24,16 @@ OrgName: Department of Example
 OrgUnitName: Subdepartment of Example
 
 # The OmitPolicy field can be used to exclude policies from the SCuBA assessment
-# results (e.g., for controls that are met using a third party tool).
+# results (e.g., for controls that are met using a third party tool or acceptance of risk).
 # See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#omit-policies
-# for in depth details
+# for in-depth details
 OmitPolicy: {}
+
+# Policies can be annotated to mark incorrect results and document plans of action.
+# The annotation is appended in the Details column of the HTML report for the applicable
+# controls. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#annotate-policies
+# for in-depth details.
+AnnotatePolicy: {}
 
 # For product specific details on filling out the fields below, see:
 # https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#product-specific-configuration
