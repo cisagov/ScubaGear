@@ -14,7 +14,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $true
                 $Response.Message | Should -Be "SPF record found."
@@ -29,7 +30,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message |
@@ -45,7 +47,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message |
@@ -63,7 +66,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $true
                 $Response.Message | Should -Be "SPF record found."
@@ -80,7 +84,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message | Should -Be "Domain does not exist."
@@ -95,7 +100,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message | Should -Be "Domain name exists but no answers returned."
@@ -110,7 +116,8 @@ InModuleScope 'ExportEXOProvider' {
                         "LogEntries" = @()
                     }
                 }
-                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message | Should -Be "Exceptions other than NXDOMAIN returned."

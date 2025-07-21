@@ -22,7 +22,7 @@ InModuleScope 'ExportEXOProvider' {
                         "DomainName" = "example.com";
                         "IsCoexistenceDomain" = $false
                     }
-                )
+                ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
@@ -38,7 +38,7 @@ InModuleScope 'ExportEXOProvider' {
                         "DomainName" = "example2.com";
                         "IsCoexistenceDomain" = $false
                     }
-                )
+                ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
@@ -55,7 +55,7 @@ InModuleScope 'ExportEXOProvider' {
                         "DomainName" = "example2.com";
                         "IsCoexistenceDomain" = $true
                     }
-                )
+                ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }
@@ -87,7 +87,8 @@ InModuleScope 'ExportEXOProvider' {
             It "Checks at the organization level" {
                 # There are two locations where DMARC records can be found. If it's not available at the
                 # full domain level, GetScubaDmarcRecord should try again at the organization domain level
-                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"})
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
             }

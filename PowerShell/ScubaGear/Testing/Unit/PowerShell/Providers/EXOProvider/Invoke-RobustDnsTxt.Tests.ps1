@@ -15,7 +15,7 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 }
                 Mock -CommandName Invoke-DoH {}
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 0
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
@@ -40,7 +40,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
@@ -65,7 +65,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers -Contains "v=spf1 include:spf.protection.outlook.com -all" | Should -Be $true
@@ -92,7 +92,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0
@@ -117,7 +117,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0
@@ -142,7 +142,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0
@@ -167,7 +167,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @();
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0
@@ -192,7 +192,7 @@ InModuleScope 'ExportEXOProvider' {
                         "Errors" = @("something went wrong");
                     }
                 }
-                $Response = Invoke-RobustDnsTxt -Qname "example.com"
+                $Response = Invoke-RobustDnsTxt -Qname "example.com" -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-TraditionalDns -Exactly -Times 1
                 Should -Invoke -CommandName Invoke-DoH -Exactly -Times 1
                 $Response.Answers.Length| Should -Be 0

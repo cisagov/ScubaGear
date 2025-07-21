@@ -25,3 +25,13 @@ Exo:
     AllowedForwardingDomains:
       - example1.com
       - example2.com
+
+# Use this parameter to control what DNS resolver is used to fetch the SPF,
+# DKIM, and DMARC records
+PreferredDnsResolvers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Use this parameter if you prefer ScubaGear not retry any failed DNS queries
+# over DoH (using Cloudflare)
+SkipDoH: true

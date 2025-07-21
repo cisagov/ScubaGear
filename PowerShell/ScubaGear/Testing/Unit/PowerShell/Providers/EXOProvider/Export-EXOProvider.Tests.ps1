@@ -122,7 +122,7 @@ InModuleScope -ModuleName ExportEXOProvider {
             }
         }
         It "When called, returns valid JSON" {
-            $Json = Export-EXOProvider
+            $Json = Export-EXOProvider -PreferredDnsResolvers @() -SkipDoH $false
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
