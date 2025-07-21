@@ -17,14 +17,16 @@ InModuleScope 'ExportEXOProvider' {
             }
             It "Resolves 1 domain name" {
                 # Test basic functionality
-                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.rdata -Contains "v=DKIM1..." | Should -Be $true
             }
             It "Resolves multiple domain names" {
                 # Test to ensure function will loop over the domain names provided in the -Domains argument.
                 $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"},
-                @{"DomainName" = "example.com"})
+                @{"DomainName" = "example.com"}) `
+                     -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
                 $Response.rdata -Contains "v=DKIM1..." | Should -Be $true
             }
@@ -52,7 +54,8 @@ InModuleScope 'ExportEXOProvider' {
                         }
                     }
                 }
-                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"}) `
+                     -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
                 $Response.rdata -Contains "v=DKIM1..." | Should -Be $true
             }
@@ -79,7 +82,8 @@ InModuleScope 'ExportEXOProvider' {
                         }
                     }
                 }
-                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"})
+                $Response = Get-ScubaDkimRecord -Domains @(@{"DomainName" = "example.com"}) `
+                     -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 3
                 $Response.rdata -Contains "v=DKIM1..." | Should -Be $true
             }
