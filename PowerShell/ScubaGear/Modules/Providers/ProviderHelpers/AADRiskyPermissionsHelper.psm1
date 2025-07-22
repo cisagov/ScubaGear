@@ -46,7 +46,7 @@ function Get-RiskyPermissionsJson {
             $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
             $PermissionsJson = Get-Content -Path (
                 Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
-            ) | ConvertFrom-Json -Depth 4
+            ) | ConvertFrom-Json
         }
         catch {
             Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
@@ -91,7 +91,7 @@ function Format-Permission {
     )
     $Map = @()
     if ( $RoleType -ne $null) {
-        $RiskyPermissions = $Json.permissions.$RoleType.$AppDisplayName.PSObject.Properties.Name
+        $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
         $IsRisky = $RiskyPermissions -contains $Id
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
