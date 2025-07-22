@@ -488,13 +488,12 @@ class CapHelper {
         .Functionality
         Internal
         #>
-            if ($Caps.Length -eq 1 -and -not ($Caps[0] -contains "Conditions")) {
+            if ($Caps.Length -eq 1 -and $Caps[0].PSobject.Properties.name -match "Value" -and $Caps[0].Value.Length -eq 0) {
                 # For some reason, when there are no conditional access policies,
                 # we don't get an empty list. Instead we get a list with one
                 # object containing the following:
                 #   "@odata.context":  "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies"
                 #   "Value":  []
-                # Return an empty list if the keys we expect for CAPs (like "Conditions") aren't present
                 return "[]"
             }
 
