@@ -488,8 +488,17 @@ class CapHelper {
         .Functionality
         Internal
         #>
-            $Table = @()
+            if ($Caps.Length -eq 1 -and -not ($Caps[0] -contains "Conditions")) {
+                # For some reason, when there are no conditional access policies,
+                # we don't get an empty list. Instead we get a list with one
+                # object containing the following:
+                #   "@odata.context":  "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies"
+                #   "Value":  []
+                # Return an empty list if the keys we expect for CAPs (like "Conditions") aren't present
+                return "[]"
+            }
 
+            $Table = @()
             foreach ($Cap in $Caps) {
                 $State = $this.StateStrings[$Cap.State]
                 $UsersIncluded = $($this.GetIncludedUsers($Cap)) -Join ", "
