@@ -46,7 +46,7 @@ function Get-RiskyPermissionsJson {
             $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
             $PermissionsJson = Get-Content -Path (
                 Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
-            ) | ConvertFrom-Json
+            ) | Out-String | ConvertFrom-Json
         }
         catch {
             Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
