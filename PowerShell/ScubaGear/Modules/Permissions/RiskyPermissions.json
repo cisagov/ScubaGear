@@ -127,8 +127,11 @@
             }
         },
         "Office 365 Management APIs": {
-            "594c1fb6-4f81-4475-ae41-0c394909246c": "ActivityFeed.Read",
-            "4807a72c-ad38-4250-94c9-4eabfe26cd55": "ActivityFeed.ReadDlp"
+            "Application": {
+                "594c1fb6-4f81-4475-ae41-0c394909246c": "ActivityFeed.Read",
+                "4807a72c-ad38-4250-94c9-4eabfe26cd55": "ActivityFeed.ReadDlp"
+            },
+            "Delegated": {}
         },
         "Office 365 Exchange Online": {
             "Application": {
