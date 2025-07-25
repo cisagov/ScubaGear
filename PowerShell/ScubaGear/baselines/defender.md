@@ -602,7 +602,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
 
-20. Under **Microsoft 365 files and Microsoft Fabric items**, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip, or email notification**.
+20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notification**.
 
 21. Click **Save**, then **Next**.
 
