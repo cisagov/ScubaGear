@@ -568,7 +568,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.
    
-9. Under **Choose locations to apply the policy**, set **Status** to **On**
+9. Under **Choose where to apply the policy**, set **Status** to **On**
    for at least the Exchange email, OneDrive accounts, SharePoint
    sites, Teams chat and channel messages, and Devices locations, then
    click **Next**.
