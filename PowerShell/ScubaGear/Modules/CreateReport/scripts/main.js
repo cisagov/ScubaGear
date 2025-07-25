@@ -92,6 +92,14 @@ const fillCAPTable = () => {
         h2.innerHTML = "Conditional Access Policies";
         capDiv.appendChild(h2);
 
+        if (caps.length === 0) {
+            // If there are no CAPs, don't create a table, instead display this message
+            let noCapWarning = document.createElement("p");
+            noCapWarning.innerHTML = "No conditional access policies found"
+            capDiv.appendChild(noCapWarning);
+            return;
+        }
+
         let buttons = document.createElement("div");
         buttons.classList.add("buttons");
         capDiv.appendChild(buttons);

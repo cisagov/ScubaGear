@@ -73,6 +73,7 @@ header h3 {
 p {
     max-width: 700px;
     text-align: center;
+    margin: auto;
 }
 
 .show-more {
