@@ -4,7 +4,7 @@
 
 Microsoft 365 (M365) Defender is a cloud-based enterprise defense suite that coordinates prevention, detection, investigation, and response. This set of tools and features are used to detect many types of attacks.
 
-This baseline focuses on the features of Defender for Office 365, but some settings are actually configured in the Microsoft Purview compliance portal. However, for simplicity, both the M365 Defender and Microsoft Purview compliance portal items are contained in this baseline.
+This baseline focuses on the features of Defender for Office 365, but some settings are actually configured in the Microsoft Purview portal. However, for simplicity, both the M365 Defender and Microsoft Purview portal items are contained in this baseline.
 
 Generally, use of Microsoft Defender is not required by the baselines of the core M365 products (Exchange Online, Teams, etc.). Should an agency elect to use Defender as their tool of choice, agencies should apply these baseline settings. Please note that some of the controls in the core baselines require the use of a dedicated security tool that provides comparable protection as Defender.   In addition to applying these controls, agencies should consider using a cloud access security broker to secure their environments as they adopt zero trust principles.
 
@@ -549,7 +549,7 @@ information by restricted apps and unwanted Bluetooth applications.
 
 #### MS.DEFENDER.4.1v2 Instructions
 
-1. Sign in to the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview portal**.
 
 2. Under the **Solutions** section on the left-hand menu, select **Data loss
    prevention**.
@@ -560,28 +560,30 @@ information by restricted apps and unwanted Bluetooth applications.
 
 5. From the **Categories** list, select **Custom**.
 
-6. From the **Templates** list, select **Custom policy** and then click
+6. From the **Regulations** list, select **Custom policy** and then click
    **Next**.
 
 7. Edit the name and description of the policy if desired, then click
    **Next**.
 
-8. Under **Choose locations to apply the policy**, set **Status** to **On**
+8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.
+   
+9. Under **Choose where to apply the policy**, set **Status** to **On**
    for at least the Exchange email, OneDrive accounts, SharePoint
    sites, Teams chat and channel messages, and Devices locations, then
    click **Next**.
 
-9. Under **Define policy settings**, select **Create or customize advanced
+10. Under **Define policy settings**, select **Create or customize advanced
    DLP rules**, and then click **Next**.
 
-10. Click **Create rule**. Assign the rule an appropriate name and
+11. Click **Create rule**. Assign the rule an appropriate name and
    description.
 
-11. Click **Add condition**, then **Content contains**.
+12. Click **Add condition**, then **Content contains**.
 
-12. Click **Add**, then **Sensitive info types**.
+13. Click **Add**, then **Sensitive info types**.
 
-13. Add information types that protect information sensitive to the agency.
+14. Add information types that protect information sensitive to the agency.
     At a minimum, the agency should protect:
 
     - Credit card numbers
@@ -589,24 +591,24 @@ information by restricted apps and unwanted Bluetooth applications.
     - U.S. Social Security Numbers (SSN)
     - All agency-defined PII and sensitive information
 
-14. Click **Add**.
+15. Click **Add**.
 
-15. Under **Actions**, click **Add an action**.
+16. Under **Actions**, click **Add an action**.
 
-16. Check **Restrict Access or encrypt the content in Microsoft 365
+17. Check **Restrict Access or encrypt the content in Microsoft 365
     locations**.
 
-17. Under this action, select **Block Everyone**.
+18. Under this action, select **Block Everyone**.
 
-18. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
+19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
 
-19. Under **Microsoft 365 services**, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip**.
+20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**.
 
-20. Click **Save**, then **Next**.
+21. Click **Save**, then **Next**.
 
-21. Select **Turn it on right away**, then click **Next**.
+22. Select **Turn the policy on immediately**, then click **Next**.
 
-22. Click **Submit**.
+23. Click **Submit**.
 
 #### MS.DEFENDER.4.2v1 Instructions
 
@@ -627,9 +629,9 @@ See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps
 
 #### MS.DEFENDER.4.5v1 Instructions
 
-1. Sign in to the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview portal**.
 
-2. Under **Solutions**, select **Data loss prevention**.
+2. Go to **Settings**, under **Solution Settings** select **Data loss prevention**.
 
 3. Go to **Endpoint DLP Settings**.
 
@@ -653,7 +655,7 @@ If restricted app and unwanted Bluetooth app restrictions are desired,
 associated devices must be onboarded with Defender for Endpoint
 before the instructions below can be completed.
 
-1. Sign in to the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview portal**.
 
 2. Under **Solutions**, select **Data loss prevention**.
 
@@ -875,9 +877,9 @@ Related to Cybersecurity Incidents \| Office of Management and
 
 #### MS.DEFENDER.6.1v1 Instructions
 
-To enable auditing via the Microsoft Purview compliance portal:
+To enable auditing via the **Microsoft Purview portal**:
 
-1. Sign in to the **Microsoft Purview compliance portal**.
+1. Sign in to the **Microsoft Purview portal**.
 
 2. Under **Solutions**, select **Audit**.
 
