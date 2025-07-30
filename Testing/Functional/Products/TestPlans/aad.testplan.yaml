@@ -207,7 +207,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: Automated Test 2 - DO NOT MODIFY
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
