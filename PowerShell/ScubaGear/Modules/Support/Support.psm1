@@ -354,7 +354,7 @@ function Get-OPAFile {
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
-        throw "Unable to download OPA executable. To try manually downloading, see details found under the section titled 'OPA Installation' within the 'Depandancies' markdown linked in the README" | Out-Host
+        throw "Unable to download OPA executable. To try manually downloading, see details found under the section titled 'OPA Installation' within the 'Dependencies' markdown linked in the README" | Out-Host
     }
 }
 
