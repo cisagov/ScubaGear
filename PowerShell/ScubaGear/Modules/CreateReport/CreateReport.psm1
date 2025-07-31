@@ -429,6 +429,12 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
+        # The template HTML files contain embedded expressions (e.g., {AADWARNING}) which act as placeholders for where dynamic content is inserted.
+        # This allows us to dynamically inject generated HTML sections into the final report output.
+        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
+
+        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
+        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -457,6 +463,7 @@ function New-Report {
 
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
 
         if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_service_principals) {
 
@@ -481,11 +488,9 @@ function New-Report {
         }
         else{
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-
         }
-        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
-        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
+
+
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
