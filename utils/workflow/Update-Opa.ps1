@@ -158,7 +158,7 @@ function Invoke-UnitTestsWithNewOPAVersion {
         Write-Information "`nDownload of `"$OutFile`" finished."
     }
     catch {
-        Write-Error "An error has occurred: Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'"
+        Write-Error "Unable to download OPA executable. To try manually downloading, see details found under the section titled 'OPA Installation' within the 'Depandancies' markdown linked in the README"
     }
     finally {
         $WebClient.Dispose()
