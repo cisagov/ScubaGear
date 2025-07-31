@@ -15,6 +15,7 @@ import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
+import data.utils.aad.IsGeneralMFA
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
@@ -255,7 +256,7 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     ###
 
     ### Conditional access checks specific to this policy
-    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    IsGeneralMFA(CAPolicy) == true
     ###
 
     # Only match policies with user and group exclusions per the confile file

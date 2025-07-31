@@ -154,6 +154,38 @@ IsPhishingResistantMFA(Policy) := true if {
     Count(Strengths) > 0
 } else := false
 
+# Returns true if the policy enforces general MFA (either through built-in controls
+# or authentication strength that includes MFA methods)
+IsGeneralMFA(Policy) := true if {
+    # Check for traditional MFA built-in control
+    "mfa" in Policy.GrantControls.BuiltInControls
+} else := true if {
+    # Check for authentication strength that includes MFA methods
+    Strengths := ConvertToSet(Policy.GrantControls.AuthenticationStrength.AllowedCombinations)
+    # Check if any of the allowed combinations contain MFA methods
+    # This includes combinations like "password, microsoftAuthenticatorPush", "password, softwareOath", etc.
+    MFACombinations := {
+        "windowsHelloForBusiness",
+        "fido2", 
+        "x509CertificateMultiFactor",
+        "deviceBasedPush",
+        "temporaryAccessPassOneTime",
+        "temporaryAccessPassMultiUse",
+        "password, microsoftAuthenticatorPush",
+        "password, softwareOath",
+        "password, hardwareOath", 
+        "password, sms",
+        "password, voice",
+        "federatedMultiFactor",
+        "microsoftAuthenticatorPush, federatedSingleFactor",
+        "softwareOath, federatedSingleFactor",
+        "hardwareOath, federatedSingleFactor",
+        "sms, federatedSingleFactor",
+        "voice, federatedSingleFactor"
+    }
+    Count(Strengths & MFACombinations) > 0
+} else := false
+
 
 ############################################################################
 # Report formatting functions for MS.AAD.6.1v1                             #

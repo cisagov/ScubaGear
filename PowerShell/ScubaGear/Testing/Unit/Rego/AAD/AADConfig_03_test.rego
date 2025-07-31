@@ -173,8 +173,8 @@ test_3_1_Fails_3_2_Passes_Correct if {
     Output := aad.tests with input.conditional_access_policies as [CAP, CAP2]
 
     ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "2 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Bad Policy, Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
@@ -1836,4 +1836,152 @@ test_Entra_3_9_Application_Exclusion_Incorrect_V1 if {
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
 }
-#--
+
+# Test for Windows Hello for Business
+test_IsGeneralMFA_WindowsHelloForBusiness_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Windows Hello for Business Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["windowsHelloForBusiness"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Windows Hello for Business Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for FIDO2
+test_IsGeneralMFA_Fido2_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "FIDO2 Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["fido2"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>FIDO2 Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for X509 Certificate Multi-Factor
+test_IsGeneralMFA_X509CertificateMultiFactor_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "X509 Certificate Multi-Factor Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["x509CertificateMultiFactor"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>X509 Certificate Multi-Factor Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for Device Based Push
+test_IsGeneralMFA_DeviceBasedPush_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Device Based Push Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["deviceBasedPush"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Device Based Push Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for Temporary Access Pass One Time
+test_IsGeneralMFA_TemporaryAccessPassOneTime_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Temporary Access Pass One Time Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["temporaryAccessPassOneTime"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Temporary Access Pass One Time Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for Temporary Access Pass Multi Use
+test_IsGeneralMFA_TemporaryAccessPassMultiUse_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Temporary Access Pass Multi Use Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["temporaryAccessPassMultiUse"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Temporary Access Pass Multi Use Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for multiple authentication combinations
+test_IsGeneralMFA_MultipleCombinations_Correct if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Multiple Authentication Combinations Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", 
+                "value": ["windowsHelloForBusiness", "password, microsoftAuthenticatorPush", "federatedMultiFactor"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Multiple Authentication Combinations Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+}
+
+# Test for non-MFA authentication strength (should fail)
+test_IsGeneralMFA_NonMFAStrength_Incorrect if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Non-MFA Authentication Strength Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": ["password"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+}
+
+# Test for empty authentication strength (should fail)
+test_IsGeneralMFA_EmptyAuthenticationStrength_Incorrect if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "DisplayName", "value": "Empty Authentication Strength Policy"},
+                {"op": "remove", "path": "GrantControls/BuiltInControls"},
+                {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", "value": []}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+}
+

@@ -202,6 +202,47 @@ TestPlan:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Authentication Strength with Multifactor Authentication is enforced
+        ### This test enables the standard non-specific MFA policy with authentication strength set to "Multifactor Authentication"
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "deviceBasedPush"
+                      - "temporaryAccessPassOneTime"
+                      - "temporaryAccessPassMultiUse"
+                      - "password, microsoftAuthenticatorPush"
+                      - "password, softwareOath"
+                      - "password, hardwareOath"
+                      - "password, sms"
+                      - "password, voice"
+                      - "federatedMultiFactor"
+                      - "microsoftAuthenticatorPush, federatedSingleFactor"
+                      - "softwareOath, federatedSingleFactor"
+                      - "hardwareOath, federatedSingleFactor"
+                      - "sms, federatedSingleFactor"
+                      - "voice, federatedSingleFactor"
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.3.3v2
     TestDriver: ScubaCached
