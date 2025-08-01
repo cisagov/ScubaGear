@@ -1,9 +1,20 @@
+const getJsonData = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    try {
+        return JSON.parse(el.textContent);
+    } catch {
+        return el.textContent.trim();
+    }
+}
+
 /**
  * Checks if Dark Mode session storage variable exists. Creates one if it does not exist.
  * Sets the report's default Dark Mode state using the $DarkMode (JavaScript darkMode) PowerShell variable.
+ * @param {boolean} darkMode The default dark mode state.
  * @param {string} pageLocation The page where this function is called.
  */
-const mountDarkMode = (pageLocation) => {
+const mountDarkMode = (darkMode, pageLocation) => {
     try {
         let darkModeCookie = sessionStorage.getItem("darkMode");
         if (darkModeCookie === undefined || darkModeCookie === null) {
