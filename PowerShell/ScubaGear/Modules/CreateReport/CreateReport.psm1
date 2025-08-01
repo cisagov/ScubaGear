@@ -436,6 +436,10 @@ function New-Report {
         # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
 
+        # Same for risky applications and third-party service principals
+        $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
+        $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
+
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
         $csvData = Import-Csv -Path $csvPath
@@ -485,49 +489,8 @@ function New-Report {
             $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
         }
-        else{
+        else {
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-        }
-
-        $AppTypes = @(
-            @{
-                Key = "risky_applications";
-                Placeholder = "{RISKY_APPLICATIONS}";
-                Title = "Risky Applications";
-                TableId = "risky-app-table";
-            },
-            @{
-                Key = "risky_third_party_service_principals";
-                Placeholder = "{RISKY_THIRD_PARTY_SP}";
-                Title = "Risky Third-Party Service Principals";
-                TableId = "risky-third-party-sp-table";
-            }
-        )
-
-        foreach ($AppType in $AppTypes) {
-            $RiskyApps = $SettingsExport."$($AppType.Key)"
-            $IsApplication = if ($AppType.Key -eq "risky_applications") { $true } else { $false }
-            if ($null -ne $RiskyApps -and $RiskyApps.Count -gt 0) {
-                $AppData = @()
-                foreach ($App in $RiskyApps) {
-                    $AppData += [pscustomobject]@{
-                        DisplayName = $App.DisplayName;
-                        IsMultiTenantEnabled = if ($IsApplication) { $App.IsMultiTenantEnabled } else { $null }
-                        KeyCredentials = $App.KeyCredentials
-                        PasswordCredentials = $App.PasswordCredentials
-                        FederatedCredentials = $App.FederatedCredentials
-                        Permissions = $App.Permissions
-                    }
-                }
-
-                $RiskyAppTable = $AppData | ConvertTo-Html -As Table -Fragment
-                $RiskyAppTable = $RiskyAppTable.Replace("<table>", "<table id='$($section.TableId)' style='text-align:center;'>")
-                $RiskyAppHtml = "<h2>$($AppType.Title)</h2>" + $RiskyAppTable
-                $ReportHTML = $ReportHTML.Replace($AppType.Placeholder, $RiskyAppHtml)
-            }
-            else {
-                $ReportHTML = $ReportHTML.Replace($AppType.Placeholder, "")
-            }
         }
     }
     else {
@@ -537,6 +500,8 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{RISKY_APPLICATIONS}", "")
         $ReportHTML = $ReportHTML.Replace("{RISKY_THIRD_PARTY_SP}", "")
         $CapJson = "null"
+        $RiskyAppsJson = "null"
+        $RiskyThirdPartySPJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -584,22 +549,30 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", "")
     }
 
+    # Inject CSS into HTML report template
     $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-    $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>
-        $($MainCSS)
-    </style>")
+    $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "main.css") -Raw
+    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
+    # Load JS files 
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-    $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
-    $MainJS = "const caps = $($CapJson);`n$($MainJS)"
-    $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-    $MainJS = "$($MainJS)`n$($UtilsJS)"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-        let darkMode = $($DarkMode.ToString().ToLower());
-        $($MainJS)
-    </script>")
+    $MainJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "main.js") -Raw
+    $UtilsJS = Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
 
+    $JSVariables = @(
+        "let darkMode = $($DarkMode.ToString().ToLower());"
+        "const caps = $($CapJson);"
+        "const riskyApps = $($RiskyAppsJson);"
+        "const riskyThirdPartySPs = $($RiskyThirdPartySPJson);"
+    ) -join "`n"
+
+    $JSFiles = @(
+        $JSVariables
+        $MainJS
+        $UtilsJS
+    ) -join "`n"
+
+    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName

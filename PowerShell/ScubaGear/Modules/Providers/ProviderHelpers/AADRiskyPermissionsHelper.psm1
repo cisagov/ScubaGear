@@ -329,7 +329,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 }
 
                 # Exclude applications without risky permissions
-                if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true })) {
+                if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -473,7 +473,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         }
 
                         # Exclude service principals without risky permissions
-                        if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true })) {
+                        if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
                                 ObjectId                = $ServicePrincipal.Id
                                 AppId                   = $ServicePrincipal.AppId
