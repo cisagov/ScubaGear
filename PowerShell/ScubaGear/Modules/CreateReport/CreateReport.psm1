@@ -484,18 +484,58 @@ function New-Report {
             # Create a section header for the service principal information
             $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
-
         }
         else{
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
         }
 
+        $AppTypes = @(
+            @{
+                Key = "risky_applications";
+                Placeholder = "{RISKY_APPLICATIONS}";
+                Title = "Risky Applications";
+                TableId = "risky-app-table";
+            },
+            @{
+                Key = "risky_third_party_service_principals";
+                Placeholder = "{RISKY_THIRD_PARTY_SP}";
+                Title = "Risky Third-Party Service Principals";
+                TableId = "risky-third-party-sp-table";
+            }
+        )
 
+        foreach ($AppType in $AppTypes) {
+            $RiskyApps = $SettingsExport."$($AppType.Key)"
+            $IsApplication = if ($AppType.Key -eq "risky_applications") { $true } else { $false }
+            if ($null -ne $RiskyApps -and $RiskyApps.Count -gt 0) {
+                $AppData = @()
+                foreach ($App in $RiskyApps) {
+                    $AppData += [pscustomobject]@{
+                        DisplayName = $App.DisplayName;
+                        IsMultiTenantEnabled = if ($IsApplication) { $App.IsMultiTenantEnabled } else { $null }
+                        KeyCredentials = $App.KeyCredentials
+                        PasswordCredentials = $App.PasswordCredentials
+                        FederatedCredentials = $App.FederatedCredentials
+                        Permissions = $App.Permissions
+                    }
+                }
+
+                $RiskyAppTable = $AppData | ConvertTo-Html -As Table -Fragment
+                $RiskyAppTable = $RiskyAppTable.Replace("<table>", "<table id='$($section.TableId)' style='text-align:center;'>")
+                $RiskyAppHtml = "<h2>$($AppType.Title)</h2>" + $RiskyAppTable
+                $ReportHTML = $ReportHTML.Replace($AppType.Placeholder, $RiskyAppHtml)
+            }
+            else {
+                $ReportHTML = $ReportHTML.Replace($AppType.Placeholder, "")
+            }
+        }
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
+        $ReportHTML = $ReportHTML.Replace("{RISKY_APPLICATIONS}", "")
+        $ReportHTML = $ReportHTML.Replace("{RISKY_THIRD_PARTY_SP}", "")
         $CapJson = "null"
     }
 
