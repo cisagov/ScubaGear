@@ -250,8 +250,11 @@ tests contains {
 
     # Filter: this control only applies to the Global policy
     Policy.Identity == "Global"
-    Policy.BroadcastRecordingMode in ["UserOverride", "AlwaysDisabled"]
-    Status := true
+    # Check that recording is not set to "Always record" (AlwaysEnabled) - it should be either "UserOverride" (Organizer can record) or "AlwaysDisabled" (Never record)
+    # The policy should pass when BroadcastRecordingMode is NOT "AlwaysEnabled"
+    # This includes "UserOverride" (Organizer can record), "AlwaysDisabled" (Never record), or any other value except "AlwaysEnabled"
+    # Handle potential null or undefined values by treating them as valid (not "AlwaysEnabled")
+    Status := Policy.BroadcastRecordingMode != "AlwaysEnabled"
 }
 
 # Edge case where pulling configuration from tenant fails
