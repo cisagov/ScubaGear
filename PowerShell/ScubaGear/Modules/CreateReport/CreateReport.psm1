@@ -549,9 +549,9 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", "")
     }
 
-    # Inject CSS into HTML report template
+    # Inject CSS into individual HTML report template
     $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-    $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "main.css") -Raw
+    $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
     $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
     $JsonScriptTags = @(
@@ -563,29 +563,18 @@ function New-Report {
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
     # Load JS files 
-    #$MainJSPath = Join-Path -Path $ScriptsPath -ChildPath "main.js"
-    #$UtilsJSPath = Join-Path -Path $ScriptsPath -ChildPath "utils.js"
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-    $MainJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "main.js") -Raw
-    $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
-    $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "tableFunctions.js") -Raw
-
-    <#
-    $JSVariables = @(
-        "let darkMode = $($DarkMode.ToString().ToLower());"
-        "const caps = $($CapJson);"
-        "const riskyApps = $($RiskyAppsJson);"
-        "const riskyThirdPartySPs = $($RiskyThirdPartySPJson);"
-    ) -join "`n"
-    #>
+    $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
+    $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
+    $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
 
     $JSFiles = @(
-        $MainJS
+        $IndividualReportJS
         $UtilsJS
         $TableFunctionsJS
     ) -join "`n"
 
-    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>`n $($JSFiles) `n</script>")
+    $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
