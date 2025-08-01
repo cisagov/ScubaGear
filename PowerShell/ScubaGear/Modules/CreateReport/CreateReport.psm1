@@ -554,22 +554,35 @@ function New-Report {
     $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "main.css") -Raw
     $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
+    $JsonScriptTags = @(
+        "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
+        "<script type='application/json' id='cap-json'> $($CapJson) </script>"
+        "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
+        "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
+    ) -join "`n"
+    $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
+
     # Load JS files 
+    #$MainJSPath = Join-Path -Path $ScriptsPath -ChildPath "main.js"
+    #$UtilsJSPath = Join-Path -Path $ScriptsPath -ChildPath "utils.js"
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
     $MainJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "main.js") -Raw
-    $UtilsJS = Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
+    $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
+    $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "tableFunctions.js") -Raw
 
+    <#
     $JSVariables = @(
         "let darkMode = $($DarkMode.ToString().ToLower());"
         "const caps = $($CapJson);"
         "const riskyApps = $($RiskyAppsJson);"
         "const riskyThirdPartySPs = $($RiskyThirdPartySPJson);"
     ) -join "`n"
+    #>
 
     $JSFiles = @(
-        $JSVariables
         $MainJS
         $UtilsJS
+        $TableFunctionsJS
     ) -join "`n"
 
     $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>`n $($JSFiles) `n</script>")
