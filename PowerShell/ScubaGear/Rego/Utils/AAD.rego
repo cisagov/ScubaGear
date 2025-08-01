@@ -154,6 +154,38 @@ IsPhishingResistantMFA(Policy) := true if {
     Count(Strengths) > 0
 } else := false
 
+# Returns true if the policy enforces general MFA (either through built-in controls
+# or authentication strength that includes MFA methods)
+IsGeneralMFA(Policy) := true if {
+    # Check for traditional MFA built-in control
+    "mfa" in Policy.GrantControls.BuiltInControls
+} else := true if {
+    # Check for authentication strength that includes MFA methods
+    Strengths := ConvertToSet(Policy.GrantControls.AuthenticationStrength.AllowedCombinations)
+    # Check if any of the allowed combinations contain MFA methods
+    # This includes combinations like "password, microsoftAuthenticatorPush", "password, softwareOath", etc.
+    MFACombinations := {
+        "windowsHelloForBusiness",
+        "fido2", 
+        "x509CertificateMultiFactor",
+        "deviceBasedPush",
+        "temporaryAccessPassOneTime",
+        "temporaryAccessPassMultiUse",
+        "password, microsoftAuthenticatorPush",
+        "password, softwareOath",
+        "password, hardwareOath", 
+        "password, sms",
+        "password, voice",
+        "federatedMultiFactor",
+        "microsoftAuthenticatorPush, federatedSingleFactor",
+        "softwareOath, federatedSingleFactor",
+        "hardwareOath, federatedSingleFactor",
+        "sms, federatedSingleFactor",
+        "voice, federatedSingleFactor"
+    }
+    Count(Strengths & MFACombinations) > 0
+} else := false
+
 
 ############################################################################
 # Report formatting functions for MS.AAD.6.1v1                             #
@@ -172,18 +204,18 @@ FederatedDomainWarning(domains) := concat("<br/><br/>", [
     FederatedDomainWarningString
 ])
 
-# Case 1: Pass; no user passwords set to expire, no federated domains 
-# Case 2: Pass; no user passwords set to expire, federated domains 
-# Case 3: Fail; user passwords set to expire, no federated domains 
-# Case 4: Fail; user passwords set to expire, federated domains 
+# Case 1: Pass; all valid domains, no federated domains
+# Case 2: Pass; all valid domains, federated domains
+# Case 3: Fail; invalid domains exist, no federated domains
+# Case 4: Fail; invalid domains exist, federated domains
 # Default: Fail
 
 DomainReportDetails(Status, Metadata) := PASS if {
     Status == true
-    count(Metadata.FederatedDomains) == 0
+    Count(Metadata.FederatedDomains) == 0
 } else := Description if {
     Status == true
-    count(Metadata.FederatedDomains) > 0
+    Count(Metadata.FederatedDomains) > 0
     Description := concat("", [
         PASS, 
         "; however, there are ", 
@@ -191,15 +223,15 @@ DomainReportDetails(Status, Metadata) := PASS if {
     ])
 } else := Description if {
     Status == false
-    count(Metadata.UserPasswordsSetToExpire) > 0
-    count(Metadata.FederatedDomains) == 0
-    Description := ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString)
+    Count(Metadata.InvalidDomains) > 0
+    Count(Metadata.FederatedDomains) == 0
+    Description := ReportFullDetailsArray(Metadata.InvalidDomains, FailureString)
 } else := Description if {
     Status == false
-    count(Metadata.UserPasswordsSetToExpire) > 0
-    count(Metadata.FederatedDomains) > 0
+    Count(Metadata.InvalidDomains) > 0
+    Count(Metadata.FederatedDomains) > 0
     Description := concat("<br/><br/>", [
-        ReportFullDetailsArray(Metadata.UserPasswordsSetToExpire, FailureString),
+        ReportFullDetailsArray(Metadata.InvalidDomains, FailureString),
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
