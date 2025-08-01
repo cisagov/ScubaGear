@@ -237,7 +237,7 @@ tests contains {
 # MS.TEAMS.1.7v2
 #--
 
-# Pass if BroadcastRecordingMode is set to UserOverride for global policy
+# Pass if BroadcastRecordingMode is set to UserOverride (Organizer can record) or AlwaysDisabled (Never record) for global policy
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
@@ -250,7 +250,8 @@ tests contains {
 
     # Filter: this control only applies to the Global policy
     Policy.Identity == "Global"
-    Status := Policy.BroadcastRecordingMode == "UserOverride"
+    Policy.BroadcastRecordingMode in ["UserOverride", "AlwaysDisabled"]
+    Status := true
 }
 
 # Edge case where pulling configuration from tenant fails
