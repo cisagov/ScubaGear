@@ -15,6 +15,7 @@ import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
+import data.utils.aad.IsGeneralMFA
 import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
@@ -255,7 +256,7 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     ###
 
     ### Conditional access checks specific to this policy
-    "mfa" in CAPolicy.GrantControls.BuiltInControls
+    IsGeneralMFA(CAPolicy) == true
     ###
 
     # Only match policies with user and group exclusions per the confile file
@@ -754,23 +755,41 @@ tests contains {
 # MS.AAD.6.1v1
 #--
 
-# User passwords are set to not expire if they equal INT_MAX
-UserPasswordsSetToNotExpire contains Domain.Id if {
+RootDomains contains Domain if {
     some Domain in input.domain_settings
-    Domain.PasswordValidityPeriodInDays == INT_MAX
+    Domain.IsRoot == true
     Domain.IsVerified == true
-
-    # Ignore federated domains
     Domain.AuthenticationType == "Managed"
 }
 
-UserPasswordsSetToExpire contains Domain.Id if {
-    some Domain in input.domain_settings
-    Domain.PasswordValidityPeriodInDays != INT_MAX
-    Domain.IsVerified == true
+RootDomainFor(Domain) := Root.Id if {
+    some Root in RootDomains
+    endswith(Domain.Id, Root.Id)
+}
 
-    # Ignore federated domains
+IsValid(Domain) := true if {
+    Domain.IsRoot = true
+    Domain.PasswordValidityPeriodInDays == INT_MAX
+} else := true if {
+    Domain.IsRoot == false
+    RootDomainFor(Domain) != null
+    some Root in RootDomains
+    Root.Id == RootDomainFor(Domain)
+    Root.PasswordValidityPeriodInDays == INT_MAX
+} else := false
+
+ValidDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
     Domain.AuthenticationType == "Managed"
+    IsValid(Domain)
+}
+
+InvalidDomains contains Domain.Id if {
+    some Domain in input.domain_settings
+    Domain.IsVerified == true
+    Domain.AuthenticationType == "Managed"
+    not IsValid(Domain)
 }
 
 FederatedDomains contains Domain.Id if {
@@ -783,25 +802,21 @@ tests contains {
     "PolicyId": "MS.AAD.6.1v1",
     "Criticality": "Shall",
     "Commandlet": [ "Get-MgBetaDomain" ],
-    # Track invalid/valid/federated domains for use in TestResults.json
-    "ActualValue": { 
-        "invalid_domains": UserPasswordsSetToExpire, 
-        "valid_domains": UserPasswordsSetToNotExpire,
-        "federated_domains": FederatedDomains
+    "ActualValue": {
+        "ValidDomains": ValidDomains,
+        "InvalidDomains": InvalidDomains,
+        "FederatedDomains": FederatedDomains
     },
     "ReportDetails": DomainReportDetails(Status, Metadata),
     "RequirementMet": Status
 } if {
-    # For the rule to pass:
-    # User passwords for all domains shall not expire
-    # Then check if at least 1 or more domains with user passwords set to expire exist
     Conditions := [
-        Count(UserPasswordsSetToExpire) == 0, 
-        Count(UserPasswordsSetToNotExpire) > 0
+        Count(ValidDomains) > 0,
+        Count(InvalidDomains) == 0
     ]
     Status := Count(FilterArray(Conditions, true)) == 2
     Metadata := {
-        "UserPasswordsSetToExpire": UserPasswordsSetToExpire,
+        "InvalidDomains": InvalidDomains,
         "FederatedDomains": FederatedDomains
     }
 }
