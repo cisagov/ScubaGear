@@ -65,11 +65,35 @@ jobs:
             -Headers $headers `
             -Body $body
 
-      - name: Create pull request
+      - name: Check for existing pull requests
         if: success()
+        id: check_pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          echo $env:GITHUB_TOKEN | gh auth login --with-token
+          $existingPrs = gh pr list --base main --state open --search "Bump PowerShell Dependencies in:title" --json number,title
+          $prCount = ($existingPrs | ConvertFrom-Json).Count
+          echo "EXISTING_PR_COUNT=$prCount" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          if ($prCount -gt 0) {
+            Write-Host "Found $prCount existing pull request(s) for PowerShell dependency bumps"
+            echo "SHOULD_CREATE_PR=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } else {
+            Write-Host "No existing pull requests found for PowerShell dependency bumps"
+            echo "SHOULD_CREATE_PR=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+
+      - name: Create pull request
+        if: success() && env.SHOULD_CREATE_PR == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
+
+      - name: Skip pull request creation
+        if: success() && env.SHOULD_CREATE_PR == 'false'
+        run: |
+          Write-Host "Skipping pull request creation because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
