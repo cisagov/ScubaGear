@@ -250,7 +250,7 @@ tests contains {
 
     # Filter: this control only applies to the Global policy
     Policy.Identity == "Global"
-    # Check that recording is not set to "Always record" (AlwaysEnabled) - it should be either "UserOverride" (Organizer can record) or "AlwaysDisabled" (Never record)
+    # Check that recording is not set to "Always record" (AlwaysEnabled)
     # The policy should pass when BroadcastRecordingMode is NOT "AlwaysEnabled"
     # This includes "UserOverride" (Organizer can record), "AlwaysDisabled" (Never record), or any other value except "AlwaysEnabled"
     # Handle potential null or undefined values by treating them as valid (not "AlwaysEnabled")
