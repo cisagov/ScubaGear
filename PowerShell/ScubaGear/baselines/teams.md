@@ -180,7 +180,7 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section, set **Anonymous users and dial-in callers can start a meeting** to **Off**.
+4.	Under the **Meeting join & lobby** section, insure the **Anonymous users and dial-in callers can start a meeting** setting remains at the default position of **Off**.
 
 5.	If custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
@@ -339,16 +339,15 @@ To enable external access for only specific domains:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users** > **External access**.
+2.  Select **Users** > **External access** > **Organizational settings**.
 
-3.  Under **Choose which external domains your users have access to**,
-    select **Allow only specific external domains**.
+3.  Next to **Teams and Skype for Business users in external organizations**,
+    select **Allow only specific external domains**
 
-4.  Click **Allow domains** to add allowed external domains. All domains
-    not added in this step will be blocked.
+4.  Select **Add external domains**. Enter domains allowed, and then select **Done**
+    **NOTE:** All domains not added in this step will not be able to communicate with your users in Teams.
 
-5.  Click **Save**.
-
+6.  Click **Save**.
 
 #### MS.TEAMS.2.2v1 Instructions
 
@@ -356,7 +355,11 @@ To enable external access for only specific domains:
 
 2.  Select **Users > External access**.
 
-3. Under **Teams accounts not managed by an organization**, toggle **People in my organization can communicate with Teams users whose accounts aren't managed by an organization** to one of the following:
+3.  Select **Policies**.
+
+4.  Select **Global (Org-wide Default)**.
+
+5. Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to one of the following:
     1. To completely block contact with unmanaged users, toggle the setting to **Off**.
     2. To allow contact with unmanaged users only if the internal user initiates the contact:
         - Toggle the setting to **On**.
@@ -368,10 +371,11 @@ To enable external access for only specific domains:
 
 2.  Select **Users > External access**.
 
-3.  To completely block contact with unmanaged users, under **Teams
-    accounts not managed by an organization**, set **People in my
-    organization can communicate with Teams users whose accounts aren't
-    managed by an organization** to **Off**.
+3.  Select **Policies**.
+
+4.  Select **Global (Org-wide Default)**.
+
+4.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
 
 ## 3. Skype Users
 
@@ -414,14 +418,7 @@ Blog](https://techcommunity.microsoft.com/t5/microsoft-teams-blog/skype-for-busi
 
 #### MS.TEAMS.3.1v1 Instructions
 
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Users > External access**.
-
-3.  Under **Skype** users, set **Allow users in my organization to
-    communicate with Skype users** to **Off**.
-
-4.  Click **Save**.
+1.  This setting has been deprecated
 
 ## 4. Teams Email Integration
 This section helps reduce security risks related to Teams email integration. Teams provides an optional feature allowing channels to have an email address and receive email.
@@ -525,67 +522,65 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Teams apps** > **Permission policies**.
+2.  Select **Teams apps** > **Manage apps**.
 
-3.  Select **Global (Org-wide default)**.
+3.  In the upper right-hand corner select **Actions**
 
-4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
+4.  Select **Org-wide app settings**.
 
-5.  Click **Allow apps**.
+5.  Under **Microsoft apps** > Select **On**
 
-6.  Search and Click **Add** to all appropriate Microsoft Apps.
-
-7.  Click **Allow**.
-
-8.  Click **Save**.
-
-9.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+6.  Click **Save**.
 
 #### MS.TEAMS.5.2v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
+   
+3.  In the upper right-hand corner select **Actions**
 
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Third-party apps** turn off **Third-party apps**.
-    - Click **Save**.
+4.  Select **Org-wide app settings**.
 
-4.  Select **Teams apps** > **Permission policies**.
+5.  Under **Third-party apps** > Select **Off**
 
-5.  Select **Global (Org-wide default)**.
+6.  Click **Save**.
+    **NOTE:** This will make third party apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
+   
+7.  Select **Teams apps** > **Manage apps**.
 
-6.  Set **Third-party apps** to **Block all apps**, unless specific apps
-    have been approved by the agency, in which case select **Allow
-    specific apps and block all others**.
+8.  Select each individual app.
 
-7.  Click **Save**.
+9.  Select **Users and groups** > **Edit availability**
 
-8.   If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
+10.  Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+
+11.  Repeat steps 7 to 10 for each application
 
 #### MS.TEAMS.5.3v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
+   
+3.  In the upper right-hand corner select **Actions**
 
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Custom apps** turn off **Interaction with custom apps**.
-    - Click **Save**.
+4.  Select **Org-wide app settings**.
 
-4.  Select **Teams apps** > **Permission policies**.
+5.  Under **Custom apps** > Select **Off**
 
-5.  Select **Global (Org-wide default)**.
+6.  Click **Save**.
+    **NOTE:** This will make Custom apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
+   
+7.  Select **Teams apps** > **Manage apps**.
 
-6.  Set **Custom apps** to **Block all apps**, unless specific apps have
-    been approved by the agency, in which case select **Allow specific apps and block all others**.
+8.  Select each individual app.
 
-7.  Click **Save**.
+9.  Select **Users and groups** > **Edit availability**
 
-8.  If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
+10.  Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+
+11.  Repeat steps 7 to 10 for each application
 
 ## 6. Data Loss Prevention
 
