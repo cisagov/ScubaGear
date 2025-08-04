@@ -339,7 +339,7 @@ To enable external access for only specific domains:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users** > **External access** > **Organizational settings**.
+2.  Select **Users** > **External access** > **Organization settings**.
 
 3.  Next to **Teams and Skype for Business users in external organizations**,
     select **Allow only specific external domains**
@@ -367,6 +367,7 @@ To enable external access for only specific domains:
         - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
 
 #### MS.TEAMS.2.3v1 Instructions
+This Setting is a more stringent setting than MS.TEAMS.2.2v1. MS.TEAMS.2.2v1 states the setting SHALL be one or the other. MS.TEAMS.2.3v1 takes the setting one step further and the organization SHOULD not communicate with unmanged Teams accounts.
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
