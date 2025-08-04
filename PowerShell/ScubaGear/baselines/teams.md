@@ -69,7 +69,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 
 <!--Policy: MS.TEAMS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
@@ -180,7 +180,7 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section, insure the **Anonymous users and dial-in callers can start a meeting** setting remains at the default position of **Off**.
+4.	Under the **Meeting join & lobby** section, ensure the **Anonymous users and dial-in callers can start a meeting** setting remains at the default position of **Off**.
 
 5.	If custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
@@ -276,7 +276,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 <!--Policy: MS.TEAMS.2.1v1; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
@@ -288,7 +288,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
 <!--Policy: MS.TEAMS.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -300,7 +300,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 <!--Policy: MS.TEAMS.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
@@ -478,7 +478,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 
 <!--Policy: MS.TEAMS.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
@@ -489,7 +489,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 
 <!--Policy: MS.TEAMS.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
@@ -501,7 +501,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 <!--Policy: MS.TEAMS.5.3v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
-- _Last modified:_ July 2023
+- _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
