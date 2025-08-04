@@ -345,9 +345,10 @@ To enable external access for only specific domains:
     select **Allow only specific external domains**
 
 4.  Select **Add external domains**. Enter domains allowed, and then select **Done**
-    **NOTE:** All domains not added in this step will not be able to communicate with your users in Teams.
+   
+    **NOTE:** Domains will need to be added in this step in order for users to communicate with them.
 
-6.  Click **Save**.
+5.  Click **Save**.
 
 #### MS.TEAMS.2.2v1 Instructions
 
@@ -545,6 +546,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 5.  Under **Third-party apps** > Select **Off**
 
 6.  Click **Save**.
+   
     **NOTE:** This will make third party apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
    
 7.  Select **Teams apps** > **Manage apps**.
@@ -570,6 +572,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 5.  Under **Custom apps** > Select **Off**
 
 6.  Click **Save**.
+   
     **NOTE:** This will make Custom apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
    
 7.  Select **Teams apps** > **Manage apps**.
