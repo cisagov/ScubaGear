@@ -542,7 +542,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 9. Select **Users and groups** > **Edit availability**
 
-10. Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+10. Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
 
 11. Repeat steps 7 to 10 for each application
 
@@ -568,7 +568,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 9.  Select **Users and groups** > **Edit availability**
 
-10.  Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
 
 11.  Repeat steps 7 to 10 for each application
 
@@ -594,7 +594,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 9.  Select **Users and groups** > **Edit availability**
 
-10.  Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
 
 11.  Repeat steps 7 to 10 for each application
 
