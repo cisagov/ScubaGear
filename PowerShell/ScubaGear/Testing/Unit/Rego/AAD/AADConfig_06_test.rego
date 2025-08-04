@@ -11,8 +11,9 @@ import data.utils.aad.FederatedDomainWarning
 #--
 
 test_PasswordValidityPeriodInDays_Correct if {
+    # Set "federated.domain.com" (index 5 in DomainSettings base configuration) to false to skip federated domain warning
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "4/IsVerified", "value": false}
+        {"op": "add", "path": "5/IsVerified", "value": false}
     ])
     Output := aad.tests with input.domain_settings as Settings
 
@@ -20,65 +21,50 @@ test_PasswordValidityPeriodInDays_Correct if {
 }
 
 test_PasswordValidityPeriodInDays_Incorrect if {
+    # Set "federated.domain.com" (index 5 in DomainSettings base configuration) to false to skip federated domain warning
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
-        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 5},
-        {"op": "add", "path": "4/IsVerified", "value": false}
+        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": null},
+        {"op": "add", "path": "5/IsVerified", "value": false}
     ])
 
     Output := aad.tests with input.domain_settings as Settings
 
-    ReportDetailString := "2 domain(s) failed:<br/>test.url.com, test1.url.com"
+    ReportDetailString := "2 domain(s) failed:<br/>root1.com, sub.root1.com"
     TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
 }
 
 test_IsVerified_Correct if {
+    # Set "federated.domain.com" (index 5 in DomainSettings base configuration) to false to skip federated domain warning
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
-        {"op": "add", "path": "1/PasswordValidityPeriodInDays", "value": 5},
-        {"op": "add", "path": "0/IsVerified", "value": null},
-        {"op": "add", "path": "1/IsVerified", "value": false},
-        {"op": "add", "path": "2/IsVerified", "value": false},
-        {"op": "add", "path": "4/IsVerified", "value": false}
+        {"op": "add", "path": "5/IsVerified", "value": false}
     ])
-
     Output := aad.tests with input.domain_settings as Settings
 
     TestResult("MS.AAD.6.1v1", Output, PASS, true) == true
 }
 
 test_AuthenticationType_Correct if {
-    Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/AuthenticationType", "value": "Federated"},
-        {"op": "add", "path": "1/AuthenticationType", "value": "Federated"},
-        {"op": "add", "path": "2/AuthenticationType", "value": "Federated"},
-        {"op": "add", "path": "1/IsVerified", "value": false}
-    ])
-
-    Output := aad.tests with input.domain_settings as Settings
+    Output := aad.tests with input.domain_settings as DomainSettings
 
     ReportDetailString := concat(" ", [
         "Requirement met; however, there are",
-        FederatedDomainWarning(["test.url.com", "test2.url.com", "test4.url.com"])
+        FederatedDomainWarning(["federated.domain.com"])
     ])
     TestResult("MS.AAD.6.1v1", Output, ReportDetailString, true) == true
 }
 
-test_PasswordValidityPeriodInDays__ExcludeFederatedDomains_Incorrect if {
+test_PasswordValidityPeriodInDays_ExcludeFederatedDomains_Incorrect if {
     Settings := json.patch(DomainSettings, [
-        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": 5},
+        {"op": "add", "path": "0/PasswordValidityPeriodInDays", "value": null},
         {"op": "add", "path": "1/AuthenticationType", "value": "Federated"},
-        {"op": "add", "path": "2/AuthenticationType", "value": "Federated"},
         {"op": "add", "path": "3/AuthenticationType", "value": "Federated"},
-        {"op": "add", "path": "1/IsVerified", "value": false},
-        {"op": "add", "path": "4/IsVerified", "value": false}
     ])
 
     Output := aad.tests with input.domain_settings as Settings
 
     ReportDetailString := concat("<br/>", [
-        "1 domain(s) failed:<br/>test.url.com<br/>",
-        FederatedDomainWarning(["test2.url.com", "test3.url.com"])
+        "2 domain(s) failed:<br/>root1.com, sub.root1.com<br/>",
+        FederatedDomainWarning(["federated.domain.com", "root2.com", "sub.root2.com"])
     ])
     TestResult("MS.AAD.6.1v1", Output, ReportDetailString, false) == true
 }

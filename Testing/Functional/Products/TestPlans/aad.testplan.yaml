@@ -202,6 +202,47 @@ TestPlan:
                 State: enabledForReportingButNotEnforced
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Authentication Strength with Multifactor Authentication is enforced
+        ### This test enables the standard non-specific MFA policy with authentication strength set to "Multifactor Authentication"
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "deviceBasedPush"
+                      - "temporaryAccessPassOneTime"
+                      - "temporaryAccessPassMultiUse"
+                      - "password, microsoftAuthenticatorPush"
+                      - "password, softwareOath"
+                      - "password, hardwareOath"
+                      - "password, sms"
+                      - "password, voice"
+                      - "federatedMultiFactor"
+                      - "microsoftAuthenticatorPush, federatedSingleFactor"
+                      - "softwareOath, federatedSingleFactor"
+                      - "hardwareOath, federatedSingleFactor"
+                      - "sms, federatedSingleFactor"
+                      - "voice, federatedSingleFactor"
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.3.3v2
     TestDriver: ScubaCached
@@ -713,21 +754,36 @@ TestPlan:
             Splat:
               updates:
                 domain_settings:
-                  - Id: test.url.com
+                  - Id: root1.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test1.url.com
+                    IsRoot: true
+                  - Id: root2.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test2.url.com
-                    PasswordValidityPeriodInDays: 2147483647
+                    IsRoot: true
+                  - Id: sub.root1.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test4.url.com
+                    IsRoot: false
+                  - Id: sub.root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: unverified.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: federated.domain.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: false
                     AuthenticationType: "Federated"
+                    IsRoot: false
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
@@ -736,52 +792,74 @@ TestPlan:
             Splat:
               updates:
                 domain_settings:
-                  - Id: test.url.com
-                    PasswordValidityPeriodInDays: 5
+                  - Id: root1.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 5
-                    IsVerified: true
-                    AuthenticationType: "Managed"
-                  - Id: test2.url.com
+                    IsRoot: true
+                  - Id: root2.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test3.url.com
-                    PasswordValidityPeriodInDays: 5
+                    IsRoot: true
+                  - Id: sub.root1.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test4.url.com
+                    IsRoot: false
+                  - Id: sub.root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: unverified.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: federated.domain.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: false
                     AuthenticationType: "Federated"
+                    IsRoot: false
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.6.1v1 Compliant case - User passwords shall be verified
+      - TestDescription: MS.AAD.6.1v1 Compliant case - Domains must be verified for password validity check to apply
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
                 domain_settings:
-                  - Id: test.url.com
-                    PasswordValidityPeriodInDays: 5
-                    IsVerified: null
-                    AuthenticationType: "Managed"
-                  - Id: test1.url.com
-                    PasswordValidityPeriodInDays: 5
-                    IsVerified: false
-                    AuthenticationType: "Managed"
-                  - Id: test2.url.com
+                  - Id: root1.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: false
                     AuthenticationType: "Managed"
-                  - Id: test3.url.com
+                    IsRoot: true
+                  - Id: root2.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Managed"
-                  - Id: test4.url.com
+                    IsRoot: true
+                  - Id: sub.root1.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: sub.root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: unverified.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: federated.domain.com
+                    PasswordValidityPeriodInDays: null
                     IsVerified: false
                     AuthenticationType: "Federated"
+                    IsRoot: false
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Compliant case - Domains are valid and federated domains are excluded
@@ -790,19 +868,36 @@ TestPlan:
             Splat:
               updates:
                 domain_settings:
-                  - Id: test.url.com
-                    IsVerified: null
-                    AuthenticationType: "Federated"
-                  - Id: test1.url.com
-                    IsVerified: false
-                    AuthenticationType: "Federated"
-                  - Id: test2.url.com
-                    IsVerified: true
-                    AuthenticationType: "Federated"
-                  - Id: test3.url.com
+                  - Id: root1.com
                     PasswordValidityPeriodInDays: 2147483647
                     IsVerified: true
                     AuthenticationType: "Managed"
+                    IsRoot: true
+                  - Id: root2.com
+                    PasswordValidityPeriodInDays: 2147483647
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: true
+                  - Id: sub.root1.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: sub.root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: unverified.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: federated.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Federated"
+                    IsRoot: false
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.6.1v1 Non-Compliant case - Domains are invalid and federated domains are excluded
