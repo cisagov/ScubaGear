@@ -534,6 +534,18 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 6.  Click **Save**.
 
+    **NOTE:** This will make Microsoft apps in the application list available to "Everyone." If adjustments are needed follow the remaining instructions
+
+7. Select **Teams apps** > **Manage apps**.
+
+8. Select each individual app.
+
+9. Select **Users and groups** > **Edit availability**
+
+10. Changed **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+
+11. Repeat steps 7 to 10 for each application
+
 #### MS.TEAMS.5.2v1 Instructions
 
 1.  Sign in to the **Microsoft Teams admin center**.
