@@ -392,7 +392,7 @@ This section helps reduce security risks related to contact with Skype users. Mi
 
 ### Policies
 
-#### MS.TEAMS.3.1v1
+#### MS.TEAMS.3.1v1 (Settings Deprecated)
 Contact with Skype users SHALL be blocked.
 
 <!--Policy: MS.TEAMS.3.1v1; Criticality: SHALL -->
