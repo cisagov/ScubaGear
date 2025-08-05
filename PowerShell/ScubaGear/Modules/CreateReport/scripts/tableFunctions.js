@@ -305,12 +305,13 @@ const fillTruncatedCell = (caps, td, i, j) => {
 const hideCAPRow = (caps, event) => {
     try {
         let i = event.currentTarget.rowNumber;
-        let tr = document.querySelector("#caps tr:nth-of-type(" + (i+2).toString() + ")"); /*i+2
-        because nth-of-type is indexed from 1 and to account for the header row */
+        // i+2 to account for the header row since nth-of-type is indexed from 1
+        let tr = document.querySelector("#caps tr:nth-of-type(" + (i + 2).toString() + ")");
         for (let j = 0; j < capColNames.length; j++) {
-            let td = tr.querySelector("td:nth-of-type(" + (j+1).toString() + ")");
+            let td = tr.querySelector("td:nth-of-type(" + (j + 1).toString() + ")");
             fillTruncatedCell(caps, td, i, j);
         }
+
         let img = document.createElement("img");
         img.setAttribute('src', 'images/angle-right-solid.svg');
         img.setAttribute('alt', `Chevron arrow pointing right`);
@@ -659,7 +660,7 @@ const TABLE_COL_NAMES = {
         { name: "FederatedCredentials" },
         { name: "Permissions" }
     ],
-    riskySPs: [
+    riskyThirdPartySPs: [
         { name: "" },
         { name: "DisplayName" },
         { name: "KeyCredentials" },
@@ -690,7 +691,13 @@ function buildExpandableTable(data, tableType, sectionId, title) {
         return;
     };
 
+    if (!TABLE_COL_NAMES.hasOwnProperty(tableType)) {
+        console.error(`Invalid table type: ${tableType}.`);
+        return;
+    }
+
     const colNames = TABLE_COL_NAMES[tableType];
+    console.log(colNames);
     const section = document.createElement("section");
     section.id = sectionId;
     document.querySelector("main").appendChild(section);
@@ -733,12 +740,14 @@ function buildExpandableTable(data, tableType, sectionId, title) {
     const header = document.createElement("tr");
 
     colNames.forEach(col => {
+        console.log(col);
         const th = document.createElement("th");
         th.textContent = col.name;
 
         if (col.className) th.classList.add(col.className);
         header.appendChild(th);
     });
+
     thead.appendChild(header);
     table.appendChild(thead);
 
@@ -789,15 +798,24 @@ function fillTruncatedCellGeneric(data, tableType, td, i, j) {
     let truncated = false;
     const col = colNames[j];
 
-    if (data[i][col.name] && Array.isArray(data[i][col.name]) && data[i][col.name].length > 1) {
+    console.log(td, i, j)
+
+    if (data[i][col.name] === null) {
+        content = "None";
+    }
+    else if (data[i][col.name] && Array.isArray(data[i][col.name]) && data[i][col.name].length > 1) {
         content = data[i][col.name][0];
         truncated = true;
+
+        console.log("if statement", content)
     }
     else {
         content = data[i][col.name];
+
+        console.log("else statement", content)
     }
 
-    if (content.length > charLimit) {
+    if (typeof content === "string" && content.length > charLimit) {
         td.innerHTML = content.substring(0, charLimit);
         truncated = true;
     }
@@ -841,6 +859,7 @@ function expandRow(data, tableType, event) {
     for (let j = 0; j < colNames.length; j++) {
         let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
         td.innerHTML = "";
+        const col = colNames[j];
 
         if (j === 0) {
             const img = document.createElement("img");
@@ -856,33 +875,38 @@ function expandRow(data, tableType, event) {
             collapseRowButton.appendChild(img);
             td.appendChild(collapseRowButton);
         }
-        else if (data[i][colNames[j].name] && Array.isArray(data[i][colNames[j].name])) {
+        else if (data[i][col.name] && Array.isArray(data[i][col.name])) {
             const ul = document.createElement("ul");
 
-            data[i][colNames[j].name].forEach(item => {
+            data[i][col.name].forEach(item => {
                 const li = document.createElement("li");
                 li.innerHTML = typeof item === "object" ? JSON.stringify(item) : item;
                 ul.appendChild(li);
             });
             td.appendChild(ul);
         } else {
-            td.innerHTML = data[i][colNames[j].name] ?? "";
+            td.innerHTML = data[i][col.name] ?? "";
         }
     }
 }
 
 /**
  * Collapses a row back to truncated view.
+ * 
+ * @param {Array} data The table content.
+ * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
+ * @param {Event} event The event that triggered the expansion.
  */
 function hideRow(data, tableType, event) {
     const colNames = TABLE_COL_NAMES[tableType];
     let i = event.currentTarget.rowNumber;
     let tr = event.currentTarget.closest("tr");
+
     for (let j = 0; j < colNames.length; j++) {
         let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
         fillTruncatedCellGeneric(data, tableType, td, i, j);
     }
-    // Restore right chevron
+
     let td = tr.querySelector("td:first-child");
     td.innerHTML = "";
     const img = document.createElement("img");
@@ -901,14 +925,19 @@ function hideRow(data, tableType, event) {
 
 /**
  * Expands all rows in a table.
+ * 
+ * @param {Array} data The table content.
+ * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
 function expandAllRows(data, tableType) {
     const colNames = TABLE_COL_NAMES[tableType];
+
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((tr, i) => {
         for (let j = 0; j < colNames.length; j++) {
             let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
+            const col = colNames[j];
+
             if (j === 0) {
-                // Down chevron
                 td.innerHTML = "";
                 const img = document.createElement("img");
                 img.setAttribute('src', 'images/angle-down-solid.svg');
@@ -922,16 +951,19 @@ function expandAllRows(data, tableType) {
                 collapseRowButton.rowNumber = i;
                 collapseRowButton.appendChild(img);
                 td.appendChild(collapseRowButton);
-            } else if (data[i][colNames[j]] && Array.isArray(data[i][colNames[j]])) {
+            }
+            else if (data[i][col.name] && Array.isArray(data[i][col.name])) {
                 const ul = document.createElement("ul");
-                data[i][colNames[j]].forEach(item => {
+
+                data[i][col.name].forEach(item => {
                     const li = document.createElement("li");
                     li.textContent = typeof item === "object" ? JSON.stringify(item) : item;
                     ul.appendChild(li);
                 });
                 td.appendChild(ul);
-            } else {
-                td.innerHTML = data[i][colNames[j]] ?? "";
+            }
+            else {
+                td.innerHTML = data[i][col.name] ?? "";
             }
         }
     });
@@ -939,15 +971,19 @@ function expandAllRows(data, tableType) {
 
 /**
  * Collapses all rows in a table.
+ * 
+ * @param {Array} data The table content.
+ * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
 function collapseAllRows(data, tableType) {
     const colNames = TABLE_COL_NAMES[tableType];
+
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((tr, i) => {
         for (let j = 0; j < colNames.length; j++) {
             let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
             fillTruncatedCellGeneric(data, tableType, td, i, j);
         }
-        // Restore right chevron
+
         let td = tr.querySelector("td:first-child");
         td.innerHTML = "";
         const img = document.createElement("img");
