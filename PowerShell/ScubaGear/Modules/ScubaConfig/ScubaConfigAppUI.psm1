@@ -1627,7 +1627,7 @@
                 return "`nProductNames: ['*']"
             } else {
                 Write-DebugOutput -Message ("Returning specific product list for YAML: {0}" -f ($selectedProducts -join ', ')) -Source $MyInvocation.MyCommand.Name -Level "Debug"
-                Return ("`nProductNames: " + ($selectedProducts | ForEach-Object { "`n  - $_" }) -join '')
+                Return ("`nProductNames: " + ($selectedProducts | ForEach-Object { "`n  - $($_.ToLower())" }) -join '')
             }
         }
 
