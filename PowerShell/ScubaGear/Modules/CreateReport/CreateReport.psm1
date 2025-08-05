@@ -497,8 +497,6 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-        $ReportHTML = $ReportHTML.Replace("{RISKY_APPLICATIONS}", "")
-        $ReportHTML = $ReportHTML.Replace("{RISKY_THIRD_PARTY_SP}", "")
         $CapJson = "null"
         $RiskyAppsJson = "null"
         $RiskyThirdPartySPJson = "null"
