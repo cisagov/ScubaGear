@@ -127,13 +127,13 @@ InModuleScope ScubaConfigAppUI {
             It 'Should have globalSettings with sectionName and fields' {
                 $configContent = Get-Content $configPath -Raw | ConvertFrom-Json
                 $configContent.globalSettings | Should -Not -BeNullOrEmpty
-                
+
                 $configContent.globalSettings.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "GlobalSettings should have a 'sectionName' property"
                 $configContent.globalSettings.PSObject.Properties.Name | Should -Contain 'fields' -Because "GlobalSettings should have a 'fields' property"
-                
+
                 $configContent.globalSettings.sectionName | Should -Not -BeNullOrEmpty
                 $configContent.globalSettings.fields | Should -Not -BeNullOrEmpty
-                
+
                 # Ensure fields is treated as an array
                 $fieldsArray = @($configContent.globalSettings.fields)
                 $fieldsArray.Count | Should -BeGreaterThan 0 -Because "GlobalSettings should have at least one field"
@@ -149,7 +149,7 @@ InModuleScope ScubaConfigAppUI {
                     $sectionObj = $section.Value
                     $sectionObj.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "Advanced section '$($section.Name)' should have a 'sectionName' property"
                     $sectionObj.PSObject.Properties.Name | Should -Contain 'fields' -Because "Advanced section '$($section.Name)' should have a 'fields' property"
-                    
+
                     $sectionObj.sectionName | Should -Not -BeNullOrEmpty
                     # Fields array can be empty, so just check it exists
                     $sectionObj.fields | Should -Not -BeNull
