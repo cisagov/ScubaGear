@@ -250,7 +250,7 @@ img {
     text-decoration:underline;
 }
 
-.caps_table, .risky_table {
+.caps_table, .risky_apps_table, .risky_third_party_sps_table {
     width: 1000px;
     margin: 1em 3.125em 0 3.125em;
 }

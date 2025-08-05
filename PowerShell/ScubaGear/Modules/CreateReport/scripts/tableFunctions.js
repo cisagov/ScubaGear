@@ -414,7 +414,6 @@ function buildExpandableTable(data, tableType, sectionId, title) {
     }
 
     const colNames = TABLE_COL_NAMES[tableType];
-    console.log(colNames);
     const section = document.createElement("section");
     section.id = sectionId;
     document.querySelector("main").appendChild(section);
@@ -457,7 +456,6 @@ function buildExpandableTable(data, tableType, sectionId, title) {
     const header = document.createElement("tr");
 
     colNames.forEach(col => {
-        console.log(col);
         const th = document.createElement("th");
         th.textContent = col.name;
 
@@ -491,7 +489,7 @@ function buildExpandableTable(data, tableType, sectionId, title) {
                 td.appendChild(expandRowButton);
             } 
             else {
-                fillTruncatedCellGeneric(data, tableType, td, i, j);
+                fillTruncatedCell(data, tableType, td, i, j);
             }
             tr.appendChild(td);
         });
@@ -508,14 +506,12 @@ function buildExpandableTable(data, tableType, sectionId, title) {
  * @param {number} i The row index (0-indexed, not counting the header row).
  * @param {number} j The column index (0-indexed).
  */
-function fillTruncatedCellGeneric(data, tableType, td, i, j) {
+function fillTruncatedCell(data, tableType, td, i, j) {
     const colNames = TABLE_COL_NAMES[tableType];
     const charLimit = 50;
     let content = "";
     let truncated = false;
     const col = colNames[j];
-
-    console.log(td, i, j)
 
     if (data[i][col.name] === null) {
         content = "None";
@@ -523,13 +519,9 @@ function fillTruncatedCellGeneric(data, tableType, td, i, j) {
     else if (data[i][col.name] && Array.isArray(data[i][col.name]) && data[i][col.name].length > 1) {
         content = data[i][col.name][0];
         truncated = true;
-
-        console.log("if statement", content)
     }
     else {
         content = data[i][col.name];
-
-        console.log("else statement", content)
     }
 
     if (typeof content === "string" && content.length > charLimit) {
@@ -569,42 +561,9 @@ function fillTruncatedCellGeneric(data, tableType, td, i, j) {
  * @param {Event} event The event that triggered the expansion.
  */
 function expandRow(data, tableType, event) {
-    const colNames = TABLE_COL_NAMES[tableType];
-    let i = event.currentTarget.rowNumber;
-    let tr = event.currentTarget.closest("tr");
-
-    for (let j = 0; j < colNames.length; j++) {
-        let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
-        td.innerHTML = "";
-        const col = colNames[j];
-
-        if (j === 0) {
-            const img = document.createElement("img");
-            img.setAttribute('src', 'images/angle-down-solid.svg');
-            img.setAttribute('alt', `Chevron arrow pointing down`);
-            img.style.width = '14px';
-
-            const collapseRowButton = document.createElement("button");
-            collapseRowButton.title = `Show less info for row ${i + 1}`;
-            collapseRowButton.classList.add("chevron");
-            collapseRowButton.addEventListener("click", (event) => hideRow(data, tableType, event));
-            collapseRowButton.rowNumber = i;
-            collapseRowButton.appendChild(img);
-            td.appendChild(collapseRowButton);
-        }
-        else if (data[i][col.name] && Array.isArray(data[i][col.name])) {
-            const ul = document.createElement("ul");
-
-            data[i][col.name].forEach(item => {
-                const li = document.createElement("li");
-                li.innerHTML = typeof item === "object" ? JSON.stringify(item) : item;
-                ul.appendChild(li);
-            });
-            td.appendChild(ul);
-        } else {
-            td.innerHTML = data[i][col.name] ?? "";
-        }
-    }
+    let row = event.currentTarget.closest("tr");
+    let rowIndex = event.currentTarget.rowNumber;
+    fillExpandedRow(data, tableType, row, rowIndex);
 }
 
 /**
@@ -615,29 +574,9 @@ function expandRow(data, tableType, event) {
  * @param {Event} event The event that triggered the expansion.
  */
 function hideRow(data, tableType, event) {
-    const colNames = TABLE_COL_NAMES[tableType];
-    let i = event.currentTarget.rowNumber;
-    let tr = event.currentTarget.closest("tr");
-
-    for (let j = 0; j < colNames.length; j++) {
-        let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
-        fillTruncatedCellGeneric(data, tableType, td, i, j);
-    }
-
-    let td = tr.querySelector("td:first-child");
-    td.innerHTML = "";
-    const img = document.createElement("img");
-    img.setAttribute('src', 'images/angle-right-solid.svg');
-    img.setAttribute('alt', `Chevron arrow pointing right`);
-    img.style.width = '10px';
-
-    const expandRowButton = document.createElement("button");
-    expandRowButton.title = `Show more info for row ${i + 1}`;
-    expandRowButton.classList.add("chevron");
-    expandRowButton.addEventListener("click", (event) => expandRow(data, tableType, event));
-    expandRowButton.rowNumber = i;
-    expandRowButton.appendChild(img);
-    td.appendChild(expandRowButton);
+    let row = event.currentTarget.closest("tr");
+    let rowIndex = event.currentTarget.rowNumber;
+    fillCollapsedRow(data, tableType, row, rowIndex);
 }
 
 /**
@@ -647,42 +586,8 @@ function hideRow(data, tableType, event) {
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
 function expandAllRows(data, tableType) {
-    const colNames = TABLE_COL_NAMES[tableType];
-
-    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((tr, i) => {
-        for (let j = 0; j < colNames.length; j++) {
-            let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
-            const col = colNames[j];
-
-            if (j === 0) {
-                td.innerHTML = "";
-                const img = document.createElement("img");
-                img.setAttribute('src', 'images/angle-down-solid.svg');
-                img.setAttribute('alt', `Chevron arrow pointing down`);
-                img.style.width = '14px';
-
-                const collapseRowButton = document.createElement("button");
-                collapseRowButton.title = `Show less info for row ${i + 1}`;
-                collapseRowButton.classList.add("chevron");
-                collapseRowButton.addEventListener("click", (event) => hideRow(data, tableType, event));
-                collapseRowButton.rowNumber = i;
-                collapseRowButton.appendChild(img);
-                td.appendChild(collapseRowButton);
-            }
-            else if (data[i][col.name] && Array.isArray(data[i][col.name])) {
-                const ul = document.createElement("ul");
-
-                data[i][col.name].forEach(item => {
-                    const li = document.createElement("li");
-                    li.textContent = typeof item === "object" ? JSON.stringify(item) : item;
-                    ul.appendChild(li);
-                });
-                td.appendChild(ul);
-            }
-            else {
-                td.innerHTML = data[i][col.name] ?? "";
-            }
-        }
+    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
+        fillExpandedRow(data, tableType, row, rowIndex);
     });
 }
 
@@ -693,27 +598,82 @@ function expandAllRows(data, tableType) {
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
 function collapseAllRows(data, tableType) {
-    const colNames = TABLE_COL_NAMES[tableType];
-
-    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((tr, i) => {
-        for (let j = 0; j < colNames.length; j++) {
-            let td = tr.querySelector(`td:nth-of-type(${j + 1})`);
-            fillTruncatedCellGeneric(data, tableType, td, i, j);
-        }
-
-        let td = tr.querySelector("td:first-child");
-        td.innerHTML = "";
-        const img = document.createElement("img");
-        img.setAttribute('src', 'images/angle-right-solid.svg');
-        img.setAttribute('alt', `Chevron arrow pointing right`);
-        img.style.width = '10px';
-
-        const expandRowButton = document.createElement("button");
-        expandRowButton.title = `Show more info for row ${i + 1}`;
-        expandRowButton.classList.add("chevron");
-        expandRowButton.addEventListener("click", (event) => expandRow(data, tableType, event));
-        expandRowButton.rowNumber = i;
-        expandRowButton.appendChild(img);
-        td.appendChild(expandRowButton);
+    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
+        fillCollapsedRow(data, tableType, row, rowIndex);
     });
 }
+
+/**
+ * Fills a table row with expanded (full) content.
+ * @param {Array} data The table content.
+ * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
+ * @param {HTMLTableRowElement} row The table row element.
+ * @param {number} rowIndex The row index.
+ */
+function fillExpandedRow(data, tableType, row, rowIndex) {
+    const colNames = TABLE_COL_NAMES[tableType];
+
+    for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
+        let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
+        td.innerHTML = "";
+        const col = colNames[colIndex];
+
+        if (colIndex === 0) {
+            const img = document.createElement("img");
+            img.setAttribute('src', 'images/angle-down-solid.svg');
+            img.setAttribute('alt', `Chevron arrow pointing down`);
+            img.style.width = '14px';
+
+            const collapseRowButton = document.createElement("button");
+            collapseRowButton.title = `Show less info for row ${rowIndex + 1}`;
+            collapseRowButton.classList.add("chevron");
+            collapseRowButton.addEventListener("click", (event) => hideRow(data, tableType, event));
+            collapseRowButton.rowNumber = rowIndex;
+            collapseRowButton.appendChild(img);
+            td.appendChild(collapseRowButton);
+        }
+        else if (data[rowIndex][col.name] && Array.isArray(data[rowIndex][col.name])) {
+            const ul = document.createElement("ul");
+            data[rowIndex][col.name].forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = typeof item === "object" ? JSON.stringify(item) : item;
+                ul.appendChild(li);
+            });
+            td.appendChild(ul);
+        } else {
+            td.innerHTML = data[rowIndex][col.name] ?? "";
+        }
+    }
+}
+
+/**
+ * Fills a table row with collapsed (truncated) content and restores the chevron.
+ * @param {Array} data The table content.
+ * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
+ * @param {HTMLTableRowElement} row The table row element.
+ * @param {number} rowIndex The row index.
+ */
+function fillCollapsedRow(data, tableType, row, rowIndex) {
+    const colNames = TABLE_COL_NAMES[tableType];
+
+    for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
+        let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
+        fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+    }
+
+    let td = row.querySelector("td:first-child");
+    td.innerHTML = "";
+    const img = document.createElement("img");
+    img.setAttribute('src', 'images/angle-right-solid.svg');
+    img.setAttribute('alt', `Chevron arrow pointing right`);
+    img.style.width = '10px';
+
+    const expandRowButton = document.createElement("button");
+    expandRowButton.title = `Show more info for row ${rowIndex + 1}`;
+    expandRowButton.classList.add("chevron");
+    expandRowButton.addEventListener("click", (event) => expandRow(data, tableType, event));
+    expandRowButton.rowNumber = rowIndex;
+    expandRowButton.appendChild(img);
+    td.appendChild(expandRowButton);
+}
+
