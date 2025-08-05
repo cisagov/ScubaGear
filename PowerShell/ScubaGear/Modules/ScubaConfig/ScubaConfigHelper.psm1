@@ -230,16 +230,16 @@ function Update-ScubaConfigBaselineWithRego {
     if ($configContent.Version) {
         $currentVersion = $configContent.Version
         $currentDate = Get-Date
-        
+
         # Calculate year offset from 2025 (UI development start year)
         $uiStartYear = 2025
         $currentYear = $currentDate.Year
         $yearOffset = $currentYear - $uiStartYear + 1  # +1 so 2025 = 1, 2026 = 2, etc.
-        
+
         $month = $currentDate.Month       # Current month (1-12)
         $day = $currentDate.Day           # Current day (1-31)
         $dateString = Get-Date -Format "M/d/yyyy"
-        
+
         $newVersion = "$yearOffset.$month.$day"
         $configContent.Version = "$newVersion [updated $dateString]"
         Write-Output "Updated version from '$currentVersion' to '$($configContent.Version)'"
