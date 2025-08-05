@@ -6,6 +6,7 @@
     Width="1200"
     WindowStartupLocation="CenterScreen"
     Background="#F6FBFE"
+    Foreground="#333333"
     ShowInTaskbar="False"
     >
 
