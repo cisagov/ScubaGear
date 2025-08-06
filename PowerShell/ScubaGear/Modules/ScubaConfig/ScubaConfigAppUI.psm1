@@ -4,7 +4,7 @@
     Opens the ScubaConfig UI for configuring Scuba settings.
 
     .DESCRIPTION
-    This function opens a WPF-based UI for configuring Scuba settings.
+    This Function opens a WPF-based UI for configuring Scuba settings.
 
     .EXAMPLE
     Start-ScubaConfigAppUI
@@ -39,7 +39,7 @@
     $scubaui.AnnotationData | ConvertTo-Json -Depth 5
 
     .NOTES
-    This function requires the ScubaConfig module to be loaded and the ConvertFrom-Yaml function to be available.
+    This Function requires the ScubaConfig module to be loaded and the ConvertFrom-Yaml Function to be available.
     https://github.com/cisagov/ScubaGear
 
     .LINK
@@ -115,8 +115,9 @@
     $syncHash.Runspace = $Runspace
     $syncHash.GraphConnected = $Online
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppUI.xaml"
-    $syncHash.UIConfigPath = "$PSScriptRoot\ScubaConfig_$Language.json"
-    $syncHash.YAMLImport = $ConfigFilePath
+    $syncHash.UIConfigPath = "$PSScriptRoot\ScubaConfigAppUI_Control_$Language.json"
+    $syncHash.BaselineConfigPath = "$PSScriptRoot\ScubaBaselines_$Language.json"
+    $syncHash.ConfigImportPath = $ConfigFilePath
     $syncHash.GraphEndpoint = $GraphEndpoint
     $syncHash.M365Environment = $M365Environment
 
@@ -163,12 +164,12 @@
          # Store Form Objects In PowerShell
         $UIXML.SelectNodes("//*[@Name]") | ForEach-Object{ $syncHash."$($_.Name)" = $syncHash.Window.FindName($_.Name)}
 
-        function Write-DebugOutput {
+        Function Write-DebugOutput {
             <#
             .SYNOPSIS
             Writes debug output messages to the debug queue when debug mode is enabled.
             .DESCRIPTION
-            This function adds timestamped debug messages to the syncHash debug queue for troubleshooting and monitoring UI operations.
+            This Function adds timestamped debug messages to the syncHash debug queue for troubleshooting and monitoring UI operations.
             #>
             param(
                 [string]$Message,
@@ -187,25 +188,6 @@
             }
         }
 
-        # Set window icon from DrawingImage resource
-        try {
-            $iconDrawing = $syncHash.Window.FindResource("ScubaGearIconImage")
-            if ($iconDrawing) {
-                $syncHash.Window.Icon = $iconDrawing
-                Write-DebugOutput -Message "Window icon set from DrawingImage" -Source "Icon Creation" -Level "Info"
-            }
-        }
-        catch {
-            Write-DebugOutput -Message "Failed to set window icon: $($_.Exception.Message)" -Source "Icon Creation" -Level "Warning"
-        }
-
-        #Import UI configuration file
-        $syncHash.UIConfigs = Get-Content -Path $syncHash.UIConfigPath -Raw | ConvertFrom-Json
-        Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source "UI Launch" -Level "Info"
-
-        Write-DebugOutput -Message "UI initialization started - creating timer and data structures" -Source "UI Initialization" -Level "Info"
-
-
 
         #===========================================================================
         # Search Helper Functions
@@ -216,7 +198,7 @@
             .SYNOPSIS
             Initializes search and filter controls for all tabs.
             .DESCRIPTION
-            This function sets up search boxes, filter dropdowns, and their event handlers for baselineControl tabs.
+            This Function sets up search boxes, filter dropdowns, and their event handlers for baselineControl tabs.
             #>
             param()
 
@@ -236,7 +218,7 @@
             .SYNOPSIS
             Hides search and filter controls for all tabs.
             .DESCRIPTION
-            This function hides all search boxes and filter dropdowns for baselineControl tabs.
+            This Function hides all search boxes and filter dropdowns for baselineControl tabs.
             #>
             param()
 
@@ -249,19 +231,19 @@
             }
         }
 
-        # Add these functions after the existing UI helper function
+        # Add these Functions after the existing UI helper Function
         Function Get-UniqueCriticalityValues {
             <#
             .SYNOPSIS
             Extracts unique criticality values from all baseline policies.
             .DESCRIPTION
-            This function scans all product baselines and returns unique criticality values for filter dropdown population.
+            This Function scans all product baselines and returns unique criticality values for filter dropdown population.
             #>
             param()
 
             $criticalityValues = @()
 
-            foreach ($productBaselines in $syncHash.UIConfigs.baselines.PSObject.Properties) {
+            foreach ($productBaselines in $syncHash.Baselines.PSObject.Properties) {
                 foreach ($baseline in $productBaselines.Value) {
                     if ($baseline.criticality -and $baseline.criticality -notin $criticalityValues) {
                         $criticalityValues += $baseline.criticality
@@ -272,14 +254,14 @@
             return $criticalityValues | Sort-Object
         }
 
-        # Find the Add-SearchAndFilterCapability function and modify it to defer initial filtering:
+        # Find the Add-SearchAndFilterCapability Function and modify it to defer initial filtering:
 
         Function Add-SearchAndFilterCapability {
             <#
             .SYNOPSIS
             Initializes search and filter controls for all tabs.
             .DESCRIPTION
-            This function sets up search boxes, filter dropdowns, and their event handlers for baselineControl tabs.
+            This Function sets up search boxes, filter dropdowns, and their event handlers for baselineControl tabs.
             #>
             param()
 
@@ -338,7 +320,7 @@
                         }
                     }.GetNewClosure())
 
-                    Write-DebugOutput -Message "Added auto-clear search functionality for $tabType product tabs" -Source "SearchAndFilter" -Level "Verbose"
+                    Write-DebugOutput -Message "Added auto-clear search Functionality for $tabType product tabs" -Source "SearchAndFilter" -Level "Verbose"
                 }
 
                 # Initialize search textbox with improved placeholder handling
@@ -448,7 +430,7 @@
             .SYNOPSIS
             Applies search and filter criteria to policy cards.
             .DESCRIPTION
-            This function filters the display of policy cards based on search text and criticality selection.
+            This Function filters the display of policy cards based on search text and criticality selection.
             #>
             param(
                 [string]$TabType,
@@ -581,7 +563,7 @@
             .SYNOPSIS
             Tests if a policy card matches the current search and filter criteria.
             .DESCRIPTION
-            This function evaluates whether a policy card should be visible based on search text and criticality filter.
+            This Function evaluates whether a policy card should be visible based on search text and criticality filter.
             Assumes the card Tag property contains baseline data with id, name, criticality, and rationale properties.
             #>
             param(
@@ -655,7 +637,7 @@
         #===========================================================================
         # UI Helper Functions
         #===========================================================================
-        # Helper function to find controls in a container
+        # Helper Function to find controls in a container
         Function Find-ControlInContainer {
             param(
                 $Container,
@@ -682,12 +664,12 @@
         }
 
         # Recursively find all controls
-        function Find-ControlElement {
+        Function Find-ControlElement {
             <#
             .SYNOPSIS
             Recursively searches for all control elements within a WPF container.
             .DESCRIPTION
-            This function traverses the visual tree to find and return all control elements contained within a specified parent container.
+            This Function traverses the visual tree to find and return all control elements contained within a specified parent container.
             #>
             param(
                 [Parameter(Mandatory = $true)]
@@ -713,7 +695,7 @@
             .SYNOPSIS
             Adds event handlers to dynamically created WPF controls.
             .DESCRIPTION
-            This function attaches appropriate event handlers to different types of WPF controls (TextBox, ComboBox, Button, etc.) for user interaction tracking.
+            This Function attaches appropriate event handlers to different types of WPF controls (TextBox, ComboBox, Button, etc.) for user interaction tracking.
             #>
             param(
                 [System.Windows.Controls.Control]$Control
@@ -764,15 +746,13 @@
             }
         }
 
-
-
-        # Helper function to find control by setting name
+        # Helper Function to find control by setting name
         Function Find-ControlBySettingName {
             <#
             .SYNOPSIS
             Searches for WPF controls using various naming conventions.
             .DESCRIPTION
-            This function attempts to locate controls by trying multiple naming patterns and conventions commonly used in the application.
+            This Function attempts to locate controls by trying multiple naming patterns and conventions commonly used in the application.
             #>
             param([string]$SettingName)
 
@@ -802,12 +782,12 @@
         }
 
         # Function to search recursively for controls
-        function Find-ControlByName {
+        Function Find-ControlByName {
             <#
             .SYNOPSIS
             Recursively searches for a control by name within a parent container.
             .DESCRIPTION
-            This nested function traverses the visual tree to locate a control with a specific name.
+            This nested Function traverses the visual tree to locate a control with a specific name.
             #>
             param($parent, $targetName)
 
@@ -843,13 +823,13 @@
             return $null
         }
 
-        # Helper function to update control value based on type
+        # Helper Function to update control value based on type
         Function Set-ControlValue {
             <#
             .SYNOPSIS
             Updates control values based on their type and handles focus preservation.
             .DESCRIPTION
-            This function sets values on different types of WPF controls while preserving cursor position and preventing timer interference.
+            This Function sets values on different types of WPF controls while preserving cursor position and preventing timer interference.
             #>
             param(
                 [object]$Control,
@@ -896,13 +876,181 @@
             }
         }
 
-        # Helper function to update ComboBox values
+        # Function to search recursively for the list container
+        Function Find-ListContainer {
+            <#
+            .SYNOPSIS
+            Recursively searches for a list container control by name.
+            .DESCRIPTION
+            This nested Function traverses the WPF control hierarchy to locate a list container used for array field values.
+            #>
+
+            param($parent, $targetName)
+
+            if ($parent.Name -eq $targetName) {
+                return $parent
+            }
+
+            if ($parent.Children) {
+                foreach ($child in $parent.Children) {
+                    $result = Find-ListContainer -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Content -and $parent.Content.Children) {
+                foreach ($child in $parent.Content.Children) {
+                    $result = Find-ListContainer -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Items) {
+                foreach ($item in $parent.Items) {
+                    if ($item.Content -and $item.Content.Children) {
+                        foreach ($child in $item.Content.Children) {
+                            $result = Find-ListContainer -parent $child -targetName $targetName
+                            if ($result) { return $result }
+                        }
+                    }
+                }
+            }
+
+            return $null
+        }
+
+        # Function to search recursively for the checkbox
+        Function Find-CheckBox {
+            <#
+            .SYNOPSIS
+            Recursively searches for a CheckBox control by name.
+            .DESCRIPTION
+            This nested Function traverses the WPF control hierarchy to locate a specific CheckBox control used for boolean field values.
+            #>
+            param($parent, $targetName)
+
+            if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.CheckBox]) {
+                return $parent
+            }
+
+            if ($parent.Children) {
+                foreach ($child in $parent.Children) {
+                    $result = Find-CheckBox -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Content -and $parent.Content.Children) {
+                foreach ($child in $parent.Content.Children) {
+                    $result = Find-CheckBox -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Items) {
+                foreach ($item in $parent.Items) {
+                    if ($item.Content -and $item.Content.Children) {
+                        foreach ($child in $item.Content.Children) {
+                            $result = Find-CheckBox -parent $child -targetName $targetName
+                            if ($result) { return $result }
+                        }
+                    }
+                }
+            }
+
+            return $null
+        }
+
+        # Function to search recursively for the textbox
+        Function Find-TextBox {
+            <#
+            .SYNOPSIS
+            Recursively searches for a TextBox control by name.
+            .DESCRIPTION
+            This nested Function traverses the WPF control hierarchy to locate a specific TextBox control used for string field values.
+            #>
+            param($parent, $targetName)
+
+            if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.TextBox]) {
+                return $parent
+            }
+
+            if ($parent.Children) {
+                foreach ($child in $parent.Children) {
+                    $result = Find-TextBox -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Content -and $parent.Content.Children) {
+                foreach ($child in $parent.Content.Children) {
+                    $result = Find-TextBox -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Items) {
+                foreach ($item in $parent.Items) {
+                    if ($item.Content -and $item.Content.Children) {
+                        foreach ($child in $item.Content.Children) {
+                            $result = Find-TextBox -parent $child -targetName $targetName
+                            if ($result) { return $result }
+                        }
+                    }
+                }
+            }
+
+            return $null
+        }
+
+        Function Find-DatePicker {
+            <#
+            .SYNOPSIS
+            Recursively searches for a DatePicker control by name.
+            .DESCRIPTION
+            This nested Function traverses the WPF control hierarchy to locate a specific DatePicker control used for date field values.
+            #>
+            param($parent, $targetName)
+
+            if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.DatePicker]) {
+                return $parent
+            }
+
+            if ($parent.Children) {
+                foreach ($child in $parent.Children) {
+                    $result = Find-DatePicker -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Content -and $parent.Content.Children) {
+                foreach ($child in $parent.Content.Children) {
+                    $result = Find-DatePicker -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
+            }
+
+            if ($parent.Items) {
+                foreach ($item in $parent.Items) {
+                    if ($item.Content -and $item.Content.Children) {
+                        foreach ($child in $item.Content.Children) {
+                            $result = Find-DatePicker -parent $child -targetName $targetName
+                            if ($result) { return $result }
+                        }
+                    }
+                }
+            }
+
+            return $null
+        }
+
+        # Helper Function to update ComboBox values
         Function Set-ComboBoxValue {
             <#
             .SYNOPSIS
             Updates ComboBox control selection to match a specified value.
             .DESCRIPTION
-            This function sets the selected item in a ComboBox control by matching the provided value against available items.
+            This Function sets the selected item in a ComboBox control by matching the provided value against available items.
             #>
             param(
                 [System.Windows.Controls.ComboBox]$ComboBox,
@@ -992,7 +1140,7 @@
                     $isValid = $false
                 }
                 # Check for required files if specified
-                elseif ($RequiredFiles -and $RequiredFiles.Count -gt 0) {
+                elseif ($null -ne $RequiredFiles) {
                     $foundRequiredFile = $false
                     foreach ($requiredFile in $RequiredFiles) {
                         $fullPath = Join-Path $currentValue $requiredFile
@@ -1032,7 +1180,7 @@
             .SYNOPSIS
             Configures placeholder text behavior for TextBox controls.
             .DESCRIPTION
-            This function sets up placeholder text that appears when TextBox controls are empty and manages the visual styling for placeholder display.
+            This Function sets up placeholder text that appears when TextBox controls are empty and manages the visual styling for placeholder display.
             #>
             param(
                 [System.Windows.Controls.TextBox]$TextBox,
@@ -1078,16 +1226,15 @@
             }.GetNewClosure())
         }
         #===========================================================================
-        # UPDATE UI FUNCTIONS
+        # UPDATE UI FunctionS
         #===========================================================================
         Function Update-AllUIFromData {
             <#
             .SYNOPSIS
             Updates all UI elements from the current data structures.
             .DESCRIPTION
-            This function refreshes all UI components to reflect the current state of the configuration data.
+            This Function refreshes all UI components to reflect the current state of the configuration data.
             #>
-            # At the end of Import-YamlToDataStructures, add:
             try {
                 # Update general settings (textboxes, comboboxes)
                 Update-GeneralSettingsFromData
@@ -1115,15 +1262,13 @@
 
         }
 
-
-
         # Function to update general settings UI from data (Dynamic Version)
         Function Update-GeneralSettingsFromData {
             <#
             .SYNOPSIS
             Updates general settings UI controls from data.
             .DESCRIPTION
-            This function populates general settings controls with values from the GeneralSettings data structure.
+            This Function populates general settings controls with values from the GeneralSettings data structure.
             #>
             if (-not $syncHash.GeneralSettingsData) { return }
 
@@ -1155,7 +1300,7 @@
             .SYNOPSIS
             Updates advanced settings UI controls from data.
             .DESCRIPTION
-            This function populates advanced settings controls with values from the AdvancedSettings data structure and enables appropriate toggle sections.
+            This Function populates advanced settings controls with values from the AdvancedSettings data structure and enables appropriate toggle sections.
             #>
             if (-not $syncHash.AdvancedSettingsData) { return }
 
@@ -1219,7 +1364,7 @@
             .SYNOPSIS
             Updates product name checkbox controls from data.
             .DESCRIPTION
-            This function sets the checked state of product name checkboxes based on the current configuration data.
+            This Function sets the checked state of product name checkboxes based on the current configuration data.
             #>
             param([string[]]$ProductNames = $null)
 
@@ -1241,7 +1386,7 @@
                 } else {
                     $productsToSelect = $ProductNames
                 }
-            } elseif ($syncHash.GeneralSettingsData.ProductNames -and $syncHash.GeneralSettingsData.ProductNames.Count -gt 0) {
+            } elseif ($syncHash.GeneralSettingsData.ProductNames) {
                 $productsToSelect = $syncHash.GeneralSettingsData.ProductNames
             }
 
@@ -1335,7 +1480,7 @@
                 foreach ($policyId in $syncHash.ExclusionData[$productName].Keys) {
                     try {
                         # Find the exclusionField from the baseline config
-                        $baseline = $syncHash.UIConfigs.baselines.$productName | Where-Object { $_.id -eq $policyId }
+                        $baseline = $syncHash.Baselines.$productName | Where-Object { $_.id -eq $policyId }
                         if ($baseline -and $baseline.exclusionField -ne "none") {
 
                             # Find the existing card checkbox
@@ -1447,7 +1592,7 @@
             .SYNOPSIS
             Updates omission controls from the Omissions data structure.
             .DESCRIPTION
-            This function populates omission checkboxes, rationale fields, and expiration dates with values from the configuration data.
+            This Function populates omission checkboxes, rationale fields, and expiration dates with values from the configuration data.
             #>
             if (-not $syncHash.OmissionData) { return }
 
@@ -1509,7 +1654,7 @@
             .SYNOPSIS
             Updates annotation controls from the Annotations data structure.
             .DESCRIPTION
-            This function populates annotation checkboxes and comment fields with values from the configuration data.
+            This Function populates annotation checkboxes and comment fields with values from the configuration data.
             #>
             if (-not $syncHash.AnnotationData) { return }
 
@@ -1565,7 +1710,7 @@
             Collects checked product checkboxes from UI and updates $syncHash.GeneralSettingsData.ProductNames
 
             .DESCRIPTION
-            This function scans the UI for checked product checkboxes and updates the GeneralSettings
+            This Function scans the UI for checked product checkboxes and updates the GeneralSettings
             with the actual list of selected products. This is used for UI-to-data synchronization.
             #>
 
@@ -1602,7 +1747,7 @@
             Returns ProductNames formatted appropriately for YAML output
 
             .DESCRIPTION
-            This function determines the correct format for ProductNames in YAML output.
+            This Function determines the correct format for ProductNames in YAML output.
             If all available products are selected, returns ['*'].
             Otherwise, returns the actual list of selected products.
             #>
@@ -1627,7 +1772,7 @@
                 return "`nProductNames: ['*']"
             } else {
                 Write-DebugOutput -Message ("Returning specific product list for YAML: {0}" -f ($selectedProducts -join ', ')) -Source $MyInvocation.MyCommand.Name -Level "Debug"
-                Return ("`nProductNames: " + ($selectedProducts | ForEach-Object { "`n  - $($_.ToLower())" }) -join '')
+                Return ("`nProductNames: " + ($selectedProducts | ForEach-Object { "`n  - $_" }) -join '')
             }
         }
 
@@ -1637,7 +1782,7 @@
             .SYNOPSIS
             Creates policy cards for baselineControl.
             .DESCRIPTION
-            This function generates UI cards for each policy baseline of a product, allowing users to configure baselines.
+            This Function generates UI cards for each policy baseline of a product, allowing users to configure baselines.
             #>
             param(
                 [string]$ProductName,
@@ -1656,9 +1801,9 @@
             }
 
             # Get baselines for this product
-            $baselines = $syncHash.UIConfigs.baselines.$ProductName
+            $baselines = $syncHash.Baselines.$ProductName
 
-            if ($baselines -and $baselines.Count -gt 0) {
+            if ($null -ne $baselines) {
                 # Filter baselines based on the control type
                 $filteredBaselines = switch ($ControlType) {
                     "Exclusions" {
@@ -1669,7 +1814,7 @@
                     }
                 }
 
-                if ($filteredBaselines -and $filteredBaselines.Count -gt 0) {
+                if ($null -ne $filteredBaselines) {
                     foreach ($baseline in $filteredBaselines) {
                         # Get the field list for this baseline
                         $fieldList = if ($baseline.PSObject.Properties.Name -contains $baselineControl.fieldControlName) {
@@ -1691,7 +1836,8 @@
                                     -FieldList $fieldList `
                                     -OutputData $outputData `
                                     -ShowFieldType:$baselineControl.showFieldType `
-                                    -ShowDescription:$baselineControl.showDescription
+                                    -ShowDescription:$baselineControl.showDescription `
+                                    -FlipFieldValueAndPolicyId:$baselineControl.supportsAllProducts
 
                         if ($card) {
                             [void]$Container.Children.Add($card)
@@ -1730,7 +1876,7 @@
             .SYNOPSIS
             Validates required fields in a policy card details panel.
             .DESCRIPTION
-            This function checks that all required fields in a policy configuration card have valid values before allowing the configuration to be saved.
+            This Function checks that all required fields in a policy configuration card have valid values before allowing the configuration to be saved.
             #>
             param(
                 [System.Windows.Controls.StackPanel]$detailsPanel,
@@ -1822,12 +1968,13 @@
 
             return $missingRequiredFields
         }
+
         Function New-FieldListControl {
             <#
             .SYNOPSIS
             Creates a dynamic field list control for policy configurations.
             .DESCRIPTION
-            This function generates interactive UI controls for managing lists of field values in policy configurations.
+            This Function generates interactive UI controls for managing lists of field values in policy configurations.
             #>
             param(
                 [string]$ControlName,
@@ -1859,7 +2006,7 @@
             $fieldName = ($PolicyId.replace('.', '_') + "_" + $ControlName + "_" + $Field.value)
 
             if ($Field.type -eq "array") {
-                # Create array input with add/remove functionality
+                # Create array input with add/remove Functionality
                 $arrayContainer = New-Object System.Windows.Controls.StackPanel
                 $arrayContainer.Name = $fieldName + "_Container"
 
@@ -1889,7 +2036,7 @@
                 # Add global event handlers to dynamically created inputTextBox
                 Add-ControlEventHandler -Control $inputTextBox
 
-                # placeholder functionality - capture placeholder in closure properly
+                # placeholder Functionality - capture placeholder in closure properly
                 $inputTextBox.Add_GotFocus({
                     #param($sender, $e)
                     if ($this.Text -eq $placeholderText) {
@@ -1926,7 +2073,7 @@
 
                 Add-ControlEventHandler -Control $addButton
 
-                # add button functionality - capture placeholder properly
+                # add button Functionality - capture placeholder properly
                 $addButton.Add_Click({
                     $inputBox = $this.Parent.Children[0]
                     $listPanel = $this.Parent.Parent.Children[1]
@@ -2070,7 +2217,7 @@
                         # Add global event handlers to dynamically created clear button
                         Add-ControlEventHandler -Control $clearButton
 
-                        # Clear button functionality
+                        # Clear button Functionality
                         $clearButton.Add_Click({
                             # Find the DatePicker (previous sibling)
                             $parentPanel = $this.Parent
@@ -2131,7 +2278,7 @@
                     $stringTextBox.Foreground = [System.Windows.Media.Brushes]::Gray
                     $stringTextBox.FontStyle = "Italic"
 
-                    # string field placeholder functionality
+                    # string field placeholder Functionality
                     $stringTextBox.Add_GotFocus({
                         #param($sender, $e)
                         if ($this.Text -eq $stringPlaceholder) {
@@ -2177,7 +2324,7 @@
                     $selectedItems = Show-GraphSelector -GraphEntityType $GraphQueryData.Name -SearchTerm $searchTerm
 
                     # More robust check for valid results
-                    if ($selectedItems -and $selectedItems.Count -gt 0 -and $null -ne $selectedItems[0]) {
+                    if ($null -ne $selectedItems) {
                         # Add selected users to the list
                         foreach ($item in $selectedItems) {
                             # Skip if item is null or empty
@@ -2249,7 +2396,7 @@
             .SYNOPSIS
             Creates a comprehensive field card UI element for policy configuration.
             .DESCRIPTION
-            This function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
+            This Function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
             #>
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ProductName")]
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutputData")]
@@ -2263,7 +2410,8 @@
                 [string[]]$FieldList,  # Can be string or array
                 $OutputData,
                 [switch]$ShowFieldType,
-                [switch]$ShowDescription
+                [switch]$ShowDescription,
+                [switch]$FlipFieldValueAndPolicyId
             )
 
             # Store baseline data in card Tag for filtering
@@ -2518,187 +2666,30 @@
                     return # Exit save operation if validation fails
                 }
 
-                # Initialize policy level if not exists
-                if (-not $OutputData[$ProductName]) {
-                    $OutputData[$ProductName] = @{}
+                # Initialize output data structure
+                If($FlipFieldValueAndPolicyId) {
+                    # For annotations/omissions: Product -> FieldType -> PolicyId -> Data
+                    # Get the yamlValue from the baseline control that uses this input type
+                    $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.defaultFields -eq $validInputFields[0] }
+                    $NestedKey = if ($baselineControl) { $baselineControl.yamlValue } else { $validInputFields[0] }
+                    $PolicyKey = $policyId            # The actual policy ID becomes nested under FieldType
+                } else {
+                    # Normal structure: Product -> PolicyId -> FieldType -> Data
+                    $NestedKey = $policyId
+                    $PolicyKey = $validInputFields[0]  # Use the first valid input field name
                 }
-                if (-not $OutputData[$ProductName][$policyId]) {
-                    $OutputData[$ProductName][$policyId] = @{}
+
+                # Initialize structure
+                if (-not $OutputData[$ProductName]) {
+                    $OutputData[$ProductName] = [ordered]@{}
+                }
+                if (-not $OutputData[$ProductName][$NestedKey]) {
+                    $OutputData[$ProductName][$NestedKey] = [ordered]@{}
                 }
 
                 $hasOutputData = $false
                 $savedinputTypes = @()
 
-                # Get the details panel (parent of button panel)
-                $detailsPanel = $this.Parent.Parent
-
-                # Function to search recursively for the list container
-                function Find-ListContainer {
-                    <#
-                    .SYNOPSIS
-                    Recursively searches for a list container control by name.
-                    .DESCRIPTION
-                    This nested function traverses the WPF control hierarchy to locate a list container used for array field values.
-                    #>
-
-                    param($parent, $targetName)
-
-                    if ($parent.Name -eq $targetName) {
-                        return $parent
-                    }
-
-                    if ($parent.Children) {
-                        foreach ($child in $parent.Children) {
-                            $result = Find-ListContainer -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Content -and $parent.Content.Children) {
-                        foreach ($child in $parent.Content.Children) {
-                            $result = Find-ListContainer -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Items) {
-                        foreach ($item in $parent.Items) {
-                            if ($item.Content -and $item.Content.Children) {
-                                foreach ($child in $item.Content.Children) {
-                                    $result = Find-ListContainer -parent $child -targetName $targetName
-                                    if ($result) { return $result }
-                                }
-                            }
-                        }
-                    }
-
-                    return $null
-                }
-
-                # Function to search recursively for the checkbox
-                function Find-CheckBox {
-                    <#
-                    .SYNOPSIS
-                    Recursively searches for a CheckBox control by name.
-                    .DESCRIPTION
-                    This nested function traverses the WPF control hierarchy to locate a specific CheckBox control used for boolean field values.
-                    #>
-                    param($parent, $targetName)
-
-                    if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.CheckBox]) {
-                        return $parent
-                    }
-
-                    if ($parent.Children) {
-                        foreach ($child in $parent.Children) {
-                            $result = Find-CheckBox -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Content -and $parent.Content.Children) {
-                        foreach ($child in $parent.Content.Children) {
-                            $result = Find-CheckBox -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Items) {
-                        foreach ($item in $parent.Items) {
-                            if ($item.Content -and $item.Content.Children) {
-                                foreach ($child in $item.Content.Children) {
-                                    $result = Find-CheckBox -parent $child -targetName $targetName
-                                    if ($result) { return $result }
-                                }
-                            }
-                        }
-                    }
-
-                    return $null
-                }
-
-                # Function to search recursively for the textbox
-                function Find-TextBox {
-                    <#
-                    .SYNOPSIS
-                    Recursively searches for a TextBox control by name.
-                    .DESCRIPTION
-                    This nested function traverses the WPF control hierarchy to locate a specific TextBox control used for string field values.
-                    #>
-                    param($parent, $targetName)
-
-                    if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.TextBox]) {
-                        return $parent
-                    }
-
-                    if ($parent.Children) {
-                        foreach ($child in $parent.Children) {
-                            $result = Find-TextBox -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Content -and $parent.Content.Children) {
-                        foreach ($child in $parent.Content.Children) {
-                            $result = Find-TextBox -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Items) {
-                        foreach ($item in $parent.Items) {
-                            if ($item.Content -and $item.Content.Children) {
-                                foreach ($child in $item.Content.Children) {
-                                    $result = Find-TextBox -parent $child -targetName $targetName
-                                    if ($result) { return $result }
-                                }
-                            }
-                        }
-                    }
-
-                    return $null
-                }
-
-                function Find-DatePicker {
-                    <#
-                    .SYNOPSIS
-                    Recursively searches for a DatePicker control by name.
-                    .DESCRIPTION
-                    This nested function traverses the WPF control hierarchy to locate a specific DatePicker control used for date field values.
-                    #>
-                    param($parent, $targetName)
-
-                    if ($parent.Name -eq $targetName -and $parent -is [System.Windows.Controls.DatePicker]) {
-                        return $parent
-                    }
-
-                    if ($parent.Children) {
-                        foreach ($child in $parent.Children) {
-                            $result = Find-DatePicker -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Content -and $parent.Content.Children) {
-                        foreach ($child in $parent.Content.Children) {
-                            $result = Find-DatePicker -parent $child -targetName $targetName
-                            if ($result) { return $result }
-                        }
-                    }
-
-                    if ($parent.Items) {
-                        foreach ($item in $parent.Items) {
-                            if ($item.Content -and $item.Content.Children) {
-                                foreach ($child in $item.Content.Children) {
-                                    $result = Find-DatePicker -parent $child -targetName $targetName
-                                    if ($result) { return $result }
-                                }
-                            }
-                        }
-                    }
-
-                    return $null
-                }
 
                 # Process each Field and MERGE them into a single policy entry
                 foreach ($inputData in $validInputFields) {
@@ -2799,28 +2790,46 @@
 
                     # Store the data with proper nesting for YAML output
                     if ($fieldCardData.Count -gt 0) {
-                        # Get the YAML section name (exclusion type value like "CapExclusions", "RoleExclusions")
-                        $FieldListValue = $FieldListDef.value
-
-                        # Handle empty values - store fields directly under policy if no group value
-                        if ([string]::IsNullOrWhiteSpace($FieldListValue)) {
-                            # If the inputType has no value, store fields directly under the policy
-                            foreach ($fieldKey in $fieldCardData.Keys) {
-                                $OutputData[$ProductName][$policyId][$fieldKey] = $fieldCardData[$fieldKey]
+                        # Save data with the appropriate structure
+                        if ($FlipFieldValueAndPolicyId) {
+                            # Structure: Product -> FieldType -> PolicyId -> Data
+                            # $NestedKey = inputType name, $PolicyKey = PolicyId
+                            if (-not $OutputData[$ProductName][$NestedKey][$PolicyKey]) {
+                                $OutputData[$ProductName][$NestedKey][$PolicyKey] = [ordered]@{}
                             }
-                            Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $policyId, "Direct", ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
+
+                            # Store field data directly under the policy
+                            foreach ($fieldKey in $fieldCardData.Keys) {
+                                $OutputData[$ProductName][$NestedKey][$PolicyKey][$fieldKey] = $fieldCardData[$fieldKey]
+                            }
+                            Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $PolicyKey, $NestedKey, ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
                         } else {
-                            # If the inputType has a value, create nested structure
-                            # Initialize the exclusion type container if it doesn't exist
-                            if (-not $OutputData[$ProductName][$policyId][$FieldListValue]) {
-                                $OutputData[$ProductName][$policyId][$FieldListValue] = @{}
-                            }
+                            # Original structure: Product -> PolicyId -> FieldType -> Data
+                            # $NestedKey = PolicyId, $PolicyKey = inputType name
 
-                            # Store field data under the exclusion type
-                            foreach ($fieldKey in $fieldCardData.Keys) {
-                                $OutputData[$ProductName][$policyId][$FieldListValue][$fieldKey] = $fieldCardData[$fieldKey]
+                            # Get the YAML section name (exclusion type value like "CapExclusions", "RoleExclusions")
+                            $FieldListValue = $FieldListDef.value
+
+                            # Handle empty values - store fields directly under policy if no group value
+                            if ([string]::IsNullOrWhiteSpace($FieldListValue)) {
+                                # If the inputType has no value, store fields directly under the policy
+                                foreach ($fieldKey in $fieldCardData.Keys) {
+                                    $OutputData[$ProductName][$NestedKey][$fieldKey] = $fieldCardData[$fieldKey]
+                                }
+                                Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $NestedKey, "Direct", ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
+                            } else {
+                                # If the inputType has a value, create nested structure
+                                # Initialize the exclusion type container if it doesn't exist
+                                if (-not $OutputData[$ProductName][$NestedKey][$FieldListValue]) {
+                                    $OutputData[$ProductName][$NestedKey][$FieldListValue] = @{}
+                                }
+
+                                # Store field data under the exclusion type
+                                foreach ($fieldKey in $fieldCardData.Keys) {
+                                    $OutputData[$ProductName][$NestedKey][$FieldListValue][$fieldKey] = $fieldCardData[$fieldKey]
+                                }
+                                Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $NestedKey, $FieldListValue, ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
                             }
-                            Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $policyId, $FieldListValue, ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
                         }
 
                         $hasOutputData = $true
@@ -2960,18 +2969,15 @@
         }#end New-FieldListsCard
 
         #===========================================================================
-        #
         # GRAPH HELPER
-        #
         #===========================================================================
-
         # Enhanced Graph Query Function with Filter Support
-        function Invoke-GraphQueryWithFilter {
+        Function Invoke-GraphQueryWithFilter {
             <#
             .SYNOPSIS
             Executes Microsoft Graph API queries with filtering support in a background thread.
             .DESCRIPTION
-            This function performs asynchronous Microsoft Graph API queries with optional filtering, returning data for users, groups, or other Graph entities.
+            This Function performs asynchronous Microsoft Graph API queries with optional filtering, returning data for users, groups, or other Graph entities.
             #>
             param(
                 [string]$QueryType,
@@ -3031,7 +3037,7 @@
                     #Write-DebugOutput -Message "Graph Query URI: $($queryParams.Uri)" -Source $MyInvocation.MyCommand.Name -Level "Information"
 
                     # Execute the Graph request
-                    $result = Invoke-MgGraphRequest @queryParams
+                    $result = Invoke-MgGraphRequest @queryParams -OutputType PSObject
 
                     # Return the result
                     return @{
@@ -3067,12 +3073,12 @@
         #===========================================================================
         # Graph Selection Function
         #===========================================================================
-        function Show-GraphProgressWindow {
+        Function Show-GraphProgressWindow {
             <#
             .SYNOPSIS
             Displays a progress window while executing Graph queries and shows results in a selection interface.
             .DESCRIPTION
-            This function shows a progress dialog during Graph API operations and presents the results in a searchable, selectable data grid for users and groups.
+            This Function shows a progress dialog during Graph API operations and presents the results in a searchable, selectable data grid for users and groups.
             #>
             param(
                 [string]$GraphEntityType,
@@ -3253,12 +3259,12 @@
             }
         }
 
-        function Show-GraphSelector {
+        Function Show-GraphSelector {
             <#
             .SYNOPSIS
-            Shows a Graph entity selector with optional search functionality.
+            Shows a Graph entity selector with optional search Functionality.
             .DESCRIPTION
-            This function displays a selector interface for Microsoft Graph entities (users, groups) with optional search term filtering and result limiting.
+            This Function displays a selector interface for Microsoft Graph entities (users, groups) with optional search term filtering and result limiting.
             #>
             param(
                 [string]$GraphEntityType,
@@ -3274,12 +3280,12 @@
         }
 
         #build UI selection window
-        function Show-UISelectionWindow {
+        Function Show-UISelectionWindow {
             <#
             .SYNOPSIS
             Creates a universal selection window with search and filtering capabilities.
             .DESCRIPTION
-            This function generates a reusable selection dialog with a searchable data grid, supporting single or multiple selection modes for various data types.
+            This Function generates a reusable selection dialog with a searchable data grid, supporting single or multiple selection modes for various data types.
             #>
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "SearchProperty")]
             param(
@@ -3354,7 +3360,7 @@
                 $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                 $searchBox.Margin = "5,0"
 
-                # Search box placeholder functionality
+                # Search box placeholder Functionality
                 $searchBox.Add_GotFocus({
                     if ($searchBox.Text -eq $SearchPlaceholder) {
                         $searchBox.Text = ""
@@ -3412,7 +3418,7 @@
                 # Store original items for filtering
                 $originalItems = $Items
 
-                # Filter function
+                # Filter Function
                 $FilterItems = {
                     $searchText = $searchBox.Text.ToLower()
                     if ([string]::IsNullOrWhiteSpace($searchText) -or $searchText -eq $SearchPlaceholder.ToLower()) {
@@ -3521,16 +3527,15 @@
             }
         }
 
-                #===========================================================================
-        # YAML IMPORT PROGRESS FUNCTIONS
         #===========================================================================
-
+        # YAML IMPORT PROGRESS FunctionS
+        #===========================================================================
         Function Show-YamlImportProgress {
             <#
             .SYNOPSIS
             Shows a progress window during YAML import operations.
             .DESCRIPTION
-            This function creates a separate runspace with a XAML-based progress window for YAML import operations.
+            This Function creates a separate runspace with a XAML-based progress window for YAML import operations.
             It provides real-time feedback during the import process.
             #>
             param(
@@ -3641,7 +3646,7 @@
                     # Store in main syncHash for communication
                     $syncHash.ProgressSync = $progressSync
 
-                    # Update message function
+                    # Update message Function
 
                     $updateMessage = {
                         <#
@@ -3659,7 +3664,7 @@
                         })
                     }
 
-                    # Store update function
+                    # Store update Function
                     $syncHash.UpdateProgressMessage = $updateMessage
 
                     # Show window and wait
@@ -3740,7 +3745,7 @@
             .SYNOPSIS
             Imports YAML configuration with progress feedback.
             .DESCRIPTION
-            This function handles the complete YAML import process with a progress window showing real-time status updates.
+            This Function handles the complete YAML import process with a progress window showing real-time status updates.
             #>
             param(
                 [Parameter(Mandatory=$true)]
@@ -3819,7 +3824,7 @@
             .SYNOPSIS
             Imports YAML configuration data into internal data structures.
             .DESCRIPTION
-            This function parses YAML configuration data and populates the application's internal data structures without updating the UI.
+            This Function parses YAML configuration data and populates the application's internal data structures without updating the UI.
             #>
             param($Config)
 
@@ -3871,6 +3876,7 @@
 
                 # Import Exclusions
                 $hasProductSections = $productIds | Where-Object { $topLevelKeys -contains $_ }
+                $supportsAllProducts = $syncHash.UIConfigs.baselineControls | Where-Object { $_.supportsAllProducts }
 
                 if ($hasProductSections) {
                     foreach ($productName in $productIds) {
@@ -3882,7 +3888,7 @@
                                 $policyData = $productData[$policyId]
 
                                 # Find the exclusionField from baseline config
-                                $baseline = $syncHash.UIConfigs.baselines.$productName | Where-Object { $_.id -eq $policyId }
+                                $baseline = $syncHash.Baselines.$productName | Where-Object { $_.id -eq $policyId }
                                 if ($baseline -and $baseline.exclusionField -ne "none") {
                                     # Get the exclusionField configuration to get the actual YAML key name
                                     $FieldListConfig = $syncHash.UIConfigs.inputTypes.($baseline.exclusionField)
@@ -3912,79 +3918,103 @@
                     }
                 }
 
-                # Import Omissions - structure to match save functions
-                if ($topLevelKeys -contains "OmitPolicy") {
-                    $omissionKeys = $Config["OmitPolicy"].Keys
+                # Import Annotations and Omissions
+                #TEST $PolicyControl = $supportsAllProducts[0]
+                Foreach($PolicyControl in $supportsAllProducts)
+                {
+                    # Get the output data structure for this control
+                    $OutputData = $syncHash.($PolicyControl.dataControlOutput)
 
-                    foreach ($policyId in $omissionKeys) {
-                        $omissionData = $Config["OmitPolicy"][$policyId]
+                    if ($topLevelKeys -contains $PolicyControl.yamlValue) {
+                        $controlData = $Config[$PolicyControl.yamlValue]
 
-                        # Find which product this policy belongs to
-                        $productName = $null
-                        foreach ($product in $syncHash.UIConfigs.products) {
-                            $baseline = $syncHash.UIConfigs.baselines.($product.id) | Where-Object { $_.id -eq $policyId }
-                            if ($baseline) {
-                                $productName = $product.id
-                                break
+                        # Check if this is the flipped structure (AnnotatePolicy -> PolicyId -> Data)
+                        # vs normal structure (PolicyId -> AnnotatePolicy -> Data)
+                        $isFlippedStructure = $false
+                        $firstKey = $controlData.Keys | Select-Object -First 1
+                        if ($firstKey -and $controlData[$firstKey] -is [hashtable]) {
+                            # Check if first level contains policy-like keys (e.g., "MS.AAD.2.1v1")
+                            $innerKeys = $controlData[$firstKey].Keys
+                            #get all field names from the default fields
+                            $fieldList = $syncHash.UIConfigs.inputTypes.($PolicyControl.defaultFields).fields.value
+                            #get all policy ids from baselines
+                            $PolicyIds = foreach ($category in $syncHash.Baselines.PSObject.Properties) {
+                                foreach ($policy in $category.Value) {
+                                    $policy.id
+                                }
+                            }
+                            $hasFieldKeys = $innerKeys | Where-Object { $_ -in $fieldList }
+                            $hasPolicyKeys = $innerKeys | Where-Object { $_ -in $PolicyIds }
+
+                            if ($hasPolicyKeys -and -not $hasFieldKeys) {
+                                $isFlippedStructure = $true
                             }
                         }
 
-                        if ($productName) {
-                            # Initialize product level if not exists
-                            if (-not $syncHash.OmissionData[$productName]) {
-                                $syncHash.OmissionData[$productName] = [ordered]@{}
+                        if ($isFlippedStructure) {
+                            # Handle flipped structure: AnnotatePolicy -> PolicyId -> Data
+                            #TEST $policyId = $controlData.Keys[0]
+                            foreach ($policyId in $controlData.Keys)
+                            {
+                                $policyFieldData = $controlData[$policyId]
+
+                                # Find which product this policy belongs to
+                                $productName = $null
+                                foreach ($product in $syncHash.UIConfigs.products) {
+                                    $baseline = $syncHash.Baselines.($product.id) | Where-Object { $_.id -eq $policyId }
+                                    if ($baseline) {
+                                        $productName = $product.id
+                                        break
+                                    }
+                                }
+
+                                if ($productName) {
+                                    # Initialize structure
+                                    if (-not $OutputData[$productName]) {
+                                        $OutputData[$productName] = [ordered]@{}
+                                    }
+                                    if (-not $OutputData[$productName][$policyId]) {
+                                        $OutputData[$productName][$policyId] = [ordered]@{}
+                                    }
+
+                                    # Store in internal structure (always Product -> PolicyId -> AnnotatePolicy -> Data)
+                                    $OutputData[$productName][$policyId][$PolicyControl.yamlValue] = $policyFieldData
+
+                                    Write-DebugOutput -Message ("Imported flipped {0} for [{1}][{2}]: {3}" -f $PolicyControl.yamlValue,$productName,$policyId,($policyFieldData | ConvertTo-Json -Compress)) -Source $MyInvocation.MyCommand.Name -Level "Info"
+                                }
                             }
+                        } else {
+                            # Handle normal structure: PolicyId -> AnnotatePolicy -> Data (existing logic)
+                            $policyIdKeys = $controlData.Keys
+                            #TEST $policyId = $policyIdKeys[0]
+                            foreach ($policyId in $policyIdKeys) {
+                                $ControlFieldData = $controlData[$policyId]
 
-                            # Initialize policy level if not exists
-                            if (-not $syncHash.OmissionData[$productName][$policyId]) {
-                                $syncHash.OmissionData[$productName][$policyId] = [ordered]@{}
+                                # Find which product this policy belongs to
+                                $productName = $null
+                                foreach ($product in $syncHash.UIConfigs.products) {
+                                    $baseline = $syncHash.UIConfigs.baselines.($product.id) | Where-Object { $_.id -eq $policyId }
+                                    if ($baseline) {
+                                        $productName = $product.id
+                                        break
+                                    }
+                                }
+
+                                if ($productName) {
+                                    # Initialize structure
+                                    if (-not $OutputData[$productName]) {
+                                        $OutputData[$productName] = [ordered]@{}
+                                    }
+                                    if (-not $OutputData[$productName][$policyId]) {
+                                        $OutputData[$productName][$policyId] = [ordered]@{}
+                                    }
+
+                                    # Store using the structure expected by save functions
+                                    $OutputData[$productName][$policyId][$PolicyControl.yamlValue] = $ControlFieldData
+
+                                    Write-DebugOutput -Message ("Imported standard {0} for [{1}][{2}]: {3}" -f $PolicyControl.yamlValue,$productName,$policyId,($ControlFieldData | ConvertTo-Json -Compress)) -Source $MyInvocation.MyCommand.Name -Level "Info"
+                                }
                             }
-
-                            # Store using the structure expected by save functions: Product -> PolicyId -> "OmitPolicy" -> Field data
-                            $syncHash.OmissionData[$productName][$policyId]["OmitPolicy"] = @{
-                                Rationale = $omissionData["Rationale"]
-                                Expiration = $omissionData["Expiration"]
-                            }
-
-                            Write-DebugOutput -Message "Imported omission for [$productName][$policyId]: Rationale=$($omissionData['Rationale']), Expiration=$($omissionData['Expiration'])" -Source $MyInvocation.MyCommand.Name -Level "Info"
-                        }
-                    }
-                }
-
-                # Import Annotations - structure to match save functions
-                if ($topLevelKeys -contains "AnnotatePolicy") {
-                    $annotationKeys = $Config["AnnotatePolicy"].Keys
-
-                    foreach ($policyId in $annotationKeys) {
-                        $annotationData = $Config["AnnotatePolicy"][$policyId]
-
-                        # Find which product this policy belongs to
-                        $productName = $null
-                        foreach ($product in $syncHash.UIConfigs.products) {
-                            $baseline = $syncHash.UIConfigs.baselines.($product.id) | Where-Object { $_.id -eq $policyId }
-                            if ($baseline) {
-                                $productName = $product.id
-                                break
-                            }
-                        }
-
-                        if ($productName) {
-                            # Initialize product level if not exists
-                            if (-not $syncHash.AnnotationData[$productName]) {
-                                $syncHash.AnnotationData[$productName] = [ordered]@{}
-                            }
-
-                            # Initialize policy level if not exists
-                            if (-not $syncHash.AnnotationData[$productName][$policyId]) {
-                                $syncHash.AnnotationData[$productName][$policyId] = [ordered]@{}
-                            }
-
-                            # Store using the structure expected by save functions: Product -> PolicyId -> "AnnotatePolicy" -> Field data
-                            $syncHash.AnnotationData[$productName][$policyId]["AnnotatePolicy"] = @{
-                                Comment = $annotationData["Comment"]
-                            }
-
-                            Write-DebugOutput -Message "Imported annotation for [$productName][$policyId]: Comment=$($annotationData['Comment'])" -Source $MyInvocation.MyCommand.Name -Level "Info"
                         }
                     }
                 }
@@ -4000,13 +4030,181 @@
             }
         }
 
+        Function Format-YamlMultilineString {
+            <#
+            .SYNOPSIS
+            Formats a string value for YAML output, using pipe syntax for multiline strings.
+            .DESCRIPTION
+            This function detects multiline strings and formats them using YAML's pipe (|) syntax
+            for better readability, while single-line strings are quoted normally.
+            #>
+            param(
+                [Parameter(Mandatory=$true)]
+                [string]$FieldName,
+                [Parameter(Mandatory=$true)]
+                [AllowEmptyString()]
+                [string]$FieldValue,
+                [Parameter(Mandatory=$false)]
+                [int]$IndentLevel = 1
+            )
+
+            if ([string]::IsNullOrEmpty($FieldValue)) {
+                return "`n$(' ' * ($IndentLevel * 2))$FieldName`: `"`""
+            }
+
+            # Check if the string contains newlines (multiline)
+            if ($FieldValue -match "`n" -or $FieldValue -match "`r") {
+                # Use YAML pipe syntax for multiline strings
+                $output = "`n$(' ' * ($IndentLevel * 2))$FieldName`: |"
+                
+                # Split the content into lines and indent each line properly
+                $lines = $FieldValue -split "`r?`n"
+                foreach ($line in $lines) {
+                    # Add proper indentation (indent level + 1 for content under pipe)
+                    $output += "`n$(' ' * (($IndentLevel + 1) * 2))$line"
+                }
+                return $output
+            } else {
+                # Single line - use quoted format
+                $escapedValue = $FieldValue.Replace('"', '""')
+                return "`n$(' ' * ($IndentLevel * 2))$FieldName`: `"$escapedValue`""
+            }
+        }
+        Function New-YamlPreviewConvert {
+            <#
+            .SYNOPSIS
+            Generates YAML configuration preview from current UI settings.
+            .DESCRIPTION
+            This function creates a YAML preview string by collecting values from all UI data structures and converting them into a formatted YAML string.
+            .NOTES
+
+            #If Accidently removed the keysToNotAdd from the GeneralSettingsData
+            $productNames = @('Aad', 'exo', 'teams', 'sharepoint', 'defender')
+            $productNames = @('*')
+            if (-not $syncHash.GeneralSettingsData.ProductNames) {
+                $syncHash.GeneralSettingsData.Add('ProductNames', $productNames)
+            }
+            if (-not $syncHash.GeneralSettingsData.M365Environment) {
+                $syncHash.GeneralSettingsData.Add('M365Environment', 'commercial')
+            }
+
+            .LINK
+            ConvertTo-Yaml
+            #>
+            $yamlPreview = @()
+            $yamlPreview += '# ScubaGear Configuration File'
+            $yamlPreview += "`n# Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+            $yamlPreview += "`r"
+            $yamlPreview += "`n# Organization Configuration"
+            $yamlPreview += "`r"
+
+            $yamlOptions = @(
+                'DefaultToStaticType',
+                'DisableAliases',
+                'OmitNullValues',
+                'WithIndentedSequences'
+            )
+            #use ConvertTo-Yaml to generate the YAML preview
+            #remove productName and M365Environment from GeneralSettingsData for the top porttion
+            $OrgnizationConfig = [System.Collections.Specialized.OrderedDictionary]::new()
+            $keysToNotAdd = @("ProductNames", "M365Environment")
+            Foreach($key in $syncHash.GeneralSettingsData.Keys) {
+                if ($key -notin $keysToNotAdd) {
+                    $OrgnizationConfig.Add($key, $syncHash.GeneralSettingsData[$key])
+                }
+            }
+            $yamlPreview += ConvertTo-Yaml -Data $OrgnizationConfig -Options $yamlOptions
+
+            # Handle ProductNames using the enhanced function
+            $yamlPreview += "`r"
+            $ProductConfig = [System.Collections.Specialized.OrderedDictionary]::new()
+            $keysToAdd= @("ProductNames")
+            Foreach($key in $syncHash.GeneralSettingsData.Keys){
+                if ($key -in $keysToAdd) {
+                    $ProductConfig.Add($key, $syncHash.GeneralSettingsData[$key])
+                }
+            }
+
+            $yamlPreview += ConvertTo-Yaml -Data $ProductConfig -Options $yamlOptions
+
+            $yamlPreview += "`n# Configuration Details"
+            $yamlPreview += "`r"
+            # Handle M365Environment
+            $EnvironmentConfig = [System.Collections.Specialized.OrderedDictionary]::new()
+            $keysToAdd= @("M365Environment")
+            Foreach($key in $syncHash.GeneralSettingsData.Keys){
+                if ($key -in $keysToAdd) {
+                    $EnvironmentConfig.Add($key, $syncHash.GeneralSettingsData[$key])
+                }
+            }
+
+            $yamlPreview += ConvertTo-Yaml -Data $EnvironmentConfig -Options $yamlOptions
+
+            if($null -ne $syncHash.AdvancedSettingsData -and $syncHash.AdvancedSettingsData.Count -gt 0){
+                $yamlPreview += "`n# Advanced Settings"
+                $yamlPreview += ""
+                # Process advanced settings from data structure instead of UI controls
+                $yamlPreview += ConvertTo-Yaml -Data $syncHash.AdvancedSettingsData -Options $yamlOptions
+            }
+
+            # Add exclusions
+            If($null -ne $syncHash.ExclusionData -and $syncHash.ExclusionData.Count -gt 0) {
+                $yamlPreview += "`n# Exclusions"
+                $yamlPreview += "`r"
+                # Convert ExclusionData to YAML format
+                $yamlPreview += (ConvertTo-Yaml -Data $syncHash.ExclusionData -Options $yamlOptions).Trim()
+            }
+
+            $supportsAllProducts = $syncHash.UIConfigs.baselineControls | Where-Object { $_.supportsAllProducts }
+            #TEST $PolicyControl = $supportsAllProducts[0]
+            Foreach($PolicyControl in $supportsAllProducts)
+            {
+                # Get the output data structure for this control
+                $OutputData = $syncHash.($PolicyControl.dataControlOutput)
+
+                if($null -ne $OutputData -and $OutputData.Count -gt 0) {
+                    $yamlPreview += "`n# $($PolicyControl.controlType) Section"
+                    $yamlPreview += "`r"
+
+                    $NewDataConfig = [System.Collections.Specialized.OrderedDictionary]::new()
+                    foreach ($section in $OutputData.Values) {
+                        foreach ($key in $section.Keys) {
+                            $NewDataConfig.Add($key, $section[$key])
+                        }
+                    }
+                    #$yamlPreview += "`n$($PolicyControl.yamlValue)`:"
+                    $yamlPreview += ConvertTo-Yaml -Data $NewDataConfig -Options $yamlOptions
+                }
+            }
+
+            If($null -ne $syncHash.GlobalSettingsData -and $syncHash.GlobalSettingsData.Count -gt 0) {
+                $yamlPreview += "`n# Global Settings"
+                $yamlPreview += "`r"
+                # Convert GlobalSettingsData to YAML format
+                $yamlPreview += ConvertTo-Yaml -Data $syncHash.GlobalSettingsData -Options $yamlOptions
+            }
+            #add final newline
+            $yamlPreview += "`r"
+
+            # Display in preview tab
+            $syncHash.YamlPreview_TextBox.Text = $yamlPreview
+
+            foreach ($tab in $syncHash.MainTabControl.Items) {
+                if ($tab -is [System.Windows.Controls.TabItem] -and $tab.Header -eq "Preview") {
+                    $syncHash.MainTabControl.SelectedItem = $syncHash.PreviewTab
+                    break
+                }
+            }
+        }
+
         Function New-YamlPreview {
             <#
             .SYNOPSIS
             Generates YAML configuration preview from current UI settings.
             .DESCRIPTION
-            This function creates a YAML preview string by collecting values from all UI controls and formatting them according to ScubaGear configuration standards.
+            This Function creates a YAML preview string by collecting values from all UI controls and formatting them according to ScubaGear configuration standards.
             #>
+
             $yamlPreview = @()
             $yamlPreview += '# ScubaGear Configuration File'
             $yamlPreview += "`n# Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
@@ -4024,13 +4222,8 @@
                             $settingValue = $syncHash.GeneralSettingsData[$settingName]
 
                             if (![string]::IsNullOrWhiteSpace($settingValue)) {
-                                # Handle special formatting for description
-                                if ($settingName -eq 'Description') {
-                                    $escapedDescription = $settingValue.Replace('"', '""')
-                                    $yamlPreview += "`n$settingName`: `"$escapedDescription`""
-                                } else {
-                                    $yamlPreview += "`n$settingName`: $settingValue"
-                                }
+                                # Use the new multiline formatting function
+                                $yamlPreview += Format-YamlMultilineString -FieldName $settingName -FieldValue $settingValue -IndentLevel 0
                             }
                         }
                     }
@@ -4057,7 +4250,8 @@
                             if ($settingValue -is [bool]) {
                                 $yamlPreview += "`n$settingKey`: $($settingValue.ToString().ToLower())"
                             } else {
-                                $yamlPreview += "`n$settingKey`: $settingValue"
+                                # Use the new multiline formatting function  
+                                $yamlPreview += Format-YamlMultilineString -FieldName $settingKey -FieldValue $settingValue -IndentLevel 0
                             }
                         }
                     }
@@ -4066,7 +4260,7 @@
 
             $yamlPreview += "`n`n# Configuration Details"
 
-            # Handle ProductNames using the enhanced function
+            # Handle ProductNames using the enhanced Function
             $yamlPreview += Get-ProductNamesForYaml
 
             # Handle M365Environment
@@ -4092,13 +4286,14 @@
                                 # Format the value appropriately
                                 if ($settingValue -is [bool]) {
                                     $formattedValue = $settingValue.ToString().ToLower()
+                                    $sectionSettings += "`n$settingName`: $formattedValue"
                                 } elseif ($settingValue -match '\\|:') {
                                     $formattedValue = "`"$($settingValue.Replace('\', '\\'))`""
+                                    $sectionSettings += "`n$settingName`: $formattedValue"
                                 } else {
-                                    $formattedValue = $settingValue
+                                    # Use multiline formatting for text values
+                                    $sectionSettings += Format-YamlMultilineString -FieldName $settingName -FieldValue $settingValue -IndentLevel 0
                                 }
-
-                                $sectionSettings += "`n$settingName`: $formattedValue"
                             }
                         }
 
@@ -4115,225 +4310,146 @@
 
                         if ($settingValue -is [bool]) {
                             $formattedValue = $settingValue.ToString().ToLower()
+                            $yamlPreview += "`n$settingKey`: $formattedValue"
                         } elseif ($settingValue -match '\\|:') {
                             $formattedValue = "`"$($settingValue.Replace('\', '\\'))`""
+                            $yamlPreview += "`n$settingKey`: $formattedValue"
                         } else {
-                            $formattedValue = $settingValue
+                            # Use multiline formatting for text values
+                            $yamlPreview += Format-YamlMultilineString -FieldName $settingKey -FieldValue $settingValue -IndentLevel 0
                         }
-
-                        $yamlPreview += "`n$settingKey`: $formattedValue"
                     }
                 }
             }
 
-
-            If($syncHash.ExclusionData.count -gt 0) {
-                $yamlPreview += "`n`n# Exclusions Section"
+            #pull all policies from baselines
+            $allPolicies = foreach ($category in ($syncHash.Baselines.PSObject.Properties)) {
+                foreach ($policy in $category.Value) {
+                    [PSCustomObject]@{
+                        Source = $category.Name
+                        Id     = $policy.id
+                        Name   = $policy.name
+                    }
+                }
             }
 
-            # Handle Exclusions (unchanged - already hashtable)
-            foreach ($productName in ($syncHash.ExclusionData.Keys | Sort-Object)) {
+            # loops through the baselineControls: exclusions,annotations and omissions
+            Foreach ($baselineControl in $syncHash.UIConfigs.baselineControls){
 
-                #$productHasExclusions = $false
-                $productExclusions = @()
+                $OutputData = $syncHash.($baselineControl.dataControlOutput)
 
-                foreach ($policyId in ($syncHash.ExclusionData[$productName].Keys | Sort-Object)) {
-                    $baseline = $syncHash.UIConfigs.baselines.$productName | Where-Object { $_.id -eq $policyId }
+                If($null -ne $OutputData -and $OutputData.Count -gt 0) {
+                    $yamlPreview += "`n`n#  Baseline Control: $($baselineControl.controlType)"
 
-                    $policyBlock = @()
+                    If($baselineControl.supportsAllProducts) {
+                        # Handle annotations and omissions (supports all products)
+                        # Structure: Product -> FieldType -> PolicyId -> FieldData (after FlipFieldValueAndPolicyId)
+                        # Output: yamlValue -> PolicyId -> FieldName: FieldValue
 
-                    if ($baseline) {
-                        $policyBlock += "`n  # $($baseline.name)"
-                    }
+                        $yamlPreview += "`n$($baselineControl.yamlValue)`:"
 
-                    $policyBlock += "`n  $policyId`:"  # Only once per policy
-
-                    $exclusions = $syncHash.ExclusionData[$productName][$policyId]
-
-                    foreach ($exclusionKey in ($exclusions.Keys | Sort-Object)) {
-                        $exclusionData = $exclusions[$exclusionKey]
-
-                        if ($null -ne $exclusionData -and ($exclusionData -isnot [System.Collections.ICollection] -or $exclusionData.Count -gt 0)) {
-
-                            # Handle types: boolean / string
-                            if ($exclusionData -is [bool] -or $exclusionData -is [string] -or $exclusionData -is [int]) {
-                                $policyBlock += "`n    $exclusionKey`: $exclusionData"
-                            }
-
-                            # Array
-                            elseif ($exclusionData -is [array]) {
-                                $policyBlock += "`n    $exclusionKey`:"
-                                foreach ($item in $exclusionData) {
-                                    $policyBlock += "`n      - $item"
+                        # Collect all policies from all products
+                        $allPoliciesForControl = [ordered]@{}
+                        
+                        foreach ($productName in ($OutputData.Keys | Sort-Object)) {
+                            # The structure is now Product -> FieldType -> PolicyId -> FieldData
+                            foreach ($fieldType in ($OutputData[$productName].Keys | Sort-Object)) {
+                                $policiesForFieldType = $OutputData[$productName][$fieldType]
+                                
+                                # Now iterate through the policies under this field type
+                                foreach ($policyId in ($policiesForFieldType.Keys | Sort-Object)) {
+                                    $fieldData = $policiesForFieldType[$policyId]
+                                    
+                                    if ($fieldData -and $fieldData.Count -gt 0) {
+                                        # If policy doesn't exist yet, create it
+                                        if (-not $allPoliciesForControl.Contains($policyId)) {
+                                            $allPoliciesForControl[$policyId] = [ordered]@{}
+                                        }
+                                        
+                                        # Merge field data
+                                        foreach ($fieldKey in $fieldData.Keys) {
+                                            $allPoliciesForControl[$policyId][$fieldKey] = $fieldData[$fieldKey]
+                                        }
+                                    }
                                 }
                             }
+                        }
 
-                            # Hashtable
-                            elseif ($exclusionData -is [hashtable]) {
-                                $policyBlock += "`n    $exclusionKey`:"
-                                foreach ($fieldName in $exclusionData.Keys) {
-                                    $fieldValue = $exclusionData[$fieldName]
+                        # Output the consolidated policies
+                        foreach ($policyId in ($allPoliciesForControl.Keys | Sort-Object)) {
+                            # Get the policy details from allPolicies
+                            $PolicyDetails = $allPolicies | Where-Object { $_.Id -eq $policyId } | Select-Object -First 1
+                            if ($PolicyDetails) {
+                                $yamlPreview += "`n  # $($PolicyDetails.Name)"
+                            }
+                            $yamlPreview += "`n  $policyId`:"
 
-                                    if ($null -eq $fieldValue) { continue }
-
-                                    $policyBlock += "`n      $fieldName`:"
-
-                                    if ($fieldValue -is [array]) {
-                                        foreach ($item in $fieldValue) {
-                                            $policyBlock += "`n        - $item"
-                                        }
+                            $policyFields = $allPoliciesForControl[$policyId]
+                            foreach ($fieldKey in ($policyFields.Keys | Sort-Object)) {
+                                $fieldValue = $policyFields[$fieldKey]
+                                if ($null -ne $fieldValue -and ![string]::IsNullOrEmpty($fieldValue)) {
+                                    if ($fieldValue -is [bool]) {
+                                        $yamlPreview += "`n    $fieldKey`: $($fieldValue.ToString().ToLower())"
                                     } else {
-                                        $policyBlock += "`n        - $fieldValue"
+                                        # Use the new multiline formatting function with proper indentation
+                                        $yamlPreview += Format-YamlMultilineString -FieldName $fieldKey -FieldValue $fieldValue -IndentLevel 2
                                     }
                                 }
                             }
                         }
-                    }
 
-                    # Append the entire block only ONCE per policy
-                    if ($policyBlock.Count -gt 0) {
-                        $productExclusions += $policyBlock
-                    }
-                }
+                    } Else {
+                        # Handle exclusions (product-specific)
+                        # Structure: Product -> PolicyId -> FieldData
+                        # Output: Product -> PolicyId -> FieldName: FieldValue
 
-                if ($productExclusions.Count -gt 0) {
-                    $yamlPreview += "`n$productName`:"
-                    $yamlPreview += $productExclusions
-                }
-            }
+                        foreach ($productName in ($OutputData.Keys | Sort-Object)) {
+                            $yamlPreview += "`n$productName`:"
 
-            # Handle Annotations - Dynamic version using UIConfig fields
-            $annotationCount = 0
-            foreach ($productName in $syncHash.AnnotationData.Keys) {
-                $annotationCount += $syncHash.AnnotationData[$productName].Count
-            }
-
-            if ($annotationCount -gt 0) {
-                $yamlPreview += "`n`n# Annotations Section"
-                # Get the YAML section name from UIConfig
-                $annotationSectionName = $syncHash.UIConfigs.inputTypes.annotation.value
-                $yamlPreview += "`n$annotationSectionName`:"
-
-                # Group annotations by product
-                foreach ($productName in ($syncHash.AnnotationData.Keys | Sort-Object)) {
-                    #$yamlPreview += "`n  # $productName Annotations:"
-
-                    # Sort policies by ID
-                    $sortedPolicies = $syncHash.AnnotationData[$productName].Keys | Sort-Object
-                    foreach ($policyId in $sortedPolicies) {
-                        $annotationData = $syncHash.AnnotationData[$productName][$policyId]
-
-                        # Get policy details from baselines
-                        $policyInfo = $syncHash.UIConfigs.baselines.$productName | Where-Object { $_.id -eq $policyId }
-
-                        if ($policyInfo) {
-                            # Add policy comment with description
-                            $yamlPreview += "`n  # $($policyInfo.name)"
-                        }
-
-                        $yamlPreview += "`n  $policyId`:"
-
-                        # Access the nested annotation data correctly
-                        # The structure is: $syncHash.AnnotationData[Product][PolicyId][AnnotationType][FieldName]
-                        # We need to get the annotation type (like "AnnotatePolicy") first
-                        foreach ($annotationType in $annotationData.Keys) {
-                            $annotation = $annotationData[$annotationType]
-
-                            # Process fields in the order defined in UIConfig
-                            $annotationFields = $syncHash.UIConfigs.inputTypes.annotation.fields
-                            foreach ($field in $annotationFields) {
-                                $fieldValue = $annotation[$field.value]
-
-                                if ($null -ne $fieldValue -and ![string]::IsNullOrEmpty($fieldValue)) {
-                                    # Handle different field types
-                                    if ($field.type -eq "boolean") {
-                                        $yamlPreview += "`n    $($field.value): $($fieldValue.ToString().ToLower())"
-                                    }
-                                    elseif ($field.type -eq "longstring" -or $field.type -eq "string") {
-                                        if ($fieldValue -match "`n") {
-                                            # Use quoted string format with \n for line breaks
-                                            $escapedValue = $fieldValue.Replace('"', '""').Replace("`n", "\n")
-                                            $yamlPreview += "`n    $($field.value): `"$escapedValue`""
-                                        } else {
-                                            $yamlPreview += "`n    $($field.value): `"$fieldValue`""
-                                        }
-                                    }
-                                    elseif ($field.type -eq "dateString") {
-                                        $yamlPreview += "`n    $($field.value): $fieldValue"
-                                    }
-                                    else {
-                                        # Default handling
-                                        $yamlPreview += "`n    $($field.value): $fieldValue"
-                                    }
+                            foreach ($policyId in ($OutputData[$productName].Keys | Sort-Object)) {
+                                $PolicyDetails = $allPolicies | Where-Object { $_.Id -eq $policyId } | Select-Object -First 1
+                                if ($PolicyDetails) {
+                                    $yamlPreview += "`n  # $($PolicyDetails.Name)"
                                 }
-                            }
-                        }
-                    }
-                }
-            }
+                                $yamlPreview += "`n  $policyId`:"
 
-            # Handle Omissions - Dynamic version using UIConfig fields
-            $omissionCount = 0
-            foreach ($productName in $syncHash.OmissionData.Keys) {
-                $omissionCount += $syncHash.OmissionData[$productName].Count
-            }
-
-            if ($omissionCount -gt 0) {
-                $yamlPreview += "`n`n# Omissions Section"
-                # Get the YAML section name from UIConfig
-                $omissionSectionName = $syncHash.UIConfigs.inputTypes.omissions.value
-                $yamlPreview += "`n$omissionSectionName`:"
-
-                # Group omissions by product
-                foreach ($productName in ($syncHash.OmissionData.Keys | Sort-Object)) {
-                    #$yamlPreview += "`n  # $productName Omissions:"
-
-                    # Sort policies by ID
-                    $sortedPolicies = $syncHash.OmissionData[$productName].Keys | Sort-Object
-                    foreach ($policyId in $sortedPolicies) {
-                        $omissionData = $syncHash.OmissionData[$productName][$policyId]
-
-                        # Get policy details from baselines
-                        $policyInfo = $syncHash.UIConfigs.baselines.$productName | Where-Object { $_.id -eq $policyId }
-
-                        if ($policyInfo) {
-                            # Add policy comment with description
-                            $yamlPreview += "`n  # $($policyInfo.name)"
-                        }
-
-                        $yamlPreview += "`n  $policyId`:"
-
-                        # Access the nested omission data correctly
-                        # The structure is: $syncHash.OmissionData[Product][PolicyId][OmissionType][FieldName]
-                        # We need to get the omission type (like "OmitPolicy") first
-                        foreach ($omissionType in $omissionData.Keys) {
-                            $omission = $omissionData[$omissionType]
-
-                            # Process fields in the order defined in UIConfig
-                            $omissionFields = $syncHash.UIConfigs.inputTypes.omissions.fields
-                            foreach ($field in $omissionFields) {
-                                $fieldValue = $omission[$field.value]
-
-                                if ($null -ne $fieldValue -and ![string]::IsNullOrEmpty($fieldValue)) {
-                                    # Handle different field types
-                                    if ($field.type -eq "boolean") {
-                                        $yamlPreview += "`n    $($field.value): $($fieldValue.ToString().ToLower())"
-                                    }
-                                    elseif ($field.type -eq "longstring" -or $field.type -eq "string") {
-                                        if ($fieldValue -match "`n") {
-                                            # Use quoted string format with \n for line breaks
-                                            $escapedValue = $fieldValue.Replace('"', '""').Replace("`n", "\n")
-                                            $yamlPreview += "`n    $($field.value): `"$escapedValue`""
-                                        } else {
-                                            $yamlPreview += "`n    $($field.value): `"$fieldValue`""
+                                $policyData = $OutputData[$productName][$policyId]
+                                foreach ($fieldKey in ($policyData.Keys | Sort-Object)) {
+                                    $fieldValue = $policyData[$fieldKey]
+                                    
+                                    if ($null -ne $fieldValue -and ($fieldValue -isnot [System.Collections.ICollection] -or $fieldValue.Count -gt 0)) {
+                                        if ($fieldValue -is [bool]) {
+                                            $yamlPreview += "`n    $fieldKey`: $($fieldValue.ToString().ToLower())"
+                                        } 
+                                        elseif ($fieldValue -is [array]) {
+                                            $yamlPreview += "`n    $fieldKey`:"
+                                            foreach ($item in $fieldValue) {
+                                                $yamlPreview += "`n      - $item"
+                                            }
                                         }
-                                    }
-                                    elseif ($field.type -eq "dateString") {
-                                        $yamlPreview += "`n    $($field.value): $fieldValue"
-                                    }
-                                    else {
-                                        # Default handling
-                                        $yamlPreview += "`n    $($field.value): $fieldValue"
+                                        elseif ($fieldValue -is [hashtable]) {
+                                            $yamlPreview += "`n    $fieldKey`:"
+                                            foreach ($subFieldName in $fieldValue.Keys) {
+                                                $subFieldValue = $fieldValue[$subFieldName]
+                                                if ($null -ne $subFieldValue) {
+                                                    $yamlPreview += "`n      $subFieldName`:"
+                                                    if ($subFieldValue -is [array]) {
+                                                        foreach ($item in $subFieldValue) {
+                                                            $yamlPreview += "`n        - $item"
+                                                        }
+                                                    } else {
+                                                        $yamlPreview += "`n        - $subFieldValue"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        elseif ($fieldValue -is [string]) {
+                                            # Use the new multiline formatting function with proper indentation
+                                            $yamlPreview += Format-YamlMultilineString -FieldName $fieldKey -FieldValue $fieldValue -IndentLevel 2
+                                        }
+                                        else {
+                                            $yamlPreview += "`n    $fieldKey`: $fieldValue"
+                                        }
                                     }
                                 }
                             }
@@ -4343,7 +4459,7 @@
             }
 
             # Add Global Settings to YAML
-            if ($syncHash.GlobalSettingsData -and $syncHash.GlobalSettingsData.Keys.Count -gt 0) {
+            if ($syncHash.GlobalSettingsData) {
                 # Check if there are any valid values to display
                 $hasValidGlobalSettings = $false
                 $globalSettingsOutput = @()
@@ -4369,6 +4485,10 @@
                         $lowerValue = $value.ToString().ToLower()
                         $globalSettingsOutput += "`n$key`: $lowerValue"
                     }
+                    elseif ($value -is [string]) {
+                        # Use the new multiline formatting function
+                        $globalSettingsOutput += Format-YamlMultilineString -FieldName $key -FieldValue $value -IndentLevel 0
+                    }
                     elseif ($null -ne $value -and $value -ne "") {
                         $globalSettingsOutput += "`n$key`: $value"
                     }
@@ -4393,8 +4513,7 @@
                     break
                 }
             }
-        }#end function : New-YamlPreview
-
+        }#end Function : New-YamlPreview
         #===========================================================================
         # RESET: NEW SESSION
         #===========================================================================
@@ -4403,7 +4522,7 @@
             .SYNOPSIS
             Clears all field values and resets the UI to default state.
             .DESCRIPTION
-            This function resets all configuration data structures and UI controls to their initial empty state for starting a new session.
+            This Function resets all configuration data structures and UI controls to their initial empty state for starting a new session.
             #>
 
             # Clear core data structures
@@ -4527,7 +4646,7 @@
                 }
             }
 
-        }#end function : Clear-FieldValue
+        }#end Function : Clear-FieldValue
 
         # Function to collect general settings from UI controls
         Function Save-GeneralSettingsFromInput {
@@ -4535,11 +4654,11 @@
             .SYNOPSIS
             Saves general settings from UI controls to data structures.
             .DESCRIPTION
-            This function collects values from UI controls and stores them in the GeneralSettings data structure for YAML export.
+            This Function collects values from UI controls and stores them in the GeneralSettings data structure for YAML export.
             Only processes fields that are NOT part of advanced settings sections.
             #>
 
-            # Collect ProductNames from checked checkboxes - use helper function
+            # Collect ProductNames from checked checkboxes - use helper Function
             #Update-ProductNames
 
             # Build list of advanced settings field names to exclude
@@ -4598,14 +4717,14 @@
                 }
             }
 
-        } #end function : Save-GeneralSettingsFromInput
+        } #end Function : Save-GeneralSettingsFromInput
 
         Function Save-AdvancedSettingsFromInput {
             <#
             .SYNOPSIS
             Saves advanced settings from UI controls to data structures.
             .DESCRIPTION
-            This function collects values from advanced settings UI controls and stores them in the AdvancedSettings data structure for YAML export.
+            This Function collects values from advanced settings UI controls and stores them in the AdvancedSettings data structure for YAML export.
             Only collects values from sections that are enabled via their toggle checkboxes.
             #>
 
@@ -4647,18 +4766,17 @@
                 }
             }
 
-        } #end function : Save-AdvancedSettingsFromInput
+        } #end Function : Save-AdvancedSettingsFromInput
 
         #===========================================================================
-        # GLOBAL SETTINGS FUNCTIONS
+        # GLOBAL SETTINGS FunctionS
         #===========================================================================
-
         Function New-GlobalSettingsControls {
             <#
             .SYNOPSIS
             Creates UI controls for global settings using New-FieldListCard with custom save handling.
             .DESCRIPTION
-            This function creates global settings using the working New-FieldListCard but redirects saves to the flat GlobalSettingsData structure.
+            This Function creates global settings using the working New-FieldListCard but redirects saves to the flat GlobalSettingsData structure.
             #>
 
             if (-not $syncHash.UIConfigs.globalSettings -or -not $syncHash.UIConfigs.globalSettings.fields) {
@@ -4714,7 +4832,7 @@
                 }
             }
 
-            # Now add auto-save functionality by watching the temp data structure
+            # Now add auto-save Functionality by watching the temp data structure
             Add-GlobalSettingsAutoSave
 
             Write-DebugOutput -Message "Global settings controls created successfully" -Source "Global Settings" -Level "Info"
@@ -4723,7 +4841,7 @@
         Function Add-GlobalSettingsAutoSave {
             <#
             .SYNOPSIS
-            Adds auto-save functionality to monitor global settings changes and copy to the main data structure.
+            Adds auto-save Functionality to monitor global settings changes and copy to the main data structure.
             #>
 
             # Set up a timer to periodically check for changes and auto-save
@@ -4776,7 +4894,7 @@
             .SYNOPSIS
             Saves global settings from UI controls to data structures.
             .DESCRIPTION
-            This function collects values from global settings UI controls and stores them for YAML export.
+            This Function collects values from global settings UI controls and stores them for YAML export.
             #>
 
             if (-not $syncHash.UIConfigs.globalSettings -or -not $syncHash.UIConfigs.globalSettings.fields) {
@@ -4810,9 +4928,32 @@
                 }
             }
         }
-                #===========================================================================
-        # LOAD UI
+
         #===========================================================================
+        #
+        # LOAD UI
+        #
+        #===========================================================================
+        # Set window icon from DrawingImage resource
+        try {
+            $iconDrawing = $syncHash.Window.FindResource("ScubaGearIconImage")
+            if ($iconDrawing) {
+                $syncHash.Window.Icon = $iconDrawing
+                Write-DebugOutput -Message "Window icon set from DrawingImage" -Source "Icon Creation" -Level "Info"
+            }
+        }
+        catch {
+            Write-DebugOutput -Message "Failed to set window icon: $($_.Exception.Message)" -Source "Icon Creation" -Level "Warning"
+        }
+
+        #Import UI configuration file
+        $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
+        Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source "UI Launch" -Level "Info"
+
+        #Import baseline configuration file
+        $syncHash.Baselines = ((Get-Content -Path $syncHash.BaselineConfigPath -Raw) | ConvertFrom-Json).baselines
+        Write-DebugOutput -Message "Baselines loaded: $($syncHash.BaselineConfigPath)" -Source "UI Launch" -Level "Info"
+
         # Add global event handlers to all UI controls after everything is loaded
         $syncHash.PreviewTab.IsEnabled = $false
 
@@ -4826,6 +4967,12 @@
             Write-DebugOutput -Message "Debug is enabled in mode: $($syncHash.UIConfigs.DebugMode)" -Source "UI Launch" -Level "Info"
         } else {
             $syncHash.DebugTab.Visibility = "Collapsed"
+        }
+
+        If($syncHash.UIConfigs.EnableScubaRun){
+            $syncHash.ScubaRunTab.Visibility = "Visible"
+        }else {
+            $syncHash.ScubaRunTab.Visibility = "Collapsed"
         }
 
         #override locale context
@@ -4904,6 +5051,7 @@
 
             # Add event handlers for checked/unchecked
             $checkBox.Add_Checked({
+                $checkBox.IsEnabled = $false # Disable checkbox to prevent further changes during processing
 
                 $productId = $this.Tag
 
@@ -4915,7 +5063,7 @@
                 # Add to GeneralSettings if not already present
                 if ($syncHash.GeneralSettingsData.ProductNames -notcontains $productId) {
                     # Force array type and add the new product
-                    $syncHash.GeneralSettingsData.ProductNames = [System.Array]($syncHash.GeneralSettingsData.ProductNames + $productId)
+                    $syncHash.GeneralSettingsData.ProductNames = [System.Array]($syncHash.GeneralSettingsData.ProductNames + $productId.ToLower())
                     Write-DebugOutput -Message "Added [$productId] to ProductNames data" -Source "User Action" -Level "Info"
                 }
 
@@ -4947,14 +5095,14 @@
                     } else {
                         Write-DebugOutput -Message "No content container found for: $($productId)$($Policy.controlType)Content" -Source "UI Update" -Level "Verbose"
                     }
-
-
                 }
+                # Re-enable the checkbox after processing
+                $checkBox.IsEnabled = $true
 
             }.GetNewClosure())
 
             $checkBox.Add_Unchecked({
-
+                $checkBox.IsEnabled = $false # Disable checkbox to prevent further changes during processing
                 $productId = $this.Tag
 
                 # Check minimum selection requirement
@@ -5001,6 +5149,8 @@
                         Write-DebugOutput -Message "No content container found for: $($productId)$($Policy.controlType)Content" -Source "UI Update" -Level "Verbose"
                     }
                 }
+                # Re-enable the checkbox after processing
+                $checkBox.IsEnabled = $true
             }.GetNewClosure())
 
         }
@@ -5051,7 +5201,7 @@
         # Handle Organization TextBox with special Graph Connected logic
         if ($syncHash.GraphConnected) {
             try {
-                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/organization").Value
+                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/organization" -OutputType PSObject).Value
                 $tenantName = ($tenantDetails.VerifiedDomains | Where-Object { $_.IsDefault -eq $true }).Name
                 $syncHash.Organization_TextBox.Text = $tenantName
                 $syncHash.Organization_TextBox.Foreground = [System.Windows.Media.Brushes]::Gray
@@ -5065,23 +5215,14 @@
             }
         }
 
-        # Add event to placeholder TextBoxes
-        foreach ($placeholderKey in $syncHash.UIConfigs.localePlaceholder.PSObject.Properties.Name) {
-            $control = $syncHash.$placeholderKey
-            if ($control -is [System.Windows.Controls.TextBox]) {
-                $placeholderText = $syncHash.UIConfigs.localePlaceholder.$placeholderKey
-                Initialize-PlaceholderTextBox -TextBox $control -PlaceholderText $placeholderText
-            }
-        }
-
         # If YAMLImport is specified, load the YAML configuration
         # Process YAMLConfigFile parameter AFTER UI is fully initialized
-        If($syncHash.YAMLImport){
+        If($syncHash.ConfigImportPath){
             try {
-                Write-DebugOutput -Message "Processing YAMLConfigFile parameter: $($syncHash.YAMLImport)" -Source "UI Launch" -Level "Info"
+                Write-DebugOutput -Message "Processing YAMLConfigFile parameter: $($syncHash.ConfigImportPath)" -Source "UI Launch" -Level "Info"
 
                 # Import with progress window
-                $importSuccess = Invoke-YamlImportWithProgress -YamlFilePath $syncHash.YAMLImport -WindowTitle "Loading Configuration File"
+                $importSuccess = Invoke-YamlImportWithProgress -YamlFilePath $syncHash.ConfigImportPath -WindowTitle "Loading Configuration File"
 
                 if ($importSuccess) {
                     Write-DebugOutput -Message "YAMLConfigFile processed successfully" -Source "UI Launch" -Level "Info"
@@ -5431,7 +5572,7 @@
 
         If($syncHash.UIConfigs.EnableSearchAndFilter){
 
-            # Initialize search and filter functionality
+            # Initialize search and filter Functionality
             try {
                 Show-SearchAndFilterControl
             } catch {
@@ -5442,14 +5583,14 @@
         }Else{
             #hide search and filter controls
             Hide-SearchAndFilterControl
-            Write-DebugOutput -Message "Search and filter functionality is disabled" -Source "UI Initialization" -Level "Info"
+            Write-DebugOutput -Message "Search and filter Functionality is disabled" -Source "UI Initialization" -Level "Info"
         }
 
 
         #=======================================
         # CLOSE UI
         #=======================================
-        function Invoke-TimerCleanup {
+        Function Invoke-TimerCleanup {
             if ($syncHash.UIUpdateTimer) {
                 $syncHash.UIUpdateTimer.Stop()
                 $syncHash.UIUpdateTimer = $null
