@@ -30,6 +30,15 @@
     "CriticalityFilter_ComboBox": "{0} only",
     "ResultCount_TextBlock": "{0} policies"
   },
+  "localeToolTips": {
+    "Organization_TextBox": "While this is not required for ScubaGear to function, it is required for this UI to export a configuration file.",
+    "OrgName_TextBox": "This is required for BOD submissions. It is used to identify the organization in the configuration file.",
+    "OrgUnit_TextBox": "Optional field to specify the organizational unit or department.",
+    "Description_TextBox": "Optional description to document the purpose of this configuration.",
+    "AppId_TextBox": "Application ID (Client ID) for certificate-based authentication. Must be in GUID format.",
+    "CertificateThumbprint_TextBox": "SHA-1 thumbprint of the certificate used for authentication. Must be 40 hexadecimal characters.",
+    "M365Environment_ComboBox": "Select the Microsoft 365 environment type that matches your tenant configuration."
+},
   "localeInfoMessages": {
     "NoPoliciesAvailable": "No policies available for this product.",
     "PolicySaving": "Saving {0} for policy: {1}",
@@ -463,7 +472,7 @@
       "fields": [
         {
           "type": "boolean",
-          "name": "Incorrect Result",
+          "name": "Incorrect Result (aka False Positive)",
           "value": "IncorrectResult",
           "description": "Check to indicate that the result is incorrect",
           "valueType": "boolean",

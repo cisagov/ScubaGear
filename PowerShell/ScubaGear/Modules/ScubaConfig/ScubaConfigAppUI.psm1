@@ -1226,7 +1226,137 @@
             }.GetNewClosure())
         }
         #===========================================================================
-        # UPDATE UI FunctionS
+        # Help Tooltip Functions
+        #===========================================================================
+
+        # Add help icon next to controls
+        Function Add-ControlHelpIcon {
+            param(
+                [Parameter(Mandatory=$true)]
+                [System.Windows.Controls.Control]$Control,
+                [Parameter(Mandatory=$true)]
+                [string]$ControlName
+            )
+
+            # Check if tooltip exists in configuration
+            if ($syncHash.UIConfigs.localeToolTips.PSObject.Properties.Name -contains $ControlName) {
+                $helpText = $syncHash.UIConfigs.localeToolTips.$ControlName
+                
+                # Find the parent container
+                $parent = $Control.Parent
+                if ($parent -is [System.Windows.Controls.StackPanel] -or $parent -is [System.Windows.Controls.Grid]) {
+                    
+                    # Create help icon button
+                    $helpIcon = New-Object System.Windows.Controls.Button
+                    $helpIcon.Content = "?"
+                    $helpIcon.Width = 20
+                    $helpIcon.Height = 20
+                    $helpIcon.FontSize = 12
+                    $helpIcon.FontWeight = "Bold"
+                    $helpIcon.Background = [System.Windows.Media.Brushes]::LightBlue
+                    $helpIcon.BorderBrush = [System.Windows.Media.Brushes]::DarkBlue
+                    $helpIcon.BorderThickness = "1"
+                    $helpIcon.Margin = "5,0,0,0"
+                    $helpIcon.VerticalAlignment = "Center"
+                    $helpIcon.Cursor = [System.Windows.Input.Cursors]::Help
+                    
+                    # Add click event to show help text
+                    $helpIcon.Add_Click({
+                        [System.Windows.MessageBox]::Show($helpText, "Help: $ControlName", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    }.GetNewClosure())
+                    
+                    # Add to parent container
+                    if ($parent -is [System.Windows.Controls.StackPanel] -and $parent.Orientation -eq "Horizontal") {
+                        $parent.Children.Add($helpIcon)
+                    } elseif ($parent -is [System.Windows.Controls.Grid]) {
+                        # Position next to the control in grid
+                        $column = [System.Windows.Controls.Grid]::GetColumn($Control)
+                        [System.Windows.Controls.Grid]::SetColumn($helpIcon, $column + 1)
+                        $row = [System.Windows.Controls.Grid]::GetRow($Control)
+                        [System.Windows.Controls.Grid]::SetRow($helpIcon, $row)
+                        $parent.Children.Add($helpIcon)
+                    }
+                    
+                    return $true
+                }
+            }
+            
+            return $false
+        }
+
+        # Add context-sensitive help panel
+        Function Add-ContextualHelp {
+            param(
+                [Parameter(Mandatory=$true)]
+                [System.Windows.Controls.Control]$Control,
+                [Parameter(Mandatory=$true)]
+                [string]$ControlName
+            )
+
+            # Check if help text exists
+            if ($syncHash.UIConfigs.localeToolTips.PSObject.Properties.Name -contains $ControlName) {
+                $helpText = $syncHash.UIConfigs.localeToolTips.$ControlName
+                
+                # Add focus events to show/hide help
+                $Control.Add_GotFocus({
+                    if ($syncHash.HelpPanel) {
+                        $syncHash.HelpPanel.Visibility = "Visible"
+                        $syncHash.HelpText.Text = $helpText
+                        $syncHash.HelpTitle.Text = "Help: $ControlName"
+                    }
+                }.GetNewClosure())
+                
+                $Control.Add_LostFocus({
+                    if ($syncHash.HelpPanel) {
+                        $syncHash.HelpPanel.Visibility = "Collapsed"
+                    }
+                }.GetNewClosure())
+                
+                return $true
+            }
+            
+            return $false
+        }
+
+        # Initialize help panel (call this once during UI setup)
+        Function Initialize-HelpPanel {
+            # Create help panel (add this to your XAML or create programmatically)
+            $helpPanel = New-Object System.Windows.Controls.Border
+            $helpPanel.Name = "HelpPanel"
+            $helpPanel.Background = [System.Windows.Media.Brushes]::LightBlue
+            $helpPanel.BorderBrush = [System.Windows.Media.Brushes]::DarkBlue
+            $helpPanel.BorderThickness = "2"
+            $helpPanel.Padding = "10"
+            $helpPanel.Margin = "10"
+            $helpPanel.Visibility = "Collapsed"
+            
+            $helpStack = New-Object System.Windows.Controls.StackPanel
+            
+            $helpTitle = New-Object System.Windows.Controls.TextBlock
+            $helpTitle.Name = "HelpTitle"
+            $helpTitle.FontWeight = "Bold"
+            $helpTitle.FontSize = 14
+            $helpTitle.Margin = "0,0,0,5"
+            
+            $helpText = New-Object System.Windows.Controls.TextBlock
+            $helpText.Name = "HelpText"
+            $helpText.TextWrapping = "Wrap"
+            $helpText.FontSize = 12
+            
+            $helpStack.Children.Add($helpTitle)
+            $helpStack.Children.Add($helpText)
+            $helpPanel.Child = $helpStack
+            
+            # Store references
+            $syncHash.HelpPanel = $helpPanel
+            $syncHash.HelpTitle = $helpTitle
+            $syncHash.HelpText = $helpText
+            
+            # Add to main window (you'll need to modify this based on your layout)
+            # $syncHash.MainContainer.Children.Add($helpPanel)
+        }
+        #===========================================================================
+        # UPDATE UI Functions
         #===========================================================================
         Function Update-AllUIFromData {
             <#
@@ -1471,6 +1601,54 @@
             Write-DebugOutput -Message ("Updated checkboxes and tabs for products: {0}" -f ($productsToSelect -join ', ')) -Source $MyInvocation.MyCommand.Name -Level "Debug"
         }
 
+        Function Update-BaselineDataFromImport {
+            <#
+            .SYNOPSIS
+            Updates baseline data from imported configuration.
+            .DESCRIPTION
+            This Function processes the imported configuration data to update baseline controls and their associated data structures.
+            #>
+            $BaselineControls = $syncHash.UIConfigs.baselineControls
+
+            Foreach($baseline in $BaselineControls) {
+                
+                $outputData = $syncHash.($baseline.dataControlOutput)
+                #clear the output data
+                $outputData.Clear()
+
+                #determine how to update the data on the baseline control type
+                If($baseline.supportsAllProducts){
+                    #EG. update the exclusions or omissions data
+
+                }Else{
+                    #EG. update the exclusions data 
+                }
+            }
+        }
+
+        Function Update-BaselineControlUIFromData {
+            <#
+            .SYNOPSIS
+            Updates baseline control UI elements from data.
+            .DESCRIPTION
+            This Function populates baseline control elements with values from the BaselineConfig data structure.
+            #>
+             $BaselineControls = $syncHash.UIConfigs.baselineControls
+
+            Foreach($baseline in $BaselineControls) {
+                
+                $outputData = $syncHash.($baseline.dataControlOutput)
+
+                #determine how to update the data on the baseline control type
+                If($baseline.supportsAllProducts){
+                    #EG. update the exclusions or omissions cards
+
+                }Else{
+                    #EG. update the exclusions cards
+                }
+            }
+        }
+        
         # Updated Update-ExclusionsFromData Function for hashtable structure
         Function Update-ExclusionsFromData {
             if (-not $syncHash.ExclusionData) { return }
@@ -1557,6 +1735,20 @@
                                                         $control.Text = $fieldValue
                                                         $control.Foreground = [System.Windows.Media.Brushes]::Black
                                                         $control.FontStyle = [System.Windows.FontStyles]::Normal
+                                                        
+                                                        # Also update DatePicker if this is a dateString field
+                                                        if ($field.type -eq "dateString") {
+                                                            $DatePickerControl = ($controlName + "_DatePicker")
+                                                            $datePicker = $syncHash.$DatePickerControl
+                                                            if ($datePicker) {
+                                                                try {
+                                                                    $dateValue = [DateTime]::ParseExact($fieldValue, "yyyy-MM-dd", $null)
+                                                                    $datePicker.SelectedDate = $dateValue
+                                                                } catch {
+                                                                    Write-DebugOutput -Message ("Error parsing date '{0}' for field '{1}' in policy '{2}': {3}" -f $fieldValue, $fieldName, $policyId, $_.Exception.Message) -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1626,6 +1818,18 @@
                                     $expirationTextBox.Text = $omission.Expiration
                                     $expirationTextBox.Foreground = [System.Windows.Media.Brushes]::Black
                                     $expirationTextBox.FontStyle = [System.Windows.FontStyles]::Normal
+                                    
+                                    # Also update the corresponding DatePicker if it exists
+                                    $expirationDatePickerName = ($policyId.replace('.', '_') + "_Expiration_DatePicker")
+                                    $expirationDatePicker = $syncHash.$expirationDatePickerName
+                                    if ($expirationDatePicker) {
+                                        try {
+                                            $dateValue = [DateTime]::ParseExact($omission.Expiration, "yyyy-MM-dd", $null)
+                                            $expirationDatePicker.SelectedDate = $dateValue
+                                        } catch {
+                                            Write-DebugOutput -Message ("Error parsing expiration date '{0}' for policy '{1}': {2}" -f $omission.Expiration, $policyId, $_.Exception.Message) -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                                        }
+                                    }
                                 }
                             }
 
@@ -1661,26 +1865,113 @@
             # Iterate through products and policies in hashtable structure
             foreach ($productName in $syncHash.AnnotationData.Keys) {
                 foreach ($policyId in $syncHash.AnnotationData[$productName].Keys) {
-                    $annotation = $syncHash.AnnotationData[$productName][$policyId]
-
                     try {
-                        # Find the existing card controls
+                        # Find the annotation checkbox
                         $checkboxName = ($policyId.replace('.', '_') + "_AnnotationCheckbox")
-                        $commentTextBoxName = ($policyId.replace('.', '_') + "_Comment_TextBox")
-                        $removeButtonName = ($policyId.replace('.', '_') + "_RemoveAnnotation")
-
                         $checkbox = $syncHash.$checkboxName
-                        $commentTextBox = $syncHash.$commentTextBoxName
-                        $removeButton = $syncHash.$removeButtonName
 
-                        if ($checkbox -and $commentTextBox) {
-                            # Mark as checked (but don't expand details)
+                        if ($checkbox) {
+                            # Mark as checked
                             $checkbox.IsChecked = $true
 
-                            # Populate comment
-                            $commentTextBox.Text = $annotation.Comment
+                            # Get annotation data for this policy
+                            $annotationData = $syncHash.AnnotationData[$productName][$policyId]
 
-                            # Show remove button
+                            # Handle annotation fields dynamically (like exclusions)
+                            if ($annotationData -is [hashtable]) {
+                                # Iterate through annotation fields (YAML key names)
+                                foreach ($yamlKeyName in $annotationData.Keys) {
+                                    $fieldData = $annotationData[$yamlKeyName]
+
+                                    # Get the annotation field configuration
+                                    $FieldListConfig = $syncHash.UIConfigs.inputTypes.annotation
+
+                                    if ($FieldListConfig) {
+                                        # Populate the annotation data fields based on annotation configuration
+                                        foreach ($field in $FieldListConfig.fields) {
+                                            $fieldName = $field.value  # Use field.value for control naming
+                                            $controlName = ($policyId.replace('.', '_') + "_Annotation_" + $fieldName)
+
+                                            if ($fieldData.Keys -contains $fieldName) {
+                                                $fieldValue = $fieldData[$fieldName]
+
+                                                if ($field.type -eq "array" -and $fieldValue -is [array]) {
+                                                    # Handle array fields
+                                                    $listControl = ($controlName + "_List")
+                                                    $listContainer = $syncHash.$listControl
+                                                    if ($listContainer) {
+                                                        # Clear existing items
+                                                        $listContainer.Children.Clear()
+
+                                                        # Add each array item
+                                                        foreach ($item in $fieldValue) {
+                                                            $itemPanel = New-Object System.Windows.Controls.StackPanel
+                                                            $itemPanel.Orientation = "Horizontal"
+                                                            $itemPanel.Margin = "0,2,0,2"
+
+                                                            $itemText = New-Object System.Windows.Controls.TextBlock
+                                                            $itemText.Text = $item
+                                                            $itemText.VerticalAlignment = "Center"
+                                                            $itemText.Margin = "0,0,8,0"
+
+                                                            $removeBtn = New-Object System.Windows.Controls.Button
+                                                            $removeBtn.Content = "Remove"
+                                                            $removeBtn.Background = [System.Windows.Media.Brushes]::Red
+                                                            $removeBtn.Foreground = [System.Windows.Media.Brushes]::White
+                                                            $removeBtn.Width = 60
+                                                            $removeBtn.Height = 20
+                                                            $removeBtn.Add_Click({
+                                                                $listContainer.Children.Remove($itemPanel)
+                                                                Write-DebugOutput -Message "Item removed: $item" -Source $listContainer -Level "Info"
+                                                            }.GetNewClosure())
+
+                                                            [void]$itemPanel.Children.Add($itemText)
+                                                            [void]$itemPanel.Children.Add($removeBtn)
+                                                            [void]$listContainer.Children.Add($itemPanel)
+                                                        }
+                                                    }
+                                                } else {
+                                                    # Handle single value fields
+                                                    $TextboxControl = ($controlName + "_TextBox")
+                                                    $control = $syncHash.$TextboxControl
+                                                    if ($control) {
+                                                        $control.Text = $fieldValue
+                                                        $control.Foreground = [System.Windows.Media.Brushes]::Black
+                                                        $control.FontStyle = [System.Windows.FontStyles]::Normal
+                                                        
+                                                        # Also update DatePicker if this is a dateString field
+                                                        if ($field.type -eq "dateString") {
+                                                            $DatePickerControl = ($controlName + "_DatePicker")
+                                                            $datePicker = $syncHash.$DatePickerControl
+                                                            if ($datePicker) {
+                                                                try {
+                                                                    $dateValue = [DateTime]::ParseExact($fieldValue, "yyyy-MM-dd", $null)
+                                                                    $datePicker.SelectedDate = $dateValue
+                                                                } catch {
+                                                                    Write-DebugOutput -Message ("Error parsing date '{0}' for field '{1}' in policy '{2}': {3}" -f $fieldValue, $fieldName, $policyId, $_.Exception.Message) -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                # Legacy format - just a simple comment string
+                                $commentTextBoxName = ($policyId.replace('.', '_') + "_Comment_TextBox")
+                                $commentTextBox = $syncHash.$commentTextBoxName
+                                if ($commentTextBox) {
+                                    $commentTextBox.Text = $annotationData.ToString()
+                                    $commentTextBox.Foreground = [System.Windows.Media.Brushes]::Black
+                                    $commentTextBox.FontStyle = [System.Windows.FontStyles]::Normal
+                                }
+                            }
+
+                            # Show remove button and make header bold
+                            $removeButtonName = ($policyId.replace('.', '_') + "_RemoveAnnotation")
+                            $removeButton = $syncHash.$removeButtonName
                             if ($removeButton) {
                                 $removeButton.Visibility = "Visible"
                             }
@@ -3528,7 +3819,7 @@
         }
 
         #===========================================================================
-        # YAML IMPORT PROGRESS FunctionS
+        # YAML IMPORT PROGRESS Functions
         #===========================================================================
         Function Show-YamlImportProgress {
             <#
@@ -3818,6 +4109,7 @@
         #======================================================
         # YAML CONTROL
         #======================================================
+
         # Function to import YAML data into core data structures (without UI updates)
         Function Import-YamlToDataStructures {
             <#
@@ -3874,90 +4166,21 @@
                     }
                 }
 
-                # Import Exclusions
-                $hasProductSections = $productIds | Where-Object { $topLevelKeys -contains $_ }
-                $supportsAllProducts = $syncHash.UIConfigs.baselineControls | Where-Object { $_.supportsAllProducts }
-
-                if ($hasProductSections) {
-                    foreach ($productName in $productIds) {
-                        if ($topLevelKeys -contains $productName) {
-                            $productData = $Config[$productName]
-                            $productKeys = $productData.Keys
-
-                            foreach ($policyId in $productKeys) {
-                                $policyData = $productData[$policyId]
-
-                                # Find the exclusionField from baseline config
-                                $baseline = $syncHash.Baselines.$productName | Where-Object { $_.id -eq $policyId }
-                                if ($baseline -and $baseline.exclusionField -ne "none") {
-                                    # Get the exclusionField configuration to get the actual YAML key name
-                                    $FieldListConfig = $syncHash.UIConfigs.inputTypes.($baseline.exclusionField)
-                                    $yamlKeyName = if ($FieldListConfig) { $FieldListConfig.name } else { $baseline.exclusionField }
-
-                                    # Check if the policy data contains the expected exclusionField key
-                                    if ($policyData.Contains($yamlKeyName)) {
-                                        # Initialize product level if not exists
-                                        if (-not $syncHash.ExclusionData[$productName]) {
-                                            $syncHash.ExclusionData[$productName] = [ordered]@{}
-                                        }
-
-                                        # Initialize policy level if not exists
-                                        if (-not $syncHash.ExclusionData[$productName][$policyId]) {
-                                            $syncHash.ExclusionData[$productName][$policyId] = [ordered]@{}
-                                        }
-
-                                        # Extract the field data from inside the exclusionField
-                                        $FieldListData = $policyData[$yamlKeyName]
-                                        $syncHash.ExclusionData[$productName][$policyId][$yamlKeyName] = $FieldListData
-
-                                        Write-DebugOutput -Message "Imported exclusion for [$productName][$policyId][$yamlKeyName]: $($FieldListData | ConvertTo-Json -Compress)" -Source $MyInvocation.MyCommand.Name -Level "Info"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                # Import Annotations and Omissions
-                #TEST $PolicyControl = $supportsAllProducts[0]
-                Foreach($PolicyControl in $supportsAllProducts)
-                {
-                    # Get the output data structure for this control
-                    $OutputData = $syncHash.($PolicyControl.dataControlOutput)
-
-                    if ($topLevelKeys -contains $PolicyControl.yamlValue) {
-                        $controlData = $Config[$PolicyControl.yamlValue]
-
-                        # Check if this is the flipped structure (AnnotatePolicy -> PolicyId -> Data)
-                        # vs normal structure (PolicyId -> AnnotatePolicy -> Data)
-                        $isFlippedStructure = $false
-                        $firstKey = $controlData.Keys | Select-Object -First 1
-                        if ($firstKey -and $controlData[$firstKey] -is [hashtable]) {
-                            # Check if first level contains policy-like keys (e.g., "MS.AAD.2.1v1")
-                            $innerKeys = $controlData[$firstKey].Keys
-                            #get all field names from the default fields
-                            $fieldList = $syncHash.UIConfigs.inputTypes.($PolicyControl.defaultFields).fields.value
-                            #get all policy ids from baselines
-                            $PolicyIds = foreach ($category in $syncHash.Baselines.PSObject.Properties) {
-                                foreach ($policy in $category.Value) {
-                                    $policy.id
-                                }
-                            }
-                            $hasFieldKeys = $innerKeys | Where-Object { $_ -in $fieldList }
-                            $hasPolicyKeys = $innerKeys | Where-Object { $_ -in $PolicyIds }
-
-                            if ($hasPolicyKeys -and -not $hasFieldKeys) {
-                                $isFlippedStructure = $true
-                            }
-                        }
-
-                        if ($isFlippedStructure) {
-                            # Handle flipped structure: AnnotatePolicy -> PolicyId -> Data
-                            #TEST $policyId = $controlData.Keys[0]
-                            foreach ($policyId in $controlData.Keys)
-                            {
+                # Process baseline controls using supportsAllProducts property
+                foreach ($baselineControl in $syncHash.UIConfigs.baselineControls) {
+                    $OutputData = $syncHash.($baselineControl.dataControlOutput)
+                    
+                    if ($baselineControl.supportsAllProducts) {
+                        # Handle annotations and omissions (supports all products)
+                        # YAML structure: yamlValue -> PolicyId -> FieldData
+                        # Save structure: Product -> yamlValue -> PolicyId -> FieldData (MUST MATCH SAVE LOGIC!)
+                        
+                        if ($topLevelKeys -contains $baselineControl.yamlValue) {
+                            $controlData = $Config[$baselineControl.yamlValue]
+                            
+                            foreach ($policyId in $controlData.Keys) {
                                 $policyFieldData = $controlData[$policyId]
-
+                                
                                 # Find which product this policy belongs to
                                 $productName = $null
                                 foreach ($product in $syncHash.UIConfigs.products) {
@@ -3967,53 +4190,67 @@
                                         break
                                     }
                                 }
-
+                                
                                 if ($productName) {
-                                    # Initialize structure
+                                    # Initialize structure to match save logic: Product -> yamlValue -> PolicyId -> FieldData
                                     if (-not $OutputData[$productName]) {
                                         $OutputData[$productName] = [ordered]@{}
                                     }
-                                    if (-not $OutputData[$productName][$policyId]) {
-                                        $OutputData[$productName][$policyId] = [ordered]@{}
+                                    if (-not $OutputData[$productName][$baselineControl.yamlValue]) {
+                                        $OutputData[$productName][$baselineControl.yamlValue] = [ordered]@{}
                                     }
-
-                                    # Store in internal structure (always Product -> PolicyId -> AnnotatePolicy -> Data)
-                                    $OutputData[$productName][$policyId][$PolicyControl.yamlValue] = $policyFieldData
-
-                                    Write-DebugOutput -Message ("Imported flipped {0} for [{1}][{2}]: {3}" -f $PolicyControl.yamlValue,$productName,$policyId,($policyFieldData | ConvertTo-Json -Compress)) -Source $MyInvocation.MyCommand.Name -Level "Info"
+                                    if (-not $OutputData[$productName][$baselineControl.yamlValue][$policyId]) {
+                                        $OutputData[$productName][$baselineControl.yamlValue][$policyId] = [ordered]@{}
+                                    }
+                                    
+                                    # Store the field data under the policy ID
+                                    foreach ($fieldKey in $policyFieldData.Keys) {
+                                        $OutputData[$productName][$baselineControl.yamlValue][$policyId][$fieldKey] = $policyFieldData[$fieldKey]
+                                    }
+                                    
+                                    Write-DebugOutput -Message "Imported $($baselineControl.controlType) for [$productName][$($baselineControl.yamlValue)][$policyId]: $($policyFieldData | ConvertTo-Json -Compress)" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                                } else {
+                                    Write-DebugOutput -Message "Could not find product for policy: $policyId" -Source $MyInvocation.MyCommand.Name -Level "Warning"
                                 }
                             }
                         } else {
-                            # Handle normal structure: PolicyId -> AnnotatePolicy -> Data (existing logic)
-                            $policyIdKeys = $controlData.Keys
-                            #TEST $policyId = $policyIdKeys[0]
-                            foreach ($policyId in $policyIdKeys) {
-                                $ControlFieldData = $controlData[$policyId]
-
-                                # Find which product this policy belongs to
-                                $productName = $null
-                                foreach ($product in $syncHash.UIConfigs.products) {
-                                    $baseline = $syncHash.UIConfigs.baselines.($product.id) | Where-Object { $_.id -eq $policyId }
-                                    if ($baseline) {
-                                        $productName = $product.id
-                                        break
+                            Write-DebugOutput -Message "No $($baselineControl.yamlValue) section found in YAML" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                        }
+                        
+                    } else {
+                        # Handle exclusions (product-specific)
+                        # YAML structure: Product -> PolicyId -> ExclusionType -> FieldData
+                        # Save structure: Product -> PolicyId -> ExclusionType -> FieldData (SAME as YAML)
+                        
+                        foreach ($productName in $productIds) {
+                            if ($topLevelKeys -contains $productName) {
+                                $productData = $Config[$productName]
+                                
+                                foreach ($policyId in $productData.Keys) {
+                                    $policyData = $productData[$policyId]
+                                    
+                                    # Verify this policy exists in the baseline for this product
+                                    $baseline = $syncHash.Baselines.$productName | Where-Object { $_.id -eq $policyId }
+                                    if ($baseline -and $baseline.exclusionField -ne "none") {
+                                        # Initialize product and policy levels if they don't exist
+                                        if (-not $OutputData[$productName]) {
+                                            $OutputData[$productName] = [ordered]@{}
+                                        }
+                                        if (-not $OutputData[$productName][$policyId]) {
+                                            $OutputData[$productName][$policyId] = [ordered]@{}
+                                        }
+                                        
+                                        # Copy all the exclusion data for this policy
+                                        foreach ($exclusionType in $policyData.Keys) {
+                                            $OutputData[$productName][$policyId][$exclusionType] = $policyData[$exclusionType]
+                                            Write-DebugOutput -Message "Imported $($baselineControl.controlType) for [$productName][$policyId][$exclusionType]: $($policyData[$exclusionType] | ConvertTo-Json -Compress)" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                                        }
+                                    } else {
+                                        Write-DebugOutput -Message "Policy $policyId not found or doesn't support exclusions for product $productName" -Source $MyInvocation.MyCommand.Name -Level "Warning"
                                     }
                                 }
-
-                                if ($productName) {
-                                    # Initialize structure
-                                    if (-not $OutputData[$productName]) {
-                                        $OutputData[$productName] = [ordered]@{}
-                                    }
-                                    if (-not $OutputData[$productName][$policyId]) {
-                                        $OutputData[$productName][$policyId] = [ordered]@{}
-                                    }
-
-                                    # Store using the structure expected by save functions
-                                    $OutputData[$productName][$policyId][$PolicyControl.yamlValue] = $ControlFieldData
-
-                                    Write-DebugOutput -Message ("Imported standard {0} for [{1}][{2}]: {3}" -f $PolicyControl.yamlValue,$productName,$policyId,($ControlFieldData | ConvertTo-Json -Compress)) -Source $MyInvocation.MyCommand.Name -Level "Info"
-                                }
+                            } else {
+                                Write-DebugOutput -Message "No $productName section found in YAML" -Source $MyInvocation.MyCommand.Name -Level "Info"
                             }
                         }
                     }
@@ -4027,8 +4264,9 @@
             }
             catch {
                 Write-DebugOutput -Message "Error importing data: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                throw
             }
-        }
+}
 
         Function Format-YamlMultilineString {
             <#
@@ -4070,6 +4308,7 @@
                 return "`n$(' ' * ($IndentLevel * 2))$FieldName`: `"$escapedValue`""
             }
         }
+        
         Function New-YamlPreviewConvert {
             <#
             .SYNOPSIS
@@ -4974,6 +5213,11 @@
         }else {
             $syncHash.ScubaRunTab.Visibility = "Collapsed"
         }
+
+        #Add-ControlHelpIcon -Control $syncHash.Organization_TextBox -ControlName "Organization_TextBox"
+        #Add-ControlHelpIcon -Control $syncHash.OrgName_TextBox -ControlName "OrgName_TextBox"
+        #Add-ControlHelpIcon -Control $syncHash.AppId_TextBox -ControlName "AppId_TextBox"
+        #Add-ControlHelpIcon -Control $syncHash.CertificateThumbprint_TextBox -ControlName "CertificateThumbprint_TextBox"
 
         #override locale context
         foreach ($localeElement in $syncHash.UIConfigs.localeContext.PSObject.Properties) {
