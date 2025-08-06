@@ -808,13 +808,17 @@
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
                                         <TextBox x:Name="Organization_TextBox" Text="example.onmicrosoft.com"/>
-                                        <TextBlock Text="Required. Must be in format: name.onmicrosoft.com or name.onmicrosoft.us" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                        <TextBlock x:Name="Organization_Required_TextBlock" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
                                     </StackPanel>
 
                                     <!-- Organization Name -->
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock Text="Organization Name"  FontWeight="Medium"  Margin="0,0,0,4"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <TextBlock Text="Organization Name"  FontWeight="Medium"  Margin="0,0,0,4"/>
+                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
+                                        </StackPanel>
                                         <TextBox x:Name="OrgName_TextBox" Text="Your organization name"/>
+                                        <TextBlock x:Name="OrgName_Required_TextBlock" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
                                     </StackPanel>
 
                                     <!-- Organization Unit Name -->
@@ -826,18 +830,18 @@
                                     <!-- Description -->
                                     <StackPanel Margin="0,0,0,16">
                                         <TextBlock Text="Description" FontWeight="Medium" Margin="0,0,0,4"/>
-                                        <TextBox x:Name="Description_TextBox" Text="Organization description or purpose of this configuration" Height="66" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="8"/>
+                                        <TextBox x:Name="Description_TextBox" Height="66" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="8"/>
                                     </StackPanel>
 
                                     <!-- M365 Environment -->
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock Text="Select a M365 Environment" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="M365Environment_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
                                         <ComboBox x:Name="M365Environment_ComboBox" Width="380" HorizontalAlignment="Left" Style="{StaticResource ModernComboBox}"/>
                                     </StackPanel>
 
                                     <!-- Products -->
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock x:Name="Products_TextBlock" Text="Products" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="Products_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
 
                                         <Grid x:Name="ProductsGrid">
                                             <Grid.ColumnDefinitions>
@@ -856,7 +860,7 @@
 
                                     <!-- Products Supporting Exclusions -->
                                     <StackPanel Margin="0,0,0,0">
-                                        <TextBlock Text="Products Supporting Exclusions" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="ExclusionsProducts_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
                                         <TextBlock x:Name="ExclusionsInfo_TextBlock" Foreground="{StaticResource MutedTextBrush}"/>
                                     </StackPanel>
                                 </StackPanel>
@@ -1438,6 +1442,13 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Scuba Run Tab -->
+                <TabItem x:Name="ScubaRunTab" Header="Scuba Run">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
+                        <!-- Scuba Run Tab Content (Hidden by default) -->
                     </ScrollViewer>
                 </TabItem>
 

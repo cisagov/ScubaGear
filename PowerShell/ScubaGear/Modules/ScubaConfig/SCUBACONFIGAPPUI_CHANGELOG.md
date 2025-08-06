@@ -1,5 +1,11 @@
 # SCUBACONFIGAPPUI CHANGELOG
 
+## 1.8.6 [08/06/2025] - YAML Generation and Input Validation Enhancements
+- Fixed baseline controls loop in YAML preview to properly display field names and values for exclusions, annotations, and omissions
+- Corrected data structure access pattern for flipped structure (Product -> FieldType -> PolicyId -> FieldData) in annotations and omissions processing
+- Implemented YAML pipe syntax (|) for multiline strings with proper indentation instead of escaped quotes and \n characters
+- Separated baseline policies and UI configuration into distinct JSON files for improved maintainability
+
 ## 1.8.4 [08/04/2025] - Global Settings Implementation and Placeholder Text Fixes
 - Implemented global settings tab with DNS resolver array controls and DoH boolean settings 
 - Fixed placeholder text restoration bug; reliable behavior across multiple focus cycles
