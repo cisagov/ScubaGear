@@ -277,9 +277,18 @@ test_BroadcastRecordingMode_Correct if {
     TestResult("MS.TEAMS.1.7v2", Output, PASS, true) == true
 }
 
+test_BroadcastRecordingMode_NeverRecord_Correct if {
+    Policy := json.patch(BroadcastPolicies,
+                    [{"op": "add", "path": "BroadcastRecordingMode", "value": "AlwaysDisabled"}])
+
+    Output := teams.tests with input.broadcast_policies as [Policy]
+
+    TestResult("MS.TEAMS.1.7v2", Output, PASS, true) == true
+}
+
 test_BroadcastRecordingMode_Incorrect if {
     Policy := json.patch(BroadcastPolicies,
-                    [{"op": "add", "path": "BroadcastRecordingMode", "value": "AlwaysRecord"}])
+                    [{"op": "add", "path": "BroadcastRecordingMode", "value": "AlwaysEnabled"}])
 
     Output := teams.tests with input.broadcast_policies as [Policy]
 
@@ -290,7 +299,7 @@ test_BroadcastRecordingMode_Incorrect if {
 test_BroadcastRecordingMode_Multiple if {
     Policy := json.patch(BroadcastPolicies,
                     [{"op": "add", "path": "Identity", "value": "Tag:TestPolicy"},
-                    {"op": "add", "path": "BroadcastRecordingMode", "value": "AlwaysRecord"}])
+                    {"op": "add", "path": "BroadcastRecordingMode", "value": "AlwaysEnabled"}])
 
     Output := teams.tests with input.broadcast_policies as [BroadcastPolicies, Policy]
 

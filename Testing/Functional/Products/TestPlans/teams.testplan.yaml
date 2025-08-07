@@ -217,14 +217,14 @@ TestPlan:
               BroadcastRecordingMode: AlwaysEnabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.7v2 Non-compliant - BroadcastRecordingMode = AlwaysDisabled
+      - TestDescription: MS.TEAMS.1.7v2 Compliant - BroadcastRecordingMode = AlwaysDisabled
         Preconditions:
           - Command: Set-CsTeamsMeetingBroadcastPolicy
             Splat:
               Identity: Global
               BroadcastRecordingMode: AlwaysDisabled
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.TEAMS.1.7v2 Compliant - BroadcastRecordingMode = UserOverride
         Preconditions:
           - Command: Set-CsTeamsMeetingBroadcastPolicy
