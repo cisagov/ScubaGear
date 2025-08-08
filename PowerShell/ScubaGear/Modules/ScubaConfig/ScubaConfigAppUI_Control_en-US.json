@@ -1,5 +1,5 @@
 {
-  "Version": "1.8.5 [updated 8/5/2025]",
+  "Version": "1.8.7 [updated 8/7/2025]",
   "DebugMode": false,
   "EnableSearchAndFilter": false,
   "EnableScubaRun": false,
@@ -30,15 +30,6 @@
     "CriticalityFilter_ComboBox": "{0} only",
     "ResultCount_TextBlock": "{0} policies"
   },
-  "localeToolTips": {
-    "Organization_TextBox": "While this is not required for ScubaGear to function, it is required for this UI to export a configuration file.",
-    "OrgName_TextBox": "This is required for BOD submissions. It is used to identify the organization in the configuration file.",
-    "OrgUnit_TextBox": "Optional field to specify the organizational unit or department.",
-    "Description_TextBox": "Optional description to document the purpose of this configuration.",
-    "AppId_TextBox": "Application ID (Client ID) for certificate-based authentication. Must be in GUID format.",
-    "CertificateThumbprint_TextBox": "SHA-1 thumbprint of the certificate used for authentication. Must be 40 hexadecimal characters.",
-    "M365Environment_ComboBox": "Select the Microsoft 365 environment type that matches your tenant configuration."
-},
   "localeInfoMessages": {
     "NoPoliciesAvailable": "No policies available for this product.",
     "PolicySaving": "Saving {0} for policy: {1}",
@@ -102,6 +93,28 @@
     "ConfirmRemovalOfCard": "Are you sure you want to remove this item?",
     "ValidationErrors": "Please correct the validation errors before proceeding.",
     "GraphError": "Error retrieving data from Graph: {0}"
+  },
+  "localeHelpTips": {
+    "Organization_HelpLabel": {
+        "Title" : "Organization Domain",
+        "Content" : "Enter your organization's domain (e.g., example.onmicrosoft.com). This is used to connect to your Microsoft 365 tenant.",
+        "AdditionalSections": {
+            "Example" : "contoso.onmicrosoft.com",
+            "Required" : "Yes, this field is mandatory",
+            "Note" : "Must be a valid Microsoft 365 tenant domain"
+        },
+        "Placement": "Right"
+    },
+    "OrgName_HelpLabel": {
+        "Title" : "Organization Name",
+        "Content" : "Enter the name of your organization. This is used for documentation purposes.",
+        "AdditionalSections": {
+            "Example" : "Contoso Ltd.",
+            "Required" : "This option is required for BOD submissions",
+            "Note" : "This will be included in the configuration file"
+        },
+        "Placement": "Right"
+    }
   },
   "localeTitles": {
     "DuplicateEntry": "Duplicate Entry",
@@ -170,6 +183,43 @@
       "PreferredDnsResolvers",
       "SkipDoH"
     ]
+  },
+  "ScubaRunConfig": {
+    "sectionName": "Run ScubaGear Configuration",
+    "description": "This section allows you to run ScubaGear with the current configuration.",
+    "powershell": {
+      "version": "5.1",
+      "modules": [
+        "ScubaGear"
+      ],
+      "PreCommands": [
+        "Import-Module ScubaGear -Force",
+        "Initialize-SCuBA"
+      ],
+      "cmdlets": "Invoke-Scuba",
+      "parameters" : {
+        "ConfigFilePath": {
+          "type": "string",
+          "description": "Path to the ScubaGear configuration file.",
+          "defaultValue": "ScubaGearConfig.yaml"
+        },
+        "SilenceBODWarnings": {
+          "type": "boolean",
+          "description": "Suppress BOD warnings.",
+          "defaultValue": false
+        },
+        "DarkMode": {
+          "type": "boolean",
+          "description": "Show ScubaGear report in dark mode.",
+          "defaultValue": false
+        },
+        "Quiet": {
+          "type": "boolean",
+          "description": "Run ScubaGear in quiet mode, suppressing report",
+          "defaultValue": false
+        }
+      }
+    }
   },
   "products": [
     {
@@ -566,56 +616,249 @@
     "Users": {
       "name": "Users",
       "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
       "outProperty": "id",
       "tipProperty": "displayName"
     },
     "Groups": {
       "name": "Groups",
       "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
-        "$select": "id,displayName,description,mail,groupTypes,securityEnabled,mailEnabled"
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
       "outProperty": "id",
       "tipProperty": "displayName"
     },
     "IncludedUsers": {
       "name": "Users",
       "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
       "outProperty": "userPrincipalName",
       "tipProperty": "displayName"
     },
     "IncludedGroups": {
       "name": "Groups",
       "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
-        "$select": "id,displayName,description,mail,groupTypes,securityEnabled,mailEnabled"
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
       "outProperty": "displayName",
       "tipProperty": "description"
     },
     "ExcludedUsers": {
       "name": "Users",
       "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
       "outProperty": "userPrincipalName",
       "tipProperty": "displayName"
     },
     "ExcludedGroups": {
       "name": "Groups",
       "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
       "queryParameters": {
-        "$select": "id,displayName,description,mail,groupTypes,securityEnabled,mailEnabled"
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
       },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
       "outProperty": "displayName",
       "tipProperty": "description"
+    },
+    "AppId_TextBox": {
+      "name": "Applications",
+      "endpoint": "/v1.0/applications",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,appId,displayName"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Application Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Application ID",
+          "value": "appId"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        }
+      ],
+      "outProperty": "appId",
+      "tipProperty": "displayName"
     }
   }
 }

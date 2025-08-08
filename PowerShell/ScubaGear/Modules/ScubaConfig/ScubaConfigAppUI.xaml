@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="ScubaGear Configuration Editor"
     Height="860"
-    Width="1200"
+    Width="1280"
     WindowStartupLocation="CenterScreen"
     Background="#F6FBFE"
     Foreground="#333333"
@@ -27,7 +27,7 @@
                             </LinearGradientBrush>
                         </GeometryDrawing.Brush>
                     </GeometryDrawing>
-                    
+
                     <!-- Shield -->
                     <GeometryDrawing>
                         <GeometryDrawing.Geometry>
@@ -40,7 +40,7 @@
                             <Pen Brush="White" Thickness="1.5"/>
                         </GeometryDrawing.Pen>
                     </GeometryDrawing>
-                    
+
                     <!-- Wave lines and S-curve would go here -->
                 </DrawingGroup>
             </DrawingImage.Drawing>
@@ -533,9 +533,9 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
-                            <ScrollViewer x:Name="PART_ContentHost" 
-                                        Focusable="false" 
-                                        HorizontalScrollBarVisibility="Hidden" 
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                        Focusable="false"
+                                        HorizontalScrollBarVisibility="Hidden"
                                         VerticalScrollBarVisibility="Hidden"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -583,40 +583,40 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Width="0"/>
                             </Grid.ColumnDefinitions>
-                            <Popup x:Name="PART_Popup" 
-                                AllowsTransparency="true" 
-                                Grid.ColumnSpan="2" 
-                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
-                                Margin="1" 
-                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" 
+                            <Popup x:Name="PART_Popup"
+                                AllowsTransparency="true"
+                                Grid.ColumnSpan="2"
+                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Margin="1"
+                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}"
                                 Placement="Bottom">
-                                <Border x:Name="dropDownBorder" 
-                                        BorderBrush="{StaticResource BorderBrush}" 
-                                        BorderThickness="1" 
+                                <Border x:Name="dropDownBorder"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
                                         Background="#FFFFFF"
                                         CornerRadius="6"
-                                        MaxHeight="{TemplateBinding MaxDropDownHeight}" 
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                         MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
                                     <ScrollViewer x:Name="DropDownScrollViewer">
                                         <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
                                             <Canvas x:Name="canvas" HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
-                                                <Rectangle x:Name="opaqueRect" 
-                                                        Fill="{Binding Background, ElementName=dropDownBorder}" 
-                                                        Height="{Binding ActualHeight, ElementName=dropDownBorder}" 
+                                                <Rectangle x:Name="opaqueRect"
+                                                        Fill="{Binding Background, ElementName=dropDownBorder}"
+                                                        Height="{Binding ActualHeight, ElementName=dropDownBorder}"
                                                         Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
                                             </Canvas>
-                                            <ItemsPresenter x:Name="ItemsPresenter" 
-                                                            KeyboardNavigation.DirectionalNavigation="Contained" 
+                                            <ItemsPresenter x:Name="ItemsPresenter"
+                                                            KeyboardNavigation.DirectionalNavigation="Contained"
                                                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                                         </Grid>
                                     </ScrollViewer>
                                 </Border>
                             </Popup>
-                            <ToggleButton x:Name="toggleButton" 
-                                        BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="{TemplateBinding BorderThickness}" 
-                                        Background="{TemplateBinding Background}" 
-                                        Grid.ColumnSpan="2" 
+                            <ToggleButton x:Name="toggleButton"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}"
+                                        Grid.ColumnSpan="2"
                                         IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToggleButton.Style>
                                     <Style TargetType="ToggleButton">
@@ -627,24 +627,24 @@
                                         <Setter Property="Template">
                                             <Setter.Value>
                                                 <ControlTemplate TargetType="ToggleButton">
-                                                    <Border x:Name="templateRoot" 
-                                                            BorderBrush="{TemplateBinding BorderBrush}" 
-                                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                                    <Border x:Name="templateRoot"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
                                                             Background="{TemplateBinding Background}"
                                                             CornerRadius="6"
                                                             SnapsToDevicePixels="true">
-                                                        <Border x:Name="splitBorder" 
-                                                                BorderBrush="Transparent" 
-                                                                BorderThickness="1" 
-                                                                HorizontalAlignment="Right" 
-                                                                Margin="0" 
-                                                                SnapsToDevicePixels="true" 
+                                                        <Border x:Name="splitBorder"
+                                                                BorderBrush="Transparent"
+                                                                BorderThickness="1"
+                                                                HorizontalAlignment="Right"
+                                                                Margin="0"
+                                                                SnapsToDevicePixels="true"
                                                                 Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
-                                                            <Path x:Name="arrow" 
-                                                                Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z" 
-                                                                Fill="{StaticResource TextBrush}" 
-                                                                HorizontalAlignment="Center" 
-                                                                Margin="0" 
+                                                            <Path x:Name="arrow"
+                                                                Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z"
+                                                                Fill="{StaticResource TextBrush}"
+                                                                HorizontalAlignment="Center"
+                                                                Margin="0"
                                                                 VerticalAlignment="Center"/>
                                                         </Border>
                                                     </Border>
@@ -673,15 +673,15 @@
                                     </Style>
                                 </ToggleButton.Style>
                             </ToggleButton>
-                            <ContentPresenter x:Name="contentPresenter" 
-                                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
-                                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" 
-                                            Content="{TemplateBinding SelectionBoxItem}" 
-                                            ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" 
-                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                            IsHitTestVisible="false" 
-                                            Margin="{TemplateBinding Padding}" 
-                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                            <ContentPresenter x:Name="contentPresenter"
+                                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                            Content="{TemplateBinding SelectionBoxItem}"
+                                            ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            IsHitTestVisible="false"
+                                            Margin="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -760,11 +760,11 @@
             </Grid.ColumnDefinitions>
 
             <!-- Logo Icon -->
-            <Image Grid.Column="0" 
-                   Source="{StaticResource ScubaGearIconImage}" 
-                   Width="48" 
-                   Height="48" 
-                   Margin="0,0,16,0" 
+            <Image Grid.Column="0"
+                   Source="{StaticResource ScubaGearIconImage}"
+                   Width="48"
+                   Height="48"
+                   Margin="0,0,16,0"
                    VerticalAlignment="Top"/>
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
@@ -804,6 +804,14 @@
                                     <!-- Organization -->
                                     <StackPanel Margin="0,0,0,16">
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label x:Name="Organization_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
                                             <TextBlock Text="Organization" FontWeight="Medium"/>
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
@@ -814,6 +822,14 @@
                                     <!-- Organization Name -->
                                     <StackPanel Margin="0,0,0,16">
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                             <Label x:Name="OrgName_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
                                             <TextBlock Text="Organization Name"  FontWeight="Medium"  Margin="0,0,0,4"/>
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
@@ -901,15 +917,15 @@
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <!-- Search TextBox -->
-                                <TextBox x:Name="ExclusionsSearch_TextBox" 
+                                <TextBox x:Name="ExclusionsSearch_TextBox"
                                         Grid.Column="0"
                                         Margin="0,0,10,0"
                                         Tag="Search policies by name or ID..." />
-                                
+
                                 <!-- Clear Search Button -->
-                                <Button x:Name="ExclusionsClearSearch_Button" 
+                                <Button x:Name="ExclusionsClearSearch_Button"
                                         Grid.Column="1"
                                         Content="&#x2715;"
                                         Width="30"
@@ -917,16 +933,16 @@
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ClearButton}"
                                         ToolTip="Clear search"/>
-                                
+
                                 <!-- Criticality Filter ComboBox -->
-                                <ComboBox x:Name="ExclusionsCriticality_ComboBox" 
+                                <ComboBox x:Name="ExclusionsCriticality_ComboBox"
                                         Grid.Column="2"
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
-                                
+
                                 <!-- Results Count -->
-                                <TextBlock x:Name="ExclusionsResultCount_TextBlock" 
+                                <TextBlock x:Name="ExclusionsResultCount_TextBlock"
                                         Grid.Column="3"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
@@ -1030,15 +1046,15 @@
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <!-- Search TextBox -->
-                                <TextBox x:Name="AnnotationsSearch_TextBox" 
+                                <TextBox x:Name="AnnotationsSearch_TextBox"
                                         Grid.Column="0"
                                         Margin="0,0,10,0"
                                         Tag="Search policies by name or ID..." />
-                                
+
                                 <!-- Clear Search Button -->
-                                <Button x:Name="AnnotationsClearSearch_Button" 
+                                <Button x:Name="AnnotationsClearSearch_Button"
                                         Grid.Column="1"
                                         Content="&#x2715;"
                                         Width="30"
@@ -1046,16 +1062,16 @@
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ClearButton}"
                                         ToolTip="Clear search"/>
-                                
+
                                 <!-- Criticality Filter ComboBox -->
-                                <ComboBox x:Name="AnnotationsCriticality_ComboBox" 
+                                <ComboBox x:Name="AnnotationsCriticality_ComboBox"
                                         Grid.Column="2"
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
-                                
+
                                 <!-- Results Count -->
-                                <TextBlock x:Name="AnnotationsResultCount_TextBlock" 
+                                <TextBlock x:Name="AnnotationsResultCount_TextBlock"
                                         Grid.Column="3"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
@@ -1159,15 +1175,15 @@
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <!-- Search TextBox -->
-                                <TextBox x:Name="OmissionsSearch_TextBox" 
+                                <TextBox x:Name="OmissionsSearch_TextBox"
                                         Grid.Column="0"
                                         Margin="0,0,10,0"
                                         Tag="Search policies by name or ID..." />
-                                
+
                                 <!-- Clear Search Button -->
-                                <Button x:Name="OmissionsClearSearch_Button" 
+                                <Button x:Name="OmissionsClearSearch_Button"
                                         Grid.Column="1"
                                         Content="&#x2715;"
                                         Width="30"
@@ -1175,16 +1191,16 @@
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ClearButton}"
                                         ToolTip="Clear search"/>
-                                
+
                                 <!-- Criticality Filter ComboBox -->
-                                <ComboBox x:Name="OmissionsCriticality_ComboBox" 
+                                <ComboBox x:Name="OmissionsCriticality_ComboBox"
                                         Grid.Column="2"
                                         Margin="0,0,10,0"
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
-                                
+
                                 <!-- Results Count -->
-                                <TextBlock x:Name="OmissionsResultCount_TextBlock" 
+                                <TextBlock x:Name="OmissionsResultCount_TextBlock"
                                         Grid.Column="3"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
@@ -1385,7 +1401,7 @@
                                     <TextBlock x:Name="GlobalSettingsInfo_TextBlock" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,16">
                                         Configure global settings that apply across all policies and configurations.
                                     </TextBlock>
-                                    
+
                                     <!-- Dynamic Global Settings Container -->
                                     <StackPanel x:Name="GlobalSettingsContainer">
                                         <!-- Global settings fields will be dynamically added here -->
@@ -1445,11 +1461,183 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <!-- Scuba Run Tab -->
+                <!-- Scuba Run Tab Content -->
                 <TabItem x:Name="ScubaRunTab" Header="Scuba Run">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
-                        <!-- Scuba Run Tab Content (Hidden by default) -->
-                    </ScrollViewer>
+                    <Grid Margin="16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>    <!-- Header/Description -->
+                            <RowDefinition Height="Auto"/>    <!-- Control Panel -->
+                            <RowDefinition Height="*"/>       <!-- Status and Progress -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Section -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Run ScubaGear Configuration"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource PrimaryBrush}"
+                                        Margin="0,0,0,8"/>
+                                <TextBlock x:Name="ScubaRunDescription_TextBlock"
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"
+                                        Text="Execute ScubaGear assessment using the current configuration. Ensure you have generated a valid YAML configuration before running."/>
+                                <TextBlock x:Name="ScubaRunStatus_TextBlock"
+                                        FontWeight="SemiBold"
+                                        Margin="0,8,0,0"
+                                        Text="Status: Ready"
+                                        Foreground="{StaticResource PrimaryBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Control Panel -->
+                        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>  <!-- Run Button -->
+                                    <ColumnDefinition Width="*"/>     <!-- Parameters -->
+                                    <ColumnDefinition Width="Auto"/>  <!-- Product Progress -->
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Run Button Section -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,24,0">
+                                    <Button x:Name="RunScubaGear_Button"
+                                            Style="{StaticResource PrimaryButton}"
+                                            Content="Run ScubaGear"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Width="220"
+                                            Height="150"
+                                            IsEnabled="False"
+                                            Margin="0,0,0,12"/>
+                                    <Button x:Name="StopScubaGear_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Stop Execution"
+                                            Width="220"
+                                            Height="150"
+                                            IsEnabled="False"
+                                            Background="#DC3545"
+                                            Foreground="White"
+                                            Visibility="Collapsed"/>
+                                    <TextBlock Text="PowerShell 5.1 Required"
+                                            FontSize="10"
+                                            Foreground="{StaticResource MutedTextBrush}"
+                                            HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Parameters Section -->
+                                <StackPanel Grid.Column="1" Margin="0,0,24,0">
+                                    <TextBlock Text="Execution Parameters"
+                                            FontWeight="SemiBold"
+                                            Margin="0,0,0,8"/>
+
+                                    <!-- SilenceBODWarnings -->
+                                    <CheckBox x:Name="SilenceBODWarnings_CheckBox"
+                                            Content="Silence BOD Warnings"
+                                            Margin="0,0,0,8"
+                                            ToolTip="Suppress BOD warnings during execution"/>
+
+                                    <!-- DarkMode -->
+                                    <CheckBox x:Name="DarkMode_CheckBox"
+                                            Content="Dark Mode Report"
+                                            Margin="0,0,0,8"
+                                            ToolTip="Generate ScubaGear report in dark mode"/>
+
+                                    <!-- Quiet -->
+                                    <CheckBox x:Name="Quiet_CheckBox"
+                                            Content="Quiet Mode"
+                                            Margin="0,0,0,8"
+                                            ToolTip="Run ScubaGear in quiet mode, suppressing report generation"/>
+
+                                    <!-- Config File Path (Read-only) -->
+                                    <TextBlock Text="Configuration File:"
+                                            FontWeight="SemiBold"
+                                            Margin="0,8,0,4"/>
+                                    <TextBox x:Name="ConfigFilePath_TextBox"
+                                            Text="ScubaGearConfig.yaml"
+                                            IsReadOnly="True"
+                                            Background="#F5F5F5"
+                                            ToolTip="Temporary configuration file that will be generated"/>
+                                </StackPanel>
+
+                                <!-- Product Progress Section -->
+                                <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="12"
+                                    Background="#FAFAFA"
+                                    MinWidth="200">
+                                    <StackPanel>
+                                        <TextBlock Text="Product Progress"
+                                                FontWeight="SemiBold"
+                                                Margin="0,0,0,8"
+                                                HorizontalAlignment="Center"/>
+                                        <StackPanel x:Name="ProductProgress_StackPanel">
+                                            <!-- Dynamic product progress items will be added here -->
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Status and Output Section -->
+                        <Border Grid.Row="2" Style="{StaticResource Card}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Status Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                            Text="Execution Output"
+                                            FontWeight="SemiBold"/>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button x:Name="ClearOutput_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Clear"
+                                            Width="60"
+                                            Height="24"
+                                            FontSize="10"
+                                            Margin="0,0,8,0"/>
+                                        <Button x:Name="CopyOutput_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Copy"
+                                            Width="60"
+                                            Height="24"
+                                            FontSize="10"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Output TextBox -->
+                                <Border Grid.Row="1"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4">
+                                    <TextBox x:Name="ScubaOutput_TextBox"
+                                            IsReadOnly="True"
+                                            VerticalScrollBarVisibility="Auto"
+                                            HorizontalScrollBarVisibility="Auto"
+                                            FontFamily="Consolas"
+                                            FontSize="11"
+                                            Background="#1E1E1E"
+                                            Foreground="#FFFFFF"
+                                            Padding="8"
+                                            TextWrapping="NoWrap"
+                                            AcceptsReturn="True"
+                                            Text="Ready to execute ScubaGear configuration...&#x0A;"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
                 </TabItem>
 
                 <!-- Debug Tab  -->
@@ -1494,7 +1682,7 @@
                                             Style="{StaticResource PrimaryButton}"
                                             Content="Copy to Clipboard"
                                             Width="116" Height="37"/>
-                                        
+
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
