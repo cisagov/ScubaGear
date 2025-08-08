@@ -122,7 +122,6 @@
     $syncHash.M365Environment = $M365Environment
 
     # Initialize debug output structures
-    $syncHash.DebugOutputQueue = [System.Collections.Queue]::Synchronized([System.Collections.Queue]::new())  # first in first out: for debug screen
     $syncHash.DebugLogData = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())  # For debug download
     $syncHash.DebugFlushTimer = $null
 
@@ -1225,135 +1224,402 @@
                 }
             }.GetNewClosure())
         }
+
+        Function Add-DynamicGraphButtons {
+            <#
+            .SYNOPSIS
+            Dynamically adds Graph query buttons to TextBoxes based on graphQueries configuration.
+            .DESCRIPTION
+            This function scans all graphQueries configurations and automatically adds "Get" buttons
+            next to any TextBox controls that have matching names when Graph is connected.
+            #>
+            # Get all available graph query configurations
+            $graphQueryConfigs = $syncHash.UIConfigs.graphQueries.PSObject.Properties
+
+            foreach ($queryConfig in $graphQueryConfigs) {
+                $textBoxName = $queryConfig.Name
+                $graphQueryData = $queryConfig.Value
+
+                # Check if corresponding TextBox exists in syncHash
+                if (-not $syncHash.$textBoxName) {
+                    Write-DebugOutput -Message "TextBox '$textBoxName' not found in syncHash - skipping" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    continue
+                }
+
+                $textBox = $syncHash.$textBoxName
+
+                # Verify it's actually a TextBox
+                if ($textBox.GetType().Name -ne "TextBox") {
+                    Write-DebugOutput -Message "Control '$textBoxName' is not a TextBox - skipping" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    continue
+                }
+
+                # Add the Graph button to this TextBox
+                Add-GraphButtonToTextBox -TextBox $textBox -TextBoxName $textBoxName -GraphQueryData $graphQueryData
+            }
+        }
+
+        Function Add-GraphButtonToTextBox {
+            <#
+            .SYNOPSIS
+            Adds a Graph query button to a specific TextBox.
+            .DESCRIPTION
+            Creates and inserts a Graph query button next to the specified TextBox using the provided configuration.
+            #>
+            param(
+                [Parameter(Mandatory)]
+                [System.Windows.Controls.TextBox]$TextBox,
+
+                [Parameter(Mandatory)]
+                [string]$TextBoxName,
+
+                [Parameter(Mandatory)]
+                [PSObject]$GraphQueryData
+            )
+
+            # Find the parent container (should be a StackPanel or Grid)
+            $parentContainer = $TextBox.Parent
+            if (-not $parentContainer) {
+                Write-DebugOutput -Message "TextBox '$TextBoxName' has no parent container" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                return
+            }
+
+            # Check if button already exists to prevent duplicates
+            $buttonName = "Get$($TextBoxName.Replace('_TextBox', ''))Button"
+            $existingButton = $null
+
+            if ($parentContainer.GetType().Name -eq "StackPanel") {
+                $existingButton = $parentContainer.Children | Where-Object {
+                    $_.GetType().Name -eq "Button" -and $_.Name -eq $buttonName
+                }
+            } elseif ($parentContainer.GetType().Name -eq "Grid") {
+                $existingButton = $parentContainer.Children | Where-Object {
+                    $_.GetType().Name -eq "Button" -and $_.Name -eq $buttonName
+                }
+            }
+
+            if ($existingButton) {
+                Write-DebugOutput -Message "Graph button '$buttonName' already exists for '$TextBoxName'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                return
+            }
+
+            # Create the Graph query button
+            $graphButton = New-Object System.Windows.Controls.Button
+            $graphButton.Content = "Get $($GraphQueryData.name)"
+            $graphButton.Name = $buttonName
+            $graphButton.Width = 100
+            $graphButton.Height = 28
+            $graphButton.Margin = "8,0,0,0"
+            $graphButton.Style = $syncHash.Window.FindResource("SecondaryButton")
+            $graphButton.ToolTip = "Select $($GraphQueryData.name.ToLower()) from Microsoft Graph"
+
+            # Add global event handlers
+            Add-ControlEventHandler -Control $graphButton
+
+            # Create the click event handler
+            $graphButton.Add_Click({
+                try {
+                    # Get search term from TextBox if it has content (excluding placeholder text)
+                    $searchTerm = ""
+                    $textBoxValue = $TextBox.Text
+                    $placeholderKey = "$TextBoxName"
+                    $placeholderText = $syncHash.UIConfigs.localePlaceholder.$placeholderKey
+
+                    if (![string]::IsNullOrWhiteSpace($textBoxValue) -and $textBoxValue -ne $placeholderText) {
+                        $searchTerm = $textBoxValue
+                    }
+
+                    Write-DebugOutput -Message "Opening Graph selector for $TextBoxName with search term: '$searchTerm'" -Source "Dynamic Graph Button" -Level "Info"
+
+                    # Show the entity selector
+                    $selectedItems = Show-GraphSelector -GraphEntityType $TextBoxName -SearchTerm $searchTerm
+
+                    if ($null -ne $selectedItems -and $selectedItems.Count -gt 0) {
+                        # Get the first selected item
+                        $selectedItem = $selectedItems[0]
+
+                        # Set the value in the textbox using the configured output property
+                        if ($selectedItem.($GraphQueryData.outProperty)) {
+                            $TextBox.Text = $selectedItem.($GraphQueryData.outProperty)
+                            $TextBox.Foreground = [System.Windows.Media.Brushes]::Black
+                            $TextBox.FontStyle = [System.Windows.FontStyles]::Normal
+
+                            # Get display name for logging/feedback
+                            $displayName = if ($GraphQueryData.tipProperty -and $selectedItem.($GraphQueryData.tipProperty)) {
+                                $selectedItem.($GraphQueryData.tipProperty)
+                            } else {
+                                $selectedItem.($GraphQueryData.outProperty)
+                            }
+
+                            Write-DebugOutput -Message "Selected $($GraphQueryData.name.ToLower()): $displayName with value: $($selectedItem.($GraphQueryData.outProperty))" -Source "Dynamic Graph Button" -Level "Info"
+
+                            # Show success message
+                            [System.Windows.MessageBox]::Show(
+                                "$($GraphQueryData.name) selected: $displayName",
+                                "$($GraphQueryData.name) Selected",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Information
+                            )
+                        } else {
+                            Write-DebugOutput -Message "Selected $($GraphQueryData.name.ToLower()) missing required property: $($GraphQueryData.outProperty)" -Source "Dynamic Graph Button" -Level "Warning"
+                            [System.Windows.MessageBox]::Show(
+                                "Selected item is missing required data property.",
+                                "Invalid Selection",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Warning
+                            )
+                        }
+                    } else {
+                        Write-DebugOutput -Message "No $($GraphQueryData.name.ToLower()) selected from Graph query" -Source "Dynamic Graph Button" -Level "Info"
+                    }
+                }
+                catch {
+                    Write-DebugOutput -Message "Error in Dynamic Graph button click for $($GraphQueryData.name): $($_.Exception.Message)" -Source "Dynamic Graph Button" -Level "Error"
+                    [System.Windows.MessageBox]::Show(
+                        ($syncHash.UIConfigs.localePopupMessages.GraphError -f $_.Exception.Message),
+                        $syncHash.UIConfigs.localeTitles.GraphError,
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Error
+                    )
+                }
+            }.GetNewClosure())
+
+            # Add the button to the parent container
+            try {
+                if ($parentContainer.GetType().Name -eq "StackPanel") {
+                    # For StackPanel (horizontal layout), just add to children
+                    [void]$parentContainer.Children.Add($graphButton)
+                } elseif ($parentContainer.GetType().Name -eq "Grid") {
+                    # For Grid, we need to be more careful about positioning
+                    # Try to place it in the same row as the TextBox, next column
+                    $textBoxRow = [System.Windows.Controls.Grid]::GetRow($TextBox)
+                    $textBoxColumn = [System.Windows.Controls.Grid]::GetColumn($TextBox)
+
+                    [System.Windows.Controls.Grid]::SetRow($graphButton, $textBoxRow)
+                    [System.Windows.Controls.Grid]::SetColumn($graphButton, $textBoxColumn + 1)
+                    [void]$parentContainer.Children.Add($graphButton)
+                } else {
+                    Write-DebugOutput -Message "Unsupported parent container type: $($parentContainer.GetType().Name) for TextBox '$TextBoxName'" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                    return
+                }
+
+                Write-DebugOutput -Message "Added Graph button '$buttonName' for TextBox '$TextBoxName'" -Source $MyInvocation.MyCommand.Name -Level "Info"
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to add Graph button to container for '$TextBoxName': $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+            }
+        }
         #===========================================================================
         # Help Tooltip Functions
         #===========================================================================
 
         # Add help icon next to controls
-        Function Add-ControlHelpIcon {
+        # Add this function after the existing help functions around line 1357:
+        # Consolidated popup function that handles both simple and rich popups
+        Function Add-HoverPopup {
             param(
                 [Parameter(Mandatory=$true)]
                 [System.Windows.Controls.Control]$Control,
                 [Parameter(Mandatory=$true)]
-                [string]$ControlName
+                [string]$Title,
+                [Parameter(Mandatory=$true)]
+                [string]$Content,
+                [Parameter(Mandatory=$false)]
+                [ValidateSet("Left", "Right", "Top", "Bottom")]
+                [string]$Placement = "Right",
+                [hashtable]$AdditionalSections = @{}
             )
 
-            # Check if tooltip exists in configuration
-            if ($syncHash.UIConfigs.localeToolTips.PSObject.Properties.Name -contains $ControlName) {
-                $helpText = $syncHash.UIConfigs.localeToolTips.$ControlName
+            # Create the popup
+            $popup = New-Object System.Windows.Controls.Primitives.Popup
+            $popup.PlacementTarget = $Control
+            $popup.Placement = [System.Windows.Controls.Primitives.PlacementMode]::$Placement
+            $popup.StaysOpen = $false
+            $popup.AllowsTransparency = $true
 
-                # Find the parent container
-                $parent = $Control.Parent
-                if ($parent -is [System.Windows.Controls.StackPanel] -or $parent -is [System.Windows.Controls.Grid]) {
+            # Create popup border
+            $popupBorder = New-Object System.Windows.Controls.Border
+            $popupBorder.Background = [System.Windows.Media.Brushes]::White
+            $popupBorder.BorderBrush = [System.Windows.Media.Brushes]::Gray
+            $popupBorder.BorderThickness = "1"
+            $popupBorder.CornerRadius = "4"
+            $popupBorder.Padding = "10"
+            $popupBorder.MaxWidth = if ($AdditionalSections.Count -gt 0) { 350 } else { 300 }
 
-                    # Create help icon button
-                    $helpIcon = New-Object System.Windows.Controls.Button
-                    $helpIcon.Content = "?"
-                    $helpIcon.Width = 20
-                    $helpIcon.Height = 20
-                    $helpIcon.FontSize = 12
-                    $helpIcon.FontWeight = "Bold"
-                    $helpIcon.Background = [System.Windows.Media.Brushes]::LightBlue
-                    $helpIcon.BorderBrush = [System.Windows.Media.Brushes]::DarkBlue
-                    $helpIcon.BorderThickness = "1"
-                    $helpIcon.Margin = "5,0,0,0"
-                    $helpIcon.VerticalAlignment = "Center"
-                    $helpIcon.Cursor = [System.Windows.Input.Cursors]::Help
+            # Add shadow effect
+            $dropShadow = New-Object System.Windows.Media.Effects.DropShadowEffect
+            $dropShadow.Color = [System.Windows.Media.Colors]::Gray
+            $dropShadow.Direction = 315
+            $dropShadow.ShadowDepth = 2
+            $dropShadow.Opacity = 0.5
+            $popupBorder.Effect = $dropShadow
 
-                    # Add click event to show help text
-                    $helpIcon.Add_Click({
-                        [System.Windows.MessageBox]::Show($helpText, "Help: $ControlName", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
-                    }.GetNewClosure())
+            # Choose content type based on whether we have additional sections
+            if ($AdditionalSections.Count -gt 0) {
+                # Use FlowDocument for rich content
+                $flowDocViewer = New-Object System.Windows.Controls.FlowDocumentScrollViewer
+                $flowDocViewer.VerticalScrollBarVisibility = "Auto"
+                $flowDocViewer.HorizontalScrollBarVisibility = "Hidden"
+                $flowDocViewer.IsToolBarVisible = $false
+                $popupBorder.MaxHeight = 200
 
-                    # Add to parent container
-                    if ($parent -is [System.Windows.Controls.StackPanel] -and $parent.Orientation -eq "Horizontal") {
-                        $parent.Children.Add($helpIcon)
-                    } elseif ($parent -is [System.Windows.Controls.Grid]) {
-                        # Position next to the control in grid
-                        $column = [System.Windows.Controls.Grid]::GetColumn($Control)
-                        [System.Windows.Controls.Grid]::SetColumn($helpIcon, $column + 1)
-                        $row = [System.Windows.Controls.Grid]::GetRow($Control)
-                        [System.Windows.Controls.Grid]::SetRow($helpIcon, $row)
-                        $parent.Children.Add($helpIcon)
+                # Create FlowDocument
+                $flowDoc = New-Object System.Windows.Documents.FlowDocument
+                $flowDoc.FontFamily = "Segoe UI"
+                $flowDoc.FontSize = 12
+
+                # Title paragraph
+                $titleParagraph = New-Object System.Windows.Documents.Paragraph
+                $titleParagraph.Margin = "0,0,0,8"
+                $titleRun = New-Object System.Windows.Documents.Run
+                $titleRun.Text = $Title
+                $titleRun.FontWeight = "Bold"
+                $titleRun.FontSize = 14
+                $titleRun.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
+                $titleParagraph.AddChild($titleRun)
+                $flowDoc.AddChild($titleParagraph)
+
+                # Content paragraph
+                $contentParagraph = New-Object System.Windows.Documents.Paragraph
+                $contentParagraph.Margin = "0,0,0,8"
+                $contentRun = New-Object System.Windows.Documents.Run
+                $contentRun.Text = $Content
+                $contentParagraph.AddChild($contentRun)
+                $flowDoc.AddChild($contentParagraph)
+
+                # Additional sections
+                foreach ($sectionTitle in $AdditionalSections.Keys) {
+                    $sectionParagraph = New-Object System.Windows.Documents.Paragraph
+                    $sectionParagraph.Margin = "0,4,0,4"
+
+                    # Section title
+                    $sectionTitleRun = New-Object System.Windows.Documents.Run
+                    $sectionTitleRun.Text = "$sectionTitle`: "
+                    $sectionTitleRun.FontWeight = "Bold"
+                    $sectionParagraph.AddChild($sectionTitleRun)
+
+                    # Section content
+                    $sectionContentRun = New-Object System.Windows.Documents.Run
+                    $sectionContentRun.Text = $AdditionalSections[$sectionTitle]
+                    $sectionParagraph.AddChild($sectionContentRun)
+
+                    $flowDoc.AddChild($sectionParagraph)
+                }
+
+                $flowDocViewer.Document = $flowDoc
+                $popupBorder.Child = $flowDocViewer
+            } else {
+                # Use simple StackPanel for basic content
+                $contentStack = New-Object System.Windows.Controls.StackPanel
+
+                # Title
+                $titleBlock = New-Object System.Windows.Controls.TextBlock
+                $titleBlock.Text = $Title
+                $titleBlock.FontWeight = "Bold"
+                $titleBlock.FontSize = 14
+                $titleBlock.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
+                $titleBlock.Margin = "0,0,0,8"
+                [void]$contentStack.Children.Add($titleBlock)
+
+                # Content
+                $contentBlock = New-Object System.Windows.Controls.TextBlock
+                $contentBlock.Text = $Content
+                $contentBlock.FontSize = 12
+                $contentBlock.TextWrapping = "Wrap"
+                $contentBlock.Foreground = $syncHash.Window.FindResource("TextBrush")
+                [void]$contentStack.Children.Add($contentBlock)
+
+                $popupBorder.Child = $contentStack
+            }
+
+            $popup.Child = $popupBorder
+
+            # Add mouse events to both the control AND the popup
+            $Control.Add_MouseEnter({
+                $popup.IsOpen = $true
+            }.GetNewClosure())
+
+            $Control.Add_MouseLeave({
+                # Only close if mouse is not over the popup
+                if (-not $popup.IsMouseOver) {
+                    $popup.IsOpen = $false
+                }
+            }.GetNewClosure())
+
+            # Add popup mouse events to prevent flickering
+            $popup.Add_MouseEnter({
+                $popup.IsOpen = $true
+            }.GetNewClosure())
+
+            $popup.Add_MouseLeave({
+                $popup.IsOpen = $false
+            }.GetNewClosure())
+            return $popup
+        }
+
+        Function Initialize-HelpPopups {
+            <#
+            .SYNOPSIS
+            Automatically adds hover popups to all HelpLabel controls in the UI.
+            .DESCRIPTION
+            This function scans the UI for controls with names ending in "HelpLabel" and adds hover popups with content from the localeHelpTips configuration.
+            #>
+
+            Write-DebugOutput -Message "Starting dynamic help popup initialization" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+            # Find all controls with names ending in "HelpLabel"
+            $helpLabels = $syncHash.GetEnumerator() | Where-Object {
+                $_.Key -like "*HelpLabel" -and $_.Value -is [System.Windows.Controls.Label]
+            }
+
+            Write-DebugOutput -Message "Found $($helpLabels.Count) HelpLabel controls" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+            foreach ($helpLabel in $helpLabels) {
+                $controlName = $helpLabel.Key
+                $control = $helpLabel.Value
+
+                Write-DebugOutput -Message "Processing help label: $controlName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                # Check if help tip configuration exists in localeHelpTips
+                if ($syncHash.UIConfigs.localeHelpTips.PSObject.Properties.Name -contains $controlName) {
+                    $helpData = $syncHash.UIConfigs.localeHelpTips.$controlName
+
+                    # Use Title from config if available, otherwise generate from control name
+                    $title = $helpData.Title
+
+                    # Get content
+                    $content = $helpData.Content
+
+                    $Params = @{
+                        Control = $control
+                        Title = $title
+                        Content = $content
                     }
 
-                    return $true
+                    # Check for additional sections to determine popup type
+                    if ($helpData.AdditionalSections) {
+                        # Convert PSCustomObject to hashtable
+                        $additionalSectionsHashtable = [ordered]@{}
+                        foreach ($property in $helpData.AdditionalSections.PSObject.Properties) {
+                            $additionalSectionsHashtable[$property.Name] = $property.Value
+                        }
+                        $Params.Add("AdditionalSections", $additionalSectionsHashtable)
+                    }
+
+                    If($helpData.Placement) {
+                        $Params.Add("Placement", $helpData.Placement)
+                    }
+
+                    # Add the hover popup to the control
+                    Add-HoverPopup @Params
+
+                    Write-DebugOutput -Message "Added hover popup to: $controlName" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                } else {
+                    Write-DebugOutput -Message "No help tip configuration found for: $controlName in localeHelpTips" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                 }
             }
 
-            return $false
-        }
-
-        # Add context-sensitive help panel
-        Function Add-ContextualHelp {
-            param(
-                [Parameter(Mandatory=$true)]
-                [System.Windows.Controls.Control]$Control,
-                [Parameter(Mandatory=$true)]
-                [string]$ControlName
-            )
-
-            # Check if help text exists
-            if ($syncHash.UIConfigs.localeToolTips.PSObject.Properties.Name -contains $ControlName) {
-                $helpText = $syncHash.UIConfigs.localeToolTips.$ControlName
-
-                # Add focus events to show/hide help
-                $Control.Add_GotFocus({
-                    if ($syncHash.HelpPanel) {
-                        $syncHash.HelpPanel.Visibility = "Visible"
-                        $syncHash.HelpText.Text = $helpText
-                        $syncHash.HelpTitle.Text = "Help: $ControlName"
-                    }
-                }.GetNewClosure())
-
-                $Control.Add_LostFocus({
-                    if ($syncHash.HelpPanel) {
-                        $syncHash.HelpPanel.Visibility = "Collapsed"
-                    }
-                }.GetNewClosure())
-
-                return $true
-            }
-
-            return $false
-        }
-
-        # Initialize help panel (call this once during UI setup)
-        Function Initialize-HelpPanel {
-            # Create help panel (add this to your XAML or create programmatically)
-            $helpPanel = New-Object System.Windows.Controls.Border
-            $helpPanel.Name = "HelpPanel"
-            $helpPanel.Background = [System.Windows.Media.Brushes]::LightBlue
-            $helpPanel.BorderBrush = [System.Windows.Media.Brushes]::DarkBlue
-            $helpPanel.BorderThickness = "2"
-            $helpPanel.Padding = "10"
-            $helpPanel.Margin = "10"
-            $helpPanel.Visibility = "Collapsed"
-
-            $helpStack = New-Object System.Windows.Controls.StackPanel
-
-            $helpTitle = New-Object System.Windows.Controls.TextBlock
-            $helpTitle.Name = "HelpTitle"
-            $helpTitle.FontWeight = "Bold"
-            $helpTitle.FontSize = 14
-            $helpTitle.Margin = "0,0,0,5"
-
-            $helpText = New-Object System.Windows.Controls.TextBlock
-            $helpText.Name = "HelpText"
-            $helpText.TextWrapping = "Wrap"
-            $helpText.FontSize = 12
-
-            $helpStack.Children.Add($helpTitle)
-            $helpStack.Children.Add($helpText)
-            $helpPanel.Child = $helpStack
-
-            # Store references
-            $syncHash.HelpPanel = $helpPanel
-            $syncHash.HelpTitle = $helpTitle
-            $syncHash.HelpText = $helpText
-
-            # Add to main window (you'll need to modify this based on your layout)
-            # $syncHash.MainContainer.Children.Add($helpPanel)
+            Write-DebugOutput -Message "Help popup initialization completed" -Source $MyInvocation.MyCommand.Name -Level "Info"
         }
         #===========================================================================
         # UPDATE UI Functions
@@ -2668,6 +2934,12 @@
             $checkbox.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_FieldListCheckbox")
             $checkbox.VerticalAlignment = "Top"
             $checkbox.Margin = "0,0,12,0"
+            #$checkbox.Content = "▶"  # Right-pointing triangle when collapsed
+            $checkbox.FontSize = 14
+            $checkbox.FontWeight = "Bold"
+            $checkbox.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
+            # Remove the default checkbox appearance
+            $checkbox.Template = $null
             [System.Windows.Controls.Grid]::SetColumn($checkbox, 0)
 
             # Add global event handlers to dynamically created checkbox
@@ -2828,11 +3100,13 @@
             $checkbox.Add_Checked({
                 $detailsPanel = $this.Parent.Parent.Children | Where-Object { $_.GetType().Name -eq "StackPanel" }
                 $detailsPanel.Visibility = "Visible"
+                #$this.Content = "▼"  # Down-pointing triangle when expanded
             }.GetNewClosure())
 
             $checkbox.Add_Unchecked({
                 $detailsPanel = $this.Parent.Parent.Children | Where-Object { $_.GetType().Name -eq "StackPanel" }
                 $detailsPanel.Visibility = "Collapsed"
+                #$this.Content = "▶"  # Right-pointing triangle when collapsed
             }.GetNewClosure())
 
             Add-ControlEventHandler -Control $saveButton
@@ -3266,9 +3540,74 @@
             }
         }
 
-        #===========================================================================
-        # Graph Selection Function
-        #===========================================================================
+        Function Get-GraphEntityConfig {
+            <#
+            .SYNOPSIS
+            Dynamically builds entity configurations from the JSON graphQueries configuration.
+            .DESCRIPTION
+            This function reads the graphQueries section from the UI configuration and creates
+            the entity configurations needed for the Graph selector dialogs.
+            #>
+            param(
+                [string]$entityType
+            )
+
+            # Check if the specific entity type exists in the configuration
+            $queryProperty = $syncHash.UIConfigs.graphQueries.PSObject.Properties | Where-Object { $_.Name -eq $entityType }
+
+            if (-not $queryProperty) {
+                Write-DebugOutput -Message "Entity type '$entityType' not found in graphQueries configuration" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                return $null
+            }
+
+            $queryConfig = $queryProperty.Value
+
+            # Build the configuration for the specific entity type
+            $config = @{
+                Title = "Select $($queryConfig.name)"
+                SearchPlaceholder = "Search by $($queryConfig.searchProperty.ToLower())..."
+                LoadingMessage = "Loading $($queryConfig.name.ToLower())..."
+                NoResultsMessage = "No $($queryConfig.name.ToLower()) found matching the search criteria."
+                NoResultsTitle = "No $($queryConfig.name) Found"
+                FilterProperty = $queryConfig.queryfilterProperty
+                SearchProperty = $queryConfig.searchProperty
+                QueryType = $entityType
+            }
+
+            # Build column configuration from displayColumnOrder
+            $columnConfig = [ordered]@{}
+            foreach ($column in $queryConfig.displayColumnOrder) {
+                $columnConfig[$column.value] = @{
+                    Header = $column.name
+                    Width = 200  # Default width, you could make this configurable too
+                }
+            }
+            $config.ColumnConfig = $columnConfig
+
+            # Create data transform script block with columns captured in closure
+            $columns = $queryConfig.displayColumnOrder
+            $config.DataTransform = {
+                param($item)
+                $result = [PSCustomObject]@{ OriginalObject = $item }
+
+                foreach ($column in $columns) {
+                    $propName = $column.value
+                    # Handle special cases for group types
+                    if ($propName -eq "groupTypes" -and $item.GroupTypes) {
+                        $groupType = "Distribution"
+                        if ($item.SecurityEnabled) { $groupType = "Security" }
+                        if ($item.GroupTypes -contains "Unified") { $groupType = "Microsoft 365" }
+                        $result | Add-Member -MemberType NoteProperty -Name "GroupType" -Value $groupType
+                    } else {
+                        $result | Add-Member -MemberType NoteProperty -Name $propName -Value $item.$propName
+                    }
+                }
+                return $result
+            }.GetNewClosure()
+
+            return $config
+        }
+
         Function Show-GraphProgressWindow {
             <#
             .SYNOPSIS
@@ -3283,70 +3622,8 @@
             )
 
             try {
-                # Define entity-specific configurations
-                $entityConfigs = @{
-                    users = @{
-                        Title = "Select Users"
-                        SearchPlaceholder = "Search by display name..."
-                        LoadingMessage = "Loading users..."
-                        NoResultsMessage = "No users found matching the search criteria."
-                        NoResultsTitle = "No Users Found"
-                        FilterProperty = "userPrincipalName"
-                        SearchProperty = "DisplayName"
-                        DisplayOrder = @("DisplayName", "UserPrincipalName", "AccountEnabled", "Id")
-                        QueryType = "users"
-                        DataTransform = {
-                            param($item)
-                            [PSCustomObject]@{
-                                DisplayName = $item.DisplayName
-                                UserPrincipalName = $item.UserPrincipalName
-                                AccountEnabled = $item.AccountEnabled
-                                Id = $item.Id
-                                OriginalObject = $item
-                            }
-                        }
-                        ColumnConfig = [ordered]@{
-                            DisplayName = @{ Header = "Display Name"; Width = 200 }
-                            UserPrincipalName = @{ Header = "User Principal Name"; Width = 250 }
-                            AccountEnabled = @{ Header = "Enabled"; Width = 80 }
-                            Id = @{ Header = "ID"; Width = 150 }
-                        }
-                    }
-                    groups = @{
-                        Title = "Select Groups"
-                        SearchPlaceholder = "Search by group name..."
-                        LoadingMessage = "Loading groups..."
-                        NoResultsMessage = "No groups found matching the search criteria."
-                        NoResultsTitle = "No Groups Found"
-                        FilterProperty = "displayName"
-                        SearchProperty = "DisplayName"
-                        DisplayOrder = @("DisplayName", "Description", "GroupType", "Id")
-                        QueryType = "groups"
-                        DataTransform = {
-                            param($item)
-                            $groupType = "Distribution"
-                            if ($item.SecurityEnabled) { $groupType = "Security" }
-                            if ($item.GroupTypes -contains "Unified") { $groupType = "Microsoft 365" }
-
-                            [PSCustomObject]@{
-                                DisplayName = $item.DisplayName
-                                Description = $item.Description
-                                GroupType = $groupType
-                                Id = $item.Id
-                                OriginalObject = $item
-                            }
-                        }
-                        ColumnConfig = [ordered]@{
-                            DisplayName = @{ Header = "Group Name"; Width = 200 }
-                            Description = @{ Header = "Description"; Width = 250 }
-                            GroupType = @{ Header = "Type"; Width = 100 }
-                            Id = @{ Header = "ID"; Width = 150 }
-                        }
-                    }
-                }
-
                 # Get configuration for the specified entity type
-                $config = $entityConfigs[$GraphEntityType]
+                $config = Get-GraphEntityConfig -entityType $GraphEntityType
                 if ($config) {
                     Write-DebugOutput -Message "Using configuration for graph entity type: $GraphEntityType" -Source $MyInvocation.MyCommand.Name -Level "Verbose"
                 }else{
@@ -3724,7 +4001,7 @@
         }
 
         #===========================================================================
-        # YAML IMPORT PROGRESS Functions
+        # YAML Control Functions
         #===========================================================================
         Function Show-YamlImportProgress {
             <#
@@ -4011,9 +4288,6 @@
                 }
             }
         }
-        #======================================================
-        # YAML CONTROL
-        #======================================================
 
         # Function to import YAML data into core data structures (without UI updates)
         Function Import-YamlToDataStructures {
@@ -4171,7 +4445,7 @@
                 Write-DebugOutput -Message "Error importing data: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
                 throw
             }
-}
+        }
 
         Function Format-YamlMultilineString {
             <#
@@ -4348,6 +4622,10 @@
             .DESCRIPTION
             This Function creates a YAML preview string by collecting values from all UI controls and formatting them according to ScubaGear configuration standards.
             #>
+            Param(
+                [Parameter(Mandatory=$false)]
+                [switch]$NoRedirect
+            )
 
             $yamlPreview = @()
             $yamlPreview += '# ScubaGear Configuration File'
@@ -4674,12 +4952,13 @@
             $syncHash.YamlPreview_TextBox.Text = $yamlPreview
 
             foreach ($tab in $syncHash.MainTabControl.Items) {
-                if ($tab -is [System.Windows.Controls.TabItem] -and $tab.Header -eq "Preview") {
+                if ($tab -is [System.Windows.Controls.TabItem] -and $tab.Header -eq "Preview" -and $NoRedirect -eq $false) {
                     $syncHash.MainTabControl.SelectedItem = $syncHash.PreviewTab
                     break
                 }
             }
         }#end Function : New-YamlPreview
+
         #===========================================================================
         # RESET: NEW SESSION
         #===========================================================================
@@ -4814,6 +5093,9 @@
 
         }#end Function : Clear-FieldValue
 
+        #===========================================================================
+        # SAVE: COLLECT SETTINGS FROM UI CONTROLS
+        #===========================================================================
         # Function to collect general settings from UI controls
         Function Save-GeneralSettingsFromInput {
             <#
@@ -5096,6 +5378,503 @@
         }
 
         #===========================================================================
+        # SCUBA RUN Controls
+        #===========================================================================
+
+        # Add this to your ScubaConfigAppUI.psm1
+
+        Function Initialize-ScubaRunTab {
+            <#
+            .SYNOPSIS
+            Initializes the Scuba Run tab with event handlers and default values.
+            #>
+
+            # Set default values from configuration
+            $scubaConfig = $syncHash.UIConfigs.ScubaRunConfig
+            $syncHash.SilenceBODWarnings_CheckBox.IsChecked = $scubaConfig.powershell.parameters.SilenceBODWarnings.defaultValue
+            $syncHash.DarkMode_CheckBox.IsChecked = $scubaConfig.powershell.parameters.DarkMode.defaultValue
+            $syncHash.Quiet_CheckBox.IsChecked = $scubaConfig.powershell.parameters.Quiet.defaultValue
+            $syncHash.ConfigFilePath_TextBox.Text = $scubaConfig.powershell.parameters.ConfigFilePath.defaultValue
+
+            # Enable text wrapping for the output textbox to handle long lines
+            if ($syncHash.ScubaOutput_TextBox) {
+                $syncHash.ScubaOutput_TextBox.TextWrapping = "Wrap"
+                $syncHash.ScubaOutput_TextBox.AcceptsReturn = $true
+                $syncHash.ScubaOutput_TextBox.VerticalScrollBarVisibility = "Auto"
+                $syncHash.ScubaOutput_TextBox.HorizontalScrollBarVisibility = "Auto"
+            }
+
+            # Add event handlers
+            $syncHash.RunScubaGear_Button.Add_Click({
+                Start-ScubaGearExecution
+            })
+
+            $syncHash.StopScubaGear_Button.Add_Click({
+                Stop-ScubaGearExecution
+            })
+
+            $syncHash.ClearOutput_Button.Add_Click({
+                $syncHash.ScubaOutput_TextBox.Clear()
+                $syncHash.ScubaOutput_TextBox.AppendText("Output cleared...`r`n")
+            })
+
+            $syncHash.CopyOutput_Button.Add_Click({
+                try {
+                    [System.Windows.Clipboard]::SetText($syncHash.ScubaOutput_TextBox.Text)
+                    Update-ScubaRunStatus "Output copied to clipboard" "Info"
+                }
+                catch {
+                    Update-ScubaRunStatus "Failed to copy output: $($_.Exception.Message)" "Error"
+                }
+            })
+
+            # Initialize product progress
+            Initialize-ProductProgress
+
+            Write-DebugOutput -Message "Scuba Run tab initialized" -Source $MyInvocation.MyCommand.Name -Level "Info"
+        }
+
+        Function Initialize-ProductProgress {
+            <#
+            .SYNOPSIS
+            Creates progress indicators for each selected product.
+            #>
+
+            $syncHash.ProductProgress_StackPanel.Children.Clear()
+
+            # Get selected products
+            $selectedProducts = $syncHash.GeneralSettingsData.ProductNames
+
+            if (-not $selectedProducts -or $selectedProducts.Count -eq 0) {
+                $noProductsText = New-Object System.Windows.Controls.TextBlock
+                $noProductsText.Text = "No products selected"
+                $noProductsText.Foreground = $syncHash.Window.FindResource("MutedTextBrush")
+                $noProductsText.HorizontalAlignment = "Center"
+                [void]$syncHash.ProductProgress_StackPanel.Children.Add($noProductsText)
+                return
+            }
+
+            foreach ($productId in $selectedProducts) {
+                $product = $syncHash.UIConfigs.products | Where-Object { $_.id -eq $productId }
+                if (-not $product) { continue }
+
+                # Create progress item
+                $progressItem = New-Object System.Windows.Controls.StackPanel
+                $progressItem.Orientation = "Horizontal"
+                $progressItem.Margin = "0,2,0,2"
+                $progressItem.Name = "Progress_$productId"
+
+                # Status icon
+                $statusIcon = New-Object System.Windows.Controls.TextBlock
+                $statusIcon.Text = "⏸"  # Paused/waiting
+                $statusIcon.FontSize = 14
+                $statusIcon.Margin = "0,0,8,0"
+                $statusIcon.Name = "StatusIcon_$productId"
+
+                # Product name
+                $productText = New-Object System.Windows.Controls.TextBlock
+                $productText.Text = $product.displayName
+                $productText.FontSize = 11
+                $productText.VerticalAlignment = "Center"
+
+                [void]$progressItem.Children.Add($statusIcon)
+                [void]$progressItem.Children.Add($productText)
+                [void]$syncHash.ProductProgress_StackPanel.Children.Add($progressItem)
+
+                # Store reference in syncHash for easy access
+                $syncHash."StatusIcon_$productId" = $statusIcon
+            }
+        }
+
+        Function Update-ProductProgress {
+            <#
+            .SYNOPSIS
+            Updates the progress status for a specific product.
+            #>
+            param(
+                [string]$ProductId,
+                [ValidateSet("Waiting", "Running", "Complete", "Error")]
+                [string]$Status
+            )
+
+            $statusIcon = $syncHash."StatusIcon_$ProductId"
+            if (-not $statusIcon) { return }
+
+            switch ($Status) {
+                "Waiting" {
+                    $statusIcon.Text = "⏸"
+                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Gray
+                }
+                "Running" {
+                    $statusIcon.Text = "🔄"
+                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Blue
+                }
+                "Complete" {
+                    $statusIcon.Text = "✅"
+                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Green
+                }
+                "Error" {
+                    $statusIcon.Text = "❌"
+                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Red
+                }
+            }
+        }
+
+        Function Update-ScubaRunStatus {
+            <#
+            .SYNOPSIS
+            Updates the status text and output log.
+            #>
+            param(
+                [string]$Message,
+                [ValidateSet("Info", "Warning", "Error", "Success")]
+                [string]$Level = "Info"
+            )
+
+            $timestamp = Get-Date -Format "HH:mm:ss"
+
+            # Process long messages for better readability
+            $processedMessage = $Message
+            if ($Message.Length -gt 120 -and $Message -match "WARNING:") {
+                # Split long warning messages at logical points
+                $processedMessage = $Message -replace '\s{3,}', "`r`n    " # Replace multiple spaces with newlines and indentation
+                $processedMessage = $processedMessage -replace 'WARNING:\s+', "WARNING:`r`n    " # Put WARNING on its own line
+            }
+
+            $logEntry = "[$timestamp] $processedMessage"
+
+            # Update status text
+            $syncHash.ScubaRunStatus_TextBlock.Text = "Status: $Message"
+
+
+            # Set color based on level
+            switch ($Level) {
+                "Info" { $syncHash.ScubaRunStatus_TextBlock.Foreground = $syncHash.Window.FindResource("PrimaryBrush") }
+                "Warning" { $syncHash.ScubaRunStatus_TextBlock.Foreground = [System.Windows.Media.Brushes]::Orange }
+                "Error" { $syncHash.ScubaRunStatus_TextBlock.Foreground = [System.Windows.Media.Brushes]::Red }
+                "Success" { $syncHash.ScubaRunStatus_TextBlock.Foreground = [System.Windows.Media.Brushes]::Green }
+            }
+
+            # Add to output log
+            $syncHash.ScubaOutput_TextBox.AppendText("$logEntry`r`n")
+            $syncHash.ScubaOutput_TextBox.ScrollToEnd()
+
+            Write-DebugOutput -Message $Message -Source "ScubaRun" -Level $Level
+        }
+
+        Function Test-ScubaRunReadiness {
+            <#
+            .SYNOPSIS
+            Checks if ScubaGear can be run (valid YAML generated).
+            #>
+
+            # Check if we have valid configuration data
+            $hasValidConfig = $false
+
+            # Check if products are selected
+            if ($syncHash.GeneralSettingsData.ProductNames -and $syncHash.GeneralSettingsData.ProductNames.Count -gt 0) {
+                $hasValidConfig = $true
+            }
+
+            # Check if Organization is set (required)
+            if ([string]::IsNullOrWhiteSpace($syncHash.GeneralSettingsData.Organization)) {
+                $hasValidConfig = $false
+            }
+
+            # Enable/disable run button
+            $syncHash.RunScubaGear_Button.IsEnabled = $hasValidConfig
+
+            if ($hasValidConfig) {
+                Update-ScubaRunStatus "Ready to run ScubaGear" "Success"
+            } else {
+                Update-ScubaRunStatus "Configuration incomplete - check Main tab" "Warning"
+            }
+
+            return $hasValidConfig
+        }
+
+        Function Start-ScubaGearExecution {
+            <#
+            .SYNOPSIS
+            Starts ScubaGear execution in a background job.
+            #>
+
+            try {
+                # Test readiness
+                if (-not (Test-ScubaRunReadiness)) {
+                    Update-ScubaRunStatus "Cannot run - configuration is incomplete" "Error"
+                    return
+                }
+
+                # Generate temporary YAML file
+                $tempConfigPath = Export-TempYamlConfiguration
+                if (-not $tempConfigPath) {
+                    Update-ScubaRunStatus "Failed to generate temporary configuration" "Error"
+                    return
+                }
+
+                # Update UI state
+                $syncHash.RunScubaGear_Button.IsEnabled = $false
+                $syncHash.StopScubaGear_Button.IsEnabled = $true
+                $syncHash.RunScubaGear_Button.Visibility = "Collapsed"
+                $syncHash.StopScubaGear_Button.Visibility = "Visible"
+
+                # Reset product progress
+                foreach ($productId in $syncHash.GeneralSettingsData.ProductNames) {
+                    Update-ProductProgress -ProductId $productId -Status "Waiting"
+                }
+
+                Update-ScubaRunStatus "Starting ScubaGear execution..." "Info"
+
+                # Build PowerShell command
+                $command = Build-ScubaGearCommand -ConfigFilePath $tempConfigPath
+
+                Update-ScubaRunStatus "Executing command: $command" "Info"
+                # Start background job
+                Start-ScubaGearJob -Command $command
+
+            }
+            catch {
+                Update-ScubaRunStatus "Error starting ScubaGear: $($_.Exception.Message)" "Error"
+                # Reset UI state
+                Reset-ScubaRunUI
+            }
+        }
+
+        Function Export-TempYamlConfiguration {
+            <#
+            .SYNOPSIS
+            Exports current configuration to a temporary YAML file.
+            #>
+
+            try {
+                # Generate YAML content (reuse existing preview function)
+                New-YamlPreview -NoRedirect
+
+                # Get the generated YAML content from the UI
+                $yamlContent = $syncHash.YamlPreview_TextBox.Text
+
+                if ([string]::IsNullOrWhiteSpace($yamlContent)) {
+                    throw "No YAML content was generated. Please ensure all required fields are filled."
+                }
+
+                # Create temp directory if it doesn't exist
+                $tempDir = Join-Path $env:TEMP "ScubaConfigRun"
+                if (-not (Test-Path $tempDir)) {
+                    New-Item -Path $tempDir -ItemType Directory -Force | Out-Null
+                }
+
+                # Create temp file
+                $tempFileName = "ScubaGearConfig_$(Get-Date -Format 'yyyyMMdd_HHmmss').yaml"
+                $tempFilePath = Join-Path $tempDir $tempFileName
+
+                # Write YAML content
+                [System.IO.File]::WriteAllText($tempFilePath, $yamlContent, [System.Text.Encoding]::UTF8)
+
+                Update-ScubaRunStatus "Configuration exported to: $tempFilePath" "Info"
+                return $tempFilePath
+            }
+            catch {
+                Update-ScubaRunStatus "Failed to export configuration: $($_.Exception.Message)" "Error"
+                return $null
+            }
+        }
+
+        Function Build-ScubaGearCommand {
+            <#
+            .SYNOPSIS
+            Builds the PowerShell command to execute ScubaGear.
+            #>
+            param([string]$ConfigFilePath)
+
+            # Build command with module import and ScubaGear execution
+            $scubaConfig = $syncHash.UIConfigs.ScubaRunConfig
+            $cmdParts = @()
+
+            # Add module imports from configuration
+            if ($scubaConfig.powershell.modules) {
+                foreach ($module in $scubaConfig.powershell.modules) {
+                    $cmdParts += "Import-Module $module -Force;"
+                }
+            }
+
+            # Add pre-commands from configuration in order
+            if ($scubaConfig.powershell.PreCommands) {
+                foreach ($preCommand in $scubaConfig.powershell.PreCommands) {
+                    $cmdParts += "$preCommand;"
+                }
+            }
+
+            # Add the main ScubaGear command from configuration
+            $cmdParts += $scubaConfig.powershell.cmdlets
+
+            # Dynamically add all parameters from configuration
+            if ($scubaConfig.powershell.parameters) {
+                foreach ($paramName in $scubaConfig.powershell.parameters.PSObject.Properties.Name) {
+                    $paramConfig = $scubaConfig.powershell.parameters.$paramName
+
+                    # Handle different parameter types
+                    switch ($paramConfig.type) {
+                        "string" {
+                            if ($paramName -eq "ConfigFilePath") {
+                                # Use the provided ConfigFilePath parameter
+                                $cmdParts += "-$paramName '$ConfigFilePath'"
+                            } else {
+                                # For other string parameters, get from UI control
+                                $textBoxName = "$paramName" + "_TextBox"
+                                $textBox = $syncHash.$textBoxName
+                                if ($textBox -and ![string]::IsNullOrWhiteSpace($textBox.Text)) {
+                                    $cmdParts += "-$paramName '$($textBox.Text)'"
+                                }
+                            }
+                        }
+                        "boolean" {
+                            $checkboxName = "$paramName" + "_CheckBox"
+                            $checkbox = $syncHash.$checkboxName
+
+                            if ($checkbox -and $checkbox.IsChecked) {
+                                $cmdParts += "-$paramName"
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $cmdParts -join " "
+        }
+
+        Function Start-ScubaGearJob {
+            <#
+            .SYNOPSIS
+            Starts ScubaGear in a background PowerShell 5.1 process.
+            #>
+            param([string]$Command)
+
+            # Create a job to run PowerShell 5.1
+            $job = Start-Job -ScriptBlock {
+                # Force PowerShell 5.1
+                $ps51Path = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
+
+                if (Test-Path $ps51Path) {
+                    & $ps51Path -Command $Using:Command
+                } else {
+                    throw "PowerShell 5.1 not found at expected location"
+                }
+            } -ArgumentList $Command
+
+            # Store job reference
+            $syncHash.ScubaGearJob = $job
+
+            # Start monitoring timer
+            Start-ScubaGearMonitoring
+        }
+
+        Function Start-ScubaGearMonitoring {
+            <#
+            .SYNOPSIS
+            Monitors the ScubaGear job progress.
+            #>
+
+            $timer = New-Object System.Windows.Threading.DispatcherTimer
+            $timer.Interval = [TimeSpan]::FromSeconds(2)
+
+            $timer.Add_Tick({
+                if ($syncHash.ScubaGearJob) {
+                    $job = $syncHash.ScubaGearJob
+
+                    # Check job state
+                    switch ($job.State) {
+                        "Running" {
+                            Update-ScubaRunStatus "ScubaGear is running..." "Info"
+                            # You could parse output here if available
+                        }
+                        "Completed" {
+                            $results = Receive-Job -Job $job
+                            Update-ScubaRunStatus "ScubaGear completed successfully" "Success"
+                            $syncHash.ScubaOutput_TextBox.AppendText("$results`r`n")
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+                        }
+                        "Failed" {
+                            $null = Receive-Job -Job $job -ErrorAction SilentlyContinue
+                            Update-ScubaRunStatus "ScubaGear failed: $error" "Error"
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+                        }
+                        "Stopped" {
+                            Update-ScubaRunStatus "ScubaGear execution was stopped" "Warning"
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+                        }
+                    }
+                }
+            })
+
+            $syncHash.ScubaGearTimer = $timer
+            $timer.Start()
+        }
+
+        Function Stop-ScubaGearExecution {
+            <#
+            .SYNOPSIS
+            Stops the running ScubaGear job.
+            #>
+
+            if ($syncHash.ScubaGearJob) {
+                Stop-Job -Job $syncHash.ScubaGearJob -Force
+                Remove-Job -Job $syncHash.ScubaGearJob -Force
+                $syncHash.ScubaGearJob = $null
+            }
+
+            if ($syncHash.ScubaGearTimer) {
+                $syncHash.ScubaGearTimer.Stop()
+                $syncHash.ScubaGearTimer = $null
+            }
+
+            Update-ScubaRunStatus "Execution stopped by user" "Warning"
+            Reset-ScubaRunUI
+        }
+
+        Function Complete-ScubaGearExecution {
+            <#
+            .SYNOPSIS
+            Completes ScubaGear execution and updates UI.
+            #>
+
+            # Mark all products as complete (or detect which ones actually completed)
+            foreach ($productId in $syncHash.GeneralSettingsData.ProductNames) {
+                Update-ProductProgress -ProductId $productId -Status "Complete"
+            }
+
+            Reset-ScubaRunUI
+        }
+
+        Function Reset-ScubaRunUI {
+            <#
+            .SYNOPSIS
+            Resets the UI to ready state.
+            #>
+
+            $syncHash.RunScubaGear_Button.IsEnabled = $true
+            $syncHash.StopScubaGear_Button.IsEnabled = $false
+            $syncHash.StopScubaGear_Button.Visibility = "Collapsed"
+            $syncHash.RunScubaGear_Button.Visibility = "Visible"
+
+            Test-ScubaRunReadiness
+        }
+
+        # Call this when the tab is initialized
+        Add-Type -TypeDefinition @"
+        using System;
+        using System.Runtime.InteropServices;
+        public class PowerShellHelper {
+            [DllImport("kernel32.dll", SetLastError = true)]
+            public static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
+
+            public delegate bool ConsoleCtrlDelegate(uint CtrlType);
+        }
+"@
+        #===========================================================================
         #
         # LOAD UI
         #
@@ -5135,16 +5914,6 @@
             $syncHash.DebugTab.Visibility = "Collapsed"
         }
 
-        If($syncHash.UIConfigs.EnableScubaRun){
-            $syncHash.ScubaRunTab.Visibility = "Visible"
-        }else {
-            $syncHash.ScubaRunTab.Visibility = "Collapsed"
-        }
-
-        #Add-ControlHelpIcon -Control $syncHash.Organization_TextBox -ControlName "Organization_TextBox"
-        #Add-ControlHelpIcon -Control $syncHash.OrgName_TextBox -ControlName "OrgName_TextBox"
-        #Add-ControlHelpIcon -Control $syncHash.AppId_TextBox -ControlName "AppId_TextBox"
-        #Add-ControlHelpIcon -Control $syncHash.CertificateThumbprint_TextBox -ControlName "CertificateThumbprint_TextBox"
 
         #override locale context
         foreach ($localeElement in $syncHash.UIConfigs.localeContext.PSObject.Properties) {
@@ -5380,6 +6149,8 @@
                 $syncHash.Organization_TextBox.BorderBrush = [System.Windows.Media.Brushes]::Gray
                 $syncHash.Organization_TextBox.BorderThickness = "1"
                 $syncHash.Organization_TextBox.isEnabled = $false # Disable editing if Graph is connected
+
+                Add-DynamicGraphButtons
             } catch {
                 # Fallback to placeholder if Graph request fails
                 Initialize-PlaceholderTextBox -TextBox $syncHash.Organization_TextBox -PlaceholderText $syncHash.UIConfigs.localePlaceholder.Organization_TextBox
@@ -5419,6 +6190,14 @@
         Write-DebugOutput -Message "Initializing Global Settings tab" -Source "UI Launch" -Level "Info"
         New-GlobalSettingsControls
 
+        If($syncHash.UIConfigs.EnableScubaRun){
+            $syncHash.ScubaRunTab.Visibility = "Visible"
+            # Initialize ScubaRun tab
+            Write-DebugOutput -Message "Initializing ScubaRun tab" -Source "UI Launch" -Level "Info"
+            Initialize-ScubaRunTab
+        }else {
+            $syncHash.ScubaRunTab.Visibility = "Collapsed"
+        }
         #===========================================================================
         # Button Event Handlers
         #===========================================================================
@@ -5527,6 +6306,10 @@
                     Save-GlobalSettingsFromInput
                     # Generate YAML preview
                     New-YamlPreview
+
+                    If($syncHash.UIConfigs.EnableScubaRun){
+                        Test-ScubaRunReadiness
+                    }
                 }
             }) #end Dispatcher.Invoke
         })
@@ -5757,6 +6540,7 @@
             Write-DebugOutput -Message "Search and filter Functionality is disabled" -Source "UI Initialization" -Level "Info"
         }
 
+        Initialize-HelpPopups
 
         #=======================================
         # CLOSE UI
@@ -5774,7 +6558,20 @@
         }
 
         # Add Loaded event once
-        $syncHash.Window.Add_Loaded({ $syncHash.isLoaded = $true })
+        $syncHash.Window.Add_Loaded({
+            $syncHash.isLoaded = $true
+            <#
+            # Initialize help popups after the window is fully loaded
+            $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action]{
+                try {
+                    Write-DebugOutput -Message "Initializing help popups after window load" -Source "UI Launch" -Level "Info"
+                    Initialize-HelpPopups
+                } catch {
+                    Write-DebugOutput -Message "Error initializing help popups: $($_.Exception.Message)" -Source "UI Launch" -Level "Error"
+                }
+            })
+            #>
+        })
 
         # Closing event (calls Close-UIMainWindow only)
         # Events, UI setup here...

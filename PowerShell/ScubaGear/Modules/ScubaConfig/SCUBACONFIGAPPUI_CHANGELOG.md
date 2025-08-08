@@ -1,5 +1,11 @@
 # SCUBACONFIGAPPUI CHANGELOG
 
+## 1.8.7 [08/07/2025] - ScubaGear Execution Output Text Wrapping Enhancement
+- Built a fully JSON-driven ScubaGear execution framework with dynamic PowerShell command construction, including cmdlet selection, module imports, parameter type handling (string/boolean), and UI control mapping.
+- Implemented graph comamnd for application id retriveal
+- Improved execution workflow stability with variable scope fixes in background jobs, temporary YAML file generation and cleanup, and robust error handling.
+- Refined YAML generation process by correcting function calls and ensuring accurate preview/export behavior.
+
 ## 1.8.6 [08/06/2025] - YAML Generation and Input Validation Enhancements
 - Fixed baseline controls loop in YAML preview to properly display field names and values for exclusions, annotations, and omissions
 - Corrected data structure access pattern for flipped structure (Product -> FieldType -> PolicyId -> FieldData) in annotations and omissions processing
