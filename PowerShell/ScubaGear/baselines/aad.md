@@ -254,6 +254,7 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 <!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
 - _Rationale:_ To disable the legacy authentication methods screen for the tenant, configure the Manage Migration feature to Migration Complete. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and potential security misconfigurations.
 - _Last modified:_ June 2023
+- _Note:_ Migration is not possible for newer tenants, as they use the newer authentication methods by default.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
 - _MITRE ATT&CK TTP Mapping:_
   - None

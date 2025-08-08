@@ -1123,6 +1123,15 @@ test_PolicyMigrationState_Correct if {
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
+# Test with PolicyMigrationState = null (newly created tenants)
+test_PolicyMigrationState_Correct_NullValue if {
+    Auth := json.patch(AuthenticationMethod, [
+        {"op": "add", "path": "authentication_method_policy/PolicyMigrationState", "value": null}
+    ])
+    Output := aad.tests with input.authentication_method as [Auth]
+    TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
+}
+
 test_PolicyMigrationState_preMigration_Incorrect if {
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState", "value": "preMigration"}])
