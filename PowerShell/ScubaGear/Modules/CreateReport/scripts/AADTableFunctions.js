@@ -41,7 +41,7 @@ const TABLE_COL_NAMES = {
  * @param {string} sectionId - The section id for the table.
  * @param {string} title - The table title.
  */
-function buildExpandableTable(data, tableType, sectionId, title) {
+const buildExpandableTable = (data, tableType, sectionId, title) => {
     if (data === undefined || data === null) {
         /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but
             this js file applies to all baselines. If data is null,
@@ -153,7 +153,7 @@ function buildExpandableTable(data, tableType, sectionId, title) {
  * @param {number} i The row index (0-indexed, not counting the header row).
  * @param {number} j The column index (0-indexed).
  */
-function fillTruncatedCell(data, tableType, td, i, j) {
+const fillTruncatedCell = (data, tableType, td, i, j) => {
     const colNames = TABLE_COL_NAMES[tableType];
     const charLimit = 50;
     let content = "";
@@ -206,13 +206,14 @@ function fillTruncatedCell(data, tableType, td, i, j) {
  * @param {HTMLTableRowElement} row The table row element.
  * @param {number} rowIndex The row index.
  */
-function fillExpandedRow(data, tableType, row, rowIndex) {
+const fillExpandedRow = (data, tableType, row, rowIndex) => {
     const colNames = TABLE_COL_NAMES[tableType];
 
     for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
         td.innerHTML = "";
         const col = colNames[colIndex];
+        const cellData = data[rowIndex][col.name];
 
         if (colIndex === 0) {
             const img = document.createElement("img");
@@ -228,16 +229,17 @@ function fillExpandedRow(data, tableType, row, rowIndex) {
             collapseRowButton.appendChild(img);
             td.appendChild(collapseRowButton);
         }
-        else if (data[rowIndex][col.name] && Array.isArray(data[rowIndex][col.name])) {
+        else if (cellData && Array.isArray(cellData)) {
             const ul = document.createElement("ul");
-            data[rowIndex][col.name].forEach(item => {
+            cellData.forEach(item => {
                 const li = document.createElement("li");
                 li.textContent = typeof item === "object" ? JSON.stringify(item) : item;
                 ul.appendChild(li);
             });
             td.appendChild(ul);
-        } else {
-            td.innerHTML = data[rowIndex][col.name] ?? "";
+        }
+        else {
+            td.innerHTML = cellData ?? "";
         }
     }
 }
@@ -249,7 +251,7 @@ function fillExpandedRow(data, tableType, row, rowIndex) {
  * @param {HTMLTableRowElement} row The table row element.
  * @param {number} rowIndex The row index.
  */
-function fillCollapsedRow(data, tableType, row, rowIndex) {
+const fillCollapsedRow = (data, tableType, row, rowIndex) => {
     const colNames = TABLE_COL_NAMES[tableType];
 
     for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
@@ -281,7 +283,7 @@ function fillCollapsedRow(data, tableType, row, rowIndex) {
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  * @param {Event} event The event that triggered the expansion.
  */
-function expandRow(data, tableType, event) {
+const expandRow = (data, tableType, event) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
     fillExpandedRow(data, tableType, row, rowIndex);
@@ -293,7 +295,7 @@ function expandRow(data, tableType, event) {
  * @param {Array} data The table content.
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
-function expandAllRows(data, tableType) {
+const expandAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillExpandedRow(data, tableType, row, rowIndex);
     });
@@ -306,7 +308,7 @@ function expandAllRows(data, tableType) {
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  * @param {Event} event The event that triggered the expansion.
  */
-function collapseRow(data, tableType, event) {
+const collapseRow = (data, tableType, event) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
     fillCollapsedRow(data, tableType, row, rowIndex);
@@ -318,7 +320,7 @@ function collapseRow(data, tableType, event) {
  * @param {Array} data The table content.
  * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
  */
-function collapseAllRows(data, tableType) {
+const collapseAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillCollapsedRow(data, tableType, row, rowIndex);
     });
