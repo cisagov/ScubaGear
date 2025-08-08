@@ -13,9 +13,9 @@
 - Separated baseline policies and UI configuration into distinct JSON files for improved maintainability
 
 ## 1.8.4 [08/04/2025] - Global Settings Implementation and Placeholder Text Fixes
-- Implemented global settings tab with DNS resolver array controls and DoH boolean settings 
+- Implemented global settings tab with DNS resolver array controls and DoH boolean settings
 - Fixed placeholder text restoration bug; reliable behavior across multiple focus cycles
-- Enhanced UI control stability with proper variable scoping in event handler closures 
+- Enhanced UI control stability with proper variable scoping in event handler closures
 - Improved data structure synchronization between nested cards and flat YAML output
 - Implemented language-agnostic MessageBox system with new `localeTitles` JSON configuration section for standardized titles and messages
 - Improved internationalization readiness and standardized MessageBox presentation across all UI components for multi-language support
