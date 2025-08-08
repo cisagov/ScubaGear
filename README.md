@@ -143,7 +143,7 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 - 📖 [Learn about all configuration options](docs/configuration/configuration.md) →
 
 > [!TIP]
-> A [sample YAML configuration file](PowerShell\ScubaGear\Sample-Config-Files\full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module. **For easier editing, you can import it into the UI and make further adjustments there.**
+> Several samples configurations are provided [Full config](PowerShell\ScubaGear\Sample-Config-Files\full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module. **For easier editing, you can import it into the UI and make further adjustments there.**
 
 
 ### 6: Run Scuba with configuration File
