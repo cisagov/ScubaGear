@@ -638,6 +638,16 @@
         #===========================================================================
         # Helper Function to find controls in a container
         Function Find-ControlInContainer {
+            <#
+            .SYNOPSIS
+            Finds all controls of a specific type within a container.
+            .DESCRIPTION
+            This function searches through the visual tree of a WPF container to find and return all controls of a specified type.
+            .PARAMETER Container
+            The container to search within, which can be a Window, UserControl, or any other WPF container.
+            .PARAMETER ControlType
+            The type of control to search for, specified as a string (e.g., "TextBox", "ComboBox", etc.).
+            #>
             param(
                 $Container,
                 [string]$ControlType
@@ -1102,14 +1112,34 @@
 
         # Function to validate UI field based on regex and required status
         Function Confirm-RequiredField {
+            <#
+            .SYNOPSIS
+            Confirms that a required field is filled out correctly.
+            .DESCRIPTION
+            This function checks if a UI element (e.g., TextBox, ComboBox) meets the specified requirements, such as being filled out and matching a regex pattern.
+            .PARAMETER UIElement
+            The UI element to validate, which can be a TextBox, ComboBox, etc.
+            .PARAMETER RegexPattern
+            The regex pattern to validate the field content against.
+            .PARAMETER ErrorMessage
+            The message to display if validation fails.
+            .PARAMETER PlaceholderText
+            Optional placeholder text to check against empty fields.
+            .PARAMETER ShowMessageBox
+            If specified, shows a message box with the error message if validation fails.
+            .PARAMETER TestPath
+            If specified, tests if the path exists for the current value.
+            .PARAMETER RequiredFiles
+            An array of required files to check for existence within the specified path.
+            #>
             param(
                 [System.Windows.Controls.Control]$UIElement,
                 [string]$RegexPattern,
                 [string]$ErrorMessage,
                 [string]$PlaceholderText = "",
                 [switch]$ShowMessageBox,
-                [switch]$TestPath,           # NEW: Test if path exists
-                [string[]]$RequiredFiles     # NEW: Array of required files in the path
+                [switch]$TestPath,
+                [string[]]$RequiredFiles
             )
 
             $isValid = $true
@@ -1133,7 +1163,7 @@
                     -not ($currentValue -match $RegexPattern)) {
                 $isValid = $false
             }
-            # NEW: Check path existence if TestPath is specified
+            # Check path existence if TestPath is specified
             elseif ($TestPath -and ![string]::IsNullOrWhiteSpace($currentValue) -and $currentValue -ne $PlaceholderText) {
                 if (-not (Test-Path $currentValue)) {
                     $isValid = $false
@@ -1417,6 +1447,28 @@
         # Add this function after the existing help functions around line 1357:
         # Consolidated popup function that handles both simple and rich popups
         Function Add-HoverPopup {
+            <#
+            .SYNOPSIS
+            Adds a hover popup to a control.
+
+            .DESCRIPTION
+            This function creates a hover popup for a specified control, allowing for additional information to be displayed when the user hovers over the control.
+
+            .PARAMETER Control
+            The control to attach the hover popup to.
+
+            .PARAMETER Title
+            The title of the hover popup.
+
+            .PARAMETER Content
+            The content to display in the hover popup.
+
+            .PARAMETER Placement
+            The placement of the hover popup relative to the control.
+
+            .PARAMETER AdditionalSections
+            Any additional sections to include in the hover popup.
+            #>
             param(
                 [Parameter(Mandatory=$true)]
                 [System.Windows.Controls.Control]$Control,
@@ -4494,18 +4546,6 @@
             Generates YAML configuration preview from current UI settings.
             .DESCRIPTION
             This function creates a YAML preview string by collecting values from all UI data structures and converting them into a formatted YAML string.
-            .NOTES
-
-            #If Accidently removed the keysToNotAdd from the GeneralSettingsData
-            $productNames = @('Aad', 'exo', 'teams', 'sharepoint', 'defender')
-            $productNames = @('*')
-            if (-not $syncHash.GeneralSettingsData.ProductNames) {
-                $syncHash.GeneralSettingsData.Add('ProductNames', $productNames)
-            }
-            if (-not $syncHash.GeneralSettingsData.M365Environment) {
-                $syncHash.GeneralSettingsData.Add('M365Environment', 'commercial')
-            }
-
             .LINK
             ConvertTo-Yaml
             #>
@@ -6545,17 +6585,6 @@
         #=======================================
         # CLOSE UI
         #=======================================
-        Function Invoke-TimerCleanup {
-            if ($syncHash.UIUpdateTimer) {
-                $syncHash.UIUpdateTimer.Stop()
-                $syncHash.UIUpdateTimer = $null
-            }
-            if ($syncHash.DebugFlushTimer) {
-                $syncHash.DebugFlushTimer.Stop()
-                $syncHash.DebugFlushTimer.Dispose()
-                $syncHash.DebugFlushTimer = $null
-            }
-        }
 
         # Add Loaded event once
         $syncHash.Window.Add_Loaded({
@@ -6596,7 +6625,6 @@
         # Closed event (final GC only)
         $syncHash.Window.Add_Closed({
             try {
-                #Invoke-TimerCleanup
 
                 #Safe to release all memory
                 [System.GC]::Collect()

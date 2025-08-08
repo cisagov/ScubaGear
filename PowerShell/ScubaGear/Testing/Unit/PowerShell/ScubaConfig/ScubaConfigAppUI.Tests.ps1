@@ -5,8 +5,8 @@ InModuleScope ScubaConfigAppUI {
     Describe -tag "Config" -name 'ScubaConfig JSON Configuration Validation' {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'uiConfigPath')]
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'baselineConfigPath')]
             $uiConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigAppUI_Control_en-US.json"
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'baselineConfigPath')]
             $baselineConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaBaselines_en-US.json"
         }
 
@@ -33,15 +33,18 @@ InModuleScope ScubaConfigAppUI {
                     'Version',
                     'DebugMode',
                     'EnableSearchAndFilter',
+                    'EnableScubaRun',
                     'localeContext',
                     'localePlaceholder',
                     'localeInfoMessages',
                     'localeErrorMessages',
                     'localePopupMessages',
+                    'localeHelpTips',
                     'localeTitles',
                     'defaultAdvancedSettings',
                     'advancedSections',
                     'globalSettings',
+                    'ScubaRunConfig',
                     'products',
                     'M365Environment',
                     'baselineControls',
@@ -221,7 +224,7 @@ InModuleScope ScubaConfigAppUI {
             It 'Should have baselines for each product' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
                 $baselineConfigContent = Get-Content $baselineConfigPath -Raw | ConvertFrom-Json
-                
+
                 $baselineConfigContent.baselines | Should -Not -BeNullOrEmpty
 
                 # Verify baselines exist for each product
