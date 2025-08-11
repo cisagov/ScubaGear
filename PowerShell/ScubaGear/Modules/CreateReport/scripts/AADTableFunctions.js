@@ -18,19 +18,19 @@ const TABLE_COL_NAMES = {
     riskyApps: [
         { name: "" },
         { name: "DisplayName" },
-        { name: "IsMultiTenantEnabled" },
-        { name: "KeyCredentials" },
-        { name: "PasswordCredentials" },
-        { name: "FederatedCredentials" },
-        { name: "Permissions" }
+        { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
+        { name: "KeyCredentials", className: "key_credentials" },
+        { name: "PasswordCredentials", className: "password_credentials" },
+        { name: "FederatedCredentials", className: "federated_credentials" },
+        { name: "Permissions", className: "permissions" }
     ],
     riskyThirdPartySPs: [
         { name: "" },
-        { name: "DisplayName" },
-        { name: "KeyCredentials" },
-        { name: "PasswordCredentials" },
-        { name: "FederatedCredentials" },
-        { name: "Permissions" }
+        { name: "DisplayName", className: "display_name" },
+        { name: "KeyCredentials", className: "key_credentials" },
+        { name: "PasswordCredentials", className: "password_credentials" },
+        { name: "FederatedCredentials", className: "federated_credentials" },
+        { name: "Permissions", className: "permissions" }
     ]
 };
 
@@ -38,10 +38,10 @@ const TABLE_COL_NAMES = {
  * Shared function to build a table with expand/collapse chevrons and truncation.
  * @param {Array} data - The data array.
  * @param {string} tableType - One of 'caps', 'riskyApps', 'riskySPs'.
- * @param {string} sectionId - The section id for the table.
+ * @param {string} className - The className(s) assigned to an expandable table.
  * @param {string} title - The table title.
  */
-const buildExpandableTable = (data, tableType, sectionId, title) => {
+const buildExpandableTable = (data, tableType, className, title) => {
     if (data === undefined || data === null) {
         /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but
             this js file applies to all baselines. If data is null,
@@ -62,7 +62,7 @@ const buildExpandableTable = (data, tableType, sectionId, title) => {
 
     const colNames = TABLE_COL_NAMES[tableType];
     const section = document.createElement("section");
-    section.id = sectionId;
+    section.className = className;
     document.querySelector("main").appendChild(section);
 
     section.appendChild(document.createElement("hr"));
@@ -230,7 +230,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
             td.appendChild(collapseRowButton);
         }
         else if (cellData && Array.isArray(cellData) && cellData.length > 1) {
-            const items = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+            const items = normalizeToArray(cellData);
             console.log(items);
             if (items.length === 0) {
                 td.innerHTML = "None";

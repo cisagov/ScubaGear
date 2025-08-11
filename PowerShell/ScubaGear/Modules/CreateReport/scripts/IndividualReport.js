@@ -6,9 +6,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const riskyApps = getJsonData('risky-apps-json');
     const riskyThirdPartySPs = getJsonData('risky-third-party-sp-json');
 
-    buildExpandableTable(caps, "caps", "caps", "Conditional Access Policies");
-    buildExpandableTable(riskyApps, "riskyApps", "risky_apps_table", "Risky Applications");
-    buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", "risky_third_party_sps_table", "Risky Third Party Service Principals");
+    buildExpandableTable(caps, "caps", "expandable_wrapper", "Conditional Access Policies");
+    buildExpandableTable(riskyApps, "riskyApps", "expandable_wrapper", "Risky Applications");
+    buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", "expandable_wrapper", "Risky Third Party Service Principals");
 
     colorRows();
     applyScopeAttributes();
