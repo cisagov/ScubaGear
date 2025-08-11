@@ -61,6 +61,9 @@
         [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
         [string]$M365Environment,
 
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
+        [string]$TenantName,
+
         [switch]$Passthru
     )
 
@@ -93,17 +96,33 @@
 
     }
 
+    $GraphParameters = @{
+        Environment = $graphEnvironment
+    }
+    If($TenantName) {
+        $GraphParameters.TenantId = $TenantName
+    }
+    $GraphParameters.Scopes = @(
+        "User.Read.All",
+        "Group.Read.All",
+        "Policy.Read.All",
+        "Organization.Read.All",
+        "Application.Read.All"
+    )
+
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
+            #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output "Connecting to Microsoft Graph..."
-            Connect-MgGraph -Scopes "User.Read.All", "Group.Read.All", "Policy.Read.All", "Organization.Read.All" -NoWelcome -Environment $graphEnvironment -ErrorAction Stop | Out-Null
+            Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
             $Online = $true
             Write-Output "Successfully connected to Microsoft Graph"
         }
         catch {
             Write-Error "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
             $Online = $false
+            Break
         }
     } else {
         $Online = $false
@@ -120,6 +139,7 @@
     $syncHash.ConfigImportPath = $ConfigFilePath
     $syncHash.GraphEndpoint = $GraphEndpoint
     $syncHash.M365Environment = $M365Environment
+    $syncHash.TenantName = $TenantName
 
     # Initialize debug output structures
     $syncHash.DebugLogData = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())  # For debug download
@@ -1364,9 +1384,9 @@
                     # Show the entity selector
                     $selectedItems = Show-GraphSelector -GraphEntityType $TextBoxName -SearchTerm $searchTerm
 
-                    if ($null -ne $selectedItems -and $selectedItems.Count -gt 0) {
+                    if ($null -ne $selectedItems) {
                         # Get the first selected item
-                        $selectedItem = $selectedItems[0]
+                        $selectedItem = $selectedItems
 
                         # Set the value in the textbox using the configured output property
                         if ($selectedItem.($GraphQueryData.outProperty)) {
@@ -3493,6 +3513,106 @@
         #===========================================================================
         # GRAPH HELPER
         #===========================================================================
+        Function Update-GraphStatusIndicator {
+            <#
+            .SYNOPSIS
+            Updates the Graph connection status indicator in the UI.
+            .DESCRIPTION
+            Updates the visual indicator to show whether Microsoft Graph is connected or disconnected.
+            #>
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "IsConnected")]
+            param(
+                [bool]$IsConnected = $syncHash.GraphConnected
+            )
+
+            try {
+                $syncHash.Window.Dispatcher.Invoke([Action]{
+                    if ($IsConnected) {
+                        # Connected state - Green indicator
+                        $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::LimeGreen
+                        $syncHash.GraphStatusText.Text = "Graph Connected"
+                        $syncHash.GraphStatusText.Foreground = [System.Windows.Media.Brushes]::DarkGreen
+                        $syncHash.GraphStatusBorder.Background = [System.Windows.Media.Brushes]::LightGreen
+                        $syncHash.GraphStatusBorder.ToolTip = "Microsoft Graph is connected and ready for data queries"
+
+                        Write-DebugOutput -Message "Graph status indicator updated: Connected" -Source "Graph Status" -Level "Info"
+                    } else {
+                        # Disconnected state - Red indicator
+                        $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::Red
+                        $syncHash.GraphStatusText.Text = "Graph Disconnected"
+                        $syncHash.GraphStatusText.Foreground = [System.Windows.Media.Brushes]::DarkRed
+                        $syncHash.GraphStatusBorder.Background = [System.Windows.Media.Brushes]::LightPink
+                        $syncHash.GraphStatusBorder.ToolTip = "Microsoft Graph is not connected - some features may be limited"
+
+                        Write-DebugOutput -Message "Graph status indicator updated: Disconnected" -Source "Graph Status" -Level "Info"
+                    }
+                })
+            } catch {
+                Write-DebugOutput -Message "Error updating Graph status indicator: $($_.Exception.Message)" -Source "Graph Status" -Level "Error"
+            }
+        }
+
+        Function Initialize-GraphStatusIndicator {
+            <#
+            .SYNOPSIS
+            Initializes the Graph status indicator with click functionality.
+            .DESCRIPTION
+            Sets up the Graph status indicator and adds click event for connection management.
+            #>
+
+            # Add click event to the status border for connection management
+            $syncHash.GraphStatusBorder.Add_MouseLeftButtonUp({
+                if ($syncHash.GraphConnected) {
+                    # Show disconnect option
+                    $result = [System.Windows.MessageBox]::Show(
+                        "Do you want to disconnect from Microsoft Graph?`n`nThis will disable dynamic data queries but won't affect your current configuration.",
+                        "Disconnect Graph",
+                        [System.Windows.MessageBoxButton]::YesNo,
+                        [System.Windows.MessageBoxImage]::Question
+                    )
+
+                    if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+                        try {
+                            Disconnect-MgGraph -ErrorAction Stop
+                            $syncHash.GraphConnected = $false
+                            Update-GraphStatusIndicator -IsConnected $false
+
+                            # Remove dynamic Graph buttons
+                            # You might want to add a function to clean up dynamic buttons
+
+                            [System.Windows.MessageBox]::Show(
+                                "Successfully disconnected from Microsoft Graph.",
+                                "Graph Disconnected",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Information
+                            )
+                        } catch {
+                            Write-DebugOutput -Message "Error disconnecting from Graph: $($_.Exception.Message)" -Source "Graph Status" -Level "Error"
+                            [System.Windows.MessageBox]::Show(
+                                "Error disconnecting from Graph: $($_.Exception.Message)",
+                                "Disconnect Error",
+                                [System.Windows.MessageBoxButton]::OK,
+                                [System.Windows.MessageBoxImage]::Error
+                            )
+                        }
+                    }
+                } else {
+                    # Show connect information
+                    [System.Windows.MessageBox]::Show(
+                        "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually.",
+                        "Graph Connection",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                }
+            })
+
+            # Set initial status
+            Update-GraphStatusIndicator -IsConnected $syncHash.GraphConnected
+
+            Write-DebugOutput -Message "Graph status indicator initialized" -Source "Graph Status" -Level "Info"
+        }
+
         # Enhanced Graph Query Function with Filter Support
         Function Invoke-GraphQueryWithFilter {
             <#
@@ -3624,6 +3744,7 @@
                 FilterProperty = $queryConfig.queryfilterProperty
                 SearchProperty = $queryConfig.searchProperty
                 QueryType = $entityType
+                AllowMultiple = $queryConfig.allowMultipleSelection
             }
 
             # Build column configuration from displayColumnOrder
@@ -3763,7 +3884,7 @@
                                         -ColumnConfig $config.ColumnConfig `
                                         -SearchProperty $config.SearchProperty `
                                         -DisplayOrder $config.ColumnConfig.Keys `
-                                        -AllowMultiple
+                                        -AllowMultiple:$config.AllowMultiple
 
                     return $selectedItems
                 }
@@ -3994,7 +4115,7 @@
 
                 # Event handlers
                 $selectButton.Add_Click({
-                    if ($dataGrid.SelectedItems.Count -gt 0) {
+                    if ($dataGrid.SelectedItems) {
                         $selectedResults = @()
                         foreach ($selectedItem in $dataGrid.SelectedItems) {
                             $selectedResults += $selectedItem
@@ -4250,8 +4371,7 @@
                             $progressRunspace.Dispose()
                         }
                     } catch {
-                        # Ignore cleanup errors
-                        Write-Error -Message "Error during cleanup: $($_.Exception.Message)"
+                        Write-DebugOutput -Message "Error during cleanup: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
                     }
 
                     # Remove from syncHash
@@ -5268,7 +5388,7 @@
             #>
 
             if (-not $syncHash.UIConfigs.globalSettings -or -not $syncHash.UIConfigs.globalSettings.fields) {
-                Write-DebugOutput -Message "No global settings fields defined in configuration" -Source "Global Settings" -Level "Info"
+                Write-DebugOutput -Message "No global settings fields defined in configuration" -Source $MyInvocation.MyCommand.Name -Level "Info"
                 return
             }
 
@@ -5280,17 +5400,17 @@
                 $syncHash.GlobalSettingsData = @{}
             }
 
-            Write-DebugOutput -Message "Creating global settings controls for $($syncHash.UIConfigs.globalSettings.fields.Count) fields" -Source "Global Settings" -Level "Info"
+            Write-DebugOutput -Message "Creating global settings controls for $($syncHash.UIConfigs.globalSettings.fields.Count) fields" -Source $MyInvocation.MyCommand.Name -Level "Info"
 
             foreach ($fieldName in $syncHash.UIConfigs.globalSettings.fields) {
                 $inputType = $syncHash.UIConfigs.inputTypes.$fieldName
 
                 if (-not $inputType) {
-                    Write-DebugOutput -Message "Input type not found for global settings field: $fieldName" -Source "Global Settings" -Level "Warning"
+                    Write-DebugOutput -Message "Input type not found for global settings field: $fieldName" -Source $MyInvocation.MyCommand.Name -Level "Warning"
                     continue
                 }
 
-                Write-DebugOutput -Message "Creating field list card for global settings field: $fieldName" -Source "Global Settings" -Level "Info"
+                Write-DebugOutput -Message "Creating field list card for global settings field: $fieldName" -Source $MyInvocation.MyCommand.Name -Level "Info"
 
                 # Create a temporary data structure that New-FieldListCard can use
                 if (-not $syncHash.TempGlobalData) {
@@ -5314,16 +5434,16 @@
 
                 if ($card) {
                     $syncHash.GlobalSettingsContainer.Children.Add($card)
-                    Write-DebugOutput -Message "Successfully created card for global setting: $fieldName" -Source "Global Settings" -Level "Info"
+                    Write-DebugOutput -Message "Successfully created card for global setting: $fieldName" -Source $MyInvocation.MyCommand.Name -Level "Info"
                 } else {
-                    Write-DebugOutput -Message "Failed to create card for global setting: $fieldName" -Source "Global Settings" -Level "Warning"
+                    Write-DebugOutput -Message "Failed to create card for global setting: $fieldName" -Source $MyInvocation.MyCommand.Name -Level "Warning"
                 }
             }
 
             # Now add auto-save Functionality by watching the temp data structure
             Add-GlobalSettingsAutoSave
 
-            Write-DebugOutput -Message "Global settings controls created successfully" -Source "Global Settings" -Level "Info"
+            Write-DebugOutput -Message "Global settings controls created successfully" -Source $MyInvocation.MyCommand.Name -Level "Info"
         }
 
         Function Add-GlobalSettingsAutoSave {
@@ -5367,12 +5487,12 @@
                             }
                         }
                     } catch {
-                        Write-DebugOutput -Message "Error in global settings auto-save: $($_.Exception.Message)" -Source "Global Settings Timer" -Level "Warning"
+                        Write-DebugOutput -Message "Error in global settings auto-save: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Warning"
                     }
                 })
 
                 $syncHash.GlobalSettingsTimer.Start()
-                Write-DebugOutput -Message "Global settings auto-save timer started" -Source "Global Settings" -Level "Info"
+                Write-DebugOutput -Message "Global settings auto-save timer started" -Source $MyInvocation.MyCommand.Name -Level "Info"
             }
         }
 
@@ -5389,7 +5509,7 @@
                 return
             }
 
-            Write-DebugOutput -Message "Saving global settings from UI input" -Source "Global Settings" -Level "Info"
+            Write-DebugOutput -Message "Saving global settings from UI input" -Source $MyInvocation.MyCommand.Name -Level "Info"
 
             foreach ($fieldName in $syncHash.UIConfigs.globalSettings.fields) {
                 $inputType = $syncHash.UIConfigs.inputTypes.$fieldName
@@ -5405,12 +5525,12 @@
                             $checkbox = $syncHash[$checkboxName]
                             if ($checkbox) {
                                 $syncHash.GlobalSettingsData[$field.value] = $checkbox.IsChecked -eq $true
-                                Write-DebugOutput -Message "Global setting $($field.value): $($syncHash.GlobalSettingsData[$field.value])" -Source "Global Settings" -Level "Info"
+                                Write-DebugOutput -Message "Global setting $($field.value): $($syncHash.GlobalSettingsData[$field.value])" -Source $MyInvocation.MyCommand.Name -Level "Info"
                             }
                         }
                         "array" {
                             # Array data is already managed in the add/remove event handlers
-                            Write-DebugOutput -Message "Global setting $($field.value): $($syncHash.GlobalSettingsData[$field.value] -join ', ')" -Source "Global Settings" -Level "Info"
+                            Write-DebugOutput -Message "Global setting $($field.value): $($syncHash.GlobalSettingsData[$field.value] -join ', ')" -Source $MyInvocation.MyCommand.Name -Level "Info"
                         }
                     }
                 }
@@ -5421,7 +5541,127 @@
         # SCUBA RUN Controls
         #===========================================================================
 
-        # Add this to your ScubaConfigAppUI.psm1
+        Function New-ScubaRunParameterControls {
+            <#
+            .SYNOPSIS
+            Dynamically creates UI controls for ScubaRun parameters based on configuration.
+            #>
+
+            if (-not $syncHash.UIConfigs.ScubaRunConfig.powershell.parameters) {
+                Write-DebugOutput -Message "No ScubaRun parameters defined in configuration" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                return
+            }
+
+            # Clear existing dynamic controls
+            $syncHash.ScubaRunParametersContainer.Children.Clear()
+
+            $scubaConfig = $syncHash.UIConfigs.ScubaRunConfig
+            $parameters = $scubaConfig.powershell.parameters
+
+            Write-DebugOutput -Message "Creating dynamic ScubaRun parameter controls" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+            foreach ($parameterName in $parameters.PSObject.Properties.Name) {
+                $paramConfig = $parameters.$parameterName
+
+                # Skip hidden parameters (they won't show in UI but will be used in commands)
+                if ($paramConfig.hidden -eq $true) {
+                    Write-DebugOutput -Message "Skipping hidden parameter: $parameterName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    continue
+                }
+
+                Write-DebugOutput -Message "Creating control for parameter: $parameterName" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+                # Create container for this parameter
+                $paramContainer = New-Object System.Windows.Controls.StackPanel
+                $paramContainer.Margin = "0,0,0,8"
+
+                # Create the appropriate control based on parameter type
+                switch ($paramConfig.type) {
+                    "boolean" {
+                        $control = New-Object System.Windows.Controls.CheckBox
+                        $control.Content = $paramConfig.name
+                        $control.IsChecked = $paramConfig.defaultValue
+                        $control.IsEnabled = -not $paramConfig.readOnly
+                        $control.ToolTip = $paramConfig.description
+
+                        # Store control name for later reference
+                        $controlName = $parameterName.Replace("ScubaRun", "") + "_CheckBox"
+                        $control.Name = $controlName
+                        $syncHash.$controlName = $control
+
+                        Write-DebugOutput -Message "Created CheckBox: $controlName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    }
+                    "string" {
+                        # Create label for the parameter
+                        $label = New-Object System.Windows.Controls.TextBlock
+                        $label.Text = $paramConfig.name
+                        $label.FontWeight = "SemiBold"
+                        $label.Margin = "0,0,0,4"
+                        [void]$paramContainer.Children.Add($label)
+
+                        $control = New-Object System.Windows.Controls.TextBox
+                        $control.Text = $paramConfig.defaultValue
+                        $control.IsReadOnly = $paramConfig.readOnly
+                        $control.ToolTip = $paramConfig.description
+                        $control.Height = 36
+                        $control.Padding = "8,6"
+                        $control.BorderBrush = $syncHash.Window.FindResource("BorderBrush")
+                        $control.Background = if ($paramConfig.readOnly) { "#F5F5F5" } else { "#FFFFFF" }
+                        $control.Foreground = if ($paramConfig.readOnly) { $syncHash.Window.FindResource("PrimaryBrush") } else { $syncHash.Window.FindResource("TextBrush") }
+
+                        # Store control name for later reference
+                        $controlName = $parameterName.Replace("ScubaRun", "") + "_TextBox"
+                        $control.Name = $controlName
+                        $syncHash.$controlName = $control
+
+                        Write-DebugOutput -Message "Created TextBox: $controlName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    }
+                    "dropdown" {
+                        # Create label for the parameter
+                        $label = New-Object System.Windows.Controls.TextBlock
+                        $label.Text = $paramConfig.name
+                        $label.FontWeight = "SemiBold"
+                        $label.Margin = "0,0,0,4"
+                        [void]$paramContainer.Children.Add($label)
+
+                        #get length of items to determine width
+                        $maxItemWidth = ($paramConfig.items | Measure-Object -Property Length -Maximum).Maximum
+
+                        $control = New-Object System.Windows.Controls.ComboBox
+                        $control.ItemsSource = $paramConfig.items
+                        $control.SelectedItem = $paramConfig.defaultValue
+                        $control.IsEnabled = -not $paramConfig.readOnly
+                        $control.ToolTip = $paramConfig.description
+                        $control.Height = 36
+                        $control.MaxWidth = $maxItemWidth + 100
+                        $control.HorizontalAlignment = "Left"
+                        $control.Padding = "8,6"
+                        $control.BorderBrush = $syncHash.Window.FindResource("BorderBrush")
+                        $control.Background = if ($paramConfig.readOnly) { "#F5F5F5" } else { "#FFFFFF" }
+                        $control.Foreground = if ($paramConfig.readOnly) { $syncHash.Window.FindResource("PrimaryBrush") } else { $syncHash.Window.FindResource("TextBrush") }
+
+                        # Store control name for later reference
+                        $controlName = $parameterName.Replace("ScubaRun", "") + "_ComboBox"
+                        $control.Name = $controlName
+                        $syncHash.$controlName = $control
+
+                        Write-DebugOutput -Message "Created ComboBox: $controlName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    }
+                    default {
+                        Write-DebugOutput -Message "Unknown parameter type: $($paramConfig.type) for $parameterName" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                        continue
+                    }
+                }
+
+                # Add control to container
+                [void]$paramContainer.Children.Add($control)
+
+                # Add the parameter container to the main container
+                [void]$syncHash.ScubaRunParametersContainer.Children.Add($paramContainer)
+            }
+
+            Write-DebugOutput -Message "Dynamic ScubaRun parameter controls created successfully" -Source $MyInvocation.MyCommand.Name -Level "Info"
+        }
 
         Function Initialize-ScubaRunTab {
             <#
@@ -5429,135 +5669,45 @@
             Initializes the Scuba Run tab with event handlers and default values.
             #>
 
-            # Set default values from configuration
-            $scubaConfig = $syncHash.UIConfigs.ScubaRunConfig
-            $syncHash.SilenceBODWarnings_CheckBox.IsChecked = $scubaConfig.powershell.parameters.SilenceBODWarnings.defaultValue
-            $syncHash.DarkMode_CheckBox.IsChecked = $scubaConfig.powershell.parameters.DarkMode.defaultValue
-            $syncHash.Quiet_CheckBox.IsChecked = $scubaConfig.powershell.parameters.Quiet.defaultValue
-            $syncHash.ConfigFilePath_TextBox.Text = $scubaConfig.powershell.parameters.ConfigFilePath.defaultValue
+            # Create dynamic parameter controls
+            New-ScubaRunParameterControls
 
             # Enable text wrapping for the output textbox to handle long lines
-            if ($syncHash.ScubaOutput_TextBox) {
-                $syncHash.ScubaOutput_TextBox.TextWrapping = "Wrap"
-                $syncHash.ScubaOutput_TextBox.AcceptsReturn = $true
-                $syncHash.ScubaOutput_TextBox.VerticalScrollBarVisibility = "Auto"
-                $syncHash.ScubaOutput_TextBox.HorizontalScrollBarVisibility = "Auto"
+            if ($syncHash.ScubaRunOutput_TextBox) {
+                $syncHash.ScubaRunOutput_TextBox.TextWrapping = "Wrap"
+                $syncHash.ScubaRunOutput_TextBox.AcceptsReturn = $true
+                $syncHash.ScubaRunOutput_TextBox.VerticalScrollBarVisibility = "Auto"
+                $syncHash.ScubaRunOutput_TextBox.HorizontalScrollBarVisibility = "Auto"
             }
 
-            # Add event handlers
-            $syncHash.RunScubaGear_Button.Add_Click({
+            # Add event handlers - CORRECTED BUTTON NAME
+            $syncHash.ScubaRunStart_Button.Add_Click({
                 Start-ScubaGearExecution
             })
 
-            $syncHash.StopScubaGear_Button.Add_Click({
+            $syncHash.ScubaRunStop_Button.Add_Click({
                 Stop-ScubaGearExecution
             })
 
-            $syncHash.ClearOutput_Button.Add_Click({
-                $syncHash.ScubaOutput_TextBox.Clear()
-                $syncHash.ScubaOutput_TextBox.AppendText("Output cleared...`r`n")
+            $syncHash.ScubaRunClearOutput_Button.Add_Click({
+                $syncHash.ScubaRunOutput_TextBox.Clear()
+                $syncHash.ScubaRunOutput_TextBox.AppendText("Output cleared...`r`n")
             })
 
-            $syncHash.CopyOutput_Button.Add_Click({
+            $syncHash.ScubaRunCopyOutput_Button.Add_Click({
                 try {
-                    [System.Windows.Clipboard]::SetText($syncHash.ScubaOutput_TextBox.Text)
+                    [System.Windows.Clipboard]::SetText($syncHash.ScubaRunOutput_TextBox.Text)
                     Update-ScubaRunStatus "Output copied to clipboard" "Info"
-                }
-                catch {
-                    Update-ScubaRunStatus "Failed to copy output: $($_.Exception.Message)" "Error"
+                } catch {
+                    Update-ScubaRunStatus "Failed to copy output to clipboard" "Error"
                 }
             })
 
-            # Initialize product progress
-            Initialize-ProductProgress
+            # Initialize button states and show initial status
+            $syncHash.JustCompletedExecution = $false  # Ensure flag is clear on initialization
+            Reset-ScubaRunUI
 
-            Write-DebugOutput -Message "Scuba Run tab initialized" -Source $MyInvocation.MyCommand.Name -Level "Info"
-        }
-
-        Function Initialize-ProductProgress {
-            <#
-            .SYNOPSIS
-            Creates progress indicators for each selected product.
-            #>
-
-            $syncHash.ProductProgress_StackPanel.Children.Clear()
-
-            # Get selected products
-            $selectedProducts = $syncHash.GeneralSettingsData.ProductNames
-
-            if (-not $selectedProducts -or $selectedProducts.Count -eq 0) {
-                $noProductsText = New-Object System.Windows.Controls.TextBlock
-                $noProductsText.Text = "No products selected"
-                $noProductsText.Foreground = $syncHash.Window.FindResource("MutedTextBrush")
-                $noProductsText.HorizontalAlignment = "Center"
-                [void]$syncHash.ProductProgress_StackPanel.Children.Add($noProductsText)
-                return
-            }
-
-            foreach ($productId in $selectedProducts) {
-                $product = $syncHash.UIConfigs.products | Where-Object { $_.id -eq $productId }
-                if (-not $product) { continue }
-
-                # Create progress item
-                $progressItem = New-Object System.Windows.Controls.StackPanel
-                $progressItem.Orientation = "Horizontal"
-                $progressItem.Margin = "0,2,0,2"
-                $progressItem.Name = "Progress_$productId"
-
-                # Status icon
-                $statusIcon = New-Object System.Windows.Controls.TextBlock
-                $statusIcon.Text = "⏸"  # Paused/waiting
-                $statusIcon.FontSize = 14
-                $statusIcon.Margin = "0,0,8,0"
-                $statusIcon.Name = "StatusIcon_$productId"
-
-                # Product name
-                $productText = New-Object System.Windows.Controls.TextBlock
-                $productText.Text = $product.displayName
-                $productText.FontSize = 11
-                $productText.VerticalAlignment = "Center"
-
-                [void]$progressItem.Children.Add($statusIcon)
-                [void]$progressItem.Children.Add($productText)
-                [void]$syncHash.ProductProgress_StackPanel.Children.Add($progressItem)
-
-                # Store reference in syncHash for easy access
-                $syncHash."StatusIcon_$productId" = $statusIcon
-            }
-        }
-
-        Function Update-ProductProgress {
-            <#
-            .SYNOPSIS
-            Updates the progress status for a specific product.
-            #>
-            param(
-                [string]$ProductId,
-                [ValidateSet("Waiting", "Running", "Complete", "Error")]
-                [string]$Status
-            )
-
-            $statusIcon = $syncHash."StatusIcon_$ProductId"
-            if (-not $statusIcon) { return }
-
-            switch ($Status) {
-                "Waiting" {
-                    $statusIcon.Text = "⏸"
-                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Gray
-                }
-                "Running" {
-                    $statusIcon.Text = "🔄"
-                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Blue
-                }
-                "Complete" {
-                    $statusIcon.Text = "✅"
-                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Green
-                }
-                "Error" {
-                    $statusIcon.Text = "❌"
-                    $statusIcon.Foreground = [System.Windows.Media.Brushes]::Red
-                }
-            }
+            Write-DebugOutput -Message "ScubaRun tab initialized with correct button event handlers" -Source $MyInvocation.MyCommand.Name -Level "Info"
         }
 
         Function Update-ScubaRunStatus {
@@ -5584,7 +5734,7 @@
             $logEntry = "[$timestamp] $processedMessage"
 
             # Update status text
-            $syncHash.ScubaRunStatus_TextBlock.Text = "Status: $Message"
+            $syncHash.ScubaRunStatus_TextBlock.Text = $Message
 
 
             # Set color based on level
@@ -5596,10 +5746,10 @@
             }
 
             # Add to output log
-            $syncHash.ScubaOutput_TextBox.AppendText("$logEntry`r`n")
-            $syncHash.ScubaOutput_TextBox.ScrollToEnd()
+            $syncHash.ScubaRunOutput_TextBox.AppendText("$logEntry`r`n")
+            $syncHash.ScubaRunOutput_TextBox.ScrollToEnd()
 
-            Write-DebugOutput -Message $Message -Source "ScubaRun" -Level $Level
+            Write-DebugOutput -Message $Message -Source $MyInvocation.MyCommand.Name -Level $Level
         }
 
         Function Test-ScubaRunReadiness {
@@ -5622,12 +5772,15 @@
             }
 
             # Enable/disable run button
-            $syncHash.RunScubaGear_Button.IsEnabled = $hasValidConfig
+            $syncHash.ScubaRunStart_Button.IsEnabled = $hasValidConfig
 
-            if ($hasValidConfig) {
-                Update-ScubaRunStatus "Ready to run ScubaGear" "Success"
-            } else {
-                Update-ScubaRunStatus "Configuration incomplete - check Main tab" "Warning"
+            # Only update status if we're not preserving a completion message
+            if (-not $syncHash.JustCompletedExecution) {
+                if ($hasValidConfig) {
+                    Update-ScubaRunStatus "Ready to run ScubaGear" "Success"
+                } else {
+                    Update-ScubaRunStatus "Configuration incomplete - check Main tab" "Warning"
+                }
             }
 
             return $hasValidConfig
@@ -5654,22 +5807,26 @@
                 }
 
                 # Update UI state
-                $syncHash.RunScubaGear_Button.IsEnabled = $false
-                $syncHash.StopScubaGear_Button.IsEnabled = $true
-                $syncHash.RunScubaGear_Button.Visibility = "Collapsed"
-                $syncHash.StopScubaGear_Button.Visibility = "Visible"
-
-                # Reset product progress
-                foreach ($productId in $syncHash.GeneralSettingsData.ProductNames) {
-                    Update-ProductProgress -ProductId $productId -Status "Waiting"
-                }
+                $syncHash.ScubaRunStart_Button.IsEnabled = $false
+                $syncHash.ScubaRunStop_Button.IsEnabled = $true
+                $syncHash.ScubaRunStart_Button.Visibility = "Collapsed"
+                $syncHash.ScubaRunStop_Button.Visibility = "Visible"
 
                 Update-ScubaRunStatus "Starting ScubaGear execution..." "Info"
 
                 # Build PowerShell command
                 $command = Build-ScubaGearCommand -ConfigFilePath $tempConfigPath
 
-                Update-ScubaRunStatus "Executing command: $command" "Info"
+                # Debug: Show commands in output
+                $syncHash.ScubaRunOutput_TextBox.AppendText("=== SCUBAGEAR EXECUTION STARTING ===`r`n")
+                $syncHash.ScubaRunOutput_TextBox.AppendText("Configuration file: $tempConfigPath`r`n")
+                $syncHash.ScubaRunOutput_TextBox.AppendText("Commands to execute:`r`n")
+                foreach ($cmd in $command) {
+                    $syncHash.ScubaRunOutput_TextBox.AppendText("  $cmd`r`n")
+                }
+                $syncHash.ScubaRunOutput_TextBox.AppendText("=== EXECUTION OUTPUT ===`r`n")
+                $syncHash.ScubaRunOutput_TextBox.ScrollToEnd()
+
                 # Start background job
                 Start-ScubaGearJob -Command $command
 
@@ -5723,7 +5880,7 @@
         Function Build-ScubaGearCommand {
             <#
             .SYNOPSIS
-            Builds the PowerShell command to execute ScubaGear.
+            Builds the PowerShell command to execute ScubaGear with required defaults and optional parameters.
             #>
             param([string]$ConfigFilePath)
 
@@ -5731,83 +5888,631 @@
             $scubaConfig = $syncHash.UIConfigs.ScubaRunConfig
             $cmdParts = @()
 
-            # Add module imports from configuration
-            if ($scubaConfig.powershell.modules) {
-                foreach ($module in $scubaConfig.powershell.modules) {
-                    $cmdParts += "Import-Module $module -Force;"
-                }
-            }
-
-            # Add pre-commands from configuration in order
+            # Add pre-commands from configuration (but skip module installation)
             if ($scubaConfig.powershell.PreCommands) {
-                foreach ($preCommand in $scubaConfig.powershell.PreCommands) {
-                    $cmdParts += "$preCommand;"
+                foreach ($preCommand in $scubaConfig.powershell.preCommands) {
+                    # Skip any Install-Module commands as they're likely to fail
+                    if ($preCommand -notlike "*Install-Module*") {
+                        $cmdParts += "$preCommand"
+                    }
                 }
             }
 
-            # Add the main ScubaGear command from configuration
-            $cmdParts += $scubaConfig.powershell.cmdlets
+            # Build the main ScubaGear command with parameters
+            $mainCommand = $scubaConfig.powershell.cmdlets
+            $parameters = @()
 
-            # Dynamically add all parameters from configuration
+            # REQUIRED DEFAULT PARAMETERS - Always include these
+            $parameters += "-ConfigFilePath '$ConfigFilePath'"
+
+            $organizationValue = $syncHash.Organization_TextBox.Text
+            $parameters += "-Organization '$organizationValue'"
+
+            # OPTIONAL PARAMETERS - Only add these if they have values and are not the removed defaults
             if ($scubaConfig.powershell.parameters) {
                 foreach ($paramName in $scubaConfig.powershell.parameters.PSObject.Properties.Name) {
                     $paramConfig = $scubaConfig.powershell.parameters.$paramName
 
-                    # Handle different parameter types
+                    # Skip the removed default parameters (ConfigFilePath and Organization are handled above)
+                    if ($paramName -in @("ScubaRunConfigFilePath", "ScubaRunOrganization")) {
+                        continue
+                    }
+
+                    # Skip hidden parameters
+                    if ($paramConfig.hidden -eq $true) {
+                        continue
+                    }
+
+                    # Map parameter names to actual Invoke-Scuba parameters
+                    $actualParamName = $paramName
+
                     switch ($paramConfig.type) {
                         "string" {
-                            if ($paramName -eq "ConfigFilePath") {
-                                # Use the provided ConfigFilePath parameter
-                                $cmdParts += "-$paramName '$ConfigFilePath'"
-                            } else {
-                                # For other string parameters, get from UI control
-                                $textBoxName = "$paramName" + "_TextBox"
-                                $textBox = $syncHash.$textBoxName
-                                if ($textBox -and ![string]::IsNullOrWhiteSpace($textBox.Text)) {
-                                    $cmdParts += "-$paramName '$($textBox.Text)'"
-                                }
+                            # Get value from UI controls
+                            $textBoxName = $paramName + "_TextBox"
+                            $textBox = $syncHash.$textBoxName
+                            if ($textBox -and ![string]::IsNullOrWhiteSpace($textBox.Text)) {
+                                $parameters += "-$actualParamName '$($textBox.Text)'"
+                                Write-DebugOutput -Message "Added optional string parameter: -$actualParamName '$($textBox.Text)'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                             }
                         }
                         "boolean" {
-                            $checkboxName = "$paramName" + "_CheckBox"
+                            $checkboxName = $paramName + "_CheckBox"
                             $checkbox = $syncHash.$checkboxName
 
                             if ($checkbox -and $checkbox.IsChecked) {
-                                $cmdParts += "-$paramName"
+                                $parameters += "-$actualParamName"
+                                Write-DebugOutput -Message "Added optional boolean parameter: -$actualParamName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                            }
+                        }
+                        "dropdown" {
+                            $comboBoxName = $paramName + "_ComboBox"
+                            $comboBox = $syncHash.$comboBoxName
+
+                            if ($null -ne $comboBox.SelectedItem) {
+                                If ($comboBox.SelectedItem -is [string]) {
+                                    $parameters += "-$actualParamName '$($comboBox.SelectedItem)'"
+                                } else {
+                                    $parameters += "-$actualParamName $($comboBox.SelectedItem)"
+                                }
+                                Write-DebugOutput -Message "Added optional dropdown parameter: -$actualParamName '$($comboBox.SelectedItem)'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                             }
                         }
                     }
                 }
             }
 
-            return $cmdParts -join " "
+            # Combine main command with parameters
+            $fullCommand = "$mainCommand $($parameters -join ' ')"
+            $cmdParts += $fullCommand
+
+            # Add post-commands from configuration
+            if ($scubaConfig.powershell.PostCommands) {
+                foreach ($postCommand in $scubaConfig.powershell.postCommands) {
+                    $cmdParts += $postCommand
+                }
+            }
+
+            # Log the commands for debugging
+            Write-DebugOutput -Message "Built ScubaGear commands:" -Source $MyInvocation.MyCommand.Name -Level "Info"
+            foreach ($cmd in $cmdParts) {
+                Write-DebugOutput -Message "  Command: $cmd" -Source $MyInvocation.MyCommand.Name -Level "Info"
+            }
+
+            # Also update the UI to show what will be executed
+            Update-ScubaRunStatus "Prepared commands: $($cmdParts.Count) commands ready" "Info"
+
+            return $cmdParts
         }
 
+        <#
         Function Start-ScubaGearJob {
             <#
             .SYNOPSIS
-            Starts ScubaGear in a background PowerShell 5.1 process.
-            #>
-            param([string]$Command)
+            Starts ScubaGear in a background PowerShell process with real-time output capture.
+            #
+            param([string[]]$Command)
 
-            # Create a job to run PowerShell 5.1
+            # Get what powershell version to run based on configuration
+            $psVersion = $syncHash.UIConfigs.ScubaRunConfig.powershell.version
+            if($psVersion -eq "5.1") {
+                $poshPath = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
+            } else {
+                $poshPath = "$env:ProgramFiles\PowerShell\7\pwsh.exe"
+            }
+
+            # Create a temporary script file to execute all commands in sequence
+            $tempScriptDir = Join-Path $env:TEMP "ScubaConfigRun"
+            if (-not (Test-Path $tempScriptDir)) {
+                New-Item -Path $tempScriptDir -ItemType Directory -Force | Out-Null
+            }
+
+            $tempScriptPath = Join-Path $tempScriptDir "ScubaGearExecution_$(Get-Date -Format 'yyyyMMdd_HHmmss').ps1"
+
+            # Create enhanced script content with real-time output
+            $scriptContent = @"
+# Enhanced script for real-time output capture
+`$ErrorActionPreference = 'Continue'
+
+# Function to write timestamped output
+function Write-TimestampedOutput {
+    param([string]`$Message, [string]`$Type = 'Info')
+    `$timestamp = Get-Date -Format 'HH:mm:ss'
+    Write-Host "[`$timestamp] [`$Type] `$Message" -ForegroundColor `$(if (`$Type -eq 'Error') { 'Red' } elseif (`$Type -eq 'Warning') { 'Yellow' } else { 'Green' })
+}
+
+Write-TimestampedOutput "Starting ScubaGear execution script..."
+
+"@
+
+            # Add each command with proper variable expansion
+            foreach ($cmd in $Command) {
+                $scriptContent += @"
+
+Write-TimestampedOutput "Executing: $cmd" "Info"
+try {
+    # Execute the command directly, allowing variable expansion
+    $cmd
+    Write-TimestampedOutput "Command completed successfully" "Info"
+} catch {
+    Write-TimestampedOutput "ERROR executing command: `$(`$_.Exception.Message)" "Error"
+}
+
+"@
+    }
+
+            $scriptContent += @"
+
+Write-TimestampedOutput "ScubaGear execution script completed." "Info"
+"@
+
+            # Write script to file
+            $scriptContent | Out-File -FilePath $tempScriptPath -Encoding UTF8
+
+            # Store execution start time for finding the results folder
+            $syncHash.ScubaGearExecutionStartTime = Get-Date
+
+            # Create a job with real-time output streaming
             $job = Start-Job -ScriptBlock {
-                # Force PowerShell 5.1
-                $ps51Path = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
+                # Use the appropriate PowerShell executable
+                $poshExecutable = $using:poshPath
 
-                if (Test-Path $ps51Path) {
-                    & $ps51Path -Command $Using:Command
-                } else {
-                    throw "PowerShell 5.1 not found at expected location"
+                if (-not (Test-Path $poshExecutable)) {
+                    # Fallback to PowerShell 5.1 if the specified path doesn't exist
+                    $poshExecutable = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
                 }
-            } -ArgumentList $Command
 
-            # Store job reference
-            $syncHash.ScubaGearJob = $job
+                # Execute the script file and capture all output
+                & $poshExecutable -ExecutionPolicy Bypass -File $using:tempScriptPath
+            }
 
-            # Start monitoring timer
-            Start-ScubaGearMonitoring
+            # Store job reference and script path for cleanup
+            $syncHash.ScubaRunExecutionJob = $job
+            $syncHash.TempScriptPath = $tempScriptPath
+
+            # Start enhanced monitoring for real-time output
+            Start-ScubaGearMonitoringRealTime
         }
+        #>
+        Function Start-ScubaGearJob {
+            <#
+            .SYNOPSIS
+            Starts ScubaGear in a background job without external script files.
+            #>
+            param([string[]]$Command)
+
+            # Store execution start time for finding the results folder
+            $syncHash.ScubaGearExecutionStartTime = Get-Date
+
+            # Create variables to pass to the job
+            $configFilePath = $syncHash.TempConfigPath  # Store this when we create the temp config
+            $organizationValue = $syncHash.Organization_TextBox.Text
+            
+            # Get parameter values from UI
+            $jobParameters = @{}
+            
+            # Collect actual parameter values from UI controls
+            if ($syncHash.UIConfigs.ScubaRunConfig.powershell.parameters) {
+                foreach ($paramName in $syncHash.UIConfigs.ScubaRunConfig.powershell.parameters.PSObject.Properties.Name) {
+                    $paramConfig = $syncHash.UIConfigs.ScubaRunConfig.powershell.parameters.$paramName
+                    
+                    if ($paramConfig.hidden -eq $true) { continue }
+                    
+                    switch ($paramConfig.type) {
+                        "string" {
+                            $textBoxName = $paramName + "_TextBox"
+                            $textBox = $syncHash.$textBoxName
+                            if ($textBox -and ![string]::IsNullOrWhiteSpace($textBox.Text)) {
+                                $jobParameters[$paramName] = $textBox.Text
+                            }
+                        }
+                        "boolean" {
+                            $checkboxName = $paramName + "_CheckBox"
+                            $checkbox = $syncHash.$checkboxName
+                            if ($checkbox -and $checkbox.IsChecked) {
+                                $jobParameters[$paramName] = $true
+                            }
+                        }
+                        "dropdown" {
+                            $comboBoxName = $paramName + "_ComboBox"
+                            $comboBox = $syncHash.$comboBoxName
+                            if ($null -ne $comboBox.SelectedItem) {
+                                $jobParameters[$paramName] = $comboBox.SelectedItem
+                            }
+                        }
+                    }
+                }
+            }
+
+            # Create a job with direct scriptblock execution
+            $job = Start-Job -ScriptBlock {
+                param($ConfigPath, $Organization, $Parameters)
+                
+                # Function to write timestamped output
+                function Write-TimestampedOutput {
+                    param([string]$Message, [string]$Type = 'Info')
+                    $timestamp = Get-Date -Format 'HH:mm:ss'
+                    $color = switch ($Type) {
+                        'Error' { 'Red' }
+                        'Warning' { 'Yellow' }
+                        'Success' { 'Green' }
+                        default { 'White' }
+                    }
+                    Write-Host "[$timestamp] [$Type] $Message" -ForegroundColor $color
+                }
+
+                Write-TimestampedOutput "Starting ScubaGear execution..." "Info"
+
+                try {
+                    # Import ScubaGear module if not already loaded
+                    if (-not (Get-Module -Name ScubaGear)) {
+                        Write-TimestampedOutput "Importing ScubaGear module..." "Info"
+                        Import-Module ScubaGear -Force
+                    }
+
+                    # Build parameter hashtable for splatting
+                    $scubaParams = @{
+                        ConfigFilePath = $ConfigPath
+                        Organization = $Organization
+                    }
+
+                    # Add optional parameters from UI
+                    foreach ($key in $Parameters.Keys) {
+                        $actualParamName = $key -replace '^ScubaRun', ''  # Remove ScubaRun prefix
+                        $scubaParams[$actualParamName] = $Parameters[$key]
+                    }
+
+                    Write-TimestampedOutput "Executing: Invoke-SCuBA with $($scubaParams.Count) parameters" "Info"
+                    
+                    # Execute ScubaGear with parameter splatting
+                    Invoke-SCuBA @scubaParams -Verbose
+
+                    Write-TimestampedOutput "ScubaGear execution completed successfully!" "Success"
+                }
+                catch {
+                    Write-TimestampedOutput "ERROR: $($_.Exception.Message)" "Error"
+                    Write-TimestampedOutput "Full error details: $($_.Exception)" "Error"
+                    throw
+                }
+            } -ArgumentList $configFilePath, $organizationValue, $jobParameters
+
+            # Store job reference for monitoring
+            $syncHash.ScubaRunExecutionJob = $job
+
+            # Start enhanced monitoring for real-time output
+            Start-ScubaGearMonitoringRealTime
+        }
+
+        Function Find-ScubaGearResultFolder {
+            <#
+            .SYNOPSIS
+            Finds the most recently created ScubaGear results folder.
+            #>
+            param([datetime]$StartTime)
+
+            try {
+                # Common locations where ScubaGear creates output folders
+                $searchPaths = @(
+                    "$env:USERPROFILE\Documents",
+                    ".",
+                    "$env:USERPROFILE\Desktop"
+                )
+
+                # Get the folder base name - check UI controls first, then fall back to defaults
+                $baseName = "M365BaselineConformance"
+                $reportName = "BaselineReports"
+
+                # Try to get values from UI controls if they exist and have actual values
+                $folderNameValue = $syncHash.OutFolderName_TextBox.Text
+                if (![string]::IsNullOrWhiteSpace($folderNameValue)) {
+                    $baseName = $syncHash.UIConfigs.localePlaceholder.OutFolderName_TextBox
+                    Write-DebugOutput -Message "Folder placeholder value: '$baseName'" -Source $MyInvocation -Level "Debug"
+                }
+
+                $reportNameValue = $syncHash.OutReportName_TextBox.Text
+                if (![string]::IsNullOrWhiteSpace($reportNameValue)) {
+                    if ($syncHash.UIConfigs.localePlaceholder.OutReportName_TextBox) {
+                        $reportName = $syncHash.UIConfigs.localePlaceholder.OutReportName_TextBox
+                        Write-DebugOutput -Message "Report placeholder value: '$reportName'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                    }
+                }
+
+                Write-DebugOutput -Message "Looking for folders with base name: '$baseName' and report name: '$reportName'" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+                $mostRecentFolder = $null
+                $mostRecentTime = [datetime]::MinValue
+
+                foreach ($searchPath in $searchPaths) {
+                    if (Test-Path $searchPath) {
+                        # Look for folders with the pattern: BaseName_YYYY_MM_DD_HH_MM_SS
+                        $searchPattern = "$baseName*"
+                        Write-DebugOutput -Message "Searching in '$searchPath' for pattern: '$searchPattern'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                        $scubaFolders = Get-ChildItem -Path $searchPath -Directory -Filter $searchPattern -ErrorAction SilentlyContinue |
+                            Where-Object {
+                                # Check if folder was created after start time (with 2 minute buffer)
+                                $_.CreationTime -gt $StartTime.AddMinutes(-2) -and
+                                # Additional check: folder name should match the expected pattern
+                                $_.Name -like "$baseName*"
+                            } |
+                            Sort-Object CreationTime -Descending
+
+                        Write-DebugOutput -Message "Found $($scubaFolders.Count) matching folders in '$searchPath'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                        if ($scubaFolders -and $scubaFolders.Count -gt 0) {
+                            $newestInThisPath = $scubaFolders[0]
+                            Write-DebugOutput -Message "Newest folder in this path: '$($newestInThisPath.FullName)' (Created: $($newestInThisPath.CreationTime))" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                            if ($newestInThisPath.CreationTime -gt $mostRecentTime) {
+                                $mostRecentFolder = $newestInThisPath
+                                $mostRecentTime = $newestInThisPath.CreationTime
+                            }
+                        }
+                    }
+                }
+
+                if ($mostRecentFolder) {
+                    Write-DebugOutput -Message "Most recent folder found: '$($mostRecentFolder.FullName)'" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+                    # Check if the HTML report exists with the expected name
+                    $htmlFile = Join-Path $mostRecentFolder.FullName "$reportName.html"
+                    Write-DebugOutput -Message "Looking for HTML file: '$htmlFile'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                    if (Test-Path $htmlFile) {
+                        Write-DebugOutput -Message "HTML report found: '$htmlFile'" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                        return @{
+                            Type = "HTML"
+                            Path = $htmlFile
+                            Folder = $mostRecentFolder.FullName
+                        }
+                    } else {
+                        # Try to find any HTML file in the folder as fallback
+                        $htmlFiles = Get-ChildItem -Path $mostRecentFolder.FullName -Filter "*.html" -ErrorAction SilentlyContinue
+                        if ($htmlFiles -and $htmlFiles.Count -gt 0) {
+                            $fallbackHtml = $htmlFiles[0].FullName
+                            Write-DebugOutput -Message "Using fallback HTML file: '$fallbackHtml'" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                            return @{
+                                Type = "HTML"
+                                Path = $fallbackHtml
+                                Folder = $mostRecentFolder.FullName
+                            }
+                        } else {
+                            Write-DebugOutput -Message "No HTML files found in folder, returning folder path" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                            return @{
+                                Type = "Folder"
+                                Path = $mostRecentFolder.FullName
+                                Folder = $mostRecentFolder.FullName
+                            }
+                        }
+                    }
+                } else {
+                    Write-DebugOutput -Message "No matching ScubaGear folders found" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                }
+            }
+            catch {
+                Write-DebugOutput -Message "Error finding ScubaGear results: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+            }
+
+            return $null
+        }
+
+        Function Start-ScubaGearMonitoringRealTime {
+            <#
+            .SYNOPSIS
+            Monitors the ScubaGear job progress with real-time output capture.
+            #>
+
+            $timer = New-Object System.Windows.Threading.DispatcherTimer
+            $timer.Interval = [TimeSpan]::FromSeconds(1)  # Check more frequently for real-time feel
+
+            # Track what output we've already processed
+            $script:lastOutputCount = 0
+
+            # Fun scuba-themed running messages
+            $script:scubaRunningMessages = @(
+                "Diving deep... ScubaGear is exploring your settings!",
+                "Checking your dive gear... almost ready to surface!",
+                "Underwater operations in progress... please hold your breath!",
+                "Navigating the reef of configurations... stay tuned!",
+                "ScubaGear is adjusting your dive computer... one fin stroke at a time!",
+                "Making waves... your ScubaGear is on the move!",
+                "Sonar ping! ScubaGear is scanning for updates!",
+                "Bubbles rising... ScubaGear is bubbling with activity!",
+                "Submerging into configuration depths... please hang tight!",
+                "Gear check complete... ScubaGear is on the ascent!",
+                "Swimming through policies... current is strong but steady!",
+                "Exploring the coral reef of compliance... beautiful formations ahead!",
+                "Avoiding the sharks of misconfigurations... smooth sailing!",
+                "Tentacles deep in your tenant... mapping every corner!",
+                "Freestyle stroke through your security settings!",
+                "Oxygen levels good... continuing the deep dive!",
+                "Anchored in your environment... collecting treasures of insight!",
+                "Charting the underwater map of your M365 landscape!"
+            )
+
+            # Status update tracking (update every 3-4 seconds instead of every second)
+            $script:statusUpdateCounter = 0
+            $script:statusUpdateInterval = 3  # Update status every 3 timer ticks (3 seconds)
+            $script:currentMessageIndex = 0
+
+            $timer.Add_Tick({
+                if ($syncHash.ScubaRunExecutionJob) {
+                    $job = $syncHash.ScubaRunExecutionJob
+
+                    # Capture any new output that's available
+                    try {
+                        $newOutput = Receive-Job -Job $job -Keep
+
+                        if ($newOutput -and $newOutput.Count -gt $script:lastOutputCount) {
+                            # Process only new output lines
+                            $newLines = $newOutput[$script:lastOutputCount..($newOutput.Count - 1)]
+                            foreach ($line in $newLines) {
+                                if (![string]::IsNullOrWhiteSpace($line)) {
+                                    # Add to output textbox in real-time
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("$line`r`n")
+                                    $syncHash.ScubaRunOutput_TextBox.ScrollToEnd()
+                                }
+                            }
+                            $script:lastOutputCount = $newOutput.Count
+                        }
+                    } catch {
+                        Write-DebugOutput -Message "Error receiving job output: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                    }
+
+                    # Check job state
+                    switch ($job.State) {
+                        "Running" {
+                            # Only update status message every few seconds with rotating messages
+                            $script:statusUpdateCounter++
+                            if ($script:statusUpdateCounter -ge $script:statusUpdateInterval) {
+                                # Get next message in rotation
+                                #$currentMessage = $script:scubaRunningMessages[$script:currentMessageIndex]
+                                #Update-ScubaRunStatus $currentMessage "Info"
+
+                                #get random message from list
+                                $randomMessage = Get-Random -InputObject $script:scubaRunningMessages
+                                Update-ScubaRunStatus $randomMessage "Info"
+
+                                # Move to next message (wrap around at end)
+                                $script:currentMessageIndex = ($script:currentMessageIndex + 1) % $script:scubaRunningMessages.Count
+                                $script:statusUpdateCounter = 0
+
+                                # Vary the interval slightly for more natural feel (3-5 seconds)
+                                $script:statusUpdateInterval = Get-Random -Minimum 3 -Maximum 6
+                            }
+                        }
+                        "Completed" {
+                            # Get any final output
+                            $finalOutput = Receive-Job -Job $job
+                            if ($finalOutput -and $finalOutput.Count -gt $script:lastOutputCount) {
+                                $finalLines = $finalOutput[$script:lastOutputCount..($finalOutput.Count - 1)]
+                                foreach ($line in $finalLines) {
+                                    if (![string]::IsNullOrWhiteSpace($line)) {
+                                        $syncHash.ScubaRunOutput_TextBox.AppendText("$line`r`n")
+                                    }
+                                }
+                            }
+
+                            # Now try to find the results folder
+                            $resultsInfo = Find-ScubaGearResultFolder -StartTime $syncHash.ScubaGearExecutionStartTime
+
+                            if ($resultsInfo) {
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("`r`n🎉 EXECUTION COMPLETE! 🎉`r`n")
+
+                                if ($resultsInfo.Type -eq "HTML") {
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("📊 Results available at: $($resultsInfo.Path)`r`n")
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("💡 Tip: Copy this path and paste it into your browser to view the report`r`n")
+                                    # Update status with the baseline conformance report path
+                                    Update-ScubaRunStatus "✅ ScubaGear Complete | 📊 Report: $($resultsInfo.Path)" "Success"
+                                } else {
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("📁 Results folder: $($resultsInfo.Path)`r`n")
+                                    # Update status with folder path
+                                    Update-ScubaRunStatus "✅ ScubaGear Complete | 📁 Folder: $($resultsInfo.Path)" "Success"
+                                }
+
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("📂 Full results folder: $($resultsInfo.Folder)`r`n")
+                            } else {
+                                # Enhanced fallback message with more specific guidance
+                                Update-ScubaRunStatus "✅ ScubaGear Complete | 📁 Check Documents folder for results" "Success"
+
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("`r`n🎉 EXECUTION COMPLETE! 🎉`r`n")
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("📁 Check your Documents folder for M365BaselineConformance_* folders`r`n")
+                            }
+
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+
+                            # Cleanup temp script
+                            if ($syncHash.TempScriptPath -and (Test-Path $syncHash.TempScriptPath)) {
+                                try {
+                                    Remove-Item -Path $syncHash.TempScriptPath -Force -ErrorAction SilentlyContinue
+                                    $syncHash.TempScriptPath = $null
+                                } catch {
+                                    Write-DebugOutput -Message "Error cleaning up temp script file: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                                }
+                            }
+                        }
+                        "Failed" {
+                            $failureReason = ""
+                            try {
+                                $jobError = $job.ChildJobs[0].Error
+                                if ($jobError) {
+                                    $failureReason = ": $($jobError[-1].Exception.Message)"
+                                }
+                            } catch {
+                                Write-DebugOutput -Message "Error extracting job error message: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                            }
+
+                            Update-ScubaRunStatus "ScubaGear execution failed: $failureReason" "Error"
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+                        }
+                        "Stopped" {
+                            Update-ScubaRunStatus "ScubaGear execution was stopped" "Warning"
+                            Complete-ScubaGearExecution
+                            $this.Stop()
+                        }
+                    }
+                }
+            })
+
+            $syncHash.ScubaRunExecutionTimer = $timer
+            $timer.Start()
+        }
+
+        Function Stop-ScubaGearExecution {
+            <#
+            .SYNOPSIS
+            Stops the running ScubaGear job.
+            #>
+
+            if ($syncHash.ScubaRunExecutionJob) {
+                Stop-Job -Job $syncHash.ScubaRunExecutionJob -Force
+                Remove-Job -Job $syncHash.ScubaRunExecutionJob -Force
+                $syncHash.ScubaRunExecutionJob = $null
+            }
+
+            if ($syncHash.ScubaRunExecutionTimer) {
+                $syncHash.ScubaRunExecutionTimer.Stop()
+                $syncHash.ScubaRunExecutionTimer = $null
+            }
+
+            # Cleanup temporary script file
+            if ($syncHash.TempScriptPath -and (Test-Path $syncHash.TempScriptPath)) {
+                try {
+                    Remove-Item -Path $syncHash.TempScriptPath -Force -ErrorAction SilentlyContinue
+                    $syncHash.TempScriptPath = $null
+                } catch {
+                    Write-DebugOutput -Message "Error cleaning up temp script file: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                }
+            }
+
+            Update-ScubaRunStatus "Execution stopped by user" "Warning"
+            # Clear completion flag since this is a manual stop, not a completion
+            $syncHash.JustCompletedExecution = $false
+            Reset-ScubaRunUI
+        }
+
+        Function Complete-ScubaGearExecution {
+            <#
+            .SYNOPSIS
+            Completes ScubaGear execution and updates UI.
+            #>
+            # Cleanup temporary script file
+            if ($syncHash.TempScriptPath -and (Test-Path $syncHash.TempScriptPath)) {
+                try {
+                    Remove-Item -Path $syncHash.TempScriptPath -Force -ErrorAction SilentlyContinue
+                    $syncHash.TempScriptPath = $null
+                } catch {
+                    Write-DebugOutput -Message "Error cleaning up temp script file: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                }
+            }
+
+            # Set flag to indicate we just completed execution (preserve status message)
+            $syncHash.JustCompletedExecution = $true
+            Reset-ScubaRunUI
+        }
+
 
         Function Start-ScubaGearMonitoring {
             <#
@@ -5819,8 +6524,8 @@
             $timer.Interval = [TimeSpan]::FromSeconds(2)
 
             $timer.Add_Tick({
-                if ($syncHash.ScubaGearJob) {
-                    $job = $syncHash.ScubaGearJob
+                if ($syncHash.ScubaRunExecutionJob) {
+                    $job = $syncHash.ScubaRunExecutionJob
 
                     # Check job state
                     switch ($job.State) {
@@ -5831,7 +6536,7 @@
                         "Completed" {
                             $results = Receive-Job -Job $job
                             Update-ScubaRunStatus "ScubaGear completed successfully" "Success"
-                            $syncHash.ScubaOutput_TextBox.AppendText("$results`r`n")
+                            $syncHash.ScubaRunOutput_TextBox.AppendText("$results`r`n")
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
@@ -5850,7 +6555,7 @@
                 }
             })
 
-            $syncHash.ScubaGearTimer = $timer
+            $syncHash.ScubaRunExecutionTimer = $timer
             $timer.Start()
         }
 
@@ -5860,32 +6565,18 @@
             Stops the running ScubaGear job.
             #>
 
-            if ($syncHash.ScubaGearJob) {
-                Stop-Job -Job $syncHash.ScubaGearJob -Force
-                Remove-Job -Job $syncHash.ScubaGearJob -Force
-                $syncHash.ScubaGearJob = $null
+            if ($syncHash.ScubaRunExecutionJob) {
+                Stop-Job -Job $syncHash.ScubaRunExecutionJob -Force
+                Remove-Job -Job $syncHash.ScubaRunExecutionJob -Force
+                $syncHash.ScubaRunExecutionJob = $null
             }
 
-            if ($syncHash.ScubaGearTimer) {
-                $syncHash.ScubaGearTimer.Stop()
-                $syncHash.ScubaGearTimer = $null
+            if ($syncHash.ScubaRunExecutionTimer) {
+                $syncHash.ScubaRunExecutionTimer.Stop()
+                $syncHash.ScubaRunExecutionTimer = $null
             }
 
             Update-ScubaRunStatus "Execution stopped by user" "Warning"
-            Reset-ScubaRunUI
-        }
-
-        Function Complete-ScubaGearExecution {
-            <#
-            .SYNOPSIS
-            Completes ScubaGear execution and updates UI.
-            #>
-
-            # Mark all products as complete (or detect which ones actually completed)
-            foreach ($productId in $syncHash.GeneralSettingsData.ProductNames) {
-                Update-ProductProgress -ProductId $productId -Status "Complete"
-            }
-
             Reset-ScubaRunUI
         }
 
@@ -5895,25 +6586,20 @@
             Resets the UI to ready state.
             #>
 
-            $syncHash.RunScubaGear_Button.IsEnabled = $true
-            $syncHash.StopScubaGear_Button.IsEnabled = $false
-            $syncHash.StopScubaGear_Button.Visibility = "Collapsed"
-            $syncHash.RunScubaGear_Button.Visibility = "Visible"
+            $syncHash.ScubaRunStart_Button.IsEnabled = $true
+            $syncHash.ScubaRunStop_Button.IsEnabled = $false
+            $syncHash.ScubaRunStop_Button.Visibility = "Collapsed"
+            $syncHash.ScubaRunStart_Button.Visibility = "Visible"
 
-            Test-ScubaRunReadiness
+            # Only show "Ready to run" status if we haven't just completed execution
+            if (-not $syncHash.JustCompletedExecution) {
+                Test-ScubaRunReadiness
+            } else {
+                # Clear the flag for next time
+                $syncHash.JustCompletedExecution = $false
+            }
         }
 
-        # Call this when the tab is initialized
-        Add-Type -TypeDefinition @"
-        using System;
-        using System.Runtime.InteropServices;
-        public class PowerShellHelper {
-            [DllImport("kernel32.dll", SetLastError = true)]
-            public static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
-
-            public delegate bool ConsoleCtrlDelegate(uint CtrlType);
-        }
-"@
         #===========================================================================
         #
         # LOAD UI
@@ -6181,7 +6867,7 @@
         # Handle Organization TextBox with special Graph Connected logic
         if ($syncHash.GraphConnected) {
             try {
-                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/organization" -OutputType PSObject).Value
+                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
                 $tenantName = ($tenantDetails.VerifiedDomains | Where-Object { $_.IsDefault -eq $true }).Name
                 $syncHash.Organization_TextBox.Text = $tenantName
                 $syncHash.Organization_TextBox.Foreground = [System.Windows.Media.Brushes]::Gray
@@ -6192,8 +6878,13 @@
 
                 Add-DynamicGraphButtons
             } catch {
+                Write-DebugOutput -Message "Failed to retrieve organization details from Graph: $($_.Exception.Message)" -Source "Graph Request" -Level "Error"
+                $syncHash.GraphConnected = $false
                 # Fallback to placeholder if Graph request fails
                 Initialize-PlaceholderTextBox -TextBox $syncHash.Organization_TextBox -PlaceholderText $syncHash.UIConfigs.localePlaceholder.Organization_TextBox
+            } finally {
+                # Ensure Graph status indicator is initialized
+                Initialize-GraphStatusIndicator
             }
         }
 
@@ -6238,6 +6929,8 @@
         }else {
             $syncHash.ScubaRunTab.Visibility = "Collapsed"
         }
+
+        $syncHash.ScubaRunPowerShellVersion_TextBlock.Text = "PowerShell $($syncHash.UIConfigs.ScubaRunConfig.powershell.version) required"
         #===========================================================================
         # Button Event Handlers
         #===========================================================================
@@ -6286,6 +6979,20 @@
                 if (-not $orgValid) {
                     $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrganizationValidation
                     #navigate to General tab
+                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
+                }
+
+                # Products validation (at least one product must be selected)
+                if (-not $syncHash.GeneralSettingsData.ProductNames -or $syncHash.GeneralSettingsData.ProductNames.Count -eq 0) {
+                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.ProductSelection
+                    $syncHash.MainTabControl.SelectedItem = $syncHash.GeneralTab
+                    $productsValid = $false
+                }else {
+                    $productsValid = $true
+                }
+
+                If(-not $productsValid) {
+                    $syncHash.PreviewTab.IsEnabled = $false
                     $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
                 }
 
@@ -6608,7 +7315,7 @@
              $syncHash.isClosing = $true
 
             # Disconnect safely
-            if ($syncHash.GraphConnected) {
+            if (Get-MgContext) {
                 try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch {
                     Write-Error "Error disconnecting from Microsoft Graph: $($_.Exception.Message)"
                 }
@@ -6635,8 +7342,15 @@
             }
         })
 
-        #always force windows on bottom
+        #always force windows on top
         $syncHash.Window.Topmost = $True
+
+        #hit esc to not force on top
+        $syncHash.Window.Add_KeyDown({
+            if ($_.Key -eq [System.Windows.Input.Key]::Escape) {
+                $syncHash.Window.Topmost = $False
+            }
+        })
 
         #$syncHash.UIUpdateTimer.Start()
 

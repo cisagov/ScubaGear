@@ -2,7 +2,7 @@
   "Version": "1.8.7 [updated 8/7/2025]",
   "DebugMode": false,
   "EnableSearchAndFilter": false,
-  "EnableScubaRun": false,
+  "EnableScubaRun": true,
   "localeContext": {
     "Title_TextBlock": "Scuba Configuration Editor",
     "SubTitle_TextBlock": "Create a ScubaGear configuration file for exclusions, annotations, and omissions",
@@ -15,7 +15,8 @@
     "ExclusionsTabInfo_TextBlock": "Configure exclusions for specific policies. Exclusions allow you to customize policy behavior by excluding specific users, groups, domains, or other entities from policy evaluation. Products must be selected on the main page before configuring exclusions.",
     "AnnotationsTabInfo_TextBlock": "Add comments and annotations to policies for documentation and tracking purposes. Products must be selected on the main page before configuring annotations.",
     "OmissionsTabInfo_TextBlock": "Select policies to omissions from the assessment and provide justification. Products must be selected on the main page before configuring omissions.",
-    "PreviewTabInfo_TextBlock": "Preview your configuration before saving. Ensure all exclusions and omissions are correctly set."
+    "PreviewTabInfo_TextBlock": "Preview your configuration before saving. Ensure all exclusions and omissions are correctly set.",
+    "ScubaRunDescription_TextBlock": "Execute ScubaGear assessment using the current configuration. Ensure you have generated a valid YAML configuration before running."
   },
   "localePlaceholder": {
     "Organization_TextBox": "Enter tenant name (e.g., example.onmicrosoft.com)",
@@ -63,7 +64,8 @@
     "RequiredFieldsValidation": "The following required fields cannot be empty: {0}",
     "SkippingNullCard": "Skipping null card for policy: {0}",
     "RemoveEventHandlerError": "Failed to remove event handler for: {0}",
-    "CertificateSelectionError": "Certificate selection error: {0}"
+    "CertificateSelectionError": "Certificate selection error: {0}",
+    "ProductSelection": "At least one product must be selected for the configuration to be valid."
   },
   "localePopupMessages": {
     "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
@@ -192,31 +194,54 @@
       "modules": [
         "ScubaGear"
       ],
-      "PreCommands": [
-        "Import-Module ScubaGear -Force",
-        "Initialize-SCuBA"
+      "preCommands": [
+        "Import-Module ScubaGear -Force -Verbose",
+        "$Scope = If(([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match \"S-1-5-32-544\"){\"AllUsers\"}Else{\"CurrentUser\"}",
+        "Write-Output \"Running with scope: $Scope\""
       ],
       "cmdlets": "Invoke-Scuba",
+      "postCommands": [
+        "Write-Output 'ScubaGear execution completed'",
+        "Get-ChildItem \"$env:temp\\ScubaConfigRun\" -Filter *.yaml | Remove-Item -Force -ErrorAction SilentlyContinue -Verbose"
+      ],
       "parameters" : {
-        "ConfigFilePath": {
-          "type": "string",
-          "description": "Path to the ScubaGear configuration file.",
-          "defaultValue": "ScubaGearConfig.yaml"
-        },
         "SilenceBODWarnings": {
+          "name": "Silence BOD Warnings",
           "type": "boolean",
           "description": "Suppress BOD warnings.",
-          "defaultValue": false
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
         },
         "DarkMode": {
+          "name": "Dark Mode",
           "type": "boolean",
           "description": "Show ScubaGear report in dark mode.",
-          "defaultValue": false
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
         },
         "Quiet": {
+          "name": "Quiet Mode",
           "type": "boolean",
           "description": "Run ScubaGear in quiet mode, suppressing report",
-          "defaultValue": false
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "name": "Number of UUID Characters to Truncate",
+          "type": "dropdown",
+          "items": [
+            0,
+            13,
+            18,
+            36
+          ],
+          "description": "Specify the number of characters to truncate from the UUID.",
+          "defaultValue": 18,
+          "hidden": false,
+          "readOnly": false
         }
       }
     }
@@ -648,7 +673,8 @@
         }
       ],
       "outProperty": "id",
-      "tipProperty": "displayName"
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
     },
     "Groups": {
       "name": "Groups",
@@ -685,7 +711,8 @@
         }
       ],
       "outProperty": "id",
-      "tipProperty": "displayName"
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
     },
     "IncludedUsers": {
       "name": "Users",
@@ -722,7 +749,8 @@
         }
       ],
       "outProperty": "userPrincipalName",
-      "tipProperty": "displayName"
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
     },
     "IncludedGroups": {
       "name": "Groups",
@@ -759,7 +787,8 @@
         }
       ],
       "outProperty": "displayName",
-      "tipProperty": "description"
+      "tipProperty": "description",
+      "allowMultipleSelection": true
     },
     "ExcludedUsers": {
       "name": "Users",
@@ -796,7 +825,8 @@
         }
       ],
       "outProperty": "userPrincipalName",
-      "tipProperty": "displayName"
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
     },
     "ExcludedGroups": {
       "name": "Groups",
@@ -833,7 +863,9 @@
         }
       ],
       "outProperty": "displayName",
-      "tipProperty": "description"
+      "tipProperty": "description",
+      "allowMultipleSelection": true
+
     },
     "AppId_TextBox": {
       "name": "Applications",
@@ -858,7 +890,8 @@
         }
       ],
       "outProperty": "appId",
-      "tipProperty": "displayName"
+      "tipProperty": "displayName",
+      "allowMultipleSelection": false
     }
   }
 }
