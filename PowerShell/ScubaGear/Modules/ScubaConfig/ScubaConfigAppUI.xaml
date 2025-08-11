@@ -773,6 +773,28 @@
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Graph Status Indicator -->
+                <Border x:Name="GraphStatusBorder"
+                        Background="LightGray"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Visibility="Visible">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="GraphStatusIndicator"
+                                Width="8"
+                                Height="8"
+                                Fill="Red"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"/>
+                        <TextBlock x:Name="GraphStatusText"
+                                Text="Graph Disconnected"
+                                FontSize="11"
+                                Foreground="DarkGray"
+                                VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
                 <Button x:Name="NewSessionButton" Style="{StaticResource ClearButton}" Content="Reset" Margin="0,0,8,0" Width="96"/>
                 <Button x:Name="ImportButton" Style="{StaticResource SecondaryButton}" Content="Import" Margin="0,0,8,0" Width="70"/>
                 <Button x:Name="PreviewButton" Style="{StaticResource PrimaryButton}" Content="Preview &amp; Generate" Width="141"/>
@@ -1462,7 +1484,7 @@
                 </TabItem>
 
                 <!-- Scuba Run Tab Content -->
-                <TabItem x:Name="ScubaRunTab" Header="Scuba Run">
+                <TabItem x:Name="ScubaRunTab" Header="Run ScubaGear">
                     <Grid Margin="16">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>    <!-- Header/Description -->
@@ -1473,20 +1495,30 @@
                         <!-- Header Section -->
                         <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
                             <StackPanel>
-                                <TextBlock Text="Run ScubaGear Configuration"
-                                        FontSize="18"
-                                        FontWeight="SemiBold"
-                                        Foreground="{StaticResource PrimaryBrush}"
-                                        Margin="0,0,0,8"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Run ScubaGear Configuration"
+                                            FontSize="18"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            Margin="0,0,12,0"/>
+
+                                    <!-- Cool Beta Badge -->
+                                    <Border Background="#E3F2FD"
+                                            BorderBrush="#2196F3"
+                                            BorderThickness="1"
+                                            CornerRadius="16"
+                                            Padding="10,4"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="BETA"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="#1976D2"/>
+                                    </Border>
+                                </StackPanel>
+
                                 <TextBlock x:Name="ScubaRunDescription_TextBlock"
                                         TextWrapping="Wrap"
-                                        Foreground="{StaticResource MutedTextBrush}"
-                                        Text="Execute ScubaGear assessment using the current configuration. Ensure you have generated a valid YAML configuration before running."/>
-                                <TextBlock x:Name="ScubaRunStatus_TextBlock"
-                                        FontWeight="SemiBold"
-                                        Margin="0,8,0,0"
-                                        Text="Status: Ready"
-                                        Foreground="{StaticResource PrimaryBrush}"/>
+                                        Foreground="{StaticResource MutedTextBrush}"/>
                             </StackPanel>
                         </Border>
 
@@ -1501,7 +1533,7 @@
 
                                 <!-- Run Button Section -->
                                 <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,24,0">
-                                    <Button x:Name="RunScubaGear_Button"
+                                    <Button x:Name="ScubaRunStart_Button"
                                             Style="{StaticResource PrimaryButton}"
                                             Content="Run ScubaGear"
                                             FontSize="16"
@@ -1510,7 +1542,7 @@
                                             Height="150"
                                             IsEnabled="False"
                                             Margin="0,0,0,12"/>
-                                    <Button x:Name="StopScubaGear_Button"
+                                    <Button x:Name="ScubaRunStop_Button"
                                             Style="{StaticResource SecondaryButton}"
                                             Content="Stop Execution"
                                             Width="220"
@@ -1519,64 +1551,62 @@
                                             Background="#DC3545"
                                             Foreground="White"
                                             Visibility="Collapsed"/>
-                                    <TextBlock Text="PowerShell 5.1 Required"
+                                    <TextBlock x:Name="ScubaRunPowerShellVersion_TextBlock"
                                             FontSize="10"
                                             Foreground="{StaticResource MutedTextBrush}"
                                             HorizontalAlignment="Center"/>
                                 </StackPanel>
 
-                                <!-- Parameters Section -->
                                 <StackPanel Grid.Column="1" Margin="0,0,24,0">
-                                    <TextBlock Text="Execution Parameters"
+                                    <TextBlock Text="Execution Parameters:"
                                             FontWeight="SemiBold"
                                             Margin="0,0,0,8"/>
 
-                                    <!-- SilenceBODWarnings -->
-                                    <CheckBox x:Name="SilenceBODWarnings_CheckBox"
-                                            Content="Silence BOD Warnings"
-                                            Margin="0,0,0,8"
-                                            ToolTip="Suppress BOD warnings during execution"/>
+                                    <!-- Dynamic Parameters Container -->
+                                    <StackPanel x:Name="ScubaRunParametersContainer">
+                                        <!-- Parameters will be dynamically added here -->
+                                    </StackPanel>
 
-                                    <!-- DarkMode -->
-                                    <CheckBox x:Name="DarkMode_CheckBox"
-                                            Content="Dark Mode Report"
-                                            Margin="0,0,0,8"
-                                            ToolTip="Generate ScubaGear report in dark mode"/>
-
-                                    <!-- Quiet -->
-                                    <CheckBox x:Name="Quiet_CheckBox"
-                                            Content="Quiet Mode"
-                                            Margin="0,0,0,8"
-                                            ToolTip="Run ScubaGear in quiet mode, suppressing report generation"/>
-
-                                    <!-- Config File Path (Read-only) -->
-                                    <TextBlock Text="Configuration File:"
-                                            FontWeight="SemiBold"
-                                            Margin="0,8,0,4"/>
-                                    <TextBox x:Name="ConfigFilePath_TextBox"
-                                            Text="ScubaGearConfig.yaml"
-                                            IsReadOnly="True"
-                                            Background="#F5F5F5"
-                                            ToolTip="Temporary configuration file that will be generated"/>
                                 </StackPanel>
 
-                                <!-- Product Progress Section -->
+                               <!-- Product Progress Section -->
                                 <Border Grid.Column="2"
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
                                     Padding="12"
                                     Background="#FAFAFA"
-                                    MinWidth="200">
-                                    <StackPanel>
-                                        <TextBlock Text="Product Progress"
+                                    Width="300">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Status Text with ScrollViewer -->
+                                        <ScrollViewer Grid.Row="0"
+                                                    VerticalScrollBarVisibility="Auto"
+                                                    HorizontalScrollBarVisibility="Disabled"
+                                                    MaxHeight="120"
+                                                    Style="{StaticResource ModernScrollViewer}">
+                                            <TextBox x:Name="ScubaRunStatus_TextBlock"
                                                 FontWeight="SemiBold"
-                                                Margin="0,0,0,8"
-                                                HorizontalAlignment="Center"/>
-                                        <StackPanel x:Name="ProductProgress_StackPanel">
+                                                Margin="0,8,0,8"
+                                                TextWrapping="Wrap"
+                                                Text="Status: Not Started"
+                                                Foreground="{StaticResource PrimaryBrush}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                IsReadOnly="True"
+                                                Cursor="IBeam"
+                                                Width="276"/>
+                                        </ScrollViewer>
+
+                                        <!-- Product Progress -->
+                                        <StackPanel Grid.Row="1" x:Name="ProductProgress_StackPanel">
                                             <!-- Dynamic product progress items will be added here -->
                                         </StackPanel>
-                                    </StackPanel>
+                                    </Grid>
                                 </Border>
                             </Grid>
                         </Border>
@@ -1601,14 +1631,14 @@
                                             FontWeight="SemiBold"/>
 
                                     <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <Button x:Name="ClearOutput_Button"
+                                        <Button x:Name="ScubaRunClearOutput_Button"
                                             Style="{StaticResource SecondaryButton}"
                                             Content="Clear"
                                             Width="60"
                                             Height="24"
                                             FontSize="10"
                                             Margin="0,0,8,0"/>
-                                        <Button x:Name="CopyOutput_Button"
+                                        <Button x:Name="ScubaRunCopyOutput_Button"
                                             Style="{StaticResource SecondaryButton}"
                                             Content="Copy"
                                             Width="60"
@@ -1622,7 +1652,7 @@
                                     BorderBrush="{StaticResource BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="4">
-                                    <TextBox x:Name="ScubaOutput_TextBox"
+                                    <TextBox x:Name="ScubaRunOutput_TextBox"
                                             IsReadOnly="True"
                                             VerticalScrollBarVisibility="Auto"
                                             HorizontalScrollBarVisibility="Auto"
