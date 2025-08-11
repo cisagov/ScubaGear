@@ -5985,12 +5985,12 @@
             return $cmdParts
         }
 
-        <#
+        
         Function Start-ScubaGearJob {
             <#
             .SYNOPSIS
             Starts ScubaGear in a background PowerShell process with real-time output capture.
-            #
+            #>
             param([string[]]$Command)
 
             # Get what powershell version to run based on configuration
@@ -6073,12 +6073,13 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             # Start enhanced monitoring for real-time output
             Start-ScubaGearMonitoringRealTime
         }
-        #>
+        
+        <#
         Function Start-ScubaGearJob {
             <#
             .SYNOPSIS
             Starts ScubaGear in a background job without external script files.
-            #>
+            #
             param([string[]]$Command)
 
             # Store execution start time for finding the results folder
@@ -6182,7 +6183,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             # Start enhanced monitoring for real-time output
             Start-ScubaGearMonitoringRealTime
         }
-
+        #>
         Function Find-ScubaGearResultFolder {
             <#
             .SYNOPSIS
