@@ -208,7 +208,7 @@ img {
     width: 6.25em;
 }
 
-#caps h2 {
+.expandable_wrapper h2 {
     margin-top: 3.125em;
 }
 
@@ -218,39 +218,40 @@ img {
     margin-top: 10px;
 }
 
-#caps tr:nth-child(even), .alternating tr:nth-child(even) {
+.expandable_wrapper tr:nth-child(even),
+.alternating tr:nth-child(even) {
     background-color: var(--cap-even);
 }
 
-#caps tr:hover{
+.expandable_wrapper tr:hover {
     background-color: var(--cap-hover);
 }
 
-#caps ul {
+.expandable_wrapper ul {
     padding: 0;
     padding-left: 0.125em;
     list-style-position: inside;
 }
 
-#caps img:hover {
+.expandable_wrapper img:hover {
     cursor: pointer;
 }
 
-#caps td:nth-child(1), #caps th:nth-child(1) {
+.expandable_wrapper td:nth-child(1), .expandable_wrapper th:nth-child(1) {
     border-right: none;
 }
 
-#caps td:nth-child(2), #caps th:nth-child(2) {
+.expandable_wrapper td:nth-child(2), .expandable_wrapper th:nth-child(2) {
     border-left: none;
 }
 
-#caps span {
+.expandable_wrapper span {
     cursor: pointer;
     color: var(--header-color);
     text-decoration:underline;
 }
 
-.caps_table, .risky_apps_table, .risky_third_party_sps_table {
+.caps_table, .riskyApps_table, .riskyThirdPartySPs_table {
     width: 1000px;
     margin: 1em 3.125em 0 3.125em;
 }
@@ -279,6 +280,18 @@ th.users {
 }
 
 th.conditions {
+    width: 25%;
+}
+
+th.multi_tenant_enabled {
+    text-align: center;
+}
+
+th.key_credentials, th.password_credentials, th.federated_credentials {
+    width: 15%;
+}
+
+th.permissions {
     width: 25%;
 }
 
