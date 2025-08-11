@@ -229,17 +229,30 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
             collapseRowButton.appendChild(img);
             td.appendChild(collapseRowButton);
         }
-        else if (cellData && Array.isArray(cellData)) {
-            const ul = document.createElement("ul");
-            cellData.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = typeof item === "object" ? JSON.stringify(item) : item;
-                ul.appendChild(li);
+        else if (cellData && Array.isArray(cellData) && cellData.length > 1) {
+            const items = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+            console.log(items);
+            if (items.length === 0) {
+                td.innerHTML = "None";
+                continue;
+            }
+
+            const label = col.name;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'view-details-button';
+            btn.textContent = label;
+            btn.addEventListener('click', () => {
+                let node = renderKeyValueList(items);
+                const title = `${normalizeRiskyColumnNames(col.name)} — ${data[rowIndex]?.DisplayName ?? data[rowIndex]?.Name ?? 'Row ' + (rowIndex + 1)}`;
+                openDetailsModal(title, node);
             });
-            td.appendChild(ul);
+
+            td.appendChild(btn);
         }
         else {
-            td.innerHTML = cellData ?? "";
+            td.innerHTML = cellData ?? "None";
         }
     }
 }
@@ -326,33 +339,83 @@ const collapseAllRows = (data, tableType) => {
     });
 }
 
-/**
- * Formats a cell value for display in the risky tables.
- * Handles arrays, objects, and primitives.
- * @param {*} val The value to format.
- * @returns {Node} A DOM node for the cell.
- */
-const formatRiskyCell = (val) => {
-    if (val === null || val === undefined) {
-        return document.createTextNode("");
+const openDetailsModal = (title, contentNode) => {
+    const dialog = document.getElementById('details-dialog');
+    const titleEl = document.getElementById('details-title');
+    const contentEl = document.getElementById('details-content');
+    const closeBtn = document.getElementById('details-close');
+
+    if (!dialog || !titleEl || !contentEl || !closeBtn) {
+        console.error('Details dialog elements not found.');
+        return;
     }
-    if (Array.isArray(val)) {
-        const ul = document.createElement("ul");
-        val.forEach(item => {
-            const li = document.createElement("li");
-            if (typeof item === "object" && item !== null) {
-                li.textContent = Object.entries(item).map(([k, v]) => `${k}: ${v}`).join(", ");
-            } else {
-                li.textContent = item;
-            }
-            ul.appendChild(li);
-        });
-        return ul;
-    }
-    if (typeof val === "object") {
-        return document.createTextNode(
-            Object.entries(val).map(([k, v]) => `${k}: ${v}`).join(", ")
-        );
-    }
-    return document.createTextNode(val);
+
+    // Basic a11y: ensure heading has text
+    titleEl.textContent = title || 'Details';
+
+    // Reset content
+    contentEl.innerHTML = '';
+    if (contentNode instanceof Node) contentEl.appendChild(contentNode);
+    else contentEl.textContent = String(contentNode ?? '');
+
+    // Focus management
+    const opener = document.activeElement;
+    const onClose = () => {
+        dialog.removeEventListener('close', onClose);
+        closeBtn.removeEventListener('click', handleCloseClick);
+        if (opener && typeof opener.focus === 'function') opener.focus();
+    };
+    const handleCloseClick = () => dialog.close();
+
+    dialog.addEventListener('close', onClose);
+    closeBtn.addEventListener('click', handleCloseClick);
+
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', 'open');
+    closeBtn.focus();
 };
+
+const createViewDetailsButton = (label, onClick) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'view-details-button';
+    btn.textContent = label;
+    btn.addEventListener('click', onClick);
+    return btn;
+};
+
+const renderKeyValueList = (items) => {
+    const container = document.createElement('div');
+    const ul = document.createElement('ul');
+    ul.style.listStyle = 'none';
+    ul.style.padding = '0';
+
+    items.forEach(obj => {
+        const li = document.createElement('li');
+        li.style.padding = '8px 0';
+        li.style.borderBottom = '1px solid #eee';
+        if (obj && typeof obj === 'object') {
+            li.innerHTML = Object.entries(obj)
+                .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
+                .join('<br>');
+        } 
+        else {
+            li.textContent = String(obj);
+        }
+        ul.appendChild(li);
+    });
+    container.appendChild(ul);
+    return container;
+};
+
+const normalizeRiskyColumnNames = (name) => {
+    switch (name) {
+        case 'Permissions': return 'Permissions';
+        case 'KeyCredentials': return 'Key credentials';
+        case 'PasswordCredentials': return 'Password credentials';
+        case 'FederatedCredentials': return 'Federated credentials';
+        default: return name;
+    }
+};
+
+const normalizeToArray = (val) => Array.isArray(val) ? val : (val ? [val] : []);
