@@ -398,3 +398,71 @@ a.control_group:active {
     color: inherit; 
     border: none;
 }
+
+#details-dialog {
+    width: min(800px, 90vw);
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+#details-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#details-dialog header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+#details-dialog h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+#details-dialog #details-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+#details-content {
+    padding: 1rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+#details-content ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#details-content li {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+}
+
+#details-content li:last-child {
+    border-bottom: none;
+}
+
+.view-details-button {
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.85em;
+}
+
+.view-details-button:hover {
+    background-color: #e0e0e0;
+}
