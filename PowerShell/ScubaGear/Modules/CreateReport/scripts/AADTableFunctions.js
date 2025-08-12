@@ -61,6 +61,12 @@ const TABLE_METADATA = {
     }
 };
 
+/**
+ * Formatting function to make column names pretty.
+ * 
+ * @param {string} name - The original column name.
+ * @returns {string} - The normalized column name.
+ */
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
@@ -97,9 +103,9 @@ const createChevronIcon = (direction, width) => {
  * Creates a generic row-action button with custom content (img/span/etc.).
  * contentBuilder must return a Node that will be appended inside the button.
  * 
- * @param {string}   title - Title for the button.
- * @param {string}   className - Optional CSS class for the button.
- * @param {number}   rowIndex - The row index (0-indexed, not counting the header row).
+ * @param {string} title - Title for the button.
+ * @param {string} className - Optional CSS class for the button.
+ * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
  * @param {function} onClick - Click event handler for the button.
  * @param {function} contentBuilder - Function that returns inner Node content.
  */
@@ -118,20 +124,20 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
 /**
  * Shared function to build a table with expand/collapse chevrons and truncation.
  * 
- * @param {Array}  data - The data array.
+ * @param {Array} data - The data array.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  */
 const buildExpandableTable = (data, tableType) => {
     try {
         if (data === undefined || data === null) {
-            /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but
-                this js file applies to all baselines. If data is null,
-                then the current baseline is not AAD and we don't need to
-                do anything.
+            /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but this js file 
+                applies to all baselines. If data is null, then the current baseline is not AAD 
+                and we don't need to do anything.
 
                 Also, note that CAP, risky app, and risky SP data are not declared in the static version of
-                this file. It is prepended to the version rendered in the html
-                by CreateReport.psm1.
+                this file. It is prepended to the version rendered in the html by CreateReport.psm1.
+                Inspect one of the individual HTML reports and open the <head> tag, there will be <script>
+                tags with type="application/json" with the raw data.
             */
             return;
         };
@@ -232,20 +238,18 @@ const buildExpandableTable = (data, tableType) => {
 
 /**
  * Fills a cell with truncated content and three-dots button (for expanding) if needed.
- * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
- * @param {HTMLElement} td The table cell to fill.
- * @param {number} rowIndex The row index (0-indexed, not counting the header row).
- * @param {number} colIndex The column index (0-indexed).
+ *
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {HTMLElement} td - The table cell to fill.
+ * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
+ * @param {number} colIndex - The column index (0-indexed).
  */
 const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
     const colNames = TABLE_METADATA[tableType].columns;
     const col = colNames[colIndex];
     const cellData = data[rowIndex][col.name];
     const charLimit = 50;
-
-    let content = "";
     let truncated = false;
 
     if (cellData === null || cellData === undefined) {
@@ -307,21 +311,23 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 
 /**
  * Fills a table row with expanded (full) content.
- * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
- * @param {HTMLTableRowElement} row The table row element.
- * @param {number} rowIndex The row index.
+ *
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {HTMLTableRowElement} row - The table row element.
+ * @param {number} rowIndex - The row index.
  */
 const fillExpandedRow = (data, tableType, row, rowIndex) => {
     const metadata = TABLE_METADATA[tableType];
     const colNames = metadata.columns;
 
-    for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
+    colNames.forEach((col, colIndex) => {
+        const cellData = data[rowIndex][col.name];
+
+        // We have to manually "reset" the content of the first column to an empty value,
+        // then we can recreate the down-angled chevron arrow.
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
         td.textContent = "";
-        const col = colNames[colIndex];
-        const cellData = data[rowIndex][col.name];
 
         if (colIndex === 0) {
             td.appendChild(
@@ -333,16 +339,22 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     contentBuilder: () => createChevronIcon("down", 14)
                 })
             );
+
+            return;
         }
-        else if (cellData && (Array.isArray(cellData) || typeof cellData === "object")) {
+        
+        if (cellData && (Array.isArray(cellData) || typeof cellData === "object")) {
             const items = normalizeToArray(cellData);
             const count = items.length;
 
             if (count === 0) {
                 td.textContent = "None";
-                continue;
+                return;
             }
 
+
+            // Set the "useModal" flag inside of TABLE_METADATA to true if you want to use a modal for displaying details.
+            // Otherwise, cell data will be displayed inline.
             if (metadata.useModal) {
                 // Assumes column name "DisplayName" or "Name" exist, will need to adjust if adding new table types
                 const rowLabel = data[rowIndex].DisplayName || data[rowIndex].Name;
@@ -366,28 +378,29 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
             else {
                 td.appendChild(renderKeyValueList(items));
             }
+
+            return;
         }
-        else {
-            td.textContent = cellData ?? "None";
-        }
-    }
+
+        td.textContent = cellData ?? "None";
+    });
 }
 
 /**
  * Fills a table row with collapsed (truncated) content and restores the chevron.
  * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
- * @param {HTMLTableRowElement} row The table row element.
- * @param {number} rowIndex The row index.
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {HTMLTableRowElement} row - The table row element.
+ * @param {number} rowIndex - The row index.
  */
 const fillCollapsedRow = (data, tableType, row, rowIndex) => {
     const colNames = TABLE_METADATA[tableType].columns;
 
-    for (let colIndex = 0; colIndex < colNames.length; colIndex++) {
+    colNames.forEach((_, colIndex) => {
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
         fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
-    }
+    });
 
     // We have to manually "reset" the content of the first column to an empty value,
     // then we can recreate the right-angled chevron arrow.
@@ -405,11 +418,11 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
 }
 
 /**
- * Fills in the row of the table indicated by the event with the full version of the row.
+ * Fills in a single row of the table indicated by the event with the full version of the row.
  * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
- * @param {Event} event The event that triggered the expansion.
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Event} event - The event that triggered the expansion.
  */
 const expandRow = (data, tableType, event) => {
     let row = event.currentTarget.closest("tr");
@@ -420,8 +433,8 @@ const expandRow = (data, tableType, event) => {
 /**
  * Expands all rows in a table.
  * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  */
 const expandAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
@@ -430,11 +443,11 @@ const expandAllRows = (data, tableType) => {
 }
 
 /**
- * Collapses a row back to truncated view.
+ * Collapses a single row back to truncated view.
  * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
- * @param {Event} event The event that triggered the expansion.
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Event} event - The event that triggered the expansion.
  */
 const collapseRow = (data, tableType, event) => {
     let row = event.currentTarget.closest("tr");
@@ -445,8 +458,8 @@ const collapseRow = (data, tableType, event) => {
 /**
  * Collapses all rows in a table to the truncated version.
  * 
- * @param {Array} data The table content.
- * @param {string} tableType The type of table (e.g., 'caps', 'riskyApps', 'riskySPs').
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  */
 const collapseAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
@@ -457,8 +470,8 @@ const collapseAllRows = (data, tableType) => {
 /**
  * Opens a modal component to display data in a list format.
  * 
- * @param {string} title Header for the modal.
- * @param {Node} contentNode Content to be injected into the modal.
+ * @param {string} title - Header for the modal.
+ * @param {Node} contentNode - Content to be injected into the modal.
  */
 const openDetailsModal = (title, contentNode) => {
     const dialog = document.getElementById("details-dialog");
@@ -497,24 +510,29 @@ const openDetailsModal = (title, contentNode) => {
 /**
  * Builds a unordered list of key-value pairs from an array of items.
  * 
- * @param {Array} items Array of items to be displayed.
- * @returns {HTMLElement} An unordered list element containing the key-value pairs.
+ * @param {Array} items - Array of items to be displayed.
+ * @returns {HTMLElement} - An unordered list element containing the key-value pairs.
  */
 const renderKeyValueList = (items) => {
     const ul = document.createElement("ul");
 
+    // Iterate through the list of "Key Credentials", "Permissions", etc.
     items.forEach(item => {
         const li = document.createElement("li");
 
         if (item && typeof item === "object") {
             const entries = Object.entries(item);
-
+            
+            // Iterate through the key/value pairs for each object, e.g. key = "IsRisky", value = true
             entries.forEach(([key, value], idx) => {
                 const strong = document.createElement("strong");
                 strong.textContent = `${key}:`;
                 li.appendChild(strong);
 
                 let content = value;
+
+                // Start/End dates come in the format of /Date(1675800895000)/ which isn't a standard Date() format.
+                // Parse it then apply .toLocaleString() to get the M/D/YYYY HH:MM:SS format.
                 if (typeof value === "string" && (key === "StartDateTime" || key === "EndDateTime")) {
                     const date = parseDotNetDate(value);
                     content = date ? date.toLocaleString() : value;
@@ -544,9 +562,9 @@ const renderKeyValueList = (items) => {
  *   - non-admin consented permissions
  *   - risky permissions
  * 
- * @param {string} colName The column name from TABLE_METADATA.columns (e.g., "KeyCredentials", "Permissions").
- * @param {Array} items The normalized array of items to summarize.
- * @returns {HTMLElement|null} An unordered list element containing the summary.
+ * @param {string} colName - The column name from TABLE_METADATA.columns (e.g., "KeyCredentials", "Permissions").
+ * @param {Array} items - The normalized array of items to summarize.
+ * @returns {HTMLElement|null} - An unordered list element containing the summary.
  */
 const renderSummaryList = (colName, items) => {
     const count = items.length;
@@ -579,8 +597,12 @@ const renderSummaryList = (colName, items) => {
             if (start && end) {
                 if (start <= now && end >= now) {
                     active++;
-                } else if (end < now) {
+                    return;
+                }
+                
+                if (end < now) {
                     expired++;
+                    return;
                 }
             }
         });
@@ -593,10 +615,14 @@ const renderSummaryList = (colName, items) => {
     }
 
     if (colName === "Permissions") {
-        let adminConsented = 0, notAdminConsented = 0, risky = 0;
+        let applicationPermissions = 0, delegatedPermissions = 0, adminConsented = 0, notAdminConsented = 0, risky = 0;
 
         items.forEach(permission => {
             if (!permission || typeof permission !== "object") return;
+
+            // Handle application/delegated permissions
+            if (permission.RoleType === "Application") applicationPermissions++;
+            if (permission.RoleType === "Delegated") delegatedPermissions++;
 
             // Handle admin consented permissions
             if (permission.IsAdminConsented === true) adminConsented++;
@@ -608,6 +634,8 @@ const renderSummaryList = (colName, items) => {
 
         const ul = makeUl();
         addItem(ul, "Total", count);
+        addItem(ul, "Application Permissions", applicationPermissions);
+        addItem(ul, "Delegated Permissions", delegatedPermissions);
         addItem(ul, "Admin Consented", adminConsented);
         addItem(ul, "Not Admin Consented", notAdminConsented);
         addItem(ul, "Risky", risky);

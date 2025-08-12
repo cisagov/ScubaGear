@@ -287,8 +287,12 @@ th.multi_tenant_enabled {
     text-align: center;
 }
 
-th.key_credentials, th.password_credentials, th.federated_credentials, th.permissions {
-    width: 20%;
+th.key_credentials, th.password_credentials, th.federated_credentials {
+    width: 18%;
+}
+
+th.permissions {
+    width: 25%;
 }
 
 #toggle-container {
