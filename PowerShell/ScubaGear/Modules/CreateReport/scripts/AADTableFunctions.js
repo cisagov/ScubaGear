@@ -1,8 +1,20 @@
 /**
- * Defines the column names for each expandable table.
+ * This object configures all expandable tables in the AAD report.
  * 
- * The "" column is used for the nameless column that holds the
- * "Show more" / "Show less" buttons.
+ * The keys are the main identifiers used throughout the AAD table functions. They also determines the CSS class 
+ * applied to a given table element, e.g. `${tableType}_table`.
+ * 
+ * title:
+ *   - H2 heading displayed above the table.
+ * wrapperClass:
+ *   - CSS class applied to the <section> wrapping the table.
+ * useModal:
+ *   - If true, clicking on a cell with multiple items will open a modal with the full list.
+ *     If false, it will expand the row in place.
+ * columns:
+ *   - An array of objects, each representing a column in the table.
+ *     The first entry is "" as a placeholder for the expand/collapse arrows. Otherwise each entry
+ *     contains the name of the column along with an optional class name if custom styling is required.
  */
 const TABLE_METADATA = {
     caps: {
@@ -56,7 +68,6 @@ const normalizeColumnNames = (name) => {
         case "KeyCredentials": return "Key Credentials";
         case "PasswordCredentials": return "Password Credentials";
         case "FederatedCredentials": return "Federated Credentials";
-        case "Permissions": return "Permissions";
         default: return name;
     }
 };
@@ -279,7 +290,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
             collapseRowButton.appendChild(img);
             td.appendChild(collapseRowButton);
         }
-        else if (cellData && Array.isArray(cellData) && cellData.length > 1) {
+        else if (cellData && (Array.isArray(cellData) || typeof cellData === "object")) {
             const items = normalizeToArray(cellData);
 
             if (items.length === 0) {
