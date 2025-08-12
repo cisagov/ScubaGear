@@ -189,25 +189,291 @@
             Writes debug output messages to the debug queue when debug mode is enabled.
             .DESCRIPTION
             This Function adds timestamped debug messages to the syncHash debug queue for troubleshooting and monitoring UI operations.
+            Enhanced to also update the floating debug window if open.
             #>
             param(
+                [Parameter(Mandatory)]
                 [string]$Message,
-                [string]$Source = "General",
+
+                [Parameter(Mandatory)]
+                [string]$Source,
+
+                [ValidateSet("Verbose", "Debug", "Info", "Warning", "Error")]
                 [string]$Level = "Info"
             )
 
             if ($syncHash.UIConfigs.DebugMode) {
                 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss.fff"
-                $logEntry = "[$timestamp] [$Level] [$Source] $Message"
+                $formattedMessage = "[$timestamp] [$Level] [$Source] $Message"
 
-                $syncHash.Debug_TextBox.AppendText($logEntry + "`r`n")
-                $syncHash.Debug_TextBox.ScrollToEnd()
-                #$syncHash.DebugOutputQueue.Enqueue($logEntry)
-                [void]$syncHash.DebugLogData.Add($logEntry)
+                # Add to debug log data
+                [void]$syncHash.DebugLogData.Add($formattedMessage)
+
+                # Update main debug textbox if it exists
+                if ($syncHash.Debug_TextBox) {
+                    $syncHash.Debug_TextBox.AppendText("$formattedMessage`n")
+                    $syncHash.Debug_TextBox.ScrollToEnd()
+                }
+
+                # Update debug window if it's open
+                Update-DebugWindow -NewContent "$formattedMessage`n"
+            }
+        }
+
+        #===========================================================================
+        # Debug Window Functions
+        #===========================================================================
+        Function Show-DebugWindow {
+            <#
+            .SYNOPSIS
+            Creates and displays the floating debug window.
+            #>
+
+            # Don't create multiple debug windows
+            if ($syncHash.DebugWindow -and -not $syncHash.DebugWindow.IsClosed) {
+                $syncHash.DebugWindow.Activate()
+                return
+            }
+
+            try {
+                # Create debug window XAML
+                $debugWindowXaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ScubaGear Debug Console"
+        Height="600"
+        Width="800"
+        WindowStartupLocation="CenterOwner"
+        Background="#F6FBFE"
+        Foreground="#333333"
+        ShowInTaskbar="True"
+        Topmost="False">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
+            <TextBlock Text="🐛 Debug Console" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+            <CheckBox x:Name="AutoScrollCheckBox" Content="Auto-scroll" IsChecked="True" VerticalAlignment="Center" Margin="0,0,16,0"/>
+            <Button x:Name="ClearDebugButton" Content="Clear" Padding="8,4" Margin="0,0,8,0"/>
+            <Button x:Name="ExportDebugButton" Content="Export" Padding="8,4"/>
+        </StackPanel>
+
+        <!-- Debug Output -->
+        <Border Grid.Row="1" BorderBrush="#D0D5E0" BorderThickness="1" CornerRadius="4">
+            <TextBox x:Name="DebugOutputTextBox"
+                     IsReadOnly="True"
+                     VerticalScrollBarVisibility="Auto"
+                     HorizontalScrollBarVisibility="Auto"
+                     FontFamily="Consolas, Courier New, monospace"
+                     FontSize="12"
+                     Background="#1E1E1E"
+                     Foreground="#FFFFFF"
+                     Padding="8"
+                     TextWrapping="NoWrap"
+                     AcceptsReturn="True"/>
+        </Border>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <TextBlock x:Name="StatusTextBlock" Text="Debug console ready" Foreground="#666666" VerticalAlignment="Center" Margin="0,0,16,0"/>
+        </StackPanel>
+    </Grid>
+</Window>
+"@
+
+                # Parse XAML
+                $debugWindow = [Windows.Markup.XamlReader]::Parse($debugWindowXaml)
+                $syncHash.DebugWindow = $debugWindow
+                $syncHash.DebugOutputTextBox = $debugWindow.FindName("DebugOutputTextBox")
+                $syncHash.AutoScrollCheckBox = $debugWindow.FindName("AutoScrollCheckBox")
+                $syncHash.StatusTextBlock = $debugWindow.FindName("StatusTextBlock")
+
+                # Set up event handlers
+                $debugWindow.FindName("ClearDebugButton").Add_Click({
+                    $syncHash.DebugOutputTextBox.Clear()
+                    $syncHash.StatusTextBlock.Text = "Debug output cleared"
+                })
+
+                $debugWindow.FindName("ExportDebugButton").Add_Click({
+                    try {
+                        $saveDialog = New-Object Microsoft.Win32.SaveFileDialog
+                        $saveDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
+                        $saveDialog.FileName = "ScubaGear-Debug-$(Get-Date -Format 'yyyyMMdd-HHmmss').txt"
+
+                        if ($saveDialog.ShowDialog()) {
+                            $syncHash.DebugOutputTextBox.Text | Out-File -FilePath $saveDialog.FileName -Encoding UTF8
+                            $syncHash.StatusTextBlock.Text = "Debug output exported to $($saveDialog.FileName)"
+                        }
+                    } catch {
+                        $syncHash.StatusTextBlock.Text = "Export failed: $($_.Exception.Message)"
+                    }
+                })
+
+                # Handle window closing - set flag to prevent recursive calls
+                $debugWindow.Add_Closing({
+
+                    # Set closing flag to prevent Hide-DebugWindow from calling Close again
+                    $syncHash.DebugWindowClosing = $true
+
+                    # Clean up references
+                    $syncHash.DebugWindow = $null
+                    $syncHash.DebugOutputTextBox = $null
+                    $syncHash.AutoScrollCheckBox = $null
+                    $syncHash.StatusTextBlock = $null
+                })
+
+                # Set owner if main window exists
+                if ($syncHash.Window) {
+                    $debugWindow.Owner = $syncHash.Window
+                }
+
+                # Show the window
+                $syncHash.DebugWindow.Show()
+                $syncHash.DebugWindow.Activate()
+
+                # Update debug output with current log if available
+                if ($syncHash.DebugLogData -and $syncHash.DebugLogData.Count -gt 0) {
+                    $debugText = $syncHash.DebugLogData -join "`n"
+                    $syncHash.DebugOutputTextBox.Text = $debugText
+                    if ($syncHash.AutoScrollCheckBox.IsChecked) {
+                        $syncHash.DebugOutputTextBox.ScrollToEnd()
+                    }
+                }
+
+                $syncHash.StatusTextBlock.Text = "Debug window opened successfully"
+                Write-DebugOutput -Message "Debug window opened" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+            } catch {
+                Write-DebugOutput -Message "Error creating debug window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                [System.Windows.MessageBox]::Show("Failed to open debug window: $($_.Exception.Message)", "Debug Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+            }
+        }
+
+        Function Hide-DebugWindow {
+            try {
+                # Check if we're already closing to prevent recursive calls
+                if ($syncHash.DebugWindowClosing) {
+                    return
+                }
+
+                if ($syncHash.DebugWindow -and -not $syncHash.DebugWindow.IsClosed) {
+                    # Set the closing flag
+                    $syncHash.DebugWindowClosing = $true
+
+                    # Try to close the window
+                    $syncHash.DebugWindow.Close()
+
+                    Write-DebugOutput -Message "Debug window closed" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                } else {
+                    # Window is already closed or doesn't exist, just clear references
+                    $syncHash.DebugWindow = $null
+                    $syncHash.DebugOutputTextBox = $null
+                    $syncHash.AutoScrollCheckBox = $null
+                    $syncHash.StatusTextBlock = $null
+                    $syncHash.DebugWindowClosing = $false
+                }
+            } catch {
+                Write-DebugOutput -Message "Error closing debug window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+
+                # Force clear all references regardless of error
+                $syncHash.DebugWindow = $null
+                $syncHash.DebugOutputTextBox = $null
+                $syncHash.AutoScrollCheckBox = $null
+                $syncHash.StatusTextBlock = $null
+                $syncHash.DebugWindowClosing = $false
             }
         }
 
 
+        Function Update-DebugWindow {
+            <#
+            .SYNOPSIS
+            Updates the debug window with new content from the main debug output.
+            .DESCRIPTION
+            This function syncs the debug window content with the main application's debug output
+            and handles auto-scrolling if enabled.
+            #>
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "NewContent")]
+            param(
+                [Parameter(Mandatory = $true)]
+                [string]$NewContent
+            )
+
+            try {
+                # Only update if debug window is open and valid
+                if ($syncHash.DebugWindow -and $syncHash.DebugOutputTextBox -and -not $syncHash.DebugWindow.IsClosed) {
+                    # Use Dispatcher.Invoke to ensure thread safety
+                    $syncHash.DebugWindow.Dispatcher.Invoke([Action]{
+                        try {
+                            # Append new content
+                            $syncHash.DebugOutputTextBox.AppendText($NewContent)
+
+                            # Auto-scroll if enabled
+                            if ($syncHash.AutoScrollCheckBox -and $syncHash.AutoScrollCheckBox.IsChecked) {
+                                $syncHash.DebugOutputTextBox.ScrollToEnd()
+                            }
+
+                            # Update status with timestamp
+                            if ($syncHash.StatusTextBlock) {
+                                $syncHash.StatusTextBlock.Text = "Last update: $(Get-Date -Format 'HH:mm:ss')"
+                            }
+                        } catch {
+                            Write-Host "Error in debug window update: $($_.Exception.Message)" -ForegroundColor Red
+                        }
+                    })
+                }
+            } catch {
+                # If there's an error, the window might be closed/invalid
+                Write-Host "Debug window update failed: $($_.Exception.Message)" -ForegroundColor Yellow
+                # Don't clear references here as it might be a temporary issue
+            }
+        }
+
+        Function Export-DebugLog {
+            <#
+            .SYNOPSIS
+            Exports the debug log to a file with timestamp.
+            #>
+
+            try {
+                $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
+                $fileName = "ScubaGear_Debug_$timestamp.log"
+
+                # Use SaveFileDialog
+                $saveDialog = New-Object Microsoft.Win32.SaveFileDialog
+                $saveDialog.Filter = "Log Files (*.log)|*.log|Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
+                $saveDialog.FileName = $fileName
+                $saveDialog.Title = "Export Debug Log"
+
+                if ($saveDialog.ShowDialog() -eq $true) {
+                    $debugContent = $syncHash.Debug_DebugWindow_TextBox.Text
+                    $debugContent | Out-File -FilePath $saveDialog.FileName -Encoding UTF8
+
+                    $syncHash.Debug_DebugWindow_TextBox.AppendText("[Debug log exported to: $($saveDialog.FileName)]`n")
+
+                    # Show success message
+                    [System.Windows.MessageBox]::Show(
+                        "Debug log exported successfully to:`n$($saveDialog.FileName)",
+                        "Export Successful",
+                        [System.Windows.MessageBoxButton]::OK,
+                        [System.Windows.MessageBoxImage]::Information
+                    )
+                }
+            } catch {
+                [System.Windows.MessageBox]::Show(
+                    "Error exporting debug log: $($_.Exception.Message)",
+                    "Export Error",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Error
+                )
+            }
+        }
         #===========================================================================
         # Search Helper Functions
         #===========================================================================
@@ -746,7 +1012,21 @@
                     $Control.Add_SelectionChanged({
                         $controlName = if ($this.Name) { $this.Name } else { "Unnamed ComboBox" }
                         $selectedItem = $this.SelectedItem
-                        Write-DebugOutput -Message ("User changed a {0} named [{1}] value to: {2}" -f $Control.GetType().Name, $controlName, $selectedItem) -Source "Control Handler" -Level "Debug"
+
+                        # Get the actual value instead of the ComboBoxItem object
+                        $actualValue = if ($selectedItem) {
+                            if ($selectedItem.Tag) {
+                                $selectedItem.Tag
+                            } elseif ($selectedItem.Content) {
+                                $selectedItem.Content
+                            } else {
+                                $selectedItem.ToString()
+                            }
+                        } else {
+                            "null"
+                        }
+
+                        Write-DebugOutput -Message ("User changed a {0} named [{1}] value to: {2}" -f $this.GetType().Name, $controlName, $actualValue) -Source "Control Handler" -Level "Debug"
                     }.GetNewClosure())
                 }
                 'Button' {
@@ -803,6 +1083,7 @@
             # Try each pattern
             foreach ($pattern in $namingPatterns) {
                 if ($syncHash.$pattern) {
+                    Write-DebugOutput -Message "Found control '$pattern' for setting '$SettingName'" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                     return $syncHash.$pattern
                 }
             }
@@ -1087,27 +1368,6 @@
                 [string]$SettingKey
             )
 
-            # SPECIAL handling for M365Environment ComboBox
-            if ($SettingKey -eq "M365Environment" -or $ComboBox.Name -eq "M365Environment_ComboBox") {
-                # For M365Environment, we need to check both id and name values
-                # First try to match by id (stored in Tag)
-                $selectedItem = $ComboBox.Items | Where-Object { $_.Tag -eq $Value }
-
-                # If not found by id, try to find by name in the configuration
-                if (-not $selectedItem) {
-                    $envConfig = $syncHash.UIConfigs.M365Environment | Where-Object { $_.name -eq $Value }
-                    if ($envConfig) {
-                        $selectedItem = $ComboBox.Items | Where-Object { $_.Tag -eq $envConfig.id }
-                    }
-                }
-
-                if ($selectedItem) {
-                    $ComboBox.SelectedItem = $selectedItem
-                    Write-DebugOutput -Message "Selected M365Environment: $Value" -Source $MyInvocation.MyCommand.Name -Level "Debug"
-                    return
-                }
-            }
-
             # Default ComboBox handling for other ComboBoxes
             # Try to find item by Tag first (common for environment selection)
             $selectedItem = $ComboBox.Items | Where-Object { $_.Tag -eq $Value }
@@ -1123,8 +1383,12 @@
             }
 
             if ($selectedItem) {
-                $ComboBox.SelectedItem = $selectedItem
-                Write-DebugOutput -Message ("Setting ComboBox info for {0}: {1}" -f $SettingKey,$Value)  -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                $syncHash.Window.Dispatcher.Invoke([Action]{
+                    $ComboBox.SelectedItem = $selectedItem
+                    $ComboBox.UpdateLayout()
+                    $ComboBox.InvalidateVisual()
+                    Write-DebugOutput -Message ("Setting ComboBox info for {0}: {1}" -f $SettingKey,$Value)  -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                })
             } else {
                 Write-DebugOutput -Message ("Could not find ComboBox [{0}] with value: {1}" -f $SettingKey,$Value) -Source $MyInvocation.MyCommand.Name -Level "Warning"
             }
@@ -1738,13 +2002,31 @@
                     $settingValue = $syncHash.GeneralSettingsData[$settingKey]
 
                     # Skip if value is null or empty
-                    if ($null -eq $settingValue) { return }
+                    if ($null -eq $settingValue) {
+                        Write-DebugOutput -Message "Skipping null value for setting: $settingKey" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                        continue
+                    }
+
+                    Write-DebugOutput -Message "Processing setting: $settingKey = $settingValue" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+                    # Special handling for M365Environment
+                    if ($settingKey -eq "M365Environment") {
+                        $m365ComboBox = $syncHash.M365Environment_ComboBox
+                        if ($m365ComboBox) {
+                            Write-DebugOutput -Message "Found M365Environment_ComboBox, setting value to: $settingValue" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                            Set-ComboBoxValue -ComboBox $m365ComboBox -Value $settingValue -SettingKey $settingKey
+                            continue
+                        } else {
+                            Write-DebugOutput -Message "M365Environment_ComboBox not found in syncHash!" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                        }
+                    }
 
                     # Find the corresponding XAML control using various naming patterns
                     $control = Find-ControlBySettingName -SettingName $settingKey
 
                     if ($control) {
                         Set-ControlValue -Control $control -Value $settingValue -SettingKey $settingKey
+                        Write-DebugOutput -Message "Updated control for setting: $settingKey" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                     } else {
                         Write-DebugOutput -Message ("No UI control found for setting: {0}" -f $settingKey) -Source $MyInvocation.MyCommand.Name -Level "Warning"
                     }
@@ -3529,7 +3811,7 @@
                 $syncHash.Window.Dispatcher.Invoke([Action]{
                     if ($IsConnected) {
                         # Connected state - Green indicator
-                        $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::LimeGreen
+                        $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::Green
                         $syncHash.GraphStatusText.Text = "Graph Connected"
                         $syncHash.GraphStatusText.Foreground = [System.Windows.Media.Brushes]::DarkGreen
                         $syncHash.GraphStatusBorder.Background = [System.Windows.Media.Brushes]::LightGreen
@@ -5301,7 +5583,7 @@
                                 # Convert control name to setting name (remove _TextBox suffix)
                                 $settingName = $placeholderKey -replace '_TextBox$', ''
                                 $syncHash.GeneralSettingsData[$settingName] = $currentValue.Trim()
-                                If($syncHash.UIConfigs.DebugMode){Write-DebugOutput -Message "Collected General setting: $placeholderKey = $($syncHash.GeneralSettingsData[$settingName])" -Source $MyInvocation.MyCommand.Name -Level "Debug"}
+                                Write-DebugOutput -Message "Collected General setting: $placeholderKey = $($syncHash.GeneralSettingsData[$settingName])" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                             }
                         }
                     }
@@ -5318,7 +5600,7 @@
                     if ($selectedEnv) {
                         $syncHash.GeneralSettingsData["M365Environment"] = $selectedEnv
                     }
-                    If($syncHash.UIConfigs.DebugMode){Write-DebugOutput -Message "Collected M365Environment: $selectedEnv" -Source $MyInvocation.MyCommand.Name -Level "Debug"}
+                    Write-DebugOutput -Message "Collected M365Environment: $selectedEnv" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                 }
                 catch {
                     Write-DebugOutput -Message "Error processing M365Environment: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Warning"
@@ -5364,7 +5646,7 @@
                                     $settingName = $fieldControlName -replace '_CheckBox$', ''
                                     $syncHash.AdvancedSettingsData[$settingName] = $control.IsChecked
                                 }
-                                If($syncHash.UIConfigs.DebugMode){Write-DebugOutput -Message "Collected Advanced setting: $settingName = $($syncHash.AdvancedSettingsData[$settingName])" -Source $MyInvocation.MyCommand.Name -Level "Debug"}
+                                Write-DebugOutput -Message "Collected Advanced setting: $settingName = $($syncHash.AdvancedSettingsData[$settingName])" -Source $MyInvocation.MyCommand.Name -Level "Debug"
                             }
                         }
                     }
@@ -5625,14 +5907,13 @@
                         [void]$paramContainer.Children.Add($label)
 
                         #get length of items to determine width
-                        $maxItemWidth = ($paramConfig.items | Measure-Object -Property Length -Maximum).Maximum
+                        $maxItemWidth = ($paramConfig.items | ForEach-Object { $_.Length } | Sort-Object -Descending)[0]
 
                         $control = New-Object System.Windows.Controls.ComboBox
                         $control.ItemsSource = $paramConfig.items
                         $control.SelectedItem = $paramConfig.defaultValue
                         $control.IsEnabled = -not $paramConfig.readOnly
                         $control.ToolTip = $paramConfig.description
-                        $control.Height = 36
                         $control.MaxWidth = $maxItemWidth + 100
                         $control.HorizontalAlignment = "Left"
                         $control.Padding = "8,6"
@@ -5697,9 +5978,9 @@
             $syncHash.ScubaRunCopyOutput_Button.Add_Click({
                 try {
                     [System.Windows.Clipboard]::SetText($syncHash.ScubaRunOutput_TextBox.Text)
-                    Update-ScubaRunStatus "Output copied to clipboard" "Info"
+                    Update-ScubaRunStatus -Message "Output copied to clipboard" -Level "Info"
                 } catch {
-                    Update-ScubaRunStatus "Failed to copy output to clipboard" "Error"
+                    Update-ScubaRunStatus -Message "Failed to copy output to clipboard" -Level "Error"
                 }
             })
 
@@ -5717,6 +5998,7 @@
             #>
             param(
                 [string]$Message,
+
                 [ValidateSet("Info", "Warning", "Error", "Success")]
                 [string]$Level = "Info"
             )
@@ -5749,7 +6031,9 @@
             $syncHash.ScubaRunOutput_TextBox.AppendText("$logEntry`r`n")
             $syncHash.ScubaRunOutput_TextBox.ScrollToEnd()
 
-            Write-DebugOutput -Message $Message -Source $MyInvocation.MyCommand.Name -Level $Level
+            # Map "Success" to "Info" for debug output since Write-DebugOutput doesn't accept "Success"
+            $debugLevel = if ($Level -eq "Success") { "Info" } else { $Level }
+            Write-DebugOutput -Message $Message -Source $MyInvocation.MyCommand.Name -Level $debugLevel
         }
 
         Function Test-ScubaRunReadiness {
@@ -5777,9 +6061,9 @@
             # Only update status if we're not preserving a completion message
             if (-not $syncHash.JustCompletedExecution) {
                 if ($hasValidConfig) {
-                    Update-ScubaRunStatus "Ready to run ScubaGear" "Success"
+                    Update-ScubaRunStatus -Message "Ready to run ScubaGear" -Level "Success"
                 } else {
-                    Update-ScubaRunStatus "Configuration incomplete - check Main tab" "Warning"
+                    Update-ScubaRunStatus -Message "Configuration incomplete - check Main tab" -Level "Warning"
                 }
             }
 
@@ -5795,14 +6079,14 @@
             try {
                 # Test readiness
                 if (-not (Test-ScubaRunReadiness)) {
-                    Update-ScubaRunStatus "Cannot run - configuration is incomplete" "Error"
+                    Update-ScubaRunStatus -Message "Cannot run - configuration is incomplete" -Level "Error"
                     return
                 }
 
                 # Generate temporary YAML file
                 $tempConfigPath = Export-TempYamlConfiguration
                 if (-not $tempConfigPath) {
-                    Update-ScubaRunStatus "Failed to generate temporary configuration" "Error"
+                    Update-ScubaRunStatus -Message "Failed to generate temporary configuration" -Level "Error"
                     return
                 }
 
@@ -5812,7 +6096,7 @@
                 $syncHash.ScubaRunStart_Button.Visibility = "Collapsed"
                 $syncHash.ScubaRunStop_Button.Visibility = "Visible"
 
-                Update-ScubaRunStatus "Starting ScubaGear execution..." "Info"
+                Update-ScubaRunStatus -Message "Starting ScubaGear execution..." -Level "Info"
 
                 # Build PowerShell command
                 $command = Build-ScubaGearCommand -ConfigFilePath $tempConfigPath
@@ -5829,10 +6113,9 @@
 
                 # Start background job
                 Start-ScubaGearJob -Command $command
-
             }
             catch {
-                Update-ScubaRunStatus "Error starting ScubaGear: $($_.Exception.Message)" "Error"
+                Update-ScubaRunStatus -Message "Error starting ScubaGear: $($_.Exception.Message)" -Level "Error"
                 # Reset UI state
                 Reset-ScubaRunUI
             }
@@ -5868,11 +6151,11 @@
                 # Write YAML content
                 [System.IO.File]::WriteAllText($tempFilePath, $yamlContent, [System.Text.Encoding]::UTF8)
 
-                Update-ScubaRunStatus "Configuration exported to: $tempFilePath" "Info"
+                Update-ScubaRunStatus -Message "Configuration exported to: $tempFilePath" -Level "Info"
                 return $tempFilePath
             }
             catch {
-                Update-ScubaRunStatus "Failed to export configuration: $($_.Exception.Message)" "Error"
+                Update-ScubaRunStatus -Message "Failed to export configuration: $($_.Exception.Message)" -Level "Error"
                 return $null
             }
         }
@@ -5980,12 +6263,12 @@
             }
 
             # Also update the UI to show what will be executed
-            Update-ScubaRunStatus "Prepared commands: $($cmdParts.Count) commands ready" "Info"
+            Update-ScubaRunStatus -Message "Prepared commands: $($cmdParts.Count) commands ready" -Level "Info"
 
             return $cmdParts
         }
 
-        
+
         Function Start-ScubaGearJob {
             <#
             .SYNOPSIS
@@ -6029,13 +6312,13 @@ Write-TimestampedOutput "Starting ScubaGear execution script..."
             foreach ($cmd in $Command) {
                 $scriptContent += @"
 
-Write-TimestampedOutput "Executing: $cmd" "Info"
+Write-TimestampedOutput "Executing: $cmd" -Level "Info"
 try {
     # Execute the command directly, allowing variable expansion
     $cmd
-    Write-TimestampedOutput "Command completed successfully" "Info"
+    Write-TimestampedOutput "Command completed successfully" -Level "Info"
 } catch {
-    Write-TimestampedOutput "ERROR executing command: `$(`$_.Exception.Message)" "Error"
+    Write-TimestampedOutput "ERROR executing command: `$(`$_.Exception.Message)" -Level "Error"
 }
 
 "@
@@ -6043,7 +6326,7 @@ try {
 
             $scriptContent += @"
 
-Write-TimestampedOutput "ScubaGear execution script completed." "Info"
+Write-TimestampedOutput "ScubaGear execution script completed." -Level "Info"
 "@
 
             # Write script to file
@@ -6073,7 +6356,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             # Start enhanced monitoring for real-time output
             Start-ScubaGearMonitoringRealTime
         }
-        
+
         <#
         Function Start-ScubaGearJob {
             <#
@@ -6088,17 +6371,17 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             # Create variables to pass to the job
             $configFilePath = $syncHash.TempConfigPath  # Store this when we create the temp config
             $organizationValue = $syncHash.Organization_TextBox.Text
-            
+
             # Get parameter values from UI
             $jobParameters = @{}
-            
+
             # Collect actual parameter values from UI controls
             if ($syncHash.UIConfigs.ScubaRunConfig.powershell.parameters) {
                 foreach ($paramName in $syncHash.UIConfigs.ScubaRunConfig.powershell.parameters.PSObject.Properties.Name) {
                     $paramConfig = $syncHash.UIConfigs.ScubaRunConfig.powershell.parameters.$paramName
-                    
+
                     if ($paramConfig.hidden -eq $true) { continue }
-                    
+
                     switch ($paramConfig.type) {
                         "string" {
                             $textBoxName = $paramName + "_TextBox"
@@ -6128,7 +6411,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             # Create a job with direct scriptblock execution
             $job = Start-Job -ScriptBlock {
                 param($ConfigPath, $Organization, $Parameters)
-                
+
                 # Function to write timestamped output
                 function Write-TimestampedOutput {
                     param([string]$Message, [string]$Type = 'Info')
@@ -6142,12 +6425,12 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                     Write-Host "[$timestamp] [$Type] $Message" -ForegroundColor $color
                 }
 
-                Write-TimestampedOutput "Starting ScubaGear execution..." "Info"
+                Write-TimestampedOutput "Starting ScubaGear execution..." -Level "Info"
 
                 try {
                     # Import ScubaGear module if not already loaded
                     if (-not (Get-Module -Name ScubaGear)) {
-                        Write-TimestampedOutput "Importing ScubaGear module..." "Info"
+                        Write-TimestampedOutput "Importing ScubaGear module..." -Level "Info"
                         Import-Module ScubaGear -Force
                     }
 
@@ -6163,16 +6446,16 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                         $scubaParams[$actualParamName] = $Parameters[$key]
                     }
 
-                    Write-TimestampedOutput "Executing: Invoke-SCuBA with $($scubaParams.Count) parameters" "Info"
-                    
+                    Write-TimestampedOutput "Executing: Invoke-SCuBA with $($scubaParams.Count) parameters" -Level "Info"
+
                     # Execute ScubaGear with parameter splatting
                     Invoke-SCuBA @scubaParams -Verbose
 
-                    Write-TimestampedOutput "ScubaGear execution completed successfully!" "Success"
+                    Write-TimestampedOutput "ScubaGear execution completed successfully!" -Level "Success"
                 }
                 catch {
-                    Write-TimestampedOutput "ERROR: $($_.Exception.Message)" "Error"
-                    Write-TimestampedOutput "Full error details: $($_.Exception)" "Error"
+                    Write-TimestampedOutput "ERROR: $($_.Exception.Message)" -Level "Error"
+                    Write-TimestampedOutput "Full error details: $($_.Exception)" -Level "Error"
                     throw
                 }
             } -ArgumentList $configFilePath, $organizationValue, $jobParameters
@@ -6204,8 +6487,8 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                 $reportName = "BaselineReports"
 
                 # Try to get values from UI controls if they exist and have actual values
-                $folderNameValue = $syncHash.OutFolderName_TextBox.Text
-                if (![string]::IsNullOrWhiteSpace($folderNameValue)) {
+                $ReportPathValue = $syncHash.OutFolderName_TextBox.Text
+                if (![string]::IsNullOrWhiteSpace($ReportPathValue)) {
                     $baseName = $syncHash.UIConfigs.localePlaceholder.OutFolderName_TextBox
                     Write-DebugOutput -Message "Folder placeholder value: '$baseName'" -Source $MyInvocation -Level "Debug"
                 }
@@ -6368,11 +6651,11 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                             if ($script:statusUpdateCounter -ge $script:statusUpdateInterval) {
                                 # Get next message in rotation
                                 #$currentMessage = $script:scubaRunningMessages[$script:currentMessageIndex]
-                                #Update-ScubaRunStatus $currentMessage "Info"
+                                #Update-ScubaRunStatus -Message $currentMessage -Level "Info"
 
                                 #get random message from list
                                 $randomMessage = Get-Random -InputObject $script:scubaRunningMessages
-                                Update-ScubaRunStatus $randomMessage "Info"
+                                Update-ScubaRunStatus -Message $randomMessage -Level "Info"
 
                                 # Move to next message (wrap around at end)
                                 $script:currentMessageIndex = ($script:currentMessageIndex + 1) % $script:scubaRunningMessages.Count
@@ -6401,23 +6684,23 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                                 $syncHash.ScubaRunOutput_TextBox.AppendText("`r`n🎉 EXECUTION COMPLETE! 🎉`r`n")
 
                                 if ($resultsInfo.Type -eq "HTML") {
-                                    $syncHash.ScubaRunOutput_TextBox.AppendText("📊 Results available at: $($resultsInfo.Path)`r`n")
-                                    $syncHash.ScubaRunOutput_TextBox.AppendText("💡 Tip: Copy this path and paste it into your browser to view the report`r`n")
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("Results available at: $($resultsInfo.Path)`r`n")
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("Tip: Copy this path and paste it into your browser to view the report`r`n")
                                     # Update status with the baseline conformance report path
-                                    Update-ScubaRunStatus "✅ ScubaGear Complete | 📊 Report: $($resultsInfo.Path)" "Success"
+                                    Update-ScubaRunStatus -Message "ScubaGear Complete |Report: $($resultsInfo.Path)" -Level "Success"
                                 } else {
-                                    $syncHash.ScubaRunOutput_TextBox.AppendText("📁 Results folder: $($resultsInfo.Path)`r`n")
+                                    $syncHash.ScubaRunOutput_TextBox.AppendText("Results folder: $($resultsInfo.Path)`r`n")
                                     # Update status with folder path
-                                    Update-ScubaRunStatus "✅ ScubaGear Complete | 📁 Folder: $($resultsInfo.Path)" "Success"
+                                    Update-ScubaRunStatus -Message "ScubaGear Complete | Folder: $($resultsInfo.Path)" -Level "Success"
                                 }
 
-                                $syncHash.ScubaRunOutput_TextBox.AppendText("📂 Full results folder: $($resultsInfo.Folder)`r`n")
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("Full results folder: $($resultsInfo.Folder)`r`n")
                             } else {
                                 # Enhanced fallback message with more specific guidance
-                                Update-ScubaRunStatus "✅ ScubaGear Complete | 📁 Check Documents folder for results" "Success"
+                                Update-ScubaRunStatus -Message "ScubaGear Complete | Check Documents folder for results" -Level "Success"
 
                                 $syncHash.ScubaRunOutput_TextBox.AppendText("`r`n🎉 EXECUTION COMPLETE! 🎉`r`n")
-                                $syncHash.ScubaRunOutput_TextBox.AppendText("📁 Check your Documents folder for M365BaselineConformance_* folders`r`n")
+                                $syncHash.ScubaRunOutput_TextBox.AppendText("Check your Documents folder for M365BaselineConformance_* folders`r`n")
                             }
 
                             Complete-ScubaGearExecution
@@ -6444,12 +6727,12 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                                 Write-DebugOutput -Message "Error extracting job error message: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
                             }
 
-                            Update-ScubaRunStatus "ScubaGear execution failed: $failureReason" "Error"
+                            Update-ScubaRunStatus -Message "ScubaGear execution failed: $failureReason" -Level "Error"
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
                         "Stopped" {
-                            Update-ScubaRunStatus "ScubaGear execution was stopped" "Warning"
+                            Update-ScubaRunStatus -Message "ScubaGear execution was stopped" -Level "Warning"
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
@@ -6488,7 +6771,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                 }
             }
 
-            Update-ScubaRunStatus "Execution stopped by user" "Warning"
+            Update-ScubaRunStatus -Message "Execution stopped by user" -Level "Warning"
             # Clear completion flag since this is a manual stop, not a completion
             $syncHash.JustCompletedExecution = $false
             Reset-ScubaRunUI
@@ -6511,6 +6794,13 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
 
             # Set flag to indicate we just completed execution (preserve status message)
             $syncHash.JustCompletedExecution = $true
+
+            # Ensure Results tab is enabled and refresh it
+            If($syncHash.UIConfigs.EnableResultReader) {
+                $syncHash.ResultsTab.IsEnabled = $true
+                Update-ResultsTab
+            }
+
             Reset-ScubaRunUI
         }
 
@@ -6531,24 +6821,24 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                     # Check job state
                     switch ($job.State) {
                         "Running" {
-                            Update-ScubaRunStatus "ScubaGear is running..." "Info"
+                            Update-ScubaRunStatus -Message "ScubaGear is running..." -Level "Info"
                             # You could parse output here if available
                         }
                         "Completed" {
                             $results = Receive-Job -Job $job
-                            Update-ScubaRunStatus "ScubaGear completed successfully" "Success"
+                            Update-ScubaRunStatus -Message "ScubaGear completed successfully" -Level "Success"
                             $syncHash.ScubaRunOutput_TextBox.AppendText("$results`r`n")
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
                         "Failed" {
                             $null = Receive-Job -Job $job -ErrorAction SilentlyContinue
-                            Update-ScubaRunStatus "ScubaGear failed: $error" "Error"
+                            Update-ScubaRunStatus -Message "ScubaGear failed: $error" -Level "Error"
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
                         "Stopped" {
-                            Update-ScubaRunStatus "ScubaGear execution was stopped" "Warning"
+                            Update-ScubaRunStatus -Message "ScubaGear execution was stopped" -Level "Warning"
                             Complete-ScubaGearExecution
                             $this.Stop()
                         }
@@ -6577,7 +6867,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                 $syncHash.ScubaRunExecutionTimer = $null
             }
 
-            Update-ScubaRunStatus "Execution stopped by user" "Warning"
+            Update-ScubaRunStatus -Message "Execution stopped by user" -Level "Warning"
             Reset-ScubaRunUI
         }
 
@@ -6601,11 +6891,738 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             }
         }
 
+
+        #===========================================================================
+        # Results Management Functions
+        #===========================================================================
+
+        Function Initialize-ResultsTab {
+            <#
+            .SYNOPSIS
+            Initializes the Results tab and scans for existing ScubaGear reports.
+            .DESCRIPTION
+            This function sets up the Results tab, scans the output directory for existing reports,
+            and creates tabs for each found report with formatted timestamps.
+            #>
+
+            Write-DebugOutput -Message "Initializing Results tab" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+            # Enable the Results tab
+            $syncHash.ResultsTab.IsEnabled = $true
+            $syncHash.ResultsTab.Header = $syncHash.UIConfigs.Reports.tabName
+
+
+            # Add event handlers for control buttons
+            $syncHash.ResultsRefresh_Button.Add_Click({
+                Update-ResultsTab
+            })
+
+            $syncHash.ResultsOpenFolder_Button.Add_Click({
+                Open-ResultsFolder
+            })
+
+            # Initial scan for existing results
+            Update-ResultsTab
+        }
+
+        Function Update-ResultsTab {
+            <#
+            .SYNOPSIS
+            Scans for ScubaGear result folders and creates/updates result tabs.
+            .DESCRIPTION
+            This function searches the output directory for M365BaselineConformance folders,
+            parses timestamps, and creates tabs with properly formatted dates.
+            Enhanced to search both configured OutPath and default Documents folder.
+            #>
+            $folderName = $syncHash.AdvancedSettingsData["OutFolderName"]
+            If(-Not $folderName) {
+                $folderName = $syncHash.UIConfigs.defaultAdvancedSettings.OutFolderName_TextBox
+            }
+
+            $jsonfilename = $syncHash.AdvancedSettingsData["OutJsonFileName"]
+            If(-Not $jsonfilename) {
+                $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox
+            }
+
+
+            Write-DebugOutput -Message "Refreshing results tabs" -Source $MyInvocation.MyCommand.Name -Level "Info"
+
+            # Get the output directory from settings
+            $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
+            $defaultPath = Join-Path $env:USERPROFILE "Documents"  # ScubaGear default location
+
+            # Create list of paths to search
+            $searchPaths = @()
+
+            # Add configured path if it exists and is valid
+            if (![string]::IsNullOrEmpty($configuredPath) -and $configuredPath -ne "." -and (Test-Path $configuredPath)) {
+                $searchPaths += $configuredPath
+                Write-DebugOutput -Message "Searching configured path: $configuredPath" -Source $MyInvocation.MyCommand.Name -Level "Info"
+            }
+
+            # Always add Documents folder as ScubaGear default
+            if ($searchPaths -notcontains $defaultPath) {
+                $searchPaths += $defaultPath
+                Write-DebugOutput -Message "Searching default Documents path: $defaultPath" -Source $MyInvocation.MyCommand.Name -Level "Info"
+            }
+
+            # Clear existing result tabs (keep ResultsEmptyTab)
+            $tabsToRemove = @()
+            foreach ($tab in $syncHash.ResultsTabControl.Items) {
+                if ($tab.Name -ne "ResultsEmptyTab") {
+                    $tabsToRemove += $tab
+                }
+            }
+            foreach ($tab in $tabsToRemove) {
+                $syncHash.ResultsTabControl.Items.Remove($tab)
+            }
+
+            # Find all M365BaselineConformance folders from all search paths
+            $syncHash.ResultsJsonData = @()
+            foreach ($searchPath in $searchPaths) {
+                if (Test-Path $searchPath) {
+
+                    $foldersInPath = Get-ChildItem -Path $searchPath -Directory -Filter "${folderName}_*" | ForEach-Object {
+                        $jsonFile = Get-ChildItem -Path $_.FullName -Filter "${jsonfilename}*.json" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+                        $TimeNameInfo = Get-ResultsReportTimeStamp -SearchPrefix $folderName -Name $_.BaseName
+                        [PSCustomObject]@{
+                            ReportName = $_.BaseName
+                            TabHeader = $TimeNameInfo.TabHeader
+                            ReportTimeStamp = $TimeNameInfo.TimeStamp
+                            RelativeTime = $TimeNameInfo.RelativeTime
+                            ReportPath = $_.FullName
+                            JsonResultsPath = $jsonFile
+                        }
+                    }
+                    $syncHash.ResultsJsonData += $foldersInPath
+                    Write-DebugOutput -Message "Found $($foldersInPath.Count) result folders in: $searchPath" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                }
+            }
+
+            if ($syncHash.ResultsJsonData -eq 0) {
+                # Show ResultsEmptyTab
+                $syncHash.ResultsEmptyTab.Visibility = "Visible"
+                $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
+                Update-ResultsCount 0
+            } else {
+                # Hide ResultsEmptyTab
+                $syncHash.ResultsEmptyTab.Visibility = "Collapsed"
+
+                # Create tabs for each result folder
+                foreach ($Report in $syncHash.ResultsJsonData) {
+                    New-ResultsReportTab -Report $Report
+                }
+
+                # Select the most recent tab (first in sorted list)
+                if ($syncHash.ResultsTabControl.Items.Count -gt 1) {
+                    $syncHash.ResultsTabControl.SelectedIndex = 1  # Skip ResultsEmptyTab at index 0
+                }
+
+                Update-ResultsCount $syncHash.ResultsJsonData.Count
+            }
+        }
+
+
+
+        Function New-ResultsReportTab {
+            <#
+            .SYNOPSIS
+            Creates a native WPF tab displaying ScubaGear results from ScubaResults JSON data.
+            #>
+            param(
+                [Parameter(Mandatory)]
+                [PSCustomObject]$Report
+            )
+
+            # Create new TabItem
+            $newTab = New-Object System.Windows.Controls.TabItem
+            $newTab.Header = $Report.TabHeader
+            $newTab.Name = "Result_$($Report.ReportName -Replace '\W+', '_')"
+
+            if (-not $Report.JsonResultsPath) {
+                # No ScubaResults file found
+                $noDataTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath
+                $newTab.Content = $noDataTab
+            } else {
+                try {
+                    $scubaData = Get-Content $Report.JsonResultsPath | ConvertFrom-Json
+                    $reportContent = New-ResultsContent -ScubaData $scubaData -ReportPath $Report.ReportPath -RelativeTime ($Report.RelativeTime + " (" + $Report.ReportTimeStamp +")")
+                    $newTab.Content = $reportContent
+                }
+                catch {
+                    Write-DebugOutput -Message "Error loading ScubaResults: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                    $errorTab = Create-ErrorTab -ErrorMessage $_.Exception.Message
+                    $newTab.Content = $errorTab
+                }
+            }
+
+            # Add to main tab control
+            $syncHash.ResultsTabControl.Items.Add($newTab)
+            Write-DebugOutput -Message "Added native result tab: $($Report.ReportTimeStamp.TabHeader)" -Source $MyInvocation.MyCommand.Name -Level "Info"
+        }
+
+
+        Function New-ResultsContent {
+            <#
+            .SYNOPSIS
+            Creates the content for a results tab using the provided ScubaData.
+            #>
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ReportPath")]
+            param(
+                [PSCustomObject[]]$ScubaData,
+                [string]$ReportPath,
+                [string]$RelativeTime
+            )
+
+            # Create the XAML template for the entire report content
+            $xamlTemplate = @"
+<ScrollViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              VerticalScrollBarVisibility="Auto"
+              HorizontalScrollBarVisibility="Auto">
+    <StackPanel Margin="8">
+
+        <!-- Tenant Header Card -->
+        <Border Style="{DynamicResource Card}" Margin="0,0,0,8">
+            <Grid Margin="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left side - Tenant info -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="📊 ScubaGear Assessment Report" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+
+                    <!-- Tenant Info Table -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="160"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Tenant Display Name" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Name="TenantDisplayName" Text="{DISPLAY_NAME}" Margin="6,2,0,2"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Tenant Domain Name" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Name="TenantDomainName" Text="{DOMAIN_NAME}" Margin="6,2,0,2"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Tenant ID" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Name="TenantId" Text="{TENANT_ID}" Margin="6,2,0,2"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Report Date" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Name="ReportDate" Text="{REPORT_DATE}" Margin="6,2,0,2"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Scuba Version" FontWeight="SemiBold" Margin="0,2"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Name="ScubaVersion" Text="{SCUBA_VERSION}" Margin="6,2,0,2"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Right side - Action buttons and version info -->
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button Name="OpenHtmlBtn" Style="{DynamicResource PrimaryButton}" Content="📄 Open Full HTML Report"
+                            Margin="0,0,0,6" Width="190" Height="32"/>
+                    <Button Name="OpenFolderBtn" Style="{DynamicResource SecondaryButton}" Content="📁 Open Report Folder"
+                            Width="190" Margin="0,0,0,8" Height="32"/>
+
+                    <!-- ScubaGear Version and UUID Info -->
+
+                        <StackPanel VerticalAlignment="bottom">
+                            <TextBlock Text="Report UUID:" FontSize="10" Foreground="LightGray"/>
+                            <TextBlock Text="{REPORT_UUID}" FontSize="10" FontFamily="Consolas" Margin="0,0,0,0" Foreground="Gray"/>
+                        </StackPanel>
+
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Report Tabs -->
+        <TabControl Name="ReportTabControl" Margin="0,8,0,0">
+
+            <!-- Summary Tab -->
+            <TabItem Header="📊 Baseline Conformance Reports">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="8">
+                        <ItemsControl Name="SummaryItemsControl">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{DynamicResource Card}" Margin="0,0,0,4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="280"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Product Name Column -->
+                                            <TextBlock Grid.Column="0" FontSize="12" Text="{Binding Product}" FontWeight="SemiBold"
+                                                    Foreground="Blue" TextDecorations="Underline"
+                                                    VerticalAlignment="Center"/>
+
+                                            <!-- Status Badges Column -->
+                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding StatusItems}"
+                                                        VerticalAlignment="Center">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="{Binding Color}" CornerRadius="8" Padding="6,2" Margin="0,0,4,2">
+                                                            <TextBlock Text="{Binding Text}" Foreground="{Binding TextColor}"
+                                                                    FontSize="12" FontWeight="SemiBold"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+
+            </TabItem>
+
+            <!-- Product Tabs will be added dynamically -->
+            {PRODUCT_TABS}
+
+        </TabControl>
+    </StackPanel>
+</ScrollViewer>
+"@
+
+            # Process the data and replace placeholders
+            $processedXaml = $xamlTemplate
+
+            # Replace tenant information placeholders
+            $displayName = [string]$ScubaData.MetaData.DisplayName
+            $domainName = [string]$ScubaData.MetaData.DomainName
+            $tenantId = [string]$ScubaData.MetaData.TenantId
+
+            # Extract ScubaGear version and UUID
+            $scubaVersion = if ($ScubaData.MetaData.ToolVersion) { [string]$ScubaData.MetaData.ToolVersion } else { "Unknown" }
+            $reportUuid = if ($ScubaData.MetaData.ReportUUID) { [string]$ScubaData.MetaData.ReportUUID } else { "Unknown" }
+
+            $processedXaml = $processedXaml -replace '{DISPLAY_NAME}', $displayName
+            $processedXaml = $processedXaml -replace '{DOMAIN_NAME}', $domainName
+            $processedXaml = $processedXaml -replace '{TENANT_ID}', $tenantId
+            $processedXaml = $processedXaml -replace '{REPORT_DATE}', $RelativeTime
+            $processedXaml = $processedXaml -replace '{SCUBA_VERSION}', $scubaVersion
+            $processedXaml = $processedXaml -replace '{REPORT_UUID}', $reportUuid
+
+            # Generate product tabs XAML
+            $productTabsXaml = ""
+            if ($ScubaData.Results) {
+                foreach ($productName in ($ScubaData.Results | Get-Member -MemberType NoteProperty).Name) {
+                    $displayName = switch ($productName) {
+                        "AAD" { "Azure Active Directory" }
+                        "Defender" { "Microsoft 365 Defender" }
+                        "EXO" { "Exchange Online" }
+                        "PowerPlatform" { "Microsoft Power Platform" }
+                        "SharePoint" { "SharePoint Online" }
+                        "Teams" { "Microsoft Teams" }
+                        default { $productName }
+                    }
+
+                    $productTabsXaml += @"
+            <TabItem Header="$displayName">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="${productName}ProductStack" Margin="16">
+                        <!-- Product content will be populated dynamically -->
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+"@
+                }
+            }
+
+            # Generate product tabs XAML - DISABLED FOR SUMMARY-ONLY VIEW
+            $productTabsXaml = ""
+            $processedXaml = $processedXaml -replace '{PRODUCT_TABS}', $productTabsXaml
+
+            # Parse the XAML into a WPF control
+            try {
+                $reportControl = [Windows.Markup.XamlReader]::Parse($processedXaml)
+                Write-DebugOutput -Message "Parsed Results XAML into WPF control for tab: $($ReportTimeStamp.TabHeader)" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+
+
+                # Set up button event handlers
+                $openHtmlBtn = $reportControl.FindName("OpenHtmlBtn")
+                $openFolderBtn = $reportControl.FindName("OpenFolderBtn")
+
+                if ($openHtmlBtn) {
+                    $openHtmlBtn.Add_Click({
+                        $htmlFile = Get-ChildItem -Path $ReportPath -Name "*.html" | Select-Object -First 1
+                        if ($htmlFile) {
+                            $htmlPath = Join-Path $ReportPath $htmlFile
+                            Start-Process $htmlPath
+                        } else {
+                            [System.Windows.MessageBox]::Show("HTML report not found in folder.", "Report Not Found", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        }
+                    }.GetNewClosure())
+                }
+
+                if ($openFolderBtn) {
+                    $openFolderBtn.Add_Click({
+                        Start-Process "explorer.exe" -ArgumentList $ReportPath
+                    }.GetNewClosure())
+                }
+
+
+                # Populate summary data
+                $summaryItems = @()
+                foreach ($productAbbr in ($ScubaData.Summary | Get-Member -MemberType NoteProperty).Name) {
+
+                    Write-DebugOutput -Message "Processing summary data for product: $productAbbr" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                    $productData = $ScubaData.Summary.$productAbbr
+
+                    $displayName = switch ($productAbbr) {
+                        "AAD" { "Azure Active Directory" }
+                        "Defender" { "Microsoft 365 Defender" }
+                        "EXO" { "Exchange Online" }
+                        "PowerPlatform" { "Microsoft Power Platform" }
+                        "SharePoint" { "SharePoint Online" }
+                        "Teams" { "Microsoft Teams" }
+                        default { $productAbbr }
+                    }
+
+                    # Build styled status badges
+                    $statusItems = @()
+
+                    $passes = if ($productData.Passes -is [array]) { $productData.Passes -join ", " } else { [string]$productData.Passes }
+                    $warnings = if ($productData.Warnings -is [array]) { $productData.Warnings -join ", " } else { [string]$productData.Warnings }
+                    $failures = if ($productData.Failures -is [array]) { $productData.Failures -join ", " } else { [string]$productData.Failures }
+                    $manual = if ($productData.Manual -is [array]) { $productData.Manual -join ", " } else { [string]$productData.Manual }
+                    $errors = if ($productData.Errors -is [array]) { $productData.Errors -join ", " } else { [string]$productData.Errors }
+
+                    # Add status badges with colors
+                    if ([int]$passes -gt 0) {
+                        $statusItems += [PSCustomObject]@{
+                            Text = "✓ $passes pass$(if([int]$passes -gt 1){'es'})"
+                            Color = "#28a745"  # Green
+                            TextColor = "White"
+                        }
+                    }
+                    if ([int]$warnings -gt 0) {
+                        $statusItems += [PSCustomObject]@{
+                            Text = "⚠ $warnings warning$(if([int]$warnings -gt 1){'s'})"
+                            Color = "#ffc107"  # Yellow/Orange
+                            TextColor = "#212529"  # Dark text for better contrast
+                        }
+                    }
+                    if ([int]$failures -gt 0) {
+                        $statusItems += [PSCustomObject]@{
+                            Text = "✗ $failures failure$(if([int]$failures -gt 1){'s'})"
+                            Color = "#dc3545"  # Red
+                            TextColor = "White"
+                        }
+                    }
+                    if ([int]$manual -gt 0) {
+                        $statusItems += [PSCustomObject]@{
+                            Text = "👤 $manual manual check$(if([int]$manual -gt 1){'s'})"
+                            Color = "#6f42c1"  # Purple
+                            TextColor = "White"
+                        }
+                    }
+                    if ([int]$errors -gt 0) {
+                        $statusItems += [PSCustomObject]@{
+                            Text = "⚡ $errors error$(if([int]$errors -gt 1){'s'})"
+                            Color = "#fd7e14"  # Orange
+                            TextColor = "White"
+                        }
+                    }
+
+                    $summaryItems += [PSCustomObject]@{
+                        Product = $displayName
+                        StatusItems = $statusItems
+                    }
+                }
+
+                $summaryItemsControl = $reportControl.FindName("SummaryItemsControl")
+                if ($summaryItemsControl) {
+                    $summaryItemsControl.ItemsSource = $summaryItems
+                }
+
+                <#
+                # Populate product tabs with group data
+                if ($ScubaData.Results) {
+                    foreach ($productName in ($ScubaData.Results | Get-Member -MemberType NoteProperty).Name) {
+                        $productData = $ScubaData.Results.$productName
+                        $productStack = $reportControl.FindName("${productName}ProductStack")
+
+                        if ($productStack) {
+                            foreach ($group in $productData) {
+                                try {
+                                    $groupExpander = New-ResultsGroupExpanderXaml -GroupData $group
+                                    Write-DebugOutput -Message "Created group expander for product: $groupExpander " -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                                    if ($groupExpander) {
+                                        $productStack.Children.Add($groupExpander)
+                                        Write-DebugOutput -Message "Added group expander to product stack: $productName" -Source $MyInvocation.MyCommand.Name -Level "Debug"
+                                    } else {
+                                        Write-DebugOutput -Message "Group expander was null for product: $productName" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                                    }
+                                } catch {
+                                    Write-DebugOutput -Message "Error adding group expander to product stack $productName`: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                                }
+                            }
+                        } else {
+                            Write-DebugOutput -Message "Product stack not found for: ${productName}ProductStack" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                        }
+                    }
+                }
+                #>
+
+
+                return $reportControl
+
+            } catch {
+                Write-DebugOutput -Message "Error creating XAML report: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                return Create-ErrorTab -ErrorMessage "Failed to create report view: $($_.Exception.Message)"
+            }
+        }
+
+        Function New-ResultsGroupExpanderXaml {
+            param($GroupData)
+
+            try {
+                # Simple validation
+                if (-not $GroupData) {
+                    return $null
+                }
+
+                # Create XAML for group expander
+                $expanderXaml = @"
+<Expander xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          Header="🔒 {GROUP_HEADER}"
+          Margin="0,0,0,8"
+          IsExpanded="False">
+    <StackPanel Margin="16,8,8,8">
+        {CONTROLS_CONTENT}
+    </StackPanel>
+</Expander>
+"@
+
+                # Build header - simple string conversion with fallbacks
+                $groupNumber = if ($GroupData.GroupNumber) { [string]$GroupData.GroupNumber } else { "" }
+                $groupName = if ($GroupData.GroupName) { [string]$GroupData.GroupName } else { "Unknown Group" }
+
+                $header = if ($groupNumber) { "$groupNumber. $groupName" } else { $groupName }
+
+                # Escape special XML characters in header
+                $safeHeader = $header -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+
+                # Build controls content
+                $controlsContent = ""
+                if ($GroupData.Controls) {
+                    foreach ($control in $GroupData.Controls) {
+                        try {
+                            # Safe string extraction with simple fallbacks
+                            $controlId = if ($control."Control ID") { [string]$control."Control ID" } else { "Unknown" }
+                            $result = if ($control.Result) { [string]$control.Result } else { "N/A" }
+                            $criticality = if ($control.Criticality) { [string]$control.Criticality } else { "" }
+                            $requirement = if ($control.Requirement) { [string]$control.Requirement } else { "" }
+
+                            # Truncate requirement
+                            $truncatedRequirement = if ($requirement.Length -gt 100) {
+                                $requirement.Substring(0, 100) + "..."
+                            } else {
+                                $requirement
+                            }
+
+                            # Escape special XML characters in all text
+                            $safeControlId = $controlId -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                            $safeResult = $result -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                            $safeCriticality = $criticality -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                            $safeRequirement = $truncatedRequirement -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+
+                            # Color for result
+                            $resultColor = switch ($result) {
+                                "Pass" { "Green" }
+                                "Fail" { "Red" }
+                                "Warning" { "Orange" }
+                                "Error" { "Purple" }
+                                "N/A" { "Gray" }
+                                "Manual" { "Blue" }
+                                default { "Black" }
+                            }
+
+                            $controlsContent += @"
+        <Border BorderBrush="LightGray" BorderThickness="1" Margin="0,2" Padding="8" CornerRadius="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="$safeControlId" FontWeight="SemiBold" VerticalAlignment="Top"/>
+                <TextBlock Grid.Column="1" Text="$safeResult" Foreground="$resultColor" VerticalAlignment="Top"/>
+                <TextBlock Grid.Column="2" Text="$safeCriticality" VerticalAlignment="Top"/>
+                <TextBlock Grid.Column="3" Text="$safeRequirement" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            </Grid>
+        </Border>
+"@
+                        } catch {
+                            Write-DebugOutput -Message "Error processing control: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Warning"
+                            # Skip this control and continue
+                            continue
+                        }
+                    }
+                }
+
+                # If no controls were processed successfully, add a placeholder
+                if ([string]::IsNullOrWhiteSpace($controlsContent)) {
+                    $controlsContent = @"
+        <TextBlock Text="No control data available" FontStyle="Italic" Foreground="Gray" Margin="8"/>
+"@
+                }
+
+                # Replace placeholders
+                $processedXaml = $expanderXaml -replace '\{GROUP_HEADER\}', $safeHeader
+                $processedXaml = $processedXaml -replace '\{CONTROLS_CONTENT\}', $controlsContent
+
+                # Parse and return
+                Write-DebugOutput -Message "Creating group expander for: $safeHeader" -Source $MyInvocation.MyCommand.Name -Level "Info"
+                return [Windows.Markup.XamlReader]::Parse($processedXaml)
+
+            } catch {
+                Write-DebugOutput -Message "Error creating group expander: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+
+                # Return simple fallback
+                $fallback = New-Object System.Windows.Controls.TextBlock
+                $fallback.Text = "Error displaying group data"
+                $fallback.Foreground = [System.Windows.Media.Brushes]::Red
+                return $fallback
+            }
+        }
+
+        Function New-ResultsNoDataTab {
+            <#
+            .SYNOPSIS
+            Creates a "No Data" tab for the results view.
+            #>
+            param(
+                [string]$ReportPath
+            )
+
+            $noDataStack = New-Object System.Windows.Controls.StackPanel
+            $noDataStack.HorizontalAlignment = "Center"
+            $noDataStack.VerticalAlignment = "Center"
+
+            $noDataText = New-Object System.Windows.Controls.TextBlock
+            $noDataText.Text = ("No ScubaResults data found in: {0}`n`nThis report folder may be missing the ScubaResults JSON file." -f $ReportPath)
+            $noDataText.FontSize = 16
+            $noDataText.TextAlignment = "Center"
+            $noDataText.Foreground = $syncHash.Window.FindResource("MutedTextBrush")
+            $noDataStack.Children.Add($noDataText)
+
+            return $noDataStack
+        }
+
+        Function Update-ResultsCount {
+            <#
+            .SYNOPSIS
+            Updates the results count badge in the Results tab header.
+            #>
+            param([int]$Count)
+
+            $syncHash.ResultsCountText.Text = if ($Count -eq 0) { "No Reports" } elseif ($Count -eq 1) { "1 Report" } else { "$Count Reports" }
+        }
+
+        Function Get-ResultsReportTimeStamp {
+            param(
+                [Parameter(Mandatory)]
+                [string]$Name,
+
+                [string]$SearchPrefix
+            )
+
+            if ($Name -match "${SearchPrefix}_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})") {
+                $year = $matches[1]; $month = $matches[2]; $day = $matches[3]
+                $hour = $matches[4]; $minute = $matches[5]; $second = $matches[6]
+                $timestamp = Get-Date -Year $year -Month $month -Day $day -Hour $hour -Minute $minute -Second $second
+                $tabHeader = "$year-$month-$day ($hour`:$minute`:$second)"
+                $relativeTime = Get-ResultsRelativeTime $timestamp  # ← Fixed function name
+                return [PSCustomObject]@{
+                    TabHeader = $tabHeader
+                    TimeStamp = $timestamp
+                    RelativeTime = $relativeTime
+                }
+            } else {
+                return [PSCustomObject]@{
+                    TabHeader = $Name
+                    TimeStamp = "Unknown time"
+                    RelativeTime  = "Unknown time"
+                }
+            }
+        }
+
+        Function Get-ResultsRelativeTime {
+            <#
+            .SYNOPSIS
+            Returns a human-readable relative time string.
+            #>
+            param([DateTime]$DateTime)
+
+            $now = Get-Date
+            $timespan = $now - $DateTime
+
+            if ($timespan.TotalDays -lt 1) {
+                if ($timespan.TotalHours -lt 1) {
+                    if ($timespan.TotalMinutes -lt 1) {
+                        return "Just now"
+                    } else {
+                        return "$([math]::Floor($timespan.TotalMinutes)) minutes ago"
+                    }
+                } else {
+                    return "$([math]::Floor($timespan.TotalHours)) hours ago"
+                }
+            } elseif ($timespan.TotalDays -lt 7) {
+                return "$([math]::Floor($timespan.TotalDays)) days ago"
+            } else {
+                return $DateTime.ToString("MMM dd, yyyy")
+            }
+        }
+
+        Function Open-ResultsFolder {
+            <#
+            .SYNOPSIS
+            Opens the main results folder in Windows Explorer.
+            #>
+
+            $outputPath = $syncHash.GeneralSettingsData["OutPath"]
+            if ([string]::IsNullOrEmpty($outputPath)) {
+                $outputPath = Join-Path $env:USERPROFILE "ScubaResults"
+            }
+
+            if (Test-Path $outputPath) {
+                Start-Process "explorer.exe" -ArgumentList $outputPath
+            } else {
+                [System.Windows.MessageBox]::Show(
+                    "Results folder not found: $outputPath",
+                    "Folder Not Found",
+                    [System.Windows.MessageBoxButton]::OK,
+                    [System.Windows.MessageBoxImage]::Warning
+                )
+            }
+        }
+
         #===========================================================================
         #
         # LOAD UI
         #
         #===========================================================================
+
         # Set window icon from DrawingImage resource
         try {
             $iconDrawing = $syncHash.Window.FindResource("ScubaGearIconImage")
@@ -6632,15 +7649,13 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
         #update version
         $syncHash.Version_TextBlock.Text = "v$($syncHash.UIConfigs.Version)"
 
-        # Show/Hide Debug tab based on DebugUI parameter
-        if ($syncHash.UIConfigs.DebugMode) {
-            $syncHash.DebugTab.Visibility = "Visible"
-            $syncHash.DebugTabInfo_TextBlock.Text = "Debug output is enabled. Real-time debugging information will appear below."
-            Write-DebugOutput -Message "Debug is enabled in mode: $($syncHash.UIConfigs.DebugMode)" -Source "UI Launch" -Level "Info"
-        } else {
-            $syncHash.DebugTab.Visibility = "Collapsed"
+        # Initialize debug toggle button
+        If($syncHash.UIConfigs.DebugMode){
+            $syncHash.DebugButton.Visibility = "Visible"
+            Initialize-DebugButton
+        }Else{
+            $syncHash.DebugButton.Visibility = "Collapsed"
         }
-
 
         #override locale context
         foreach ($localeElement in $syncHash.UIConfigs.localeContext.PSObject.Properties) {
@@ -6922,11 +7937,21 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
         Write-DebugOutput -Message "Initializing Global Settings tab" -Source "UI Launch" -Level "Info"
         New-GlobalSettingsControls
 
-        If($syncHash.UIConfigs.EnableScubaRun){
+        If($syncHash.UIConfigs.EnableScubaRun)
+        {
             $syncHash.ScubaRunTab.Visibility = "Visible"
             # Initialize ScubaRun tab
             Write-DebugOutput -Message "Initializing ScubaRun tab" -Source "UI Launch" -Level "Info"
             Initialize-ScubaRunTab
+
+            If($syncHash.UIConfigs.EnableResultReader) {
+                # Initialize Results tab
+                Write-DebugOutput -Message "Initializing Results tab" -Source "UI Launch" -Level "Info"
+                $syncHash.ResultsTab.Visibility = "Visible"
+                Initialize-ResultsTab
+            }Else{
+                $syncHash.ResultsTab.Visibility = "Collapsed"
+            }
         }else {
             $syncHash.ScubaRunTab.Visibility = "Collapsed"
         }
@@ -6983,6 +8008,17 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                     $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
                 }
 
+                #check OrgName
+                $orgNameValid = Confirm-RequiredField -UIElement $syncHash.OrgName_TextBox `
+                                        -RegexPattern $syncHash.UIConfigs.valueValidations.orgName.pattern `
+                                        -PlaceholderText $syncHash.UIConfigs.localePlaceholder.OrgName_TextBox
+
+                if (-not $orgNameValid) {
+                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrgNameValidation
+                    #navigate to General tab
+                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
+                }
+
                 # Products validation (at least one product must be selected)
                 if (-not $syncHash.GeneralSettingsData.ProductNames -or $syncHash.GeneralSettingsData.ProductNames.Count -eq 0) {
                     $errorMessages += $syncHash.UIConfigs.localeErrorMessages.ProductSelection
@@ -6997,8 +8033,9 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                     $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
                 }
 
-                # Advanced Tab Validations (only if sections are toggled on)
 
+
+                # Advanced Tab Validations (only if sections are toggled on)
                 # Application Section Validations
                 if ($syncHash.ApplicationSection_Toggle.IsChecked) {
 
@@ -7043,6 +8080,9 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
                 if ($errorMessages.Count -gt 0) {
                     $syncHash.PreviewTab.IsEnabled = $false
                     #$errorMessages += $syncHash.UIConfigs.localeErrorMessages.PreviewValidation + "`n`n" + ($errorMessages -join "`n")
+                    #make message more user-friendly add a - and a new line to each error after first
+                    $errorMessages = $errorMessages | ForEach-Object { "`n - $_" }
+                    $errorMessages = "The following validation errors occurred: $($errorMessages -join '')"
                     [System.Windows.MessageBox]::Show($errorMessages, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                 }else {
                     $syncHash.PreviewTab.IsEnabled = $true
@@ -7125,6 +8165,7 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             }
         })
 
+        <#
         $syncHash.DownloadDebugLogButton.Add_Click({
             if ($syncHash.Debug_TextBox.Text -and $syncHash.Debug_TextBox.Text.Count -gt 0) {
                 $saveDialog = New-Object Microsoft.Win32.SaveFileDialog
@@ -7139,6 +8180,47 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             }
 
         })
+
+        # Copy Debug Logs Button
+        $syncHash.CopyDebugLogsButton.Add_Click({
+            try {
+                $syncHash.Window.Dispatcher.Invoke([Action]{
+                    if (![string]::IsNullOrWhiteSpace($syncHash.Debug_TextBox.Text)) {
+                        [System.Windows.Clipboard]::SetText($syncHash.Debug_TextBox.Text)
+                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.DebugLogsCopied, "Copy Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    } else {
+                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.DebugLogsNoEntries, "Nothing to Copy", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    }
+                })
+            }
+            catch {
+                # Even this must go in Dispatcher
+                $syncHash.Window.Dispatcher.Invoke([Action]{
+                    [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.DebugLogsError -f $_.Exception.Message), "Copy Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                })
+            }
+        })
+        #>
+        # Add click event handler
+        $syncHash.DebugButton.Add_Click({
+            try {
+                if ($syncHash.DebugWindow -and $syncHash.DebugWindow.IsVisible -and -not $syncHash.DebugWindow.IsClosed) {
+                    Hide-DebugWindow
+                } else {
+                    Show-DebugWindow
+                }
+            } catch {
+                Write-DebugOutput -Message "Error toggling debug window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand.Name -Level "Error"
+                # Clear invalid window reference
+                $syncHash.DebugWindow = $null
+                $syncHash.DebugOutputTextBox = $null
+                $syncHash.AutoScrollCheckBox = $null
+                $syncHash.StatusTextBlock = $null
+                # Try to show window again
+                Show-DebugWindow
+            }
+        })
+
 
         # Browse Output Path Button
         $syncHash.BrowseOutPathButton.Add_Click({
@@ -7252,25 +8334,6 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
             }
         })
 
-        # Copy Debug Logs Button
-        $syncHash.CopyDebugLogsButton.Add_Click({
-            try {
-                $syncHash.Window.Dispatcher.Invoke([Action]{
-                    if (![string]::IsNullOrWhiteSpace($syncHash.Debug_TextBox.Text)) {
-                        [System.Windows.Clipboard]::SetText($syncHash.Debug_TextBox.Text)
-                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.DebugLogsCopied, "Copy Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
-                    } else {
-                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.DebugLogsNoEntries, "Nothing to Copy", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
-                    }
-                })
-            }
-            catch {
-                # Even this must go in Dispatcher
-                $syncHash.Window.Dispatcher.Invoke([Action]{
-                    [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.DebugLogsError -f $_.Exception.Message), "Copy Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
-                })
-            }
-        })
 
         If($syncHash.UIConfigs.EnableSearchAndFilter){
 
@@ -7313,7 +8376,27 @@ Write-TimestampedOutput "ScubaGear execution script completed." "Info"
         # Closing event (calls Close-UIMainWindow only)
         # Events, UI setup here...
         $syncHash.Window.Add_Closing({
-             $syncHash.isClosing = $true
+            # Show simple confirmation dialog
+            $result = [System.Windows.MessageBox]::Show(
+                $syncHash.UIConfigs.localePopupMessages.CloseConfirmation,
+                "Confirm Close",
+                [System.Windows.MessageBoxButton]::YesNo,
+                [System.Windows.MessageBoxImage]::Question
+            )
+
+            # If user clicked "No", cancel the close operation
+            if ($result -eq [System.Windows.MessageBoxResult]::No) {
+                $args[1].Cancel = $true
+                return
+            }
+
+            # Close debug window if open
+            if ($syncHash.DebugWindow) {
+                $syncHash.DebugWindow.Close()
+            }
+
+            # If user clicked "Yes", proceed with normal closing operations
+            $syncHash.isClosing = $true
 
             # Disconnect safely
             if (Get-MgContext) {

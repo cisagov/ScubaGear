@@ -22,34 +22,6 @@
     $exclusionMappings = @{}
 
     # Define the mapping patterns to look for in Rego files
-    <#
-    $patterns = @{
-        # AAD Patterns
-        'UserExclusionsFullyExempt.*["\']([^"\']+)["\']' = 'capolicy'
-        'GroupExclusionsFullyExempt.*["\']([^"\']+)["\']' = 'capolicy'
-        'PrivilegedRoleExclusions.*["\']([^"\']+)["\']' = 'role'
-
-        # Defender Patterns
-        'SensitiveAccountsConfig.*["\']([^"\']+)["\']' = 'sensitiveAccounts'
-        'SensitiveAccountsSetting.*["\']([^"\']+)["\']' = 'sensitiveAccounts'
-        'ImpersonationProtectionConfig.*["\']([^"\']+)["\'].*["\']AgencyDomains["\']' = 'agencyDomains'
-        'ImpersonationProtectionConfig.*["\']([^"\']+)["\'].*["\']PartnerDomains["\']' = 'partnerDomains'
-        'ImpersonationProtectionConfig.*["\']([^"\']+)["\'].*["\']SensitiveUsers["\']' = 'sensitiveUsers'
-        'ImpersonationProtectionConfig.*["\']([^"\']+)["\']' = 'sensitiveUsers'  # Default for impersonation
-
-        # EXO Patterns
-        'input\.scuba_config\.Exo\[["\']([^"\']+)["\']\]\.AllowedForwardingDomains' = 'forwardingDomains'
-
-        # General scuba_config patterns
-        'input\.scuba_config\.Aad\[["\']([^"\']+)["\']\]\.CapExclusions' = 'capolicy'
-        'input\.scuba_config\.Aad\[["\']([^"\']+)["\']\]\.RoleExclusions' = 'role'
-        'input\.scuba_config\.Defender\[["\']([^"\']+)["\']\]\.SensitiveAccounts' = 'sensitiveAccounts'
-        'input\.scuba_config\.Defender\[["\']([^"\']+)["\']\]\.SensitiveUsers' = 'sensitiveUsers'
-        'input\.scuba_config\.Defender\[["\']([^"\']+)["\']\]\.PartnerDomains' = 'partnerDomains'
-        'input\.scuba_config\.Defender\[["\']([^"\']+)["\']\]\.AgencyDomains' = 'agencyDomains'
-        'input\.scuba_config\.Exo\[["\']([^"\']+)["\']\]\.AllowedForwardingDomains' = 'forwardingDomains'
-    }#>
-
     $patterns = @{
         'UserExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'capolicy'
         'GroupExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'capolicy'
@@ -191,7 +163,7 @@ function Update-ScubaConfigBaselineWithRego {
     An array of additional fields to include in the policy objects.
 
     .EXAMPLE
-    Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaConfig_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory ".\Rego"
+    Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory ".\Rego"
     #>
     param(
         [Parameter(Mandatory=$true)]
@@ -601,17 +573,21 @@ function Get-ScubaPolicyContent {
     return $result
 }
 <#
+#import module
+[string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm1')
+
 # Get the REGO mappings
 $regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
 
 # Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaConfig_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
 
 # Filter specific products
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaConfig_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 
 # Update configuration with additional fields
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaConfig_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
 #>
 # export
 #Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigRegoExclusionMappings, Update-ScubaConfigBaselineWithRego

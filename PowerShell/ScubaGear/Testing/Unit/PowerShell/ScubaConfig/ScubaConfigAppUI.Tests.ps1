@@ -45,6 +45,7 @@ InModuleScope ScubaConfigAppUI {
                     'advancedSections',
                     'globalSettings',
                     'ScubaRunConfig',
+                    'Reports'
                     'products',
                     'M365Environment',
                     'baselineControls',
