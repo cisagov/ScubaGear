@@ -8,6 +8,8 @@ const getJsonData = (id) => {
     }
 }
 
+const normalizeToArray = (val) => Array.isArray(val) ? val : (val ? [val] : []);
+
 /**
  * Checks if Dark Mode session storage variable exists. Creates one if it does not exist.
  * Sets the report's default Dark Mode state using the $DarkMode (JavaScript darkMode) PowerShell variable.
