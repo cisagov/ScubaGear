@@ -1,0 +1,2089 @@
+{
+  "baselines": {
+    "aad": [
+      {
+        "id": "MS.AAD.1.1v1",
+        "name": "Legacy authentication SHALL be blocked.",
+        "rationale": "The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.\n\n2. Create a Conditional Access policy to block legacy authentication\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)",
+          "- [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)",
+          "- [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)",
+          "- [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)",
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ],
+        "resources": [
+          "- [Block legacy authentication with Conditional Access](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-policy-block-legacy)",
+          "- [Five steps to securing your identity infrastructure](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity)"
+        ]
+      },
+      {
+        "id": "MS.AAD.2.1v1",
+        "name": "Users detected as high risk SHALL be blocked.",
+        "rationale": "Blocking high-risk users may prevent compromised accounts from accessing the tenant.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Create a conditional access policy blocking users categorized as high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > <b>High</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.2.2v1",
+        "name": "A notification SHOULD be sent to the administrator when high-risk users are detected.",
+        "rationale": "Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.2.3v1",
+        "name": "Sign-ins detected as high risk SHALL be blocked.",
+        "rationale": "This prevents compromised accounts from accessing the tenant.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Create a Conditional Access policy blocking sign-ins determined high risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy as per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Sign-in risk > <b>High</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ],
+        "resources": [
+          "- [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)",
+          "- [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)",
+          "- [Self-remediation experience with Microsoft Entra ID Protection and Conditional Access](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.1v1",
+        "name": "Phishing-resistant MFA SHALL be enforced for all users.",
+        "rationale": "Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Create a conditional access policy enforcing phishing-resistant MFA for all users. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.2v1",
+        "name": "If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.",
+        "rationale": "This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires MFA enforcement, thus reducing single-form authentication risk.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate MFA method. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)",
+          "- [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)",
+          "- [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)",
+          "- [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.3v2",
+        "name": "If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.",
+        "rationale": "This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.\n\n1. In **Microsoft Entra admin center**, click **Protection > Authentication methods > Microsoft Authenticator**.\n2. Click the **Configure** tab.\n3. For **Allow use of Microsoft Authenticator OTP** select *No*.\n4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.\n5. Under **Show geographic location in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.\n6. Select **Save**",
+        "mitreMapping": [
+          "- [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)",
+          "- [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)",
+          "- [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)",
+          "- [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.4v1",
+        "name": "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.",
+        "rationale": "To disable the legacy authentication methods screen for the tenant, configure the Manage Migration feature to Migration Complete. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and potential security misconfigurations.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Go through the process of [How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).\n2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration)."
+      },
+      {
+        "id": "MS.AAD.3.5v1",
+        "name": "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.",
+        "rationale": "SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. In **Microsoft Entra admin center** , click **Protection > Authentication methods**\n2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.",
+        "mitreMapping": [
+          "- [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.6v1",
+        "name": "Phishing-resistant MFA SHALL be required for highly privileged roles.",
+        "rationale": "This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.",
+        "criticality": "SHALL",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Create a conditional access policy enforcing phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > Select users and groups > Directory roles > <b>select each of the roles listed in the Highly Privileged Roles section at the top of this document</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.7v1",
+        "name": "Managed devices SHOULD be required for authentication.",
+        "rationale": "The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, \"When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user.\"",
+        "criticality": "SHOULD",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Create a conditional access policy requiring a user's device to be either Microsoft Entra ID hybrid joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.8v1",
+        "name": "Managed Devices SHOULD be required to register MFA.",
+        "rationale": "Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.",
+        "criticality": "SHOULD",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Create a conditional access policy requiring a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > User actions > <b>Register security information</b>\n\n  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)",
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.9v1",
+        "name": "Device code authentication SHOULD be blocked.",
+        "rationale": "The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.",
+        "criticality": "SHOULD",
+        "exclusionField": "capolicy",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "February 2025",
+        "implementation": "1. Create a Conditional Access policy to block device code flow\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
+        "mitreMapping": [
+          "- [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)",
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)"
+        ],
+        "resources": [
+          "- [What authentication and verification methods are available in Microsoft Entra ID?](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)",
+          "- [Use additional context in Authenticator notifications - Authentication methods policy](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-additional-context#enable-additional-context-in-the-portal)",
+          "- [M-22-09 Federal Zero Trust Architecture Strategy](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf)",
+          "- [Configure Microsoft Entra hybrid join](https://learn.microsoft.com/en-us/entra/identity/devices/how-to-hybrid-join)",
+          "- [Microsoft Entra joined devices](https://learn.microsoft.com/en-us/entra/identity/devices/concept-directory-join)",
+          "- [Set up automatic enrollment for Windows devices (for Intune)](https://learn.microsoft.com/en-us/mem/intune/enrollment/windows-enroll)",
+          "- [Enable passkeys (FIDO2) for your organization](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-enable-passkey-fido2)",
+          "- [Storm-2372 conducts device code phishing campaign](https://www.microsoft.com/en-us/security/blog/2025/02/13/storm-2372-conducts-device-code-phishing-campaign/)",
+          "- [Microsoft 365 Device Code Phishing Cyber Attack – Demonstration, Analysis and Mitigation](https://github.com/cisagov/ScubaGear/issues/1599)",
+          "- [Block device code flow](https://learn.microsoft.com/en-us/entra/identity/conditional-access/managed-policies#block-device-code-flow)"
+        ]
+      },
+      {
+        "id": "MS.AAD.4.1v1",
+        "name": "Security logs SHALL be sent to the agency's security operations center for monitoring.",
+        "rationale": "The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Follow the configuration instructions unique to the products and integration patterns at your organization to send the security logs to the security operations center for monitoring.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)"
+        ],
+        "resources": [
+          "- [Everything you wanted to know about Security and Audit Logging in Office 365](https://thecloudtechnologist.com/2021/10/15/everything-you-wanted-to-know-about-security-and-audit-logging-in-office-365/)",
+          "- [What are Microsoft Entra sign-in logs??](https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins)",
+          "- [National Cybersecurity Protection System-Cloud Interface Reference Architecture Volume One: General Guidance](https://www.cisa.gov/sites/default/files/publications/NCPS%20Cloud%20Interface%20RA%20Volume%20One%20%282021-05-14%29.pdf)"
+        ]
+      },
+      {
+        "id": "MS.AAD.5.1v1",
+        "name": "Only administrators SHALL be allowed to register applications.",
+        "rationale": "Application access for the tenant presents a heightened security risk compared to interactive user access because applications are typically not subject to critical security protections, such as MFA policies. Reduce risk of unauthorized users installing malicious applications into the tenant by ensuring that only specific privileged users can register applications.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  In **Microsoft Entra admin center**, select **Users**.\n\n2. Select **User settings**.\n\n3. For **Users can register applications**, select **No**.\n\n4. Click **Save**.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.5.2v1",
+        "name": "Only administrators SHALL be allowed to consent to applications.",
+        "rationale": "Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  In **Microsoft Entra admin center** select **Enterprise Applications**.\n\n2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.\n\n3. Under **User consent for applications**, select **Do not allow user consent**.\n\n4. Click **Save**.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.5.3v1",
+        "name": "An admin consent workflow SHALL be configured for applications.",
+        "rationale": "Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  In **Microsoft Entra admin center**  create a new Microsoft Entra ID Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.\n\n2. Then in **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.\n\n3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.\n\n4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.\n\n5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).\n\n6. Click **Save**.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ],
+        "resources": [
+          "- [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)",
+          "- [Enforce Administrators to Provide Consent for Apps Before Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)",
+          "- [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)"
+        ]
+      },
+      {
+        "id": "MS.AAD.6.1v1",
+        "name": "User passwords SHALL NOT expire.",
+        "rationale": "The National Institute of Standards and Technology (NIST), OMB, and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. For example, OMB-22-09 states, \"Password policies must not require use of special characters or regular rotation.\"",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. [Configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).",
+        "resources": [
+          "- [Password expiration requirements for users](https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users)",
+          "- [Eliminate bad passwords using Microsoft Entra Password Protection](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-password-ban-bad)",
+          "- [NIST Special Publication 800-63B - Digital Identity Guidelines](https://pages.nist.gov/800-63-3/sp800-63b.html)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.1v1",
+        "name": "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.",
+        "rationale": "The Global Administrator role provides unfettered access to the tenant. Limiting the number of users with this level of access makes tenant compromise more challenging. Microsoft recommends fewer than five users in the Global Administrator role. However, additional user accounts, up to eight, may be necessary to support emergency access and some operational scenarios.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "When counting the number of users assigned to the Global Administrator role, count each user only once.\n\n1. In **Microsoft Entra admin center**  count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.\n\n2. Validate that there are a total of two to eight users assigned to the Global Administrator role.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.2v1",
+        "name": "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.",
+        "rationale": "Many privileged administrative users do not need unfettered access to the tenant to perform their duties. By assigning them to roles based on least privilege, the risks associated with having their accounts compromised are reduced.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "This policy is based on the ratio below:\n\n`X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)`\n\n1. Follow the instructions for policy MS.AAD.7.1v1 above to get a count of users assigned to the Global Administrator role.\n\n2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment.\n\n3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant with the policy.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)",
+          "- [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)",
+          "- [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)",
+          "- [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.3v1",
+        "name": "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.",
+        "rationale": "By provisioning cloud-only Microsoft Entra ID user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.\n\n3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Microsoft Entra ID portal.\n\n    ```\n    Connect-MgGraph\n    Get-MgBetaUser -Filter \"userPrincipalName eq 'username@somedomain.com'\" | FL\n    ```\n\n6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Microsoft Entra ID.",
+        "mitreMapping": [
+          "- [T1556: Modify Authentication Process](https://attack.mitre.org/techniques/T1556/)",
+          "- [T1556.007: Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.4v1",
+        "name": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.",
+        "rationale": "Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Microsoft Entra ID PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.",
+        "criticality": "SHALL",
+        "exclusionField": "role",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. In **Microsoft Entra admin center**  select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. Select the **Global administrator role**.\n\n3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.\n\n4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Microsoft Entra ID PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.\n\nException cases:\n- Emergency access accounts that require perpetual active assignment.\n- Service accounts that require perpetual active assignment.\n- If using PIM for Groups, a group that is enrolled in PIM is allowed to have a perpetual active assignment to a role because activation is handled by PIM for Groups.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.5v1",
+        "name": "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.",
+        "rationale": "Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 admin center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. In **Microsoft Entra admin center**  select **Roles and admins**.\n\n3. Select the **Global administrator role**.\n\n4. Under **Manage**, select **Assignments** and click the **Active assignments** tab.\n\n5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra ID PIM. If the role was assigned outside of Microsoft Entra ID PIM, delete the assignment and recreate it using Microsoft Entra ID PIM.",
+        "mitreMapping": [
+          "- [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.6v1",
+        "name": "Activation of the Global Administrator role SHALL require approval.",
+        "rationale": "Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**.\n\n  1.  Select the **Global Administrator** role in the list.\n  2.  Click **Settings**.\n  3.  Click **Edit**.\n  4.  Select the **Require approval to activate** option.\n  5.  Click **Update**.\n\n3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 2 above to each PIM group's **Member** settings.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.7v1",
+        "name": "Eligible and Active highly privileged role assignments SHALL trigger an alert.",
+        "rationale": "Closely monitor assignment of the highest privileged roles for signs of compromise. Send assignment alerts to enable the security monitoring team to detect compromise attempts.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n3. Click the **Global Administrator** role.\n\n4. Click **Settings** and then click **Edit**.\n\n5. Click the **Notification** tab.\n\n6. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.\n\n7. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.\n\n8. Click **Update**.\n\n9. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per the steps above to each PIM group's **Member** settings.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.8v1",
+        "name": "User activation of the Global Administrator role SHALL trigger an alert.",
+        "rationale": "Closely monitor activation of the Global Administrator role for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**.\n\n3. Click the **Global Administrator** role.\n\n4. Click **Settings** and then click **Edit**.\n\n5. Click the **Notification** tab.\n\n6. Under **Send notifications when eligible members activate this role**, in the **Role activation alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.\n\n7. Click **Update**.\n\n8. If the Global Administrator role has any PIM groups actively assigned to it, then also apply the same configurations per the steps above to each PIM group's **Member** settings.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.7.9v1",
+        "name": "User activation of other highly privileged roles SHOULD trigger an alert.",
+        "rationale": "Closely monitor activation of high-risk roles for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts. In some environments, activating privileged roles can generate a significant number of alerts.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox different from the one used to monitor Global Administrator activations.\n\n 2. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per step 1 to each PIM group's **Member** settings.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)",
+          "- [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)",
+          "- [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)"
+        ],
+        "resources": [
+          "- [Limit number of Global Administrators to less than 5](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/best-practices#5-limit-the-number-of-global-administrators-to-less-than-5)",
+          "- [Implement Privilege Access Management](https://learn.microsoft.com/en-us/azure/security/fundamentals/steps-secure-identity#implement-privilege-access-management)",
+          "- [Assign Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-add-role-to-user)",
+          "- [Privileged Identity Management (PIM) for Groups](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/concept-pim-for-groups)",
+          "- [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow)",
+          "- [Configure security alerts for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts)"
+        ]
+      }
+    ],
+    "defender": [
+      {
+        "id": "MS.DEFENDER.1.1v1",
+        "name": "The standard and strict preset security policies SHALL be enabled.",
+        "rationale": "Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Standard protection**, slide the toggle switch to the right so the text next to the toggle reads **Standard protection is on**.\n6. Under **Strict protection**, slide the toggle switch to the right so the text next to the toggle reads **Strict protection is on**.\n\nNote: If the toggle slider in step 5 is grayed out, click on **Manage protection settings**\ninstead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.1.2v1",
+        "name": "All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.",
+        "rationale": "Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Select **Manage protection settings** under either **Standard protection**\n   or **Strict protection**.\n6. On the **Apply Exchange Online Protection** page, select **All recipients**.\n7. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.1.3v1",
+        "name": "All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.",
+        "rationale": "Important user protections are provided by Defender for Office 365 protection, including safe attachments and safe links. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.\n7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.\n8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n9. Select **Next** on each page until the **Review and confirm your changes** page.\n10. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.1.4v1",
+        "name": "Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.",
+        "rationale": "Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.",
+        "criticality": "SHALL",
+        "exclusionField": "sensitiveAccounts",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Strict protection**, select **Manage protection settings**.\n6. On the **Apply Exchange Online Protection** page, select **Specific recipients**.\n7. Add all sensitive accounts via the **User** and **Group** boxes using the\n   names of mailboxes, users, contacts, M365 groups, and distribution groups.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.1.5v1",
+        "name": "Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.",
+        "rationale": "Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.",
+        "criticality": "SHALL",
+        "exclusionField": "sensitiveAccounts",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Strict protection**, select **Manage protection settings**.\n6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.\n7. On the **Apply Defender for Office 365 protection** page, select\n   **Specific recipients** or **Previously selected recipients** if sensitive\n   accounts were already set on the EOP page.\n8. If adding sensitive accounts separately via **Specific recipients**, add all\n   sensitive accounts via the **User** and **Group** boxes using the names of\n   mailboxes, users, contacts, M365 groups, and distribution groups.\n9. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ],
+        "resources": [
+          "- [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users)",
+          "- [Configure anti-phishing policies in EOP \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-eop-configure?view=o365-worldwide)",
+          "- [Configure anti-malware policies in EOP \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-malware-policies-configure?view=o365-worldwide)",
+          "- [Configure anti-spam policies in EOP \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-spam-policies-configure?view=o365-worldwide)",
+          "- [Configure anti-phishing policies in Defender for Office 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-mdo-configure?view=o365-worldwide)",
+          "- [Set up Safe Attachments policies in Microsoft Defender for Office 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-policies-configure?view=o365-worldwide)",
+          "- [Set up Safe Links policies in Microsoft Defender for Office 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.2.1v1",
+        "name": "User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.",
+        "rationale": "User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.",
+        "criticality": "SHOULD",
+        "exclusionField": "sensitiveUsers",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom users** page, add a name and valid email address for each\n   sensitive account and click **Add** after each.\n8. Select **Next** until you reach the **Trusted senders and domains** page.\n9. (Optional) Add specific email addresses here to not flag as impersonation\n   when sending messages and prevent false positives. Click **Add** after each.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.2.2v1",
+        "name": "Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.",
+        "rationale": "Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.",
+        "criticality": "SHOULD",
+        "exclusionField": "agencyDomains",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom domains** page, add each agency domain\n   and click **Add** after each.\n8. Select **Next** until you reach the **Trusted senders and domains** page.\n9. (Optional) Add specific domains here to not flag as impersonation when\n   sending messages and prevent false positives. Click **Add** after each.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.2.3v1",
+        "name": "Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.",
+        "rationale": "Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.",
+        "criticality": "SHOULD",
+        "exclusionField": "partnerDomains",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom domains** page, add each partner domain\n   and click **Add** after each.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ],
+        "resources": [
+          "- [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365)",
+          "- [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.3.1v1",
+        "name": "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.",
+        "rationale": "Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To enable Safe Attachments for SharePoint, OneDrive, and Microsoft\nTeams, follow the instructions listed at [Turn on Safe Attachments for\nSharePoint, OneDrive, and Microsoft Teams \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide).\n\n1.  Sign in to **Microsoft 365 Defender**.\n\n2.  Under **Email & collaboration**, select **Policies & rules**.\n\n3.  Select **Threat policies**.\n\n4.  Under **Policies**, select **Safe Attachments**.\n\n5.  Select **Global settings**.\n\n6.  Toggle the **Turn on Defender for Office 365 for SharePoint, OneDrive, and\n    Microsoft Teams** slider to **On**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1204.001: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)",
+          "- [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.4.1v2",
+        "name": "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).",
+        "rationale": "Users may inadvertently share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "November 2024",
+        "implementation": "1. Sign in to the **Microsoft Purview portal**.\n\n2. Under the **Solutions** section on the left-hand menu, select **Data loss\n   prevention**.\n\n3. Select **Policies** from the top of the page.\n\n4. Select **Create policy**.\n\n5. From the **Categories** list, select **Custom**.\n\n6. From the **Regulations** list, select **Custom policy** and then click\n   **Next**.\n\n7. Edit the name and description of the policy if desired, then click\n   **Next**.\n\n8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.\n   \n9. Under **Choose where to apply the policy**, set **Status** to **On**\n   for at least the Exchange email, OneDrive accounts, SharePoint\n   sites, Teams chat and channel messages, and Devices locations, then\n   click **Next**.\n\n10. Under **Define policy settings**, select **Create or customize advanced\n   DLP rules**, and then click **Next**.\n\n11. Click **Create rule**. Assign the rule an appropriate name and\n   description.\n\n12. Click **Add condition**, then **Content contains**.\n\n13. Click **Add**, then **Sensitive info types**.\n\n14. Add information types that protect information sensitive to the agency.\n    At a minimum, the agency should protect:\n\n    - Credit card numbers\n    - U.S. Individual Taxpayer Identification Numbers (ITIN)\n    - U.S. Social Security Numbers (SSN)\n    - All agency-defined PII and sensitive information\n\n15. Click **Add**.\n\n16. Under **Actions**, click **Add an action**.\n\n17. Check **Restrict Access or encrypt the content in Microsoft 365\n    locations**.\n\n18. Under this action, select **Block Everyone**.\n\n19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.\n\n20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**.\n\n21. Click **Save**, then **Next**.\n\n22. Select **Turn the policy on immediately**, then click **Next**.\n\n23. Click **Submit**.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.4.2v1",
+        "name": "The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.",
+        "rationale": "Unauthorized disclosures may happen through M365 services or endpoint devices. DLP policies should cover all affected locations to be effective.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) step 8\n   for details on enforcing DLP policy in specific M365 service locations.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.4.3v1",
+        "name": "The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.",
+        "rationale": "Access to sensitive information should be prohibited unless explicitly allowed. Specific exemptions can be made based on agency policies and valid business justifications.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps\n   15-17 for details on configuring DLP policy to block sharing sensitive\n   information with everyone.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.4.4v1",
+        "name": "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.",
+        "rationale": "Some users may not be aware of agency policies on proper use of sensitive information. Enabling notifications provides positive feedback to users when accessing sensitive information.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps\n   18-19 for details on configuring DLP policy to notify users when accessing\n   sensitive information."
+      },
+      {
+        "id": "MS.DEFENDER.4.5v1",
+        "name": "A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.",
+        "rationale": "Some apps may inappropriately share accessed files or not conform to agency policies for access to sensitive information. Defining a list of those apps makes it possible to use DLP policies to restrict those apps' access to sensitive information on endpoints using Defender.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to the **Microsoft Purview portal**.\n\n2. Go to **Settings**, under **Solution Settings** select **Data loss prevention**.\n\n3. Go to **Endpoint DLP Settings**.\n\n4. Go to **Restricted apps and app groups**.\n\n5. Click **Add or edit Restricted Apps**.\n\n6. Enter an app and executable name to disallow said app from\n   accessing protected files, and log the incident.\n\n7. Return and click **Unallowed Bluetooth apps**.\n\n8. Click **Add or edit unallowed Bluetooth apps**.\n\n9. Enter an app and executable name to disallow said app from\n   accessing protected files, and log the incident.",
+        "mitreMapping": [
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.4.6v1",
+        "name": "The custom policy SHOULD include an action to block access to sensitive",
+        "rationale": "Some apps may inappropriately share accessed files or not conform to agency policies for access to sensitive information. Defining a DLP policy with an action to block access from restricted apps and unwanted Bluetooth applications prevents unauthorized disclosure by those programs.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "If restricted app and unwanted Bluetooth app restrictions are desired,\nassociated devices must be onboarded with Defender for Endpoint\nbefore the instructions below can be completed.\n\n1. Sign in to the **Microsoft Purview portal**.\n\n2. Under **Solutions**, select **Data loss prevention**.\n\n3. Select **Policies** from the top of the page.\n\n4. Find the custom DLP policy configured under\n   [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) in the list\n   and click the Policy name to select.\n\n5. Select **Edit Policy**.\n\n6. Click **Next** on each page in the policy wizard until you reach the\n   Advanced DLP rules page.\n\n7. Select the relevant rule and click the pencil icon to edit it.\n\n8. Under **Actions**, click **Add an action**.\n\n9. Choose **Audit or restrict activities on device**\n\n10. Under **File activities for all apps**, select\n    **Apply restrictions to specific activity**.\n\n11. Check the box next to **Copy or move using unallowed Bluetooth app**\n    and set its action to **Block**.\n\n12. Under **Restricted app activities**, check the **Access by restricted apps** box\n   and set the action drop-down to **Block**.\n\n13. Click **Save** to save the changes.\n\n14. Click **Next** on each page until reaching the\n    **Review your policy and create it** page.\n\n15. Review the policy and click **Submit** to complete the policy changes.",
+        "mitreMapping": [
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)",
+          "- [T1486: Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.5.1v1",
+        "name": "At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.",
+        "rationale": "Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender**.\n\n2. Under **Email & collaboration**, select **Policies & rules**.\n\n3. Select **Alert Policy**.\n\n4. Select the checkbox next to each alert to enable as determined by the\n   agency and at a minimum those referenced in the\n   [_CISA M365 Secure Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:\n\n   a. **Suspicious email sending patterns detected.**\n\n   b. **Suspicious connector activity.**\n\n   c. **Suspicious Email Forwarding Activity.**\n\n   d. **Messages have been delayed.**\n\n   e. **Tenant restricted from sending unprovisioned email.**\n\n   f. **Tenant restricted from sending email.**\n\n   g. **A potentially malicious URL click was detected.**\n\n5. Click the pencil icon from the top menu.\n\n6. Select the **Enable selected policies** action from the **Bulk actions**\n   menu.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.5.2v1",
+        "name": "The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).",
+        "rationale": "Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "For each enabled alert, to add one or more email recipients:\n\n1. Sign in to **Microsoft 365 Defender**.\n\n2. Under **Email & collaboration**, select **Policies & rules**.\n\n3. Select **Alert Policy**.\n\n4. Click the alert policy to modify.\n\n5. Click the pencil icon next to **Set your recipients**.\n\n6. Check the **Opt-In for email notifications** box.\n\n7. Add one or more email addresses to the **Email recipients** text box.\n\n8. Click **Next**.\n\n9. On the **Review** page, click **Submit** to save the notification settings.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.6.1v1",
+        "name": "Unified Audit logging SHALL be enabled.",
+        "rationale": "Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "To enable auditing via the **Microsoft Purview portal**:\n\n1. Sign in to the **Microsoft Purview portal**.\n\n2. Under **Solutions**, select **Audit**.\n\n3. If auditing is not enabled, a banner is displayed to notify the\nadministrator to start recording user and admin activity.\n\n4. Click the **Start recording user and admin activity**.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)"
+        ]
+      },
+      {
+        "id": "MS.DEFENDER.6.3v1",
+        "name": "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.",
+        "rationale": "Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.\nEnsure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. \n\nAs noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/defender.md#license-requirements-1) section above, the creation of a custom audit log retention policy and its retention in the M365 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses. No additional license is required to view and export logs. To view and export audit logs follow [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records) and/or [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)"
+        ],
+        "resources": [
+          "- [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records)",
+          "- [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)",
+          "- [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)"
+        ]
+      }
+    ],
+    "exo": [
+      {
+        "id": "MS.EXO.1.1v2",
+        "name": "Automatic forwarding to external domains SHALL be disabled.",
+        "rationale": "Adversaries can use automatic forwarding to gain persistent access to a victim's email. Disabling forwarding to external domains prevents this technique when the adversary is external to the organization but does not impede legitimate internal forwarding.",
+        "criticality": "SHALL",
+        "exclusionField": "forwardingDomains",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "To disallow automatic forwarding to external domains:\n\n1.  Sign in to the **Exchange admin center**.\n\n2.  Select **Mail flow**, then **Remote domains**.\n\n3.  Select **Default**.\n\n4.  Under **Email reply types**, select **Edit reply types**.\n\n5.  Clear the checkbox next to **Allow automatic forwarding**, then\n    click **Save**.\n\n6.  Return to **Remote domains** and review each\n    additional remote domain in the list, ensuring that automatic forwarding\n    is only allowed for approved domains.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.2.2v2",
+        "name": "An SPF policy SHALL be published for each domain that fails all non-approved senders.",
+        "rationale": "An adversary may modify the `FROM` field of an email such that it appears to be a legitimate email sent by an agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way. SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, \"Enhance Email and Web Security\".",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2024",
+        "implementation": "First, identify any approved senders specific to your agency, e.g., any on-premises mail servers. SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.\n\nSPF is not configured through the Exchange admin center, but rather via\nDNS records hosted by the agency's domain. Thus, the exact steps needed\nto set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.\n\nTo test your SPF configuration, consider using a web-based tool, such as\nthose listed under [How can I validate SPF records for my domain? \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/setup/domains-faq?view=o365-worldwide#how-can-i-validate-spf-records-for-my-domain).\nAdditionally, SPF records can be requested using the\nPowerShell tool `Resolve-DnsName`. For example:\n\n```\nResolve-DnsName example.onmicrosoft.com txt\n```\n\nIf SPF is configured, you will see a response resembling `v=spf1 include:spf.protection.outlook.com -all`\nreturned; though by necessity, the contents of the SPF\npolicy may vary by agency. In this example, the SPF policy indicates\nthe IP addresses listed by the policy for \"spf.protection.outlook.com\" are\nthe only approved senders for \"example.onmicrosoft.com.\" These IPs can be determined\nvia an additional SPF lookup, this time for \"spf.protection.outlook.com.\" Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; this directive indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion\nof SPF record syntax.",
+        "mitreMapping": [
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.3.1v1",
+        "name": "DKIM SHOULD be enabled for all domains.",
+        "rationale": "An adversary may modify the `FROM` field of an email such that it appears to be a legitimate email sent by an agency, facilitating phishing attacks. Enabling DKIM is another means for recipients to detect spoofed emails and verify the integrity of email content.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. To enable DKIM, follow the instructions listed on [Steps to Create,\nenable and disable DKIM from Microsoft 365 Defender portal \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide#steps-to-create-enable-and-disable-dkim-from-microsoft-365-defender-portal).",
+        "mitreMapping": [
+          "- [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.4.1v1",
+        "name": "A DMARC policy SHALL be published for every second-level domain.",
+        "rationale": "Without a DMARC policy available for each domain, recipients may improperly handle SPF and DKIM failures, possibly enabling spoofed emails to reach end users' mailboxes. Publishing DMARC records at the second-level domain protects the second-level domains and all subdomains.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "DMARC is not configured through the Exchange admin center, but rather via\nDNS records hosted by the agency's domain. As such, implementation varies\ndepending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dmarc-configure?view=o365-worldwide#step-4-form-the-dmarc-txt-record-for-your-domain)\nfor Microsoft guidance.\n\nA DMARC record published at the second-level domain will protect all subdomains.\nIn other words, a DMARC record published for `example.com` will protect both\n`a.example.com` and `b.example.com`, but a separate record would need to be\npublished for `c.example.gov`.\n\nTo test your DMARC configuration, consider using one of many publicly available\nweb-based tools. Additionally, DMARC records can be requested using the\nPowerShell tool `Resolve-DnsName`. For example:\n\n```\nResolve-DnsName _dmarc.example.com txt\n```\n\nIf DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com`\nwill be returned, though by necessity, the contents of the record will vary\nby agency. In this example, the policy indicates all emails failing the\nSPF/DKIM checks are to be rejected and aggregate reports sent to\nreports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be\nsent to reports@example.com.",
+        "mitreMapping": [
+          "- [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.4.2v1",
+        "name": "The DMARC message rejection option SHALL be p=reject.",
+        "rationale": "Of the three policy options (i.e., none, quarantine, and reject), reject provides the strongest protection. Reject is the level of protection required by BOD 18-01 for FCEB departments and agencies.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.",
+        "mitreMapping": [
+          "- [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.4.3v1",
+        "name": "The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.",
+        "rationale": "Email spoofing attempts are not inherently visible to domain owners. DMARC provides a mechanism to receive reports of spoofing attempts. Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports gives CISA insight into spoofing attempts and is required by BOD 18-01 for FCEB departments and agencies.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>\nas one of the emails for the RUA field.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.4.4v1",
+        "name": "An agency point of contact SHOULD be included for aggregate and failure reports.",
+        "rationale": "Email spoofing attempts are not inherently visible to domain owners. DMARC provides a mechanism to receive reports of spoofing attempts. Including an agency point of contact gives the agency insight into attempts to spoof their domains.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:\n- A point of contact specific to your agency in the RUA field.\n- <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.\n- One or more agency-defined points of contact in the RUF field.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.5.1v1",
+        "name": "SMTP AUTH SHALL be disabled.",
+        "rationale": "SMTP AUTH is not used or needed by modern email clients. Therefore, disabling it as the global default conforms to the principle of least functionality.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To disable SMTP AUTH for the organization:\n\n1. Sign in to the **Exchange admin center**.\n\n2. On the left hand pane, select **Settings**; then from the settings list, select **Mail Flow**.\n\n3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked."
+      },
+      {
+        "id": "MS.EXO.6.1v1",
+        "name": "Contact folders SHALL NOT be shared with all domains.",
+        "rationale": "Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing for specific legitimate use as needed.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To restrict sharing with all domains:\n\n1. Sign in to the **Exchange admin center**.\n\n2. On the left-hand pane under **Organization**, select **Sharing**.\n\n3. Select **Individual Sharing**.\n\n4. For all existing policies, select the policy, then select **Manage domains**.\n\n5. For all sharing rules under all existing policies, ensure **Sharing with all domains** is not selected.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.6.2v1",
+        "name": "Calendar details SHALL NOT be shared with all domains.",
+        "rationale": "Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing for legitimate use as needed.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To restrict sharing calendar details with all domains:\n\n1. Refer to step 5 in [MS.EXO.6.1v1 Instructions](#msexo61v1-instructions) to implement\nthis policy.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.7.1v1",
+        "name": "External sender warnings SHALL be implemented.",
+        "rationale": "Phishing is an ever-present threat. Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To create a mail flow rule to produce external sender warnings:\n\n1.  Sign in to the **Exchange admin center**.\n\n2.  Under **Mail flow**, select **Rules**.\n\n3.  Click the plus (**+**) button to create a new rule.\n\n4.  Select **Modify messages…**.\n\n5.  Give the rule an appropriate name.\n\n6.  Under **Apply this rule if…,** select **The sender is external/internal**.\n\n7.  Under **select sender location**, select **Outside the organization**, then click **OK**.\n\n8.  Under **Do the following…,** select **Prepend the subject of the message with…**.\n\n9.  Under **specify subject prefix**, enter a message such as\n    \"\\[External\\]\" (without the quotation marks), then click **OK**.\n\n10. Click **Next**.\n\n11. Under **Choose a mode for this rule**, select **Enforce**.\n\n12. Leave the **Severity** as **Not Specified**.\n\n13. Leave the **Match sender address in message** as **Header** and click **Next**.\n\n14. Click **Finish** and then **Done**.\n\n15. The new rule will be disabled.  Re-select the new rule to show its\n    settings and slide the **Enable or disable rule** slider to the right\n    until it shows as **Enabled**.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.8.1v2",
+        "name": "A DLP solution SHALL be used.",
+        "rationale": "Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.8.2v2",
+        "name": "The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.",
+        "rationale": "Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.8.3v1",
+        "name": "The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.",
+        "rationale": "Any alternative DLP solution should be able to detect sensitive information in Exchange Online and block access to unauthorized entities.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.8.4v1",
+        "name": "At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.",
+        "rationale": "Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.9.1v2",
+        "name": "Emails SHALL be filtered by attachment file types.",
+        "rationale": "Malicious attachments often take the form of click-to-run files. Sharing high risk file types, when necessary, is better left to a means other than email; the dangers of allowing them to be sent over email outweigh any potential benefits. Filtering email attachments based on file types can prevent spread of malware distributed via click-to-run email attachments.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude email filtering based on attachment file type.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.9.2v1",
+        "name": "The attachment filter SHOULD attempt to determine the true file type and assess the file extension.",
+        "rationale": "Users can change a file extension at the end of a file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type. Verifying the file type and checking that this matches the designated file extension can help detect instances where the file extension was changed.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\nattempt to determine the true file type and assess the file extension.",
+        "mitreMapping": [
+          "- [T1036: Masquerading](https://attack.mitre.org/techniques/T1036/)",
+          "- [T1036.006: Space after Filename](https://attack.mitre.org/techniques/T1036/006/)",
+          "- [T1036.007: Double File Extension](https://attack.mitre.org/techniques/T1036/007/)",
+          "- [T1036.008: Masquerade File Type](https://attack.mitre.org/techniques/T1036/008/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.9.3v2",
+        "name": "Disallowed file types SHALL be determined and enforced.",
+        "rationale": "Malicious attachments often take the form of click-to-run files, though other file types can contain malicious content as well. As such, determining the full list of file types to block is left to each organization, to be made in accordance with their risk tolerance.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.9.4v1",
+        "name": "Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.",
+        "rationale": "Malicious attachments often take the form of click-to-run files. Sharing high risk file types, when necessary, is better left to a means other than email; the dangers of allowing them to be sent over email outweigh any potential benefits. Filtering email attachments based on file types can prevent spread of malware distributed via click-to-run email attachments.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.9.5v1",
+        "name": "At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).",
+        "rationale": "Malicious attachments often take the form of click-to-run files. Blocking a list of common executable files helps mitigate the risk of adversarial exploitation.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ],
+        "resources": [
+          "- [Common attachments filter in anti-malware policies \\| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about#common-attachments-filter-in-anti-malware-policies)"
+        ]
+      },
+      {
+        "id": "MS.EXO.10.1v1",
+        "name": "Emails SHALL be scanned for malware.",
+        "rationale": "Email can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude anti-malware protection.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.10.2v1",
+        "name": "Emails identified as containing malware SHALL be quarantined or dropped.",
+        "rationale": "Email can be used as a mechanism for delivering malware. Preventing emails with known malware from reaching user mailboxes helps ensure users cannot interact with those emails.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude anti-malware protection to quarantine malware in email.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.10.3v1",
+        "name": "Email scanning SHALL be capable of reviewing emails after delivery.",
+        "rationale": "As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude zero-hour auto purge (ZAP) to retroactively detect malware in messages\nalready delivered to mailboxes and removes them.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.11.1v1",
+        "name": "Impersonation protection checks SHOULD be used.",
+        "rationale": "Users might not be able to reliably identify phishing emails, especially if the `FROM` address is nearly indistinguishable from that of a known entity. By automatically identifying senders who appear to be impersonating known senders, the risk of a successful phishing attempt can be reduced.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling impersonation protection](./defender.md#msdefender21v1-instructions).",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.11.2v1",
+        "name": "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.",
+        "rationale": "Many tasks are better suited for automated processes, such as identifying unusual characters in the `FROM` address or identifying a first-time sender. User warnings can handle these tasks, reducing the burden on end users and the risk of successful phishing attempts.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1) which\ninclude user safety tips to warn users.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.11.3v1",
+        "name": "The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.",
+        "rationale": "Phishing attacks can result in unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1) which\ninclude mailbox intelligence for detecting phishing attacks using AI.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.12.1v1",
+        "name": "IP allow lists SHOULD NOT be created.",
+        "rationale": "Messages sent from IP addresses on an allow list bypass important security mechanisms, including spam filtering and sender authentication checks. Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To modify the connection filters, follow the instructions found in [Use\nthe Microsoft 365 Defender portal to modify the default connection\nfilter\npolicy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/connection-filter-policies-configure?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy).\n\n1. Sign in to **Microsoft 365 Defender portal**.\n\n2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.\n\n3. Select **Threat Policies** from the list of policy names.\n\n4. Under **Policies**, select **Anti-spam**.\n\n5. Select **Connection filter policy (Default)**.\n\n6. Click **Edit connection filter policy**.\n\n7. Ensure no addresses are specified under **Always allow messages from\n   the following IP addresses or address range**.\n\n8. Ensure **Turn on safe list** is not selected."
+      },
+      {
+        "id": "MS.EXO.12.2v1",
+        "name": "Safe lists SHOULD NOT be enabled.",
+        "rationale": "Messages sent from allowed safe list addresses bypass important security mechanisms, including spam filtering and sender authentication checks. Avoiding use of safe lists prevents potential threats from circumventing security mechanisms. While blocking all malicious senders is not feasible, blocking specific known, malicious IP addresses may reduce the threat from specific senders.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to **Microsoft 365 Defender portal**.\n\n2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.\n\n3. Select **Threat Policies** from the list of policy names.\n\n4. Under **Policies**, select **Anti-spam**.\n\n5. Select **Connection filter policy (Default)**.\n\n6. Click **Edit connection filter policy**.\n\n7. (Optional) Enter addresses under **Always block messages from the following\n   IP addresses or address range** as needed.\n\n8. Ensure **Turn on safe list** is not selected."
+      },
+      {
+        "id": "MS.EXO.13.1v1",
+        "name": "Mailbox auditing SHALL be enabled.",
+        "rationale": "Exchange Online user accounts can be compromised or misused. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Mailbox auditing can be managed from the Exchange Online PowerShell.\nFollow the instructions listed on [Manage mailbox auditing in Office\n365](https://learn.microsoft.com/en-us/microsoft-365/compliance/audit-mailboxes?view=o365-worldwide).\n\nTo check the current mailbox auditing status for your organization via PowerShell:\n\n1.  Connect to the Exchange Online PowerShell.\n\n2.  Run the following command:\n\n    `Get-OrganizationConfig | Format-List AuditDisabled`\n\n3.  An `AuditDisabled : False` result indicates mailbox auditing is enabled.\n\nTo enable mailbox auditing by default for your organization via PowerShell:\n\n1.  Connect to the Exchange Online PowerShell.\n\n2.  Run the following command:\n\n    `Set-OrganizationConfig –AuditDisabled $false`",
+        "mitreMapping": [
+          "- [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)",
+          "- [T1070.008: Clear Mailbox Data](https://attack.mitre.org/techniques/T1070/008/)",
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.002: Additional Email Delegate Permissions](https://attack.mitre.org/techniques/T1098/002/)",
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)",
+          "- [T1586: Compromise Accounts](https://attack.mitre.org/techniques/T1586/)",
+          "- [T1586.002: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)",
+          "- [T1564: Hide Artifacts](https://attack.mitre.org/techniques/T1564/)",
+          "- [T1564.008: Email Hiding Rules](https://attack.mitre.org/techniques/T1564/008/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.14.1v2",
+        "name": "A spam filter SHALL be enabled.",
+        "rationale": "Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.14.2v1",
+        "name": "Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.",
+        "rationale": "Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering that moves high confidence spam to either the junk\n or quarantine folder.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.14.3v1",
+        "name": "Allowed domains SHALL NOT be added to inbound anti-spam protection policies.",
+        "rationale": "Legitimate emails may be incorrectly filtered by spam protections. Adding allowed senders is an acceptable method of combating these false positives. Allowing an entire domain, especially a common domain like office.com, however, provides for a large number of potentially unknown users to bypass spam protections.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which do not\ninclude any allowed sender domains by default.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.14.4v1",
+        "name": "If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.",
+        "rationale": "Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "May 2024",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)"
+        ],
+        "resources": [
+          "- [Configure anti-spam policies in EOP \\| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-spam-policies-configure?view=o365-worldwide)"
+        ]
+      },
+      {
+        "id": "MS.EXO.15.1v1",
+        "name": "URL comparison with a block-list SHOULD be enabled.",
+        "rationale": "Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links protections to scan URLs in email messages against a list\nof known, malicious links.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.15.2v1",
+        "name": "Direct download links SHOULD be scanned for malware.",
+        "rationale": "URLs in emails may direct users to download and run malware. Scanning direct download links in real-time for known malware and blocking access can prevent users from infecting their devices.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links protections to scan links to files for malware.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.15.3v1",
+        "name": "User click tracking SHOULD be enabled.",
+        "rationale": "Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links click protections to track user clicks on links in email.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.16.1v1",
+        "name": "At a minimum, the following alerts SHALL be enabled:",
+        "rationale": "Potentially malicious or service impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to events listed above draws attention to them to help minimize impact to users and the agency.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft 365 alert policies, see the following implementation steps for\n[enabling alerts](./defender.md#msdefender51v1-instructions) for additional\nguidance.",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)",
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)",
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.16.2v1",
+        "name": "The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.",
+        "rationale": "Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure these suspicious or malicious events are acted upon in a timely manner to limit overall impact.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft 365 alert policies, see the following implementation steps to\n[add email recipients to an alert](./defender.md#msdefender51v1-instructions)\nfor additional guidance.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.006: Indicator Blocking](https://attack.mitre.org/techniques/T1562/006/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.17.1v1",
+        "name": "Unified Audit logging SHALL be enabled.",
+        "rationale": "Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "See the following implementation steps for enabling [Unified Audit logging](./defender.md#msdefender61v1-instructions) for additional\nguidance.",
+        "mitreMapping": [
+          "- [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)",
+          "- [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)"
+        ]
+      },
+      {
+        "id": "MS.EXO.17.3v1",
+        "name": "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).",
+        "rationale": "Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified Audit Logs in the Cloud Azure log category.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "See the following implementation steps to\n[create an audit retention policy](./defender.md#msdefender63v1-instructions)\nfor additional guidance.\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)"
+        ],
+        "resources": [
+          "- [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records)",
+          "- [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)",
+          "- [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy)"
+        ]
+      }
+    ],
+    "powerbi": [
+      {
+        "id": "MS.POWERBI.1.1v1",
+        "name": "The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.",
+        "rationale": "A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click **Publish to web** set to **Disabled**",
+        "mitreMapping": [
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.2.1v1",
+        "name": "Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.",
+        "rationale": "Disabling external access to Power BI helps keep guest users from accessing potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To Disable Completely:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Disabled**\n\nTo Enable with Security Group(s):\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Enabled**\n\n5. Select the security group(s) you want to have access to the PowerBI tenant.\n> Note:\n> You may need to make a specific security group(s)",
+        "mitreMapping": [
+          "- [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)",
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.3.1v1",
+        "name": "The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.",
+        "rationale": "Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "To disable completely:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Invite external users to your organization** and set to **Disabled**\n\nTo enable with security groups:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Invite external users to your organization** and set to **Enabled**\n\n5. Select the security group(s) needed.\n> Note:\n> You may need to make a specific security group(s)",
+        "mitreMapping": [
+          "- [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)",
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)",
+          "- [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.4.1v1",
+        "name": "Service principals with access to APIs SHOULD be restricted to specific security groups.",
+        "rationale": "With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.\nChoose a specific security group allowed to use service principles for the APIs.",
+        "mitreMapping": [
+          "- [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)",
+          "- [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.4.2v1",
+        "name": "Service principals creating and using profiles SHOULD be restricted to specific security groups.",
+        "rationale": "With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.\nChoose a specific security group allowed to use service principles to create and use profiles",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.5.1v1",
+        "name": "ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.",
+        "rationale": "If resource keys are allowed, someone can move data without Microsoft Entra ID OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Block ResourceKey Authentication** and set to **Enabled**",
+        "mitreMapping": [
+          "- [T1134: Access Token Manipulation](https://attack.mitre.org/techniques/T1134/)",
+          "- [T1134.001: Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001/)",
+          "- [T1134.003: Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.6.1v1",
+        "name": "Python and R interactions SHOULD be disabled.",
+        "rationale": "External code poses a security and privacy risk as there is no good way to regulate what is done with the data or integrations. Disabling this will reduce the risk of a data leak or malicious actor.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **R and Python Visuals Settings**\n\n4. Click on **Interact with and share R and Python visuals** and set to **Disabled**",
+        "mitreMapping": [
+          "- [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)",
+          "- [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)"
+        ]
+      },
+      {
+        "id": "MS.POWERBI.7.1v1",
+        "name": "Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.",
+        "rationale": "A document without sensitivity labels may be opened unknowingly, potentially exposing data to someone who is not supposed to have access to it. This policy will help organize and classify data, making it easier to keep data out of the wrong hands.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Information protection**\n\n4. Click on **Allow users to apply sensitivity labels for content** and set to **Enabled**\n   Define who can apply and change sensitivity labels in Power BI assets.\n\n# Appendix A: Implementation Considerations",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)",
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)"
+        ]
+      }
+    ],
+    "powerplatform": [
+      {
+        "id": "MS.POWERPLATFORM.1.1v1",
+        "name": "The ability to create production and sandbox environments SHALL be restricted to admins.",
+        "rationale": "Users creating new Power Platform environments may inadvertently bypass data loss prevention (DLP) policy settings or misconfigure the security settings of their environment.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  In the upper-right corner of the Microsoft Power Platform site,\n    select the **Gear icon** (Settings icon).\n\n3.  Select **Power Platform settings**.\n\n4.  Under **Who can create production and sandbox environments**, select\n    **Only specific admins.**",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
+        ]
+      },
+      {
+        "id": "MS.POWERPLATFORM.1.2v1",
+        "name": "The ability to create trial environments SHALL be restricted to admins.",
+        "rationale": "Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Follow the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.\n\n2.  Under **Who can create trial environments**, select **Only specific admins.**"
+      },
+      {
+        "id": "MS.POWERPLATFORM.2.1v1",
+        "name": "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.",
+        "rationale": "All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while also maintaining the agency's security posture.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Policies** \\> **Data Policies.**\n\n3.  Select the **+ New Policy** icon to create a new policy.\n\n4.  Give the policy a suitable agency name and click **Next.**\n\n5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab containing sensitive data that can be utilized to create flows and apps.\n\n6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. \n\n7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. \n\n8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.\n\n9.  At the bottom of the screen, select **Next** to move on.\n\n10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \\| Microsoft\n  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.\n\n11.  Click **Next**.\n\n12.  At the **Scope** section for the default environment, select **Add multiple environments** and add the default environment.\n\n13.  Select **Next**-\\> **Create Policy** to finish.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
+        ]
+      },
+      {
+        "id": "MS.POWERPLATFORM.2.2v1",
+        "name": "Non-default environments SHOULD have at least one DLP policy affecting them.",
+        "rationale": "Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Repeat steps 1 to 11 in the MS.POWERPLATFORM.2.1v1 instructions.\n\n2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments where you wish to enforce a DLP policy upon. If you wish to apply the DLP policy for all environments including environments created in the future select **Add all environments**.\n\n4.  Select **Next**-\\> **Create Policy** to finish.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
+        ]
+      },
+      {
+        "id": "MS.POWERPLATFORM.3.1v1",
+        "name": "Power Platform tenant isolation SHALL be enabled.",
+        "rationale": "Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Policies -\\> Tenant Isolation**.\n\n3.  Set the slider in the center of the screen to **On** then click **Save**\n    on the bottom of the screen.",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)",
+          "- [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)"
+        ]
+      },
+      {
+        "id": "MS.POWERPLATFORM.3.2v1",
+        "name": "An inbound/outbound connection allowlist SHOULD be configured.",
+        "rationale": "Depending on agency needs an allowlist can be configured to allow cross tenant collaboration via connectors.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to\narrive at the same page.\n\n2.  The tenant isolation allowlist can be configured by clicking **New tenant rule**\non the Tenant Isolation page.\n\n3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.\n\n4.  If Tenant Isolation is switched **Off**, these rules will not be enforced until tenant\nisolation is turned **On**."
+      }
+    ],
+    "sharepoint": [
+      {
+        "id": "MS.SHAREPOINT.1.1v1",
+        "name": "External sharing for SharePoint SHALL be limited to Existing guests or Only people in your organization.",
+        "rationale": "Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1. Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Adjust external sharing slider for SharePoint to **Existing guests** or **Only people in your organization**.\n\n4. Select **Save**.",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.1.2v1",
+        "name": "External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.",
+        "rationale": "Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized access to information.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Adjust external sharing slider for OneDrive to **Existing Guests** or **Only people in your organization**.\n\n4. Select **Save**.",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.1.3v1",
+        "name": "External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.",
+        "rationale": "By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "Note: If SharePoint external sharing is set to its most restrictive setting of \"Only people in your organization\", then no external sharing is allowed and no implementation changes are required for this policy item.\n\n1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Expand **More external sharing settings**.\n\n4.  Select **Limit external sharing by domain**.\n\n5.  Select **Add domains**.\n\n6.  Add each approved external domain users are allowed to share files with.\n\n7.  Select **Manage security groups**\n\n8. Add each approved security group. Members of these groups will be allowed to share files externally.\n\n9.  Select **Save**.",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ],
+        "resources": [
+          "- [Overview of external sharing in SharePoint and OneDrive in Microsoft 365 \\| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/external-sharing-overview)",
+          "- [Manage sharing settings for SharePoint and OneDrive in Microsoft 365 \\| Microsoft Documents](https://learn.microsoft.com/en-us/sharepoint/turn-external-sharing-on-or-off)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.2.1v1",
+        "name": "File and folder default sharing scope SHALL be set to Specific people (only the people the user specifies).",
+        "rationale": "By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**\n\n3.  Under **File and folder links**, set the default link type to **Specific people (only the people the user specifies)**\n\n4.  Select **Save**",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.2.2v1",
+        "name": "File and folder default sharing permissions SHALL be set to View.",
+        "rationale": "Edit access to files and folders could allow a user to make unauthorized changes. By restricting default permissions to **View**, administrators prevent unintended or malicious modification.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "June 2023",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2. Select **Policies** \\> **Sharing**.\n\n3. Under **File and folder links**, set the permission that is selected by default for sharing links to **View**.\n\n4. Select **Save**.",
+        "mitreMapping": [
+          "- [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.3.1v1",
+        "name": "Expiration days for Anyone links SHALL be set to 30 days or less.",
+        "rationale": "Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators can prevent unintended sustained access to the link.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.\n\n4.  Select the checkbox **These links must expire within this many days**.\n\n5.  Enter **30** days or less.\n\n6.  Select **Save**.",
+        "mitreMapping": [
+          "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)",
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.3.2v1",
+        "name": "The allowable file and folder permissions for links SHALL be set to View only.",
+        "rationale": "Unauthorized changes to files can be made if permissions allow editing by anyone. By restricting permissions on links to **View** only, administrators prevent anonymous file changes.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.\n\n4.  Set the configuration items in the section **These links can give these permissions**.\n\n5.  Set the **Files** option to **View**.\n\n6.  Set the **Folders** option to **View**.\n\n7.  Select **Save**.",
+        "mitreMapping": [
+          "- [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)"
+        ]
+      },
+      {
+        "id": "MS.SHAREPOINT.3.3v1",
+        "name": "Reauthentication days for people who use a verification code SHALL be set to 30 days or less.",
+        "rationale": "A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Expand **More external sharing settings**.\n\n4. Select **People who use a verification code must reauthenticate after this many days**.\n\n5.  Enter **30** days or less.\n\n6. Select **Save**.\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)",
+          "- [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)",
+          "- [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)"
+        ]
+      }
+    ],
+    "teams": [
+      {
+        "id": "MS.TEAMS.1.1v1",
+        "name": "External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.",
+        "rationale": "An external participant with control of a shared screen could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "To help ensure external participants do not have the ability to request\ncontrol of the shared desktop or window in the meeting:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Select the **Global (Org-wide default)** policy.\n\n4.  Under the **Content sharing** section, set **External\n    participants can give or request control** to **Off**.\n\n5.  If custom policies were created, repeat these steps for each\n    policy, selecting the appropriate policy in step 3."
+      },
+      {
+        "id": "MS.TEAMS.1.2v1",
+        "name": "Anonymous users SHALL NOT be enabled to start meetings.",
+        "rationale": "For agencies that implemented custom policies providing more flexibility to some users to automatically admit \"everyone\" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "To configure settings for anonymous users:\n\n1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, set **Anonymous users and dial-in callers can start a meeting** to **Off**.\n\n5.\tIf custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.1.3v1",
+        "name": "Anonymous users and dial-in callers SHOULD NOT be admitted automatically.",
+        "rationale": "Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.\n\n5.\tIn the same section, set **People dialing in can bypass the lobby** to **Off**."
+      },
+      {
+        "id": "MS.TEAMS.1.4v1",
+        "name": "Internal users SHOULD be admitted automatically.",
+        "rationale": "Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is set to **People in my org**.\n\n5.\tIn the same section, set **People dialing in can bypass the lobby** to **Off**."
+      },
+      {
+        "id": "MS.TEAMS.1.5v1",
+        "name": "Dial-in users SHOULD NOT be enabled to bypass the lobby.",
+        "rationale": "Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, set **People dialing in can bypass the lobby** to **Off**."
+      },
+      {
+        "id": "MS.TEAMS.1.6v1",
+        "name": "Meeting recording SHOULD be disabled.",
+        "rationale": "Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Select the **Global (Org-wide default)** policy.\n\n4.  Under the **Recording & transcription** section, set **Meeting\n    recording** to **Off**.\n\n5.  Select **Save**."
+      },
+      {
+        "id": "MS.TEAMS.1.7v2",
+        "name": "Record an event SHOULD NOT be set to Always record.",
+        "rationale": "Allowing to always record Live Events can pose data and video recording leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin\n    center**.\n\n2.  Select **Meetings** > **Live events policies**.\n\n3.  Select **Global (Org-wide default)** policy.\n\n4.  Set **Record an event** to either  **Organizer can record** or **Never record**\n\n5.  Click **Save**.\n\n6.  If custom policies were created, repeat these steps for each\n    policy, selecting the appropriate policy in step 3.",
+        "resources": [
+          "- [Meeting policy settings \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.2.1v1",
+        "name": "External access for users SHALL only be enabled on a per-domain basis.",
+        "rationale": "The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "To enable external access for only specific domains:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users** > **External access**.\n\n3.  Under **Choose which external domains your users have access to**,\n    select **Allow only specific external domains**.\n\n4.  Click **Allow domains** to add allowed external domains. All domains\n    not added in this step will be blocked.\n\n5.  Click **Save**.",
+        "mitreMapping": [
+          "- [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)",
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.2.2v1",
+        "name": "Unmanaged users SHALL NOT be enabled to initiate contact with internal users.",
+        "rationale": "Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users > External access**.\n\n3. Under **Teams accounts not managed by an organization**, toggle **People in my organization can communicate with Teams users whose accounts aren't managed by an organization** to one of the following:\n    1. To completely block contact with unmanaged users, toggle the setting to **Off**.\n    2. To allow contact with unmanaged users only if the internal user initiates the contact:\n        - Toggle the setting to **On**.\n        - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.2.3v1",
+        "name": "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.",
+        "rationale": "Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users > External access**.\n\n3.  To completely block contact with unmanaged users, under **Teams\n    accounts not managed by an organization**, set **People in my\n    organization can communicate with Teams users whose accounts aren't\n    managed by an organization** to **Off**.",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.3.1v1",
+        "name": "Contact with Skype users SHALL be blocked.",
+        "rationale": "Microsoft is officially retiring all forms of Skype as listed above. Allowing contact with Skype users puts agency users at additional security risk. By blocking contact with Skype users an agency limits access to security threats utilizing the vulnerabilities of the Skype product.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users > External access**.\n\n3.  Under **Skype** users, set **Allow users in my organization to\n    communicate with Skype users** to **Off**.\n\n4.  Click **Save**.",
+        "mitreMapping": [
+          "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.4.1v1",
+        "name": "Teams email integration SHALL be disabled.",
+        "rationale": "Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin\n    center**.\n\n2.  Select **Teams** > **Teams Settings**.\n\n3.  Under the **Email integration** section, set **Users can send\n    emails to a channel email address** to **Off**.",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)",
+          "- [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.5.1v1",
+        "name": "Agencies SHOULD only allow installation of Microsoft apps approved by the agency.",
+        "rationale": "Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Permission policies**.\n\n3.  Select **Global (Org-wide default)**.\n\n4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.\n\n5.  Click **Allow apps**.\n\n6.  Search and Click **Add** to all appropriate Microsoft Apps.\n\n7.  Click **Allow**.\n\n8.  Click **Save**.\n\n9.  If custom policies have been created, repeat these steps for each\n    policy, selecting the appropriate policy in step 3.",
+        "mitreMapping": [
+          "- [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.5.2v1",
+        "name": "Agencies SHOULD only allow installation of third-party apps approved by the agency.",
+        "rationale": "Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Manage apps**.\n\n3.  Select **Org-wide app settings** button to access pop-up options.\n    - Under **Third-party apps** turn off **Third-party apps**.\n    - Click **Save**.\n\n4.  Select **Teams apps** > **Permission policies**.\n\n5.  Select **Global (Org-wide default)**.\n\n6.  Set **Third-party apps** to **Block all apps**, unless specific apps\n    have been approved by the agency, in which case select **Allow\n    specific apps and block all others**.\n\n7.  Click **Save**.\n\n8.   If custom policies have been created, repeat steps 4 to 7 for each\n    policy, selecting the appropriate policy in step 5.",
+        "mitreMapping": [
+          "- [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)",
+          "- [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.5.3v1",
+        "name": "Agencies SHOULD only allow installation of custom apps approved by the agency.",
+        "rationale": "Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Manage apps**.\n\n3.  Select **Org-wide app settings** button to access pop-up options.\n    - Under **Custom apps** turn off **Interaction with custom apps**.\n    - Click **Save**.\n\n4.  Select **Teams apps** > **Permission policies**.\n\n5.  Select **Global (Org-wide default)**.\n\n6.  Set **Custom apps** to **Block all apps**, unless specific apps have\n    been approved by the agency, in which case select **Allow specific apps and block all others**.\n\n7.  Click **Save**.\n\n8.  If custom policies have been created, repeat steps 4 to 7 for each\n    policy, selecting the appropriate policy in step 5.",
+        "mitreMapping": [
+          "- [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)",
+          "- [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)"
+        ],
+        "resources": [
+          "- [Use app permission policies to control user access to apps \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-app-permission-policies)",
+          "- [Upload your app in Microsoft Teams \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/platform/concepts/deploy-and-publish/apps-upload)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.6.1v1",
+        "name": "A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.",
+        "rationale": "Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
+        "mitreMapping": [
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.6.2v1",
+        "name": "The DLP solution SHALL protect personally identifiable information (PII)",
+        "rationale": "Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
+        "mitreMapping": [
+          "- [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)",
+          "- [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)"
+        ],
+        "resources": [
+          "- [Plan for data loss prevention (DLP) \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.7.1v1",
+        "name": "Attachments included with Teams messages SHOULD be scanned for malware.",
+        "rationale": "Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.",
+        "mitreMapping": [
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.7.2v1",
+        "name": "Users SHOULD be prevented from opening or downloading files detected as malware.",
+        "rationale": "Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.8.1v1",
+        "name": "URL comparison with a blocklist SHOULD be enabled.",
+        "rationale": "Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)",
+          "- [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)"
+        ]
+      },
+      {
+        "id": "MS.TEAMS.8.2v1",
+        "name": "User click tracking SHOULD be enabled.",
+        "rationale": "Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "omissions",
+        "annotationField": "annotation",
+        "lastModified": "July 2023",
+        "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.\n\n\n[^1]: Note that B2B guest users and all anonymous users except for\n    external users appear in Teams calls as _John Doe (Guest)_. To avoid\n    potential confusion, true guest users are always referred to as B2B guest users in this document.\n\n# Appendix A - Custom Meeting Policies\n\nIf there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them. For example, custom meeting policies can be configured with _specific_ users having\npermission to record meetings. To allow specific users the ability to\nrecord meetings:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Create a new policy by selecting **Add**. Give this new policy a\n    name and appropriate description.\n\n4.  Under the **Recording & transcription** section, set **Cloud\n    recording** to **On**.\n\n5.  Select **Save**.\n\n6.  After selecting **Save**, a table displays the set of policies.\n    Select the row containing the new policy, then select **Manage\n    users**.\n\n7.  Assign the users who need the ability to record to this policy.\n\n8.  Select **Apply**.\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)",
+          "- [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)",
+          "- [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)",
+          "- [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)",
+          "- [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)",
+          "- [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)"
+        ],
+        "resources": [
+          "- [Set up Safe Links policies in Microsoft Defender for Office 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)"
+        ]
+      }
+    ]
+  }
+}

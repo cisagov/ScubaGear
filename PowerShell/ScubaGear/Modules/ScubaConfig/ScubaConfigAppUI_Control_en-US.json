@@ -1,12 +1,13 @@
 {
-  "Version": "1.8.7 [updated 8/7/2025]",
-  "DebugMode": false,
+  "Version": "1.8.12 [updated 8/12/2025]",
+  "DebugMode": true,
   "EnableSearchAndFilter": false,
   "EnableScubaRun": true,
+  "EnableResultReader": true,
   "localeContext": {
     "Title_TextBlock": "Scuba Configuration Editor",
     "SubTitle_TextBlock": "Create a ScubaGear configuration file for exclusions, annotations, and omissions",
-    "M365Environment_ComboBox": "Select M365 Environment",
+    "M365Environment_TextBlock": "Select your M365 Environment",
     "Products_TextBlock": "Select at least one product:",
     "ExclusionsProducts_TextBlock": "Products supporting exclusions:",
     "ExclusionsInfo_TextBlock": "Exclusions are supported for the following products: {0}",
@@ -46,6 +47,7 @@
     "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
     "WindowError": "Error loading screen",
     "OrganizationValidation": "Organization Name is required and must be in format: example.onmicrosoft.com or example.onmicrosoft.us",
+    "OrgNameValidation": "Org Name is required. Please specify a valid organization name.",
     "AppIdValidation": "Application ID must be in GUID format (e.g., 12345678-1234-1234-1234-123456789abc)",
     "CertificateValidation": "Certificate Thumbprint must be 40 hexadecimal characters",
     "CertificateStoreAccessError": "Error accessing certificate store: {0}",
@@ -94,7 +96,8 @@
     "InvalidPolicyId": "Invalid Policy ID format.",
     "ConfirmRemovalOfCard": "Are you sure you want to remove this item?",
     "ValidationErrors": "Please correct the validation errors before proceeding.",
-    "GraphError": "Error retrieving data from Graph: {0}"
+    "GraphError": "Error retrieving data from Graph: {0}",
+    "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'."
   },
   "localeHelpTips": {
     "Organization_HelpLabel": {
@@ -202,7 +205,7 @@
       "cmdlets": "Invoke-Scuba",
       "postCommands": [
         "Write-Output 'ScubaGear execution completed'",
-        "Get-ChildItem \"$env:temp\\ScubaConfigRun\" -Filter *.yaml | Remove-Item -Force -ErrorAction SilentlyContinue -Verbose"
+        "Get-ChildItem \"$env:temp\\ScubaConfigRun\" | Remove-Item -Force -ErrorAction SilentlyContinue -Verbose"
       ],
       "parameters" : {
         "SilenceBODWarnings": {
@@ -245,6 +248,30 @@
         }
       }
     }
+  },
+  "Reports": {
+    "tabName": "Report Summary",
+    "IncludeScubeVersion": true,
+    "IncludeReportUUID": true,
+    "summaryColumns": [
+      "Manual",
+      "Failures",
+      "Warnings",
+      "Errors",
+      "Passes",
+      "Omits",
+      "IncorrectResults"
+    ],
+    "ProductColumns": [
+      "GroupReferenceURL",
+      "Control ID",
+      "Requirement",
+      "Result",
+      "Criticality",
+      "Details",
+      "OmittedEvaluationResult",
+      "IncorrectResult"
+    ]
   },
   "products": [
     {
@@ -299,7 +326,7 @@
     },
     {
       "id": "gcchigh",
-      "name": "gcch",
+      "name": "gcchigh",
       "displayName": "Government Community Cloud High",
       "rationale": "Production environment for GCCH tenants."
     },
@@ -635,6 +662,11 @@
       "pattern": "^(.*\\.)?(onmicrosoft\\.com|onmicrosoft\\.us)$",
       "sample": "example.onmicrosoft.com",
       "format": "example.onmicrosoft.com"
+    },
+    "orgName": {
+      "pattern": "^[a-zA-Z0-9.-]+$",
+      "sample": "example",
+      "format": "example"
     }
   },
   "graphQueries": {
