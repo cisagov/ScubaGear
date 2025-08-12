@@ -424,7 +424,7 @@ a.control_group:active {
     background: rgba(0, 0, 0, 0.5);
 }
 
-#details-dialog header {
+#details-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
