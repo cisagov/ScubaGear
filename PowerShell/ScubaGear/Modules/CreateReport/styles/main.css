@@ -287,12 +287,8 @@ th.multi_tenant_enabled {
     text-align: center;
 }
 
-th.key_credentials, th.password_credentials, th.federated_credentials {
-    width: 15%;
-}
-
-th.permissions {
-    width: 25%;
+th.key_credentials, th.password_credentials, th.federated_credentials, th.permissions {
+    width: 20%;
 }
 
 #toggle-container {
@@ -468,14 +464,5 @@ a.control_group:active {
 }
 
 .view-details-button {
-    cursor: pointer;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 0.85em;
-}
-
-.view-details-button:hover {
-    background-color: #e0e0e0;
+    margin: 1rem;
 }
