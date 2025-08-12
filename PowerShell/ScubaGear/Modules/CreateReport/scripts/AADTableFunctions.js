@@ -73,115 +73,161 @@ const normalizeColumnNames = (name) => {
 };
 
 /**
- * Shared function to build a table with expand/collapse chevrons and truncation.
- * @param {Array} data - The data array.
- * @param {string} tableType - One of 'caps', 'riskyApps', 'riskySPs'.
+ * Creates a chevron <img> icon for right/down arrows.
+ * 
+ * @param {string} direction - Direction of the chevron arrow.
+ * @param {number} width - Icon width in pixels.
+ * @returns {HTMLImageElement} - An <img> element.
  */
-const buildExpandableTable = (data, tableType) => {
-    if (data === undefined || data === null) {
-        /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but
-            this js file applies to all baselines. If data is null,
-            then the current baseline is not AAD and we don't need to
-            do anything.
-
-            Also, note that CAP, risky app, and risky SP data are not declared in the static version of
-            this file. It is prepended to the version rendered in the html
-            by CreateReport.psm1.
-        */
-        return;
+const createChevronIcon = (direction, width) => {
+    const img = document.createElement("img");
+    const map = {
+        right: { src: "images/angle-right-solid.svg", alt: "Chevron arrow pointing right" },
+        down:  { src: "images/angle-down-solid.svg",  alt: "Chevron arrow pointing down" }
     };
 
-    const metadata = TABLE_METADATA[tableType];
-    if (!metadata) {
-        console.error(`Invalid table type: ${tableType}.`);
-        return;
-    }
+    const metadata = map[direction] || map.right;
+    img.setAttribute("src", metadata.src);
+    img.setAttribute("alt", metadata.alt);
+    img.style.width = `${width}px`;
+    return img;
+};
 
-    const colNames = metadata.columns;
-    const section = document.createElement("section");
-    section.className = metadata.wrapperClass;
-    document.querySelector("main").appendChild(section);
+/**
+ * Creates a generic row-action button with custom content (img/span/etc.).
+ * contentBuilder must return a Node that will be appended inside the button.
+ * 
+ * @param {string}   title - Title for the button.
+ * @param {string}   className - Optional CSS class for the button.
+ * @param {number}   rowIndex - The row index (0-indexed, not counting the header row).
+ * @param {function} onClick - Click event handler for the button.
+ * @param {function} contentBuilder - Function that returns inner Node content.
+ */
+const createRowActionButton = ({ title, className, rowIndex, onClick, contentBuilder }) => {
+    const btn = document.createElement("button");
+    btn.title = title;
+    btn.rowNumber = rowIndex;
+    btn.addEventListener("click", onClick);
+    if (className) btn.classList.add(className);
 
-    section.appendChild(document.createElement("hr"));
-    const h2 = document.createElement("h2");
-    h2.textContent = metadata.title;
-    section.appendChild(h2);
+    const content = contentBuilder();
+    if (content) btn.appendChild(content);
+    return btn;
+};
 
-    if (data.length === 0) {
-        // If there is no data, don't create a table, instead display this message
-        let noDataWarning = document.createElement("p");
-        noDataWarning.textContent = "No data found";
-        section.appendChild(noDataWarning);
-        return;
-    }
+/**
+ * Shared function to build a table with expand/collapse chevrons and truncation.
+ * 
+ * @param {Array}  data - The data array.
+ * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ */
+const buildExpandableTable = (data, tableType) => {
+    try {
+        if (data === undefined || data === null) {
+            /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but
+                this js file applies to all baselines. If data is null,
+                then the current baseline is not AAD and we don't need to
+                do anything.
 
-    // Expand/Collapse all buttons
-    const buttons = document.createElement("div");
-    buttons.classList.add("buttons");
-    section.appendChild(buttons);
+                Also, note that CAP, risky app, and risky SP data are not declared in the static version of
+                this file. It is prepended to the version rendered in the html
+                by CreateReport.psm1.
+            */
+            return;
+        };
 
-    const expandAll = document.createElement("button");
-    expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
-    expandAll.title = "Expands all rows in the table below";
-    expandAll.addEventListener("click", () => expandAllRows(data, tableType));
-    buttons.appendChild(expandAll);
+        const metadata = TABLE_METADATA[tableType];
+        if (!metadata) {
+            console.error(`Invalid table type: ${tableType}.`);
+            return;
+        }
 
-    const collapseAll = document.createElement("button");
-    collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
-    collapseAll.title = "Collapses all rows in the table below";
-    collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
-    buttons.appendChild(collapseAll);
+        const colNames = metadata.columns;
+        const section = document.createElement("section");
+        section.className = metadata.wrapperClass;
+        document.querySelector("main").appendChild(section);
 
-    const table = document.createElement("table");
-    table.className = `${tableType}_table`;
-    section.appendChild(table);
+        section.appendChild(document.createElement("hr"));
+        const h2 = document.createElement("h2");
+        h2.textContent = metadata.title;
+        section.appendChild(h2);
 
-    const thead = document.createElement("thead");
-    const header = document.createElement("tr");
+        if (data.length === 0) {
+            // If there is no data, don't create a table, instead display this message
+            let noDataWarning = document.createElement("p");
+            noDataWarning.textContent = "No data found";
+            section.appendChild(noDataWarning);
+            return;
+        }
 
-    colNames.forEach(col => {
-        const th = document.createElement("th");
-        th.textContent = col.name;
+        // Expand/Collapse all buttons
+        const buttons = document.createElement("div");
+        buttons.classList.add("buttons");
+        section.appendChild(buttons);
 
-        if (col.className) th.classList.add(col.className);
-        header.appendChild(th);
-    });
+        const expandAll = document.createElement("button");
+        expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
+        expandAll.title = "Expands all rows in the table below";
+        expandAll.addEventListener("click", () => expandAllRows(data, tableType));
+        buttons.appendChild(expandAll);
 
-    thead.appendChild(header);
-    table.appendChild(thead);
+        const collapseAll = document.createElement("button");
+        collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
+        collapseAll.title = "Collapses all rows in the table below";
+        collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
+        buttons.appendChild(collapseAll);
 
-    const tbody = document.createElement("tbody");
-    table.appendChild(tbody);
+        const table = document.createElement("table");
+        table.className = `${tableType}_table`;
+        section.appendChild(table);
 
-    data.forEach((_, rowIndex) => {
-        const tr = document.createElement("tr");
+        const thead = document.createElement("thead");
+        const header = document.createElement("tr");
 
-        colNames.forEach((_, colIndex) => {
-            const td = document.createElement("td");
+        colNames.forEach(col => {
+            const th = document.createElement("th");
+            th.textContent = normalizeColumnNames(col.name);
 
-            if (colIndex === 0) {
-                const img = document.createElement("img");
-                img.setAttribute("src", "images/angle-right-solid.svg");
-                img.setAttribute("alt", "Chevron arrow pointing right");
-                img.style.width = "10px";
-
-                const expandRowButton = document.createElement("button");
-                expandRowButton.title = `Show more info for row ${rowIndex + 1}`;
-                expandRowButton.classList.add("chevron");
-                expandRowButton.addEventListener("click", (event) => expandRow(data, tableType, event));
-                expandRowButton.rowNumber = rowIndex;
-                expandRowButton.appendChild(img);
-                td.appendChild(expandRowButton);
-            } 
-            else {
-                fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
-            }
-
-            tr.appendChild(td);
+            if (col.className) th.classList.add(col.className);
+            header.appendChild(th);
         });
 
-        tbody.appendChild(tr);
-    });
+        thead.appendChild(header);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        table.appendChild(tbody);
+
+        data.forEach((_, rowIndex) => {
+            const tr = document.createElement("tr");
+
+            colNames.forEach((_, colIndex) => {
+                const td = document.createElement("td");
+
+                if (colIndex === 0) {
+                    td.appendChild(
+                        createRowActionButton({
+                            title: `Show more info for row ${rowIndex + 1}`,
+                            className: "chevron",
+                            rowIndex,
+                            onClick: (event) => expandRow(data, tableType, event),
+                            contentBuilder: () => createChevronIcon("right", 10)
+                        })
+                    );
+                } 
+                else {
+                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                }
+
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
+    catch (error) {
+        console.error(`Error building expandable table for ${tableType}:`, error);
+    }
 }
 
 /**
@@ -214,18 +260,18 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
         const count = items.length;
 
         if (TABLE_METADATA[tableType].useModal) {
-            td.textContent = `${count} total`;
+            td.textContent = `Total: ${count}`;
         }
         else {
             const first = items[0];
-            td.textContent = first.toString();
+            td.textContent = String(first);
         }
 
         truncated = true;
     }
     // Standard view of cell data which is seen in the CAPs table
     else {
-        const value = cellData.toString();
+        const value = String(cellData);
 
         if (value.length > charLimit) {
             td.textContent = value.substring(0, charLimit);
@@ -238,21 +284,24 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 
     // Don't apply truncated cell to "Name" or "DisplayName" column
     if (col.name === "Name" || col.name === "DisplayName") {
-        td.textContent = cellData.toString();
+        td.textContent = String(cellData);
         truncated = false;
     }
 
     if (truncated) {
-        const span = document.createElement("span");
-        span.appendChild(document.createTextNode("..."));
-
-        const threeDotsButton = document.createElement("button");
-        threeDotsButton.title = `Expand row ${rowIndex + 1}`;
-        threeDotsButton.classList.add("truncated-dots");
-        threeDotsButton.addEventListener("click", (event) => expandRow(data, tableType, event));
-        threeDotsButton.rowNumber = rowIndex;
-        threeDotsButton.appendChild(span);
-        td.appendChild(threeDotsButton);
+        td.appendChild(
+            createRowActionButton({
+                title: `Expand row ${rowIndex + 1}`,
+                className: "truncated-dots",
+                rowIndex,
+                onClick: (event) => expandRow(data, tableType, event),
+                contentBuilder: () => {
+                    const span = document.createElement("span");
+                    span.appendChild(document.createTextNode("..."));
+                    return span;
+                }
+            })
+        );
     }
 }
 
@@ -275,41 +324,40 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
         const cellData = data[rowIndex][col.name];
 
         if (colIndex === 0) {
-            // We have to manually "reset" the content of the first column to an empty value,
-            // then we can recreate the down-angled chevron arrow.
-            const img = document.createElement("img");
-            img.setAttribute("src", "images/angle-down-solid.svg");
-            img.setAttribute("alt", "Chevron arrow pointing down");
-            img.style.width = "14px";
-
-            const collapseRowButton = document.createElement("button");
-            collapseRowButton.title = `Show less info for row ${rowIndex + 1}`;
-            collapseRowButton.classList.add("chevron");
-            collapseRowButton.addEventListener("click", (event) => collapseRow(data, tableType, event));
-            collapseRowButton.rowNumber = rowIndex;
-            collapseRowButton.appendChild(img);
-            td.appendChild(collapseRowButton);
+            td.appendChild(
+                createRowActionButton({
+                    title: `Show less info for row ${rowIndex + 1}`,
+                    className: "chevron",
+                    rowIndex,
+                    onClick: (event) => collapseRow(data, tableType, event),
+                    contentBuilder: () => createChevronIcon("down", 14)
+                })
+            );
         }
         else if (cellData && (Array.isArray(cellData) || typeof cellData === "object")) {
             const items = normalizeToArray(cellData);
+            const count = items.length;
 
-            if (items.length === 0) {
+            if (count === 0) {
                 td.textContent = "None";
                 continue;
             }
 
             if (metadata.useModal) {
-                // Assumes column name "DisplayName" or "Name" exist, may need to adjust if adding new table types
+                // Assumes column name "DisplayName" or "Name" exist, will need to adjust if adding new table types
                 const rowLabel = data[rowIndex].DisplayName || data[rowIndex].Name;
                 const colLabel = normalizeColumnNames(col.name);
+
+                const ul = renderSummaryList(col.name, items);
+                if (ul) td.appendChild(ul);
 
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.className = "view-details-button";
-                btn.textContent = colLabel;
+                btn.textContent = `View ${count} ${colLabel}`;
                 btn.addEventListener("click", () => {
                     let node = renderKeyValueList(items);
-                    const title = `${colLabel} - ${rowLabel}`;
+                    const title = `${rowLabel} - ${colLabel}`;
                     openDetailsModal(title, node);
                 });
 
@@ -345,18 +393,15 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
     // then we can recreate the right-angled chevron arrow.
     let td = row.querySelector("td:first-child");
     td.textContent = "";
-    const img = document.createElement("img");
-    img.setAttribute("src", "images/angle-right-solid.svg");
-    img.setAttribute("alt", "Chevron arrow pointing right");
-    img.style.width = "10px";
-
-    const expandRowButton = document.createElement("button");
-    expandRowButton.title = `Show more info for row ${rowIndex + 1}`;
-    expandRowButton.classList.add("chevron");
-    expandRowButton.addEventListener("click", (event) => expandRow(data, tableType, event));
-    expandRowButton.rowNumber = rowIndex;
-    expandRowButton.appendChild(img);
-    td.appendChild(expandRowButton);
+    td.appendChild(
+        createRowActionButton({
+            title: `Show more info for row ${rowIndex + 1}`,
+            className: "chevron",
+            rowIndex,
+            onClick: (event) => expandRow(data, tableType, event),
+            contentBuilder: () => createChevronIcon("right", 10)
+        })
+    );
 }
 
 /**
@@ -460,13 +505,30 @@ const renderKeyValueList = (items) => {
 
     items.forEach(item => {
         const li = document.createElement("li");
+
         if (item && typeof item === "object") {
-            li.innerHTML = Object.entries(item)
-                .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
-                .join("<br>");
+            const entries = Object.entries(item);
+
+            entries.forEach(([key, value], idx) => {
+                const strong = document.createElement("strong");
+                strong.textContent = `${key}:`;
+                li.appendChild(strong);
+
+                let content = value;
+                if (typeof value === "string" && (key === "StartDateTime" || key === "EndDateTime")) {
+                    const date = parseDotNetDate(value);
+                    content = date ? date.toLocaleString() : value;
+                }
+
+                li.appendChild(document.createTextNode(` ${String(content)}`));
+
+                if (idx < entries.length - 1) {
+                    li.appendChild(document.createElement("br"));
+                }
+            });
         }
         else {
-            li.textContent = item.toString();
+            li.textContent = String(item);
         }
 
         ul.appendChild(li);
@@ -474,3 +536,83 @@ const renderKeyValueList = (items) => {
 
     return ul;
 };
+
+/**
+ * Builds an unordered list summarizing data such as:
+ *   - active/expired credentials
+ *   - admin consented permissions
+ *   - non-admin consented permissions
+ *   - risky permissions
+ * 
+ * @param {string} colName The column name from TABLE_METADATA.columns (e.g., "KeyCredentials", "Permissions").
+ * @param {Array} items The normalized array of items to summarize.
+ * @returns {HTMLElement|null} An unordered list element containing the summary.
+ */
+const renderSummaryList = (colName, items) => {
+    const count = items.length;
+
+    const makeUl = () => {
+        const ul = document.createElement("ul");
+        ul.className = "summary-list";
+        return ul;
+    };
+
+    const addItem = (ul, label, value) => {
+        const li = document.createElement("li");
+        const strong = document.createElement("strong");
+        strong.textContent = `${label}:`;
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(` ${String(value)}`));
+        ul.appendChild(li);
+    };
+
+    if (colName === "KeyCredentials" || colName === "PasswordCredentials" || colName === "FederatedCredentials") {
+        const now = new Date();
+        let active = 0, expired = 0;
+
+        items.forEach(credential => {
+            if (!credential || typeof credential !== "object") return;
+
+            const start = parseDotNetDate(credential.StartDateTime);
+            const end = parseDotNetDate(credential.EndDateTime);
+
+            if (start && end) {
+                if (start <= now && end >= now) {
+                    active++;
+                } else if (end < now) {
+                    expired++;
+                }
+            }
+        });
+
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+        addItem(ul, "Active", active);
+        addItem(ul, "Expired", expired);
+        return ul;
+    }
+
+    if (colName === "Permissions") {
+        let adminConsented = 0, notAdminConsented = 0, risky = 0;
+
+        items.forEach(permission => {
+            if (!permission || typeof permission !== "object") return;
+
+            // Handle admin consented permissions
+            if (permission.IsAdminConsented === true) adminConsented++;
+            else notAdminConsented++;
+
+            // Handle risky permissions
+            if (permission.IsRisky === true) risky++;
+        });
+
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+        addItem(ul, "Admin Consented", adminConsented);
+        addItem(ul, "Not Admin Consented", notAdminConsented);
+        addItem(ul, "Risky", risky);
+        return ul;
+    }
+
+    return null;
+}
