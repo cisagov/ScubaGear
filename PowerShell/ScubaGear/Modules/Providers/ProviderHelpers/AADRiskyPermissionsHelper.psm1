@@ -312,7 +312,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 $FederatedCredentials = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplicationFederatedIdentityCredential" -M365Environment $M365Environment -Id $App.Id).Value
                 $FederatedCredentialsResults = @()
 
-                if ($null -ne $FederatedCredentials) {
+                if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
                     foreach ($FederatedCredential in $FederatedCredentials) {
                         $FederatedCredentialsResults += [PSCustomObject]@{
                             Id          = $FederatedCredential.Id
