@@ -20,10 +20,10 @@ ScubaGear is for M365 administrators who want to assess their tenant environment
 
 ## What's New 🆕
 
-**YAML Configuration UI**: SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
+**Scuba Configuration UI**: SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
 
 #### 🚀 UI Key Features:
-- Launch with `Invoke-SCuBAConfigAppUI`
+- Launch with `Start-ScubaConfigApp`
 - Step-by-step setup wizard covering all configuration options
 - Real-time validation with live YAML preview
 - Microsoft Graph integration for user and group selection
@@ -158,7 +158,7 @@ Use the graphical configuration interface to easily create and manage your setti
 
 ```powershell
 # Launch the Configuration UI
-Invoke-SCuBAConfigAppUI
+Start-ScubaConfigApp
 ```
 
 The Configuration UI provides:
@@ -169,7 +169,7 @@ The Configuration UI provides:
 - ✅ **Import/Export** existing configurations
 - ✅ **Microsoft Graph integration** for user/group selection
 
-📖 **[Learn more about the Configuration UI →](docs/configuration/scubaconfigui.md)**
+📖 **[Learn more about the Configuration UI →](docs/configuration/scubaconfigapp.md)**
 
 📖 **[Learn more about Configuration Files →](docs/configuration/configuration.md)**
 
@@ -212,7 +212,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.YAML"
 
 ### ⚙️ Configuration & Usage
 
-- [Configuration UI](docs/scubaconfigui.md) - **Graphical interface for easy setup**
+- [Configuration UI](docs/scubaconfigapp.md) - **Graphical interface for easy setup**
 - [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
 - [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 

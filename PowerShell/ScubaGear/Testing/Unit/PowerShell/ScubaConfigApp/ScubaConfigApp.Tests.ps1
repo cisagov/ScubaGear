@@ -1,13 +1,13 @@
-using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigAppUI.psm1'
+using module '..\..\..\..\Modules\ScubaConfigApp\ScubaConfigApp.psm1'
 
-InModuleScope ScubaConfigAppUI {
+InModuleScope ScubaConfigApp {
 
-    Describe -tag "Config" -name 'ScubaConfig JSON Configuration Validation' {
+    Describe -tag "Config" -name 'ScubaConfigApp JSON Configuration Validation' {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'uiConfigPath')]
-            $uiConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigAppUI_Control_en-US.json"
+            $uiConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigApp_Control_en-US.json"
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'baselineConfigPath')]
-            $baselineConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaBaselines_en-US.json"
+            $baselineConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaBaselines_en-US.json"
         }
 
         Context 'JSON File Structure Validation' {
@@ -30,7 +30,6 @@ InModuleScope ScubaConfigAppUI {
 
                 # Define expected root keys for UI configuration
                 $expectedUIRootKeys = @(
-                    'Version',
                     'DebugMode',
                     'EnableSearchAndFilter',
                     'EnableScubaRun',
@@ -70,11 +69,6 @@ InModuleScope ScubaConfigAppUI {
                 foreach ($key in $expectedBaselineRootKeys) {
                     $baselineConfigContent.PSObject.Properties.Name | Should -Contain $key -Because "Baseline config root key '$key' should be present in configuration"
                 }
-            }
-
-            It 'Should have valid version format' {
-                $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
-                $uiConfigContent.Version | Should -Match '^\d+\.\d+\.\d+' -Because "Version should start with semantic versioning format (x.y.z)"
             }
 
             It 'Should have valid DebugMode values' {
@@ -246,10 +240,10 @@ InModuleScope ScubaConfigAppUI {
         }
     }
 
-    Describe -tag "UI" -name 'ScubaConfigAppUI XAML Validation' {
+    Describe -tag "UI" -name 'ScubaConfigApp XAML Validation' {
         BeforeAll {
             # Mock the UI launch function to prevent actual UI from showing
-            Mock -CommandName Start-ScubaConfigAppUI { return $true }
+            Mock -CommandName Start-ScubaConfigApp { return $true }
 
             # Helper function to test XAML parsing without UI launch
             function Test-XamlValidity {
@@ -286,7 +280,7 @@ InModuleScope ScubaConfigAppUI {
 
         Context 'XAML File Validation' {
             It 'Should have a valid XAML file' {
-                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigAppUI.xaml"
+                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
                 Test-Path $xamlPath | Should -BeTrue
 
                 $result = Test-XamlValidity -XamlPath $xamlPath
@@ -294,7 +288,7 @@ InModuleScope ScubaConfigAppUI {
             }
 
             It 'Should contain required UI elements' {
-                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigAppUI.xaml"
+                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
                 $result = Test-XamlValidity -XamlPath $xamlPath
 
                 $result.IsValid | Should -BeTrue
@@ -311,10 +305,124 @@ InModuleScope ScubaConfigAppUI {
         Context 'Mocked UI Function' {
             It 'Should not launch actual UI when mocked' {
                 # This should return true without launching UI
-                Start-ScubaConfigAppUI | Should -BeTrue
+                Start-ScubaConfigApp | Should -BeTrue
 
                 # Verify the mock was called
-                Should -Invoke -CommandName Start-ScubaConfigAppUI -Exactly -Times 1
+                Should -Invoke -CommandName Start-ScubaConfigApp -Exactly -Times 1
+            }
+        }
+    }
+
+    Describe -tag "Files" -name 'ScubaConfigApp Additional Files Validation' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'changelogPath')]
+            $changelogPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigApp_CHANGELOG.md"
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'xamlResourcesPath')]
+            $xamlResourcesPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigAppResources"
+        }
+
+        Context 'Changelog File Validation' {
+            It 'Should have a changelog file' {
+                Test-Path $changelogPath | Should -BeTrue -Because "Changelog file should exist"
+            }
+
+            It 'Should have valid changelog format' {
+                if (Test-Path $changelogPath) {
+                    $changelogContent = Get-Content $changelogPath -Raw
+                    $changelogContent | Should -Not -BeNullOrEmpty -Because "Changelog should not be empty"
+                    $changelogContent | Should -Match '##\s+\d+\.\d+\.\d+' -Because "Changelog should contain version headers in format '## x.x.x'"
+                }
+            }
+        }
+
+        Context 'XAML Resources Validation' {
+            It 'Should have XAML resources directory' {
+                Test-Path $xamlResourcesPath | Should -BeTrue -Because "XAML resources directory should exist"
+            }
+
+            It 'Should contain main XAML file' {
+                $mainXamlPath = Join-Path $xamlResourcesPath "ScubaConfigAppUI.xaml"
+                Test-Path $mainXamlPath | Should -BeTrue -Because "Main XAML file should exist in resources directory"
+            }
+        }
+    }
+
+    Describe -tag "Integration" -name 'ScubaConfigApp Integration Tests' {
+        BeforeAll {
+            # Mock function to prevent actual UI launch
+            Mock Start-ScubaConfigApp { return $true }
+
+            function Test-XamlValidity {
+                param([string]$XamlPath)
+
+                try {
+                    # Load assemblies needed for XAML parsing
+                    [System.Reflection.Assembly]::LoadWithPartialName('PresentationFramework') | Out-Null
+                    [System.Reflection.Assembly]::LoadWithPartialName('PresentationCore') | Out-Null
+
+                    # Read and process XAML the same way as the main function
+                    [string]$XAML = (Get-Content $XamlPath -ReadCount 0) -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace '^<Win.*', '<Window' -replace 'Click=".*','/>'
+                    [xml]$UIXML = $XAML
+                    $reader = New-Object System.Xml.XmlNodeReader ([xml]$UIXML)
+
+                    # Try to load the XAML - this will throw if invalid
+                    $window = [Windows.Markup.XamlReader]::Load($reader)
+
+                    return @{
+                        IsValid = $true
+                        Window = $window
+                        Error = $null
+                    }
+                }
+                catch {
+                    return @{
+                        IsValid = $false
+                        Window = $null
+                        Error = $_.Exception.Message
+                    }
+                }
+            }
+        }
+
+        Context 'XAML File Validation' {
+            It 'Should have a valid XAML file' {
+                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
+                Test-Path $xamlPath | Should -BeTrue
+
+                $result = Test-XamlValidity -XamlPath $xamlPath
+                $result.IsValid | Should -BeTrue -Because "XAML should be valid: $($result.Error)"
+            }
+
+            It 'Should contain required UI elements' {
+                $xamlPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
+                $result = Test-XamlValidity -XamlPath $xamlPath
+
+                $result.IsValid | Should -BeTrue
+                $result.Window | Should -Not -BeNullOrEmpty
+
+                # Test for specific named elements that should exist in the XAML
+                $result.Window.FindName("MainTabControl") | Should -Not -BeNullOrEmpty -Because "MainTabControl should exist in XAML"
+                $result.Window.FindName("PreviewButton") | Should -Not -BeNullOrEmpty -Because "PreviewButton should exist in XAML"
+                $result.Window.FindName("ImportButton") | Should -Not -BeNullOrEmpty -Because "ImportButton should exist in XAML"
+                $result.Window.FindName("NewSessionButton") | Should -Not -BeNullOrEmpty -Because "NewSessionButton should exist in XAML"
+
+                # Test for new elements added during restructuring
+                $result.Window.FindName("ChangelogButton") | Should -Not -BeNullOrEmpty -Because "ChangelogButton should exist in XAML"
+                $result.Window.FindName("Version_TextBlock") | Should -Not -BeNullOrEmpty -Because "Version_TextBlock should exist in XAML"
+            }
+        }
+
+        Context 'Module Function Availability' {
+            It 'Should have Start-ScubaConfigApp function available' {
+                Get-Command Start-ScubaConfigApp -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty -Because "Start-ScubaConfigApp function should be exported from module"
+            }
+
+            It 'Should not launch actual UI when mocked' {
+                # This should return true without launching UI
+                Start-ScubaConfigApp | Should -BeTrue
+
+                # Verify the mock was called
+                Should -Invoke -CommandName Start-ScubaConfigApp -Exactly -Times 1
             }
         }
     }

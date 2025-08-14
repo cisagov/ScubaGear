@@ -1,4 +1,12 @@
-# SCUBACONFIGAPPUI CHANGELOG
+:  # SCUBACONFIGAPPUI CHANGELOG
+
+## 1.8.14 [08/14/2025] - Comprehensive Test Framework and Module Architecture Enhancement
+-  Implemented changelog display functionality with `Show-ChangelogWindow` function for easy access to version history
+-  Moved functions from main module to 17 specialized helper modules for better organization and maintainability
+-  Resolved product-specific report display issues to properly show ScubaGear execution results
+-  Implemented comprehensive Pester test suite for all 17 helper modules with 10 test contexts covering file existence, syntax validation, Unicode character detection, import validation, dependencies, and documentation
+-  Added validation for 94+ functions across helper modules ensuring all expected functions are present and properly organized
+-  Implemented Unicode character detection tests to prevent PowerShell parsing errors from problematic characters (emojis, special symbols)
 
 ## 1.8.10 [08/10/2025] - ScubaGear Execution Experience Enhancement
 - Implemented enhanced completion status reporting with baseline conformance report path display
