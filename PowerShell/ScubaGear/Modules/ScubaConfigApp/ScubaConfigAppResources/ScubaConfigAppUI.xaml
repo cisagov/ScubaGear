@@ -1818,13 +1818,19 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Version Number - Bottom Left -->
-            <TextBlock Grid.Column="0"
-                    x:Name="Version_TextBlock"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Foreground="{StaticResource MutedTextBrush}"
-                    FontSize="12"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="Version_TextBlock" Text="v1.0.0" FontSize="12" Foreground="Gray" VerticalAlignment="Center"/>
+                <Button x:Name="ChangelogButton"
+                        Content="See Changelog"
+                        FontSize="10"
+                        Padding="6,2"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderBrush="LightGray"
+                        BorderThickness="1"
+                        Cursor="Hand"/>
+            </StackPanel>
 
             <!-- Centered Content -->
             <TextBlock Grid.Column="1"

@@ -83,7 +83,7 @@ FunctionsToExport = @(
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
     'Initialize-SCuBA',
-    'Start-ScubaConfigAppUI',
+    'Start-ScubaConfigApp',
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',

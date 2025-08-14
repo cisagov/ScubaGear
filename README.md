@@ -21,10 +21,10 @@ ScubaGear is for M365 administrators who want to assess their tenant environment
 
 ## What's New 🆕
 
-**YAML Configuration UI**: SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
+**Scuba Configuration UI**: SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
 
 #### 🚀 UI Key Features:
-- Launch with `Invoke-SCuBAConfigAppUI`
+- Launch with `Start-ScubaConfigApp`
 - Step-by-step setup wizard covering all configuration options
 - Real-time validation with live YAML preview
 - Microsoft Graph integration for user and group selection
@@ -132,6 +132,31 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 > [!IMPORTANT]
 > Without a properly defined YAML file, ScubaGear will assume a default configuration that may not reflect your organization’s actual policies or risk posture. **It is required if the usage is for [CISA's Binding Operational Directive (BOD) 25-01 ](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)**
+> [!NOTE]
+> Without a properly defined YAML file, ScubaGear will assume a default configuration that may not reflect your organization’s actual policies or risk posture.  
+> **Refer to the [Baselines](baselines/README.md) to understand what options are configurable.**
+
+
+### Option 1: Configuration UI (Recommended for New Users)
+
+Use the graphical configuration interface to easily create and manage your settings:
+
+```powershell
+# Launch the Configuration UI
+Start-ScubaConfigApp
+```
+
+The Configuration UI provides:
+
+- ✅ **User-friendly interface** for all configuration options
+- ✅ **Real-time validation** of YAML layout
+- ✅ **YAML preview** before export configurations
+- ✅ **Import/Export** existing configurations
+- ✅ **Microsoft Graph integration** for user/group selection
+
+📖 **[Learn more about the Configuration UI →](docs/configuration/scubaconfigapp.md)**
+
+📖 **[Learn more about Configuration Files →](docs/configuration/configuration.md)**
 
 ### Reuse provided sample files
 
@@ -176,8 +201,9 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 
 ## Configuration & Usage
 
-- [Execution](docs/execution/execution.md)
-- [Reports](docs/execution/reports.md)
+- [Configuration UI](docs/scubaconfigapp.md) - **Graphical interface for easy setup**
+- [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
+- [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 
 ### Running Assessments
 

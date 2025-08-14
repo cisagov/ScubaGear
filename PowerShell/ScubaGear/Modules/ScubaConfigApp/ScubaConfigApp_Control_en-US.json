@@ -1,9 +1,9 @@
 {
-  "Version": "1.8.12 [updated 8/12/2025]",
   "DebugMode": true,
   "EnableSearchAndFilter": false,
   "EnableScubaRun": true,
   "EnableResultReader": true,
+  "MinimumProductsRequired": 1,
   "localeContext": {
     "Title_TextBlock": "Scuba Configuration Editor",
     "SubTitle_TextBlock": "Create a ScubaGear configuration file for exclusions, annotations, and omissions",
@@ -67,7 +67,7 @@
     "SkippingNullCard": "Skipping null card for policy: {0}",
     "RemoveEventHandlerError": "Failed to remove event handler for: {0}",
     "CertificateSelectionError": "Certificate selection error: {0}",
-    "ProductSelection": "At least one product must be selected for the configuration to be valid."
+    "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid."
   },
   "localePopupMessages": {
     "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
@@ -90,14 +90,15 @@
     "DebugLogsCopied": "Debug logs copied to clipboard successfully.",
     "DebugLogsNoEntries": "No debug logs to copy.",
     "DebugLogsError": "Error copying debug logs to clipboard: {0}",
-    "ProductSelectionError": "At least one product must be selected for the configuration to be valid.",
+    "ProductSelectionError": "At least {0} product(s) must be selected for the configuration to be valid.",
     "NoUsersSelected": "Please select at least one user.",
     "AtLeastOneSelectionRequired": "Please make at least one selection.",
     "InvalidPolicyId": "Invalid Policy ID format.",
     "ConfirmRemovalOfCard": "Are you sure you want to remove this item?",
     "ValidationErrors": "Please correct the validation errors before proceeding.",
     "GraphError": "Error retrieving data from Graph: {0}",
-    "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'."
+    "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
+    "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
   },
   "localeHelpTips": {
     "Organization_HelpLabel": {
@@ -251,8 +252,7 @@
   },
   "Reports": {
     "tabName": "Report Summary",
-    "IncludeScubeVersion": true,
-    "IncludeReportUUID": true,
+    "ShowProductSummaryReports": true,
     "summaryColumns": [
       "Manual",
       "Failures",
@@ -626,47 +626,56 @@
     "email": {
       "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
       "sample": "user@example.com",
-      "format": "user@example.com"
+      "format": "user@example.com",
+      "sensitive": true
     },
     "domain": {
       "pattern": "^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.[A-Za-z0-9-]{1,63})+$",
       "sample": "example.com",
-      "format": "user@example.com"
+      "format": "user@example.com",
+      "sensitive": true
     },
     "ipAddress": {
       "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
       "sample": "192.168.1.1",
-      "format": "x.x.x.x"
+      "format": "x.x.x.x",
+      "sensitive": false
     },
     "guid": {
       "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
       "sample": "123e4567-e89b-12d3-a456-426614174000",
-      "format": "123e4567-e89b-12d3-a456-426614174000"
+      "format": "123e4567-e89b-12d3-a456-426614174000",
+      "sensitive": true
     },
     "yearmonthday": {
       "pattern": "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
       "sample": "2023-03-15",
-      "format": "yyyy-MM-dd"
+      "format": "yyyy-MM-dd",
+      "sensitive": false
     },
     "semicolonList": {
       "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,};?)+$",
       "sample": "John Doe;jdoe@example.com",
-      "format": "John Doe;jdoe@example.com"
+      "format": "John Doe;jdoe@example.com",
+      "sensitive": true
     },
     "thumbprint": {
       "pattern": "^[A-Fa-f0-9]{40}$",
       "sample": "1234567890abcdef1234567890abcdef12345678",
-      "format": "1234567890abcdef1234567890abcdef12345678"
+      "format": "1234567890abcdef1234567890abcdef12345678",
+      "sensitive": false
     },
     "tenantDomain": {
       "pattern": "^(.*\\.)?(onmicrosoft\\.com|onmicrosoft\\.us)$",
       "sample": "example.onmicrosoft.com",
-      "format": "example.onmicrosoft.com"
+      "format": "example.onmicrosoft.com",
+      "sensitive": false
     },
     "orgName": {
       "pattern": "^[a-zA-Z0-9.-]+$",
       "sample": "example",
-      "format": "example"
+      "format": "example",
+      "sensitive": false
     }
   },
   "graphQueries": {
