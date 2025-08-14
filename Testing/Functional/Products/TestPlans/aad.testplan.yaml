@@ -315,6 +315,22 @@ TestPlan:
                 authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.AAD.3.4v1 Non-compliant case - migrationInProgress
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationInProgress
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.3.4v1 Compliant case - null
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authentication_method[0].authentication_method_policy.PolicyMigrationState: null
+              Postconditions: []
+              ExpectedResult: true
 
   - PolicyId: MS.AAD.3.5v1
     TestDriver: ScubaCached
