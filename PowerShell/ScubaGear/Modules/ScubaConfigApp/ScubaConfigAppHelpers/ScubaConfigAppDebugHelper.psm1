@@ -151,7 +151,7 @@ Function Export-DebugLog {
     try {
         # Check if debug data is available
         if (-not $syncHash.DebugLogData -or $syncHash.DebugLogData.Count -eq 0) {
-            [System.Windows.MessageBox]::Show(
+            $syncHash.ShowMessageBox.Invoke(
                 "No debug data available to export.",
                 "Export Error",
                 [System.Windows.MessageBoxButton]::OK,
@@ -229,7 +229,7 @@ Function Export-DebugLog {
                     $syncHash.DebugStatus_TextBlock.Text = "Sanitized debug log exported to $($saveDialog.FileName), mapping file: $(Split-Path $mappingFilePath -Leaf)"
 
                     # Show success message with mapping info
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "Sanitized debug log exported successfully!`n`nLog file: $($saveDialog.FileName)`nMapping file: $mappingFilePath`n`nThe mapping file contains the correlation between original and sanitized values for troubleshooting purposes.",
                         "Export Successful",
                         [System.Windows.MessageBoxButton]::OK,
@@ -238,7 +238,7 @@ Function Export-DebugLog {
                 } else {
                     $syncHash.DebugStatus_TextBlock.Text = "Debug log exported (no sensitive data found): $($saveDialog.FileName)"
 
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "Debug log exported successfully to:`n$($saveDialog.FileName)`n`nNo sensitive data was detected for sanitization.",
                         "Export Successful",
                         [System.Windows.MessageBoxButton]::OK,
@@ -263,7 +263,7 @@ Function Export-DebugLog {
                 $debugLogSnapshot | Out-File -FilePath $logFilePath -Encoding UTF8
                 $syncHash.DebugStatus_TextBlock.Text = "Debug log exported to: $($saveDialog.FileName)"
 
-                [System.Windows.MessageBox]::Show(
+                $syncHash.ShowMessageBox.Invoke(
                     "Debug log exported successfully to:`n$($saveDialog.FileName)",
                     "Export Successful",
                     [System.Windows.MessageBoxButton]::OK,
@@ -275,7 +275,7 @@ Function Export-DebugLog {
         }
     } catch {
         $syncHash.DebugStatus_TextBlock.Text = "Export failed: $($_.Exception.Message)"
-        [System.Windows.MessageBox]::Show(
+        $syncHash.ShowMessageBox.Invoke(
             "Error exporting debug log: $($_.Exception.Message)",
             "Export Error",
             [System.Windows.MessageBoxButton]::OK,
@@ -663,7 +663,7 @@ Function Show-DebugWindow {
 
     } catch {
         Write-DebugOutput -Message "Error creating debug window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-        [System.Windows.MessageBox]::Show("Failed to open debug window: $($_.Exception.Message)", "Debug Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+        $syncHash.ShowMessageBox.Invoke("Failed to open debug window: $($_.Exception.Message)", "Debug Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
     }
 }
 

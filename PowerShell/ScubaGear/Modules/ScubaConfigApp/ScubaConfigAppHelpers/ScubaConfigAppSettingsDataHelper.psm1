@@ -1,4 +1,4 @@
-Function Set-InputDataForGeneralSettings {
+Function Set-SettingsDataForGeneralSection {
     <#
     .SYNOPSIS
     Saves general settings from UI controls to data structures.
@@ -66,9 +66,9 @@ Function Set-InputDataForGeneralSettings {
         }
     }
 
-} #end Function : Set-InputDataForGeneralSettings
+} #end Function : Set-SettingsDataForGeneralSection
 
-Function Set-InputDataForAdvancedSettings {
+Function Set-SettingsDataForAdvancedSection {
     <#
     .SYNOPSIS
     Saves advanced settings from UI controls to data structures.
@@ -115,9 +115,9 @@ Function Set-InputDataForAdvancedSettings {
         }
     }
 
-} #end Function : Set-InputDataForAdvancedSettings
+} #end Function : Set-SettingsDataForAdvancedSection
 
-Function Set-InputDataForGlobalSettings {
+Function Set-SettingsDataForGlobalSection {
     <#
     .SYNOPSIS
     Saves global settings from UI controls to data structures.

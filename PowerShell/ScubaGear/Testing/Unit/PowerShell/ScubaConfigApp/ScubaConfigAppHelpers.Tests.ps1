@@ -17,12 +17,12 @@
                 'ScubaConfigAppGlobalSettingsHelper.psm1',
                 'ScubaConfigAppGraphHelper.psm1',
                 'ScubaConfigAppImportHelper.psm1',
-                'ScubaConfigAppInputDataHelper.psm1',
+                'ScubaConfigAppSettingsDataHelper.psm1',
                 'ScubaConfigAppProductHelper.psm1',
                 'ScubaConfigAppSearchHelper.psm1',
                 'ScubaConfigAppToolTipHelper.psm1',
-                'ScubaConfigAppUIHelper.psm1',
-                'ScubaConfigAppUpdateHelper.psm1',
+                'ScubaConfigAppCommonUIHelper.psm1',
+                'ScubaConfigAppUpdateUIHelper.psm1',
                 'ScubaConfigAppYamlPreviewHelper.psm1'
             )
 
@@ -190,10 +190,10 @@
                     'Invoke-YamlImportWithProgress',
                     'Import-YamlToDataStructures'
                 )
-                'ScubaConfigAppInputDataHelper.psm1' = @(
-                    'Set-InputDataForGeneralSettings',
-                    'Set-InputDataForAdvancedSettings',
-                    'Set-InputDataForGlobalSettings'
+                'ScubaConfigAppSettingsDataHelper.psm1' = @(
+                    'Set-SettingsDataForGeneralSection',
+                    'Set-SettingsDataForAdvancedSection',
+                    'Set-SettingsDataForGlobalSection'
                 )
                 'ScubaConfigAppProductHelper.psm1' = @(
                     'Update-ProductNames',
@@ -244,15 +244,15 @@
                     'Add-ToolTipHoverPopup',
                     'Initialize-ToolTipHelp'
                 )
-                'ScubaConfigAppUIHelper.psm1' = @(
-                    'Get-UniqueCriticalityValues',
-                    'Find-ControlInContainer',
-                    'Find-ControlElement',
-                    'Add-ControlEventHandler',
-                    'Find-ControlBySettingName',
-                    'Find-ControlByName',
-                    'Set-ControlValue',
-                    'Find-ListContainer',
+                'ScubaConfigAppCommonUIHelper.psm1' = @(
+                    'Get-UIConfigCriticalValues',
+                    'Find-UIControlInContainer',
+                    'Find-UIControlElement',
+                    'Add-UIControlEventHandler',
+                    'Find-UIControlBySettingName',
+                    'Find-UIControlByName',
+                    'Set-UIControlValue',
+                    'Find-UIListContainer',
                     'Find-UICheckBox',
                     'Find-UITextBox',
                     'Find-UIDatePicker',
@@ -260,8 +260,8 @@
                     'Confirm-UIRequiredField',
                     'Initialize-PlaceholderTextBox'
                 )
-                'ScubaConfigAppUpdateHelper.psm1' = @(
-                    'Update-AllUIFromData',
+                'ScubaConfigAppUpdateUIHelper.psm1' = @(
+                    'Update-UIFromSettingsData',
                     'Update-GeneralSettingsFromData',
                     'Update-AdvancedSettingsFromData',
                     'Update-ProductNameCheckboxFromData',

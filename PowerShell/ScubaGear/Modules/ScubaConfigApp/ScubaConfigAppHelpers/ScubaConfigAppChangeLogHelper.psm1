@@ -1,7 +1,9 @@
 # Add this function after the other window functions (around line 1500)
 Function Show-ChangelogWindow {
-    <#
-    .SYNOPSIS
+    catch {
+        Write-DebugOutput -Message "Error opening changelog window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        $syncHash.ShowMessageBox.Invoke("Failed to open changelog window: $($_.Exception.Message)", "Changelog Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+    }    .SYNOPSIS
     Opens a window displaying the ScubaConfigApp changelog.
     #>
 
@@ -106,6 +108,6 @@ Function Show-ChangelogWindow {
 
     } catch {
         Write-DebugOutput -Message "Error creating changelog window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-        [System.Windows.MessageBox]::Show("Failed to open changelog window: $($_.Exception.Message)", "Changelog Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+        $syncHash.ShowMessageBox.Invoke("Failed to open changelog window: $($_.Exception.Message)", "Changelog Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
     }
 }

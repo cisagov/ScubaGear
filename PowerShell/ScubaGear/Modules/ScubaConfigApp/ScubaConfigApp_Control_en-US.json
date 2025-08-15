@@ -22,7 +22,7 @@
   "localePlaceholder": {
     "Organization_TextBox": "Enter tenant name (e.g., example.onmicrosoft.com)",
     "OrgName_TextBox": "Enter organization name",
-    "OrgUnit_TextBox": "Enter organizational unit (optional)",
+    "OrgUnitName_TextBox": "Enter organizational unit (optional)",
     "Description_TextBox": "Enter a description for this configuration (optional)",
     "AppId_TextBox": "Enter Application ID (GUID format)",
     "CertificateThumbprint_TextBox": "Enter Certificate Thumbprint (40 hexadecimal)",
@@ -146,7 +146,35 @@
     "OutReportsName_TextBox": "ScubaReports",
     "OpaPath_TextBox": ".",
     "LogIn_CheckBox": true,
-    "DisconnectOnExit_CheckBox": false
+    "DisconnectOnExit`_CheckBox": false
+  },
+  "dataValidation": {
+    "generalSettingsDataKeys": [
+      "Organization",
+      "OrgName",
+      "OrgUnitName",
+      "Description",
+      "ProductNames",
+      "M365Environment"
+    ],
+    "advancedSettingsDataKeys": [
+      "AppId",
+      "CertificateThumbprint",
+      "OutPath",
+      "OutFolderName",
+      "OutProviderFileName",
+      "OutRegoFileName",
+      "OutReportName",
+      "OutJsonFileName",
+      "OutCsvFileName",
+      "OutActionPlanFileName",
+      "LogIn",
+      "DisconnectOnExit"
+    ],
+    "globalSettingsDataKeys":[
+      "PreferredDnsResolvers",
+      "SkipDoH"
+    ]
   },
   "advancedSections": {
     "ApplicationSection_Toggle": {

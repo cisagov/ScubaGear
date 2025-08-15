@@ -49,7 +49,7 @@ Function Initialize-GraphStatusIndicator {
     $syncHash.GraphStatusBorder.Add_MouseLeftButtonUp({
         if ($syncHash.GraphConnected) {
             # Show disconnect option
-            $result = [System.Windows.MessageBox]::Show(
+            $result = $syncHash.ShowMessageBox.Invoke(
                 "Do you want to disconnect from Microsoft Graph?`n`nThis will disable dynamic data queries but won't affect your current configuration.",
                 "Disconnect Graph",
                 [System.Windows.MessageBoxButton]::YesNo,
@@ -65,7 +65,7 @@ Function Initialize-GraphStatusIndicator {
                     # Remove dynamic Graph buttons
                     # You might want to add a function to clean up dynamic buttons
 
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "Successfully disconnected from Microsoft Graph.",
                         "Graph Disconnected",
                         [System.Windows.MessageBoxButton]::OK,
@@ -73,7 +73,7 @@ Function Initialize-GraphStatusIndicator {
                     )
                 } catch {
                     Write-DebugOutput -Message "Error disconnecting from Graph: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "Error disconnecting from Graph: $($_.Exception.Message)",
                         "Disconnect Error",
                         [System.Windows.MessageBoxButton]::OK,
@@ -83,7 +83,7 @@ Function Initialize-GraphStatusIndicator {
             }
         } else {
             # Show connect information
-            [System.Windows.MessageBox]::Show(
+            $syncHash.ShowMessageBox.Invoke(
                 $syncHash.UIConfigs.LocalePopupMessages.GraphNotConnected,
                 "Graph Connection",
                 [System.Windows.MessageBoxButton]::OK,
@@ -354,7 +354,7 @@ Function Show-GraphProgressWindow {
             Write-DebugOutput -Message "Graph query successful for entity type: $GraphEntityType, items found: $($result.Data.value.Count)" -Source $MyInvocation.MyCommand -Level "Verbose"
             $items = $result.Data.value
             if (-not $items -or $items.Count -eq 0) {
-                [System.Windows.MessageBox]::Show($config.NoResultsMessage, $config.NoResultsTitle,
+                $syncHash.ShowMessageBox.Invoke($config.NoResultsMessage, $config.NoResultsTitle,
                                                 [System.Windows.MessageBoxButton]::OK,
                                                 [System.Windows.MessageBoxImage]::Information)
                 return $null
@@ -379,14 +379,14 @@ Function Show-GraphProgressWindow {
         }
         else {
             Write-DebugOutput -Message "Graph query failed for entity type: $GraphEntityType, error: $($result.Error)" -Source $MyInvocation.MyCommand -Level "Error"
-            [System.Windows.MessageBox]::Show($result.Message, $syncHash.UIConfigs.localeTitles.Error,
+            $syncHash.ShowMessageBox.Invoke($result.Message, $syncHash.UIConfigs.localeTitles.Error,
                                             [System.Windows.MessageBoxButton]::OK,
                                             [System.Windows.MessageBoxImage]::Error)
             return $null
         }
     }
     catch {
-        [System.Windows.MessageBox]::Show(("{0} {1}: {2}" -f $syncHash.UIConfigs.localeErrorMessages.WindowError,$GraphEntityType, $_.Exception.Message),
+        $syncHash.ShowMessageBox.Invoke(("{0} {1}: {2}" -f $syncHash.UIConfigs.localeErrorMessages.WindowError,$GraphEntityType, $_.Exception.Message),
                                         $syncHash.UIConfigs.localeTitles.Error,
                                         [System.Windows.MessageBoxButton]::OK,
                                         [System.Windows.MessageBoxImage]::Error)
@@ -613,7 +613,7 @@ Function Show-UISelectionWindow {
                 $selectionWindow.DialogResult = $true
                 $selectionWindow.Close()
             } else {
-                [System.Windows.MessageBox]::Show("Please select an item.", "No Selection",
+                $syncHash.ShowMessageBox.Invoke("Please select an item.", "No Selection",
                                                 [System.Windows.MessageBoxButton]::OK,
                                                 [System.Windows.MessageBoxImage]::Warning)
             }
@@ -654,7 +654,7 @@ Function Show-UISelectionWindow {
         return $null
     }
     catch {
-        [System.Windows.MessageBox]::Show( ("{0} {1}: {2}" -f $syncHash.UIConfigs.localeErrorMessages.WindowError, $Title, $_.Exception.Message),
+        $syncHash.ShowMessageBox.Invoke( ("{0} {1}: {2}" -f $syncHash.UIConfigs.localeErrorMessages.WindowError, $Title, $_.Exception.Message),
                                         $syncHash.UIConfigs.localeTitles.Error,
                                         [System.Windows.MessageBoxButton]::OK,
                                         [System.Windows.MessageBoxImage]::Error)
@@ -751,7 +751,7 @@ Function Add-GraphButtonToTextBox {
     $graphButton.ToolTip = "Select $($GraphQueryData.name.ToLower()) from Microsoft Graph"
 
     # Add global event handlers
-    Add-ControlEventHandler -Control $graphButton
+    Add-UIControlEventHandler -Control $graphButton
 
     # Create the click event handler
     $graphButton.Add_Click({
@@ -791,7 +791,7 @@ Function Add-GraphButtonToTextBox {
                     Write-DebugOutput -Message "Selected $($GraphQueryData.name.ToLower()): $displayName with value: $($selectedItem.($GraphQueryData.outProperty))" -Source $MyInvocation.MyCommand -Level "Info"
 
                     # Show success message
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "$($GraphQueryData.name) selected: $displayName",
                         "$($GraphQueryData.name) Selected",
                         [System.Windows.MessageBoxButton]::OK,
@@ -799,7 +799,7 @@ Function Add-GraphButtonToTextBox {
                     )
                 } else {
                     Write-DebugOutput -Message "Selected $($GraphQueryData.name.ToLower()) missing required property: $($GraphQueryData.outProperty)" -Source $MyInvocation.MyCommand -Level "Error"
-                    [System.Windows.MessageBox]::Show(
+                    $syncHash.ShowMessageBox.Invoke(
                         "Selected item is missing required data property.",
                         "Invalid Selection",
                         [System.Windows.MessageBoxButton]::OK,
@@ -812,7 +812,7 @@ Function Add-GraphButtonToTextBox {
         }
         catch {
             Write-DebugOutput -Message "Error in Dynamic Graph button click for $($GraphQueryData.name): $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-            [System.Windows.MessageBox]::Show(
+            $syncHash.ShowMessageBox.Invoke(
                 ($syncHash.UIConfigs.localePopupMessages.GraphError -f $_.Exception.Message),
                 $syncHash.UIConfigs.localeTitles.GraphError,
                 [System.Windows.MessageBoxButton]::OK,
