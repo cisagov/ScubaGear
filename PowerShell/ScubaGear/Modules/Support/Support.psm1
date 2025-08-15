@@ -274,7 +274,7 @@ function Install-OPAforSCuBA {
 
     # Constants
     $ACCEPTABLEVERSIONS = '0.69.0', '0.70.0', '1.0.1', '1.1.0', '1.2.0',
-    '1.3.0', '1.4.2', '1.5.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
+    '1.3.0', '1.4.2', '1.5.0', '1.6.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set preferences for writing messages
@@ -354,7 +354,7 @@ function Get-OPAFile {
     }
     catch {
         $Error[0] | Format-List -Property * -Force | Out-Host
-        throw "Unable to download OPA executable. To try manually downloading, see details in README under 'Download the required OPA executable'" | Out-Host
+        throw "Unable to download OPA executable. To try manually downloading, see details found under the section titled 'OPA Installation' within the 'Dependencies' markdown linked in the README" | Out-Host
     }
 }
 
