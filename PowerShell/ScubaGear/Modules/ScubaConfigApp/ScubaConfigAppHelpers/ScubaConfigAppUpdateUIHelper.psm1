@@ -1,4 +1,4 @@
-Function Update-AllUIFromData {
+Function Update-UIFromSettingsData {
     <#
     .SYNOPSIS
     Updates all UI elements from the current data structures.
@@ -60,10 +60,10 @@ Function Update-GeneralSettingsFromData {
             }
 
             # Find the corresponding XAML control using various naming patterns
-            $control = Find-ControlBySettingName -SettingName $settingKey
+            $control = Find-UIFieldBySettingName -SettingName $settingKey
 
             if ($control) {
-                Set-ControlValue -Control $control -Value $settingValue -SettingKey $settingKey
+                Set-UIControlValue -Control $control -Value $settingValue -SettingKey $settingKey
                 Write-DebugOutput -Message "Updated control for setting: $settingKey" -Source $MyInvocation.MyCommand -Level "Verbose"
             } else {
                 Write-DebugOutput -Message ("No UI control found for setting: {0}" -f $settingKey) -Source $MyInvocation.MyCommand -Level "Error"
@@ -125,10 +125,10 @@ Function Update-AdvancedSettingsFromData {
             if ($null -eq $settingValue) { continue }
 
             # Find the corresponding XAML control using various naming patterns
-            $control = Find-ControlBySettingName -SettingName $settingKey
+            $control = Find-UIFieldBySettingName -SettingName $settingKey
 
             if ($control) {
-                Set-ControlValue -Control $control -Value $settingValue -SettingKey $settingKey
+                Set-UIControlValue -Control $control -Value $settingValue -SettingKey $settingKey
                 Write-DebugOutput -Message "Updated advanced setting control: $settingKey = $settingValue" -Source $MyInvocation.MyCommand -Level "Verbose"
             } else {
                 Write-DebugOutput -Message "Could not find control for advanced setting: $settingKey" -Source $MyInvocation.MyCommand -Level "Error"

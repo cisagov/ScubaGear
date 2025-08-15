@@ -357,7 +357,7 @@ Function New-YamlPreview {
                             }
 
                             # Handle arrays
-                            elseif ($fieldValue -is [array]) {
+                            elseif (($fieldValue -is [array] -or $fieldValue -is [System.Collections.IEnumerable]) -and $fieldValue -isnot [string] -and $fieldValue -isnot [hashtable] -and $fieldValue.Count -gt 0) {
                                 $yamlPreview += "`n    $fieldKey`:"
                                 foreach ($item in $fieldValue) {
                                     $yamlPreview += "`n      - $item"
@@ -401,7 +401,7 @@ Function New-YamlPreview {
                                 }
 
                                     # Array
-                                elseif ($fieldValue -is [array]) {
+                                elseif (($fieldValue -is [array] -or $fieldValue -is [System.Collections.IEnumerable]) -and $fieldValue -isnot [string] -and $fieldValue -isnot [hashtable] -and $fieldValue.Count -gt 0) {
                                     $yamlPreview += "`n    $fieldKey`:"
                                     foreach ($item in $fieldValue) {
                                         $yamlPreview += "`n      - $item"
@@ -456,12 +456,13 @@ Function New-YamlPreview {
             # Skip if value is null, empty, false, or empty array
             if ($null -eq $value) { continue }
             if ($value -is [string] -and [string]::IsNullOrWhiteSpace($value)) { continue }
-            if ($value -is [array] -and $value.Count -eq 0) { continue }
+            if (($value -is [array] -or $value -is [System.Collections.IEnumerable]) -and $value.Count -eq 0) { continue }
             if ($value -is [bool] -and $value -eq $false) { continue }
 
             $hasValidGlobalSettings = $true
 
-            if ($value -is [array] -and $value.Count -gt 0) {
+            # Check for any collection type (array, ArrayList, ICollection, etc.)
+            if (($value -is [array] -or $value -is [System.Collections.IEnumerable]) -and $value -isnot [string] -and $value -isnot [hashtable] -and $value.Count -gt 0) {
                 $globalSettingsOutput += "`n$key`:"
                 foreach ($item in $value) {
                     $globalSettingsOutput += "`n  - $item"
@@ -492,11 +493,12 @@ Function New-YamlPreview {
 
     # Display in preview tab
     $syncHash.YamlPreview_TextBox.Text = $yamlPreview
-
+    
     foreach ($tab in $syncHash.MainTabControl.Items) {
         if ($tab -is [System.Windows.Controls.TabItem] -and $tab.Header -eq "Preview" -and $NoRedirect -eq $false) {
             $syncHash.MainTabControl.SelectedItem = $syncHash.PreviewTab
             break
         }
     }
+
 }#end Function : New-YamlPreview

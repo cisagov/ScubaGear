@@ -1,5 +1,6 @@
+
 # Add these Functions after the existing UI helper Function
-Function Get-UniqueCriticalityValues {
+Function Get-UIConfigCriticalValues {
     <#
     .SYNOPSIS
     Extracts unique criticality values from all baseline policies.
@@ -20,9 +21,8 @@ Function Get-UniqueCriticalityValues {
 
     return $criticalityValues | Sort-Object
 }
-
 # Helper Function to find controls in a container
-Function Find-ControlInContainer {
+Function Find-UIControlInContainer {
     <#
     .SYNOPSIS
     Finds all controls of a specific type within a container.
@@ -46,19 +46,19 @@ Function Find-ControlInContainer {
 
     if ($Container.Children) {
         foreach ($child in $Container.Children) {
-            $controls += Find-ControlInContainer -Container $child -ControlType $ControlType
+            $controls += Find-UIControlInContainer -Container $child -ControlType $ControlType
         }
     }
 
     if ($Container.Content) {
-        $controls += Find-ControlInContainer -Container $Container.Content -ControlType $ControlType
+        $controls += Find-UIControlInContainer -Container $Container.Content -ControlType $ControlType
     }
 
     return $controls
 }
 
 # Recursively find all controls
-Function Find-ControlElement {
+Function Find-UIControlElement {
     <#
     .SYNOPSIS
     Recursively searches for all control elements within a WPF container.
@@ -77,14 +77,14 @@ Function Find-ControlElement {
         if ($child -is [System.Windows.Controls.Control]) {
             $results += $child
         }
-        $results += Find-ControlElement -Parent $child
+        $results += Find-UIControlElement -Parent $child
     }
 
     return $results
 }
 
 # Function to add event handlers to a specific control (for dynamically created controls)
-Function Add-ControlEventHandler {
+Function Add-UIControlEventHandler {
     <#
     .SYNOPSIS
     Adds event handlers to dynamically created WPF controls.
@@ -103,7 +103,7 @@ Function Add-ControlEventHandler {
             $Control.Add_LostFocus({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed TextBox" }
                 $controlValue = $this.Text
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlValue) -Source "Control Handler" -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlValue) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added LostFocus event handler to TextBox: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
@@ -126,7 +126,7 @@ Function Add-ControlEventHandler {
                     "null"
                 }
 
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $this.GetType().Name, $controlName, $actualValue) -Source "Control Handler" -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $this.GetType().Name, $controlName, $actualValue) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added SelectionChanged event handler to ComboBox: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
@@ -135,7 +135,7 @@ Function Add-ControlEventHandler {
             $Control.Add_Click({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed Button" }
                 $controlContent = if ($this.Content) { " ($($this.Content))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlContent) -Source "Control Handler" -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlContent) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added Click event handler to Button: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
@@ -144,14 +144,14 @@ Function Add-ControlEventHandler {
             $Control.Add_Checked({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed CheckBox" }
                 $controlTag = if ($this.Tag) { " (Tag: $($this.Tag))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source "Control Handler" -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
 
             # Add Unchecked event
             $Control.Add_Unchecked({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed CheckBox" }
                 $controlTag = if ($this.Tag) { " (Tag: $($this.Tag))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source "Control Handler" -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added Checked/Unchecked event handlers to CheckBox: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
@@ -159,7 +159,7 @@ Function Add-ControlEventHandler {
 }
 
 # Helper Function to find control by setting name
-Function Find-ControlBySettingName {
+Function Find-UIFieldBySettingName {
     <#
     .SYNOPSIS
     Searches for WPF controls using various naming conventions.
@@ -168,7 +168,7 @@ Function Find-ControlBySettingName {
     #>
     param([string]$SettingName)
 
-    Write-DebugOutput "Searching for control by setting name: $SettingName" -Source "Find-ControlBySettingName" -Level "Debug"
+    Write-DebugOutput "Searching for control by setting name: $SettingName" -Source $MyInvocation.MyCommand -Level "Debug"
 
     # Define naming patterns to try
     $namingPatterns = @(
@@ -185,22 +185,22 @@ Function Find-ControlBySettingName {
         "$SettingName`Label"                   # SettingNameLabel
     )
 
-    Write-DebugOutput "Trying $($namingPatterns.Count) naming patterns for '$SettingName'" -Source "Find-ControlBySettingName" -Level "Verbose"
+    Write-DebugOutput "Trying $($namingPatterns.Count) naming patterns for '$SettingName'" -Source $MyInvocation.MyCommand -Level "Verbose"
 
     # Try each pattern
     foreach ($pattern in $namingPatterns) {
         if ($syncHash.$pattern) {
-            Write-DebugOutput "Found control '$pattern' for setting '$SettingName'" -Source "Find-ControlBySettingName" -Level "Debug"
+            Write-DebugOutput "Found control '$pattern' for setting '$SettingName'" -Source $MyInvocation.MyCommand -Level "Debug"
             return $syncHash.$pattern
         }
     }
 
-    Write-DebugOutput "No control found for setting '$SettingName' after trying all patterns" -Source "Find-ControlBySettingName" -Level "Error"
+    Write-DebugOutput "No control found for setting '$SettingName' after trying all patterns" -Source $MyInvocation.MyCommand -Level "Error"
     return $null
 }
 
 # Function to search recursively for controls
-Function Find-ControlByName {
+Function Find-UIControlByName {
     <#
     .SYNOPSIS
     Recursively searches for a control by name within a parent container.
@@ -215,14 +215,14 @@ Function Find-ControlByName {
 
     if ($parent.Children) {
         foreach ($child in $parent.Children) {
-            $result = Find-ControlByName -parent $child -targetName $targetName
+            $result = Find-UIControlByName -parent $child -targetName $targetName
             if ($result) { return $result }
         }
     }
 
     if ($parent.Content -and $parent.Content.Children) {
         foreach ($child in $parent.Content.Children) {
-            $result = Find-ControlByName -parent $child -targetName $targetName
+            $result = Find-UIControlByName -parent $child -targetName $targetName
             if ($result) { return $result }
         }
     }
@@ -231,7 +231,7 @@ Function Find-ControlByName {
         foreach ($item in $parent.Items) {
             if ($item.Content -and $item.Content.Children) {
                 foreach ($child in $item.Content.Children) {
-                    $result = Find-ControlByName -parent $child -targetName $targetName
+                    $result = Find-UIControlByName -parent $child -targetName $targetName
                     if ($result) { return $result }
                 }
             }
@@ -242,7 +242,7 @@ Function Find-ControlByName {
 }
 
 # Helper Function to update control value based on type
-Function Set-ControlValue {
+Function Set-UIControlValue {
     <#
     .SYNOPSIS
     Updates control values based on their type and handles focus preservation.
@@ -308,7 +308,7 @@ Function Set-ControlValue {
 }
 
 # Function to search recursively for the list container
-Function Find-ListContainer {
+Function Find-UIListContainer {
     <#
     .SYNOPSIS
     Recursively searches for a list container control by name.
@@ -324,14 +324,14 @@ Function Find-ListContainer {
 
     if ($parent.Children) {
         foreach ($child in $parent.Children) {
-            $result = Find-ListContainer -parent $child -targetName $targetName
+            $result = Find-UIListContainer -parent $child -targetName $targetName
             if ($result) { return $result }
         }
     }
 
     if ($parent.Content -and $parent.Content.Children) {
         foreach ($child in $parent.Content.Children) {
-            $result = Find-ListContainer -parent $child -targetName $targetName
+            $result = Find-UIListContainer -parent $child -targetName $targetName
             if ($result) { return $result }
         }
     }
@@ -340,7 +340,7 @@ Function Find-ListContainer {
         foreach ($item in $parent.Items) {
             if ($item.Content -and $item.Content.Children) {
                 foreach ($child in $item.Content.Children) {
-                    $result = Find-ListContainer -parent $child -targetName $targetName
+                    $result = Find-UIListContainer -parent $child -targetName $targetName
                     if ($result) { return $result }
                 }
             }
@@ -609,7 +609,7 @@ Function Confirm-UIRequiredField {
     # Show error message if requested
     if (-not $isValid -and $ShowMessageBox -and ![string]::IsNullOrWhiteSpace($ErrorMessage)) {
         Write-DebugOutput "Displaying validation error message: $ErrorMessage" -Source "Confirm-UIRequiredField" -Level "Verbose"
-        [System.Windows.MessageBox]::Show($ErrorMessage, $syncHash.UIConfigs.localeTitles.ValidationError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+        $syncHash.ShowMessageBox.Invoke($ErrorMessage, $syncHash.UIConfigs.localeTitles.ValidationError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
     }
 
     Write-DebugOutput "Validation result for $($UIElement.Name): $isValid" -Source "Confirm-UIRequiredField" -Level "Debug"

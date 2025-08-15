@@ -51,7 +51,7 @@ Function Add-SearchAndFilterCapability {
 
 
     # Get unique criticality values dynamically from baseline data
-    $criticalityValues = Get-UniqueCriticalityValues
+    $criticalityValues = Get-UIConfigCriticalValues
 
     Write-DebugOutput -Message "Found criticality values: $($criticalityValues -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
 

@@ -1,4 +1,62 @@
-﻿Function Start-SCuBAConfigApp {
+﻿# Helper function to show message boxes on top of the main window
+function Show-ScubaMessageBox {
+    param(
+        [string]$Message,
+        [string]$Title = "ScubaGear Configuration",
+        [System.Windows.MessageBoxButton]$Button = [System.Windows.MessageBoxButton]::OK,
+        [System.Windows.MessageBoxImage]$Icon = [System.Windows.MessageBoxImage]::Information
+    )
+
+    # Use the main window handle to ensure message box appears on top
+    if ($syncHash.Window) {
+        # Get the window handle
+        $windowHelper = New-Object System.Windows.Interop.WindowInteropHelper($syncHash.Window)
+        $handle = $windowHelper.Handle
+
+        # Import user32.dll to use MessageBox with owner handle
+        Add-Type -TypeDefinition @"
+            using System;
+            using System.Runtime.InteropServices;
+            public class Win32MessageBox {
+                [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+                public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
+            }
+"@
+
+        # Convert WPF enums to Win32 constants
+        $buttonValue = switch ($Button) {
+            ([System.Windows.MessageBoxButton]::OK) { 0x0 }
+            ([System.Windows.MessageBoxButton]::OKCancel) { 0x1 }
+            ([System.Windows.MessageBoxButton]::YesNo) { 0x4 }
+            ([System.Windows.MessageBoxButton]::YesNoCancel) { 0x3 }
+            default { 0x0 }
+        }
+
+        $iconValue = switch ($Icon) {
+            ([System.Windows.MessageBoxImage]::Information) { 0x40 }
+            ([System.Windows.MessageBoxImage]::Question) { 0x20 }
+            ([System.Windows.MessageBoxImage]::Warning) { 0x30 }
+            ([System.Windows.MessageBoxImage]::Error) { 0x10 }
+            default { 0x40 }
+        }
+
+        $result = [Win32MessageBox]::MessageBox($handle, $Message, $Title, ($buttonValue -bor $iconValue))
+
+        # Convert Win32 result back to WPF enum
+        switch ($result) {
+            1 { return [System.Windows.MessageBoxResult]::OK }
+            2 { return [System.Windows.MessageBoxResult]::Cancel }
+            6 { return [System.Windows.MessageBoxResult]::Yes }
+            7 { return [System.Windows.MessageBoxResult]::No }
+            default { return [System.Windows.MessageBoxResult]::OK }
+        }
+    } else {
+        # Fallback to standard MessageBox if window not available
+        return [System.Windows.MessageBox]::Show($Message, $Title, $Button, $Icon)
+    }
+}
+
+Function Start-SCuBAConfigApp {
     <#
     .SYNOPSIS
     Opens the ScubaConfig UI for configuring Scuba settings.
@@ -132,6 +190,10 @@
     $syncHash = [hashtable]::Synchronized(@{})
     $Runspace = [runspacefactory]::CreateRunspace()
     $syncHash.Runspace = $Runspace
+
+    # Store the helper function in syncHash for access from event handlers
+    $syncHash.ShowMessageBox = ${function:Show-ScubaMessageBox}
+
     $syncHash.GraphConnected = $Online
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
@@ -278,7 +340,7 @@
             Write-DebugOutput -Message "M365Environment_ComboBox added: $($env.displayName) ($($env.name))" -Source $source -Level "Info"
         }
 
-        Add-ControlEventHandler -Control $syncHash.M365Environment_ComboBox
+        Add-UIControlEventHandler -Control $syncHash.M365Environment_ComboBox
 
         # Set selection based on parameter or defa          ult to first item
         if ($syncHash.M365Environment) {
@@ -377,7 +439,7 @@
                 if ($syncHash.GeneralSettingsData.ProductNames -and ($syncHash.GeneralSettingsData.ProductNames.Count -eq $minimumRequired) -and $syncHash.GeneralSettingsData.ProductNames -contains $productId) {
                     # This is the last selected product - prevent unchecking
                     Write-DebugOutput -Message "Prevented unchecking last product: $productId (minimum $minimumRequired required)" -Source $source -Level "Error"
-                    [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.ProductSelectionError -f $minimumRequired), "Minimum Selection Required", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.ProductSelectionError -f $minimumRequired), "Minimum Selection Required", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
 
                     # Set the checkbox back to checked
                     $this.IsChecked = $true
@@ -514,7 +576,7 @@
             }
             catch {
                 Write-DebugOutput -Message "Error processing YAMLConfigFile: $($_.Exception.Message)" -Source $source -Level "Error"
-                [System.Windows.MessageBox]::Show("Error importing configuration file: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                $syncHash.ShowMessageBox.Invoke("Error importing configuration file: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
             }
         }
 
@@ -552,7 +614,7 @@
         # New Session Button
         $syncHash.NewSessionButton.Add_Click({
             Write-DebugOutput -Message "New Session button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
-            $result = [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.NewSessionConfirmation, "New Session", [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Question)
+            $result = $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.NewSessionConfirmation, "New Session", [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Question)
             if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
                 # Reset all form fields
                 Clear-FieldValue
@@ -572,11 +634,11 @@
                     $importSuccess = Invoke-YamlImportWithProgress -YamlFilePath $openFileDialog.FileName -WindowTitle "Importing Configuration"
 
                     if ($importSuccess) {
-                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.ImportSuccess, "Import Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.ImportSuccess, "Import Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     }
                 }
                 catch {
-                    [System.Windows.MessageBox]::Show("Error importing configuration: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke("Error importing configuration: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                 }
             }
         })
@@ -674,21 +736,28 @@
                     #make message more user-friendly add a - and a new line to each error after first
                     $errorMessages = $errorMessages | ForEach-Object { "`n - $_" }
                     $errorMessages = "The following validation errors occurred: $($errorMessages -join '')"
-                    [System.Windows.MessageBox]::Show($errorMessages, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                    $syncHash.ShowMessageBox.Invoke($errorMessages, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                 }else {
                     $syncHash.PreviewTab.IsEnabled = $true
                 }
 
                 if ($errorMessages.Count -eq 0) {
-                    Set-InputDataForGeneralSettings
-                    Set-InputDataForAdvancedSettings
-                    Set-InputDataForGlobalSettings
+                    # Update settings data for each section
+                    Set-SettingsDataForGeneralSection
+                    Set-SettingsDataForAdvancedSection
+                    Set-SettingsDataForGlobalSection
+
+                    # Update UI elements
+                    Update-UIFromSettingsData
+
                     # Generate YAML preview
                     New-YamlPreview
 
                     If($syncHash.UIConfigs.EnableScubaRun){
                         Test-ScubaRunReadiness
                     }
+
+                    #Update-BaselineControlUIFromData
                 }
             }) #end Dispatcher.Invoke
         })
@@ -700,16 +769,16 @@
                 $syncHash.Window.Dispatcher.Invoke([Action]{
                     if (![string]::IsNullOrWhiteSpace($syncHash.YamlPreview_TextBox.Text)) {
                         [System.Windows.Clipboard]::SetText($syncHash.YamlPreview_TextBox.Text)
-                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.YamlClipboardComplete, "Copy Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardComplete, "Copy Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     } else {
-                        [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.YamlClipboardNoPreview, "Nothing to Copy", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardNoPreview, "Nothing to Copy", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     }
                 })
             }
             catch {
                 # Even this must go in Dispatcher
                 $syncHash.Window.Dispatcher.Invoke([Action]{
-                    [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.YamlClipboardError -f $_.Exception.Message, "Copy Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardError -f $_.Exception.Message, "Copy Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                 })
             }
         })
@@ -719,7 +788,7 @@
             Write-DebugOutput -Message "Download YAML button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             try {
                 if ([string]::IsNullOrWhiteSpace($syncHash.YamlPreview_TextBox.Text)) {
-                    [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localeErrorMessages.DownloadNullError, "Nothing to Download", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.DownloadNullError, "Nothing to Download", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                     return
                 }
 
@@ -750,11 +819,11 @@
                     #[System.IO.File]::WriteAllText($saveFileDialog.FileName, $yamlContent, $utf8NoBom)
                     #$yamlContent | Out-File -FilePath $saveFileDialog.FileName -Encoding utf8NoBOM
 
-                    [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.YamlSaveSuccess -f $saveFileDialog.FileName), "Save Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveSuccess -f $saveFileDialog.FileName), "Save Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                 }
             }
             catch {
-                [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.YamlSaveError -f $_.Exception.Message), "Save Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveError -f $_.Exception.Message), "Save Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
             }
         })
 
@@ -836,14 +905,14 @@
                 }
                 catch {
                     Write-DebugOutput -Message ("Error accessing certificate store: {0}" -f $_.Exception.Message) -Source $Source -Level "Error"
-                    [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localeErrorMessages.CertificateStoreAccessError -f $_.Exception.Message), "Certificate Store Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeErrorMessages.CertificateStoreAccessError -f $_.Exception.Message), "Certificate Store Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                     return
                 }
 
                 Write-DebugOutput -Message ("Found {0} certificates" -f $userCerts.Count) -Source $Source -Level "Verbose"
 
                 if ($userCerts.Count -eq 0) {
-                    [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localeErrorMessages.CertificateNotFound,
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.CertificateNotFound,
                                                     "No Certificates",
                                                     [System.Windows.MessageBoxButton]::OK,
                                                     [System.Windows.MessageBoxImage]::Information)
@@ -887,7 +956,7 @@
             }
             catch {
                 Write-DebugOutput -Message ($syncHash.UIConfigs.localeErrorMessages.CertificateSelectionError -f $_.Exception.Message) -Source $Source -Level "Error"
-                [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localeErrorMessages.WindowError,
+                $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.WindowError,
                                                 "Error",
                                                 [System.Windows.MessageBoxButton]::OK,
                                                 [System.Windows.MessageBoxImage]::Error)
@@ -937,7 +1006,7 @@
         # Events, UI setup here...
         $syncHash.Window.Add_Closing({
             # Show simple confirmation dialog
-            $result = [System.Windows.MessageBox]::Show(
+            $result = $syncHash.ShowMessageBox.Invoke(
                 $syncHash.UIConfigs.localePopupMessages.CloseConfirmation,
                 "Confirm Close",
                 [System.Windows.MessageBoxButton]::YesNo,
@@ -1020,9 +1089,6 @@
     }
 
 }
-
-Set-Alias -Name Invoke-SCuBAConfigApp -Value Start-SCuBAConfigApp -Force
-Set-Alias -Name Start-ScubaConfigAppUI -Value Start-SCuBAConfigApp -Force
 
 Export-ModuleMember -Function @(
     'Start-SCuBAConfigApp'

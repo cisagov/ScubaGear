@@ -255,7 +255,7 @@ Function New-ResultsReportTab {
     # Create folder-style header using Unicode folder icon
     $folderIcon = [System.Char]::ConvertFromUtf32(0x1F4C1)
     $newTab.Header = "$folderIcon $($Report.TabHeader)"
-    #$newTab.Header = "📁 $($Report.TabHeader)"
+    # Alternative: static folder icon with PowerShell variable
 
     $newTab.Name = "Result_$($Report.ReportName -Replace '\W+', '_')"
 
@@ -514,7 +514,7 @@ Function New-ResultsContent {
                     $htmlPath = Join-Path $ReportPath $htmlFile
                     Start-Process $htmlPath
                 } else {
-                    [System.Windows.MessageBox]::Show("HTML report not found in folder.", "Report Not Found", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    $syncHash.ShowMessageBox.Invoke("HTML report not found in folder.", "Report Not Found", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                 }
             }.GetNewClosure())
         }
@@ -669,7 +669,7 @@ Function New-ResultsGroupExpanderXaml {
         # Create XAML for group expander
         $expanderXaml = @"
 <Expander xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Header="🔒 {GROUP_HEADER}"
+        Header="&#x1F512; {GROUP_HEADER}"
         Margin="0,0,0,8"
         IsExpanded="False">
     <StackPanel Margin="16,8,8,8">
@@ -907,7 +907,7 @@ Function Open-ResultsFolder {
     if (Test-Path $outputPath) {
         Start-Process "explorer.exe" -ArgumentList $outputPath
     } else {
-        [System.Windows.MessageBox]::Show(
+        $syncHash.ShowMessageBox.Invoke(
             "Results folder not found: $outputPath",
             "Folder Not Found",
             [System.Windows.MessageBoxButton]::OK,

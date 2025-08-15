@@ -37,7 +37,7 @@ Function New-GlobalSettingsControls {
         }
 
         # Use a fake policy ID for global settings
-        $globalPolicyId = "GlobalSettings.$fieldName"
+        $globalPolicyId = "GlobalSettings"
 
         $card = New-FieldListCard `
             -CardName "GlobalSettings" `

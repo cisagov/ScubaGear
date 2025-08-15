@@ -50,7 +50,7 @@
             if ($field.type -eq "array") {
                 # For arrays, check if list container has any items
                 $listContainerName = ($controlFieldName + "_List")
-                $listContainer = Find-ControlByName -parent $detailsPanel -targetName $listContainerName
+                $listContainer = Find-UIControlByName -parent $detailsPanel -targetName $listContainerName
 
                 if ($listContainer -and $listContainer.Children.Count -gt 0) {
                     $hasValue = $true
@@ -63,7 +63,7 @@
             } elseif ($field.type -eq "dateString" -and $field.valueType -eq "yearmonthday") {
                 # Check DatePicker for date fields
                 $datePickerName = ($controlFieldName + "_DatePicker")
-                $datePicker = Find-ControlByName -parent $detailsPanel -targetName $datePickerName
+                $datePicker = Find-UIControlByName -parent $detailsPanel -targetName $datePickerName
 
                 if ($datePicker -and $datePicker.SelectedDate) {
                     $hasValue = $true
@@ -72,7 +72,7 @@
             } else {
                 # For all other string-based fields, check TextBox
                 $stringFieldName = ($controlFieldName + "_TextBox")
-                $stringTextBox = Find-ControlByName -parent $detailsPanel -targetName $stringFieldName
+                $stringTextBox = Find-UIControlByName -parent $detailsPanel -targetName $stringFieldName
 
                 if ($stringTextBox -and ![string]::IsNullOrWhiteSpace($stringTextBox.Text)) {
                     # Check if it's not a placeholder text using our dynamic list
@@ -161,7 +161,7 @@ Function New-FieldListControl {
         $inputTextBox.Text = $placeholderText
 
         # Add global event handlers to dynamically created inputTextBox
-        Add-ControlEventHandler -Control $inputTextBox
+        Add-UIControlEventHandler -Control $inputTextBox
 
         # placeholder Functionality - capture placeholder in closure properly
         $inputTextBox.Add_GotFocus({
@@ -198,7 +198,7 @@ Function New-FieldListControl {
         $listContainer.Name = $fieldName + "_List"
         [void]$arrayContainer.Children.Add($listContainer)
 
-        Add-ControlEventHandler -Control $addButton
+        Add-UIControlEventHandler -Control $addButton
 
         # add button Functionality - capture placeholder properly
         $addButton.Add_Click({
@@ -211,7 +211,7 @@ Function New-FieldListControl {
 
                 # Check if value already exists
                 if ($listContainer.Children.Children | Where-Object { $_.Text -contains $trimmedValue }) {
-                    [System.Windows.MessageBox]::Show($syncHash.UIConfigs.localePopupMessages.DuplicateEntry, $syncHash.UIConfigs.localeTitles.DuplicateEntry, "OK", "Warning")
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.DuplicateEntry, $syncHash.UIConfigs.localeTitles.DuplicateEntry, "OK", "Warning")
                     return
                 }
 
@@ -265,7 +265,7 @@ Function New-FieldListControl {
                     $inputBox.Foreground = [System.Windows.Media.Brushes]::Gray
                     $inputBox.FontStyle = "Italic"
                 } else {
-                    [System.Windows.MessageBox]::Show($errorMessage, $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
+                    $syncHash.ShowMessageBox.Invoke($errorMessage, $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
                 }
             }
         }.GetNewClosure())
@@ -282,7 +282,7 @@ Function New-FieldListControl {
         $booleanCheckBox.IsChecked = $false
 
         # Add global event handlers to dynamically created checkbox
-        Add-ControlEventHandler -Control $booleanCheckBox
+        Add-UIControlEventHandler -Control $booleanCheckBox
 
         [void]$fieldPanel.Children.Add($booleanCheckBox)
 
@@ -331,7 +331,7 @@ Function New-FieldListControl {
                 $datePicker.SelectedDateFormat = "Short"
 
                 # Add global event handlers to dynamically created DatePicker
-                Add-ControlEventHandler -Control $datePicker
+                Add-UIControlEventHandler -Control $datePicker
 
                 # Create a "Clear" button next to the DatePicker
                 $clearButton = New-Object System.Windows.Controls.Button
@@ -342,7 +342,7 @@ Function New-FieldListControl {
                 $clearButton.Margin = "0,0,8,0"
 
                 # Add global event handlers to dynamically created clear button
-                Add-ControlEventHandler -Control $clearButton
+                Add-UIControlEventHandler -Control $clearButton
 
                 # Clear button Functionality
                 $clearButton.Add_Click({
@@ -425,7 +425,7 @@ Function New-FieldListControl {
             }.GetNewClosure())
 
             # Add global event handlers to dynamically created stringTextBox
-            Add-ControlEventHandler -Control $stringTextBox
+            Add-UIControlEventHandler -Control $stringTextBox
             [void]$fieldPanel.Children.Add($stringTextBox)
         }
     }
@@ -441,7 +441,7 @@ Function New-FieldListControl {
         $graphGetButton.Margin = "8,0,0,0"
 
         # Add global event handlers to dynamically created graphGetButton
-        Add-ControlEventHandler -Control $graphGetButton
+        Add-UIControlEventHandler -Control $graphGetButton
 
         $graphGetButton.Add_Click({
         try {
@@ -508,7 +508,7 @@ Function New-FieldListControl {
         }
         catch {
             Write-DebugOutput -Message "Error in Graph button click: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-            [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.localePopupMessages.GraphError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.GraphError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.GraphError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.GraphError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
         }
     }.GetNewClosure())
 
@@ -609,7 +609,7 @@ Function New-FieldListCard {
     [System.Windows.Controls.Grid]::SetColumn($checkbox, 0)
 
     # Add global event handlers to dynamically created checkbox
-    Add-ControlEventHandler -Control $checkbox
+    Add-UIControlEventHandler -Control $checkbox
 
     # Create policy info stack panel
     $policyInfoStack = New-Object System.Windows.Controls.StackPanel
@@ -775,8 +775,8 @@ Function New-FieldListCard {
         #$this.Content = "▶"  # Right-pointing triangle when collapsed
     }.GetNewClosure())
 
-    Add-ControlEventHandler -Control $saveButton
-    Add-ControlEventHandler -Control $removeButton
+    Add-UIControlEventHandler -Control $saveButton
+    Add-UIControlEventHandler -Control $removeButton
 
     # Create click event for save button
     $saveButton.Add_Click({
@@ -791,18 +791,16 @@ Function New-FieldListCard {
         # Validate required fields BEFORE processing data
         $missingRequiredFields = Test-RequiredField -detailsPanel $detailsPanel -validInputFields $validInputFields -policyId $policyId -CardName $CardName
 
-        if ($missingRequiredFields.Count -gt 0) {
-            $errorMessage = if ($missingRequiredFields.Count -eq 1) {
-                $syncHash.UIConfigs.localeErrorMessages.RequiredFieldValidation -f $missingRequiredFields[0]
-            } else {
-                $syncHash.UIConfigs.localeErrorMessages.RequiredFieldsValidation -f ($missingRequiredFields -join ", ")
-            }
+            if ($missingRequiredFields.Count -gt 0) {
+                $errorMessage = if ($missingRequiredFields.Count -eq 1) {
+                    $syncHash.UIConfigs.localeErrorMessages.RequiredFieldValidation -f $missingRequiredFields[0]
+                } else {
+                    $syncHash.UIConfigs.localeErrorMessages.RequiredFieldsValidation -f ($missingRequiredFields -join ", ")
+                }
 
-            [System.Windows.MessageBox]::Show($errorMessage, $syncHash.UIConfigs.localeTitles.RequiredFieldsMissing, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
-            return # Exit save operation if validation fails
-        }
-
-        # Initialize output data structure
+                $syncHash.ShowMessageBox.Invoke($errorMessage, $syncHash.UIConfigs.localeTitles.RequiredFieldsMissing, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                return # Exit save operation if validation fails
+            }        # Initialize output data structure
         If($FlipFieldValueAndPolicyId) {
             # For annotations/omissions: Product -> FieldType -> PolicyId -> Data
             # Get the yamlValue from the baseline control that uses this input type
@@ -848,7 +846,7 @@ Function New-FieldListCard {
                 if ($field.type -eq "array") {
                     # For arrays, look for the list container
                     $listContainerName = ($controlFieldName + "_List")
-                    $listContainer = Find-ListContainer -parent $detailsPanel -targetName $listContainerName
+                    $listContainer = Find-UIListContainer -parent $detailsPanel -targetName $listContainerName
 
                     if ($listContainer -and $listContainer.Children.Count -gt 0) {
                         $items = @()
@@ -977,7 +975,10 @@ Function New-FieldListCard {
 
         if ($hasOutputData) {
             # Log the final merged structure
-            [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.LocalePopupMessages.CardSavedSuccess -f $CardName, $ProductName, $policyId, ($savedinputTypes -join ', ')), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
+            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.CardSavedSuccess -f $CardName, $ProductName, $policyId, ($savedinputTypes -join ', ')), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
+
+            # Update YAML preview to reflect the changes
+            #New-YamlPreview
 
             # Make remove button visible and header bold
             $removeButton.Visibility = "Visible"
@@ -988,7 +989,7 @@ Function New-FieldListCard {
             $checkbox.IsChecked = $false
         } else {
             Write-DebugOutput -Message ("No entries found for {0} fields: {1}" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Error"
-            [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.LocalePopupMessages.NoEntriesFound -f $CardName.ToLower()), $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
+            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.NoEntriesFound -f $CardName.ToLower()), $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
         }
     }.GetNewClosure())
 
@@ -998,7 +999,7 @@ Function New-FieldListCard {
         $policyIdWithUnderscores = $this.Name.Replace(("_" + $CardName + "_RemoveButton"), "")
         $policyId = $policyIdWithUnderscores.Replace("_", ".")
 
-        $result = [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardPolicyConfirmation -f $CardName.ToLower(), $policyId), $syncHash.UIConfigs.localeTitles.ConfirmRemove, "YesNo", "Question")
+        $result = $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardPolicyConfirmation -f $CardName.ToLower(), $policyId), $syncHash.UIConfigs.localeTitles.ConfirmRemove, "YesNo", "Question")
         if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
 
             # Remove the policy from the nested structure
@@ -1089,7 +1090,10 @@ Function New-FieldListCard {
                 }
             }
 
-            [System.Windows.MessageBox]::Show(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardEntrySuccess -f $CardName, $policyId), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
+            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardEntrySuccess -f $CardName, $policyId), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
+
+            # Update YAML preview to reflect the removal
+            New-YamlPreview
 
             # Hide remove button and unbold header
             $this.Visibility = "Collapsed"
