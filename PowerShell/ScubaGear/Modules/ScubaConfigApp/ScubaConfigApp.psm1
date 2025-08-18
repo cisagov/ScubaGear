@@ -580,6 +580,36 @@ Function Start-SCuBAConfigApp {
             }
         }
 
+        If($syncHash.UIConfigs.AutoSaveProgress)
+        {
+            # Show prompt asking user what to do with previous session
+            $userChoice = Show-AutoSaveRestorePrompt
+
+            switch ($userChoice) {
+                "restore" {
+                    # User wants to restore now - will be done after window loads
+                    $script:AutoSaveRestoreChoice = "restore"
+                    Write-DebugOutput -Message "AutoSave restoration scheduled for after window load" -Source $source -Level "Info"
+                }
+                "remove" {
+                    # User wants to remove previous session data
+                    Remove-AutoSaveData
+                    $script:AutoSaveRestoreChoice = "none"
+                }
+                "later" {
+                    # User wants to restore later - keep files but don't restore now
+                    $script:AutoSaveRestoreChoice = "later"
+                    Write-DebugOutput -Message "AutoSave restoration deferred - user can restore later from menu" -Source $source -Level "Info"
+                    # Show the Restore Session button so user can restore manually later
+                    $script:ShowRestoreButton = $true
+                }
+                default {
+                    # No previous session or error
+                    $script:AutoSaveRestoreChoice = "none"
+                }
+            }
+        }
+
         If($syncHash.UIConfigs.EnableScubaRun)
         {
             $syncHash.ScubaRunTab.Visibility = "Visible"
@@ -618,6 +648,24 @@ Function Start-SCuBAConfigApp {
             if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
                 # Reset all form fields
                 Clear-FieldValue
+            }
+        })
+
+        # Restore Session Button
+        $syncHash.RestoreSessionButton.Add_Click({
+            Write-DebugOutput -Message "Restore Session button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
+            try {
+                Restore-AutoSaveWithProgress
+                # Hide the button after successful restore
+                $syncHash.RestoreSessionButton.Visibility = "Collapsed"
+            } catch {
+                Write-DebugOutput -Message "Error during manual session restore: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                $syncHash.ShowMessageBox.Invoke(
+                    "An error occurred while restoring the session: $($_.Exception.Message)",
+                    "Restore Error",
+                    "OK",
+                    "Error"
+                )
             }
         })
 
@@ -964,6 +1012,49 @@ Function Start-SCuBAConfigApp {
             }
         })
 
+        #===========================================================================
+        # Tab Change Event Handlers for AutoSave Settings
+        #===========================================================================
+
+        # Track the currently selected tab to determine when to save settings
+        $script:PreviousTabName = $null
+
+        # Add SelectionChanged event handler to MainTabControl for AutoSave functionality
+        $syncHash.MainTabControl.Add_SelectionChanged({
+            try {
+                # Get the currently selected tab
+                $selectedTab = $syncHash.MainTabControl.SelectedItem
+                if (-not $selectedTab) { return }
+
+                # Get the tab name
+                $currentTabName = $selectedTab.Name
+
+                # If we have a previous tab and AutoSave is enabled, save the settings for the previous tab
+                if ($script:PreviousTabName -and (Test-AutoSaveEnabled)) {
+
+                    # Use settingsControl configuration to map tab names to settings types
+                    $settingsControl = $syncHash.UIConfigs.settingsControl
+
+                    # Find the settings configuration for the previous tab
+                    $tabConfig = $settingsControl.PSObject.Properties | Where-Object { $_.Name -eq $script:PreviousTabName }
+
+                    if ($tabConfig -and $tabConfig.Value.dataControlOutput) {
+                        $settingsType = $tabConfig.Value.dataControlOutput
+
+                        Write-DebugOutput -Message "Tab changed from $script:PreviousTabName to $currentTabName, saving $settingsType" -Source $MyInvocation.MyCommand -Level "Verbose"
+                        Save-AutoSaveSettings -SettingsType $settingsType
+                    }
+                }
+
+                # Update the previous tab name for next time
+                $script:PreviousTabName = $currentTabName
+
+            } catch {
+                Write-DebugOutput -Message "Error in tab change AutoSave handler: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+            }
+        })
+
+        Write-DebugOutput -Message "Tab change AutoSave event handlers initialized" -Source $source -Level "Info"
 
         If($syncHash.UIConfigs.EnableSearchAndFilter){
 
@@ -989,6 +1080,31 @@ Function Start-SCuBAConfigApp {
         # Add Loaded event once
         $syncHash.Window.Add_Loaded({
             $syncHash.isLoaded = $true
+
+            # Restore AutoSave data after the window is fully loaded
+            $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action]{
+                try {
+                    # Check if user chose to restore during initialization
+                    if ($script:AutoSaveRestoreChoice -eq "restore") {
+                        Write-DebugOutput -Message "Starting AutoSave restoration with progress after window load" -Source $MyInvocation.MyCommand -Level "Info"
+
+                        # Use the new progress-based restoration
+                        Restore-AutoSaveWithProgress
+                    } else {
+                        Write-DebugOutput -Message "AutoSave restoration skipped - user choice: $script:AutoSaveRestoreChoice" -Source $MyInvocation.MyCommand -Level "Info"
+                    }
+
+                    # Show Restore Session button if user chose to restore later
+                    if ($script:ShowRestoreButton -eq $true) {
+                        $syncHash.RestoreSessionButton.Visibility = "Visible"
+                        Write-DebugOutput -Message "Restore Session button made visible for later restoration" -Source $MyInvocation.MyCommand -Level "Info"
+                    }
+
+                } catch {
+                    Write-DebugOutput -Message "Error during AutoSave restoration: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                }
+            })
+
             <#
             # Initialize help popups after the window is fully loaded
             $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action]{
@@ -1017,6 +1133,25 @@ Function Start-SCuBAConfigApp {
             if ($result -eq [System.Windows.MessageBoxResult]::No) {
                 $args[1].Cancel = $true
                 return
+            }
+
+            # Save current tab settings before closing (if AutoSave is enabled)
+            try {
+                if ((Test-AutoSaveEnabled) -and $script:PreviousTabName) {
+                    # Use settingsControl configuration to map tab names to settings types
+                    $settingsControl = $syncHash.UIConfigs.settingsControl
+
+                    # Find the settings configuration for the previous tab
+                    $tabConfig = $settingsControl.PSObject.Properties | Where-Object { $_.Name -eq $script:PreviousTabName }
+
+                    if ($tabConfig -and $tabConfig.Value.dataControlOutput) {
+                        $settingsType = $tabConfig.Value.dataControlOutput
+                        Write-DebugOutput -Message "Saving current tab settings before closing: $settingsType" -Source $MyInvocation.MyCommand -Level "Info"
+                        Save-AutoSaveSettings -SettingsType $settingsType
+                    }
+                }
+            } catch {
+                Write-DebugOutput -Message "Error saving settings during window close: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
             }
 
             # Close debug window if open

@@ -371,6 +371,8 @@ Function New-ResultsContent {
                             Margin="0,0,0,6" Width="190" Height="32"/>
                     <Button Name="OpenFolderBtn" Style="{DynamicResource SecondaryButton}" Content="📁 Open Report Folder"
                             Width="190" Margin="0,0,0,8" Height="32"/>
+                    <Button Name="OpenYamlBtn" Style="{DynamicResource SecondaryButton}" Content="⚙️ View Configuration"
+                            Width="190" Margin="0,0,0,8" Height="32" Visibility="Collapsed"/>
 
                     <!-- ScubaGear Version and UUID Info -->
 
@@ -506,6 +508,7 @@ Function New-ResultsContent {
         # Set up button event handlers
         $openHtmlBtn = $reportControl.FindName("OpenHtmlBtn")
         $openFolderBtn = $reportControl.FindName("OpenFolderBtn")
+        $openYamlBtn = $reportControl.FindName("OpenYamlBtn")
 
         if ($openHtmlBtn) {
             $openHtmlBtn.Add_Click({
@@ -523,6 +526,26 @@ Function New-ResultsContent {
             $openFolderBtn.Add_Click({
                 Start-Process "explorer.exe" -ArgumentList $ReportPath
             }.GetNewClosure())
+        }
+
+        # YAML Configuration button with visibility logic
+        if ($openYamlBtn) {
+            # Check if ScubaGearConfiguration.yaml exists in the report folder
+            $yamlConfigPath = Join-Path $ReportPath "ScubaGearConfiguration.yaml"
+            if (Test-Path $yamlConfigPath) {
+                $openYamlBtn.Visibility = "Visible"
+                $openYamlBtn.Add_Click({
+                    try {
+                        Show-ConfigurationViewer -ConfigFilePath $yamlConfigPath
+                    } catch {
+                        $syncHash.ShowMessageBox.Invoke("Error opening configuration viewer: $($_.Exception.Message)", "Configuration Viewer Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    }
+                }.GetNewClosure())
+                Write-DebugOutput -Message "YAML Configuration button enabled for: $yamlConfigPath" -Source $MyInvocation.MyCommand -Level "Info"
+            } else {
+                $openYamlBtn.Visibility = "Collapsed"
+                Write-DebugOutput -Message "No ScubaGearConfiguration.yaml found, hiding YAML button" -Source $MyInvocation.MyCommand -Level "Debug"
+            }
         }
 
 

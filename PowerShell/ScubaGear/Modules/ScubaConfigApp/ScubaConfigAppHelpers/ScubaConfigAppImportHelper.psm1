@@ -309,52 +309,45 @@ Function Import-YamlToDataStructures {
         #get all products from UIConfigs
         $productIds = $syncHash.UIConfigs.products | Select-Object -ExpandProperty id
 
-        # Get data validation keys from UIConfigs
-        $dataValidation = $syncHash.UIConfigs.dataValidation
-        if (-not $dataValidation) {
-            Write-DebugOutput -Message "No dataValidation configuration found in UIConfigs" -Source $MyInvocation.MyCommand -Level "Error"
-            throw "Missing dataValidation configuration in UIConfigs"
-        }
+        # Get data validation keys from UIConfigs using new settingsControl structure
+        $settingsControl = $syncHash.UIConfigs.settingsControl
 
-        # Get valid keys for each settings data type
-        $validGeneralKeys = $dataValidation.generalSettingsDataKeys
-        $validAdvancedKeys = $dataValidation.advancedSettingsDataKeys
-        $validGlobalKeys = $dataValidation.globalSettingsDataKeys
-
-        Write-DebugOutput -Message "Using dataValidation - General: $($validGeneralKeys.Count) keys, Advanced: $($validAdvancedKeys.Count) keys, Global: $($validGlobalKeys.Count) keys" -Source $MyInvocation.MyCommand -Level "Info"
+        Write-DebugOutput -Message "Processing dynamic settings from settingsControl configuration" -Source $MyInvocation.MyCommand -Level "Info"
 
         # Import General Settings that are not product-specific or baseline controls
-        $generalSettingsFields = $topLevelKeys | Where-Object {$_ -notin $productIds -and $_ -notin @("OmitPolicy", "AnnotatePolicy")}
+        $generalSettingsFields = $topLevelKeys | Where-Object {$_ -notin $productIds}
 
         foreach ($field in $generalSettingsFields) {
             $fieldValue = $Config[$field]
 
-            # Validate and categorize the field based on dataValidation configuration
-            if ($field -in $validGeneralKeys) {
+            # Dynamically find which settings type this field belongs to
+            $matchingTabConfig = $null
+            foreach ($tabName in $settingsControl.PSObject.Properties.Name) {
+                $tabConfig = $settingsControl.$tabName
+                if ($tabConfig.validationKeys -and $field -in $tabConfig.validationKeys) {
+                    $matchingTabConfig = $tabConfig
+                    break
+                }
+            }
+
+            if ($matchingTabConfig -and $matchingTabConfig.dataControlOutput) {
+                # Initialize the data structure if it doesn't exist
+                $syncHashPropertyName = $matchingTabConfig.dataControlOutput  # e.g., "GeneralSettingsData", "AdvancedSettingsData", "GlobalSettingsData"
+                if (-not $syncHash.$syncHashPropertyName) {
+                    $syncHash.$syncHashPropertyName = [ordered]@{}
+                }
+
                 # Special handling for ProductNames to expand '*' wildcard
                 if ($field -eq "ProductNames" -and $fieldValue -contains "*") {
                     # Expand '*' to all available products
-                    $syncHash.GeneralSettingsData[$field] = $productIds
-                    Write-DebugOutput -Message "Imported general setting (expanded wildcard): $field = $($productIds -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
+                    $syncHash.$syncHashPropertyName[$field] = $productIds
+                    Write-DebugOutput -Message "Imported $syncHashPropertyName setting (expanded wildcard): $field = $($productIds -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
                 } else {
-                    $syncHash.GeneralSettingsData[$field] = $fieldValue
-                    Write-DebugOutput -Message "Imported general setting: $field = $fieldValue" -Source $MyInvocation.MyCommand -Level "Info"
+                    $syncHash.$syncHashPropertyName[$field] = $fieldValue
+                    Write-DebugOutput -Message "Imported $syncHashPropertyName setting: $field = $fieldValue" -Source $MyInvocation.MyCommand -Level "Info"
                 }
-            }
-            elseif ($field -in $validAdvancedKeys) {
-                $syncHash.AdvancedSettingsData[$field] = $fieldValue
-                Write-DebugOutput -Message "Imported advanced setting: $field = $fieldValue" -Source $MyInvocation.MyCommand -Level "Info"
-            }
-            elseif ($field -in $validGlobalKeys) {
-                # Note: GlobalSettingsData may need to be initialized if it doesn't exist
-                if (-not $syncHash.GlobalSettingsData) {
-                    $syncHash.GlobalSettingsData = [ordered]@{}
-                }
-                $syncHash.GlobalSettingsData[$field] = $fieldValue
-                Write-DebugOutput -Message "Imported global setting: $field = $fieldValue" -Source $MyInvocation.MyCommand -Level "Info"
-            }
-            else {
-                Write-DebugOutput -Message "Skipping invalid/unknown setting key: $field (not found in dataValidation configuration)" -Source $MyInvocation.MyCommand -Level "Warning"
+            } else {
+                Write-DebugOutput -Message "Skipping invalid/unknown setting key: $field (not found in any settingsControl validationKeys)" -Source $MyInvocation.MyCommand -Level "Warning"
             }
         }
 

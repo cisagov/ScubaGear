@@ -89,9 +89,9 @@ Function Update-AdvancedSettingsFromData {
         # First, determine which sections need to be enabled based on imported data
         $sectionsToEnable = @()
 
-        if ($syncHash.UIConfigs.advancedSections) {
-            foreach ($toggleName in $syncHash.UIConfigs.advancedSections.PSObject.Properties.Name) {
-                $sectionConfig = $syncHash.UIConfigs.advancedSections.$toggleName
+        if ($syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl) {
+            foreach ($toggleName in $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.PSObject.Properties.Name) {
+                $sectionConfig = $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.$toggleName
 
                 # Check if any setting from this section exists in imported data
                 $sectionHasData = $false
@@ -226,7 +226,7 @@ Function Update-ProductNameCheckboxFromData{
         }
 
         # Apply initial filters now that cards are created
-        if ($productsToSelect.Count -gt 0) {
+        if ($productsToSelect.Count -gt 0 -and $syncHash.UIConfigs.EnableSearchAndFilter) {
             # Trigger initial filter for all tab types after a brief delay to ensure cards are rendered
             $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action]{
                 try {
@@ -239,7 +239,8 @@ Function Update-ProductNameCheckboxFromData{
                 }
             })
         }
-                        # Update GeneralSettings
+
+        # Update GeneralSettings
         if ($productsToSelect.Count -gt 0) {
             $syncHash.GeneralSettingsData["ProductNames"] = $productsToSelect
         } else {

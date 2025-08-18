@@ -12,9 +12,9 @@ Function Set-SettingsDataForGeneralSection {
 
     # Build list of advanced settings field names to exclude
     $advancedSettingsFields = @()
-    if ($syncHash.UIConfigs.advancedSections) {
-        foreach ($sectionKey in $syncHash.UIConfigs.advancedSections.PSObject.Properties.Name) {
-            $sectionConfig = $syncHash.UIConfigs.advancedSections.$sectionKey
+    if ($syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl) {
+        foreach ($sectionKey in $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.PSObject.Properties.Name) {
+            $sectionConfig = $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.$sectionKey
             foreach ($fieldControlName in $sectionConfig.fields) {
                 $advancedSettingsFields += $fieldControlName
             }
@@ -81,11 +81,11 @@ Function Set-SettingsDataForAdvancedSection {
     $syncHash.AdvancedSettingsData.Clear()
 
     # Process each advanced section based on toggle state
-    if ($syncHash.UIConfigs.advancedSections) {
-        foreach ($toggleName in $syncHash.UIConfigs.advancedSections.PSObject.Properties.Name) {
+    if ($syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl) {
+        foreach ($toggleName in $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.PSObject.Properties.Name) {
             try {
                 $toggleControl = $syncHash.$toggleName
-                $sectionConfig = $syncHash.UIConfigs.advancedSections.$toggleName
+                $sectionConfig = $syncHash.UIConfigs.settingsControl.AdvancedTab.sectionControl.$toggleName
 
                 # Only process if toggle is checked
                 if ($toggleControl -and $toggleControl.IsChecked) {
@@ -125,13 +125,15 @@ Function Set-SettingsDataForGlobalSection {
     This Function collects values from global settings UI controls and stores them for YAML export.
     #>
 
-    if (-not $syncHash.UIConfigs.globalSettings -or -not $syncHash.UIConfigs.globalSettings.fields) {
+    if (-not $syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer -or
+        -not $syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer.fields) {
         return
     }
 
     Write-DebugOutput -Message "Saving global settings from UI input" -Source $MyInvocation.MyCommand -Level "Info"
 
-    foreach ($fieldName in $syncHash.UIConfigs.globalSettings.fields) {
+    $globalFields = $syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer.fields
+    foreach ($fieldName in $globalFields) {
         $inputType = $syncHash.UIConfigs.inputTypes.$fieldName
 
         if (-not $inputType) {

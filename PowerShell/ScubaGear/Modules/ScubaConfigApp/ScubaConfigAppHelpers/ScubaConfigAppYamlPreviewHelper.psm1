@@ -21,7 +21,7 @@ Function Format-YamlMultilineString {
     }
 
     # Check if the string contains newlines (multiline)
-    if ($FieldValue -match "`n" -or $FieldValue -match "`r") {
+    if ($FieldValue -match "`n" -or $FieldValue -match "`r" -or $FieldValue.Contains(':')) {
         # Use YAML pipe syntax for multiline strings
         $output = "`n$(' ' * ($IndentLevel * 2))$FieldName`: |"
 
@@ -235,10 +235,11 @@ Function New-YamlPreview {
     if ($syncHash.AdvancedSettingsData -and $syncHash.AdvancedSettingsData.Count -gt 0) {
         $yamlPreview += "`n`n# Advanced Settings"
 
-        # Group advanced settings by section for better organization
-        if ($syncHash.UIConfigs.advancedSections) {
-            foreach ($toggleName in $syncHash.UIConfigs.advancedSections.PSObject.Properties.Name) {
-                $sectionConfig = $syncHash.UIConfigs.advancedSections.$toggleName
+        # Group advanced settings by section for better organization using new settingsControl structure
+        $advancedTabConfig = $syncHash.UIConfigs.settingsControl.AdvancedTab
+        if ($advancedTabConfig -and $advancedTabConfig.sectionControl) {
+            foreach ($sectionName in $advancedTabConfig.sectionControl.PSObject.Properties.Name) {
+                $sectionConfig = $advancedTabConfig.sectionControl.$sectionName
                 $sectionSettings = @()
 
                 # Check if any settings from this section are present
@@ -493,7 +494,7 @@ Function New-YamlPreview {
 
     # Display in preview tab
     $syncHash.YamlPreview_TextBox.Text = $yamlPreview
-    
+
     foreach ($tab in $syncHash.MainTabControl.Items) {
         if ($tab -is [System.Windows.Controls.TabItem] -and $tab.Header -eq "Preview" -and $NoRedirect -eq $false) {
             $syncHash.MainTabControl.SelectedItem = $syncHash.PreviewTab

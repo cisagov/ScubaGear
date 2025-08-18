@@ -1,5 +1,29 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
 
+## 1.8.18 [08/18/2025] - GlobalSettings and Baseline Exclusion Management Enhancement
+
+### Bug Fixes
+- Fixed GlobalSettings remove functionality and case sensitivity issues with field naming across configuration files
+- Resolved baseline exclusion data persistence where removing all items from fields would leave stale data in YAML output
+- Corrected UI control clearing and naming patterns in remove operations to properly clear all field types
+- Fixed AutoSave integration parameter mismatches for GlobalSettings remove operations
+
+### Enhancements
+- Implemented AutoSave progress dialog using proven YAML import pattern for non-blocking UI
+- Added -OutPolicyOnly parameter to New-FieldListCard for simplified GlobalSettings data flow with direct storage
+- Enhanced ScubaRun with dynamic mode detection status messages and automatic configuration export with viewer
+- Replaced hardcoded baseline filtering with configuration-driven approach using supportsAllProducts property
+
+### Code Improvements
+- Removed deprecated GlobalSettings sync functions and cleaned up legacy calls across helper modules
+- Enhanced debug logging and validation error handling with comprehensive field-level detail and better error messages
+- Standardized control naming patterns and data structure handling across save/remove operations
+- Implemented clear-and-rebuild strategy for baseline exclusions to prevent data persistence issues
+
+### Configuration Updates
+- Updated field configuration to align PreferredDnsResolvers naming with ScubaGear YAML format requirements
+- Enhanced exclusion data structure handling for proper field removal and YAML compatibility
+
 ## 1.8.14 [08/14/2025] - Comprehensive Test Framework and Module Architecture Enhancement
 -  Implemented changelog display functionality with `Show-ChangelogWindow` function for easy access to version history
 -  Moved functions from main module to 17 specialized helper modules for better organization and maintainability

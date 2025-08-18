@@ -1,3 +1,156 @@
+Function Export-ConfigurationToResultsFolder {
+    <#
+    .SYNOPSIS
+    Exports the current configuration YAML to the ScubaGear results folder.
+    #>
+    param([string]$ResultsFolder)
+
+    try {
+        if (-not (Test-Path $ResultsFolder)) {
+            Write-DebugOutput -Message "Results folder not found: $ResultsFolder" -Source $MyInvocation.MyCommand -Level "Warning"
+            return
+        }
+
+        # Generate current YAML configuration
+        New-YamlPreview -NoRedirect
+        $yamlContent = $syncHash.YamlPreview_TextBox.Text
+
+        if ([string]::IsNullOrWhiteSpace($yamlContent)) {
+            Write-DebugOutput -Message "No YAML content available to export" -Source $MyInvocation.MyCommand -Level "Warning"
+            return
+        }
+
+        # Create configuration file in results folder
+        $configFileName = "ScubaGearConfiguration.yaml"
+        $configFilePath = Join-Path $ResultsFolder $configFileName
+
+        # Write YAML content to file
+        [System.IO.File]::WriteAllText($configFilePath, $yamlContent, [System.Text.Encoding]::UTF8)
+
+        Write-DebugOutput -Message "Configuration exported to: $configFilePath" -Source $MyInvocation.MyCommand -Level "Info"
+
+        # Add to output log
+        $syncHash.ScubaRunOutput_TextBox.AppendText("Configuration file saved: $configFilePath`r`n")
+
+        return $configFilePath
+    }
+    catch {
+        Write-DebugOutput -Message "Error exporting configuration to results folder: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        return $null
+    }
+}
+
+Function Show-ConfigurationViewer {
+    <#
+    .SYNOPSIS
+    Opens a simple window to display the configuration file content.
+    #>
+    param([string]$ConfigFilePath)
+
+    try {
+        if (-not (Test-Path $ConfigFilePath)) {
+            $syncHash.ShowMessageBox.Invoke("Configuration file not found: $ConfigFilePath", "Configuration Viewer", "OK", "Error")
+            return
+        }
+
+        # Read configuration content
+        $configContent = [System.IO.File]::ReadAllText($ConfigFilePath, [System.Text.Encoding]::UTF8)
+
+        # Create a new window
+        $configWindow = New-Object System.Windows.Window
+        $configWindow.Title = "ScubaGear Configuration Viewer"
+        $configWindow.Width = 800
+        $configWindow.Height = 600
+        $configWindow.WindowStartupLocation = "CenterOwner"
+        $configWindow.Owner = $syncHash.Window
+        $configWindow.Icon = $syncHash.Window.Icon
+
+        # Create main grid
+        $grid = New-Object System.Windows.Controls.Grid
+        $configWindow.Content = $grid
+
+        # Define rows
+        $headerRow = New-Object System.Windows.Controls.RowDefinition
+        $headerRow.Height = "Auto"
+        $contentRow = New-Object System.Windows.Controls.RowDefinition
+        $contentRow.Height = "*"
+        $buttonRow = New-Object System.Windows.Controls.RowDefinition
+        $buttonRow.Height = "Auto"
+
+        $grid.RowDefinitions.Add($headerRow)
+        $grid.RowDefinitions.Add($contentRow)
+        $grid.RowDefinitions.Add($buttonRow)
+
+        # Header
+        $headerText = New-Object System.Windows.Controls.TextBlock
+        $headerText.Text = "Configuration File: $(Split-Path $ConfigFilePath -Leaf)"
+        $headerText.FontSize = 14
+        $headerText.FontWeight = "Bold"
+        $headerText.Margin = "10"
+        $headerText.HorizontalAlignment = "Center"
+        [System.Windows.Controls.Grid]::SetRow($headerText, 0)
+        $grid.Children.Add($headerText)
+
+        # Content TextBox
+        $contentTextBox = New-Object System.Windows.Controls.TextBox
+        $contentTextBox.Text = $configContent
+        $contentTextBox.IsReadOnly = $true
+        $contentTextBox.AcceptsReturn = $true
+        $contentTextBox.TextWrapping = "NoWrap"
+        $contentTextBox.VerticalScrollBarVisibility = "Auto"
+        $contentTextBox.HorizontalScrollBarVisibility = "Auto"
+        $contentTextBox.FontFamily = "Consolas, Courier New, monospace"
+        $contentTextBox.FontSize = 12
+        $contentTextBox.Margin = "10,0,10,10"
+        $contentTextBox.Background = "#F5F5F5"
+        $contentTextBox.BorderBrush = $syncHash.Window.FindResource("BorderBrush")
+        [System.Windows.Controls.Grid]::SetRow($contentTextBox, 1)
+        $grid.Children.Add($contentTextBox)
+
+        # Button panel
+        $buttonPanel = New-Object System.Windows.Controls.StackPanel
+        $buttonPanel.Orientation = "Horizontal"
+        $buttonPanel.HorizontalAlignment = "Center"
+        $buttonPanel.Margin = "10"
+        [System.Windows.Controls.Grid]::SetRow($buttonPanel, 2)
+
+        # Copy button
+        $copyButton = New-Object System.Windows.Controls.Button
+        $copyButton.Content = "Copy to Clipboard"
+        $copyButton.Width = 120
+        $copyButton.Height = 30
+        $copyButton.Margin = "0,0,10,0"
+        $copyButton.Add_Click({
+            try {
+                [System.Windows.Clipboard]::SetText($contentTextBox.Text)
+                $syncHash.ShowMessageBox.Invoke("Configuration copied to clipboard", "Configuration Viewer", "OK", "Information")
+            } catch {
+                $syncHash.ShowMessageBox.Invoke("Failed to copy to clipboard: $($_.Exception.Message)", "Configuration Viewer", "OK", "Error")
+            }
+        })
+        $buttonPanel.Children.Add($copyButton)
+
+        # Close button
+        $closeButton = New-Object System.Windows.Controls.Button
+        $closeButton.Content = "Close"
+        $closeButton.Width = 80
+        $closeButton.Height = 30
+        $closeButton.Add_Click({
+            $configWindow.Close()
+        })
+        $buttonPanel.Children.Add($closeButton)
+
+        $grid.Children.Add($buttonPanel)
+
+        # Show window
+        $configWindow.ShowDialog()
+    }
+    catch {
+        $syncHash.ShowMessageBox.Invoke("Error opening configuration viewer: $($_.Exception.Message)", "Configuration Viewer", "OK", "Error")
+        Write-DebugOutput -Message "Error in Show-ConfigurationViewer: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+    }
+}
+
 Function New-ScubaRunParameterControls {
     <#
     .SYNOPSIS
@@ -159,6 +312,19 @@ Function Initialize-ScubaRunTab {
         }
     })
 
+    $syncHash.ScubaRunViewConfig_Button.Add_Click({
+        if ($syncHash.LastScubaRunResultsFolder) {
+            $configFilePath = Join-Path $syncHash.LastScubaRunResultsFolder "ScubaGearConfiguration.yaml"
+            if (Test-Path $configFilePath) {
+                Show-ConfigurationViewer -ConfigFilePath $configFilePath
+            } else {
+                $syncHash.ShowMessageBox.Invoke("Configuration file not found in results folder: $configFilePath", "Configuration Viewer", "OK", "Warning")
+            }
+        } else {
+            $syncHash.ShowMessageBox.Invoke("No configuration file available. Run ScubaGear first to generate a configuration file.", "Configuration Viewer", "OK", "Information")
+        }
+    })
+
     # Style the run button with green background
     try {
         $syncHash.ScubaRunStart_Button.Background = [System.Windows.Media.Brushes]::Green
@@ -171,6 +337,7 @@ Function Initialize-ScubaRunTab {
 
     # Initialize button states and show initial status
     $syncHash.JustCompletedExecution = $false  # Ensure flag is clear on initialization
+    $syncHash.ScubaRunViewConfig_Button.IsEnabled = $false  # Start with View Configuration button disabled
     Reset-ScubaRunUI
 
     Write-DebugOutput -Message "ScubaRun tab initialized with correct button event handlers" -Source $MyInvocation.MyCommand -Level "Info"
@@ -231,13 +398,24 @@ Function Test-ScubaRunReadiness {
     $hasValidConfig = $false
 
     # Check if products are selected
-    if ($syncHash.GeneralSettingsData.ProductNames -and $syncHash.GeneralSettingsData.ProductNames.Count -gt 0) {
+    if ($syncHash.GeneralSettingsData.ProductNames.Count -gt 0) {
         $hasValidConfig = $true
+    }else{
+        Write-DebugOutput -Message "ScubaRun not allowed. No products are selected." -Source $MyInvocation.MyCommand -Level "Error"
     }
 
     # Check if Organization is set (required)
     if ([string]::IsNullOrWhiteSpace($syncHash.GeneralSettingsData.Organization)) {
         $hasValidConfig = $false
+        Write-DebugOutput -Message "ScubaRun not allowed. Organization is not set." -Source $MyInvocation.MyCommand -Level "Error"
+    }
+
+    # Determine run mode based on AppId and CertificateThumbprint
+    # If both AppId and CertificateThumbprint have values, it's non-interactive mode
+    if (![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.AppId) -and ![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.CertificateThumbprint)) {
+        $runMode = "[non-interactive mode]"
+    }else{
+        $runMode = "[interactive mode]"
     }
 
     # Enable/disable run button
@@ -246,9 +424,9 @@ Function Test-ScubaRunReadiness {
     # Only update status if we're not preserving a completion message
     if (-not $syncHash.JustCompletedExecution) {
         if ($hasValidConfig) {
-            Update-ScubaRunStatus -Message "Ready to run ScubaGear" -Level "Success"
+            Update-ScubaRunStatus -Message ($syncHash.UIConfigs.localeInfoMessages.ScubaRunReady -f $runMode) -Level "Success"
         } else {
-            Update-ScubaRunStatus -Message "Configuration incomplete - check Main tab" -Level "Error"
+            Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubaRunIncomplete -Level "Error"
         }
     }
 
@@ -264,14 +442,14 @@ Function Start-ScubaGearExecution {
     try {
         # Test readiness
         if (-not (Test-ScubaRunReadiness)) {
-            Update-ScubaRunStatus -Message "Cannot run - configuration is incomplete" -Level "Error"
+            Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubaRunIncomplete -Level "Error"
             return
         }
 
         # Generate temporary YAML file
         $tempConfigPath = Export-TempYamlConfiguration
         if (-not $tempConfigPath) {
-            Update-ScubaRunStatus -Message "Failed to generate temporary configuration" -Level "Error"
+            Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubaRunConfigFailed -Level "Error"
             return
         }
 
@@ -756,6 +934,9 @@ Function Start-ScubaGearMonitoringRealTime {
                     $resultsInfo = Find-ScubaGearResultFolder -StartTime $syncHash.ScubaGearExecutionStartTime
 
                     if ($resultsInfo) {
+                        # Export configuration YAML to the results folder
+                        Export-ConfigurationToResultsFolder -ResultsFolder $resultsInfo.Folder
+
                         $syncHash.ScubaRunOutput_TextBox.AppendText("`r`n*** EXECUTION COMPLETE! ***`r`n")
 
                         if ($resultsInfo.Type -eq "HTML") {
@@ -770,6 +951,9 @@ Function Start-ScubaGearMonitoringRealTime {
                         }
 
                         $syncHash.ScubaRunOutput_TextBox.AppendText("Full results folder: $($resultsInfo.Folder)`r`n")
+
+                        # Store the results folder path for the View Configuration button
+                        $syncHash.LastScubaRunResultsFolder = $resultsInfo.Folder
                     } else {
                         # Enhanced fallback message with more specific guidance
                         Update-ScubaRunStatus -Message "ScubaGear Complete | Check Documents folder for results" -Level "Success"
@@ -869,6 +1053,15 @@ Function Complete-ScubaGearExecution {
 
     # Set flag to indicate we just completed execution (preserve status message)
     $syncHash.JustCompletedExecution = $true
+
+    # Enable View Configuration button if we have a results folder
+    if ($syncHash.LastScubaRunResultsFolder) {
+        $configFilePath = Join-Path $syncHash.LastScubaRunResultsFolder "ScubaGearConfiguration.yaml"
+        if (Test-Path $configFilePath) {
+            $syncHash.ScubaRunViewConfig_Button.IsEnabled = $true
+            Write-DebugOutput -Message "Enabled View Configuration button for: $configFilePath" -Source $MyInvocation.MyCommand -Level "Info"
+        }
+    }
 
     # Ensure Results tab is enabled and refresh it
     If($syncHash.UIConfigs.EnableResultReader) {
