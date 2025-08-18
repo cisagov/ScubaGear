@@ -117,10 +117,9 @@ Describe "Smoke Test: Generate Output" {
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/teams.md")
         )},
         @{Command='Copy-SCuBASampleConfigFile'; CopiedFiles=@(
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/aad_config.yaml"),
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/defender_config.yaml"),
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample_config.json"),
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample_config.yaml")
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/full_config.yaml"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/scuba_compliance.yaml"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files/sample_config.json")
         )},
         @{Command='Copy-SCuBASampleReport'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports/BaselineReports.html")
