@@ -210,7 +210,7 @@ AnnotatePolicy:
   # Users detected as high risk SHALL be blocked.
   MS.AAD.2.1v1:
     Comment: "This policy is used to block users detected as high risk. The organization has a process in place to review and unblock users if necessary."
-    RemediationDate: 2026-01-01  #Optional. The date a failing control is anticipated to be implemented.
+    RemediationDate: 2026-01-01  # Optional. The date a failing control is anticipated to be implemented.
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1:
     Comment: Implementation in progress.
