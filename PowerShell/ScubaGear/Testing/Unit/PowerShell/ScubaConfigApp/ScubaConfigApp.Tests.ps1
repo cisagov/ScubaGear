@@ -28,11 +28,14 @@ InModuleScope ScubaConfigApp {
             It 'Should contain all required UI configuration root keys' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
 
-                # Define expected root keys for UI configuration
+                # Define expected root keys for UI configuration (based on current structure)
                 $expectedUIRootKeys = @(
                     'DebugMode',
+                    'AutoSaveProgress',
                     'EnableSearchAndFilter',
                     'EnableScubaRun',
+                    'EnableResultReader',
+                    'MinimumProductsRequired',
                     'localeContext',
                     'localePlaceholder',
                     'localeInfoMessages',
@@ -41,10 +44,9 @@ InModuleScope ScubaConfigApp {
                     'localeHelpTips',
                     'localeTitles',
                     'defaultAdvancedSettings',
-                    'advancedSections',
-                    'globalSettings',
+                    'settingsControl',
                     'ScubaRunConfig',
-                    'Reports'
+                    'Reports',
                     'products',
                     'M365Environment',
                     'baselineControls',
@@ -76,9 +78,31 @@ InModuleScope ScubaConfigApp {
                 $uiConfigContent.DebugMode | Should -BeOfType [System.Boolean] -Because "DebugMode should be a boolean value"
             }
 
+            It 'Should have valid AutoSaveProgress values' {
+                $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
+                $uiConfigContent.AutoSaveProgress | Should -BeOfType [System.Boolean] -Because "AutoSaveProgress should be a boolean value"
+            }
+
             It 'Should have valid EnableSearchAndFilter values' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
                 $uiConfigContent.EnableSearchAndFilter | Should -BeOfType [System.Boolean] -Because "EnableSearchAndFilter should be a boolean value"
+            }
+
+            It 'Should have valid EnableScubaRun values' {
+                $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
+                $uiConfigContent.EnableScubaRun | Should -BeOfType [System.Boolean] -Because "EnableScubaRun should be a boolean value"
+            }
+
+            It 'Should have valid EnableResultReader values' {
+                $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
+                $uiConfigContent.EnableResultReader | Should -BeOfType [System.Boolean] -Because "EnableResultReader should be a boolean value"
+            }
+
+            It 'Should have valid MinimumProductsRequired values' {
+                $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
+                # JSON parsing in PowerShell may return [long] for integer values, so accept both [int] and [long]
+                $uiConfigContent.MinimumProductsRequired | Should -BeOfType ([System.ValueType]) -Because "MinimumProductsRequired should be a numeric value"
+                $uiConfigContent.MinimumProductsRequired | Should -BeGreaterThan 0 -Because "MinimumProductsRequired should be greater than 0"
             }
         }
 
@@ -143,36 +167,54 @@ InModuleScope ScubaConfigApp {
         }
 
         Context 'GlobalSettings Configuration Validation' {
-            It 'Should have globalSettings with sectionName and fields' {
+            It 'Should have GlobalTab under settingsControl with required structure' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
-                $uiConfigContent.globalSettings | Should -Not -BeNullOrEmpty
+                $uiConfigContent.settingsControl.GlobalTab | Should -Not -BeNullOrEmpty
 
-                $uiConfigContent.globalSettings.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "GlobalSettings should have a 'sectionName' property"
-                $uiConfigContent.globalSettings.PSObject.Properties.Name | Should -Contain 'fields' -Because "GlobalSettings should have a 'fields' property"
+                $globalTab = $uiConfigContent.settingsControl.GlobalTab
+                $globalTab.PSObject.Properties.Name | Should -Contain 'name' -Because "GlobalTab should have a 'name' property"
+                $globalTab.PSObject.Properties.Name | Should -Contain 'description' -Because "GlobalTab should have a 'description' property"
+                $globalTab.PSObject.Properties.Name | Should -Contain 'dataControlOutput' -Because "GlobalTab should have a 'dataControlOutput' property"
+                $globalTab.PSObject.Properties.Name | Should -Contain 'validationKeys' -Because "GlobalTab should have a 'validationKeys' property"
+                $globalTab.PSObject.Properties.Name | Should -Contain 'sectionControl' -Because "GlobalTab should have a 'sectionControl' property"
 
-                $uiConfigContent.globalSettings.sectionName | Should -Not -BeNullOrEmpty
-                $uiConfigContent.globalSettings.fields | Should -Not -BeNullOrEmpty
+                $globalTab.name | Should -Not -BeNullOrEmpty
+                $globalTab.dataControlOutput | Should -Be "GlobalSettingsData"
+                
+                # Check sectionControl structure
+                $globalTab.sectionControl.GlobalSettingsContainer | Should -Not -BeNullOrEmpty
+                $globalTab.sectionControl.GlobalSettingsContainer.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "GlobalSettingsContainer should have a 'sectionName' property"
+                $globalTab.sectionControl.GlobalSettingsContainer.PSObject.Properties.Name | Should -Contain 'fields' -Because "GlobalSettingsContainer should have a 'fields' property"
 
                 # Ensure fields is treated as an array
-                $fieldsArray = @($uiConfigContent.globalSettings.fields)
-                $fieldsArray.Count | Should -BeGreaterThan 0 -Because "GlobalSettings should have at least one field"
+                $fieldsArray = @($globalTab.sectionControl.GlobalSettingsContainer.fields)
+                $fieldsArray.Count | Should -BeGreaterThan 0 -Because "GlobalSettingsContainer should have at least one field"
             }
         }
 
-        Context 'AdvancedSections Configuration Validation' {
-            It 'Should have advancedSections with required structure' {
+        Context 'SettingsControl Configuration Validation' {
+            It 'Should have settingsControl with MainTab, AdvancedTab, and GlobalTab' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
-                $uiConfigContent.advancedSections | Should -Not -BeNullOrEmpty
+                $uiConfigContent.settingsControl | Should -Not -BeNullOrEmpty
 
-                foreach ($section in $uiConfigContent.advancedSections.PSObject.Properties) {
-                    $sectionObj = $section.Value
-                    $sectionObj.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "Advanced section '$($section.Name)' should have a 'sectionName' property"
-                    $sectionObj.PSObject.Properties.Name | Should -Contain 'fields' -Because "Advanced section '$($section.Name)' should have a 'fields' property"
+                # Check required tabs exist
+                $uiConfigContent.settingsControl.MainTab | Should -Not -BeNullOrEmpty
+                $uiConfigContent.settingsControl.AdvancedTab | Should -Not -BeNullOrEmpty
+                $uiConfigContent.settingsControl.GlobalTab | Should -Not -BeNullOrEmpty
 
-                    $sectionObj.sectionName | Should -Not -BeNullOrEmpty
-                    # Fields array can be empty, so just check it exists
-                    $sectionObj.fields | Should -Not -BeNull
-                }
+                # Validate MainTab structure
+                $mainTab = $uiConfigContent.settingsControl.MainTab
+                $mainTab.PSObject.Properties.Name | Should -Contain 'name' -Because "MainTab should have a 'name' property"
+                $mainTab.PSObject.Properties.Name | Should -Contain 'dataControlOutput' -Because "MainTab should have a 'dataControlOutput' property"
+                $mainTab.PSObject.Properties.Name | Should -Contain 'validationKeys' -Because "MainTab should have a 'validationKeys' property"
+                $mainTab.dataControlOutput | Should -Be "GeneralSettingsData"
+
+                # Validate AdvancedTab structure
+                $advancedTab = $uiConfigContent.settingsControl.AdvancedTab
+                $advancedTab.PSObject.Properties.Name | Should -Contain 'name' -Because "AdvancedTab should have a 'name' property"
+                $advancedTab.PSObject.Properties.Name | Should -Contain 'dataControlOutput' -Because "AdvancedTab should have a 'dataControlOutput' property"
+                $advancedTab.PSObject.Properties.Name | Should -Contain 'validationKeys' -Because "AdvancedTab should have a 'validationKeys' property"
+                $advancedTab.dataControlOutput | Should -Be "AdvancedSettingsData"
             }
         }
 

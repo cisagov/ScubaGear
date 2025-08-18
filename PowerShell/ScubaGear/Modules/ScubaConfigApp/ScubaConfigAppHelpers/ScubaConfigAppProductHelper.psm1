@@ -99,14 +99,13 @@ Function New-ProductPolicyCards {
     $baselines = $syncHash.Baselines.$ProductName
 
     if ($null -ne $baselines) {
-        # Filter baselines based on the control type
-        $filteredBaselines = switch ($ControlType) {
-            "Exclusions" {
-                $baselines | Where-Object { $_.$($baselineControl.fieldControlName) -ne 'none' }
-            }
-            default {
-                $baselines  # Omissions and Annotations use all baselines
-            }
+        # Filter baselines based on the baseline control configuration
+        $filteredBaselines = if ($baselineControl.supportsAllProducts) {
+            # For controls that support all products, use all baselines
+            $baselines
+        } else {
+            # For product-specific controls, filter baselines that have the field control configured
+            $baselines | Where-Object { $_.$($baselineControl.fieldControlName) -ne 'none' }
         }
 
         if ($null -ne $filteredBaselines) {
@@ -122,7 +121,7 @@ Function New-ProductPolicyCards {
                 $outputData = $syncHash.$($baselineControl.dataControlOutput)
 
                 $card = New-FieldListCard `
-                            -CardName $baselineControl.CardName `
+                            -CardName $baselineControl.cardName `
                             -PolicyId $baseline.id `
                             -ProductName $ProductName `
                             -PolicyName $baseline.name `

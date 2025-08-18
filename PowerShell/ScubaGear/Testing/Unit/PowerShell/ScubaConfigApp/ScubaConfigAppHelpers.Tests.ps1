@@ -7,6 +7,7 @@
     Context 'Helper Module Files Existence' {
         It 'Should have all required helper module files' {
             $expectedHelpers = @(
+                'ScubaConfigAppAutoSaveHelper.psm1',
                 'ScubaConfigAppDebugHelper.psm1',
                 'ScubaConfigAppResultsHelper.psm1',
                 'ScubaConfigAppChangeLogHelper.psm1',
@@ -146,6 +147,21 @@
         It 'Should contain all expected functions per helper module' {
             # Define expected functions for each helper module
             $expectedFunctions = @{
+                'ScubaConfigAppAutoSaveHelper.psm1' = @(
+                    'Get-AutoSaveDirectory',
+                    'Test-AutoSaveEnabled',
+                    'Save-AutoSavePolicy',
+                    'Remove-AutoSavePolicy',
+                    'Get-AutoSavePolicies',
+                    'Restore-AutoSavePolicies',
+                    'Save-AutoSaveSettings',
+                    'Show-AutoSaveRestorePrompt',
+                    'Restore-AutoSaveWithProgress',
+                    'Show-AutoSaveRestoreProgress',
+                    'Remove-AutoSaveData',
+                    'Restore-AutoSaveSettings',
+                    'Clear-AutoSaveData'
+                )
                 'ScubaConfigAppBaselineHelper.psm1' = @(
                     'Get-ScubaConfigRegoExclusionMappings',
                     'Update-ScubaConfigBaselineWithRego',
@@ -171,8 +187,7 @@
                     'New-FieldListCard'
                 )
                 'ScubaConfigAppGlobalSettingsHelper.psm1' = @(
-                    'New-GlobalSettingsControls',
-                    'Add-GlobalSettingsAutoSave'
+                    'New-GlobalSettingsControls'
                 )
                 'ScubaConfigAppGraphHelper.psm1' = @(
                     'Update-GraphStatusIndicator',
@@ -249,7 +264,7 @@
                     'Find-UIControlInContainer',
                     'Find-UIControlElement',
                     'Add-UIControlEventHandler',
-                    'Find-UIControlBySettingName',
+                    'Find-UIFieldBySettingName',
                     'Find-UIControlByName',
                     'Set-UIControlValue',
                     'Find-UIListContainer',
@@ -289,7 +304,7 @@
 
                     foreach ($expectedFunction in $expectedFunctionList) {
                         # Check for function definition (case insensitive)
-                        $functionPattern = "(?i)function\s+$([regex]::Escape($expectedFunction))\s*[\{\(]"
+                        $functionPattern = "(?i)function([regex]::Escape($expectedFunction))\s*[\{\(]"
                         $content | Should -Match $functionPattern -Because "Helper module '$helperModule' should contain function '$expectedFunction'"
                     }
 

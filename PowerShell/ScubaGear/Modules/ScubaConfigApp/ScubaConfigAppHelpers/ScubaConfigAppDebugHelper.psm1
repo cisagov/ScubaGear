@@ -650,7 +650,7 @@ Function Show-DebugWindow {
 
         # Update debug output with current log if available
         if ($syncHash.DebugLogData.Count -gt 0) {
-            $debugText = $syncHash.DebugLogData -join "`n"
+            $debugText = $syncHash.DebugLogData -join "`r`n"
             $syncHash.DebugOutput_TextBox.Text = $debugText
             if ($syncHash.DebugAutoScroll_CheckBox.IsChecked) {
                 $syncHash.DebugOutput_TextBox.ScrollToEnd()
@@ -737,7 +737,7 @@ Function Update-DebugDisplayFilter {
             }
 
             # Update the display
-            $syncHash.DebugOutput_TextBox.Text = $filteredLogs -join "`n"
+            $syncHash.DebugOutput_TextBox.Text = $filteredLogs -join "`r`n"
 
             # Auto-scroll if enabled
             if ($syncHash.DebugAutoScroll_CheckBox.IsChecked) {
@@ -794,6 +794,12 @@ Function Update-DebugWindow {
 
                     # Only append if it should be displayed
                     if ($shouldDisplay) {
+                        # Ensure there's a newline before appending if TextBox has content and doesn't end with newline
+                        $currentText = $syncHash.DebugOutput_TextBox.Text
+                        if ($currentText.Length -gt 0 -and -not $currentText.EndsWith("`r`n") -and -not $currentText.EndsWith("`n")) {
+                            $syncHash.DebugOutput_TextBox.AppendText("`r`n")
+                        }
+
                         $syncHash.DebugOutput_TextBox.AppendText($NewContent)
 
                         # Auto-scroll if enabled

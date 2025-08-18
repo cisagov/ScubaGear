@@ -88,8 +88,10 @@ Function Clear-FieldValue {
     }
 
     # Clear global settings UI controls
-    if ($syncHash.UIConfigs.globalSettings -and $syncHash.UIConfigs.globalSettings.fields) {
-        foreach ($fieldName in $syncHash.UIConfigs.globalSettings.fields) {
+    if ($syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer -and
+        $syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer.fields) {
+        $globalFields = $syncHash.UIConfigs.settingsControl.GlobalTab.sectionControl.GlobalSettingsContainer.fields
+        foreach ($fieldName in $globalFields) {
             $inputType = $syncHash.UIConfigs.inputTypes.$fieldName
             if ($inputType) {
                 foreach ($field in $inputType.fields) {

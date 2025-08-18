@@ -163,18 +163,21 @@ In the "Advanced" tab:
 - **Additional Parameters**: Set optional technical parameters
 
 ### Step 8: Review Configuration Preview
-Navigate to the "Preview" tab:
+Click "Preview & Generate" to enable the preview tab and generate the YAML file. This should automatically navigate to the "Preview" tab:
 - Review the generated YAML configuration
 - Verify all settings are correct
-- Make adjustments by returning to previous tabs if needed
+- Make adjustments by returning to previous tabs if needed. 
+
+> [!IMPORTANT]
+> Be sure to click the "Preview & Generate" when done making updates to pull those changed into yaml output. Clicking on the _Preview_ tab won't show the update
 
 ### Step 9: Save Configuration
-Click "Generate & Save":
+Click "Save YAML":
 - Save the configuration file to your desired location
 - The file will be named automatically based on your organization domain
 - Configuration is now ready for ScubaGear execution
 
-### Step 10: Execute ScubaGear Assessment
+### Step 10: Execute ScubaGear Assessment **(beta)**
 Click the "Run ScubaGear" button:
 - The "Results" tab will automatically activate
 - Real-time progress monitoring will begin
@@ -188,7 +191,7 @@ While ScubaGear runs:
 - Any errors or warnings are displayed immediately
 - The interface remains responsive during execution
 
-### Step 12: Review Report Summary
+### Step 12: Review Report Summary **(beta)**
 Once execution completes:
 - Report tabs automatically appear for each assessed product
 - Navigate between product-specific reports using the dynamic tabs

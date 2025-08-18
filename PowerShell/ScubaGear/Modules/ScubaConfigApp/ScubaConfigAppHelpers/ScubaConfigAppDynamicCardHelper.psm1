@@ -96,6 +96,216 @@
     return $missingRequiredFields
 }
 
+Function Test-FieldValidation {
+    <#
+    .SYNOPSIS
+    Validates both required fields and regex patterns for all fields in a policy card.
+    .DESCRIPTION
+    This function performs comprehensive validation including:
+    - Required field validation (fields marked as required must have values)
+    - Regex pattern validation (any field with a value must match its pattern if defined)
+    Returns both missing required fields and format validation errors.
+    #>
+    param(
+        [System.Windows.Controls.StackPanel]$detailsPanel,
+        [array]$validInputFields,
+        [string]$policyId,
+        [string]$CardName
+    )
+
+    $validationErrors = @{
+        MissingRequired = @()
+        FormatErrors = @()
+    }
+
+    # Build dynamic placeholders list
+    $dynamicPlaceholders = @("Enter value", "No date selected")
+    foreach ($inputData in $validInputFields) {
+        $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
+        if (-not $FieldListDef) { continue }
+        foreach ($field in $FieldListDef.fields) {
+            if ($syncHash.UIConfigs.valueValidations.($field.valueType)) {
+                $fieldPlaceholder = $syncHash.UIConfigs.valueValidations.($field.valueType).sample
+                if ($dynamicPlaceholders -notcontains $fieldPlaceholder) {
+                    $dynamicPlaceholders += $fieldPlaceholder
+                }
+            }
+        }
+    }
+
+    foreach ($inputData in $validInputFields) {
+        $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
+        if (-not $FieldListDef) { continue }
+
+        foreach ($field in $FieldListDef.fields) {
+            $controlFieldName = ($policyId.replace('.', '_') + "_" + $CardName + "_" + $field.value)
+            $fieldValue = $null
+            $hasValue = $false
+
+            Write-DebugOutput -Message ("Checking field: {0}, Type: {1}, Required: {2}, Control: {3}" -f $field.name, $field.type, $field.required, $controlFieldName) -Source $MyInvocation.MyCommand -Level "Info"
+
+            # Use field type to determine which control to look for
+            switch ($field.type) {
+                "array" {
+                    $arrayContainer = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_Container")
+                    if ($arrayContainer) {
+                        $listItems = $arrayContainer.Children | Where-Object { $_.GetType().Name -eq "Border" }
+                        $hasValue = $listItems.Count -gt 0
+                        if ($hasValue) {
+                            $fieldValue = @()
+                            foreach ($item in $listItems) {
+                                $textBlock = $item.Child.Children[0]
+                                if ($textBlock -and $textBlock.Text) {
+                                    $fieldValue += $textBlock.Text
+                                }
+                            }
+                        }
+                    }
+                }
+                "boolean" {
+                    $checkboxControl = Find-UICheckBox -parent $detailsPanel -targetName ($controlFieldName + "_CheckBox")
+                    if ($checkboxControl) {
+                        # Boolean fields always have a value (true/false), but for required validation
+                        # we might want to check if it's actually checked
+                        $hasValue = if ($field.required) { $checkboxControl.IsChecked -eq $true } else { $true }
+                        $fieldValue = $checkboxControl.IsChecked
+                    }
+                }
+                "dateString" {
+                    # Look for DatePicker (created for dateString fields)
+                    $datePickerControl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_DatePicker")
+                    if ($datePickerControl -and $datePickerControl.SelectedDate) {
+                        # Get format from valueValidations if available
+                        $dateFormat = if ($syncHash.UIConfigs.valueValidations.($field.valueType)) {
+                            $syncHash.UIConfigs.valueValidations.($field.valueType).format
+                        } else {
+                            "yyyy-MM-dd"  # fallback
+                        }
+                        $hasValue = $true
+                        $fieldValue = $datePickerControl.SelectedDate.ToString($dateFormat)
+                    }
+                }
+                default {
+                    # All other field types (string, longstring) use TextBox
+                    $textBoxControl = Find-UITextBox -parent $detailsPanel -targetName ($controlFieldName + "_TextBox")
+                    Write-DebugOutput -Message ("Looking for TextBox: {0}, Found: {1}" -f ($controlFieldName + "_TextBox"), ($null -ne $textBoxControl)) -Source $MyInvocation.MyCommand -Level "Info"
+
+                    if ($textBoxControl -and ![string]::IsNullOrWhiteSpace($textBoxControl.Text)) {
+                        # Get placeholder text from valueValidations if available
+                        $placeholderText = if ($syncHash.UIConfigs.valueValidations.($field.valueType)) {
+                            $syncHash.UIConfigs.valueValidations.($field.valueType).sample
+                        } else {
+                            "Enter value"  # fallback
+                        }
+
+                        Write-DebugOutput -Message ("TextBox text: '{0}', Placeholder: '{1}'" -f $textBoxControl.Text, $placeholderText) -Source $MyInvocation.MyCommand -Level "Info"
+
+                        # Check if text is not just placeholder
+                        $currentText = $textBoxControl.Text.Trim()
+                        if ($currentText -ne $placeholderText) {
+                            $hasValue = $true
+                            $fieldValue = $currentText
+                        } else {
+                            Write-DebugOutput -Message ("Text matches placeholder, treating as empty") -Source $MyInvocation.MyCommand -Level "Info"
+                        }
+                    } else {
+                        if (-not $textBoxControl) {
+                            Write-DebugOutput -Message ("TextBox control not found: {0}" -f ($controlFieldName + "_TextBox")) -Source $MyInvocation.MyCommand -Level "Error"
+                        } else {
+                            Write-DebugOutput -Message ("TextBox is empty or whitespace") -Source $MyInvocation.MyCommand -Level "Info"
+                        }
+                    }
+                }
+            }
+
+            Write-DebugOutput -Message ("Field '{0}' hasValue: {1}, Value: {2}" -f $field.name, $hasValue, $fieldValue) -Source $MyInvocation.MyCommand -Level "Info"            # Check required field validation
+            if ($field.required -and -not $hasValue) {
+                $validationErrors.MissingRequired += $field.name
+                Write-DebugOutput -Message ("Required field missing: {0}" -f $field.name) -Source $MyInvocation.MyCommand -Level "Error"
+            }
+
+            # Check regex pattern validation for fields with values
+            if ($hasValue -and $field.valueType -and $syncHash.UIConfigs.valueValidations.($field.valueType)) {
+                $validation = $syncHash.UIConfigs.valueValidations.($field.valueType)
+                if ($validation.pattern) {
+                    $pattern = $validation.pattern
+
+                    # For array fields, validate each item
+                    if ($field.type -eq "array" -and $fieldValue -is [array]) {
+                        foreach ($item in $fieldValue) {
+                            if (-not [string]::IsNullOrWhiteSpace($item) -and $item -notmatch $pattern) {
+                                $validationErrors.FormatErrors += @{
+                                    FieldName = $field.name
+                                    Value = $item
+                                    ExpectedFormat = $validation.format
+                                    Error = "Invalid format for '$($field.name)': '$item'. Expected format: $($validation.format)"
+                                }
+                                Write-DebugOutput -Message ("Format validation failed for field '{0}': '{1}' does not match pattern '{2}'" -f $field.name, $item, $pattern) -Source $MyInvocation.MyCommand -Level "Error"
+                            }
+                        }
+                    } else {
+                        # Single value validation
+                        if (-not [string]::IsNullOrWhiteSpace($fieldValue) -and $fieldValue -notmatch $pattern) {
+                            $validationErrors.FormatErrors += @{
+                                FieldName = $field.name
+                                Value = $fieldValue
+                                ExpectedFormat = $validation.format
+                                Error = "Invalid format for '$($field.name)': '$fieldValue'. Expected format: $($validation.format)"
+                            }
+                            Write-DebugOutput -Message ("Format validation failed for field '{0}': '{1}' does not match pattern '{2}'" -f $field.name, $fieldValue, $pattern) -Source $MyInvocation.MyCommand -Level "Error"
+                        }
+                    }
+                }
+
+                # Additional script-based validation checks
+                if ($validation.invalidScriptChecks -and $validation.invalidScriptChecks.Count -gt 0 -and
+                    ![string]::IsNullOrWhiteSpace($validation.invalidScriptMessage)) {
+
+                    try {
+                        # Execute each script check - if ANY fail, the validation fails
+                        $scriptValidationFailed = $false
+                        foreach ($scriptCheck in $validation.invalidScriptChecks) {
+                            try {
+                                # Create a script block that has access to $value variable
+                                $scriptWithValue = '$value = {0}; {1}' -f ("'$fieldValue'"), $scriptCheck
+                                $scriptResult = [scriptblock]::Create($scriptWithValue).Invoke()
+
+                                # Any script that returns false/null/empty indicates failure
+                                if (-not $scriptResult -or $scriptResult -eq $false -or [string]::IsNullOrEmpty($scriptResult)) {
+                                    $scriptValidationFailed = $true
+                                    Write-DebugOutput -Message ("Script validation failed for check: {0}" -f $scriptCheck) -Source $MyInvocation.MyCommand -Level "Error"
+                                    break
+                                }
+                            }
+                            catch {
+                                # If any script check fails to execute, consider validation failed
+                                $scriptValidationFailed = $true
+                                Write-DebugOutput -Message ("Script validation check failed to execute: {0} - {1}" -f $scriptCheck, $_.Exception.Message) -Source $MyInvocation.MyCommand -Level "Error"
+                                break
+                            }
+                        }
+
+                        if ($scriptValidationFailed) {
+                            $validationErrors.FormatErrors += @{
+                                FieldName = $field.name
+                                Value = $fieldValue
+                                ExpectedFormat = $validation.format
+                                Error = $validation.invalidScriptMessage
+                            }
+                            Write-DebugOutput -Message ("Script validation failed for field '{0}': {1}" -f $field.name, $validation.invalidScriptMessage) -Source $MyInvocation.MyCommand -Level "Error"
+                        }
+                    }
+                    catch {
+                        Write-DebugOutput -Message ("Script validation error for field '{0}': {1}" -f $field.name, $_.Exception.Message) -Source $MyInvocation.MyCommand -Level "Warning"
+                    }
+                }
+            }
+        }
+    }
+
+    return $validationErrors
+}
+
 Function New-FieldListControl {
     <#
     .SYNOPSIS
@@ -115,9 +325,28 @@ Function New-FieldListControl {
 
     # Field label - USE field.name for UI display
     $fieldLabel = New-Object System.Windows.Controls.TextBlock
-    $fieldLabel.Text = $Field.name
     $fieldLabel.FontWeight = "SemiBold"
     $fieldLabel.Margin = "0,0,0,4"
+
+    # Create proper formatting for required fields with red asterisk
+    if ($Field.required -eq $true) {
+        # Create a run with the field name
+        $fieldNameRun = New-Object System.Windows.Documents.Run
+        $fieldNameRun.Text = $Field.name
+
+        # Create a run with the red asterisk
+        $asteriskRun = New-Object System.Windows.Documents.Run
+        $asteriskRun.Text = " *"
+        $asteriskRun.Foreground = [System.Windows.Media.Brushes]::Red
+        $asteriskRun.FontWeight = "Bold"
+
+        # Add both runs to the textblock
+        [void]$fieldLabel.Inlines.Add($fieldNameRun)
+        [void]$fieldLabel.Inlines.Add($asteriskRun)
+    } else {
+        # Non-required field - just show the name
+        $fieldLabel.Text = $Field.name
+    }
     [void]$fieldPanel.Children.Add($fieldLabel)
 
     # Field description
@@ -329,6 +558,18 @@ Function New-FieldListControl {
                 $datePicker.Height = 28
                 $datePicker.Margin = "0,0,8,0"
                 $datePicker.SelectedDateFormat = "Short"
+                <#
+                Look for the following keys in the JSON:
+                    "dateDayMin": 0,
+                    "dateDayMax": 1825,
+                Set the DisplayDateStart and DisplayDateEnd properties of the DatePicker
+                #>
+                If($Field.dateDayMin) {
+                    $datePicker.DisplayDateStart = [DateTime]::Today.AddDays($Field.dateDayMin)
+                }
+                If($Field.dateDayMax) {
+                    $datePicker.DisplayDateEnd = [DateTime]::Today.AddDays($Field.dateDayMax)
+                }
 
                 # Add global event handlers to dynamically created DatePicker
                 Add-UIControlEventHandler -Control $datePicker
@@ -524,10 +765,13 @@ Function New-FieldListCard {
     Creates a comprehensive field card UI element for policy configuration.
     .DESCRIPTION
     This Function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
+    When using -OutPolicyOnly, specify -SettingsTypeName to indicate which settings type to save for AutoSave functionality.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ProductName")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutputData")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "FlipFieldValueAndPolicyId")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "SettingsTypeName")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutPolicyOnly")]
     param(
         [string]$CardName,
         [string]$PolicyId,
@@ -537,9 +781,11 @@ Function New-FieldListCard {
         [string]$Criticality,
         [string[]]$FieldList,  # Can be string or array
         $OutputData,
+        [string]$SettingsTypeName,  # Name of the settings type for AutoSave (used with -OutPolicyOnly)
         [switch]$ShowFieldType,
         [switch]$ShowDescription,
-        [switch]$FlipFieldValueAndPolicyId
+        [switch]$FlipFieldValueAndPolicyId,
+        [switch]$OutPolicyOnly
     )
 
     # Store baseline data in card Tag for filtering
@@ -788,37 +1034,66 @@ Function New-FieldListCard {
         # Get the details panel (parent of button panel)
         $detailsPanel = $this.Parent.Parent
 
-        # Validate required fields BEFORE processing data
-        $missingRequiredFields = Test-RequiredField -detailsPanel $detailsPanel -validInputFields $validInputFields -policyId $policyId -CardName $CardName
+        # Perform comprehensive validation (required fields + regex patterns)
+        $validationResults = Test-FieldValidation -detailsPanel $detailsPanel -validInputFields $validInputFields -policyId $policyId -CardName $CardName
 
-            if ($missingRequiredFields.Count -gt 0) {
-                $errorMessage = if ($missingRequiredFields.Count -eq 1) {
-                    $syncHash.UIConfigs.localeErrorMessages.RequiredFieldValidation -f $missingRequiredFields[0]
-                } else {
-                    $syncHash.UIConfigs.localeErrorMessages.RequiredFieldsValidation -f ($missingRequiredFields -join ", ")
-                }
+        # Check for validation errors
+        $hasValidationErrors = $false
+        $errorMessages = @()
 
-                $syncHash.ShowMessageBox.Invoke($errorMessage, $syncHash.UIConfigs.localeTitles.RequiredFieldsMissing, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
-                return # Exit save operation if validation fails
-            }        # Initialize output data structure
+        # Handle missing required fields
+        if ($validationResults.MissingRequired.Count -gt 0) {
+            $hasValidationErrors = $true
+            foreach ($fieldName in $validationResults.MissingRequired) {
+                $errorMessages += "The '$fieldName' field is required and cannot be empty."
+            }
+        }
+
+        # Handle format validation errors
+        if ($validationResults.FormatErrors.Count -gt 0) {
+            $hasValidationErrors = $true
+            foreach ($formatError in $validationResults.FormatErrors) {
+                $errorMessages += $formatError.Error
+            }
+        }
+
+        # If there are validation errors, show them and exit
+        if ($hasValidationErrors) {
+            $combinedErrorMessage = $errorMessages -join "`n`n"
+            $title = if ($validationResults.MissingRequired.Count -gt 0) {
+                $syncHash.UIConfigs.localeTitles.RequiredFieldsMissing
+            } else {
+                $syncHash.UIConfigs.localeTitles.ValidationError
+            }
+
+            $syncHash.ShowMessageBox.Invoke($combinedErrorMessage, $title, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+            return # Exit save operation if validation fails
+        }        # Initialize output data structure
         If($FlipFieldValueAndPolicyId) {
             # For annotations/omissions: Product -> FieldType -> PolicyId -> Data
             # Get the yamlValue from the baseline control that uses this input type
             $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.defaultFields -eq $validInputFields[0] }
             $NestedKey = if ($baselineControl) { $baselineControl.yamlValue } else { $validInputFields[0] }
             $PolicyKey = $policyId            # The actual policy ID becomes nested under FieldType
+        } elseif ($OutPolicyOnly) {
+            # For OutPolicyOnly (GlobalSettings): flat structure directly in OutputData
+            # No nested Product/PolicyId structure needed
+            $NestedKey = $null
+            $PolicyKey = $null
         } else {
             # Normal structure: Product -> PolicyId -> FieldType -> Data
             $NestedKey = $policyId
             $PolicyKey = $validInputFields[0]  # Use the first valid input field name
         }
 
-        # Initialize structure
-        if (-not $OutputData[$ProductName]) {
-            $OutputData[$ProductName] = [ordered]@{}
-        }
-        if (-not $OutputData[$ProductName][$NestedKey]) {
-            $OutputData[$ProductName][$NestedKey] = [ordered]@{}
+        # Initialize structure (skip for OutPolicyOnly since we're writing directly to OutputData)
+        if (-not $OutPolicyOnly) {
+            if (-not $OutputData[$ProductName]) {
+                $OutputData[$ProductName] = [ordered]@{}
+            }
+            if (-not $OutputData[$ProductName][$NestedKey]) {
+                $OutputData[$ProductName][$NestedKey] = [ordered]@{}
+            }
         }
 
         $hasOutputData = $false
@@ -925,7 +1200,13 @@ Function New-FieldListCard {
             # Store the data with proper nesting for YAML output
             if ($fieldCardData.Count -gt 0) {
                 # Save data with the appropriate structure
-                if ($FlipFieldValueAndPolicyId) {
+                if ($OutPolicyOnly) {
+                    # For OutPolicyOnly (GlobalSettings): store fields directly in OutputData with no nesting
+                    foreach ($fieldKey in $fieldCardData.Keys) {
+                        $OutputData[$fieldKey] = $fieldCardData[$fieldKey]
+                    }
+                    Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, "Direct", "OutPolicyOnly", $inputData, ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
+                } elseif ($FlipFieldValueAndPolicyId) {
                     # Structure: Product -> FieldType -> PolicyId -> Data
                     # $NestedKey = inputType name, $PolicyKey = PolicyId
                     if (-not $OutputData[$ProductName][$NestedKey][$PolicyKey]) {
@@ -953,10 +1234,8 @@ Function New-FieldListCard {
                         Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.MergedCardField -f $CardName, $ProductName, $NestedKey, "Direct", ($fieldCardData | ConvertTo-Json -Compress)) -Source $this.Name -Level "Info"
                     } else {
                         # If the inputType has a value, create nested structure
-                        # Initialize the exclusion type container if it doesn't exist
-                        if (-not $OutputData[$ProductName][$NestedKey][$FieldListValue]) {
-                            $OutputData[$ProductName][$NestedKey][$FieldListValue] = @{}
-                        }
+                        # IMPORTANT: Clear and rebuild the exclusion type container to ensure empty fields are removed
+                        $OutputData[$ProductName][$NestedKey][$FieldListValue] = @{}
 
                         # Store field data under the exclusion type
                         foreach ($fieldKey in $fieldCardData.Keys) {
@@ -969,13 +1248,66 @@ Function New-FieldListCard {
                 $hasOutputData = $true
                 $savedinputTypes += $yamlKeyName
             } else {
-                Write-DebugOutput -Message ("No entries collected for {0} fields: {1}" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Info"
+                # Handle case where no fields have values - we need to clear existing data
+                Write-DebugOutput -Message ("No entries collected for {0} fields: {1} - clearing existing data" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Info"
+
+                if ($OutPolicyOnly) {
+                    # For OutPolicyOnly: Remove any existing fields for this input type
+                    foreach ($field in $FieldListDef.fields) {
+                        if ($OutputData.ContainsKey($field.value)) {
+                            $OutputData.Remove($field.value)
+                            Write-DebugOutput -Message "Removed empty field from OutputData: $($field.value)" -Source $this.Name -Level "Info"
+                        }
+                    }
+                } elseif ($FlipFieldValueAndPolicyId) {
+                    # Structure: Product -> FieldType -> PolicyId -> Data
+                    if ($OutputData[$ProductName] -and $OutputData[$ProductName][$NestedKey] -and $OutputData[$ProductName][$NestedKey][$PolicyKey]) {
+                        $OutputData[$ProductName][$NestedKey].Remove($PolicyKey)
+                        Write-DebugOutput -Message "Removed empty policy from FieldType structure: $PolicyKey" -Source $this.Name -Level "Info"
+                    }
+                } else {
+                    # Original structure: Product -> PolicyId -> FieldType -> Data
+                    $FieldListValue = $FieldListDef.value
+
+                    if ([string]::IsNullOrWhiteSpace($FieldListValue)) {
+                        # Clear fields directly under policy
+                        if ($OutputData[$ProductName] -and $OutputData[$ProductName][$NestedKey]) {
+                            foreach ($field in $FieldListDef.fields) {
+                                if ($OutputData[$ProductName][$NestedKey].ContainsKey($field.value)) {
+                                    $OutputData[$ProductName][$NestedKey].Remove($field.value)
+                                    Write-DebugOutput -Message "Removed empty field from policy: $($field.value)" -Source $this.Name -Level "Info"
+                                }
+                            }
+                        }
+                    } else {
+                        # Clear the entire exclusion type container
+                        if ($OutputData[$ProductName] -and $OutputData[$ProductName][$NestedKey] -and $OutputData[$ProductName][$NestedKey].ContainsKey($FieldListValue)) {
+                            $OutputData[$ProductName][$NestedKey].Remove($FieldListValue)
+                            Write-DebugOutput -Message "Removed empty exclusion type: $FieldListValue" -Source $this.Name -Level "Info"
+                        }
+                    }
+                }
             }
         }
 
         if ($hasOutputData) {
-            # Log the final merged structure
-            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.CardSavedSuccess -f $CardName, $ProductName, $policyId, ($savedinputTypes -join ', ')), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
+            # Log the final merged structure and show detailed success message
+            $successMessage = if ($savedinputTypes.Count -gt 1) {
+                "Successfully saved $CardName configuration for policy '$policyId'. Fields saved: $($savedinputTypes -join ', ')."
+            } else {
+                "Successfully saved $CardName configuration for policy '$policyId'."
+            }
+            # Save the policy/settings for resume
+            if ($OutPolicyOnly -and $SettingsTypeName) {
+                Save-AutoSaveSettings -SettingsType $SettingsTypeName
+                Write-DebugOutput -Message "OutPolicyOnly save completed using SettingsType: $SettingsTypeName" -Source $this.Name -Level "Info"
+            } else {
+                # Regular policies use the policy save mechanism
+                Save-AutoSavePolicy -CardName $CardName -PolicyId $policyId -ProductName $ProductName -FlipFieldValueAndPolicyId $false
+            }
+
+            # Show success message
+            $syncHash.ShowMessageBox.Invoke($successMessage, $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
 
             # Update YAML preview to reflect the changes
             #New-YamlPreview
@@ -988,8 +1320,10 @@ Function New-FieldListCard {
             $detailsPanel.Visibility = "Collapsed"
             $checkbox.IsChecked = $false
         } else {
+            # More specific error message about why no data was saved
+            $errorMessage = "No valid data was found to save for $CardName fields. Please ensure all required fields are completed and all field values follow the correct format."
             Write-DebugOutput -Message ("No entries found for {0} fields: {1}" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Error"
-            $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.NoEntriesFound -f $CardName.ToLower()), $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
+            $syncHash.ShowMessageBox.Invoke($errorMessage, $syncHash.UIConfigs.localeTitles.ValidationError, "OK", "Warning")
         }
     }.GetNewClosure())
 
@@ -1002,13 +1336,53 @@ Function New-FieldListCard {
         $result = $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardPolicyConfirmation -f $CardName.ToLower(), $policyId), $syncHash.UIConfigs.localeTitles.ConfirmRemove, "YesNo", "Question")
         if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
 
-            # Remove the policy from the nested structure
-            if ($OutputData[$ProductName] -and $OutputData[$ProductName][$policyId]) {
-                $OutputData[$ProductName].Remove($policyId)
+            # Handle data structure based on configuration
+            if ($OutPolicyOnly) {
+                # For OutPolicyOnly (e.g. GlobalSettings): Remove fields directly from OutputData
+                Write-DebugOutput -Message "OutPolicyOnly removal - processing $($validInputFields.Count) input fields" -Source $this.Name -Level "Info"
+                foreach ($inputData in $validInputFields) {
+                    $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
+                    if ($FieldListDef) {
+                        Write-DebugOutput -Message "Processing field definition for: $inputData" -Source $this.Name -Level "Verbose"
+                        foreach ($field in $FieldListDef.fields) {
+                            $fieldKey = $field.value
+                            Write-DebugOutput -Message "Attempting to remove field key: $fieldKey" -Source $this.Name -Level "Verbose"
 
-                # If no more policies for this product, remove the product
-                if ($OutputData[$ProductName].Count -eq 0) {
-                    $OutputData.Remove($ProductName)
+                                $OutputData.Remove($fieldKey)
+                                Write-DebugOutput -Message "Successfully removed GlobalSettings field: $fieldKey" -Source $this.Name -Level "Info"
+
+                        }
+                    } else {
+                        Write-DebugOutput -Message "No field definition found for input: $inputData" -Source $this.Name -Level "Warning"
+                    }
+                }
+            } elseif ($FlipFieldValueAndPolicyId) {
+                # For annotations/omissions: Product -> FieldType -> PolicyId -> Data
+                $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.defaultFields -eq $validInputFields[0] }
+                $FieldTypeKey = if ($baselineControl) { $baselineControl.yamlValue } else { $validInputFields[0] }
+
+                if ($OutputData[$ProductName] -and $OutputData[$ProductName][$FieldTypeKey] -and $OutputData[$ProductName][$FieldTypeKey][$policyId]) {
+                    $OutputData[$ProductName][$FieldTypeKey].Remove($policyId)
+
+                    # If no more policies for this field type, remove the field type
+                    if ($OutputData[$ProductName][$FieldTypeKey].Count -eq 0) {
+                        $OutputData[$ProductName].Remove($FieldTypeKey)
+                    }
+
+                    # If no more field types for this product, remove the product
+                    if ($OutputData[$ProductName].Count -eq 0) {
+                        $OutputData.Remove($ProductName)
+                    }
+                }
+            } else {
+                # Normal structure: Product -> PolicyId -> FieldType -> Data
+                if ($OutputData[$ProductName] -and $OutputData[$ProductName][$policyId]) {
+                    $OutputData[$ProductName].Remove($policyId)
+
+                    # If no more policies for this product, remove the product
+                    if ($OutputData[$ProductName].Count -eq 0) {
+                        $OutputData.Remove($ProductName)
+                    }
                 }
             }
 
@@ -1090,10 +1464,21 @@ Function New-FieldListCard {
                 }
             }
 
+            # Handle AutoSave removal based on configuration
+            if ($OutPolicyOnly -and $SettingsTypeName) {
+                # For OutPolicyOnly: Update the settings file after removal (matching save button logic)
+                Save-AutoSaveSettings -SettingsType $SettingsTypeName
+                Write-DebugOutput -Message "Updated $SettingsTypeName AutoSave file after removal" -Source $this.Name -Level "Info"
+            } else {
+                # For regular policies: Remove the specific policy AutoSave file
+                Remove-AutoSavePolicy -CardName $CardName -PolicyId $policyId
+            }
+
+            # Show success message
             $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardEntrySuccess -f $CardName, $policyId), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")
 
             # Update YAML preview to reflect the removal
-            New-YamlPreview
+            #New-YamlPreview
 
             # Hide remove button and unbold header
             $this.Visibility = "Collapsed"

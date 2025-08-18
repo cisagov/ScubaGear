@@ -1,5 +1,6 @@
 {
   "DebugMode": true,
+  "AutoSaveProgress": false,
   "EnableSearchAndFilter": false,
   "EnableScubaRun": true,
   "EnableResultReader": true,
@@ -41,7 +42,8 @@
     "MergedCardField": "{0} merged for [{1}][{2}][{3}]: {4}",
     "SelectedCertificateThumbprint": "Selected certificate thumbprint: {0}",
     "FilterApplied": "Filter applied: {0} policies visible",
-    "SearchCleared": "Search criteria cleared"
+    "SearchCleared": "Search criteria cleared",
+    "ScubaRunReady": "Ready to run ScubaGear {0}"
   },
   "localeErrorMessages": {
     "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
@@ -67,7 +69,9 @@
     "SkippingNullCard": "Skipping null card for policy: {0}",
     "RemoveEventHandlerError": "Failed to remove event handler for: {0}",
     "CertificateSelectionError": "Certificate selection error: {0}",
-    "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid."
+    "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid.",
+    "ScubRunIncomplete": "Configuration incomplete - check Main tab",
+    "ScubRunConfigFailed": "Failed to generate temporary configuration"
   },
   "localePopupMessages": {
     "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
@@ -148,76 +152,193 @@
     "LogIn_CheckBox": true,
     "DisconnectOnExit`_CheckBox": false
   },
-  "dataValidation": {
-    "generalSettingsDataKeys": [
-      "Organization",
-      "OrgName",
-      "OrgUnitName",
-      "Description",
-      "ProductNames",
-      "M365Environment"
-    ],
-    "advancedSettingsDataKeys": [
-      "AppId",
-      "CertificateThumbprint",
-      "OutPath",
-      "OutFolderName",
-      "OutProviderFileName",
-      "OutRegoFileName",
-      "OutReportName",
-      "OutJsonFileName",
-      "OutCsvFileName",
-      "OutActionPlanFileName",
-      "LogIn",
-      "DisconnectOnExit"
-    ],
-    "globalSettingsDataKeys":[
-      "PreferredDnsResolvers",
-      "SkipDoH"
-    ]
-  },
-  "advancedSections": {
-    "ApplicationSection_Toggle": {
-      "sectionName": "Application Authentication",
-      "fields": [
-        "AppId_TextBox",
-        "CertificateThumbprint_TextBox"
+  "products": [
+    {
+      "id": "Aad",
+      "name": "Microsoft Entra ID",
+      "displayName": "Microsoft Entra ID (aad)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "Defender",
+      "name": "Defender",
+      "displayName": "Defender (defender)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "Exo",
+      "name": "Exchange Online",
+      "displayName": "Exchange Online (exo)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "PowerPlatform",
+      "name": "Power Platform",
+      "displayName": "Power Platform (powerplatform)",
+      "supportsExclusions": false
+    },
+    {
+      "id": "Sharepoint",
+      "name": "SharePoint & OneDrive",
+      "displayName": "SharePoint & OneDrive (sharepoint)",
+      "supportsExclusions": false
+    },
+    {
+      "id": "Teams",
+      "name": "Microsoft Teams",
+      "displayName": "Microsoft Teams (teams)",
+      "supportsExclusions": false
+    }
+  ],
+  "M365Environment": [
+    {
+      "id": "commercial",
+      "name": "commercial",
+      "displayName": "Commercial",
+      "rationale": "Production environment for public tenants."
+    },
+    {
+      "id": "gcc",
+      "name": "gcc",
+      "displayName": "Government Community Cloud",
+      "rationale": "Production environment for government tenants."
+    },
+    {
+      "id": "gcchigh",
+      "name": "gcchigh",
+      "displayName": "Government Community Cloud High",
+      "rationale": "Production environment for GCCH tenants."
+    },
+    {
+      "id": "dod",
+      "name": "dod",
+      "displayName": "Department of Defense",
+      "rationale": "Production environment for DOD tenants."
+    }
+  ],
+  "settingsControl": {
+    "MainTab": {
+      "name": "Main",
+      "dataControlOutput": "GeneralSettingsData",
+      "validationKeys": [
+        "Organization",
+        "OrgName",
+        "OrgUnitName",
+        "Description",
+        "ProductNames",
+        "M365Environment"
       ]
     },
-    "OutputSection_Toggle": {
-      "sectionName": "Output Configuration",
-      "fields": [
-        "OutPath_TextBox",
-        "OutFolderName_TextBox",
-        "OutProviderFileName_TextBox",
-        "OutRegoFileName_TextBox",
-        "OutReportName_TextBox",
-        "OutJsonFileName_TextBox",
-        "OutCsvFileName_TextBox",
-        "OutActionPlanFileName_TextBox"
-      ]
+    "AdvancedTab": {
+      "name": "Advanced",
+      "dataControlOutput": "AdvancedSettingsData",
+      "validationKeys": [
+        "AppId",
+        "CertificateThumbprint",
+        "OutPath",
+        "OutFolderName",
+        "OutProviderFileName",
+        "OutRegoFileName",
+        "OutReportName",
+        "OutJsonFileName",
+        "OutCsvFileName",
+        "OutActionPlanFileName",
+        "LogIn",
+        "DisconnectOnExit"
+      ],
+      "sectionControl": {
+        "ApplicationSection_Toggle": {
+          "sectionName": "Application Authentication",
+          "fields": [
+            "AppId_TextBox",
+            "CertificateThumbprint_TextBox"
+          ]
+        },
+        "OutputSection_Toggle": {
+          "sectionName": "Output Configuration",
+          "fields": [
+            "OutPath_TextBox",
+            "OutFolderName_TextBox",
+            "OutProviderFileName_TextBox",
+            "OutRegoFileName_TextBox",
+            "OutReportName_TextBox",
+            "OutJsonFileName_TextBox",
+            "OutCsvFileName_TextBox",
+            "OutActionPlanFileName_TextBox"
+          ]
+        },
+        "OpaSection_Toggle": {
+          "sectionName": "OPA Configuration",
+          "fields": [
+            "OpaPath_TextBox"
+          ]
+        },
+        "GeneralSection_Toggle": {
+          "sectionName": "General Settings",
+          "fields": [
+            "LogIn_CheckBox",
+            "DisconnectOnExit_CheckBox"
+          ]
+        }
+      }
     },
-    "OpaSection_Toggle": {
-      "sectionName": "OPA Configuration",
-      "fields": [
-        "OpaPath_TextBox"
-      ]
-    },
-    "GeneralSection_Toggle": {
-      "sectionName": "General Settings",
-      "fields": [
-        "LogIn_CheckBox",
-        "DisconnectOnExit_CheckBox"
-      ]
+    "GlobalTab": {
+      "name": "Global Settings",
+      "description": "Configure global settings that apply across all policies and configurations",
+      "dataControlOutput": "GlobalSettingsData",
+      "validationKeys": [
+        "PreferredDnsResolvers",
+        "SkipDoH"
+      ],
+      "sectionControl": {
+        "GlobalSettingsContainer": {
+          "sectionName": "Global Settings",
+          "fields": [
+            "PreferredDnsResolvers",
+            "SkipDoH"
+          ]
+        }
+      }
     }
   },
-  "globalSettings": {
-    "sectionName": "Global Settings",
-    "fields": [
-      "PreferredDnsResolvers",
-      "SkipDoH"
-    ]
-  },
+  "baselineControls": [
+    {
+      "tabName": "Exclusions",
+      "yamlValue": "[ProductName][PolicyId]",
+      "controlType": "Exclusions",
+      "dataControlOutput": "ExclusionData",
+      "fieldControlName": "exclusionField",
+      "defaultFields": "none",
+      "cardName": "Exclusion",
+      "showFieldType": true,
+      "showDescription": false,
+      "supportsAllProducts": false
+    },
+    {
+      "tabName": "Annotate Policies",
+      "yamlValue": "AnnotatePolicy",
+      "controlType": "Annotations",
+      "dataControlOutput": "AnnotationData",
+      "fieldControlName": "annotationField",
+      "defaultFields": "annotation",
+      "cardName": "Annotate",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    },
+    {
+      "tabName": "Omit Policies",
+      "yamlValue": "OmitPolicy",
+      "controlType": "Omissions",
+      "dataControlOutput": "OmissionData",
+      "fieldControlName": "omissionField",
+      "defaultFields": "omissions",
+      "cardName": "Omit",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    }
+  ],
   "ScubaRunConfig": {
     "sectionName": "Run ScubaGear Configuration",
     "description": "This section allows you to run ScubaGear with the current configuration.",
@@ -301,108 +422,6 @@
       "IncorrectResult"
     ]
   },
-  "products": [
-    {
-      "id": "Aad",
-      "name": "Microsoft Entra ID",
-      "displayName": "Microsoft Entra ID (aad)",
-      "supportsExclusions": true
-    },
-    {
-      "id": "Defender",
-      "name": "Defender",
-      "displayName": "Defender (defender)",
-      "supportsExclusions": true
-    },
-    {
-      "id": "Exo",
-      "name": "Exchange Online",
-      "displayName": "Exchange Online (exo)",
-      "supportsExclusions": true
-    },
-    {
-      "id": "PowerPlatform",
-      "name": "Power Platform",
-      "displayName": "Power Platform (powerplatform)",
-      "supportsExclusions": false
-    },
-    {
-      "id": "Sharepoint",
-      "name": "SharePoint & OneDrive",
-      "displayName": "SharePoint & OneDrive (sharepoint)",
-      "supportsExclusions": false
-    },
-    {
-      "id": "Teams",
-      "name": "Microsoft Teams",
-      "displayName": "Microsoft Teams (teams)",
-      "supportsExclusions": false
-    }
-  ],
-  "M365Environment": [
-    {
-      "id": "commercial",
-      "name": "commercial",
-      "displayName": "Commercial",
-      "rationale": "Production environment for public tenants."
-    },
-    {
-      "id": "gcc",
-      "name": "gcc",
-      "displayName": "Government Community Cloud",
-      "rationale": "Production environment for government tenants."
-    },
-    {
-      "id": "gcchigh",
-      "name": "gcchigh",
-      "displayName": "Government Community Cloud High",
-      "rationale": "Production environment for GCCH tenants."
-    },
-    {
-      "id": "dod",
-      "name": "dod",
-      "displayName": "Department of Defense",
-      "rationale": "Production environment for DOD tenants."
-    }
-  ],
-  "baselineControls": [
-    {
-      "tabName": "Exclusions",
-      "yamlValue": "[ProductName][PolicyId]",
-      "controlType": "Exclusions",
-      "dataControlOutput": "ExclusionData",
-      "fieldControlName": "exclusionField",
-      "defaultFields": "none",
-      "cardName": "Exclusion",
-      "showFieldType": true,
-      "showDescription": false,
-      "supportsAllProducts": false
-    },
-    {
-      "tabName": "Annotate Policies",
-      "yamlValue": "AnnotatePolicy",
-      "controlType": "Annotations",
-      "dataControlOutput": "AnnotationData",
-      "fieldControlName": "annotationField",
-      "defaultFields": "annotation",
-      "cardName": "Annotate",
-      "showFieldType": false,
-      "showDescription": true,
-      "supportsAllProducts": true
-    },
-    {
-      "tabName": "Omit Policies",
-      "yamlValue": "OmitPolicy",
-      "controlType": "Omissions",
-      "dataControlOutput": "OmissionData",
-      "fieldControlName": "omissionField",
-      "defaultFields": "omissions",
-      "cardName": "Omit",
-      "showFieldType": false,
-      "showDescription": true,
-      "supportsAllProducts": true
-    }
-  ],
   "inputTypes": {
     "capolicy": {
       "name": "Conditional Access Policy Excluded Groups and Users",
@@ -565,7 +584,7 @@
         }
       ]
     },
-    "preferredDNSResolvers": {
+    "PreferredDnsResolvers": {
       "name": "Preferred DNS Resolver IP Addresses",
       "value": "",
       "description": "Use this parameter to control what DNS resolver is used to fetch the SPF, DKIM, and DMARC records",
@@ -573,7 +592,7 @@
         {
           "type": "array",
           "name": "Enter preferred DNS resolver IP addresses:",
-          "value": "PreferredDNSResolvers",
+          "value": "PreferredDnsResolvers",
           "description": "Defines a list of preferred DNS resolvers",
           "valueType": "ipAddress",
           "required": false
@@ -622,6 +641,8 @@
           "value": "RemediationDate",
           "description": "The date a failing control is anticipated to be implemented",
           "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
           "required": false
         }
       ]
@@ -645,6 +666,8 @@
           "value": "Expiration",
           "description": "A date after which the policy should no longer be omitted from the report.",
           "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
           "required": false
         }
       ]
@@ -655,54 +678,77 @@
       "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
       "sample": "user@example.com",
       "format": "user@example.com",
+      "invalidScriptMessage": "Email domain must be accessible and not temporary.",
+      "invalidScriptChecks": [
+        "$value -notmatch 'tempmail|disposable'"
+      ],
       "sensitive": true
     },
     "domain": {
       "pattern": "^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.[A-Za-z0-9-]{1,63})+$",
       "sample": "example.com",
       "format": "user@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": true
     },
     "ipAddress": {
       "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
       "sample": "192.168.1.1",
       "format": "x.x.x.x",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": false
     },
     "guid": {
       "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
       "sample": "123e4567-e89b-12d3-a456-426614174000",
       "format": "123e4567-e89b-12d3-a456-426614174000",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": true
     },
     "yearmonthday": {
       "pattern": "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
       "sample": "2023-03-15",
       "format": "yyyy-MM-dd",
+      "invalidScriptMessage": "Date must be between today and five years from now.",
+      "invalidScriptChecks": [
+        "[DateTime]::Parse($value) -gt (Get-Date).AddDays(-1)",
+        "[DateTime]::Parse($value) -lt (Get-Date).AddYears(5)"
+      ],
       "sensitive": false
     },
     "semicolonList": {
       "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,};?)+$",
       "sample": "John Doe;jdoe@example.com",
       "format": "John Doe;jdoe@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": true
     },
     "thumbprint": {
       "pattern": "^[A-Fa-f0-9]{40}$",
       "sample": "1234567890abcdef1234567890abcdef12345678",
       "format": "1234567890abcdef1234567890abcdef12345678",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": false
     },
     "tenantDomain": {
       "pattern": "^(.*\\.)?(onmicrosoft\\.com|onmicrosoft\\.us)$",
       "sample": "example.onmicrosoft.com",
       "format": "example.onmicrosoft.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": false
     },
     "orgName": {
       "pattern": "^[a-zA-Z0-9.-]+$",
       "sample": "example",
       "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
       "sensitive": false
     }
   },

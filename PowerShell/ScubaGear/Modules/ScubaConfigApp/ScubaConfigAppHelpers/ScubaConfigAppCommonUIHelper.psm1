@@ -134,8 +134,7 @@ Function Add-UIControlEventHandler {
             # Add Click event
             $Control.Add_Click({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed Button" }
-                $controlContent = if ($this.Content) { " ($($this.Content))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlContent) -Source $MyInvocation.MyCommand -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] was pressed" -f $Control.GetType().Name, $controlName) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added Click event handler to Button: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
@@ -143,15 +142,13 @@ Function Add-UIControlEventHandler {
             # Add Checked event
             $Control.Add_Checked({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed CheckBox" }
-                $controlTag = if ($this.Tag) { " (Tag: $($this.Tag))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source $MyInvocation.MyCommand -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] was checked" -f $Control.GetType().Name, $controlName) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
 
             # Add Unchecked event
             $Control.Add_Unchecked({
                 $controlName = if ($this.Name) { $this.Name } else { "Unnamed CheckBox" }
-                $controlTag = if ($this.Tag) { " (Tag: $($this.Tag))" } else { "" }
-                Write-DebugOutput -Message ("{0} [{1}] changed value to: {2}" -f $Control.GetType().Name, $controlName, $controlTag) -Source $MyInvocation.MyCommand -Level "Info"
+                Write-DebugOutput -Message ("{0} [{1}] was unchecked" -f $Control.GetType().Name, $controlName) -Source $MyInvocation.MyCommand -Level "Info"
             }.GetNewClosure())
             Write-DebugOutput -Message "Added Checked/Unchecked event handlers to CheckBox: $($Control.Name)" -Source $MyInvocation.MyCommand -Level "Debug"
         }
