@@ -329,8 +329,8 @@ TestPlan:
             Splat:
               updates:
                 authentication_method[0].authentication_method_policy.PolicyMigrationState: null
-              Postconditions: []
-              ExpectedResult: true
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.3.5v1
     TestDriver: ScubaCached
