@@ -86,4 +86,15 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 - _Removal date:_ November 2024
 - _Removal rationale:_ Microsoft has noted that after November 2024 it will no longer be possible to prevent SharePoint in resetting custom script settings to its original value (disabled) for all sites. All references including the policy, implementation steps, and section, by direction of CISA and Microsoft, have been removed as the setting will be automatically reverted back to **Blocked** within 24 hours.
 
+## Microsoft Teams
+
+### Removed Policies
+
+#### MS.TEAMS.3.1v1
+
+Contact with Skype users SHALL be blocked.
+- _Removal date:_ August 2025
+- _Removal rationale:_ The option to restrict contact with Skype users found in policy MS.TEAMS.3.1v1 has been deprecated by Microsoft. All references, including the policy and its implementation steps, have been removed since the setting is no longer present.
+  
+
 **`TLP:CLEAR`**
