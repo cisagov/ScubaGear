@@ -69,7 +69,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 
 <!--Policy: MS.TEAMS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
-- _Last modified:_ August 2025
+- _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
