@@ -63,7 +63,7 @@ M365Environment: commercial
 
 ### Non-Interactive Authentication
 
-For automated or unattended execution, you can configure ScubaGear to use service principal authentication by adding **App ID** and **Certificate Thumbprint** parameters to your configuration file. This method is ideal for scheduled assessments or CI/CD pipelines.
+For automated or unattended execution, you can configure ScubaGear to use service principal authentication by adding the **Organization**, **App ID**, and **Certificate Thumbprint** parameters to your configuration file. This method is ideal for scheduled assessments or CI/CD pipelines.
 
 **Important**: The certificate's private key must be available in the certificate store, and config files with sensitive authentication data should be protected appropriately.
 
