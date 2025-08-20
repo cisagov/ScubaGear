@@ -2,7 +2,7 @@
 
 ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters](parameters.md) in a configuration file. The path of the file is specified by the `-ConfigFilePath` parameter, and its contents can be formatted as YAML or JSON. Important details about executing ScubaGear with a configuration file are listed below.
 
-- Executing ScubaGear with a modified configuration file is required to pass or omit specific ScubaGear policy checks. See [SCuBA compliance use](#scuba-compliance-use) and the associated sample configuration file for details.
+- Executing ScubaGear with a modified configuration file is required to pass or omit specific ScubaGear policy checks. See [SCuBA Compliance Configuration](#scuba-compliance-configuration) and the associated sample configuration file for details.
 
 - The configuration file allows users to add additional fields to embed within the ScubaGear output JSON for supplemental metadata purposes.
 
@@ -14,104 +14,124 @@ ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters]
 
 [Sample config files](../../PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
 
-### Basic Use
+### SCuBA Compliance Configuration
 
-The [basic use](../../PowerShell/ScubaGear/Sample-Config-Files/basic_config.yaml) example config file only specifies a product name and an M365 environment.
+The [SCuBA compliance](../../PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file is the **recommended starting point** for organizations seeking to meet SCuBA compliance checks. This configuration file contains:
+
+- Essential parameters for SCuBA baseline compliance
+- Fields for adding conditional access policy exceptions
+- Fields for omitting ScubaGear policy checks with proper rationale
+- Additional organizational documentation fields
+- Examples of exclusions, annotations, and omissions
+
+Users are highly encouraged to read all the configuration file documentation sections to understand what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
+
+This configuration file includes the additional `OrgName` and `OrgUnitName` fields for documenting the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
+
+```yaml
+OrgName: Department of Example
+OrgUnitName: Subdepartment of Example  
+```
 
 ScubaGear can be invoked with this config file:
 
 ```powershell
-# Invoke with a config file
-Invoke-SCuBA -ConfigFilePath basic_config.yaml
+# Invoke with SCuBA compliance config
+Invoke-SCuBA -ConfigFilePath scuba_compliance.yaml
 ```
 
-It can also be invoked while overriding the the `M365Environment` parameter:
+### Full Configuration Reference
+
+The [full config file](../../PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) shows **all available parameters** supported by ScubaGear specified in the config file. This serves as a complete reference for all possible configuration options. Any parameter may be commented out - if not specified or commented out, ScubaGear will supply the default value unless overridden on the command line.
+
+**Note**: Default values do not apply to authentication parameters (Organization, AppID, CertificateThumbprint).
 
 ```powershell
-# Invoke with an override
+# Invoke with full configuration reference
+Invoke-SCuBA -ConfigFilePath full_config.yaml
+```
+
+### Alternative Configuration Approaches
+
+While the SCuBA compliance and full configuration files above are recommended, you can also create simpler configurations:
+
+**Basic Configuration**: Specify only essential parameters (ProductNames and M365Environment):
+```yaml
+ProductNames: ['aad', 'defender', 'exo']
+M365Environment: commercial
+```
+
+### Non-Interactive Authentication
+
+For automated or unattended execution, you can configure ScubaGear to use service principal authentication by adding the **Organization**, **App ID**, and **Certificate Thumbprint** parameters to your configuration file. This method is ideal for scheduled assessments or CI/CD pipelines.
+
+**Important**: The certificate's private key must be available in the certificate store, and config files with sensitive authentication data should be protected appropriately.
+
+Example configuration with service principal authentication:
+
+```yaml
+Organization: "contoso.onmicrosoft.com"
+AppID: "abcdef01-2345-6789-abcd-e0123456789a"  # Application (client) ID
+CertificateThumbprint: "FEDCBA9876543210FEDCBA9876543210FEDCBA98"  # 40-character hex string
+ProductNames: ['aad', 'defender', 'exo']
+M365Environment: commercial
+```
+
+You can also override authentication parameters at runtime:
+
+```powershell
+# Override authentication parameters on command line
 Invoke-SCuBA `
-  -M365Environment gcc `
-  -ConfigFilePath minimal_config.yaml
-```
-
-### Typical Use
-
-The [typical use](../../PowerShell/ScubaGear/Sample-Config-Files/typical_config.yaml) example config file includes multiple products specified as a list and an M365 environment. Additional product values are commented out and will not be included in the testing, but they are retained in the config file to easily add them back later.
-
-ScubaGear can be invoked with this config file:
-
-```powershell
-# Invoke with config file
-Invoke-SCuBA -ConfigFilePath typical_config.yaml
-```
-
-It can also be invoked while specifying non-interactive mode authentication parameters:
-
-```powershell
-# Invoke with non-interactive authentication
-Invoke-SCuBA `
-  -ConfigFilePath typical_config.yaml `
+  -ConfigFilePath myconfig.yaml `
   -Organization contoso.onmicrosoft.com `
   -AppID abcdef0123456789abcde01234566789 `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98
 ```
 
-### SCuBA compliance use
-The [SCuBA compliance](../../PowerShell/ScubaGear/Sample-Config-Files/scuba_compliance.yaml) example config file contains a base essential set of parameters for organizations seeking to meet SCuBA compliance checks.
-The configuration file contains a subset of ScubaGear parameters, fields for adding conditional access policy exceptions, fields for omitting ScubaGear policy checks, and additional fields for documenting the organization running ScubaGear.
-Users are highly encouraged to read all the configuration file documentation sections to comprehend what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
+For more details on setting up service principal authentication, see the [Non-Interactive Permissions](../prerequisites/noninteractive.md) documentation.
 
-Uniquely, this example configuration file contains the additional `OrgName` and `OrgUnitName` fields for documenting both the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
+## Generate Configuration Files
 
-```
-OrgName: Department of Example
-OrgUnitName: Subdepartment of Example
-```
+ScubaGear provides two methods for creating configuration files: a command-line utility and a graphical user interface.
 
-ScubaGear can be invoked with this config file:
+### Method 1: Configuration UI (Recommended)
+
+The **Configuration UI** provides an intuitive graphical interface for creating and managing ScubaGear configuration files:
 
 ```powershell
-# Invoke with config file
-Invoke-SCuBA -ConfigFilePath scuba_compliance.yaml
+# Launch the Configuration UI
+Invoke-SCuBAConfigAppUI
 ```
 
-### Credential Use
+The Configuration UI offers:
+- **User-friendly interface** with guided setup
+- **Real-time validation** of all configuration options
+- **YAML preview** before saving
+- **Import/export** existing configurations
+- **Microsoft Graph integration** for browsing users and groups
+- **Built-in help** and examples for all settings
 
-The [credential user](../../PowerShell/ScubaGear/Sample-Config-Files/creds_config.yaml) example config file supplies credentials using a service principal, appId, and certificate thumbprint. (The associated private key is still required.)  Config files with sensitive data should be protected appropriately.
+This is the **recommended method** for users who prefer visual interfaces or are new to ScubaGear configuration.
 
-ScubaGear can be invoked with this config file:
+For complete documentation on using the Configuration UI, see the [Configuration UI Guide](../scubaconfigui.md).
 
-```powershell
-# Invoke with config file
-Invoke-SCuBA -ConfigFilePath creds_config.yaml
-```
+### Method 2: Command-Line Generation
 
-It can also be invoked by overriding the product names:
-
-```powershell
-# Invoke with a different product name
-Invoke-SCuBA `
-  -ConfigFilePath typical_config.yaml `
-  -ProductNames defender
-```
-
-### Full Use
-
-The [full config file](../../PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) shows all of the global parameters supported by ScubaConfig specified in the config file. Any one of these parameters may be commented out. If not specified or if commented out, ScubaConfig will supply the default value, unless it's overridden on the command line. Default values do not apply to authentication parameters.
-
-```powershell
-# Invoke without any overrides
-Invoke-SCuBA -ConfigFilePath full_config.yaml
-```
-
-## Generate an Empty Sample Configuration File
-
-ScubaGear's support module can generate an empty sample config file. Running the `New-SCuBAConfig` cmdlet will generate a full sample config called `SampleConfig.yaml` that can be filled out based on the guidance below. Parameters can be passed to the `New-SCuBAConfig` cmdlet to change values inside the sample config.
+You can also generate an empty sample configuration file using the command line. The `New-SCuBAConfig` cmdlet will create a template configuration file called `SampleConfig.yaml`:
 
 ```powershell
 # Create an empty config file
 New-SCuBAConfig
 ```
+
+Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values in the sample configuration:
+
+```powershell
+# Create config with pre-set values
+New-SCuBAConfig -Organization "contoso.onmicrosoft.com" -ProductNames "aad,defender"
+```
+
+The generated file can then be manually edited to add your specific configuration settings.
 
 ## Omit Policies
 
@@ -230,9 +250,11 @@ The policy `MS.DEFENDER.2.3v1` supports a variable called `PartnerDomains` that 
 Each domain in the list should be shown as the fully-qualified domain name associated with the partner organization. These domains are also added to the `Include custom domains` list, but the variable is kept separate to document the association with the associated Defender baseline policy.
 
 ### Exchange Online Configuration
+
 The ScubaGear configuration file provides the capability to exclude specific domains from the MS.EXO.1.1v2 policy check.
 
 #### Automatic Forwarding to Remote Domains
+
 The policy `MS.EXO.1.1v2` supports a variable called `AllowedForwardingDomains` that expects a list of domain names for which automatic forwarding should be allowed.
 Each domain in the list should be given as the fully-qualified domain name.
 Exercise caution when allowing automatic forwarding to an external domain, as adversaries can use automatic forwarding to gain persistent access to a victim's email.
