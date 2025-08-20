@@ -236,7 +236,6 @@ AnnotatePolicy:
 # Reasons for using Omit Policies
 # --------------------------------
 # - The policy is not applicable to the organization's environment.
-# - The policy has not been implemented yet, but the organization has a plan to implement it in the future. (Use Expiration to indicate when the policy will be implemented.)
 # - The policy is met using a third-party tool or solution that is not assessed by ScubaGear.
 # - The policy is a known false positive.
 # - The policy is an acceptable risk that has been documented and approved by the organization.
