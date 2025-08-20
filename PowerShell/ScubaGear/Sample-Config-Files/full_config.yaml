@@ -198,7 +198,6 @@ Defender:
 
 # Reasons for using Annotate Policies
 # -----------------------------------
-# - Document how the organization meets the policy requirements using alternative methods.
 # - Provide context about implementation decisions or risk acceptance.
 # - Add references to supporting documentation or evidence.
 # - Explain compensating controls or mitigating factors.
