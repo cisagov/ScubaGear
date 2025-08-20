@@ -31,7 +31,6 @@ This configuration file includes the additional `OrgName`, `OrgUnitName`, and `D
 ```yaml
 OrgName: Department of Example
 OrgUnitName: Subdepartment of Example  
-Description: "Production M365 tenant security assessment"
 ```
 
 ScubaGear can be invoked with this config file:
