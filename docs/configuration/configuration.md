@@ -26,7 +26,7 @@ The [SCuBA compliance](../../PowerShell/ScubaGear/Sample-Config-Files/scuba_comp
 
 Users are highly encouraged to read all the configuration file documentation sections to understand what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
 
-This configuration file includes the additional `OrgName`, `OrgUnitName`, and `Description` fields for documenting the organization and organizational subunit:
+This configuration file includes the additional `OrgName` and `OrgUnitName` fields for documenting the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
 
 ```yaml
 OrgName: Department of Example
