@@ -26,12 +26,11 @@ The [SCuBA compliance](../../PowerShell/ScubaGear/Sample-Config-Files/scuba_comp
 
 Users are highly encouraged to read all the configuration file documentation sections to understand what each field is for and to modify those fields to successfully pass ScubaGear's SCuBA baseline compliance checks.
 
-This configuration file includes the additional `OrgName`, `OrgUnitName`, and `Description` fields for documenting the organization and organizational subunit:
+This configuration file includes the additional `OrgName` and `OrgUnitName` fields for documenting the organization and organizational subunit owner of the M365 tenant ScubaGear is running against.
 
 ```yaml
 OrgName: Department of Example
 OrgUnitName: Subdepartment of Example  
-Description: "Production M365 tenant security assessment"
 ```
 
 ScubaGear can be invoked with this config file:
@@ -64,7 +63,7 @@ M365Environment: commercial
 
 ### Non-Interactive Authentication
 
-For automated or unattended execution, you can configure ScubaGear to use service principal authentication by adding **App ID** and **Certificate Thumbprint** parameters to your configuration file. This method is ideal for scheduled assessments or CI/CD pipelines.
+For automated or unattended execution, you can configure ScubaGear to use service principal authentication by adding the **Organization**, **App ID**, and **Certificate Thumbprint** parameters to your configuration file. This method is ideal for scheduled assessments or CI/CD pipelines.
 
 **Important**: The certificate's private key must be available in the certificate store, and config files with sensitive authentication data should be protected appropriately.
 

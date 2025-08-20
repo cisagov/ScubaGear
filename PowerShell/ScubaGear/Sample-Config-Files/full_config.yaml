@@ -1,5 +1,4 @@
 # The following fields are used to document what organization this configuration file belongs to.
-organization: tenant.onmicrosoft.com
 OrgName: Department of Example
 OrgUnitName: Subdepartment of Example
 
@@ -35,6 +34,7 @@ DisconnectOnExit: false
 
 # The following fields are used to authenticate to the M365 environment using service principal authentication.
 # Uncomment the following lines to use AppID and CertificateThumbprint for ServicePrincipal authentication.
+# Organization: tenant.onmicrosoft.com
 # AppID: 094220d7-27d9-48b1-8bf7-516b887ba8e5
 # CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
 
@@ -198,7 +198,6 @@ Defender:
 
 # Reasons for using Annotate Policies
 # -----------------------------------
-# - Document how the organization meets the policy requirements using alternative methods.
 # - Provide context about implementation decisions or risk acceptance.
 # - Add references to supporting documentation or evidence.
 # - Explain compensating controls or mitigating factors.
@@ -237,9 +236,7 @@ AnnotatePolicy:
 # Reasons for using Omit Policies
 # --------------------------------
 # - The policy is not applicable to the organization's environment.
-# - The policy has not been implemented yet, but the organization has a plan to implement it in the future. (Use Expiration to indicate when the policy will be implemented.)
 # - The policy is met using a third-party tool or solution that is not assessed by ScubaGear.
-# - The policy is a known false positive.
 # - The policy is an acceptable risk that has been documented and approved by the organization.
 OmitPolicy:
 
