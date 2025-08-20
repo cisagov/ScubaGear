@@ -237,7 +237,6 @@ AnnotatePolicy:
 # --------------------------------
 # - The policy is not applicable to the organization's environment.
 # - The policy is met using a third-party tool or solution that is not assessed by ScubaGear.
-# - The policy is a known false positive.
 # - The policy is an acceptable risk that has been documented and approved by the organization.
 OmitPolicy:
 
