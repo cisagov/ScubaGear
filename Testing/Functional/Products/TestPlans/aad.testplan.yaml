@@ -328,7 +328,9 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: null
+                authentication_method:
+                  - authentication_method_policy:
+                      PolicyMigrationState: null
         Postconditions: []
         ExpectedResult: true
 
