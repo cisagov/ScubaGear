@@ -63,12 +63,12 @@ test_ExternalParticipantControl_MultiplePolicies if {
 #--
 
 #
-# Policy MS.TEAMS.1.2v1
+# Policy MS.TEAMS.1.2v2
 #--
 test_AnonymousMeetingStart_Correct_V1 if {
     Output := teams.tests with input.meeting_policies as [MeetingPolicies]
 
-    TestResult("MS.TEAMS.1.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.1.2v2", Output, PASS, true) == true
 }
 
 test_AnonymousMeetingStart_Correct_V2 if {
@@ -76,7 +76,7 @@ test_AnonymousMeetingStart_Correct_V2 if {
 
     Output := teams.tests with input.meeting_policies as [Policies]
 
-    TestResult("MS.TEAMS.1.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.1.2v2", Output, PASS, true) == true
 }
 
 test_AnonymousMeetingStart_Incorrect_V1 if {
@@ -85,7 +85,7 @@ test_AnonymousMeetingStart_Incorrect_V1 if {
     Output := teams.tests with input.meeting_policies as [Policies]
 
     ReportDetailStr := "1 meeting policy(ies) found that allows anonymous users to start meetings: Global"
-    TestResult("MS.TEAMS.1.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.1.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_AnonymousMeetingStart_Incorrect_V2 if {
@@ -97,7 +97,7 @@ test_AnonymousMeetingStart_Incorrect_V2 if {
 
     ReportDetailStr :=
         "1 meeting policy(ies) found that allows anonymous users to start meetings: Tag:FirstCustomPolicy"
-    TestResult("MS.TEAMS.1.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.1.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_AnonymousMeetingStart_MultiplePolicies if {
@@ -114,7 +114,7 @@ test_AnonymousMeetingStart_MultiplePolicies if {
         "Global",
         "Tag:SecondCustomPolicy"
     ]
-    TestResultContains("MS.TEAMS.1.2v1", Output, ReportDetailArrayStrs, false) == true
+    TestResultContains("MS.TEAMS.1.2v2", Output, ReportDetailArrayStrs, false) == true
 }
 #--
 
