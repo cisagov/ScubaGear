@@ -40,7 +40,6 @@ ScubaGear uses a three-step process:
 - **Azure Active Directory (AAD)**: Identity and access management policies
 - **Microsoft Defender**: Advanced threat protection settings
 - **Exchange Online**: Email security and compliance configurations
-- **OneDrive**: File sharing and data protection policies
 - **Power Platform**: Low-code application security settings
 - **SharePoint**: Document collaboration and access controls
 - **Microsoft Teams**: Communication and meeting security policies
@@ -63,7 +62,7 @@ ScubaGear uses a three-step process:
     - [Exchange Online](PowerShell/ScubaGear/baselines/exo.md)
     - [Power BI](PowerShell/ScubaGear/baselines/powerbi.md)
     - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md)
-    - [SharePoint & OneDrive](PowerShell/ScubaGear/baselines/sharepoint.md)
+    - [SharePoint](PowerShell/ScubaGear/baselines/sharepoint.md)
     - [Teams](PowerShell/ScubaGear/baselines/teams.md)
     - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
@@ -78,10 +77,10 @@ Please review the [Prerequisites](#prerequisites) section to verify that your sy
 
 ScubaGear is designed to be run multiple times to properly evaluate and apply baseline settings.
 
-1. **First Run (No Configuration File):**  
+1. **First Run (No Configuration File):**
    Start ScubaGear without a configuration file. This initial run generates a baseline template of your environment's current settings. It does not make changes but helps you understand the default posture.
 
-2. **Subsequent Runs (With Configuration File):**  
+2. **Subsequent Runs (With Configuration File):**
    After reviewing and editing the generated configuration file, run ScubaGear again with the configuration file as input. This allows ScubaGear to compare your intended settings against the actual environment and elevate discrepancies accordingly.
 
 This iterative approach ensures ScubaGear is aligned with your environment and that all policy evaluations are based on your customized baseline.
@@ -117,7 +116,7 @@ Invoke-SCuBA -ProductNames *
 ```
 
 > [!IMPORTANT]
-> ScubaGear has specific prerequisites and relies on defined configuration values to properly evaluate your Microsoft 365 tenant. After your initial assessment run, review the results thoroughly. Address any identified gaps by updating your tenant configuration or documenting risk acceptances in a YAML configuration file using exclusions, annotations, or omissions.  
+> ScubaGear has specific prerequisites and relies on defined configuration values to properly evaluate your Microsoft 365 tenant. After your initial assessment run, review the results thoroughly. Address any identified gaps by updating your tenant configuration or documenting risk acceptances in a YAML configuration file using exclusions, annotations, or omissions.
 > **Refer to the sections below for detailed guidance.**
 
 
@@ -129,12 +128,13 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 - ✅ **Customization** – Specify which products, baselines, and rules apply to your environment.
 - ⚙️ **Configuration Mapping** – Align ScubaGear’s policies with your tenant’s current settings.
-- 🛡 **Risk Acceptance** – Document intentional deviations from baselines using **exclusions**, **annotations**, or **omissions**. 
+- 🛡 **Risk Acceptance** – Document intentional deviations from baselines using **exclusions**, **annotations**, or **omissions**.
 - 🧾 **Traceability** – Maintain a clear record of accepted risks and policy decisions for audits or internal reviews.
 - 🔁 **Repeatability** – Run consistent assessments over time or across environments using the same configuration.
 
-> [!NOTE]
-> Without a properly defined YAML file, ScubaGear will assume a default configuration that may not reflect your organization’s actual policies or risk posture.  
+> [!IMPORTANT]
+> Without a properly defined YAML file, ScubaGear will assume a default configuration that may not reflect your organization’s actual policies or risk posture. **It is required if the usage is for [CISA's Binding Operational Directive (BOD) 25-01 ](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)**
+>
 > **Refer to the [Baselines](baselines/README.md) to understand what options are configurable.**
 
 ### Reuse provided sample files
@@ -148,14 +148,18 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 ### 6: Run Scuba with configuration File
 
-While a YAML configuration file is not strictly required to run ScubaGear, it is strongly recommended—and in practice, essential for any reporting intended for the [CISA's Binding Operational Directive (BOD) 25-01 ](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services).
-
+When Invoke SCuBA for BOD submission, run:
 ```powershell
 # Run with a configuration file
-Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml"
+Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -Organization 'example.onmicrosoft.com'
 ```
 
-> the scubamodule supports several paramaters.
+For all other, run:
+
+```powershell
+# Run with a configuration file (no-BOD)
+Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilentBODWarning
+```
 
 ## Table of Contents
 
@@ -196,7 +200,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml"
 
 ### 🤖 Automation
 
-- [ScubaConnect](https://github.com/cisagov/ScubaConnect) - ScubaConnect is cloud-native infrastructure that automates the execution of assessment tools ScubaGear and ScubaGoggles.
+- [ScubaConnect](https://github.com/cisagov/ScubaConnect) - ScubaConnect is cloud-native infrastructure, developed by CISA, that automates the execution of assessment tools ScubaGear and ScubaGoggles.
 
 ### 📚 Additional Resources
 
