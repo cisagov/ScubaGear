@@ -225,7 +225,7 @@ Function Get-GraphEntityConfig {
 
     # Build the configuration for the specific entity type
     $config = @{
-        Title = "Select $($queryConfig.name)"
+        Title = $queryConfig.windowTitle
         SearchPlaceholder = "Search by $($queryConfig.searchProperty.ToLower())..."
         LoadingMessage = "Loading $($queryConfig.name.ToLower())..."
         NoResultsMessage = "No $($queryConfig.name.ToLower()) found matching the search criteria."
@@ -306,6 +306,7 @@ Function Show-GraphProgressWindow {
         $progressWindow.WindowStartupLocation = "CenterOwner"
         $progressWindow.Owner = $syncHash.Window
         $progressWindow.Background = [System.Windows.Media.Brushes]::White
+        $progressWindow.Icon = $syncHash.ImgPath
 
         $progressPanel = New-Object System.Windows.Controls.StackPanel
         $progressPanel.Margin = "20"
@@ -464,6 +465,7 @@ Function Show-UISelectionWindow {
         $selectionWindow.WindowStartupLocation = "CenterOwner"
         $selectionWindow.Owner = $syncHash.Window
         $selectionWindow.Background = [System.Windows.Media.Brushes]::White
+        $selectionWindow.Icon = $syncHash.ImgPath
 
         # Create main grid
         $mainGrid = New-Object System.Windows.Controls.Grid

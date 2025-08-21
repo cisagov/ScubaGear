@@ -183,11 +183,14 @@
                 )
                 'ScubaConfigAppDynamicCardHelper.psm1' = @(
                     'Test-RequiredField',
+                    'Test-FieldValidation',
                     'New-FieldListControl',
+                    'Add-FieldListControl',
                     'New-FieldListCard'
                 )
                 'ScubaConfigAppGlobalSettingsHelper.psm1' = @(
-                    'New-GlobalSettingsControls'
+                    'New-GlobalSettingsControls',
+                    'Update-GlobalSettingsCards'
                 )
                 'ScubaConfigAppGraphHelper.psm1' = @(
                     'Update-GraphStatusIndicator',
@@ -279,14 +282,7 @@
                     'Update-UIFromSettingsData',
                     'Update-GeneralSettingsFromData',
                     'Update-AdvancedSettingsFromData',
-                    'Update-ProductNameCheckboxFromData',
-                    'Update-BaselineControlUIFromData',
-                    'Update-PolicyCardsFromData',
-                    'Update-ProductCardsFromData',
-                    'Update-DynamicFields',
-                    'Update-ArrayField',
-                    'Update-SingleField',
-                    'Update-CardVisuals'
+                    'Update-ProductNameCheckboxFromData'
                 )
                 'ScubaConfigAppYamlPreviewHelper.psm1' = @(
                     'Format-YamlMultilineString',
@@ -304,7 +300,8 @@
 
                     foreach ($expectedFunction in $expectedFunctionList) {
                         # Check for function definition (case insensitive)
-                        $functionPattern = "(?i)function([regex]::Escape($expectedFunction))\s*[\{\(]"
+                        $escapedFunction = [regex]::Escape($expectedFunction)
+                        $functionPattern = "(?i)function\s+$escapedFunction\s*[\{\(]"
                         $content | Should -Match $functionPattern -Because "Helper module '$helperModule' should contain function '$expectedFunction'"
                     }
 

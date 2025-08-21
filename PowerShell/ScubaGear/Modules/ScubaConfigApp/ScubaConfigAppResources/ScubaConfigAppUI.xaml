@@ -777,6 +777,115 @@
             </Style.Triggers>
         </Style>
 
+
+         <Style x:Key="PolicySavedByTagCheckBox" TargetType="CheckBox">
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="CheckBox">
+                <Grid x:Name="Root" SnapsToDevicePixels="True">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="6"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Box -->
+                    <Border x:Name="Box"
+                            Width="18" Height="18"
+                            CornerRadius="4"
+                            BorderBrush="#9E9E9E"
+                            BorderThickness="1"
+                            Background="White"
+                            VerticalAlignment="Center"/>
+
+                    <!-- Check tick (only for IsChecked) -->
+                    <Path x:Name="Tick"
+                          Data="M 3 9 L 7 13 L 15 4"
+                          Stroke="White"
+                          StrokeThickness="2"
+                          StrokeEndLineCap="Round"
+                          StrokeStartLineCap="Round"
+                          Visibility="Collapsed"
+                          HorizontalAlignment="Left"
+                          VerticalAlignment="Center"/>
+
+                    <!-- Saved badge (green dot) -->
+                    <Ellipse x:Name="SavedBadge"
+                             Width="10" Height="10"
+                             Fill="#28A745"
+                             Stroke="White" StrokeThickness="1"
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Top"
+                             Margin="-2,-2,0,0"
+                             Visibility="Collapsed"/>
+
+                    <!-- Content -->
+                    <ContentPresenter Grid.Column="2"
+                                      VerticalAlignment="Center"
+                                      RecognizesAccessKey="True"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                </Grid>
+
+                <ControlTemplate.Triggers>
+                    <!-- Hover -->
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Box" Property="BorderBrush" Value="#757575"/>
+                    </Trigger>
+
+                    <!-- Checked visual -->
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter TargetName="Box" Property="Background" Value="#28A745"/>
+                        <Setter TargetName="Box" Property="BorderBrush" Value="#28A745"/>
+                        <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                    </Trigger>
+
+                    <!-- Disabled -->
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter TargetName="Box" Property="Opacity" Value="0.6"/>
+                        <Setter Property="Foreground" Value="#9E9E9E"/>
+                    </Trigger>
+
+                    <!-- Show saved badge when Tag == "Saved" -->
+                    <Trigger Property="Tag" Value="Saved">
+                        <Setter TargetName="SavedBadge" Property="Visibility" Value="Visible"/>
+                    </Trigger>
+
+                    <!-- Keyboard focus cue -->
+                    <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter TargetName="Box" Property="BorderBrush" Value="#2962FF"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+    <Setter Property="Cursor" Value="Hand"/>
+</Style>
+
+<Style x:Key="PolicyGreenDotCheckBox" TargetType="CheckBox">
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="CheckBox">
+                <Grid Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Green Dot -->
+                    <Ellipse x:Name="SavedDot"
+                             Width="16" Height="16"
+                             Fill="#28A745"
+                             Visibility="Collapsed"/>
+                </Grid>
+
+                <ControlTemplate.Triggers>
+                    <!-- Show dot only when Tag == Saved -->
+                    <Trigger Property="Tag" Value="Saved">
+                        <Setter TargetName="SavedDot" Property="Visibility" Value="Visible"/>
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+    <Setter Property="Cursor" Value="Arrow"/> <!-- not a clickable look -->
+</Style>
+
     </Window.Resources>
 
     <Grid Margin="16">
@@ -795,10 +904,9 @@
             </Grid.ColumnDefinitions>
 
             <!-- Logo Icon -->
-            <Image Grid.Column="0"
-                   Source="{StaticResource ScubaGearIconImage}"
-                   Width="48"
-                   Height="48"
+            <Image x:Name="LogoImage" Grid.Column="0"
+                   Width="52"
+                   Height="52"
                    Margin="0,0,16,0"
                    VerticalAlignment="Top"/>
 
@@ -1830,7 +1938,7 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBlock x:Name="Version_TextBlock" Text="v1.0.0" FontSize="12" Foreground="Gray" VerticalAlignment="Center"/>
                 <Button x:Name="ChangelogButton"
-                        Content="See Changelog"
+                        Content="What's New"
                         FontSize="10"
                         Padding="6,2"
                         Margin="8,0,0,0"

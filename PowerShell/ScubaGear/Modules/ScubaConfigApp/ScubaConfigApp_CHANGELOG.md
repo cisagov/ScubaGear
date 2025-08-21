@@ -1,5 +1,21 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
 
+## 1.8.21 [08/21/2025] -UI & Usability Improvements
+
+### Bug Fixes
+ - Fixed Result Path button – now opens to the correct folder based on Outpath or default.
+ - Removed debug log null message from ScubaRun when no process is running.
+
+### Enhancements
+- Added ScubaGear icon to UI windows (using Scuba-themed PNG).
+- Renamed Changelog button to What’s New (shows latest changes only). Added separate button for Full Changelog.
+- Policy import now updates cards for Exclusions, Annotations, and Omissions – providing an easier editing experience.
+- Added a green status dot next to configured items for quick visual recognition.
+
+### Code Improvements
+- Added a title property to each Graph query in JSON – now displayed in the selector window for clearer guidance.
+- Removed unnecessary update functions; integrated logic directly into card generation functions for cleaner code.
+
 ## 1.8.18 [08/18/2025] - GlobalSettings and Baseline Exclusion Management Enhancement
 
 ### Bug Fixes
@@ -9,7 +25,6 @@
 - Fixed AutoSave integration parameter mismatches for GlobalSettings remove operations
 
 ### Enhancements
-- Implemented AutoSave progress dialog using proven YAML import pattern for non-blocking UI
 - Added -OutPolicyOnly parameter to New-FieldListCard for simplified GlobalSettings data flow with direct storage
 - Enhanced ScubaRun with dynamic mode detection status messages and automatic configuration export with viewer
 - Replaced hardcoded baseline filtering with configuration-driven approach using supportsAllProducts property

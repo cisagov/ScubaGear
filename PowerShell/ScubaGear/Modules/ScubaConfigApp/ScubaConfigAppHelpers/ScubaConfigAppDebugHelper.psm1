@@ -512,6 +512,8 @@ Function Show-DebugWindow {
         # Parse XAML
         $debugWindow = [Windows.Markup.XamlReader]::Parse($debugWindowXaml)
         $syncHash.DebugWindow = $debugWindow
+        $syncHash.DebugWindow.Icon = $syncHash.ImgPath
+
         $syncHash.DebugOutput_TextBox = $debugWindow.FindName("DebugOutput_TextBox")
         $syncHash.DebugAutoScroll_CheckBox = $debugWindow.FindName("DebugAutoScroll_CheckBox")
         $syncHash.DebugStatus_TextBlock = $debugWindow.FindName("DebugStatus_TextBlock")

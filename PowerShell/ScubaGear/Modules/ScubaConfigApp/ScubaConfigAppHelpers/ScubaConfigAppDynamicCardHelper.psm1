@@ -758,6 +758,54 @@ Function New-FieldListControl {
     [void]$Container.Children.Add($fieldPanel)
 }
 
+
+function Add-FieldListControl {
+    <#
+    .SYNOPSIS
+    Adds a list control for managing fields within a policy card.
+
+    .DESCRIPTION
+    This function creates a UI control for displaying and managing a list of fields within a policy card.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [System.Windows.Controls.StackPanel]$FieldPanel,
+        [Parameter(Mandatory)]
+        $ExistingValues
+    )
+    foreach ($value in $ExistingValues)
+    {
+        # Create a horizontal panel for each entry
+        $entryPanel = New-Object System.Windows.Controls.StackPanel
+        $entryPanel.Orientation = "Horizontal"
+        $entryPanel.Margin = "0,2,0,2"
+
+        # Value display
+        $entryText = New-Object System.Windows.Controls.TextBlock
+        $entryText.Text = $value
+        $entryText.Width = 250
+        $entryText.VerticalAlignment = "Center"
+
+        # Remove button
+        $removeButton = New-Object System.Windows.Controls.Button
+        $removeButton.Content = "Remove"
+        $removeButton.Width = 60
+        $removeButton.Height = 20
+        $removeButton.Margin = "8,0,0,0"
+        $removeButton.FontSize = 10
+        $removeButton.Background = [System.Windows.Media.Brushes]::Red
+        $removeButton.Foreground = [System.Windows.Media.Brushes]::White
+        $removeButton.BorderThickness = "0"
+        $removeButton.Add_Click({
+            $FieldPanel.Children.Remove($entryPanel)
+        }.GetNewClosure())
+
+        [void]$entryPanel.Children.Add($entryText)
+        [void]$entryPanel.Children.Add($removeButton)
+        [void]$FieldPanel.Children.Add($entryPanel)
+    }
+}
+
 # Updated Function to create a field card UI element that handles multiple fields
 Function New-FieldListCard {
     <#
@@ -767,11 +815,11 @@ Function New-FieldListCard {
     This Function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
     When using -OutPolicyOnly, specify -SettingsTypeName to indicate which settings type to save for AutoSave functionality.
     #>
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ProductName")]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutputData")]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "FlipFieldValueAndPolicyId")]
+    #[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ProductName")]
+    #[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutputData")]
+    #[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "FlipFieldValueAndPolicyId")]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "SettingsTypeName")]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutPolicyOnly")]
+    #[Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "OutPolicyOnly")]
     param(
         [string]$CardName,
         [string]$PolicyId,
@@ -846,12 +894,14 @@ Function New-FieldListCard {
     $checkbox.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_FieldListCheckbox")
     $checkbox.VerticalAlignment = "Top"
     $checkbox.Margin = "0,0,12,0"
-    #$checkbox.Content = "▶"  # Right-pointing triangle when collapsed
     $checkbox.FontSize = 14
     $checkbox.FontWeight = "Bold"
     $checkbox.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
+    # Apply the custom style instead of removing template
+    #$checkbox.Style = $syncHash.Window.FindResource("PolicySavedByTagCheckBox")
+    $checkbox.Style = $syncHash.Window.FindResource("PolicyGreenDotCheckBox")
     # Remove the default checkbox appearance
-    $checkbox.Template = $null
+    #$checkbox.Template = $null
     [System.Windows.Controls.Grid]::SetColumn($checkbox, 0)
 
     # Add global event handlers to dynamically created checkbox
@@ -868,6 +918,7 @@ Function New-FieldListCard {
     $policyHeader.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
     $policyHeader.TextWrapping = "Wrap"
     $policyHeader.Margin = "0,0,0,4"
+
     [void]$policyInfoStack.Children.Add($policyHeader)
 
     # Add cursor and click handler to policy header
@@ -1007,6 +1058,181 @@ Function New-FieldListCard {
     [void]$cardGrid.Children.Add($headerGrid)
     [void]$cardGrid.Children.Add($detailsPanel)
     $card.Child = $cardGrid
+
+    # PRE-POPULATION LOGIC FOR IMPORT
+    if ($OutputData) {
+        $hasPrePopulatedData = $false
+
+        foreach ($inputData in $validInputFields) {
+            $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
+            if (-not $FieldListDef) { continue }
+
+            foreach ($field in $FieldListDef.fields) {
+                $fieldName = ($PolicyId.replace('.', '_') + "_" + $CardName + "_" + $field.value)
+                $existingData = $null
+
+                # Check for existing data based on field type and structure
+                if ($OutPolicyOnly) {
+                    # For GlobalSettings: data is directly in OutputData
+                    # Handle both hashtables (ContainsKey) and OrderedDictionaries (Contains)
+                    $hasKey = if ($OutputData -is [System.Collections.Hashtable]) {
+                        $OutputData.ContainsKey($field.value)
+                    } else {
+                        $OutputData.Contains($field.value)
+                    }
+
+                    if ($hasKey -and $OutputData[$field.value]) {
+                        $existingData = $OutputData[$field.value]
+                        Write-DebugOutput -Message "Found existing data for $($field.value): $existingData (Type: $($existingData.GetType().Name))" -Source $MyInvocation.MyCommand -Level "Info"
+                    }
+                } elseif ($FlipFieldValueAndPolicyId) {
+                    # For annotations/omissions: Product -> FieldType -> PolicyId -> Data
+                    $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.defaultFields -eq $validInputFields[0] }
+                    $FieldTypeKey = if ($baselineControl) { $baselineControl.yamlValue } else { $validInputFields[0] }
+
+                    if ($OutputData[$ProductName] -and $OutputData[$ProductName][$FieldTypeKey] -and
+                        $OutputData[$ProductName][$FieldTypeKey][$PolicyId] -and
+                        $OutputData[$ProductName][$FieldTypeKey][$PolicyId][$field.value]) {
+                        $existingData = $OutputData[$ProductName][$FieldTypeKey][$PolicyId][$field.value]
+                    }
+                } else {
+                    # Normal structure: Product -> PolicyId -> FieldType -> Data
+                    if ($OutputData[$ProductName] -and $OutputData[$ProductName][$PolicyId]) {
+                        $FieldListValue = $FieldListDef.value
+
+                        if ([string]::IsNullOrWhiteSpace($FieldListValue)) {
+                            # Data stored directly under policy
+                            if ($OutputData[$ProductName][$PolicyId][$field.value]) {
+                                $existingData = $OutputData[$ProductName][$PolicyId][$field.value]
+                            }
+                        } else {
+                            # Data stored under exclusion type
+                            if ($OutputData[$ProductName][$PolicyId][$FieldListValue] -and
+                                $OutputData[$ProductName][$PolicyId][$FieldListValue][$field.value]) {
+                                $existingData = $OutputData[$ProductName][$PolicyId][$FieldListValue][$field.value]
+                            }
+                        }
+                    }
+                }
+
+                # Pre-populate the field if data exists
+                if ($existingData) {
+                    $hasPrePopulatedData = $true
+
+                    if ( $field.type -eq "array" -and ($existingData -is [array] -or $existingData -is [System.Collections.IEnumerable]) ) {
+                        # Find the list container for this field
+                        $listContainerName = ($fieldName + "_List")
+                        $listContainer = $null
+
+                        if ($validInputFields.Count -gt 1) {
+                            # Multi-tab scenario - search within tabs
+                            $tabControl = $detailsPanel.Children | Where-Object { $_ -is [System.Windows.Controls.TabControl] }
+                            foreach ($tabItem in $tabControl.Items) {
+                                if ($tabItem.Header -eq $FieldListDef.name) {
+                                    $tabContent = $tabItem.Content
+                                    $listContainer = Find-UIListContainer -parent $tabContent -targetName $listContainerName
+                                    if ($listContainer) { break }
+                                }
+                            }
+                        } else {
+                            # Single field scenario
+                            $listContainer = Find-UIListContainer -parent $detailsPanel -targetName $listContainerName
+                        }
+
+                        if ($listContainer) {
+                            Add-FieldListControl -FieldPanel $listContainer -ExistingValues $existingData
+                        }
+                    }
+                    elseif ($field.type -eq "boolean") {
+                        # Pre-populate boolean field
+                        $booleanFieldName = ($fieldName + "_CheckBox")
+                        $booleanCheckBox = $null
+
+                        if ($validInputFields.Count -gt 1) {
+                            # Multi-tab scenario
+                            $tabControl = $detailsPanel.Children | Where-Object { $_ -is [System.Windows.Controls.TabControl] }
+                            foreach ($tabItem in $tabControl.Items) {
+                                if ($tabItem.Header -eq $FieldListDef.name) {
+                                    $tabContent = $tabItem.Content
+                                    $booleanCheckBox = Find-UICheckBox -parent $tabContent -targetName $booleanFieldName
+                                    if ($booleanCheckBox) { break }
+                                }
+                            }
+                        } else {
+                            # Single field scenario
+                            $booleanCheckBox = Find-UICheckBox -parent $detailsPanel -targetName $booleanFieldName
+                        }
+
+                        if ($booleanCheckBox) {
+                            $booleanCheckBox.IsChecked = [bool]$existingData
+                        }
+                    }
+                    elseif ($field.type -match "string") {
+                        # Pre-populate string fields
+                        if ($field.type -eq "dateString") {
+                            $datePickerName = ($fieldName + "_DatePicker")
+                            $datePicker = $null
+
+                            if ($validInputFields.Count -gt 1) {
+                                # Multi-tab scenario
+                                $tabControl = $detailsPanel.Children | Where-Object { $_ -is [System.Windows.Controls.TabControl] }
+                                foreach ($tabItem in $tabControl.Items) {
+                                    if ($tabItem.Header -eq $FieldListDef.name) {
+                                        $tabContent = $tabItem.Content
+                                        $datePicker = Find-UIDatePicker -parent $tabContent -targetName $datePickerName
+                                        if ($datePicker) { break }
+                                    }
+                                }
+                            } else {
+                                # Single field scenario
+                                $datePicker = Find-UIDatePicker -parent $detailsPanel -targetName $datePickerName
+                            }
+
+                            if ($datePicker) {
+                                try {
+                                    $datePicker.SelectedDate = [DateTime]::Parse($existingData)
+                                } catch {
+                                    Write-DebugOutput -Message "Failed to parse date: $existingData" -Source $MyInvocation.MyCommand -Level "Warning"
+                                }
+                            }
+                        } else {
+                            $stringFieldName = ($fieldName + "_TextBox")
+                            $stringTextBox = $null
+
+                            if ($validInputFields.Count -gt 1) {
+                                # Multi-tab scenario
+                                $tabControl = $detailsPanel.Children | Where-Object { $_ -is [System.Windows.Controls.TabControl] }
+                                foreach ($tabItem in $tabControl.Items) {
+                                    if ($tabItem.Header -eq $FieldListDef.name) {
+                                        $tabContent = $tabItem.Content
+                                        $stringTextBox = Find-UITextBox -parent $tabContent -targetName $stringFieldName
+                                        if ($stringTextBox) { break }
+                                    }
+                                }
+                            } else {
+                                # Single field scenario
+                                $stringTextBox = Find-UITextBox -parent $detailsPanel -targetName $stringFieldName
+                            }
+
+                            if ($stringTextBox) {
+                                $stringTextBox.Text = $existingData
+                                $stringTextBox.Foreground = [System.Windows.Media.Brushes]::Black
+                                $stringTextBox.FontStyle = "Normal"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # If we pre-populated any data, make the card visually distinct
+        if ($hasPrePopulatedData) {
+            $policyHeader.FontWeight = "Bold"
+            $removeButton.Visibility = "Visible"
+            # show the save indicator on checkbox
+            $checkbox.Tag = "Saved"
+        }
+    }
 
     # Add checkbox event handler
     $checkbox.Add_Checked({
@@ -1254,7 +1480,14 @@ Function New-FieldListCard {
                 if ($OutPolicyOnly) {
                     # For OutPolicyOnly: Remove any existing fields for this input type
                     foreach ($field in $FieldListDef.fields) {
-                        if ($OutputData.ContainsKey($field.value)) {
+                        # Handle both hashtables (ContainsKey) and OrderedDictionaries (Contains)
+                        $hasKey = if ($OutputData -is [System.Collections.Hashtable]) {
+                            $OutputData.ContainsKey($field.value)
+                        } else {
+                            $OutputData.Contains($field.value)
+                        }
+
+                        if ($hasKey) {
                             $OutputData.Remove($field.value)
                             Write-DebugOutput -Message "Removed empty field from OutputData: $($field.value)" -Source $this.Name -Level "Info"
                         }
@@ -1318,8 +1551,20 @@ Function New-FieldListCard {
 
             # Collapse details panel and uncheck checkbox
             $detailsPanel.Visibility = "Collapsed"
+             # Show save indicator (check)
+            $headerGrid = $detailsPanel.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
+            $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
+            if ($checkbox) {
+                $checkbox.Tag = "Saved"
+            }
             $checkbox.IsChecked = $false
         } else {
+            # Remove save indicator if no data was saved
+            $headerGrid = $detailsPanel.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
+            $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
+            if ($checkbox) {
+                $checkbox.Tag = $null
+            }
             # More specific error message about why no data was saved
             $errorMessage = "No valid data was found to save for $CardName fields. Please ensure all required fields are completed and all field values follow the correct format."
             Write-DebugOutput -Message ("No entries found for {0} fields: {1}" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Error"
@@ -1361,6 +1606,7 @@ Function New-FieldListCard {
                 $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.defaultFields -eq $validInputFields[0] }
                 $FieldTypeKey = if ($baselineControl) { $baselineControl.yamlValue } else { $validInputFields[0] }
 
+                # Check if the field type exists in the output data
                 if ($OutputData[$ProductName] -and $OutputData[$ProductName][$FieldTypeKey] -and $OutputData[$ProductName][$FieldTypeKey][$policyId]) {
                     $OutputData[$ProductName][$FieldTypeKey].Remove($policyId)
 
@@ -1386,11 +1632,12 @@ Function New-FieldListCard {
                 }
             }
 
-            # Clear all field values for all exclusionFields
+            # Clear all field values for all fields
             foreach ($inputData in $validInputFields) {
                 $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
                 if ($FieldListDef) {
-                    foreach ($field in $FieldListDef.fields) {
+                    foreach ($field in $FieldListDef.fields)
+                    {
                         $fieldName = ($policyId.replace('.', '_') + "_" + $inputData + "_" + $field.name)
 
                         if ($field.type -eq "array") {
@@ -1480,9 +1727,19 @@ Function New-FieldListCard {
             # Update YAML preview to reflect the removal
             #New-YamlPreview
 
-            # Hide remove button and unbold header
-            $this.Visibility = "Collapsed"
+             # Clear the save indicator and hide remove button
+            $headerGrid = $this.Parent.Parent.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
+            $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
+            if ($checkbox) {
+                $checkbox.Tag = $null
+            }
+
+            # Remove the bold formatting from policy header
+            $policyInfoStack = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "StackPanel" }
+            $policyHeader = $policyInfoStack.Children[0]
             $policyHeader.FontWeight = "SemiBold"
+
+            $this.Visibility = "Collapsed"
             $checkbox.IsChecked = $false
         }
     }.GetNewClosure())
