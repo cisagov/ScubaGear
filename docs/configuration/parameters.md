@@ -342,7 +342,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutProviderFileName
 
-**OutProviderFileName** is the name the JSON file that contains all of the information that ScubaGear extracted from the products. 
+**OutProviderFileName** is the name the JSON file that contains all of the information that ScubaGear extracted from the products.
 
 | Parameter   | Value                    |
 |-------------|--------------------------|
