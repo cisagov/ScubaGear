@@ -7,12 +7,12 @@ import data.utils.key.PASS
 
 
 #
-# Policy MS.TEAMS.5.1v1
+# Policy MS.TEAMS.5.1v2
 #--
 test_DefaultCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input.app_policies as [AppPolicies]
 
-    TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.1v2", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Correct_V2 if {
@@ -20,7 +20,7 @@ test_DefaultCatalogAppsType_Correct_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    TestResult("MS.TEAMS.5.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.1v2", Output, PASS, true) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V1 if {
@@ -31,7 +31,7 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of Microsoft Apps by default: Global"
 
-    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Incorrect_V2 if {
@@ -44,7 +44,7 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy"
 
-    TestResult("MS.TEAMS.5.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
 }
 
 test_DefaultCatalogAppsType_Multiple if {
@@ -62,17 +62,17 @@ test_DefaultCatalogAppsType_Multiple if {
         "Tag:TestPolicy1",
         "Tag:TestPolicy2"
     ]
-    TestResultContains("MS.TEAMS.5.1v1", Output, ReportDetailArrayStrs, false) == true
+    TestResultContains("MS.TEAMS.5.1v2", Output, ReportDetailArrayStrs, false) == true
 }
 #--
 
 #
-# Policy MS.TEAMS.5.2v1
+# Policy MS.TEAMS.5.2v2
 #--
 test_GlobalCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input.app_policies as [AppPolicies]
 
-    TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.2v2", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Correct_V2 if {
@@ -80,7 +80,7 @@ test_GlobalCatalogAppsType_Correct_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    TestResult("MS.TEAMS.5.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.2v2", Output, PASS, true) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V1 if {
@@ -91,7 +91,7 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of third-party apps by default: Global"
 
-    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Incorrect_V2 if {
@@ -104,7 +104,7 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy"
 
-    TestResult("MS.TEAMS.5.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_GlobalCatalogAppsType_Multiple if {
@@ -121,17 +121,17 @@ test_GlobalCatalogAppsType_Multiple if {
         "Global",
         "Tag:TestPolicy2"
     ]
-    TestResultContains("MS.TEAMS.5.2v1", Output, ReportDetailArrayStrs, false) == true
+    TestResultContains("MS.TEAMS.5.2v2", Output, ReportDetailArrayStrs, false) == true
 }
 #--
 
 #
-# Policy MS.TEAMS.5.3v1
+# Policy MS.TEAMS.5.3v2
 #--
 test_PrivateCatalogAppsType_Correct_V1 if {
     Output := teams.tests with input.app_policies as [AppPolicies]
 
-    TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.3v2", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Correct_V2 if {
@@ -139,7 +139,7 @@ test_PrivateCatalogAppsType_Correct_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    TestResult("MS.TEAMS.5.3v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.5.3v2", Output, PASS, true) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V1 if {
@@ -150,7 +150,7 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of custom apps by default: Global"
 
-    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Incorrect_V2 if {
@@ -163,7 +163,7 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr :=
     "1 app permission policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy"
 
-    TestResult("MS.TEAMS.5.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
 }
 
 test_PrivateCatalogAppsType_Multiple if {
@@ -180,6 +180,6 @@ test_PrivateCatalogAppsType_Multiple if {
         "Global",
         "Tag:TestPolicy2"
     ]
-    TestResultContains("MS.TEAMS.5.3v1", Output, ReportDetailArrayStrs, false) == true
+    TestResultContains("MS.TEAMS.5.3v2", Output, ReportDetailArrayStrs, false) == true
 }
 #--

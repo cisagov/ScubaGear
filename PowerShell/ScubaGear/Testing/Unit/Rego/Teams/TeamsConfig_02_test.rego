@@ -6,20 +6,20 @@ import data.utils.key.PASS
 
 
 #
-# Policy MS.TEAMS.2.1v1
+# Policy MS.TEAMS.2.1v2
 #--
 test_AllowFederatedUsers_Correct_V1 if {
     Config := json.patch(FederationConfiguration, [{"op": "add", "path": "AllowedDomains", "value": []}])
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 test_AllowFederatedUsers_Correct_V2 if {
     Output := teams.tests with input.federation_configuration as [FederationConfiguration]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 test_AllowedDomains_Correct if {
@@ -27,7 +27,7 @@ test_AllowedDomains_Correct if {
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 test_AllowedDomains_Incorrect if {
@@ -38,7 +38,7 @@ test_AllowedDomains_Incorrect if {
     Output := teams.tests with input.federation_configuration as [Config]
 
     ReportDetailStr := "1 meeting policy(ies) that allow external access across all domains: Global"
-    TestResult("MS.TEAMS.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.1v2", Output, ReportDetailStr, false) == true
 }
 
 test_AllowFederatedUsers_Correct_V1_multi if {
@@ -49,7 +49,7 @@ test_AllowFederatedUsers_Correct_V1_multi if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 test_AllowFederatedUsers_Correct_V2_multi if {
@@ -58,7 +58,7 @@ test_AllowFederatedUsers_Correct_V2_multi if {
 
     Output := teams.tests with input.federation_configuration as [FederationConfiguration, Config]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 
@@ -70,7 +70,7 @@ test_AllowedDomains_Correct_multi if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.1v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.1v2", Output, PASS, true) == true
 }
 
 test_AllowedDomains_Incorrect_multi if {
@@ -85,17 +85,17 @@ test_AllowedDomains_Incorrect_multi if {
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
     ReportDetailStr := "2 meeting policy(ies) that allow external access across all domains: Global, Tag:AllOn"
-    TestResult("MS.TEAMS.2.1v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.1v2", Output, ReportDetailStr, false) == true
 }
 #--
 
 #
-# Policy MS.TEAMS.2.2v1
+# Policy MS.TEAMS.2.2v2
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
     Output := teams.tests with input.federation_configuration as [FederationConfiguration]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V1_multi if {
@@ -104,7 +104,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
 
     Output := teams.tests with input.federation_configuration as [FederationConfiguration, Config]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2 if {
@@ -112,7 +112,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2_multi if {
@@ -123,7 +123,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_V1 if {
@@ -135,7 +135,7 @@ test_AllowTeamsConsumer_Incorrect_V1 if {
 
     ReportDetailStr :=
         "1 Configuration allowed unmanaged users to initiate contact with internal user across domains: Global"
-    TestResult("MS.TEAMS.2.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_multi_V1 if {
@@ -154,7 +154,7 @@ test_AllowTeamsConsumer_Incorrect_multi_V1 if {
         "Global, Tag:AllOn"
     ])
 
-    TestResult("MS.TEAMS.2.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Correct_V1 if {
@@ -162,7 +162,7 @@ test_AllowTeamsConsumer_Correct_V1 if {
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Correct_multi_V1 if {
@@ -173,17 +173,17 @@ test_AllowTeamsConsumer_Correct_multi_V1 if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.2v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
 }
 #--
 
 #
-# Policy MS.TEAMS.2.3v1
+# Policy MS.TEAMS.2.3v2
 #--
 test_AllowTeamsConsumer_Correct_V2 if {
     Output := teams.tests with input.federation_configuration as [FederationConfiguration]
 
-    TestResult("MS.TEAMS.2.3v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.3v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Correct_multi_V2 if {
@@ -192,7 +192,7 @@ test_AllowTeamsConsumer_Correct_multi_V2 if {
 
     Output := teams.tests with input.federation_configuration as [FederationConfiguration, Config]
 
-    TestResult("MS.TEAMS.2.3v1", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.3v2", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_V2 if {
@@ -201,7 +201,7 @@ test_AllowTeamsConsumer_Incorrect_V2 if {
     Output := teams.tests with input.federation_configuration as [Config]
 
     ReportDetailStr := "1 Internal users are enabled to initiate contact with unmanaged users across domains: Global"
-    TestResult("MS.TEAMS.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.3v2", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_multi_V2 if {
@@ -217,6 +217,6 @@ test_AllowTeamsConsumer_Incorrect_multi_V2 if {
         "Global, Tag:AllOn"
     ])
 
-    TestResult("MS.TEAMS.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.3v2", Output, ReportDetailStr, false) == true
 }
 #--
