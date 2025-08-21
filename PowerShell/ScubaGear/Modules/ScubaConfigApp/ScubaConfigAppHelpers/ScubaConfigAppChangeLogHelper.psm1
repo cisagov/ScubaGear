@@ -1,10 +1,8 @@
 # Add this function after the other window functions (around line 1500)
 Function Show-ChangelogWindow {
-    catch {
-        Write-DebugOutput -Message "Error opening changelog window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-        $syncHash.ShowMessageBox.Invoke("Failed to open changelog window: $($_.Exception.Message)", "Changelog Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
-    }    .SYNOPSIS
-    Opens a window displaying the ScubaConfigApp changelog.
+    <#
+    .SYNOPSIS
+    Opens a window displaying the latest ScubaConfigApp changelog entry.
     #>
 
     # Don't create multiple changelog windows
@@ -15,12 +13,43 @@ Function Show-ChangelogWindow {
 
     try {
         # Read the changelog file
-        $changelogContent = ""
+        $latestEntryContent = ""
+
         if (Test-Path $syncHash.ChangelogPath) {
-            $changelogContent = Get-Content $syncHash.ChangelogPath -Raw
+            $fullChangelogContent = Get-Content $syncHash.ChangelogPath
             Write-DebugOutput -Message "Loaded changelog from: $($syncHash.ChangelogPath)" -Source $MyInvocation.MyCommand -Level "Debug"
+
+            # Extract only the latest changelog entry (first ## section)
+            $inLatestEntry = $false
+            $latestEntryLines = @()
+
+            foreach ($line in $fullChangelogContent) {
+                if ($line -match '^## .*') {
+                    if ($inLatestEntry) {
+                        # We've hit the next version, stop collecting
+                        break
+                    } else {
+                        # This is the first version entry, start collecting
+                        $inLatestEntry = $true
+                        # Remove the ## and clean up the line
+                        $cleanedLine = $line -replace '^## ', ''
+                        $latestEntryLines += "Version: $cleanedLine"
+                    }
+                } elseif ($inLatestEntry) {
+                    # Remove any remaining # markdown headers for cleaner display
+                    $cleanedLine = $line -replace '^### ', '' -replace '^#### ', '  * '
+                    $latestEntryLines += $cleanedLine
+                }
+            }
+
+            $latestEntryContent = $latestEntryLines -join "`r`n"
+
+            if ([string]::IsNullOrWhiteSpace($latestEntryContent)) {
+                $latestEntryContent = "No changelog entries found."
+            }
+
         } else {
-            $changelogContent = "Changelog file not found at: $($syncHash.ChangelogPath)"
+            $latestEntryContent = "Changelog file not found at: $($syncHash.ChangelogPath)"
             Write-DebugOutput -Message "Changelog file not found: $($syncHash.ChangelogPath)" -Source $MyInvocation.MyCommand -Level "Warning"
         }
 
@@ -28,9 +57,9 @@ Function Show-ChangelogWindow {
         $changelogWindowXaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ScubaConfigApp Changelog"
-        Height="700"
-        Width="900"
+        Title="What's New - ScubaConfigApp"
+        Height="600"
+        Width="800"
         WindowStartupLocation="CenterOwner"
         Background="#F6FBFE"
         Foreground="#333333"
@@ -45,28 +74,31 @@ Function Show-ChangelogWindow {
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,16">
-            <TextBlock Text="ScubaConfigApp Changelog" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,16,0"/>
-            <TextBlock x:Name="ChangelogPath_TextBlock" Text="" FontSize="11" Foreground="Gray" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="0,0,0,16">
+            <TextBlock Text="What's New in Scuba Configuration Editor" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
+            <TextBlock Text="Latest changelog entry - click 'View Full Changelog' below to see complete version history"
+                       FontSize="12" Foreground="Gray" TextWrapping="Wrap"/>
         </StackPanel>
 
-        <!-- Changelog Content -->
+        <!-- Latest Changelog Entry -->
         <Border Grid.Row="1" BorderBrush="#D0D5E0" BorderThickness="1" CornerRadius="4">
             <TextBox x:Name="ChangelogContent_TextBox"
                      IsReadOnly="True"
                      VerticalScrollBarVisibility="Auto"
-                     HorizontalScrollBarVisibility="Auto"
-                     FontFamily="Consolas, Courier New, monospace"
+                     HorizontalScrollBarVisibility="Disabled"
+                     FontFamily="Segoe UI"
                      FontSize="12"
                      Background="White"
                      Foreground="#333333"
-                     Padding="12"
+                     Padding="16"
                      TextWrapping="Wrap"
-                     AcceptsReturn="True"/>
+                     AcceptsReturn="True"
+                     BorderThickness="0"/>
         </Border>
 
         <!-- Footer -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="ViewFullChangelog_Button" Content="View Full Changelog" Padding="12,6" Margin="0,0,12,0"/>
             <Button x:Name="ChangelogClose_Button" Content="Close" Padding="12,6" IsCancel="True"/>
         </StackPanel>
     </Grid>
@@ -76,15 +108,34 @@ Function Show-ChangelogWindow {
         # Parse XAML
         $changelogWindow = [Windows.Markup.XamlReader]::Parse($changelogWindowXaml)
         $syncHash.ChangelogWindow = $changelogWindow
+        $syncHash.ChangelogWindow.Icon = $syncHash.ImgPath
 
         # Get references to controls
         $changelogTextBox = $changelogWindow.FindName("ChangelogContent_TextBox")
-        $changelogPathTextBlock = $changelogWindow.FindName("ChangelogPath_TextBlock")
+        $viewFullChangelogButton = $changelogWindow.FindName("ViewFullChangelog_Button")
         $closeButton = $changelogWindow.FindName("ChangelogClose_Button")
 
         # Set content
-        $changelogTextBox.Text = $changelogContent
-        $changelogPathTextBlock.Text = "Source: $($syncHash.ChangelogPath)"
+        $changelogTextBox.Text = $latestEntryContent
+
+        # Event handlers
+        $viewFullChangelogButton.Add_Click({
+            try {
+                # Always open the changelog file in Microsoft Edge
+                $edgePath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+                if (Test-Path $edgePath) {
+                    Start-Process -FilePath $edgePath -ArgumentList $syncHash.ChangelogPath
+                    Write-DebugOutput -Message "Opened full changelog file in Edge: $($syncHash.ChangelogPath)" -Source $MyInvocation.MyCommand -Level "Info"
+                } else {
+                    # Fallback to default application if Edge is not found
+                    Invoke-Item -Path $syncHash.ChangelogPath
+                    Write-DebugOutput -Message "Edge not found, opened changelog with default app: $($syncHash.ChangelogPath)" -Source $MyInvocation.MyCommand -Level "Info"
+                }
+            } catch {
+                Write-DebugOutput -Message "Error opening full changelog: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                $syncHash.ShowMessageBox.Invoke("Could not open full changelog file: $($_.Exception.Message)", "Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+            }
+        })
 
         $closeButton.Add_Click({
             $syncHash.ChangelogWindow.Close()

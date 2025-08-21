@@ -180,7 +180,7 @@ InModuleScope ScubaConfigApp {
 
                 $globalTab.name | Should -Not -BeNullOrEmpty
                 $globalTab.dataControlOutput | Should -Be "GlobalSettingsData"
-                
+
                 # Check sectionControl structure
                 $globalTab.sectionControl.GlobalSettingsContainer | Should -Not -BeNullOrEmpty
                 $globalTab.sectionControl.GlobalSettingsContainer.PSObject.Properties.Name | Should -Contain 'sectionName' -Because "GlobalSettingsContainer should have a 'sectionName' property"

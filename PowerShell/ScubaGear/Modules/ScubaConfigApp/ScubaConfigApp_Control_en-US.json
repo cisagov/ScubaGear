@@ -754,6 +754,7 @@
   },
   "graphQueries": {
     "Users": {
+      "windowTitle": "Select user id(s) to include:",
       "name": "Users",
       "endpoint": "/v1.0/users",
       "queryfilterProperty": "displayName",
@@ -792,6 +793,7 @@
       "allowMultipleSelection": true
     },
     "Groups": {
+      "windowTitle": "Select group id(s) to include:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
       "queryfilterProperty": "displayName",
@@ -830,6 +832,7 @@
       "allowMultipleSelection": true
     },
     "IncludedUsers": {
+      "windowTitle": "Select user names(s) to include:",
       "name": "Users",
       "endpoint": "/v1.0/users",
       "queryfilterProperty": "displayName",
@@ -868,6 +871,7 @@
       "allowMultipleSelection": true
     },
     "IncludedGroups": {
+      "windowTitle": "Select group names(s) to include:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
       "queryfilterProperty": "displayName",
@@ -906,6 +910,7 @@
       "allowMultipleSelection": true
     },
     "ExcludedUsers": {
+      "windowTitle": "Select user names(s) to exclude:",
       "name": "Users",
       "endpoint": "/v1.0/users",
       "queryfilterProperty": "displayName",
@@ -944,6 +949,7 @@
       "allowMultipleSelection": true
     },
     "ExcludedGroups": {
+      "windowTitle": "Select group names(s) to exclude:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
       "queryfilterProperty": "displayName",
@@ -983,6 +989,7 @@
 
     },
     "AppId_TextBox": {
+      "windowTitle": "Select a registered Scuba service principal application:",
       "name": "Applications",
       "endpoint": "/v1.0/applications",
       "queryfilterProperty": "displayName",

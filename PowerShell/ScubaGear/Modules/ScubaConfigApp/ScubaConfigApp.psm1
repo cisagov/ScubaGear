@@ -197,6 +197,7 @@ Function Start-SCuBAConfigApp {
     $syncHash.GraphConnected = $Online
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
+    $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
     $syncHash.UIConfigPath = "$PSScriptRoot\ScubaConfigApp_Control_$Language.json"
     $syncHash.BaselineConfigPath = "$PSScriptRoot\ScubaBaselines_$Language.json"
     $syncHash.HelperModulesPath = "$PSScriptRoot\ScubaConfigAppHelpers"
@@ -254,6 +255,8 @@ Function Start-SCuBAConfigApp {
         }Else{
             $syncHash.Version_TextBlock.Text = (Get-Date -Format "1.MM.dd")
         }
+
+
         #===========================================================================
         # Debug Window Functions
         #===========================================================================
@@ -275,16 +278,8 @@ Function Start-SCuBAConfigApp {
         #===========================================================================
         $source = "Initialization"
         # Set window icon from DrawingImage resource
-        try {
-            $iconDrawing = $syncHash.Window.FindResource("ScubaGearIconImage")
-            if ($iconDrawing) {
-                $syncHash.Window.Icon = $iconDrawing
-                Write-DebugOutput -Message "Window icon set from DrawingImage" -Source $source -Level "Info"
-            }
-        }
-        catch {
-            Write-DebugOutput -Message "Failed to set window icon: $($_.Exception.Message)" -Source $source -Level "Error"
-        }
+        $syncHash.Window.Icon = $syncHash.ImgPath
+        $syncHash.LogoImage.Source = $syncHash.ImgPath
 
         #Import UI configuration file
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
@@ -901,7 +896,7 @@ Function Start-SCuBAConfigApp {
         $syncHash.BrowseOutPathButton.Add_Click({
             Write-DebugOutput -Message "Browse Output Path button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             $folderDialog = New-Object System.Windows.Forms.FolderBrowserDialog
-            $folderDialog.Description = "Select Output Path"
+            $folderDialog.Description = "Select an output path"
             $folderDialog.ShowNewFolderButton = $true
 
             if ($syncHash.OutPath_TextBox.Text -ne "." -and (Test-Path $syncHash.OutPath_TextBox.Text)) {
@@ -989,7 +984,7 @@ Function Start-SCuBAConfigApp {
                 # Show selector (single selection only for certificates)
                 $selectedThumbprint = Show-UISelectionWindow `
                                     -WindowWidth 740 `
-                                    -Title "Select Certificate" `
+                                    -Title "Select a Certificate" `
                                     -SearchPlaceholder "Search by subject..." `
                                     -Items $displayCerts `
                                     -ColumnConfig $columnConfig `

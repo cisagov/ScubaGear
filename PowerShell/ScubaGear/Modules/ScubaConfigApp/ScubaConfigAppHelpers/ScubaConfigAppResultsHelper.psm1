@@ -922,9 +922,9 @@ Function Open-ResultsFolder {
     Opens the main results folder in Windows Explorer.
     #>
 
-    $outputPath = $syncHash.GeneralSettingsData["OutPath"]
+    $outputPath = $syncHash.AdvancedSettingsData["OutPath"]
     if ([string]::IsNullOrEmpty($outputPath)) {
-        $outputPath = Join-Path $env:USERPROFILE "ScubaResults"
+        $outputPath = Join-Path $env:USERPROFILE "Documents"
     }
 
     if (Test-Path $outputPath) {

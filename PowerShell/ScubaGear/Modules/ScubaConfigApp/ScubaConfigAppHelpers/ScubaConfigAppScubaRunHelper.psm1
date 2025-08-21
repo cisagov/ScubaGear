@@ -385,7 +385,9 @@ Function Update-ScubaRunStatus {
 
     # Map "Success" to "Info" for debug output since Write-DebugOutput doesn't accept "Success"
     $debugLevel = if ($Level -eq "Success") { "Info" } else { $Level }
-    Write-DebugOutput -Message $Message -Source $MyInvocation.MyCommand -Level $debugLevel
+    If($Message) {
+        Write-DebugOutput -Message $Message -Source $MyInvocation.MyCommand -Level $debugLevel
+    }
 }
 
 Function Test-ScubaRunReadiness {
