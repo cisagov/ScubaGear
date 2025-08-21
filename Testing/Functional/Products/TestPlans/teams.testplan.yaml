@@ -13,7 +13,7 @@ TestPlan:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowExternalParticipantGiveRequestControl $false}"
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.1.2v1
+  - PolicyId: MS.TEAMS.1.2v2
     TestDriver: RunScuba
     Tests:
       - TestDescription: MS.TEAMS.1.2v1 Non-compliant - Allows External Participant Give Request Control
@@ -24,45 +24,6 @@ TestPlan:
       - TestDescription: MS.TEAMS.1.2v1 Compliant - Does not Allows  External Participant Give Request Control
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowAnonymousUsersToStartMeeting $false}"
-        Postconditions: []
-        ExpectedResult: true
-  - PolicyId: MS.TEAMS.1.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.TEAMS.1.3v1 Non-compliant - Dialin bypass lobby; Everyone is autoadmitted user
-        Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Global
-              AllowPSTNUsersToBypassLobby: true
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Global
-              AutoAdmittedUsers: EveryOne
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.3v1 Non-complaint - Dialin bypass lobby; Everyone not auto admitted user
-        Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Global
-              AllowPSTNUsersToBypassLobby: true
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              AutoAdmittedUsers: EveryoneInCompany
-              Identity: Global
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.3v1 Compliant - Dialin not bypass lobby Everyone not auto admitted user
-        Preconditions:
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              Identity: Global
-              AllowPSTNUsersToBypassLobby: false
-          - Command: Set-CsTeamsMeetingPolicy
-            Splat:
-              AutoAdmittedUsers: EveryoneInCompany
-              Identity: Global
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.TEAMS.1.4v1
@@ -124,64 +85,64 @@ TestPlan:
               AutoAdmittedUsers: EveryoneInCompanyExcludingGuests
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.1.5v1
+  - PolicyId: MS.TEAMS.1.5v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = InvitedUsers
+      - TestDescription: MS.TEAMS.1.5v2 Non-compliant - AutoAdmittedUsers = InvitedUsers
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers InvitedUsers }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = Everyone
+      - TestDescription: MS.TEAMS.1.5v2 Non-compliant - AutoAdmittedUsers = Everyone
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers Everyone }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInCompany
+      - TestDescription: MS.TEAMS.1.5v2 Non-compliant - AutoAdmittedUsers = EveryoneInCompany
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompany }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
+      - TestDescription: MS.TEAMS.1.5v2 Non-compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInSameAndFederatedCompany }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Non-compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
+      - TestDescription: MS.TEAMS.1.5v2 Non-compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompanyExcludingGuests }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $true }"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = InvitedUsers
+      - TestDescription: MS.TEAMS.1.5v2 Compliant - AutoAdmittedUsers = InvitedUsers
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers InvitedUsers }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = OrganizerOnly
+      - TestDescription: MS.TEAMS.1.5v2 Compliant - AutoAdmittedUsers = OrganizerOnly
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers OrganizerOnly }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInCompany
+      - TestDescription: MS.TEAMS.1.5v2 Compliant - AutoAdmittedUsers = EveryoneInCompany
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompany }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
+      - TestDescription: MS.TEAMS.1.5v2 Compliant - AutoAdmittedUsers = EveryoneInSameAndFederatedCompany
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInSameAndFederatedCompany }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.1.5v1 Compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
+      - TestDescription: MS.TEAMS.1.5v2 Compliant - AutoAdmittedUsers = EveryoneInCompanyExcludingGuests
         Preconditions:
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AutoAdmittedUsers EveryoneInCompanyExcludingGuests }"
           - Command: "Get-CsTeamsMeetingPolicy | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicy -Identity $($_.Identity) -AllowPSTNUsersToBypassLobby $false }"
@@ -233,10 +194,10 @@ TestPlan:
               BroadcastRecordingMode: UserOverride
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.1v1
+  - PolicyId: MS.TEAMS.2.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.1v1 Non-compliant - Allow all known domains
+      - TestDescription: MS.TEAMS.2.1v2 Non-compliant - Allow all known domains
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -246,7 +207,7 @@ TestPlan:
               AllowFederatedUsers: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.1v1 Compliant - Allow specific domain
+      - TestDescription: MS.TEAMS.2.1v2 Compliant - Allow specific domain
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -254,17 +215,17 @@ TestPlan:
           - Command: 'Set-CsTenantFederationConfiguration -AllowedDomains (New-CsEdgeAllowList -AllowedDomain (New-CsEdgeDomainPattern -Domain "domains.r.us"))'
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.1v1 Compliant - Do not allow federated users
+      - TestDescription: MS.TEAMS.2.1v2 Compliant - Do not allow federated users
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowFederatedUsers: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.2v1
+  - PolicyId: MS.TEAMS.2.2v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.2v1 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v2 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -272,7 +233,7 @@ TestPlan:
               AllowTeamsConsumerInbound: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.2v1 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -280,7 +241,7 @@ TestPlan:
               AllowTeamsConsumerInbound: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v1 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -288,7 +249,7 @@ TestPlan:
               AllowTeamsConsumerInbound: true
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v1 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -296,58 +257,58 @@ TestPlan:
               AllowTeamsConsumerInbound: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.3v1
+  - PolicyId: MS.TEAMS.2.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.3v1 Non-compliant - AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.3v2 Non-compliant - AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowTeamsConsumer: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.3v1 Compliant - DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.3v2 Compliant - DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowTeamsConsumer: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.5.1v1
+  - PolicyId: MS.TEAMS.5.1v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.5.1v1 Non-compliant - BlockedAppList
+      - TestDescription: MS.TEAMS.5.1v2 Non-compliant - BlockedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType BlockedAppList -DefaultCatalogApps @()}"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.5.1v1 Compliant - AllowedAppList
+      - TestDescription: MS.TEAMS.5.1v2 Compliant - AllowedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -DefaultCatalogAppsType AllowedAppList -DefaultCatalogApps @()}"
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.5.2v1
+  - PolicyId: MS.TEAMS.5.2v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.5.2v1 Non-compliant - BlockedAppList
+      - TestDescription: MS.TEAMS.5.2v2 Non-compliant - BlockedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -GlobalCatalogAppsType BlockedAppList -GlobalCatalogApps @()}"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.5.2v1 Compliant - AllowedAppList
+      - TestDescription: MS.TEAMS.5.2v2 Compliant - AllowedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -GlobalCatalogAppsType AllowedAppList -GlobalCatalogApps @()}"
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.5.3v1
+  - PolicyId: MS.TEAMS.5.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.5.3v1 Non-compliant - BlockedAppList
+      - TestDescription: MS.TEAMS.5.3v2 Non-compliant - BlockedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType BlockedAppList -PrivateCatalogApps @()}"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.5.3v1 Compliant - AllowedAppList
+      - TestDescription: MS.TEAMS.5.3v2 Compliant - AllowedAppList
         Preconditions:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType AllowedAppList -PrivateCatalogApps @()}"
         Postconditions: []
