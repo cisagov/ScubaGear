@@ -217,6 +217,6 @@ test_AllowTeamsConsumer_Incorrect_multi_V2 if {
         "Global, Tag:AllOn"
     ])
 
-    TestResult("MS.TEAMS.2.3v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.3v2", Output, ReportDetailStr, false) == true
 }
 #--
