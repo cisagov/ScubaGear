@@ -5,6 +5,7 @@
   "EnableScubaRun": true,
   "EnableResultReader": true,
   "MinimumProductsRequired": 1,
+  "MaximumResults": 10,
   "localeContext": {
     "Title_TextBlock": "Scuba Configuration Editor",
     "SubTitle_TextBlock": "Create a ScubaGear configuration file for exclusions, annotations, and omissions",

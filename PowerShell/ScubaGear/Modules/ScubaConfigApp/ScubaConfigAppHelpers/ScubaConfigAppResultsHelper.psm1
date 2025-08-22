@@ -13,6 +13,7 @@
     # Add event handlers for control buttons
     $syncHash.ResultsRefresh_Button.Add_Click({
         Update-ResultsTab
+
     })
 
     $syncHash.ResultsOpenFolder_Button.Add_Click({
@@ -26,43 +27,28 @@
 Function Update-ResultsTab {
     <#
     .SYNOPSIS
-    Scans for ScubaGear result folders and creates/updates result tabs.
+    Scans for ScubaGear result folders and creates/updates result tabs using simple background jobs.
     .DESCRIPTION
     This function searches the output directory for M365BaselineConformance folders,
     parses timestamps, and creates tabs with properly formatted dates.
-    Enhanced to search both configured OutPath and default Documents folder.
+    Uses PowerShell jobs for background processing to prevent UI blocking.
     #>
-    $folderName = $syncHash.AdvancedSettingsData["OutFolderName"]
-    If(-Not $folderName) {
-        $folderName = $syncHash.UIConfigs.defaultAdvancedSettings.OutFolderName_TextBox
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseUsingScopeModifierInNewRunspaces", "")]
+    [CmdletBinding()]
+    param()
+
+    # Prevent multiple concurrent scans
+    if ($syncHash.ResultsScanInProgress) {
+        Write-DebugOutput -Message "Results scan already in progress, skipping" -Source $MyInvocation.MyCommand -Level "Info"
+        return
     }
 
-    $jsonfilename = $syncHash.AdvancedSettingsData["OutJsonFileName"]
-    If(-Not $jsonfilename) {
-        $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox
-    }
+    $syncHash.ResultsScanInProgress = $true
 
-
-    Write-DebugOutput -Message "Refreshing results tabs" -Source $MyInvocation.MyCommand -Level "Info"
-
-    # Get the output directory from settings
-    $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
-    $defaultPath = Join-Path $env:USERPROFILE "Documents"  # ScubaGear default location
-
-    # Create list of paths to search
-    $searchPaths = @()
-
-    # Add configured path if it exists and is valid
-    if (![string]::IsNullOrEmpty($configuredPath) -and $configuredPath -ne "." -and (Test-Path $configuredPath)) {
-        $searchPaths += $configuredPath
-        Write-DebugOutput -Message "Searching configured path: $configuredPath" -Source $MyInvocation.MyCommand -Level "Info"
-    }
-
-    # Always add Documents folder as ScubaGear default
-    if ($searchPaths -notcontains $defaultPath) {
-        $searchPaths += $defaultPath
-        Write-DebugOutput -Message "Searching default Documents path: $defaultPath" -Source $MyInvocation.MyCommand -Level "Info"
-    }
+    # Show progress indicator immediately
+    $syncHash.ResultsScanProgress.Visibility = "Visible"
+    $syncHash.ResultsScanStatus.Text = "Scanning for ScubaGear reports..."
+    $syncHash.ResultsProgressBar.IsIndeterminate = $true
 
     # Clear existing result tabs (keep ResultsEmptyTab)
     $tabsToRemove = @()
@@ -75,52 +61,327 @@ Function Update-ResultsTab {
         $syncHash.ResultsTabControl.Items.Remove($tab)
     }
 
-    # Find all M365BaselineConformance folders from all search paths
-    $syncHash.ResultsJsonData = @()
-    foreach ($searchPath in $searchPaths) {
-        if (Test-Path $searchPath) {
+    # Show loading state
+    $syncHash.ResultsEmptyTab.Visibility = "Visible"
+    $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
+    Update-ResultsCount 0
 
-            $foldersInPath = Get-ChildItem -Path $searchPath -Directory -Filter "${folderName}_*" | ForEach-Object {
-                $jsonFile = Get-ChildItem -Path $_.FullName -Filter "${jsonfilename}*.json" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-                $TimeNameInfo = Get-ResultsReportTimeStamp -SearchPrefix $folderName -Name $_.BaseName
-                [PSCustomObject]@{
-                    ReportName = $_.BaseName
-                    TabHeader = $TimeNameInfo.TabHeader
-                    ReportTimeStamp = $TimeNameInfo.TimeStamp
-                    RelativeTime = $TimeNameInfo.RelativeTime
-                    ReportPath = $_.FullName
-                    JsonResultsPath = $jsonFile
+    # Update empty tab content to show loading message
+    $loadingContent = @"
+<ScrollViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="Loading: Scanning for ScubaGear reports..."
+                   FontSize="16"
+                   TextAlignment="Center"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="10"/>
+        <TextBlock Text="Please wait while we search for existing reports..."
+                   FontSize="12"
+                   TextAlignment="Center"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="10"/>
+    </StackPanel>
+</ScrollViewer>
+"@
+    try {
+        $loadingControl = [Windows.Markup.XamlReader]::Parse($loadingContent)
+        $syncHash.ResultsEmptyTab.Content = $loadingControl
+    } catch {
+        Write-DebugOutput -Message "Error creating loading content: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Warning"
+    }
+
+    # Get configuration values for the background job
+    $folderName = $syncHash.AdvancedSettingsData["OutFolderName"]
+    if (-not $folderName) {
+        $folderName = $syncHash.UIConfigs.defaultAdvancedSettings.OutFolderName_TextBox
+    }
+
+    $jsonfilename = $syncHash.AdvancedSettingsData["OutJsonFileName"]
+    if (-not $jsonfilename) {
+        $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox
+    }
+
+    $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
+    $defaultPath = Join-Path $env:USERPROFILE "Documents"
+
+    # Create list of paths to search
+    $searchPaths = @()
+    if (![string]::IsNullOrEmpty($configuredPath) -and $configuredPath -ne "." -and (Test-Path $configuredPath)) {
+        $searchPaths += $configuredPath
+    }
+    if ($searchPaths -notcontains $defaultPath) {
+        $searchPaths += $defaultPath
+    }
+
+    $maximumResults = $syncHash.UIConfigs.MaximumResults
+
+    # Start background job with simple script block
+    $job = Start-Job -ScriptBlock {
+        param($SearchPaths, $FolderName, $JsonFileName, $MaxResults)
+
+        function Get-ResultsReportTimeStamp {
+            param([string]$Name, [string]$SearchPrefix)
+            if ($Name -match "${SearchPrefix}_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})") {
+                $year = $matches[1]; $month = $matches[2]; $day = $matches[3]
+                $hour = $matches[4]; $minute = $matches[5]; $second = $matches[6]
+                $timestamp = Get-Date -Year $year -Month $month -Day $day -Hour $hour -Minute $minute -Second $second
+                $tabHeader = "$year-$month-$day ($hour`:$minute`:$second)"
+
+                # Calculate relative time
+                $now = Get-Date
+                $timespan = $now - $timestamp
+                if ($timespan.TotalDays -lt 1) {
+                    if ($timespan.TotalHours -lt 1) {
+                        if ($timespan.TotalMinutes -lt 1) {
+                            $relativeTime = "Just now"
+                        } else {
+                            $relativeTime = "$([math]::Floor($timespan.TotalMinutes)) minutes ago"
+                        }
+                    } else {
+                        $relativeTime = "$([math]::Floor($timespan.TotalHours)) hours ago"
+                    }
+                } elseif ($timespan.TotalDays -lt 7) {
+                    $relativeTime = "$([math]::Floor($timespan.TotalDays)) days ago"
+                } else {
+                    $relativeTime = $timestamp.ToString("MMM dd, yyyy")
+                }
+
+                return [PSCustomObject]@{
+                    TabHeader = $tabHeader
+                    TimeStamp = $timestamp
+                    RelativeTime = $relativeTime
+                }
+            } else {
+                return [PSCustomObject]@{
+                    TabHeader = $Name
+                    TimeStamp = "Unknown time"
+                    RelativeTime = "Unknown time"
                 }
             }
-            $syncHash.ResultsJsonData += $foldersInPath
-            Write-DebugOutput -Message "Found $($foldersInPath.Count) result folders in: $searchPath" -Source $MyInvocation.MyCommand -Level "Info"
-        }
-    }
-
-    if ($syncHash.ResultsJsonData -eq 0) {
-        # Show ResultsEmptyTab
-        $syncHash.ResultsEmptyTab.Visibility = "Visible"
-        $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
-        Update-ResultsCount 0
-    } else {
-        # Hide ResultsEmptyTab
-        $syncHash.ResultsEmptyTab.Visibility = "Collapsed"
-
-        # Create tabs for each result folder
-        foreach ($Report in $syncHash.ResultsJsonData) {
-            New-ResultsReportTab -Report $Report
         }
 
-        # Select the most recent tab (first in sorted list)
-        if ($syncHash.ResultsTabControl.Items.Count -gt 1) {
-            $syncHash.ResultsTabControl.SelectedIndex = 1  # Skip ResultsEmptyTab at index 0
+        $resultsData = @()
+        foreach ($searchPath in $SearchPaths) {
+            if (Test-Path $searchPath) {
+                $foldersInPath = Get-ChildItem -Path $searchPath -Directory -Filter "${FolderName}_*" -ErrorAction SilentlyContinue |
+                    Sort-Object -Property LastWriteTime -Descending |
+                    Select-Object -First $MaxResults |
+                    ForEach-Object {
+                        $jsonFile = Get-ChildItem -Path $_.FullName -Filter "${JsonFileName}*.json" -ErrorAction SilentlyContinue |
+                            Select-Object -First 1 -ExpandProperty FullName
+                        $timeNameInfo = Get-ResultsReportTimeStamp -SearchPrefix $FolderName -Name $_.BaseName
+                        [PSCustomObject]@{
+                            ReportName = $_.BaseName
+                            TabHeader = $timeNameInfo.TabHeader
+                            ReportTimeStamp = $timeNameInfo.TimeStamp
+                            RelativeTime = $timeNameInfo.RelativeTime
+                            ReportPath = $_.FullName
+                            JsonResultsPath = $jsonFile
+                        }
+                    }
+                $resultsData += $foldersInPath
+            }
         }
 
-        Update-ResultsCount $syncHash.ResultsJsonData.Count
-    }
+        return $resultsData
+
+    } -ArgumentList $searchPaths, $folderName, $jsonfilename, $maximumResults
+
+    # Use a timer to poll job status instead of events
+    $timer = New-Object System.Windows.Threading.DispatcherTimer
+    $timer.Interval = [TimeSpan]::FromMilliseconds(500)  # Check every 500ms
+
+    $timer.Add_Tick({
+        if ($job.State -eq 'Completed' -or $job.State -eq 'Failed' -or $job.State -eq 'Stopped') {
+            $timer.Stop()
+
+            try {
+                if ($job.State -eq 'Completed') {
+                    $resultsData = Receive-Job -Job $job -ErrorAction Stop
+
+                    Write-DebugOutput -Message "Job completed successfully. Results count: $($resultsData.Count)" -Source "Update-ResultsTab" -Level "Info"
+
+                    # Hide progress indicator
+                    $syncHash.ResultsScanProgress.Visibility = "Collapsed"
+                    $syncHash.ResultsScanInProgress = $false
+
+                    if ($resultsData -and $resultsData.Count -gt 0) {
+                        # Store results
+                        $syncHash.ResultsJsonData = $resultsData
+
+                        # Hide empty tab and create result tabs
+                        $syncHash.ResultsEmptyTab.Visibility = "Collapsed"
+
+                        # Create tabs for each result folder
+                        foreach ($Report in $syncHash.ResultsJsonData) {
+                            New-ResultsReportTab -Report $Report
+                        }
+
+                        # Select the most recent tab (first in sorted list)
+                        if ($syncHash.ResultsTabControl.Items.Count -gt 1) {
+                            $syncHash.ResultsTabControl.SelectedIndex = 1  # Skip ResultsEmptyTab at index 0
+                        }
+
+                        Update-ResultsCount $syncHash.ResultsJsonData.Count
+                        Write-DebugOutput -Message "Successfully loaded $($syncHash.ResultsJsonData.Count) results" -Source "Update-ResultsTab" -Level "Info"
+
+                    } else {
+                        # Show empty results
+                        $syncHash.ResultsEmptyTab.Visibility = "Visible"
+                        $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
+                        Update-ResultsCount 0
+
+                        # Reset empty tab content to default "no results" message
+                        $emptyContent = @"
+<ScrollViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="No ScubaGear reports found"
+                   FontSize="16"
+                   TextAlignment="Center"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="10"/>
+        <TextBlock Text="Run ScubaGear to generate reports that will appear here."
+                   FontSize="12"
+                   TextAlignment="Center"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="10"/>
+    </StackPanel>
+</ScrollViewer>
+"@
+                        try {
+                            $emptyControl = [Windows.Markup.XamlReader]::Parse($emptyContent)
+                            $syncHash.ResultsEmptyTab.Content = $emptyControl
+                        } catch {
+                            Write-DebugOutput -Message "Error creating empty content: $($_.Exception.Message)" -Source "Update-ResultsTab" -Level "Warning"
+                        }
+
+                        Write-DebugOutput -Message "No results found in search paths" -Source "Update-ResultsTab" -Level "Info"
+                    }
+
+                } else {
+                    # Job failed or stopped
+                    $jobErrors = Receive-Job -Job $job -ErrorAction SilentlyContinue
+                    $errorMessage = if ($jobErrors) { $jobErrors -join "; " } else { "Job failed with state: $($job.State)" }
+
+                    Write-DebugOutput -Message "Job failed with state: $($job.State). Error: $errorMessage" -Source "Update-ResultsTab" -Level "Error"
+
+                    # Hide progress indicator
+                    $syncHash.ResultsScanProgress.Visibility = "Collapsed"
+                    $syncHash.ResultsScanInProgress = $false
+
+                    # Show error state
+                    $syncHash.ResultsEmptyTab.Visibility = "Visible"
+                    $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
+                    Update-ResultsCount 0
+
+                    $errorContent = @"
+<ScrollViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollBarVisibility="Auto">
+    <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="Error scanning for reports"
+                   FontSize="16"
+                   TextAlignment="Center"
+                   Foreground="Red"
+                   Margin="10"/>
+        <TextBlock Text="$errorMessage"
+                   FontSize="12"
+                   TextAlignment="Center"
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   TextWrapping="Wrap"
+                   MaxWidth="400"
+                   Margin="10"/>
+    </StackPanel>
+</ScrollViewer>
+"@
+                    try {
+                        $errorControl = [Windows.Markup.XamlReader]::Parse($errorContent)
+                        $syncHash.ResultsEmptyTab.Content = $errorControl
+                    } catch {
+                        Write-DebugOutput -Message "Error creating error content: $($_.Exception.Message)" -Source "Update-ResultsTab" -Level "Warning"
+                    }
+                }
+
+            } catch {
+                Write-DebugOutput -Message "Error processing job results: $($_.Exception.Message)" -Source "Update-ResultsTab" -Level "Error"
+
+                # Hide progress indicator
+                $syncHash.ResultsScanProgress.Visibility = "Collapsed"
+                $syncHash.ResultsScanInProgress = $false
+
+                # Show error state
+                $syncHash.ResultsEmptyTab.Visibility = "Visible"
+                $syncHash.ResultsTabControl.SelectedItem = $syncHash.ResultsEmptyTab
+                Update-ResultsCount 0
+            } finally {
+                # Clean up the job
+                Remove-Job -Job $job -Force -ErrorAction SilentlyContinue
+            }
+        } else {
+            # Job still running - update status if needed
+            $syncHash.ResultsScanStatus.Text = "Scanning for ScubaGear reports..."
+        }
+    }.GetNewClosure())
+
+    # Start the timer
+    $timer.Start()
+
+    Write-DebugOutput -Message "Background job started for results scanning (Job ID: $($job.Id))" -Source $MyInvocation.MyCommand -Level "Info"
 }
 
+Function New-ResultsReportTab {
+    <#
+    .SYNOPSIS
+    Creates a native WPF tab displaying ScubaGear results from ScubaResults JSON data.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [PSCustomObject]$Report
+    )
 
+    # Create new TabItem
+    $newTab = New-Object System.Windows.Controls.TabItem
+
+    # Create folder-style header using text prefix
+    $newTab.Header = "Report: $($Report.TabHeader)"
+
+    $newTab.Name = "Result_$($Report.ReportName -Replace '\W+', '_')"
+
+    # Load content immediately instead of lazy loading
+    try {
+        if (Test-Path $Report.JsonResultsPath) {
+            $jsonContent = Get-Content $Report.JsonResultsPath -Raw
+            $scubaData = $jsonContent | ConvertFrom-Json
+
+            # Validate the data
+            $isValidData = Test-ResultsDataValidity -ScubaData $scubaData -ReportPath $Report.ReportPath
+
+            if ($isValidData) {
+                $relativeTimeString = $Report.RelativeTime + " (" + $Report.ReportTimeStamp + ")"
+                $reportContent = New-ResultsContent -ScubaData $scubaData -ReportPath $Report.ReportPath -RelativeTime $relativeTimeString
+                $newTab.Content = $reportContent
+            } else {
+                $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "Report data appears to be corrupted or incomplete.`n`nThe ScubaResults JSON file contains invalid summary data.`n`nThis may indicate the ScubaGear scan was interrupted or encountered errors."
+                $newTab.Content = $errorTab
+            }
+        } else {
+            $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "JSON file not found: $($Report.JsonResultsPath)"
+            $newTab.Content = $errorTab
+        }
+    } catch {
+        Write-DebugOutput -Message "Error loading report content: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "Error loading report content: $($_.Exception.Message)"
+        $newTab.Content = $errorTab
+    }
+
+    # Add to main tab control
+    $syncHash.ResultsTabControl.Items.Add($newTab)
+    Write-DebugOutput -Message "Added report tab with immediate content loading: $($Report.TabHeader)" -Source $MyInvocation.MyCommand -Level "Info"
+}
 
 Function Test-ResultsDataValidity {
     <#
@@ -239,62 +500,11 @@ Function Test-ResultsDataValidity {
     }
 }
 
-Function New-ResultsReportTab {
-    <#
-    .SYNOPSIS
-    Creates a native WPF tab displaying ScubaGear results from ScubaResults JSON data.
-    #>
-    param(
-        [Parameter(Mandatory)]
-        [PSCustomObject]$Report
-    )
-
-    # Create new TabItem
-    $newTab = New-Object System.Windows.Controls.TabItem
-
-    # Create folder-style header using Unicode folder icon
-    $folderIcon = [System.Char]::ConvertFromUtf32(0x1F4C1)
-    $newTab.Header = "$folderIcon $($Report.TabHeader)"
-    # Alternative: static folder icon with PowerShell variable
-
-    $newTab.Name = "Result_$($Report.ReportName -Replace '\W+', '_')"
-
-    if (-not $Report.JsonResultsPath) {
-        # No ScubaResults file found
-        $noDataTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "No ScubaResults file found at: $($Report.ReportPath)"
-        $newTab.Content = $noDataTab
-    } else {
-        try {
-            $scubaData = Get-Content $Report.JsonResultsPath | ConvertFrom-Json
-
-            # Validate the ScubaData before processing
-            $isValidData = Test-ResultsDataValidity -ScubaData $scubaData -ReportPath $Report.ReportPath
-
-            if ($isValidData) {
-                $reportContent = New-ResultsContent -ScubaData $scubaData -ReportPath $Report.ReportPath -RelativeTime ($Report.RelativeTime + " (" + $Report.ReportTimeStamp +")")
-                $newTab.Content = $reportContent
-
-            } else {
-                $noDataTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "Report data appears to be corrupted or incomplete: $($Report.ReportPath).`n`nThe ScubaResults JSON file contains invalid summary data.`n`nThis may indicate the ScubaGear scan was interrupted or encountered errors."
-                $newTab.Content = $noDataTab
-            }
-        }
-        catch {
-            $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "Error reading ScubaResults file: $($Report.JsonResultsPath).`n`nError details: $($_.Exception.Message)"
-            $newTab.Content = $errorTab
-        }
-    }
-
-    # Add to main tab control
-    $syncHash.ResultsTabControl.Items.Add($newTab)
-    Write-DebugOutput -Message "Added report tab: $($Report.TabHeader) with content type: $($newTab.Content.GetType().FullName)" -Source $MyInvocation.MyCommand -Level "Info"
-}
-
-
 Function New-ResultsContent {
     <#
     .SYNOPSIS
     Creates the content for a results tab using the provided ScubaData.
+    Optimized for faster loading with simplified product tabs.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSReviewUnusedParameter", "ReportPath")]
     param(
@@ -303,19 +513,18 @@ Function New-ResultsContent {
         [string]$RelativeTime
     )
 
-    # Safety check - validate data before processing
     Write-DebugOutput -Message "New-ResultsContent called for report: $ReportPath" -Source $MyInvocation.MyCommand -Level "Debug"
 
+    # Safety check - validate data before processing
     if (-not $ScubaData) {
         return New-ResultsNoDataTab -ReportPath $ReportPath -Message "ScubaData is null - returning error tab"
     }
 
-    # Additional validation to double-check data integrity
     if (-not $ScubaData.Summary -or -not $ScubaData.Results) {
         return New-ResultsNoDataTab -ReportPath $ReportPath -Message "ScubaData missing Summary or Results sections - returning error tab"
     }
 
-    # Create the XAML template for the entire report content
+    # Create simplified XAML template (without heavy product tabs initially)
     $xamlTemplate = @"
 <ScrollViewer xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         VerticalScrollBarVisibility="Auto"
@@ -332,7 +541,7 @@ Function New-ResultsContent {
 
                 <!-- Left side - Tenant info -->
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="📊 ScubaGear Assessment Report" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
+                    <TextBlock Text="ScubaGear Assessment Report" FontSize="18" FontWeight="Bold" Margin="0,0,0,6"/>
 
                     <!-- Tenant Info Table -->
                     <Grid>
@@ -365,80 +574,76 @@ Function New-ResultsContent {
                     </Grid>
                 </StackPanel>
 
-                <!-- Right side - Action buttons and version info -->
+                <!-- Right side - Action buttons -->
                 <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Name="OpenHtmlBtn" Style="{DynamicResource PrimaryButton}" Content="📄 Open Full HTML Report"
+                    <Button Name="OpenHtmlBtn" Style="{DynamicResource PrimaryButton}" Content="Open Full HTML Report"
                             Margin="0,0,0,6" Width="190" Height="32"/>
-                    <Button Name="OpenFolderBtn" Style="{DynamicResource SecondaryButton}" Content="📁 Open Report Folder"
+                    <Button Name="OpenFolderBtn" Style="{DynamicResource SecondaryButton}" Content="Open Report Folder"
                             Width="190" Margin="0,0,0,8" Height="32"/>
-                    <Button Name="OpenYamlBtn" Style="{DynamicResource SecondaryButton}" Content="⚙️ View Configuration"
+                    <Button Name="OpenYamlBtn" Style="{DynamicResource SecondaryButton}" Content="View Configuration"
                             Width="190" Margin="0,0,0,8" Height="32" Visibility="Collapsed"/>
 
-                    <!-- ScubaGear Version and UUID Info -->
-
-                        <StackPanel VerticalAlignment="bottom">
-                            <TextBlock Text="Report UUID:" FontSize="10" Foreground="LightGray"/>
-                            <TextBlock Text="{REPORT_UUID}" FontSize="10" FontFamily="Consolas" Margin="0,0,0,0" Foreground="Gray"/>
-                        </StackPanel>
-
+                    <StackPanel VerticalAlignment="bottom">
+                        <TextBlock Text="Report UUID:" FontSize="10" Foreground="LightGray"/>
+                        <TextBlock Text="{REPORT_UUID}" FontSize="10" FontFamily="Consolas" Margin="0,0,0,0" Foreground="Gray"/>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Report Tabs -->
-        <TabControl Name="ReportTabControl" Margin="0,8,0,0">
+        <!-- Summary Section Only (Fast Loading) -->
+        <Border Style="{DynamicResource Card}" Margin="0,0,0,8">
+            <StackPanel Margin="12">
+                <TextBlock Text="Baseline Conformance Summary" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <ItemsControl Name="SummaryItemsControl">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{DynamicResource Card}" Margin="0,0,0,4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="280"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-            <!-- Summary Tab -->
-            <TabItem Header="📊 Baseline Conformance Reports">
+                                    <TextBlock Grid.Column="0" FontSize="12" Text="{Binding Product}" FontWeight="SemiBold"
+                                            Foreground="Blue" TextDecorations="Underline"
+                                            VerticalAlignment="Center"/>
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="8">
-                        <ItemsControl Name="SummaryItemsControl">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{DynamicResource Card}" Margin="0,0,0,4">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="280"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
+                                    <ItemsControl Grid.Column="1" ItemsSource="{Binding StatusItems}"
+                                                VerticalAlignment="Center">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Color}" CornerRadius="8" Padding="6,2" Margin="0,0,4,2">
+                                                    <TextBlock Text="{Binding Text}" Foreground="{Binding TextColor}"
+                                                            FontSize="12" FontWeight="SemiBold"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
 
-                                            <!-- Product Name Column -->
-                                            <TextBlock Grid.Column="0" FontSize="12" Text="{Binding Product}" FontWeight="SemiBold"
-                                                    Foreground="Blue" TextDecorations="Underline"
-                                                    VerticalAlignment="Center"/>
+        <!-- Product Detail Tabs -->
+        <Border Style="{DynamicResource Card}" Margin="0,0,0,8">
+            <StackPanel Margin="12">
+                <TextBlock Text="Detailed Product Results" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
-                                            <!-- Status Badges Column -->
-                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding StatusItems}"
-                                                        VerticalAlignment="Center">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <WrapPanel Orientation="Horizontal"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Background="{Binding Color}" CornerRadius="8" Padding="6,2" Margin="0,0,4,2">
-                                                            <TextBlock Text="{Binding Text}" Foreground="{Binding TextColor}"
-                                                                    FontSize="12" FontWeight="SemiBold"/>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </ScrollViewer>
+                <TabControl Name="ProductTabControl" Margin="0,8,0,0">
+                    {PRODUCT_TABS}
+                </TabControl>
+            </StackPanel>
+        </Border>
 
-            </TabItem>
-
-            <!-- Product Tabs will be added dynamically -->
-            {PRODUCT_TABS}
-
-        </TabControl>
     </StackPanel>
 </ScrollViewer>
 "@
@@ -450,8 +655,6 @@ Function New-ResultsContent {
     $displayName = [string]$ScubaData.MetaData.DisplayName
     $domainName = [string]$ScubaData.MetaData.DomainName
     $tenantId = [string]$ScubaData.MetaData.TenantId
-
-    # Extract ScubaGear version and UUID
     $scubaVersion = if ($ScubaData.MetaData.ToolVersion) { [string]$ScubaData.MetaData.ToolVersion } else { "Unknown" }
     $reportUuid = if ($ScubaData.MetaData.ReportUUID) { [string]$ScubaData.MetaData.ReportUUID } else { "Unknown" }
 
@@ -462,48 +665,123 @@ Function New-ResultsContent {
     $processedXaml = $processedXaml -replace '{SCUBA_VERSION}', $scubaVersion
     $processedXaml = $processedXaml -replace '{REPORT_UUID}', $reportUuid
 
-    # Initialize as empty string instead of array
-    $productReportTabsXaml = ""
-    If($synchash.UIConfigs.Reports.ShowProductSummaryReports -and $ScubaData.Results) {
-        Write-DebugOutput -Message "Generating product tabs XAML for $($ScubaData.Results.PSObject.Properties.Count) products" -Source $MyInvocation.MyCommand -Level "Debug"
+    # Generate product tabs
+    $productTabsXaml = ""
+    foreach ($productAbbr in ($ScubaData.Summary | Get-Member -MemberType NoteProperty).Name) {
+        # Try to get display name from UIConfigs first, fallback to switch statement
+        $productDisplayName = $syncHash.UIConfigs.products | Where-Object { $_.Id -eq $productAbbr } | Select-Object -ExpandProperty Name
 
-        # Generate product tabs XAML
-        foreach ($productName in ($ScubaData.Results | Get-Member -MemberType NoteProperty).Name) {
-            $displayName = switch ($productName) {
-                "AAD" { "Azure Active Directory" }
-                "Defender" { "Microsoft 365 Defender" }
-                "EXO" { "Exchange Online" }
-                "PowerPlatform" { "Microsoft Power Platform" }
-                "SharePoint" { "SharePoint Online" }
-                "Teams" { "Microsoft Teams" }
-                default { $productName }
+        # Escape the product display name for XML
+        $safeProductDisplayName = $productDisplayName -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+
+        # Generate groups content for this product
+        $groupsContent = ""
+        if ($ScubaData.Results.$productAbbr) {
+            foreach ($group in $ScubaData.Results.$productAbbr) {
+                $groupNumber = if ($group.GroupNumber) { [string]$group.GroupNumber } else { "" }
+                $groupName = if ($group.GroupName) { [string]$group.GroupName } else { "Unknown Group" }
+                $groupHeader = if ($groupNumber) { "$groupNumber. $groupName" } else { $groupName }
+
+                # Escape XML characters
+                $safeGroupHeader = $groupHeader -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+
+                # Generate controls for this group
+                $controlsContent = ""
+                if ($group.Controls) {
+                    foreach ($control in $group.Controls) {
+                        $controlId = if ($control."Control ID") { [string]$control."Control ID" } else { "Unknown" }
+                        $result = if ($control.Result) { [string]$control.Result } else { "N/A" }
+                        $criticality = if ($control.Criticality) { [string]$control.Criticality } else { "" }
+                        $requirement = if ($control.Requirement) { [string]$control.Requirement } else { "" }
+
+                        # Truncate requirement if too long
+                        if ($requirement.Length -gt 100) {
+                            $requirement = $requirement.Substring(0, 100) + "..."
+                        }
+
+                        # Color based on result
+                        $resultColor = switch ($result) {
+                            "Pass" { "#28a745" }
+                            "Fail" { "#dc3545" }
+                            "Warning" { "#ffc107" }
+                            "Manual" { "#6f42c1" }
+                            "Error" { "#fd7e14" }
+                            default { "#6c757d" }
+                        }
+
+                # Escape XML characters more thoroughly
+                $safeControlId = $controlId -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                $safeResult = $result -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                $safeCriticality = $criticality -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+                $safeRequirement = $requirement -replace '&', '&amp;' -replace '<', '&lt;' -replace '>', '&gt;' -replace '"', '&quot;' -replace "'", '&apos;'
+
+                        $controlsContent += @"
+<Border BorderBrush="LightGray" BorderThickness="1" Margin="0,2" Padding="8" CornerRadius="3">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="60"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Text="$safeControlId" FontWeight="SemiBold" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="1" Text="$safeResult" Foreground="$resultColor" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="2" Text="$safeCriticality" VerticalAlignment="Top"/>
+        <TextBlock Grid.Column="3" Text="$safeRequirement" TextWrapping="Wrap" VerticalAlignment="Top"/>
+    </Grid>
+</Border>
+"@
+                    }
+                }
+
+                if ([string]::IsNullOrWhiteSpace($controlsContent)) {
+                    $controlsContent = @"
+<TextBlock Text="No control data available" FontStyle="Italic" Foreground="Gray" Margin="8"/>
+"@
+                }
+
+                $groupsContent += @"
+<Expander Header="$safeGroupHeader" Margin="0,0,0,8" IsExpanded="False">
+    <StackPanel Margin="16,8,8,8">
+        $controlsContent
+    </StackPanel>
+</Expander>
+"@
             }
+        }
 
-            Write-DebugOutput -Message "Adding tab for product: $productName ($displayName)" -Source $MyInvocation.MyCommand -Level "Verbose"
-
-            $productReportTabsXaml += @"
-    <TabItem Header="$displayName">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Name="${productName}ProductStack" Margin="16">
-                <!-- Product content will be populated dynamically -->
-            </StackPanel>
-        </ScrollViewer>
-    </TabItem>
+        if ([string]::IsNullOrWhiteSpace($groupsContent)) {
+            $groupsContent = @"
+<TextBlock Text="No group data available for this product" FontStyle="Italic" Foreground="Gray" Margin="8"/>
 "@
         }
 
-    } else {
-        Write-DebugOutput -Message "Product tabs disabled or no 'ScubaData.Results' found" -Source $MyInvocation.MyCommand -Level "Debug"
+        $productTabsXaml += @"
+<TabItem Header="$safeProductDisplayName">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="8">
+        <StackPanel>
+            $groupsContent
+        </StackPanel>
+    </ScrollViewer>
+</TabItem>
+"@
     }
 
-    Write-DebugOutput -Message "Product tabs XAML length: $($productReportTabsXaml.Length) characters" -Source $MyInvocation.MyCommand -Level "Debug"
-    $processedXaml = $processedXaml -replace '\{PRODUCT_TABS\}', $productReportTabsXaml
+    # Replace the product tabs placeholder
+    $processedXaml = $processedXaml -replace '\{PRODUCT_TABS\}', $productTabsXaml
 
     # Parse the XAML into a WPF control
     try {
-        $reportControl = [Windows.Markup.XamlReader]::Parse($processedXaml)
-        Write-DebugOutput -Message ("Successfully parsed XAML report content with product tabs") -Source $MyInvocation.MyCommand -Level "Debug"
+        # Add debug logging before parsing
+        Write-DebugOutput -Message "About to parse XAML of length: $($processedXaml.Length)" -Source $MyInvocation.MyCommand -Level "Debug"
 
+        # Check for common XML issues
+        if ($processedXaml -match '[^\x09\x0A\x0D\x20-\xD7FF\xE000-\xFFFD\x10000-x10FFFF]') {
+            Write-DebugOutput -Message "Warning: XAML contains potentially problematic characters" -Source $MyInvocation.MyCommand -Level "Warning"
+        }
+
+        $reportControl = [Windows.Markup.XamlReader]::Parse($processedXaml)
+        Write-DebugOutput -Message "Successfully parsed simplified XAML report content" -Source $MyInvocation.MyCommand -Level "Debug"
 
         # Set up button event handlers
         $openHtmlBtn = $reportControl.FindName("OpenHtmlBtn")
@@ -528,9 +806,8 @@ Function New-ResultsContent {
             }.GetNewClosure())
         }
 
-        # YAML Configuration button with visibility logic
+        # YAML Configuration button
         if ($openYamlBtn) {
-            # Check if ScubaGearConfiguration.yaml exists in the report folder
             $yamlConfigPath = Join-Path $ReportPath "ScubaGearConfiguration.yaml"
             if (Test-Path $yamlConfigPath) {
                 $openYamlBtn.Visibility = "Visible"
@@ -541,81 +818,41 @@ Function New-ResultsContent {
                         $syncHash.ShowMessageBox.Invoke("Error opening configuration viewer: $($_.Exception.Message)", "Configuration Viewer Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                     }
                 }.GetNewClosure())
-                Write-DebugOutput -Message "YAML Configuration button enabled for: $yamlConfigPath" -Source $MyInvocation.MyCommand -Level "Info"
-            } else {
-                $openYamlBtn.Visibility = "Collapsed"
-                Write-DebugOutput -Message "No ScubaGearConfiguration.yaml found, hiding YAML button" -Source $MyInvocation.MyCommand -Level "Debug"
             }
         }
 
-
-        # Populate summary data
+        # Populate summary data (this is fast)
         $summaryItems = @()
         foreach ($productAbbr in ($ScubaData.Summary | Get-Member -MemberType NoteProperty).Name) {
-
-            Write-DebugOutput -Message "Processing summary data for product: $productAbbr" -Source $MyInvocation.MyCommand -Level "Info"
             $productData = $ScubaData.Summary.$productAbbr
 
-            $displayName = switch ($productAbbr) {
-                "AAD" { "Azure Active Directory" }
-                "Defender" { "Microsoft 365 Defender" }
-                "EXO" { "Exchange Online" }
-                "PowerPlatform" { "Microsoft Power Platform" }
-                "SharePoint" { "SharePoint Online" }
-                "Teams" { "Microsoft Teams" }
-                default { $productAbbr }
-            }
+            $displayName = $syncHash.UIConfigs.products | Where-Object { $_.Id -eq $productAbbr } | Select-Object -ExpandProperty Name
 
-            # Build styled status badges
+            # Build status badges quickly
             $statusItems = @()
+            $passes = [string]$productData.Passes
+            $warnings = [string]$productData.Warnings
+            $failures = [string]$productData.Failures
+            $manual = [string]$productData.Manual
+            $errors = [string]$productData.Errors
 
-            $passes = if ($productData.Passes -is [array]) { $productData.Passes -join ", " } else { [string]$productData.Passes }
-            $warnings = if ($productData.Warnings -is [array]) { $productData.Warnings -join ", " } else { [string]$productData.Warnings }
-            $failures = if ($productData.Failures -is [array]) { $productData.Failures -join ", " } else { [string]$productData.Failures }
-            $manual = if ($productData.Manual -is [array]) { $productData.Manual -join ", " } else { [string]$productData.Manual }
-            $errors = if ($productData.Errors -is [array]) { $productData.Errors -join ", " } else { [string]$productData.Errors }
-
-            # Add status badges with colors
             if ([int]$passes -gt 0) {
-                $statusItems += [PSCustomObject]@{
-                    Text = "$([char]0x2713) $passes pass$(if([int]$passes -gt 1){'es'})"
-                    Color = "#28a745"  # Green
-                    TextColor = "White"
-                }
+                $statusItems += [PSCustomObject]@{ Text = "PASS: $passes pass$(if([int]$passes -gt 1){'es'})"; Color = "#28a745"; TextColor = "White" }
             }
             if ([int]$warnings -gt 0) {
-                $statusItems += [PSCustomObject]@{
-                    Text = "$([char]0x26A0) $warnings warning$(if([int]$warnings -gt 1){'s'})"
-                    Color = "#ffc107"  # Yellow/Orange
-                    TextColor = "#212529"  # Dark text for better contrast
-                }
+                $statusItems += [PSCustomObject]@{ Text = "WARN: $warnings warning$(if([int]$warnings -gt 1){'s'})"; Color = "#ffc107"; TextColor = "#212529" }
             }
             if ([int]$failures -gt 0) {
-                $statusItems += [PSCustomObject]@{
-                    Text = "$([char]0x2717) $failures failure$(if([int]$failures -gt 1){'s'})"
-                    Color = "#dc3545"  # Red
-                    TextColor = "White"
-                }
+                $statusItems += [PSCustomObject]@{ Text = "FAIL: $failures failure$(if([int]$failures -gt 1){'s'})"; Color = "#dc3545"; TextColor = "White" }
             }
             if ([int]$manual -gt 0) {
-                $statusItems += [PSCustomObject]@{
-                    Text = "$([System.Char]::ConvertFromUtf32(0x1F464)) $manual manual check$(if([int]$manual -gt 1){'s'})"
-                    Color = "#6f42c1"  # Purple
-                    TextColor = "White"
-                }
+                $statusItems += [PSCustomObject]@{ Text = "MANUAL: $manual manual check$(if([int]$manual -gt 1){'s'})"; Color = "#6f42c1"; TextColor = "White" }
             }
             if ([int]$errors -gt 0) {
-                $statusItems += [PSCustomObject]@{
-                    Text = "$([char]0x26A1) $errors error$(if([int]$errors -gt 1){'s'})"
-                    Color = "#fd7e14"  # Orange
-                    TextColor = "White"
-                }
+                $statusItems += [PSCustomObject]@{ Text = "ERROR: $errors error$(if([int]$errors -gt 1){'s'})"; Color = "#fd7e14"; TextColor = "White" }
             }
 
-            $summaryItems += [PSCustomObject]@{
-                Product = $displayName
-                StatusItems = $statusItems
-            }
+            $summaryItems += [PSCustomObject]@{ Product = $displayName; StatusItems = $statusItems }
         }
 
         $summaryItemsControl = $reportControl.FindName("SummaryItemsControl")
@@ -623,55 +860,12 @@ Function New-ResultsContent {
             $summaryItemsControl.ItemsSource = $summaryItems
         }
 
-        # Populate product tabs with group data
-        if ($ScubaData.Results) {
-            Write-DebugOutput -Message "Populating product tabs with results data - Found $($ScubaData.Results.PSObject.Properties.Count) products" -Source $MyInvocation.MyCommand -Level "Debug"
-
-            foreach ($productName in ($ScubaData.Results | Get-Member -MemberType NoteProperty).Name) {
-                $productData = $ScubaData.Results.$productName
-                $productStack = $reportControl.FindName("${productName}ProductStack")
-
-                Write-DebugOutput -Message "Processing product: $productName, Groups count: $($productData.Count), Stack found: $($null -ne $productStack)" -Source $MyInvocation.MyCommand -Level "Verbose"
-
-                if ($productStack) {
-                    if ($productData -and $productData.Count -gt 0) {
-                        foreach ($group in $productData) {
-                            try {
-                                Write-DebugOutput -Message "Creating group expander for group: $($group.GroupName)" -Source $MyInvocation.MyCommand -Level "Verbose"
-
-                                # Call function with explicit parameter and capture result
-                                $groupExpander = $null
-                                $groupExpander = New-ResultsGroupExpanderXaml -GroupData $group
-
-                                if ($null -ne $groupExpander) {
-                                    Write-DebugOutput -Message "Group expander type: $($groupExpander.GetType().FullName)" -Source $MyInvocation.MyCommand -Level "Debug"
-
-                                    # Explicitly cast to UIElement to ensure compatibility
-                                    $uiElement = [System.Windows.UIElement]$groupExpander
-                                    $addResult = $productStack.Children.Add($uiElement)
-                                    Write-DebugOutput -Message "Successfully added group expander to product stack: $productName (Add result: $addResult)" -Source $MyInvocation.MyCommand -Level "Debug"
-                                } else {
-                                    Write-DebugOutput -Message "Group expander was null for product: $productName, group: $($group.GroupName)" -Source $MyInvocation.MyCommand -Level "Error"
-                                }
-                            } catch {
-                                Write-DebugOutput -Message "Error adding group expander to product stack '$productName'`: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-
-                            }
-                        }
-                    } else {
-                        return New-ResultsNoDataTab -ReportPath $ReportPath -Message "No compliance data available for this product: $productName"
-                    }
-                } else {
-                    Write-DebugOutput -Message "Product stack not found for: ${productName}ProductStack" -Source $MyInvocation.MyCommand -Level "Error"
-                }
-            }
-        } else {
-            Write-DebugOutput -Message "No ScubaData.Results found" -Source $MyInvocation.MyCommand -Level "Error"
-        }
         return $reportControl
 
     } catch {
-        return New-ResultsNoDataTab -ReportPath $ReportPath -Message "Error creating XAML report: $($_.Exception.Message)"
+        Write-DebugOutput -Message "Error parsing XAML: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        Write-DebugOutput -Message "XAML snippet around error: $($processedXaml.Substring([Math]::Max(0, $processedXaml.Length - 200)))" -Source $MyInvocation.MyCommand -Level "Debug"
+        return New-ResultsNoDataTab -ReportPath $ReportPath -Message "Error creating simplified report: $($_.Exception.Message)"
     }
 }
 
@@ -859,34 +1053,6 @@ Function Update-ResultsCount {
     param([int]$Count)
 
     $syncHash.ResultsCountText.Text = if ($Count -eq 0) { "No Reports" } elseif ($Count -eq 1) { "1 Report" } else { "$Count Reports" }
-}
-
-Function Get-ResultsReportTimeStamp {
-    param(
-        [Parameter(Mandatory)]
-        [string]$Name,
-
-        [string]$SearchPrefix
-    )
-
-    if ($Name -match "${SearchPrefix}_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2})_(\d{2})") {
-        $year = $matches[1]; $month = $matches[2]; $day = $matches[3]
-        $hour = $matches[4]; $minute = $matches[5]; $second = $matches[6]
-        $timestamp = Get-Date -Year $year -Month $month -Day $day -Hour $hour -Minute $minute -Second $second
-        $tabHeader = "$year-$month-$day ($hour`:$minute`:$second)"
-        $relativeTime = Get-ResultsRelativeTime $timestamp  # ← Fixed function name
-        return [PSCustomObject]@{
-            TabHeader = $tabHeader
-            TimeStamp = $timestamp
-            RelativeTime = $relativeTime
-        }
-    } else {
-        return [PSCustomObject]@{
-            TabHeader = $Name
-            TimeStamp = "Unknown time"
-            RelativeTime  = "Unknown time"
-        }
-    }
 }
 
 Function Get-ResultsRelativeTime {
