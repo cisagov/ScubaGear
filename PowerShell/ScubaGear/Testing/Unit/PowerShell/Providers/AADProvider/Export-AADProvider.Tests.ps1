@@ -171,7 +171,7 @@ InModuleScope -ModuleName ExportAADProvider {
                 $ValidJson
             }
         }
-        
+
         It "With a AAD P2 license, returns valid JSON" {
             $Json = Export-AADProvider
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
