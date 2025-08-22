@@ -325,16 +325,6 @@ Function Initialize-ScubaRunTab {
         }
     })
 
-    # Style the run button with green background
-    try {
-        $syncHash.ScubaRunStart_Button.Background = [System.Windows.Media.Brushes]::Green
-        $syncHash.ScubaRunStart_Button.Foreground = [System.Windows.Media.Brushes]::White
-        Write-DebugOutput -Message "Applied green styling to ScubaRun start button" -Source $MyInvocation.MyCommand -Level "Debug"
-    }
-    catch {
-        Write-DebugOutput -Message "Failed to apply green styling to ScubaRun start button: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Warning"
-    }
-
     # Initialize button states and show initial status
     $syncHash.JustCompletedExecution = $false  # Ensure flag is clear on initialization
     $syncHash.ScubaRunViewConfig_Button.IsEnabled = $false  # Start with View Configuration button disabled

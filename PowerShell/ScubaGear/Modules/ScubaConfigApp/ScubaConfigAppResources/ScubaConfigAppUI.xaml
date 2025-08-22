@@ -59,6 +59,63 @@
         <SolidColorBrush x:Key="MutedTextBrush" Color="#666666"/>
 
         <!-- Button Styles -->
+        <!-- Custom ScubaRun Button Style with better disabled state and hover effects -->
+        <Style TargetType="Button" x:Key="ScubaRunButton">
+            <Setter Property="Background" Value="#28A745"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Hover effect when enabled -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsEnabled" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="#218838"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <!-- Click effect when enabled -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsPressed" Value="True"/>
+                                    <Condition Property="IsEnabled" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="#1E7E34"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <!-- Disabled state - gray appearance -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#6C757D"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Button" x:Key="PrimaryButton">
             <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="Foreground" Value="White"/>
@@ -779,112 +836,112 @@
 
 
          <Style x:Key="PolicySavedByTagCheckBox" TargetType="CheckBox">
-    <Setter Property="Template">
-        <Setter.Value>
-            <ControlTemplate TargetType="CheckBox">
-                <Grid x:Name="Root" SnapsToDevicePixels="True">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="6"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid x:Name="Root" SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                    <!-- Box -->
-                    <Border x:Name="Box"
-                            Width="18" Height="18"
-                            CornerRadius="4"
-                            BorderBrush="#9E9E9E"
-                            BorderThickness="1"
-                            Background="White"
-                            VerticalAlignment="Center"/>
+                            <!-- Box -->
+                            <Border x:Name="Box"
+                                    Width="18" Height="18"
+                                    CornerRadius="4"
+                                    BorderBrush="#9E9E9E"
+                                    BorderThickness="1"
+                                    Background="White"
+                                    VerticalAlignment="Center"/>
 
-                    <!-- Check tick (only for IsChecked) -->
-                    <Path x:Name="Tick"
-                          Data="M 3 9 L 7 13 L 15 4"
-                          Stroke="White"
-                          StrokeThickness="2"
-                          StrokeEndLineCap="Round"
-                          StrokeStartLineCap="Round"
-                          Visibility="Collapsed"
-                          HorizontalAlignment="Left"
-                          VerticalAlignment="Center"/>
+                            <!-- Check tick (only for IsChecked) -->
+                            <Path x:Name="Tick"
+                                Data="M 3 9 L 7 13 L 15 4"
+                                Stroke="White"
+                                StrokeThickness="2"
+                                StrokeEndLineCap="Round"
+                                StrokeStartLineCap="Round"
+                                Visibility="Collapsed"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"/>
 
-                    <!-- Saved badge (green dot) -->
-                    <Ellipse x:Name="SavedBadge"
-                             Width="10" Height="10"
-                             Fill="#28A745"
-                             Stroke="White" StrokeThickness="1"
-                             HorizontalAlignment="Right"
-                             VerticalAlignment="Top"
-                             Margin="-2,-2,0,0"
-                             Visibility="Collapsed"/>
+                            <!-- Saved badge (green dot) -->
+                            <Ellipse x:Name="SavedBadge"
+                                    Width="10" Height="10"
+                                    Fill="#28A745"
+                                    Stroke="White" StrokeThickness="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="-2,-2,0,0"
+                                    Visibility="Collapsed"/>
 
-                    <!-- Content -->
-                    <ContentPresenter Grid.Column="2"
-                                      VerticalAlignment="Center"
-                                      RecognizesAccessKey="True"
-                                      Content="{TemplateBinding Content}"
-                                      ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                </Grid>
+                            <!-- Content -->
+                            <ContentPresenter Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            RecognizesAccessKey="True"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                        </Grid>
 
-                <ControlTemplate.Triggers>
-                    <!-- Hover -->
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter TargetName="Box" Property="BorderBrush" Value="#757575"/>
-                    </Trigger>
+                        <ControlTemplate.Triggers>
+                            <!-- Hover -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#757575"/>
+                            </Trigger>
 
-                    <!-- Checked visual -->
-                    <Trigger Property="IsChecked" Value="True">
-                        <Setter TargetName="Box" Property="Background" Value="#28A745"/>
-                        <Setter TargetName="Box" Property="BorderBrush" Value="#28A745"/>
-                        <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
-                    </Trigger>
+                            <!-- Checked visual -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="#28A745"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#28A745"/>
+                                <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                            </Trigger>
 
-                    <!-- Disabled -->
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter TargetName="Box" Property="Opacity" Value="0.6"/>
-                        <Setter Property="Foreground" Value="#9E9E9E"/>
-                    </Trigger>
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Box" Property="Opacity" Value="0.6"/>
+                                <Setter Property="Foreground" Value="#9E9E9E"/>
+                            </Trigger>
 
-                    <!-- Show saved badge when Tag == "Saved" -->
-                    <Trigger Property="Tag" Value="Saved">
-                        <Setter TargetName="SavedBadge" Property="Visibility" Value="Visible"/>
-                    </Trigger>
+                            <!-- Show saved badge when Tag == "Saved" -->
+                            <Trigger Property="Tag" Value="Saved">
+                                <Setter TargetName="SavedBadge" Property="Visibility" Value="Visible"/>
+                            </Trigger>
 
-                    <!-- Keyboard focus cue -->
-                    <Trigger Property="IsKeyboardFocused" Value="True">
-                        <Setter TargetName="Box" Property="BorderBrush" Value="#2962FF"/>
-                    </Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate>
-        </Setter.Value>
-    </Setter>
-    <Setter Property="Cursor" Value="Hand"/>
-</Style>
+                            <!-- Keyboard focus cue -->
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#2962FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
 
-<Style x:Key="PolicyGreenDotCheckBox" TargetType="CheckBox">
-    <Setter Property="Template">
-        <Setter.Value>
-            <ControlTemplate TargetType="CheckBox">
-                <Grid Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <!-- Green Dot -->
-                    <Ellipse x:Name="SavedDot"
-                             Width="16" Height="16"
-                             Fill="#28A745"
-                             Visibility="Collapsed"/>
-                </Grid>
+        <Style x:Key="PolicyGreenDotCheckBox" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <!-- Green Dot -->
+                            <Ellipse x:Name="SavedDot"
+                                    Width="16" Height="16"
+                                    Fill="#28A745"
+                                    Visibility="Collapsed"/>
+                        </Grid>
 
-                <ControlTemplate.Triggers>
-                    <!-- Show dot only when Tag == Saved -->
-                    <Trigger Property="Tag" Value="Saved">
-                        <Setter TargetName="SavedDot" Property="Visibility" Value="Visible"/>
-                    </Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate>
-        </Setter.Value>
-    </Setter>
-    <Setter Property="Cursor" Value="Arrow"/> <!-- not a clickable look -->
-</Style>
+                        <ControlTemplate.Triggers>
+                            <!-- Show dot only when Tag == Saved -->
+                            <Trigger Property="Tag" Value="Saved">
+                                <Setter TargetName="SavedDot" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Arrow"/> <!-- not a clickable look -->
+        </Style>
 
     </Window.Resources>
 
@@ -1681,7 +1738,7 @@
                                 <!-- Run Button Section -->
                                 <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,24,0">
                                     <Button x:Name="ScubaRunStart_Button"
-                                            Style="{StaticResource PrimaryButton}"
+                                            Style="{StaticResource ScubaRunButton}"
                                             Content="Run ScubaGear"
                                             FontSize="16"
                                             FontWeight="Bold"
@@ -1889,6 +1946,20 @@
                                         Width="140"
                                         Height="32"/>
                                 </StackPanel>
+
+                                <!-- Progress Bar for Scanning -->
+                                <StackPanel x:Name="ResultsScanProgress" Visibility="Collapsed" Margin="0,12,0,0">
+                                    <TextBlock x:Name="ResultsScanStatus"
+                                             Text="Scanning for ScubaGear reports..."
+                                             FontSize="12"
+                                             Foreground="{StaticResource MutedTextBrush}"
+                                             Margin="0,0,0,4"/>
+                                    <ProgressBar x:Name="ResultsProgressBar"
+                                               Height="4"
+                                               IsIndeterminate="True"
+                                               Background="#E0E0E0"
+                                               Foreground="{StaticResource PrimaryBrush}"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
@@ -1902,7 +1973,6 @@
                             <TabItem x:Name="ResultsEmptyTab" Header="No Results Available">
                                 <Border Style="{StaticResource Card}">
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,16"/>
                                         <TextBlock Text="No ScubaGear results found"
                                                 FontSize="18"
                                                 FontWeight="SemiBold"
