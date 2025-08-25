@@ -8,11 +8,6 @@ on:
     - cron: "15 6 * * 1-5"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
-  actions: write
-
 jobs:
   bump-dependencies:
     runs-on: windows-latest
@@ -30,23 +25,26 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
+      - name: Update dependencies documentation table
+        run: |
+          pwsh -File ./utils/workflow/UpdateDependenciesTable.ps1
+
       - name: Commit changes and create new branch
         id: create_branch
         shell: pwsh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+          git add ./docs/prerequisites/dependencies.md
+          git commit -m 'Bump PowerShell dependencies and update documentation' || echo "No changes to commit"
           $timestamp = Get-Date -Format "yyyyMMddHHmmss"
           $branchName = "bump-dependencies-$timestamp"
-          git checkout -b $branchName
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:$branchName
+          git branch $branchName
+          git push -u origin $branchName
           echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Trigger smoke test workflow
+      - name: Trigger and wait for smoke test workflow
         if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,43 +55,75 @@ jobs:
             Authorization = "Bearer $env:GITHUB_TOKEN"
             Accept = "application/vnd.github+json"
           }
+          
+          # Trigger the workflow
           $body = @{
             ref = "$env:BRANCH_NAME"
           } | ConvertTo-Json
-          Invoke-RestMethod -Method Post `
+          
+          $response = Invoke-RestMethod -Method Post `
             -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
             -Headers $headers `
             -Body $body
-
-      - name: Check for existing pull requests
-        if: success()
-        id: check_pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: pwsh
-        run: |
-          echo $env:GITHUB_TOKEN | gh auth login --with-token
-          $existingPrs = gh pr list --base main --state open --search "Bump PowerShell Dependencies in:title" --json number,title
-          $prCount = ($existingPrs | ConvertFrom-Json).Count
-          echo "EXISTING_PR_COUNT=$prCount" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          if ($prCount -gt 0) {
-            Write-Host "Found $prCount existing pull request(s) for PowerShell dependency bumps"
-            echo "SHOULD_CREATE_PR=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          } else {
-            Write-Host "No existing pull requests found for PowerShell dependency bumps"
-            echo "SHOULD_CREATE_PR=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          
+          Write-Host "Smoke test workflow triggered successfully"
+          
+          # Wait a bit for the workflow to start
+          Start-Sleep -Seconds 30
+          
+          # Get the latest workflow run for our branch
+          $runsResponse = Invoke-RestMethod -Method Get `
+            -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/runs?branch=$env:BRANCH_NAME&per_page=1" `
+            -Headers $headers
+          
+          if ($runsResponse.workflow_runs.Count -eq 0) {
+            throw "No smoke test workflow run found for branch $env:BRANCH_NAME"
           }
+          
+          $runId = $runsResponse.workflow_runs[0].id
+          $runUrl = $runsResponse.workflow_runs[0].html_url
+          Write-Host "Monitoring smoke test workflow run: $runUrl"
+          
+          # Poll for completion
+          $maxWaitMinutes = 30
+          $pollIntervalSeconds = 30
+          $maxPolls = ($maxWaitMinutes * 60) / $pollIntervalSeconds
+          $pollCount = 0
+          
+          do {
+            Start-Sleep -Seconds $pollIntervalSeconds
+            $pollCount++
+            
+            $runStatus = Invoke-RestMethod -Method Get `
+              -Uri "https://api.github.com/repos/${{ github.repository }}/actions/runs/$runId" `
+              -Headers $headers
+            
+            $status = $runStatus.status
+            $conclusion = $runStatus.conclusion
+            
+            Write-Host "Smoke test status: $status, conclusion: $conclusion (poll $pollCount/$maxPolls)"
+            
+            if ($status -eq "completed") {
+              if ($conclusion -eq "success") {
+                Write-Host "✅ Smoke test workflow completed successfully"
+                break
+              }
+              else {
+                throw "❌ Smoke test workflow failed with conclusion: $conclusion. Check: $runUrl"
+              }
+            }
+            
+            if ($pollCount -ge $maxPolls) {
+              throw "⏰ Smoke test workflow timed out after $maxWaitMinutes minutes. Check: $runUrl"
+            }
+            
+          } while ($status -ne "completed")
 
       - name: Create pull request
-        if: success() && env.SHOULD_CREATE_PR == 'true'
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
-
-      - name: Skip pull request creation
-        if: success() && env.SHOULD_CREATE_PR == 'false'
-        run: |
-          Write-Host "Skipping pull request creation because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
