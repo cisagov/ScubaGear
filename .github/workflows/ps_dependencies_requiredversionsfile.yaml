@@ -55,54 +55,54 @@ jobs:
             Authorization = "Bearer $env:GITHUB_TOKEN"
             Accept = "application/vnd.github+json"
           }
-          
+
           # Trigger the workflow
           $body = @{
             ref = "$env:BRANCH_NAME"
           } | ConvertTo-Json
-          
+
           $response = Invoke-RestMethod -Method Post `
             -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
             -Headers $headers `
             -Body $body
-          
+
           Write-Host "Smoke test workflow triggered successfully"
-          
+
           # Wait a bit for the workflow to start
           Start-Sleep -Seconds 30
-          
+
           # Get the latest workflow run for our branch
           $runsResponse = Invoke-RestMethod -Method Get `
             -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/runs?branch=$env:BRANCH_NAME&per_page=1" `
             -Headers $headers
-          
+
           if ($runsResponse.workflow_runs.Count -eq 0) {
             throw "No smoke test workflow run found for branch $env:BRANCH_NAME"
           }
-          
+
           $runId = $runsResponse.workflow_runs[0].id
           $runUrl = $runsResponse.workflow_runs[0].html_url
           Write-Host "Monitoring smoke test workflow run: $runUrl"
-          
+
           # Poll for completion
           $maxWaitMinutes = 30
           $pollIntervalSeconds = 30
           $maxPolls = ($maxWaitMinutes * 60) / $pollIntervalSeconds
           $pollCount = 0
-          
+
           do {
             Start-Sleep -Seconds $pollIntervalSeconds
             $pollCount++
-            
+
             $runStatus = Invoke-RestMethod -Method Get `
               -Uri "https://api.github.com/repos/${{ github.repository }}/actions/runs/$runId" `
               -Headers $headers
-            
+
             $status = $runStatus.status
             $conclusion = $runStatus.conclusion
-            
+
             Write-Host "Smoke test status: $status, conclusion: $conclusion (poll $pollCount/$maxPolls)"
-            
+
             if ($status -eq "completed") {
               if ($conclusion -eq "success") {
                 Write-Host "✅ Smoke test workflow completed successfully"
@@ -112,11 +112,11 @@ jobs:
                 throw "❌ Smoke test workflow failed with conclusion: $conclusion. Check: $runUrl"
               }
             }
-            
+
             if ($pollCount -ge $maxPolls) {
               throw "⏰ Smoke test workflow timed out after $maxWaitMinutes minutes. Check: $runUrl"
             }
-            
+
           } while ($status -ne "completed")
 
       - name: Create pull request
