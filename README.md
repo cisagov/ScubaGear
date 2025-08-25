@@ -12,7 +12,8 @@
 
 ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant’s configuration conforms to the policies described in the Secure Cloud Business Applications ([SCuBA](https://cisa.gov/scuba)) Secure Configuration Baseline [documents](/baselines/README.md).
 
-> **Note**: This documentation can be read using [GitHub Pages](https://cisagov.github.io/ScubaGear).
+> [!NOTE]
+> This documentation can be read using [GitHub Pages](https://cisagov.github.io/ScubaGear).
 
 ## Target Audience
 
@@ -30,27 +31,22 @@ ScubaGear uses a three-step process:
 
 ## Key Features
 
-### 🖥️ Multiple Interfaces
+### Baseline Security Coverage
 
-- **Command Line**: PowerShell cmdlets for automation and scripting
-- **Configuration Files**: YAML-based configuration for repeatable assessments
-
-### 🔒 Comprehensive Security Coverage
-
-- **Azure Active Directory (AAD)**: Identity and access management policies
+- **Microsoft Entra ID (AAD)**: Identity and access management policies
 - **Microsoft Defender**: Advanced threat protection settings
 - **Exchange Online**: Email security and compliance configurations
 - **Power Platform**: Low-code application security settings
 - **SharePoint**: Document collaboration and access controls
 - **Microsoft Teams**: Communication and meeting security policies
 
-### 📊 Rich Reporting
+### Rich Reporting
 
 - **HTML Reports**: Interactive, user-friendly compliance reports
 - **JSON Output**: Machine-readable results for automation
 - **CSV Export**: Spreadsheet-compatible data for analysis
 
-### 🎯 CISA SCuBA Alignment
+### CISA SCuBA Alignment
 
 - Based on official [CISA SCuBA baselines](https://cisa.gov/scuba)
 - Regularly updated to match the latest security recommendations
@@ -75,13 +71,18 @@ Please review the [Prerequisites](#prerequisites) section to verify that your sy
 
 ### Quick Start Guide
 
-ScubaGear is designed to be run multiple times to properly evaluate and apply baseline settings.
+ScubaGear can be run multiple times to properly evaluate baseline settings.
 
 1. **First Run (No Configuration File):**
    Start ScubaGear without a configuration file. This initial run generates a baseline template of your environment's current settings. It does not make changes but helps you understand the default posture.
 
 2. **Subsequent Runs (With Configuration File):**
    After reviewing and editing the generated configuration file, run ScubaGear again with the configuration file as input. This allows ScubaGear to compare your intended settings against the actual environment and elevate discrepancies accordingly.
+
+> [!IMPORTANT]
+> ScubaGear has specific prerequisites and relies on defined configuration values to properly evaluate your Microsoft 365 tenant. After your initial assessment run, review the results thoroughly. Address any identified gaps by updating your tenant configuration or documenting risk acceptances in a YAML configuration file using exclusions, annotations, or omissions.
+> **Refer to the sections below for detailed guidance.**
+
 
 This iterative approach ensures ScubaGear is aligned with your environment and that all policy evaluations are based on your customized baseline.
 
@@ -115,11 +116,6 @@ Invoke-SCuBA -Version
 Invoke-SCuBA -ProductNames *
 ```
 
-> [!IMPORTANT]
-> ScubaGear has specific prerequisites and relies on defined configuration values to properly evaluate your Microsoft 365 tenant. After your initial assessment run, review the results thoroughly. Address any identified gaps by updating your tenant configuration or documenting risk acceptances in a YAML configuration file using exclusions, annotations, or omissions.
-> **Refer to the sections below for detailed guidance.**
-
-
 ### 5. Build YAML configuration file
 
 📄 **Why You Need a YAML Configuration File**
@@ -139,11 +135,11 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 ### Reuse provided sample files
 
-- 📄 [View the Sample Configuration](PowerShell/ScubaGear/Sample-Config-Files) →
-- 📖 [Learn about all configuration options](docs/configuration/configuration.md) →
+- 📄 [View the Sample Configuration](PowerShell/ScubaGear/Sample-Config-Files)
+- 📖 [Learn about all configuration options](docs/configuration/configuration.md)
 
 > [!TIP]
-> Several samples configurations are provided [Full config](PowerShell\ScubaGear\Sample-Config-Files\full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module. **For easier editing, you can import it into the UI and make further adjustments there.**
+> Several samples configurations are provided [Full config](PowerShell\ScubaGear\Sample-Config-Files\full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module.
 
 
 ### 6: Run Scuba with configuration File
