@@ -33,40 +33,30 @@ ScubaGear uses a three-step process:
 
 ### Baseline Security Coverage
 
-- **Microsoft Entra ID (AAD)**: Identity and access management policies
-- **Microsoft Defender**: Advanced threat protection settings
-- **Exchange Online**: Email security and compliance configurations
-- **Power Platform**: Low-code application security settings
-- **SharePoint**: Document collaboration and access controls
-- **Microsoft Teams**: Communication and meeting security policies
+SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 and the MITRE ATT&CK framework.
+
+  - [Baselines](baselines/README.md)
+    - [Microsoft Entra ID](PowerShell/ScubaGear/baselines/aad.md): Identity and access management policies
+    - [Defender](PowerShell/ScubaGear/baselines/defender.md): Advanced threat protection settings
+    - [Exchange Online](PowerShell/ScubaGear/baselines/exo.md): Email security and compliance configurations
+    - [Power BI](PowerShell/ScubaGear/baselines/powerbi.md): Cloud-based data visualization tool security settings
+    - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md): Low-code application security settings
+    - [SharePoint](PowerShell/ScubaGear/baselines/sharepoint.md): Document collaboration and access controls
+    - [Teams](PowerShell/ScubaGear/baselines/teams.md): Communication and meeting security policies
+
+  - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
 ### Rich Reporting
 
 - **HTML Reports**: Interactive, user-friendly compliance reports
-- **JSON Output**: Machine-readable results for automation
+- **JSON Output**: Parsed results for CISA CyberScope reporting
 - **CSV Export**: Spreadsheet-compatible data for analysis
-
-### CISA SCuBA Alignment
-
-- Based on official [CISA SCuBA baselines](https://cisa.gov/scuba)
-- Regularly updated to match the latest security recommendations
-- Detailed policy mappings and explanations
-  - [Mappings](docs/misc/mappings.md)
-  - [Baselines](baselines/README.md)
-    - [Microsoft Entra ID](PowerShell/ScubaGear/baselines/aad.md)
-    - [Defender](PowerShell/ScubaGear/baselines/defender.md)
-    - [Exchange Online](PowerShell/ScubaGear/baselines/exo.md)
-    - [Power BI](PowerShell/ScubaGear/baselines/powerbi.md)
-    - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md)
-    - [SharePoint](PowerShell/ScubaGear/baselines/sharepoint.md)
-    - [Teams](PowerShell/ScubaGear/baselines/teams.md)
-    - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
 ## Getting Started
 
 Before launching **ScubaGear**, it's important to ensure your environment is properly prepared. This includes having the necessary configurations, permissions, and platform dependencies in place.
 
-Please review the [Prerequisites](#prerequisites) section to verify that your system meets all requirements. This will help avoid errors during execution and ensure a smooth experience when using ScubaGear.
+Please review the [prerequisites](#prerequisites) section to verify that your system meets all requirements. This will help avoid errors during execution and ensure a smooth experience when using ScubaGear.
 
 
 ### Quick Start Guide
@@ -154,7 +144,7 @@ For all other, run:
 
 ```powershell
 # Run with a configuration file (no-BOD)
-Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilentBODWarning
+Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 ```
 
 ## Table of Contents
