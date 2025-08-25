@@ -127,4 +127,3 @@ jobs:
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
-          
