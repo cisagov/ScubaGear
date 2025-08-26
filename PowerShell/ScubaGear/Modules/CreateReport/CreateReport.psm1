@@ -247,6 +247,9 @@ function New-Report {
 
                 $Config = $SettingsExport.scuba_config
 
+                # Save the original result details before any annotations are added. (Add-Annotation below modifies the contents of the details field)
+                $OriginalDetails = $Result.Details
+
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
@@ -279,7 +282,7 @@ function New-Report {
                         "IncorrectResult"="N/A"
                         "IncorrectDetails"="N/A"
                         "OriginalResult"=$Result.DisplayString
-                        "OriginalDetails"=$Result.Details
+                        "OriginalDetails"=$OriginalDetails
                         "AnnotationComment"= if ([string]::IsNullOrEmpty($UserComment)) {"N/A"} else {$UserComment}
                         "AnnotationRemediationDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                         "OmissionComment"=$OmitRationale
@@ -309,9 +312,9 @@ function New-Report {
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
-                        "IncorrectDetails"=$Result.Details
+                        "IncorrectDetails"=$OriginalDetails
                         "OriginalResult"=$Result.DisplayString
-                        "OriginalDetails"=$Result.Details
+                        "OriginalDetails"=$OriginalDetails
                         "AnnotationComment"=$UserComment
                         "AnnotationRemediationDate"=$RemediationDate
                         "OmissionComment"="N/A"
