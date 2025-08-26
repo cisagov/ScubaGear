@@ -250,11 +250,17 @@ function New-Report {
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
+                # Declare annotation fields at the top level. If they exist, these fields need to be included 
+                # in the control object regardless if the control is omitted, incorrect, or normal
+                $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
+
                 # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
+                    $OmitExpiration = $Config.OmitPolicy.$($Control.Id).Expiration
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
                         $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
@@ -272,6 +278,12 @@ function New-Report {
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
                         "IncorrectDetails"="N/A"
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$Result.Details
+                        "AnnotationComment"= if ([string]::IsNullOrEmpty($UserComment)) {"N/A"} else {$UserComment}
+                        "AnnotationRemediationDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
+                        "OmissionComment"=$OmitRationale
+                        "OmissionExpirationDate"=$OmitExpiration
                     }
                     continue
                 }
@@ -279,8 +291,6 @@ function New-Report {
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
                 $IncorrectResult = Get-IncorrectResult $Config $Control.Id
                 if ($Result.DisplayString -eq "Fail") {
-                    $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
-                    $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
@@ -300,6 +310,12 @@ function New-Report {
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
                         "IncorrectDetails"=$Result.Details
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$Result.Details
+                        "AnnotationComment"=$UserComment
+                        "AnnotationRemediationDate"=$RemediationDate
+                        "OmissionComment"="N/A"
+                        "OmissionExpirationDate"="N/A"
                     }
                     continue
                 }
@@ -316,6 +332,12 @@ function New-Report {
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"="N/A"
+                    "OriginalDetails"="N/A"
+                    "AnnotationComment"= if ([string]::IsNullOrEmpty($UserComment)) {"N/A"} else {$UserComment}
+                    "AnnotationRemediationDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
+                    "OmissionComment"="N/A"
+                    "OmissionExpirationDate"="N/A"
                 }
             }
             else {
@@ -331,6 +353,12 @@ function New-Report {
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"="N/A"
+                    "OriginalDetails"="N/A"
+                    "AnnotationComment"="N/A"
+                    "AnnotationRemediationDate"="N/A"
+                    "OmissionComment"="N/A"
+                    "OmissionExpirationDate"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
