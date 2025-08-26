@@ -32,11 +32,7 @@ jobs:
 
       - name: Update dependencies documentation table
         run: |
-          if (Test-Path "./utils/workflow/UpdateDependenciesTable.ps1") {
-            pwsh -File ./utils/workflow/UpdateDependenciesTable.ps1
-          } else {
-            Write-Host "UpdateDependenciesTable.ps1 not found, skipping documentation update"
-          }
+          pwsh -File ./utils/workflow/UpdateDependenciesTable.ps1
 
       - name: Commit changes and create new branch
         id: create_branch
