@@ -108,7 +108,6 @@ Invoke-SCuBA -ProductNames *
 
 ### 5. Build YAML configuration file
 
-📄 **Why You Need a YAML Configuration File**
 
 ScubaGear uses a YAML configuration file to define how your environment should be evaluated. This file serves several important purposes:
 
