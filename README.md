@@ -134,7 +134,7 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 ### 6: Run Scuba with configuration File
 
-When running `Invoke-SCuBA` for BOD submission, run:
+When running `Invoke-SCuBA` for BOD 25-01 submissions:
 ```powershell
 # Run with a configuration file
 Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -Organization 'example.onmicrosoft.com'
