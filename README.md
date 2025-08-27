@@ -140,7 +140,7 @@ When running `Invoke-SCuBA` for BOD submission, run:
 Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -Organization 'example.onmicrosoft.com'
 ```
 
-For all other, run:
+For all other instances:
 
 ```powershell
 # Run with a configuration file (no-BOD)
