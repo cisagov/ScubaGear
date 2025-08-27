@@ -46,11 +46,11 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
   - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
-### Rich Reporting
+### ScubaGear Output
 
-- **HTML Reports**: Interactive, user-friendly compliance reports
-- **JSON Output**: Parsed results for CISA CyberScope reporting
-- **CSV Export**: Spreadsheet-compatible data for analysis
+- **HTML Reports**: Interactive, user-friendly compliance reports. See SAMPLE: [Baselinereports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
+- **JSON Output**: Structured results for reporting and parsing. See SAMPLE: [ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
+- **CSV Export**: Spreadsheet-compatible data for analysis. See SAMPLE: [ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
 
 ## Getting Started
 
@@ -111,27 +111,25 @@ Invoke-SCuBA -ProductNames *
 
 ScubaGear uses a YAML configuration file to define how your environment should be evaluated. This file serves several important purposes:
 
-- ✅ **Customization** – Specify which products, baselines, and rules apply to your environment.
-- ⚙️ **Configuration Mapping** – Align ScubaGear’s policies with your tenant’s current settings.
-- 🛡 **Risk Acceptance** – Document intentional deviations from baselines using **exclusions**, **annotations**, or **omissions**.
-- 🧾 **Traceability** – Maintain a clear record of accepted risks and policy decisions for audits or internal reviews.
-- 🔁 **Repeatability** – Run consistent assessments over time or across environments using the same configuration.
+- **Customization** – Specify which products, baselines, and rules apply to your environment.
+- **Configuration Mapping** – Align ScubaGear’s policies with your tenant’s current settings.
+- **Risk Acceptance** – Document intentional deviations from baselines using **exclusions**, **annotations**, or **omissions**.
+- **Traceability** – Maintain a clear record of accepted risks and policy decisions for audits or internal reviews.
+- **Repeatability** – Run consistent assessments over time or across environments using the same configuration.
 
 > [!IMPORTANT]
 > Without a properly defined YAML file, ScubaGear will assume a default configuration that may not reflect your organization’s actual policies or risk posture. **It is required if the usage is for [CISA's Binding Operational Directive (BOD) 25-01 ](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)**
->
-> **Refer to the [Baselines](baselines/README.md) to understand what options are configurable.**
 
 ### Reuse provided sample files
 
-- 📄 [View the Sample Configuration](PowerShell/ScubaGear/Sample-Config-Files)
-- 📖 [Learn about all configuration options](docs/configuration/configuration.md)
+- [View the Sample Configuration](PowerShell/ScubaGear/Sample-Config-Files)
+- [Learn about all configuration options](docs/configuration/configuration.md)
 
 > [!TIP]
-> Several samples configurations are provided [Full config](PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module.
+> [full_config.yaml](PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module.
 
 
-### 6: Run Scuba with configuration File
+### 6: Run ScubaGear with a configuration File
 
 When running `Invoke-SCuBA` for BOD 25-01 submissions:
 ```powershell
@@ -148,7 +146,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 
 ## Table of Contents
 
-### 🚀 Getting Started
+### Getting Started
 
 #### Installation
 
@@ -163,17 +161,17 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
     - [Interactive Permissions](docs/prerequisites/interactive.md)
     - [Non-Interactive Permissions](docs/prerequisites/noninteractive.md)
 
-### ⚙️ Configuration & Usage
+## Configuration & Usage
 
 - [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
 - [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 
-### 🏃‍♂️ Running Assessments
+### Running Assessments
 
 - [Execution Guide](docs/execution/execution.md)
 - [Understanding Reports](docs/execution/reports.md)
 
-### 🔧 Troubleshooting & Support
+### Troubleshooting & Support
 
 - [Multiple Tenants](docs/troubleshooting/tenants.md)
 - [Product-Specific Issues](docs/troubleshooting/)
@@ -183,11 +181,11 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
   - [Microsoft Graph](docs/troubleshooting/graph.md)
 - [Network & Proxy](docs/troubleshooting/proxy.md)
 
-### 🤖 Automation
+### Automation
 
 - [ScubaConnect](https://github.com/cisagov/ScubaConnect) - ScubaConnect is cloud-native infrastructure, developed by CISA, that automates the execution of assessment tools ScubaGear and ScubaGoggles.
 
-### 📚 Additional Resources
+### Additional Resources
 
 - [Assumptions](docs/misc/assumptions.md)
 - [Mappings](docs/misc/mappings.md)
@@ -204,11 +202,11 @@ Unless otherwise noted, this project is distributed under the Creative Commons Z
 [github-license-img]: https://img.shields.io/github/license/cisagov/ScubaGear
 [github-release-img]: https://img.shields.io/github/v/release/cisagov/ScubaGear?label=GitHub&logo=github
 [psgallery-release-img]: https://img.shields.io/powershellgallery/v/ScubaGear?logo=powershell&label=PSGallery
-[ci-pipeline]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.YAML
-[ci-pipeline-img]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.YAML/badge.svg
-[functional-test]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.YAML
-[functional-test-img]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.YAML/badge.svg
-[github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.YAML?logo=github
+[ci-pipeline]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml
+[ci-pipeline-img]: https://github.com/cisagov/ScubaGear/actions/workflows/run_pipeline.yaml/badge.svg
+[functional-test]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml
+[functional-test-img]: https://github.com/cisagov/ScubaGear/actions/workflows/test_production_function.yaml/badge.svg
+[github-cicd-workflow-img]: https://img.shields.io/github/actions/workflow/status/cisagov/ScubaGear/run_pipeline.yaml?logo=github
 [github-downloads-img]: https://img.shields.io/github/downloads/cisagov/ScubaGear/total?logo=github
 [psgallery-downloads-img]: https://img.shields.io/powershellgallery/dt/ScubaGear?logo=powershell
 [github-issues-img]: https://img.shields.io/github/issues/cisagov/ScubaGear
