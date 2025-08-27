@@ -54,7 +54,7 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
 ## Getting Started
 
-Before launching **ScubaGear**, it's important to ensure your environment is properly prepared. This includes having the necessary configurations, permissions, and platform dependencies in place.
+Before launching **ScubaGear**, it's important to ensure your environment is properly configured. This includes having the necessary dependencies and permissions in place.
 
 Please review the [prerequisites](#prerequisites) section to verify that your system meets all requirements. This will help avoid errors during execution and ensure a smooth experience when using ScubaGear.
 
