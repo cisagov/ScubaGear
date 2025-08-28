@@ -18,6 +18,7 @@ function Export-AADProvider {
     )
 
     Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
+    Import-Module $PSScriptRoot/ProviderHelpers/LicenseHelper.psm1
     $Tracker = Get-CommandTracker
 
     # The below cmdlet covers ~ 9 policy checks that inspect conditional access policies, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
@@ -45,6 +46,10 @@ function Export-AADProvider {
     $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
     $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+
+    # Determine tenant license state based on subscribed SKUs/service plans
+    $LicenseStateObj = Get-AADLicenseState -SubscribedSku $SubscribedSku
+    $LicenseState = ConvertTo-Json -Depth 4 @($LicenseStateObj)
 
     # Get a list of the tenant's provisioned service plans - used to see if the tenant has AAD premium p2 license required for some checks
     # The Rego looks at the service_plans in the JSON
@@ -210,6 +215,7 @@ function Export-AADProvider {
     "authentication_method": $AuthenticationMethod,
     "domain_settings": $DomainSettings,
     "license_information": $LicenseInfo,
+    "license_state": $LicenseState,
     "total_user_count": $UserCount,
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
