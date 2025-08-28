@@ -9,9 +9,26 @@ Initialize-SCuBA
 
 > **Note**: ScubaGear utilizes several libraries from Microsoft to read data about their product configurations.  At least one of these libraries is tied to PowerShell 5.  Until Microsoft updates their library, ScubaGear will continue to use PowerShell 5.  As this version is only available on Windows, ScubaGear will only run on Windows.
 
-`Initialize-SCuBA` will install several modules on your system. These modules are listed in [RequiredVersions.ps1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/RequiredVersions.ps1).  It will also install [OPA](https://www.openpolicyagent.org).
+`Initialize-SCuBA` will install the modules in the PowerShell Module Dependencies Section on to your system. It will also install [OPA](https://www.openpolicyagent.org).
 
 > **Note**: The `Initialize-SCuBA` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA and any other related files.
+
+## PowerShell Module Dependencies
+
+The following PowerShell modules are required for ScubaGear to function properly. These modules and their version constraints are defined in [RequiredVersions.ps1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/RequiredVersions.ps1):
+
+| Module Name                                   | Minimum Version | Maximum Version  | Purpose                                      |
+|:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
+| MicrosoftTeams                                | 4.9.3           | 6.99.99999       | Microsoft Teams configuration management     |
+| ExchangeOnlineManagement                      | 3.2.0           | 3.4.99999        | Exchange Online and Defender configuration   |
+| Microsoft.Online.SharePoint.PowerShell        | 16.0.0          | 16.0.24810.12000 | SharePoint Online and OneDrive configuration |
+| PnP.PowerShell                                | 1.12.0          | 1.99.99999       | Alternative SharePoint PowerShell module     |
+| Microsoft.PowerApps.Administration.PowerShell | 2.0.198         | 2.0.203          | Power Platform administration                |
+| Microsoft.PowerApps.PowerShell                | 1.0.0           | 1.99.99999       | Power Platform management                    |
+| Microsoft.Graph.Authentication                | 2.0.0           | 2.99.99999       | Microsoft Graph authentication               |
+| powershell-yaml                               | 0.4.2           | 0.99.99999       | YAML configuration file support              |
+
+> **Note**: The maximum versions are updated to the latest available versions on a scheduled basis.
 
 ## OPA Installation
 
