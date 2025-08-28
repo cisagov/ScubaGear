@@ -23,30 +23,55 @@
 
     # Define the mapping patterns to look for in Rego files
     $patterns = @{
-        'UserExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'capolicy'
-        'GroupExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'capolicy'
-        'PrivilegedRoleExclusions.*["'']([^"'']+)["'']' = 'role'
+        'UserExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'CapExclusions'
+        'GroupExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'CapExclusions'
+        'PrivilegedRoleExclusions.*["'']([^"'']+)["'']' = 'RoleExclusions'
 
-        'SensitiveAccountsConfig.*["'']([^"'']+)["'']' = 'sensitiveAccounts'
-        'SensitiveAccountsSetting.*["'']([^"'']+)["'']' = 'sensitiveAccounts'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']AgencyDomains["'']' = 'agencyDomains'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']PartnerDomains["'']' = 'partnerDomains'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']SensitiveUsers["'']' = 'sensitiveUsers'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["'']' = 'sensitiveUsers'
+        'SensitiveAccountsConfig.*["'']([^"'']+)["'']' = 'SensitiveAccounts'
+        'SensitiveAccountsSetting.*["'']([^"'']+)["'']' = 'SensitiveAccounts'
+        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']AgencyDomains["'']' = 'AgencyDomains'
+        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']PartnerDomains["'']' = 'PartnerDomains'
+        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']SensitiveUsers["'']' = 'SensitiveUsers'
+        'ImpersonationProtectionConfig.*["'']([^"'']+)["'']' = 'SensitiveUsers'
 
-        'input\.scuba_config\.Exo\[\''([^'']+)\''\]\.AllowedForwardingDomains' = 'forwardingDomains'
+        'input\.scuba_config\.Exo\[\''([^'']+)\''\]\.AllowedForwardingDomains' = 'AllowedForwardingDomains'
 
-        'input\.scuba_config\.Aad\[\''([^'']+)\''\]\.CapExclusions' = 'capolicy'
-        'input\.scuba_config\.Aad\[\''([^'']+)\''\]\.RoleExclusions' = 'role'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveAccounts' = 'sensitiveAccounts'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveUsers' = 'sensitiveUsers'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.PartnerDomains' = 'partnerDomains'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.AgencyDomains' = 'agencyDomains'
+        'input\.scuba_config\.Aad\[\''([^'']+)\''\]\.RoleExclusions' = 'RoleExclusions'
+        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveAccounts' = 'SensitiveAccounts'
+        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveUsers' = 'SensitiveUsers'
+        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.PartnerDomains' = 'PartnerDomains'
+        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.AgencyDomains' = 'AgencyDomains'
     }
 
 
-    # Get all Rego files
-    $regoFiles = Get-ChildItem -Path $RegoDirectory -Filter "*.rego" -Recurse
+    # Get all Rego files with error handling for permission denied issues
+    try {
+        $regoFiles = Get-ChildItem -Path $RegoDirectory -Filter "*.rego" -Recurse -ErrorAction Stop
+    }
+    catch [System.UnauthorizedAccessException] {
+        # Handle permission denied errors by trying without -Recurse or with limited scope
+        Write-Warning "Permission denied accessing some directories. Searching only in immediate subdirectories."
+        $regoFiles = @()
+
+        # Get files from the root directory
+        $regoFiles += Get-ChildItem -Path $RegoDirectory -Filter "*.rego" -ErrorAction SilentlyContinue
+
+        # Get files from immediate subdirectories only
+        $subdirs = Get-ChildItem -Path $RegoDirectory -Directory -ErrorAction SilentlyContinue
+        foreach ($subdir in $subdirs) {
+            try {
+                $regoFiles += Get-ChildItem -Path $subdir.FullName -Filter "*.rego" -Recurse -ErrorAction Stop
+            }
+            catch {
+                # Skip directories we can't access
+                Write-Verbose "Skipping directory due to access restrictions: $($subdir.FullName)"
+                $regoFiles += Get-ChildItem -Path $subdir.FullName -Filter "*.rego" -ErrorAction SilentlyContinue
+            }
+        }
+    }
+    catch {
+        throw "Failed to access Rego directory '$RegoDirectory': $($_.Exception.Message)"
+    }
 
     foreach ($file in $regoFiles) {
         $content = Get-Content -Path $file.FullName -Raw
@@ -100,32 +125,32 @@
                 # Look for specific exclusion patterns within the policy section
                 switch -Regex ($line) {
                     'UserExclusionsFullyExempt|GroupExclusionsFullyExempt' {
-                        $exclusionMappings[$currentPolicyId] = 'capolicy'
-                        Write-Verbose "Found CAP mapping: $currentPolicyId -> capolicy (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'CapExclusions'
+                        Write-Verbose "Found CAP mapping: $currentPolicyId -> CapExclusions (from context)"
                     }
                     'PrivilegedRoleExclusions' {
-                        $exclusionMappings[$currentPolicyId] = 'role'
-                        Write-Verbose "Found role mapping: $currentPolicyId -> role (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'RoleExclusions'
+                        Write-Verbose "Found RoleExclusions mapping: $currentPolicyId -> RoleExclusions (from context)"
                     }
                     'SensitiveAccountsConfig|SensitiveAccountsSetting' {
-                        $exclusionMappings[$currentPolicyId] = 'sensitiveAccounts'
-                        Write-Verbose "Found sensitive accounts mapping: $currentPolicyId -> sensitiveAccounts (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'SensitiveAccounts'
+                        Write-Verbose "Found sensitive accounts mapping: $currentPolicyId -> SensitiveAccounts (from context)"
                     }
                     'ImpersonationProtectionConfig.*SensitiveUsers' {
-                        $exclusionMappings[$currentPolicyId] = 'sensitiveUsers'
-                        Write-Verbose "Found sensitive users mapping: $currentPolicyId -> sensitiveUsers (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'SensitiveUsers'
+                        Write-Verbose "Found sensitive users mapping: $currentPolicyId -> SensitiveUsers (from context)"
                     }
                     'ImpersonationProtectionConfig.*PartnerDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'partnerDomains'
-                        Write-Verbose "Found partner domains mapping: $currentPolicyId -> partnerDomains (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'PartnerDomains'
+                        Write-Verbose "Found partner domains mapping: $currentPolicyId -> PartnerDomains (from context)"
                     }
                     'ImpersonationProtectionConfig.*AgencyDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'agencyDomains'
-                        Write-Verbose "Found agency domains mapping: $currentPolicyId -> agencyDomains (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'AgencyDomains'
+                        Write-Verbose "Found agency domains mapping: $currentPolicyId -> AgencyDomains (from context)"
                     }
                     'AllowedForwardingDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'forwardingDomains'
-                        Write-Verbose "Found forwarding domains mapping: $currentPolicyId -> forwardingDomains (from context)"
+                        $exclusionMappings[$currentPolicyId] = 'AllowedForwardingDomains'
+                        Write-Verbose "Found forwarding domains mapping: $currentPolicyId -> AllowedForwardingDomains (from context)"
                     }
                 }
             }
@@ -160,7 +185,7 @@ function Update-ScubaConfigBaselineWithRego {
     An array of product names to filter the policies.
 
     .PARAMETER AdditionalFields
-    An array of additional fields to include in the policy objects.
+    An array of additional fields to include in the policy objects. Available fields: criticality, lastModified, implementation, mitreMapping, resources, link.
 
     .EXAMPLE
     Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory ".\Rego"
@@ -182,7 +207,7 @@ function Update-ScubaConfigBaselineWithRego {
         [string[]]$ProductFilter = @(),
 
         [Parameter(Mandatory=$false)]
-        [string[]]$AdditionalFields = @("criticality", "lastModified", "implementation", "mitreMapping", "resources")
+        [string[]]$AdditionalFields = @("criticality", "lastModified", "implementation", "mitreMapping", "resources", "link")
     )
 
     # Get the exclusion mappings from Rego files
@@ -270,8 +295,9 @@ function Update-ScubaConfigBaselineWithRego {
                 rationale = $policy.Rationale
                 criticality = $null
                 exclusionField = $exclusionField
-                omissionField = "omissions"
-                annotationField = "annotation"
+                omissionField = "Omissions"
+                annotationField = "Annotations"
+                link = "$GitHubDirectoryUrl/$($product.ToLower()).md#$($policy.PolicyId.replace('.', '').ToLower())"
             }
 
             # Add additional fields if specified and they exist
@@ -301,6 +327,10 @@ function Update-ScubaConfigBaselineWithRego {
                         if ($policy.Resources -and $policy.Resources.Count -gt 0) {
                             $policyObj.resources = $policy.Resources
                         }
+                    }
+                    "link" {
+                        # Link is always generated, so it's already added above
+                        # This case exists for documentation/consistency
                     }
                 }
             }
@@ -468,7 +498,10 @@ function Get-ScubaBaselinePolicy {
             }
             if ($inPoliciesSection -and ($line.Trim() -match '^## ' -or $line.Trim() -match '^# ')) {
                 if ($currentPolicy) {
-                    $currentPolicy += Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+                    $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+                    foreach ($key in $policyContent.Keys) {
+                        $currentPolicy[$key] = $policyContent[$key]
+                    }
                     $policies += [PSCustomObject]$currentPolicy
                     $currentPolicy = $null
                     $currentContent = @()
@@ -480,7 +513,10 @@ function Get-ScubaBaselinePolicy {
             if ($inPoliciesSection) {
                 if ($line -match $policyHeaderPattern) {
                     if ($currentPolicy) {
-                        $currentPolicy += Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+                        $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+                        foreach ($key in $policyContent.Keys) {
+                            $currentPolicy[$key] = $policyContent[$key]
+                        }
                         $policies += [PSCustomObject]$currentPolicy
                         $currentContent = @()
                     }
@@ -505,7 +541,10 @@ function Get-ScubaBaselinePolicy {
         }
 
         if ($currentPolicy) {
-            $currentPolicy += Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+            $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
+            foreach ($key in $policyContent.Keys) {
+                $currentPolicy[$key] = $policyContent[$key]
+            }
             $policies += [PSCustomObject]$currentPolicy
         }
 
@@ -581,7 +620,7 @@ Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm
 $regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
 
 # Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US copy.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
 
 # Filter specific products
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")

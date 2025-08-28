@@ -167,7 +167,7 @@ Function Export-DebugLog {
         $saveDialog = New-Object Microsoft.Win32.SaveFileDialog
         $saveDialog.Filter = "Log Files (*.log)|*.log|Text Files (*.txt)|*.txt|All Files (*.*)|*.*"
         $saveDialog.FileName = if ($SanitizeData) { "$baseFileName-sanitized.log" } else { "$baseFileName.log" }
-        $saveDialog.Title = if ($SanitizeData) { "Export Sanitized Debug Log" } else { "Export Debug Log" }
+        $saveDialog.Title = if ($SanitizeData) { $syncHash.UIConfigs.localeTitles.ExportSanitizedDebugLog } else { $syncHash.UIConfigs.localeTitles.ExportDebugLog }
 
         if ($saveDialog.ShowDialog() -eq $true) {
             $logFilePath = $saveDialog.FileName
@@ -226,21 +226,21 @@ Function Export-DebugLog {
                     $mappingData | ConvertTo-Json -Depth 3 | Out-File -FilePath $mappingFilePath -Encoding UTF8
 
                     # Update status with both files
-                    $syncHash.DebugStatus_TextBlock.Text = "Sanitized debug log exported to $($saveDialog.FileName), mapping file: $(Split-Path $mappingFilePath -Leaf)"
+                    $syncHash.DebugStatus_TextBlock.Text = $syncHash.UIConfigs.localeStatusMessages.SanitizedLogExported -f $saveDialog.FileName, (Split-Path $mappingFilePath -Leaf)
 
                     # Show success message with mapping info
                     $syncHash.ShowMessageBox.Invoke(
-                        "Sanitized debug log exported successfully!`n`nLog file: $($saveDialog.FileName)`nMapping file: $mappingFilePath`n`nThe mapping file contains the correlation between original and sanitized values for troubleshooting purposes.",
-                        "Export Successful",
+                        $syncHash.UIConfigs.localeProgressMessages.SanitizedDebugLogExportSuccess -f $saveDialog.FileName, $mappingFilePath,
+                        $syncHash.UIConfigs.localeTitles.ExportSuccessful,
                         [System.Windows.MessageBoxButton]::OK,
                         [System.Windows.MessageBoxImage]::Information
                     )
                 } else {
-                    $syncHash.DebugStatus_TextBlock.Text = "Debug log exported (no sensitive data found): $($saveDialog.FileName)"
+                    $syncHash.DebugStatus_TextBlock.Text = $syncHash.UIConfigs.localeStatusMessages.DebugLogExportedNoSensitiveData -f $saveDialog.FileName
 
                     $syncHash.ShowMessageBox.Invoke(
-                        "Debug log exported successfully to:`n$($saveDialog.FileName)`n`nNo sensitive data was detected for sanitization.",
-                        "Export Successful",
+                        $syncHash.UIConfigs.localeProgressMessages.DebugLogExportNoSensitiveData -f $saveDialog.FileName,
+                        $syncHash.UIConfigs.localeTitles.ExportSuccessful,
                         [System.Windows.MessageBoxButton]::OK,
                         [System.Windows.MessageBoxImage]::Information
                     )
@@ -261,11 +261,11 @@ Function Export-DebugLog {
                 Write-DebugOutput -Message "Created snapshot of $($debugLogSnapshot.Count) debug log entries for export" -Source $MyInvocation.MyCommand -Level "Debug"
 
                 $debugLogSnapshot | Out-File -FilePath $logFilePath -Encoding UTF8
-                $syncHash.DebugStatus_TextBlock.Text = "Debug log exported to: $($saveDialog.FileName)"
+                $syncHash.DebugStatus_TextBlock.Text = $syncHash.UIConfigs.localeStatusMessages.DebugLogExported -f $saveDialog.FileName
 
                 $syncHash.ShowMessageBox.Invoke(
-                    "Debug log exported successfully to:`n$($saveDialog.FileName)",
-                    "Export Successful",
+                    $syncHash.UIConfigs.localeProgressMessages.DebugLogExportSuccess -f $saveDialog.FileName,
+                    $syncHash.UIConfigs.localeTitles.ExportSuccessful,
                     [System.Windows.MessageBoxButton]::OK,
                     [System.Windows.MessageBoxImage]::Information
                 )
@@ -274,10 +274,10 @@ Function Export-DebugLog {
             Write-DebugOutput -Message "Debug log export completed: $logFilePath (Sanitized: $SanitizeData)" -Source $MyInvocation.MyCommand -Level "Info"
         }
     } catch {
-        $syncHash.DebugStatus_TextBlock.Text = "Export failed: $($_.Exception.Message)"
+        $syncHash.DebugStatus_TextBlock.Text = $syncHash.UIConfigs.localeStatusMessages.ExportFailed -f $_.Exception.Message
         $syncHash.ShowMessageBox.Invoke(
-            "Error exporting debug log: $($_.Exception.Message)",
-            "Export Error",
+            $syncHash.UIConfigs.localeProgressMessages.DebugLogExportError -f $_.Exception.Message,
+            $syncHash.UIConfigs.localeTitles.ExportError,
             [System.Windows.MessageBoxButton]::OK,
             [System.Windows.MessageBoxImage]::Error
         )
@@ -363,7 +363,7 @@ Function Search-DebugLog {
 
     $debugText = $syncHash.DebugOutput_TextBox.Text
     if ([string]::IsNullOrEmpty($debugText)) {
-        $syncHash.DebugSearchStatus_TextBlock.Text = "No text to search"
+        $syncHash.DebugSearchStatus_TextBlock.Text = $syncHash.UIConfigs.localeStatusMessages.NoSearchText
         $syncHash.DebugSearchPrev_Button.IsEnabled = $false
         $syncHash.DebugSearchNext_Button.IsEnabled = $false
         return
@@ -665,7 +665,7 @@ Function Show-DebugWindow {
 
     } catch {
         Write-DebugOutput -Message "Error creating debug window: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-        $syncHash.ShowMessageBox.Invoke("Failed to open debug window: $($_.Exception.Message)", "Debug Window Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.FailedToOpenDebugWindow -f $_.Exception.Message, $syncHash.UIConfigs.localeTitles.DebugWindowError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
     }
 }
 

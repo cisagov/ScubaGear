@@ -790,12 +790,15 @@ Function New-ResultsContent {
 
         if ($openHtmlBtn) {
             $openHtmlBtn.Add_Click({
+                #minimize main window
+                $syncHash.Window.WindowState = [System.Windows.WindowState]::Minimized
+
                 $htmlFile = Get-ChildItem -Path $ReportPath -Name "*.html" | Select-Object -First 1
                 if ($htmlFile) {
                     $htmlPath = Join-Path $ReportPath $htmlFile
                     Start-Process $htmlPath
                 } else {
-                    $syncHash.ShowMessageBox.Invoke("HTML report not found in folder.", "Report Not Found", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.HtmlReportNotFound, $syncHash.UIConfigs.localeTitles.ReportNotFound, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                 }
             }.GetNewClosure())
         }
@@ -815,7 +818,7 @@ Function New-ResultsContent {
                     try {
                         Show-ConfigurationViewer -ConfigFilePath $yamlConfigPath
                     } catch {
-                        $syncHash.ShowMessageBox.Invoke("Error opening configuration viewer: $($_.Exception.Message)", "Configuration Viewer Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.ConfigurationViewerError -f $_.Exception.Message, $syncHash.UIConfigs.localeTitles.ConfigurationViewerError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                     }
                 }.GetNewClosure())
             }

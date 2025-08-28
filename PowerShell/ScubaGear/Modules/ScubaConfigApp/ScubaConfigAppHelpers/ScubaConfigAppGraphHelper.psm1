@@ -15,7 +15,7 @@ Function Update-GraphStatusIndicator {
             if ($IsConnected) {
                 # Connected state - Green indicator
                 $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::Green
-                $syncHash.GraphStatusText.Text = "Graph Connected"
+                $syncHash.GraphStatusText.Text = $syncHash.UIConfigs.localeStatusMessages.GraphConnected
                 $syncHash.GraphStatusText.Foreground = [System.Windows.Media.Brushes]::DarkGreen
                 $syncHash.GraphStatusBorder.Background = [System.Windows.Media.Brushes]::LightGreen
                 $syncHash.GraphStatusBorder.ToolTip = "Microsoft Graph is connected and ready for data queries"
@@ -24,7 +24,7 @@ Function Update-GraphStatusIndicator {
             } else {
                 # Disconnected state - Red indicator
                 $syncHash.GraphStatusIndicator.Fill = [System.Windows.Media.Brushes]::Red
-                $syncHash.GraphStatusText.Text = "Graph Disconnected"
+                $syncHash.GraphStatusText.Text = $syncHash.UIConfigs.localeStatusMessages.GraphDisconnected
                 $syncHash.GraphStatusText.Foreground = [System.Windows.Media.Brushes]::DarkRed
                 $syncHash.GraphStatusBorder.Background = [System.Windows.Media.Brushes]::LightPink
                 $syncHash.GraphStatusBorder.ToolTip = "Microsoft Graph is not connected - some features may be limited"
@@ -407,12 +407,20 @@ Function Show-GraphSelector {
         [string]$SearchTerm = "",
         [int]$Top = 100
     )
-    If([string]::IsNullOrWhiteSpace($SearchTerm)) {
-        Write-DebugOutput -Message "Showing $($GraphEntityType.ToLower()) selector with top: $Top" -Source $MyInvocation.MyCommand -Level "Info"
-    }Else {
-        Write-DebugOutput -Message "Showing $($GraphEntityType.ToLower()) selector with search term: $SearchTerm, top: $Top" -Source $MyInvocation.MyCommand -Level "Info"
+    If($syncHash.GraphConnected){
+        If([string]::IsNullOrWhiteSpace($SearchTerm)) {
+            Write-DebugOutput -Message "Showing $($GraphEntityType.ToLower()) selector with top: $Top" -Source $MyInvocation.MyCommand -Level "Info"
+        }Else {
+            Write-DebugOutput -Message "Showing $($GraphEntityType.ToLower()) selector with search term: $SearchTerm, top: $Top" -Source $MyInvocation.MyCommand -Level "Info"
+        }
+        return Show-GraphProgressWindow -GraphEntityType $GraphEntityType -SearchTerm $SearchTerm -Top $Top
+    }Else{
+        Write-DebugOutput -Message "Microsoft Graph is not connected" -Source $MyInvocation.MyCommand -Level "Warning"
+        # Show an error message to the user
+        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.GraphConnectionError, $syncHash.UIConfigs.localeTitles.ConnectionError,
+                                          [System.Windows.MessageBoxButton]::OK,
+                                          [System.Windows.MessageBoxImage]::Error)
     }
-    return Show-GraphProgressWindow -GraphEntityType $GraphEntityType -SearchTerm $SearchTerm -Top $Top
 }
 
 #build UI selection window
@@ -615,7 +623,7 @@ Function Show-UISelectionWindow {
                 $selectionWindow.DialogResult = $true
                 $selectionWindow.Close()
             } else {
-                $syncHash.ShowMessageBox.Invoke("Please select an item.", "No Selection",
+                $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.PleaseSelectItem, $syncHash.UIConfigs.localeTitles.NoSelection,
                                                 [System.Windows.MessageBoxButton]::OK,
                                                 [System.Windows.MessageBoxImage]::Warning)
             }

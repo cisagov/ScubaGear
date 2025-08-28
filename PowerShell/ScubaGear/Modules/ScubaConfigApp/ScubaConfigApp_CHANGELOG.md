@@ -5,6 +5,7 @@
 ### Bug Fixes
  - Fixed Result Path button – now opens to the correct folder based on Outpath or default.
  - Removed debug log null message from ScubaRun when no process is running.
+ - Fixed search and filter clearing issue when selecting cards.
 
 ### Enhancements
 - Added ScubaGear icon to UI windows (using Scuba-themed PNG).
@@ -12,11 +13,14 @@
 - Policy import now updates cards for Exclusions, Annotations, and Omissions – providing an easier editing experience.
 - Added a green status dot next to configured items for quick visual recognition.
 - Updated Scuba Run button to show gray when disabled, removeing confusion if enabled.
+- Add Filter control for saved configurations; allowing a better user experience when managing cards
+- Minimzed UI when launching full report; this reduced multple click and helps users make sure they see the report open
 
 ### Code Improvements
 - Added a title property to each Graph query in JSON – now displayed in the selector window for clearer guidance.
 - Removed unnecessary update functions; integrated logic directly into card generation functions for cleaner code.
 - Sped up launch time by developing runspace for results scan and reduced maximum reports to 10
+
 
 ## 1.8.18 [08/18/2025] - GlobalSettings and Baseline Exclusion Management Enhancement
 

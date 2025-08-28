@@ -107,7 +107,8 @@ Function Start-SCuBAConfigApp {
 
     [CmdletBinding(DefaultParameterSetName = 'Offline')]
     Param(
-        $ConfigFilePath,
+        [ValidateScript({ Test-Path $_ -PathType Leaf })]
+        [string]$ConfigFilePath,
 
         [ValidateSet('en-US')]
         $Language = 'en-US',
@@ -115,9 +116,9 @@ Function Start-SCuBAConfigApp {
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
         [switch]$Online,
 
-        [Parameter(Mandatory = $true,ParameterSetName = 'Online')]
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
         [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
-        [string]$M365Environment,
+        [string]$M365Environment = 'commercial',
 
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
         [string]$TenantName,
@@ -163,7 +164,6 @@ Function Start-SCuBAConfigApp {
     $GraphParameters.Scopes = @(
         "User.Read.All",
         "Group.Read.All",
-        "Policy.Read.All",
         "Organization.Read.All",
         "Application.Read.All"
     )
@@ -172,18 +172,30 @@ Function Start-SCuBAConfigApp {
     if ($Online) {
         try {
             #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
-            Write-Output "Connecting to Microsoft Graph..."
+            Write-Output ""
+            Write-Output "⏳ Connecting to Microsoft Graph..."
             Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
-            $Online = $true
-            Write-Output "Successfully connected to Microsoft Graph"
+
+            #ensure user is authenticated
+            Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            Write-Output "✅ Successfully connected to Microsoft Graph"
+            $GraphConnected = $true
         }
         catch {
-            Write-Error "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
-            $Online = $false
+            Write-Error "❌ Failed to connect to Microsoft Graph: $($_.Exception.Message)"
+            $GraphConnected = $false
             Break
         }
+        finally {
+            Write-Output "📥 Attempting to pull Scuba baselines from online..."
+        }
     } else {
-        $Online = $false
+        $GraphConnected = $false
+    }
+
+    Write-Output "🚀 Launching ScubaConfigApp...please wait."
+    If($ConfigFilePath){
+        Write-Output "📥 Importing configuration from $ConfigFilePath..."
     }
 
     # build a hash table with locale data to pass to runspace
@@ -194,7 +206,9 @@ Function Start-SCuBAConfigApp {
     # Store the helper function in syncHash for access from event handlers
     $syncHash.ShowMessageBox = ${function:Show-ScubaMessageBox}
 
-    $syncHash.GraphConnected = $Online
+    # Build the syncHash with necessary paths and parameters
+    $syncHash.Online = $Online
+    $syncHash.GraphConnected = $GraphConnected
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
     $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
@@ -219,9 +233,6 @@ Function Start-SCuBAConfigApp {
     $syncHash.ExclusionData = [ordered]@{}
     $syncHash.OmissionData = [ordered]@{}
     $syncHash.AnnotationData = [ordered]@{}
-
-    #$syncHash.Theme = $Theme
-
     #build runspace
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
@@ -258,7 +269,7 @@ Function Start-SCuBAConfigApp {
 
 
         #===========================================================================
-        # Debug Window Functions
+        # Import modules
         #===========================================================================
         Import-Module "$($syncHash.HelperModulesPath)\ScubaConfigAppDebugHelper.psm1"
 
@@ -281,13 +292,66 @@ Function Start-SCuBAConfigApp {
         $syncHash.Window.Icon = $syncHash.ImgPath
         $syncHash.LogoImage.Source = $syncHash.ImgPath
 
-        #Import UI configuration file
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
         Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source $source -Level "Info"
 
-        #Import baseline configuration file
-        $syncHash.Baselines = ((Get-Content -Path $syncHash.BaselineConfigPath -Raw) | ConvertFrom-Json).baselines
-        Write-DebugOutput -Message "Baselines loaded: $($syncHash.BaselineConfigPath)" -Source $source -Level "Info"
+        # Cascading baseline loading strategy without scriptblocks
+        $syncHash.Baselines = $null
+        $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
+        $RegoTestPath = Join-Path $ModuleBasePath "..\..\Rego"
+
+        # Strategy 1: Online Markdown with Rego processing (if online and enabled)
+        if ($syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
+            try {
+                Write-DebugOutput -Message "Attempting to load baselines from online markdown files in this directory: $($syncHash.UIConfigs.OnlineBaselineMarkdownURL)" -Source $source -Level "Verbose"
+
+                $RegoResolvedPath = (Resolve-Path $RegoTestPath).Path
+                $BaselineDestPath = "$env:Temp\ScubaBaselines.json"
+                Copy-Item -Path $syncHash.BaselineConfigPath -Destination $BaselineDestPath -Force | Out-Null
+
+                Update-ScubaConfigBaselineWithRego `
+                    -ConfigFilePath $BaselineDestPath `
+                    -GitHubDirectoryUrl $syncHash.UIConfigs.OnlineBaselineMarkdownURL `
+                    -RegoDirectory $RegoResolvedPath `
+                    -AdditionalFields @('criticality')
+
+                $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
+                $syncHash.Baselines = $JsonConfigData.baselines
+                Write-DebugOutput -Message "Successfully loaded baselines using: Online Markdown with Rego Baseline" -Source $source -Level "Info"
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to load baselines using Online Markdown with Rego Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
+                $syncHash.Baselines = $null
+            }
+        }
+
+        # Strategy 2: Online JSON baseline (if strategy 1 failed and online is enabled)
+        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines) {
+            try {
+                Write-DebugOutput -Message "Attempting to load baselines from online JSON: $($syncHash.UIConfigs.OnlineBaselineJsonURL)" -Source $source -Level "Verbose"
+
+                $onlineBaselines = (Invoke-RestMethod -Uri $syncHash.UIConfigs.OnlineBaselineJsonURL -ErrorAction Stop).baselines
+                $syncHash.Baselines = $onlineBaselines
+                Write-DebugOutput -Message "Successfully loaded baselines using: Online JSON Baseline" -Source $source -Level "Info"
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to load baselines using Online JSON Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
+                $syncHash.Baselines = $null
+            }
+        }
+
+        # Strategy 3: Local baseline file (final fallback)
+        if (-not $syncHash.Baselines) {
+            try {
+                Write-DebugOutput -Message "Loading baselines from local file: $($syncHash.BaselineConfigPath)" -Source $source -Level "Verbose"
+                $syncHash.Baselines = ((Get-Content -Path $syncHash.BaselineConfigPath -Raw) | ConvertFrom-Json).baselines
+                Write-DebugOutput -Message "Successfully loaded baselines using: Local Baseline File" -Source $source -Level "Info"
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to load baselines using Local Baseline File: $($_.Exception.Message)" -Source $source -Level "Error"
+                Write-Error "All baseline loading strategies failed. Unable to load baseline configuration."
+            }
+        }
 
         # Add global event handlers to all UI controls after everything is loaded
         $syncHash.PreviewTab.IsEnabled = $false
@@ -710,6 +774,17 @@ Function Start-SCuBAConfigApp {
 
                 if (-not $orgNameValid) {
                     $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrgNameValidation
+                    #navigate to General tab
+                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
+                }
+
+                #check Org Unitname
+                $orgUnitNameValid = Confirm-UIRequiredField -UIElement $syncHash.OrgUnitName_TextBox `
+                                        -RegexPattern $syncHash.UIConfigs.valueValidations.orgUnitName.pattern `
+                                        -PlaceholderText $syncHash.UIConfigs.localePlaceholder.OrgUnitName_TextBox
+
+                if (-not $orgUnitNameValid) {
+                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrgUnitNameValidation
                     #navigate to General tab
                     $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
                 }
@@ -1214,10 +1289,20 @@ Function Start-SCuBAConfigApp {
     $Runspace.Close()
     $Runspace.Dispose()
 
+    #show graph was disconnected if it was online
+    if ($Data.GraphConnected -eq $true) {
+        Write-Output ""
+        Write-Output "🔌 Disconnected from Microsoft Graph"
+    }
+    if ($Data.Error.Count -eq 0) {
+        Write-Output "✅ ScubaConfigApp closed successfully with no errors"
+    } else {
+        Write-Output "⚠️  ScubaConfigApp closed with $($Data.Error.Count) error(s)"
+    }
+
     If($Passthru){
         return $Data
     }
-
 }
 
 Export-ModuleMember -Function @(

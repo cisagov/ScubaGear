@@ -47,7 +47,7 @@ Function Show-YamlImportProgress {
 
         <!-- Title/Icon Row -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,20,20,10">
-            <TextBlock Text="&#x1F4E5;" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <TextBlock Text="&#x1F4E5;" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="White"/>
             <Label Content="$WindowTitle" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
         </StackPanel>
 

@@ -1,7 +1,7 @@
 <Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="ScubaGear Configuration Editor"
+    Title="ScubaConfigApp"
     Height="900"
     Width="1280"
     WindowStartupLocation="CenterScreen"
@@ -1038,7 +1038,7 @@
                                             <TextBlock Text="Organization" FontWeight="Medium"/>
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
-                                        <TextBox x:Name="Organization_TextBox" Text="example.onmicrosoft.com"/>
+                                        <TextBox x:Name="Organization_TextBox"/>
                                         <TextBlock x:Name="Organization_Required_TextBlock" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
                                     </StackPanel>
 
@@ -1056,14 +1056,24 @@
                                             <TextBlock Text="Organization Name"  FontWeight="Medium"  Margin="0,0,0,4"/>
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
-                                        <TextBox x:Name="OrgName_TextBox" Text="Your organization name"/>
-                                        <TextBlock x:Name="OrgName_Required_TextBlock" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                        <TextBox x:Name="OrgName_TextBox"/>
                                     </StackPanel>
 
                                     <!-- Organization Unit Name -->
                                     <StackPanel Margin="0,0,0,16">
-                                        <TextBlock Text="Organization Unit Name" FontWeight="Medium" Margin="0,0,0,4"/>
-                                        <TextBox x:Name="OrgUnitName_TextBox" Text="Your organization unit name"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                             <Label x:Name="OrgUnitName_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
+                                            <TextBlock Text="Organization Unit Name" FontWeight="Medium" Margin="0,0,0,4"/>
+                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="OrgUnitName_TextBox"/>
                                     </StackPanel>
 
                                     <!-- Description -->
@@ -1141,6 +1151,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
@@ -1167,9 +1178,16 @@
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
 
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="ExclusionsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
                                 <!-- Results Count -->
                                 <TextBlock x:Name="ExclusionsResultCount_TextBlock"
-                                        Grid.Column="3"
+                                        Grid.Column="4"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
                                         Text="0 policies"/>
@@ -1270,6 +1288,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
@@ -1296,9 +1315,16 @@
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
 
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="AnnotationsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
                                 <!-- Results Count -->
                                 <TextBlock x:Name="AnnotationsResultCount_TextBlock"
-                                        Grid.Column="3"
+                                        Grid.Column="4"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
                                         Text="0 policies"/>
@@ -1399,6 +1425,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
@@ -1425,9 +1452,16 @@
                                         Style="{StaticResource ModernComboBox}">
                                 </ComboBox>
 
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="OmissionsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
                                 <!-- Results Count -->
                                 <TextBlock x:Name="OmissionsResultCount_TextBlock"
-                                        Grid.Column="3"
+                                        Grid.Column="4"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MutedTextBrush}"
                                         Text="0 policies"/>
@@ -1706,7 +1740,7 @@
                                             Foreground="{StaticResource PrimaryBrush}"
                                             Margin="0,0,12,0"/>
 
-                                    <!-- Cool Beta Badge -->
+                                    <!-- Cool Beta Badge
                                     <Border Background="#E3F2FD"
                                             BorderBrush="#2196F3"
                                             BorderThickness="1"
@@ -1718,6 +1752,7 @@
                                                 FontWeight="SemiBold"
                                                 Foreground="#1976D2"/>
                                     </Border>
+                                     -->
                                 </StackPanel>
 
                                 <TextBlock x:Name="ScubaRunDescription_TextBlock"
@@ -1896,7 +1931,7 @@
                                             FontWeight="SemiBold"
                                             Foreground="{StaticResource PrimaryBrush}"
                                             Margin="0,0,12,0"/>
-                                    <!-- Cool Beta Badge -->
+                                    <!-- Cool Beta Badge
                                     <Border Background="#E3F2FD"
                                             BorderBrush="#2196F3"
                                             BorderThickness="1"
@@ -1908,7 +1943,7 @@
                                                 FontWeight="SemiBold"
                                                 Foreground="#1976D2"/>
                                     </Border>
-
+                                    -->
                                     <!-- Results Badge -->
                                     <Border x:Name="ResultsCountBorder"
                                         Background="#E8F5E8"
@@ -2024,7 +2059,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     TextAlignment="Center">
-                <Run Text="ScubaGear Configuration Editor" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                <Run Text="ScubaConfigApp" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
                 <Run Text=" | "/>
                 <Hyperlink NavigateUri="https://github.com/cisagov/ScubaGear">
                     GitHub Repository
