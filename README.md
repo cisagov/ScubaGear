@@ -122,7 +122,7 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 
 ### Reuse provided sample files
 
-- [View the Sample Configuration](PowerShell/ScubaGear/Sample-Config-Files)
+- [View sample configuration files](PowerShell/ScubaGear/Sample-Config-Files)
 - [Learn about all configuration options](docs/configuration/configuration.md)
 
 > [!TIP]
