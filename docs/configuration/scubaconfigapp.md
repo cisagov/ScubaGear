@@ -1,10 +1,10 @@
-# SCuBAConfig Module
+# ScubaConfigApp Module
 
-The SCuBAConfig module provides a graphical user interface for creating and managing SCuBAGear configuration files. This module contains the PowerShell functions and resources needed to launch the configuration UI and manage SCuBAGear settings.
+The ScubaConfigApp is a PowerShell-driven UI built with Windows Presentation Framework. It’s not an executable—it’s lightweight, portable, and supports any Microsoft OS with graphical UI.
 
 ## Overview
 
-SCuBAConfig is a PowerShell module that includes:
+ScubaConfigApp module contains these elements:
 
 - **Configuration UI**: WPF-based graphical interface for creating YAML configuration files
 - **Configuration Management**: Functions for loading, validating, and exporting SCuBAGear configurations
@@ -18,14 +18,14 @@ SCuBAConfig is a PowerShell module that includes:
 
 ## Main Function
 
-### Start-ScubaConfigApp
+### Start-SCuBAConfigApp
 
-Opens the SCuBAGear Configuration UI for creating and managing configuration files, executing ScubaGear assessments, and viewing results with native report viewers.
+Opens the ScubaGear Configuration UI for creating and managing configuration files, executing ScubaGear assessments, and viewing results with native report viewers.
 
 #### Syntax
 
 ```powershell
-Start-ScubaConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Online] [[-M365Environment] <String>] [-Passthru]
+Start-SCuBAConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Online] [[-M365Environment] <String>] [-Passthru]
 ```
 
 #### Parameters
@@ -42,22 +42,23 @@ Start-ScubaConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Onlin
 
 ```powershell
 # Basic usage - Launch the configuration UI
-Start-ScubaConfigApp
+Start-SCuBAConfigApp
 
 # Launch with Graph connectivity for commercial environment (Interactive)
-Start-ScubaConfigApp -Online -M365Environment commercial
+Start-SCuBAConfigApp -Online
 
 # Import existing configuration
-Start-ScubaConfigApp -ConfigFilePath "C:\configs\myconfig.yaml"
+Start-SCuBAConfigApp -ConfigFilePath "C:\configs\myconfig.yaml"
 
 # Launch and connect to graph for GCC High environment
-Start-ScubaConfigApp -Online -M365Environment gcchigh
+Start-SCuBAConfigApp -Online -M365Environment gcchigh
 
-#Use Passthru with a variable to save all configurations in hashtables
-$SCuBAUI = Start-ScubaConfigApp -Passthru
+#Use Passthru with a variable to retrieve all configurations in hashtables
+$SCuBAUI = Start-SCuBAConfigApp -Passthru
 #retrieving data
 $SCuBAUI.GeneralSettings | ConvertTo-Json
 $SCuBAUI.AdvancedSettings | ConvertTo-Json
+$SCuBAUI.GlobalSettings | ConvertTo-Json
 $SCuBAUI.Exclusions | ConvertTo-Json -Depth 4
 $SCuBAUI.Annotations | ConvertTo-Json -Depth 4
 $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
@@ -112,11 +113,11 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 
 ## Usage Workflow
 
-Follow this comprehensive step-by-step guide to use the ScubaConfigAppUI for configuration creation, ScubaGear execution, and report review:
+Follow this comprehensive step-by-step guide to use the ScubaConfigApp for configuration creation, ScubaGear execution, and report review:
 
 ### Step 1: Launch the Application
 ```powershell
-Start-ScubaConfigApp
+Start-SCuBAConfigApp
 ```
 - The WPF application window will open with tabbed navigation
 - Begin with the "Organization" tab which is selected by default
@@ -299,88 +300,12 @@ Invoke-SCuBA -ConfigFilePath "path\to\generated\example.onmicrosoft.com.yaml"
 
 - **SCuBAConfig.psm1**: Main module file containing all functions and UI logic
 - **SCuBAConfig.psd1**: Module manifest with metadata and dependencies
-- **SCuBAConfigAppUI.xaml**: WPF UI definition file
+- **ScubaConfigApp.xaml**: WPF UI definition file
 
 ### Configuration Files
 
-- **SCuBAConfig_en-US.json**: English localization and configuration settings
+- **ScubaConfigApp_Control_en-US.json**: English localization and configuration settings
 - Additional language files can be added following the same naming pattern
-
-### Resource Files
-
-- UI templates, styles, and other resources as needed
-
-## Configuration File Structure
-
-The `SCuBAConfig_en-US.json` file contains:
-
-```json
-{
-  "DebugMode": false,
-  "EnableSearchAndFilter": false,
-  "EnableScubaRun": true,
-  "EnableResultReader": true,
-  "localeContext": {
-    // UI text elements
-  },
-  "localePlaceholder": {
-    // Input field placeholder text
-  },
-  "defaultAdvancedSettings": {
-    // Default values for advanced settings
-  },
-  "localeInfoMessages": {
-    // Success and information messages
-  },
-  "localeErrorMessages": {
-    // Error and validation messages
-  },
-  "products": {
-    // defines supported product for SCuBAgear
-  },
-  "advancedSections": {
-    //defined advanced settings toggle.
-  },
-  "M365Environment": {
-    //supported tenant environments for config file
-  },
-  "baselineControls": {
-    // defines the types of baseline controls to display
-  },
-  "baselines": [
-    "aad": {
-      // defines SCuBAgear baselines for Entra Admin Center
-    },
-    "defender": {
-      // defines SCuBAgear baselines for Defender Admin Center
-    },
-    "exo": {
-      // defines SCuBAgear baselines for M365 Exchange Admin Center
-    },
-    "sharepoint": {
-      // defines SCuBAgear baselines for SharePoint Admin Center
-    },
-    "teams": {
-      // defines SCuBAgear baselines for Teams Admin Center
-    },
-    "powerbi": {
-      // defines SCuBAgear baselines for Powrbi
-    },
-    "powerplatform": {
-      // defines SCuBAgear baselines for PowerPlatform
-    }
-  ],
-  "inputTypes": {
-    // defines fields and value types for all baseline cards
-  },
-  "valueValidations":{
-      // defines field value validation checks
-  },
-   "graphQueries": {
-    // defines graph queries used in UI (when online)
-  }
-}
-```
 
 ## Requirements
 
@@ -399,7 +324,7 @@ The `SCuBAConfig_en-US.json` file contains:
 
 If your not seeing the debug button, follow these steps
 
-1. Edit `SCuBAConfig_en-US.json` in the module directory
+1. Edit `ScubaConfigApp\ScubaConfigApp_Control_en-US.json` in the module directory
 2. Change `"DebugMode": true` to enable
 3. Restart the UI application. There will be a debug button in the bottom right corner.
 
@@ -414,11 +339,12 @@ Example:
 The **Debug Window** displays detailed diagnostic information, but it is **not intended** for end users to troubleshoot issues on their own.
 Instead, it is recommended to:
 
-- Open an issue
-- Export the log
-- Or copy the contents to the clipboard and paste them into the issue or an email
+- Open an [bug](https://github.com/cisagov/ScubaGear/issues/new?template=2-bugreport.yaml)
+- Export the log from the debug window (Santize it if needed)
+- Explain the issue and attach the debug log to bug issue
 
-A **Sanitize** option is available to replace sensitive data with placeholder values.
+>[!IMPORTANT]
+>A **Sanitize** option is available to replace sensitive data with placeholder values.
 
 ![SCuBAGear Debug Window](../images/scubaconfigapp_debug.png)
 
@@ -428,7 +354,7 @@ A **Sanitize** option is available to replace sensitive data with placeholder va
 
   ```powershell
   # Basic usage - Launch the configuration UI
-  $SCuBAUI = Start-ScubaConfigApp -Passthru
+  $SCuBAUI = Start-SCuBAConfigApp -Passthru
   $SCuBAUI.error
   ```
 
@@ -437,12 +363,11 @@ A **Sanitize** option is available to replace sensitive data with placeholder va
   ```
   User.Read.All
   Group.Read.All
-  Policy.Read.All
   Organization.Read.All
   Application.Read.All
   ```
 
-- **Configuration validation errors**: Review required fields and format requirements. Be sure to click `Save` for each configurations and then the click `Review & Generate` button
+- **Configuration validation errors**: Review required fields and format requirements. Be sure to click `Save` for each configurations and then the click `Preview & Generate` button
 
 ### Debug Information
 
@@ -455,12 +380,10 @@ Enable debug mode to get detailed information about:
 
 ## Known UI Issues
 
-- When importing a configuration file, the Exclusions, Annotations, and Omissions tabs do not refresh, though the data is successfully imported and visible in the Preview. Adding new items to an existing policy may overwrite the imported data. A fix is planned for a future update.
 - Clicking between `New Session` and `Import` multiple times may cause UI issues. Close UI and relaunch is the recommended
 - The UI does not support YAML anchors or aliases at this time.
 - The UI does not support JSON export at this time
 - The `-Online` parameter does not support using a service principal at this time. It must be interactive
-- Enabling "Search and Filter" may cause baseline policies to disappear under each sub tab. To resolve, press the clear filter button for each tab.
 
 ### Run ScubaGear and Report Summary Notes
 
@@ -475,13 +398,13 @@ Enable debug mode to get detailed information about:
 
 The UI is built using WPF and follows MVVM-like (Model–View–ViewModel) patterns:
 
-- **View**: Defined in `SCuBAConfigAppUI.xaml`
-- **Logic**: Contained in `SCuBAConfigAppUI.psm1`
+- **View**: Defined in `ScubaConfigApp.xaml`
+- **Logic**: Contained in `ScubaConfigApp.psm1`
 - **Data**: Managed through PowerShell hashtables and objects
 
 ### Adding Localization
 
-1. Create new JSON file following naming pattern: `SCuBAConfig_<locale>.json`
+1. Create new JSON file following naming pattern: `ScubaConfigApp_Control_<locale>.json`
 2. Translate all text elements in the localeContext section
 3. Update module to load appropriate locale file
 
@@ -492,7 +415,7 @@ Follow the main SCuBAGear contribution guidelines when making changes to this mo
 ## Version History
 
 - **1.12.0**: Current version with full configuration functionality
-- Previous versions: See [SCuBAGearAppUI changelog](../../PowerShell/SCuBAGear/Modules/SCuBAConfig/SCuBACONFIGAPPapp_CHANGELOG.md)
+- Previous versions: See [ScubaConfigApp changelog](../../PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_CHANGELOG.md)
 
 ## License
 
@@ -502,6 +425,6 @@ Same license as the parent SCuBAGear project.
 
 For issues and questions:
 
-- **SCuBAGear Issues**: [GitHub Issues](https://github.com/cisagov/SCuBAGear/issues)
-- **Documentation**: [SCuBAGear Docs](https://github.com/cisagov/SCuBAGear/docs)
-- **Discussions**: [GitHub Discussions](https://github.com/cisagov/SCuBAGear/discussions)
+- **SCuBAGear Issues**: [GitHub Issues](https://github.com/cisagov/scubagear/issues)
+- **Documentation**: [SCuBAGear Docs](https://github.com/cisagov/scubagear/docs)
+- **Discussions**: [GitHub Discussions](https://github.com/cisagov/scubagear/discussions)

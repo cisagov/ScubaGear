@@ -49,10 +49,10 @@ Function New-YamlPreviewConvert {
     ConvertTo-Yaml
     #>
     $yamlPreview = @()
-    $yamlPreview += '# ScubaGear Configuration File'
-    $yamlPreview += "`n# Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    $yamlPreview += $syncHash.UIConfigs.localeYamlComments.ConfigurationFile
+    $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedOn -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
     $yamlPreview += "`r"
-    $yamlPreview += "`n# Organization Configuration"
+    $yamlPreview += "`n" + $syncHash.UIConfigs.localeYamlComments.OrganizationConfiguration
     $yamlPreview += "`r"
 
     $yamlOptions = @(
@@ -84,7 +84,7 @@ Function New-YamlPreviewConvert {
 
     $yamlPreview += ConvertTo-Yaml -Data $ProductConfig -Options $yamlOptions
 
-    $yamlPreview += "`n# Configuration Details"
+    $yamlPreview += "`n" + $syncHash.UIConfigs.localeYamlComments.ConfigurationDetails
     $yamlPreview += "`r"
     # Handle M365Environment
     $EnvironmentConfig = [System.Collections.Specialized.OrderedDictionary]::new()
@@ -98,7 +98,7 @@ Function New-YamlPreviewConvert {
     $yamlPreview += ConvertTo-Yaml -Data $EnvironmentConfig -Options $yamlOptions
 
     if($null -ne $syncHash.AdvancedSettingsData -and $syncHash.AdvancedSettingsData.Count -gt 0){
-        $yamlPreview += "`n# Advanced Settings"
+        $yamlPreview += "`n" + $syncHash.UIConfigs.localeYamlComments.AdvancedSettings
         $yamlPreview += ""
         # Process advanced settings from data structure instead of UI controls
         $yamlPreview += ConvertTo-Yaml -Data $syncHash.AdvancedSettingsData -Options $yamlOptions
@@ -120,7 +120,7 @@ Function New-YamlPreviewConvert {
         $OutputData = $syncHash.($PolicyControl.dataControlOutput)
 
         if($null -ne $OutputData -and $OutputData.Count -gt 0) {
-            $yamlPreview += "`n# $($PolicyControl.controlType) Section"
+            $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.BaselineControl -f $PolicyControl.controlType)
             $yamlPreview += "`r"
 
             $NewDataConfig = [System.Collections.Specialized.OrderedDictionary]::new()
@@ -135,7 +135,7 @@ Function New-YamlPreviewConvert {
     }
 
     If($null -ne $syncHash.GlobalSettingsData -and $syncHash.GlobalSettingsData.Count -gt 0) {
-        $yamlPreview += "`n# Global Settings"
+        $yamlPreview += "`n" + $syncHash.UIConfigs.localeYamlComments.GlobalSettings
         $yamlPreview += "`r"
         # Convert GlobalSettingsData to YAML format
         $yamlPreview += ConvertTo-Yaml -Data $syncHash.GlobalSettingsData -Options $yamlOptions
@@ -169,9 +169,9 @@ Function New-YamlPreview {
     Write-DebugOutput "Starting YAML preview generation" -Source "New-YamlPreview" -Level "Debug"
 
     $yamlPreview = @()
-    $yamlPreview += '# ScubaGear Configuration File'
-    $yamlPreview += "`n# Generated on: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-    $yamlPreview += "`n`n# Organization Configuration"
+    $yamlPreview += $syncHash.UIConfigs.localeYamlComments.ConfigurationFile
+    $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedOn -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
+    $yamlPreview += "`n`n" + $syncHash.UIConfigs.localeYamlComments.OrganizationConfiguration
 
     # Process main settings from GeneralSettings data structure instead of UI controls
     if ($syncHash.GeneralSettingsData -and $syncHash.GeneralSettingsData.Count -gt 0) {
@@ -222,7 +222,7 @@ Function New-YamlPreview {
         }
     }
 
-    $yamlPreview += "`n`n# Configuration Details"
+    $yamlPreview += "`n`n" + $syncHash.UIConfigs.localeYamlComments.ConfigurationDetails
 
     # Handle ProductNames using the enhanced Function
     $yamlPreview += Get-ProductNamesForYaml
@@ -233,7 +233,7 @@ Function New-YamlPreview {
 
     # Process advanced settings from data structure instead of UI controls
     if ($syncHash.AdvancedSettingsData -and $syncHash.AdvancedSettingsData.Count -gt 0) {
-        $yamlPreview += "`n`n# Advanced Settings"
+        $yamlPreview += "`n`n" + $syncHash.UIConfigs.localeYamlComments.AdvancedSettings
 
         # Group advanced settings by section for better organization using new settingsControl structure
         $advancedTabConfig = $syncHash.UIConfigs.settingsControl.AdvancedTab
@@ -264,7 +264,7 @@ Function New-YamlPreview {
 
                 # Add section comment and settings if any exist
                 if ($sectionSettings.Count -gt 0) {
-                    $yamlPreview += "`n# $($sectionConfig.sectionName)"
+                    $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.BaselineControl -f $sectionConfig.sectionName)
                     $yamlPreview += $sectionSettings
                 }
             }
@@ -304,7 +304,7 @@ Function New-YamlPreview {
         $OutputData = $syncHash.($baselineControl.dataControlOutput)
 
         If($null -ne $OutputData -and $OutputData.Count -gt 0) {
-            $yamlPreview += "`n`n#  Baseline Control: $($baselineControl.controlType)"
+            $yamlPreview += "`n`n" + ($syncHash.UIConfigs.localeYamlComments.BaselineControl -f $baselineControl.controlType)
 
             If($baselineControl.supportsAllProducts) {
                 # Handle annotations and omissions (supports all products)
@@ -484,7 +484,7 @@ Function New-YamlPreview {
 
         # Only add the section header and content if there are valid settings
         if ($hasValidGlobalSettings) {
-            $yamlPreview += "`n`n# Global Settings"
+            $yamlPreview += "`n`n" + $syncHash.UIConfigs.localeYamlComments.GlobalSettings
             $yamlPreview += $globalSettingsOutput
         }
     }

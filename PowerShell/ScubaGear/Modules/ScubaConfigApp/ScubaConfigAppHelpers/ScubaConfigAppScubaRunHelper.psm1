@@ -49,7 +49,7 @@ Function Show-ConfigurationViewer {
 
     try {
         if (-not (Test-Path $ConfigFilePath)) {
-            $syncHash.ShowMessageBox.Invoke("Configuration file not found: $ConfigFilePath", "Configuration Viewer", "OK", "Error")
+            $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.ConfigurationFileNotFound -f $ConfigFilePath, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Error")
             return
         }
 
@@ -123,9 +123,9 @@ Function Show-ConfigurationViewer {
         $copyButton.Add_Click({
             try {
                 [System.Windows.Clipboard]::SetText($contentTextBox.Text)
-                $syncHash.ShowMessageBox.Invoke("Configuration copied to clipboard", "Configuration Viewer", "OK", "Information")
+                $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.ConfigurationCopiedToClipboard, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Information")
             } catch {
-                $syncHash.ShowMessageBox.Invoke("Failed to copy to clipboard: $($_.Exception.Message)", "Configuration Viewer", "OK", "Error")
+                $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.FailedToCopyToClipboard -f $_.Exception.Message, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Error")
             }
         })
         $buttonPanel.Children.Add($copyButton)
@@ -146,7 +146,7 @@ Function Show-ConfigurationViewer {
         $configWindow.ShowDialog()
     }
     catch {
-        $syncHash.ShowMessageBox.Invoke("Error opening configuration viewer: $($_.Exception.Message)", "Configuration Viewer", "OK", "Error")
+        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.ConfigurationViewerError -f $_.Exception.Message, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Error")
         Write-DebugOutput -Message "Error in Show-ConfigurationViewer: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
     }
 }
@@ -318,10 +318,10 @@ Function Initialize-ScubaRunTab {
             if (Test-Path $configFilePath) {
                 Show-ConfigurationViewer -ConfigFilePath $configFilePath
             } else {
-                $syncHash.ShowMessageBox.Invoke("Configuration file not found in results folder: $configFilePath", "Configuration Viewer", "OK", "Warning")
+                $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.ConfigurationFileNotFoundInResults -f $configFilePath, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Warning")
             }
         } else {
-            $syncHash.ShowMessageBox.Invoke("No configuration file available. Run ScubaGear first to generate a configuration file.", "Configuration Viewer", "OK", "Information")
+            $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.NoConfigurationFileAvailable, $syncHash.UIConfigs.localeTitles.ConfigurationViewer, "OK", "Information")
         }
     })
 

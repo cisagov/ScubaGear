@@ -53,8 +53,6 @@ Function Add-SearchAndFilterCapability {
     # Get unique criticality values dynamically from baseline data
     $criticalityValues = Get-UIConfigCriticalValues
 
-    Write-DebugOutput -Message "Found criticality values: $($criticalityValues -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
-
     # Initialize for each tab type
     $tabTypes = $synchash.UIConfigs.baselineControls.controlType
 
@@ -84,9 +82,11 @@ Function Add-SearchAndFilterCapability {
                         # Fallback: manually clear the search and apply filter
                         $searchBox = $syncHash."$($currentTabType)Search_TextBox"
                         $criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
+                        $configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
 
                         if ($searchBox) {
-                            $searchBox.Text = "Search policies by name or ID..."
+                            $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
+                            $searchBox.Text = $syncHash.UIConfigs.localePlaceholder.SearchPlaceholder_TextBox
                             $searchBox.Foreground = [System.Windows.Media.Brushes]::Gray
                             $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                             $searchBox.Tag = "Placeholder"
@@ -94,6 +94,11 @@ Function Add-SearchAndFilterCapability {
                             # Reset criticality filter to "All"
                             if ($criticalityComboBox) {
                                 $criticalityComboBox.SelectedIndex = 0
+                            }
+
+                            # Reset configuration status filter to "All"
+                            if ($configuredComboBox) {
+                                $configuredComboBox.SelectedIndex = 0
                             }
 
                             # Trigger the search update
@@ -114,7 +119,7 @@ Function Add-SearchAndFilterCapability {
             $searchTextBox.Text = ""
 
             # Set up placeholder behavior
-            $placeholderText = "Search policies by name or ID..."
+            $placeholderText = $syncHash.UIConfigs.localePlaceholder.SearchPlaceholder_TextBox
             $searchTextBox.Text = $placeholderText
             $searchTextBox.Foreground = [System.Windows.Media.Brushes]::Gray
             $searchTextBox.FontStyle = [System.Windows.FontStyles]::Italic
@@ -123,6 +128,7 @@ Function Add-SearchAndFilterCapability {
             # Add GotFocus event
             $searchTextBox.Add_GotFocus({
                 if ($this.Tag -eq "Placeholder") {
+                    $this.Tag = "Clearing" # Set temporary tag to prevent TextChanged from triggering search
                     $this.Text = ""
                     $this.Foreground = [System.Windows.Media.Brushes]::Black
                     $this.FontStyle = [System.Windows.FontStyles]::Normal
@@ -133,6 +139,7 @@ Function Add-SearchAndFilterCapability {
             # Add LostFocus event
             $searchTextBox.Add_LostFocus({
                 if ([string]::IsNullOrWhiteSpace($this.Text)) {
+                    $this.Tag = "Clearing" # Set temporary tag to prevent TextChanged from triggering search
                     $this.Text = $placeholderText
                     $this.Foreground = [System.Windows.Media.Brushes]::Gray
                     $this.FontStyle = [System.Windows.FontStyles]::Italic
@@ -142,8 +149,14 @@ Function Add-SearchAndFilterCapability {
 
             # Add TextChanged event for real-time search
             $searchTextBox.Add_TextChanged({
+                # Don't trigger search if we're in the middle of clearing/setting placeholder
+                if ($this.Tag -eq "Clearing") {
+                    return
+                }
+
                 # Only trigger search if not in placeholder mode
-                if ($this.Tag -ne "Placeholder" -and ![string]::IsNullOrWhiteSpace($this.Text)) {
+                if ($this.Tag -ne "Placeholder") {
+                    # Trigger search whether text is present or empty (to show all items when cleared)
                     Set-SearchAndFilter -TabType $tabType
                 }
             }.GetNewClosure())
@@ -159,15 +172,25 @@ Function Add-SearchAndFilterCapability {
 
         $clearButton.Add_Click({
             $searchBox = $syncHash."$($tabType)Search_TextBox"
+            $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+            $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+
             if ($searchBox) {
-                $searchBox.Text = "Search policies by name or ID..."
+                $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
+                $searchBox.Text = $syncHash.UIConfigs.localePlaceholder.SearchPlaceholder_TextBox
                 $searchBox.Foreground = [System.Windows.Media.Brushes]::Gray
                 $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                 $searchBox.Tag = "Placeholder"
 
-                # Reset default selection to "All"
-                $criticalityComboBox.SelectedIndex = 0
+                # Reset default selection to "All" for both filters
+                if ($criticalityComboBox) {
+                    $criticalityComboBox.SelectedIndex = 0
+                }
+                if ($configuredComboBox) {
+                    $configuredComboBox.SelectedIndex = 0
+                }
 
+                # Now trigger the search with cleared state
                 Set-SearchAndFilter -TabType $tabType
             }
         }.GetNewClosure())
@@ -197,10 +220,59 @@ Function Add-SearchAndFilterCapability {
 
         # Add filter event handler
         $criticalityComboBox.Add_SelectionChanged({
-            Set-SearchAndFilter -TabType $tabType -Criticality $this.SelectedItem.Tag
+            # Get current configuration status from the other dropdown
+            $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+            $configurationStatus = if ($configuredComboBox -and $configuredComboBox.SelectedItem) {
+                $configuredComboBox.SelectedItem.Tag
+            } else {
+                "ALL_CONFIGURATIONS"
+            }
+            Set-SearchAndFilter -TabType $tabType -Criticality $this.SelectedItem.Tag -ConfigurationStatus $configurationStatus
         }.GetNewClosure())
 
         Write-DebugOutput -Message "Criticality filter initialized for $tabType with $($criticalityValues.Count) values" -Source $MyInvocation.MyCommand -Level "Info"
+
+        # Initialize configuration status filter combobox
+        $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+        if ($configuredComboBox) {
+            # Clear existing items
+            $configuredComboBox.Items.Clear()
+
+            # Add "All" option
+            $allConfigItem = New-Object System.Windows.Controls.ComboBoxItem
+            $allConfigItem.Content = "All Configurations"
+            $allConfigItem.Tag = "ALL_CONFIGURATIONS"
+            [void]$configuredComboBox.Items.Add($allConfigItem)
+
+            # Add "Configured" option (cards with "Saved" tag)
+            $configuredItem = New-Object System.Windows.Controls.ComboBoxItem
+            $configuredItem.Content = "Configured Only"
+            $configuredItem.Tag = "CONFIGURED"
+            [void]$configuredComboBox.Items.Add($configuredItem)
+
+            # Add "Not Configured" option (cards with null/empty tag)
+            $notConfiguredItem = New-Object System.Windows.Controls.ComboBoxItem
+            $notConfiguredItem.Content = "Not Configured Only"
+            $notConfiguredItem.Tag = "NOT_CONFIGURED"
+            [void]$configuredComboBox.Items.Add($notConfiguredItem)
+
+            # Set default selection to "All"
+            $configuredComboBox.SelectedIndex = 0
+
+            # Add filter event handler
+            $configuredComboBox.Add_SelectionChanged({
+                # Get current criticality from the other dropdown
+                $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+                $criticality = if ($criticalityComboBox -and $criticalityComboBox.SelectedItem) {
+                    $criticalityComboBox.SelectedItem.Tag
+                } else {
+                    "ALL_BASELINES"
+                }
+                Set-SearchAndFilter -TabType $tabType -Criticality $criticality -ConfigurationStatus $this.SelectedItem.Tag
+            }.GetNewClosure())
+
+            Write-DebugOutput -Message "Configuration status filter initialized for $tabType" -Source $MyInvocation.MyCommand -Level "Info"
+        }
 
     }#end foreach
 
@@ -214,17 +286,27 @@ Function Set-SearchAndFilter {
     .SYNOPSIS
     Applies search and filter criteria to policy cards.
     .DESCRIPTION
-    This Function filters the display of policy cards based on search text and criticality selection.
+    This Function filters the display of policy cards based on search text, criticality selection, and configuration status.
     #>
     param(
         [string]$TabType,
-        [string]$Criticality = "ALL_BASELINES"  # Default to showing all baselines
+        [string]$Criticality = "ALL_BASELINES",  # Default to showing all baselines
+        [string]$ConfigurationStatus = "ALL_CONFIGURATIONS"  # Default to showing all configurations
     )
 
     # Get search criteria
     $searchTextBox = $syncHash."$($TabType)Search_TextBox"
-    #$criticalityComboBox = $syncHash."$($TabType)Criticality_ComboBox"
+    $criticalityComboBox = $syncHash."$($TabType)Criticality_ComboBox"
+    $configuredComboBox = $syncHash."$($TabType)Configured_ComboBox"
     $resultCountTextBlock = $syncHash."$($TabType)ResultCount_TextBlock"
+
+    # Get current filter values if not provided as parameters
+    if ($Criticality -eq "ALL_BASELINES" -and $criticalityComboBox -and $criticalityComboBox.SelectedItem) {
+        $Criticality = $criticalityComboBox.SelectedItem.Tag
+    }
+    if ($ConfigurationStatus -eq "ALL_CONFIGURATIONS" -and $configuredComboBox -and $configuredComboBox.SelectedItem) {
+        $ConfigurationStatus = $configuredComboBox.SelectedItem.Tag
+    }
 
     $searchText = ""
     # Only use search text if not in placeholder mode
@@ -232,7 +314,7 @@ Function Set-SearchAndFilter {
         $searchText = $searchTextBox.Text.Trim()
     }
 
-    Write-DebugOutput -Message "Applying filter: Search='$searchText', Criticality='$Criticality'" -Source $MyInvocation.MyCommand -Level "Verbose"
+    Write-DebugOutput -Message "Applying filter: Search='$searchText', Criticality='$Criticality', ConfigurationStatus='$ConfigurationStatus'" -Source $MyInvocation.MyCommand -Level "Verbose"
 
     # Apply filter to each product tab
     $productTabControl = $syncHash."$($TabType)ProductTabControl"
@@ -293,7 +375,7 @@ Function Set-SearchAndFilter {
             }
 
             try {
-                $shouldShow = Test-SearchAndFilter -Card $card -SearchText $searchText -Criticality $Criticality
+                $shouldShow = Test-SearchAndFilter -Card $card -SearchText $searchText -Criticality $Criticality -ConfigurationStatus $ConfigurationStatus
 
                 if ($shouldShow) {
                     $card.Visibility = [System.Windows.Visibility]::Visible
@@ -347,14 +429,16 @@ Function Test-SearchAndFilter {
     .SYNOPSIS
     Tests if a policy card matches the current search and filter criteria.
     .DESCRIPTION
-    This Function evaluates whether a policy card should be visible based on search text and criticality filter.
+    This Function evaluates whether a policy card should be visible based on search text, criticality filter, and configuration status.
     Assumes the card Tag property contains baseline data with id, name, criticality, and rationale properties.
+    Card objects themselves may have configuration status information (e.g., "Saved" tag for configured cards).
     #>
     param(
         [Parameter(Mandatory=$true)]
         [System.Windows.FrameworkElement]$Card,  # Changed from Border to FrameworkElement to be more flexible
         [string]$SearchText,
-        [string]$Criticality
+        [string]$Criticality,
+        [string]$ConfigurationStatus = "ALL_CONFIGURATIONS"
     )
 
     # Safety check - return true if window is closing or card is invalid
@@ -406,6 +490,180 @@ Function Test-SearchAndFilter {
             # Show only cards that match the selected criticality
             if ($cardData.criticality -ne $Criticality) {
                 return $false
+            }
+        }
+
+        # Apply configuration status filter
+        if (![string]::IsNullOrWhiteSpace($ConfigurationStatus) -and $ConfigurationStatus -ne "ALL_CONFIGURATIONS") {
+            # Check if the card object has configuration status information
+            $isConfigured = $false
+
+            # Method 1: Check if the card itself has any "Saved" indicators
+            # This could be in the card's Tag, Name, or other properties
+            if ($Card.Tag -and ($Card.Tag -eq "Saved")) {
+                $isConfigured = $true
+            }
+
+            # Method 2: Look for CheckBox controls within the card that have "Saved" tag
+            # This is the primary way the app marks configured policies
+            if (-not $isConfigured) {
+                try {
+                    # Function to recursively search for CheckBox with "Saved" tag
+                    function Find-SavedCheckBox($element) {
+                        if (-not $element) {
+                            return $false
+                        }
+
+                        # Check if this element is a CheckBox with "Saved" tag
+                        if ($element -is [System.Windows.Controls.CheckBox]) {
+                            if ($element.Tag -eq "Saved") {
+                                return $true
+                            }
+                            # Debug: Log all checkboxes found
+                            Write-DebugOutput -Message "Found CheckBox with Tag: '$($element.Tag)'" -Source "Find-SavedCheckBox" -Level "Debug"
+                        }
+
+                        # Search in child elements using direct property access
+                        # Skip LogicalTreeHelper.GetChildren() as it doesn't work properly in PowerShell
+
+                        # Try visual tree for more complex layouts
+                        try {
+                            if ($element -is [System.Windows.DependencyObject]) {
+                                $childCount = [System.Windows.Media.VisualTreeHelper]::GetChildrenCount($element)
+                                for ($i = 0; $i -lt $childCount; $i++) {
+                                    $child = [System.Windows.Media.VisualTreeHelper]::GetChild($element, $i)
+                                    if (Find-SavedCheckBox $child) {
+                                        return $true
+                                    }
+                                }
+                            }
+                        } catch {
+                            # Visual tree navigation failed
+                            return $false
+                        }
+
+                        # For Panel controls, try the Children collection
+                        try {
+                            if ($element -is [System.Windows.Controls.Panel] -and $element.Children) {
+                                foreach ($child in $element.Children) {
+                                    if (Find-SavedCheckBox $child) {
+                                        return $true
+                                    }
+                                }
+                            }
+                        } catch {
+                            # Panel children access failed
+                            return $false
+                        }
+
+                        # For ContentControl (like Border), check Content property
+                        try {
+                            if ($element -is [System.Windows.Controls.ContentControl] -and $element.Content -and $element.Content -ne $element) {
+                                if (Find-SavedCheckBox $element.Content) {
+                                    return $true
+                                }
+                            }
+                        } catch {
+                            # Content access failed
+                            return $false
+                        }
+
+                        return $false
+                    }
+
+                    $isConfigured = Find-SavedCheckBox $Card
+
+                } catch {
+                    # If there's an error searching for saved checkboxes, assume not configured
+                    Write-DebugOutput -Message "Error checking configuration status: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Debug"
+                    $isConfigured = $false
+                }
+            }
+
+            <# Method 3: Check if the card has visible configuration data
+            # Look for any TextBox, ComboBox, or other input controls with non-default values
+            if (-not $isConfigured) {
+                try {
+                    function Find-ConfiguredInputs($element) {
+                        if (-not $element) {
+                            return $false
+                        }
+
+                        # Check for TextBox with non-empty, non-placeholder text
+                        if ($element -is [System.Windows.Controls.TextBox]) {
+                            if (-not [string]::IsNullOrWhiteSpace($element.Text) -and
+                                $element.Text -notlike "*placeholder*" -and
+                                $element.Text -notlike "*Enter*" -and
+                                $element.Text -notlike "*Type*") {
+                                return $true
+                            }
+                        }
+
+                        # Check for ComboBox with selected items
+                        if ($element -is [System.Windows.Controls.ComboBox]) {
+                            if ($element.SelectedIndex -gt 0 -or $element.SelectedItem) {
+                                return $true
+                            }
+                        }
+
+                        # Check for CheckBox that's checked (but not the main policy checkbox)
+                        if ($element -is [System.Windows.Controls.CheckBox] -and $element.IsChecked -eq $true) {
+                            # Skip the main policy checkbox (usually has different styling)
+                            if (-not ($element.Name -like "*Policy*" -or $element.Style -and $element.Style.TargetType -eq [System.Windows.Controls.CheckBox])) {
+                                return $true
+                            }
+                        }
+
+                        # Recursively check children (simplified version)
+                        try {
+                            if ($element -is [System.Windows.Controls.Panel] -and $element.Children) {
+                                foreach ($child in $element.Children) {
+                                    if (Find-ConfiguredInputs $child) {
+                                        return $true
+                                    }
+                                }
+                            }
+
+                            if ($element -is [System.Windows.Controls.ContentControl] -and $element.Content -and $element.Content -ne $element) {
+                                if (Find-ConfiguredInputs $element.Content) {
+                                    return $true
+                                }
+                            }
+                        } catch {
+                            # Ignore errors in recursion
+                            return $false
+                        }
+
+                        return $false
+                    }
+
+                    $isConfigured = Find-ConfiguredInputs $Card
+
+                } catch {
+                    # If there's an error checking for configured inputs, assume not configured
+                    Write-DebugOutput -Message "Error checking for configured inputs: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Debug"
+                    $isConfigured = $false
+                }
+            }
+            #>
+
+            # Debug logging to understand what's happening
+            if ($cardData.id) {
+                Write-DebugOutput -Message "Card $($cardData.id): isConfigured = $isConfigured, requested filter = $ConfigurationStatus" -Source $MyInvocation.MyCommand -Level "Debug"
+            }
+
+            # Apply the filter
+            switch ($ConfigurationStatus) {
+                "CONFIGURED" {
+                    if (-not $isConfigured) {
+                        return $false
+                    }
+                }
+                "NOT_CONFIGURED" {
+                    if ($isConfigured) {
+                        return $false
+                    }
+                }
             }
         }
 

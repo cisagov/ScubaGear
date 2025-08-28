@@ -227,6 +227,14 @@ Function Update-ProductNameCheckboxFromData{
 
         # Apply initial filters now that cards are created
         if ($productsToSelect.Count -gt 0 -and $syncHash.UIConfigs.EnableSearchAndFilter) {
+            # Update criticality dropdowns now that baselines are loaded
+            try {
+                Update-CriticalityDropdowns
+                Write-DebugOutput -Message "Updated criticality dropdowns after baseline loading" -Source $MyInvocation.MyCommand -Level "Info"
+            } catch {
+                Write-DebugOutput -Message "Error updating criticality dropdowns: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+            }
+
             # Trigger initial filter for all tab types after a brief delay to ensure cards are rendered
             $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action]{
                 try {

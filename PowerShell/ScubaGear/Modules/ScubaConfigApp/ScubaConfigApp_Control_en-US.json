@@ -1,14 +1,17 @@
 {
   "DebugMode": true,
   "AutoSaveProgress": false,
-  "EnableSearchAndFilter": false,
+  "EnableSearchAndFilter": true,
   "EnableScubaRun": true,
   "EnableResultReader": true,
   "MinimumProductsRequired": 1,
   "MaximumResults": 10,
+  "PullOnlineBaselines": true,
+  "OnlineBaselineMarkdownURL": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines",
+  "OnlineBaselineJsonURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/856-adding-a-gui-to-scubagear/PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaBaselines_en-US.json",
   "localeContext": {
-    "Title_TextBlock": "Scuba Configuration Editor",
-    "SubTitle_TextBlock": "Create a ScubaGear configuration file for exclusions, annotations, and omissions",
+    "Title_TextBlock": "SCuBAGear Configuration Editor",
+    "SubTitle_TextBlock": "Create a configuration file for SCuBAGear exclusions, annotations, and omissions baseline controls",
     "M365Environment_TextBlock": "Select your M365 Environment",
     "Products_TextBlock": "Select at least one product:",
     "ExclusionsProducts_TextBlock": "Products supporting exclusions:",
@@ -24,7 +27,7 @@
   "localePlaceholder": {
     "Organization_TextBox": "Enter tenant name (e.g., example.onmicrosoft.com)",
     "OrgName_TextBox": "Enter organization name",
-    "OrgUnitName_TextBox": "Enter organizational unit (optional)",
+    "OrgUnitName_TextBox": "Enter organizational unit name",
     "Description_TextBox": "Enter a description for this configuration (optional)",
     "AppId_TextBox": "Enter Application ID (GUID format)",
     "CertificateThumbprint_TextBox": "Enter Certificate Thumbprint (40 hexadecimal)",
@@ -33,6 +36,29 @@
     "AllCriticality_ComboBox": "All Criticality",
     "CriticalityFilter_ComboBox": "{0} only",
     "ResultCount_TextBlock": "{0} policies"
+  },
+  "localeTitles": {
+    "DuplicateEntry": "Duplicate Entry",
+    "Success": "Success",
+    "ValidationError": "Validation Error",
+    "ConfirmRemove": "Confirm Remove",
+    "Error": "Error",
+    "Information": "Information",
+    "Warning": "Warning",
+    "Confirmation": "Confirmation",
+    "RequiredFieldsMissing": "Required Fields Missing",
+    "GraphError": "Graph Error",
+    "ExportDebugLog": "Export Debug Log",
+    "ExportSanitizedDebugLog": "Export Sanitized Debug Log",
+    "ExportSuccessful": "Export Successful",
+    "ExportError": "Export Error",
+    "SessionRestored": "Session Restored",
+    "ConfigurationViewer": "Configuration Viewer",
+    "ReportNotFound": "Report Not Found",
+    "ConfigurationViewerError": "Configuration Viewer Error",
+    "ConnectionError": "Connection Error",
+    "NoSelection": "No Selection",
+    "DebugWindowError": "Debug Window Error"
   },
   "localeInfoMessages": {
     "NoPoliciesAvailable": "No policies available for this product.",
@@ -72,7 +98,17 @@
     "CertificateSelectionError": "Certificate selection error: {0}",
     "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid.",
     "ScubRunIncomplete": "Configuration incomplete - check Main tab",
-    "ScubRunConfigFailed": "Failed to generate temporary configuration"
+    "ScubRunConfigFailed": "Failed to generate temporary configuration",
+    "GraphConnectionError": "Microsoft Graph is not connected. Please check your connection and try again.",
+    "PleaseSelectItem": "Please select an item.",
+    "ConfigurationFileNotFound": "Configuration file not found: {0}",
+    "ConfigurationViewerError": "Error opening configuration viewer: {0}",
+    "ConfigurationFileNotFoundInResults": "Configuration file not found in results folder: {0}",
+    "NoConfigurationFileAvailable": "No configuration file available. Run ScubaGear first to generate a configuration file.",
+    "HtmlReportNotFound": "HTML report not found in folder.",
+    "FailedToOpenDebugWindow": "Failed to open debug window: {0}",
+    "ConfigurationCopiedToClipboard": "Configuration copied to clipboard",
+    "FailedToCopyToClipboard": "Failed to copy to clipboard: {0}"
   },
   "localePopupMessages": {
     "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
@@ -105,6 +141,38 @@
     "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
     "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
   },
+
+  "localeStatusMessages": {
+    "GraphConnected": "Graph Connected",
+    "GraphDisconnected": "Graph Disconnected",
+    "DebugLogExported": "Debug log exported to: {0}",
+    "SanitizedLogExported": "Sanitized debug log exported to {0}, mapping file: {1}",
+    "DebugLogExportedNoSensitiveData": "Debug log exported (no sensitive data found): {0}",
+    "ExportFailed": "Export failed: {0}",
+    "SessionRestored": "Session restored successfully from: {0}",
+    "SessionRestoreCompleted": "Session restore completed.",
+    "NoSearchText": "No text to search",
+    "RestoreFrom": "Restore from: {0}",
+    "ChangelogSource": "Source: {0}"
+  },
+  "localeYamlComments": {
+    "ConfigurationFile": "# ScubaGear Configuration File",
+    "GeneratedOn": "# Generated on: {0}",
+    "OrganizationConfiguration": "# Organization Configuration",
+    "ConfigurationDetails": "# Configuration Details",
+    "AdvancedSettings": "# Advanced Settings",
+    "GlobalSettings": "# Global Settings",
+    "BaselineControl": "#  Baseline Control: {0}"
+  },
+  "localeProgressMessages": {
+    "SanitizedDebugLogExportSuccess": "Sanitized debug log exported successfully!\n\nLog file: {0}\nMapping file: {1}\n\nThe mapping file contains the correlation between original and sanitized values for troubleshooting purposes.",
+    "DebugLogExportSuccess": "Debug log exported successfully to:\n{0}",
+    "DebugLogExportNoSensitiveData": "Debug log exported successfully to:\n{0}\n\nNo sensitive data was detected for sanitization.",
+    "DebugLogExportError": "Error exporting debug log: {0}",
+    "SessionRestoreSuccess": "Previous session restored successfully! Restored {0} policies and {1} settings configurations.",
+    "SessionRestoreFinalize": "Finalizing restore...",
+    "SessionRestoreStatus": "Session restored successfully"
+  },
   "localeHelpTips": {
     "Organization_HelpLabel": {
         "Title" : "Organization Domain",
@@ -121,23 +189,30 @@
         "Content" : "Enter the name of your organization. This is used for documentation purposes.",
         "AdditionalSections": {
             "Example" : "Contoso Ltd.",
-            "Required" : "This option is required for BOD submissions",
+            "Required" : "This option is required for SCuBA Compliance & BOD submissions",
             "Note" : "This will be included in the configuration file"
         },
         "Placement": "Right"
+    },
+    "OrgUnitName_HelpLabel": {
+        "Title" : "Organization Unit Name",
+        "Content" : "Enter the name of your organization subunit. This is used for documentation purposes.",
+        "AdditionalSections": {
+            "Example" : "Office of IT",
+            "Required" : "This option is required for SCuBA Compliance & BOD submissions",
+            "Note" : "This will be included in the configuration file"
+        },
+        "Placement": "Right"
+    },
+    "ProductNames_HelpLabel": {
+        "Title": "Product Names",
+        "Content": "Select the products to be included in the configuration.",
+        "AdditionalSections": {
+            "Required": "At least one product must be selected.",
+            "Note": "This will be included in the configuration file"
+        },
+        "Placement": "Right"
     }
-  },
-  "localeTitles": {
-    "DuplicateEntry": "Duplicate Entry",
-    "Success": "Success",
-    "ValidationError": "Validation Error",
-    "ConfirmRemove": "Confirm Remove",
-    "Error": "Error",
-    "Information": "Information",
-    "Warning": "Warning",
-    "Confirmation": "Confirmation",
-    "RequiredFieldsMissing": "Required Fields Missing",
-    "GraphError": "Graph Error"
   },
   "defaultAdvancedSettings": {
     "OutPath_TextBox": ".",
@@ -309,7 +384,7 @@
       "controlType": "Exclusions",
       "dataControlOutput": "ExclusionData",
       "fieldControlName": "exclusionField",
-      "defaultFields": "none",
+      "defaultFields": "None",
       "cardName": "Exclusion",
       "showFieldType": true,
       "showDescription": false,
@@ -321,7 +396,7 @@
       "controlType": "Annotations",
       "dataControlOutput": "AnnotationData",
       "fieldControlName": "annotationField",
-      "defaultFields": "annotation",
+      "defaultFields": "Annotations",
       "cardName": "Annotate",
       "showFieldType": false,
       "showDescription": true,
@@ -333,7 +408,7 @@
       "controlType": "Omissions",
       "dataControlOutput": "OmissionData",
       "fieldControlName": "omissionField",
-      "defaultFields": "omissions",
+      "defaultFields": "Omissions",
       "cardName": "Omit",
       "showFieldType": false,
       "showDescription": true,
@@ -424,7 +499,7 @@
     ]
   },
   "inputTypes": {
-    "capolicy": {
+    "CapExclusions": {
       "name": "Conditional Access Policy Excluded Groups and Users",
       "value": "CapExclusions",
       "description": "Exclude specific groups or users from conditional access policies",
@@ -447,7 +522,7 @@
         }
       ]
     },
-    "role": {
+    "RoleExclusions": {
       "name": "Privilege Identity Management Excluded Roles",
       "value": "RoleExclusions",
       "description": "Exclude specific groups or users from role requirements",
@@ -470,7 +545,7 @@
         }
       ]
     },
-    "sensitiveAccounts": {
+    "SensitiveAccounts": {
       "name": "Sensitive Accounts",
       "value": "SensitiveAccounts",
       "description": "Defines sensitive accounts filters used to select accounts to assign to the strict preset security policy",
@@ -525,7 +600,7 @@
         }
       ]
     },
-    "sensitiveUsers": {
+    "SensitiveUsers": {
       "name": "Defender's Sensitive Users",
       "value": "SensitiveUsers",
       "description": "Defines sensitive user accounts by display name and email address",
@@ -540,7 +615,7 @@
         }
       ]
     },
-    "partnerDomains": {
+    "PartnerDomains": {
       "name": "Partner Domains",
       "value": "PartnerDomains",
       "description": "Defines a list of frequent partner domain names",
@@ -555,7 +630,7 @@
         }
       ]
     },
-    "forwardingDomains": {
+    "AllowedForwardingDomains": {
       "name": "Allowed Forwarding Domains",
       "value": "",
       "description": "Domains allowed for automatic email forwarding",
@@ -570,7 +645,7 @@
         }
       ]
     },
-    "agencyDomains": {
+    "AgencyDomains": {
       "name": "Agency Domains",
       "value": "AgencyDomains",
       "description": "Defines a list of agency domain names that should be specified",
@@ -615,7 +690,7 @@
         }
       ]
     },
-    "annotation": {
+    "Annotations": {
       "name": "Annotation",
       "value": "AnnotatePolicy",
       "description": "Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.",
@@ -648,7 +723,7 @@
         }
       ]
     },
-    "omissions": {
+    "Omissions": {
       "name": "Omissions",
       "Value": "OmitPolicy",
       "description": "Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.",
@@ -745,8 +820,16 @@
       "sensitive": false
     },
     "orgName": {
-      "pattern": "^[a-zA-Z0-9.-]+$",
-      "sample": "example",
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Department of Example",
+      "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "orgUnitName": {
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Division of Example",
       "format": "example",
       "invalidScriptMessage": "",
       "invalidScriptChecks": [],

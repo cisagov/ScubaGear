@@ -11,14 +11,19 @@ Function Get-UIConfigCriticalValues {
 
     $criticalityValues = @()
 
-    foreach ($productBaselines in $syncHash.Baselines.PSObject.Properties) {
-        foreach ($baseline in $productBaselines.Value) {
+    foreach ($productBaselines in $syncHash.Baselines.PSObject.Properties)
+    {
+        Write-DebugOutput -Message "Scanning product baselines for criticality values" -Source $MyInvocation.MyCommand -Level "Debug"
+        foreach ($baseline in $productBaselines.Value)
+        {
             if ($baseline.criticality -and $baseline.criticality -notin $criticalityValues) {
+                Write-DebugOutput -Message "Found unique criticality value: $($baseline.criticality)" -Source $MyInvocation.MyCommand -Level "Debug"
                 $criticalityValues += $baseline.criticality
             }
         }
     }
 
+    Write-DebugOutput -Message "Found criticality values: $($criticalityValues -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
     return $criticalityValues | Sort-Object
 }
 # Helper Function to find controls in a container

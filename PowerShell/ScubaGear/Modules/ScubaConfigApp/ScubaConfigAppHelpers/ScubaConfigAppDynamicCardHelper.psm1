@@ -1554,17 +1554,13 @@ Function New-FieldListCard {
              # Show save indicator (check)
             $headerGrid = $detailsPanel.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
             $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
-            if ($checkbox) {
-                $checkbox.Tag = "Saved"
-            }
+            $checkbox.Tag = "Saved"
             $checkbox.IsChecked = $false
         } else {
             # Remove save indicator if no data was saved
             $headerGrid = $detailsPanel.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
             $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
-            if ($checkbox) {
-                $checkbox.Tag = $null
-            }
+            $checkbox.Tag = $null
             # More specific error message about why no data was saved
             $errorMessage = "No valid data was found to save for $CardName fields. Please ensure all required fields are completed and all field values follow the correct format."
             Write-DebugOutput -Message ("No entries found for {0} fields: {1}" -f $CardName.ToLower(), $inputData) -Source $this.Name -Level "Error"
@@ -1730,9 +1726,7 @@ Function New-FieldListCard {
              # Clear the save indicator and hide remove button
             $headerGrid = $this.Parent.Parent.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
             $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
-            if ($checkbox) {
-                $checkbox.Tag = $null
-            }
+            $checkbox.Tag = $null
 
             # Remove the bold formatting from policy header
             $policyInfoStack = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "StackPanel" }

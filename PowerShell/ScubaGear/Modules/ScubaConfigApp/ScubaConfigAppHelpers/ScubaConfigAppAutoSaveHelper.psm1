@@ -596,15 +596,15 @@ Function Restore-AutoSaveWithProgress {
         }
 
         # Step 4: Final processing
-        $progress.UpdateMessage.Invoke("Finalizing restore...", "Session restored successfully")
+        $progress.UpdateMessage.Invoke($syncHash.UIConfigs.localeProgressMessages.SessionRestoreFinalize, $syncHash.UIConfigs.localeProgressMessages.SessionRestoreStatus)
         Start-Sleep -Milliseconds 300
 
         Write-DebugOutput -Message "AutoSave restoration with progress completed successfully" -Source $MyInvocation.MyCommand -Level "Info"
 
         # Show completion message
         $syncHash.ShowMessageBox.Invoke(
-            "Previous session restored successfully! Restored $($policyFiles.Count) policies and $($settingsFiles.Count) settings configurations.",
-            "Session Restored",
+            $syncHash.UIConfigs.localeProgressMessages.SessionRestoreSuccess -f $policyFiles.Count, $settingsFiles.Count,
+            $syncHash.UIConfigs.localeTitles.SessionRestored,
             "OK",
             "Information"
         )

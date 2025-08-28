@@ -76,6 +76,7 @@ Function Add-ToolTipHoverPopup {
         # Title paragraph
         $titleParagraph = New-Object System.Windows.Documents.Paragraph
         $titleParagraph.Margin = "0,0,0,8"
+        $titleParagraph.TextAlignment = "Left"
         $titleRun = New-Object System.Windows.Documents.Run
         $titleRun.Text = $Title
         $titleRun.FontWeight = "Bold"
@@ -87,6 +88,7 @@ Function Add-ToolTipHoverPopup {
         # Content paragraph
         $contentParagraph = New-Object System.Windows.Documents.Paragraph
         $contentParagraph.Margin = "0,0,0,8"
+        $contentParagraph.TextAlignment = "Left"
         $contentRun = New-Object System.Windows.Documents.Run
         $contentRun.Text = $Content
         $contentParagraph.AddChild($contentRun)
@@ -96,6 +98,7 @@ Function Add-ToolTipHoverPopup {
         foreach ($sectionTitle in $AdditionalSections.Keys) {
             $sectionParagraph = New-Object System.Windows.Documents.Paragraph
             $sectionParagraph.Margin = "0,4,0,4"
+            $sectionParagraph.TextAlignment = "Left"
 
             # Section title
             $sectionTitleRun = New-Object System.Windows.Documents.Run
@@ -124,6 +127,7 @@ Function Add-ToolTipHoverPopup {
         $titleBlock.FontSize = 14
         $titleBlock.Foreground = $syncHash.Window.FindResource("PrimaryBrush")
         $titleBlock.Margin = "0,0,0,8"
+        $titleBlock.TextAlignment = "Left"
         [void]$contentStack.Children.Add($titleBlock)
 
         # Content
@@ -131,6 +135,7 @@ Function Add-ToolTipHoverPopup {
         $contentBlock.Text = $Content
         $contentBlock.FontSize = 12
         $contentBlock.TextWrapping = "Wrap"
+        $contentBlock.TextAlignment = "Left"
         $contentBlock.Foreground = $syncHash.Window.FindResource("TextBrush")
         [void]$contentStack.Children.Add($contentBlock)
 
