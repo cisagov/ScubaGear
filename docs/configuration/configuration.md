@@ -159,7 +159,7 @@ The `AnnotatePolicy` top-level key, shown in this [example ScubaGear configurati
 For each annotated policy, the config file allows you to indicate the following:
 - `IncorrectResult`: Boolean, whether or not to mark the result incorrect. Optional, defaults to false.
 - `Comment`: The annotation to add to the report. A warning will be printed if control is marked incorrect with no comment provided as justification.
-- `RemediationDate`: Optional. The date a failing control is anticipated to be implemented. The expected format is yyy-mm-dd.
+- `RemediationDate`: Optional. The date a failing control is anticipated to be implemented. The expected format is yyyy-mm-dd.
 
 **Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.**
 
