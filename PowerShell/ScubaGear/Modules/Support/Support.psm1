@@ -274,7 +274,8 @@ function Install-OPAforSCuBA {
 
     # Constants
     $ACCEPTABLEVERSIONS = '0.69.0', '0.70.0', '1.0.1', '1.1.0', '1.2.0',
-    '1.3.0', '1.4.2', '1.5.0', '1.6.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
+    '1.3.0', '1.4.2', '1.5.0', '1.6.0',
+    '1.7.1', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
     $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
 
     # Set preferences for writing messages
