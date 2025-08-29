@@ -213,7 +213,7 @@ AnnotatePolicy:
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1:
     Comment: Implementation in progress.
-    RemediationDate: 12/1/2025
+    RemediationDate: 2025-12-01
   # -------------------------------------
   # ANNOTATEPOLICY : EXO SAMPLE
   # -------------------------------------
