@@ -337,8 +337,8 @@ function New-Report {
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
-                    "OriginalResult"="N/A"
-                    "OriginalDetails"="N/A"
+                    "OriginalResult"=$Result.DisplayString
+                    "OriginalDetails"=$OriginalDetails
                     "Comments"=$Comments
                     "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                 }
@@ -346,18 +346,20 @@ function New-Report {
             else {
                 # The test result is missing
                 $ReportSummary.Errors += 1
+                $ControlResult = "Error - Test results missing"
+                $ControlDetails = "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= "Error - Test results missing"
+                    "Result"= $ControlResult
                     "Criticality"= "-"
-                    "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                    "Details"= $ControlDetails
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
-                    "OriginalResult"="N/A"
-                    "OriginalDetails"="N/A"
+                    "OriginalResult"=$ControlResult
+                    "OriginalDetails"=$ControlDetails
                     "Comments"=$Comments
                     "AnnotationRemediationDate"="N/A"
                     "OmissionExpirationDate"="N/A"
