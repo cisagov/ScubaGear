@@ -255,8 +255,11 @@ function New-Report {
 
                 # Declare annotation fields at the top level. If they exist, these fields need to be included 
                 # in the control object regardless if the control is omitted, incorrect, or normal
-                $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                 $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
+
+                $Comments = @()
+                if (-not [string]::IsNullOrEmpty($PolicyComment)) { $Comments += $PolicyComment }
 
                 # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
@@ -264,6 +267,9 @@ function New-Report {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
                     $OmitExpiration = $Config.OmitPolicy.$($Control.Id).Expiration
+
+                    if(-not [string]::IsNullOrEmpty($OmitRationale)) { $Comments += $OmitRationale }
+
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
                         $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
@@ -283,10 +289,8 @@ function New-Report {
                         "IncorrectDetails"="N/A"
                         "OriginalResult"=$Result.DisplayString
                         "OriginalDetails"=$OriginalDetails
-                        "AnnotationComment"= if ([string]::IsNullOrEmpty($UserComment)) {"N/A"} else {$UserComment}
-                        "AnnotationRemediationDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
-                        "OmissionComment"=$OmitRationale
-                        "OmissionExpirationDate"=$OmitExpiration
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($OmitExpiration)) {"N/A"} else {$OmitExpiration}
                     }
                     continue
                 }
@@ -315,10 +319,8 @@ function New-Report {
                         "IncorrectDetails"=$OriginalDetails
                         "OriginalResult"=$Result.DisplayString
                         "OriginalDetails"=$OriginalDetails
-                        "AnnotationComment"=$UserComment
-                        "AnnotationRemediationDate"=$RemediationDate
-                        "OmissionComment"="N/A"
-                        "OmissionExpirationDate"="N/A"
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                     }
                     continue
                 }
@@ -337,10 +339,8 @@ function New-Report {
                     "IncorrectResultDetails"="N/A"
                     "OriginalResult"="N/A"
                     "OriginalDetails"="N/A"
-                    "AnnotationComment"= if ([string]::IsNullOrEmpty($UserComment)) {"N/A"} else {$UserComment}
-                    "AnnotationRemediationDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
-                    "OmissionComment"="N/A"
-                    "OmissionExpirationDate"="N/A"
+                    "Comments"=$Comments
+                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                 }
             }
             else {
@@ -358,9 +358,8 @@ function New-Report {
                     "IncorrectResultDetails"="N/A"
                     "OriginalResult"="N/A"
                     "OriginalDetails"="N/A"
-                    "AnnotationComment"="N/A"
+                    "Comments"=$Comments
                     "AnnotationRemediationDate"="N/A"
-                    "OmissionComment"="N/A"
                     "OmissionExpirationDate"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
@@ -400,7 +399,7 @@ function New-Report {
     # Craft the json report
     $ReportJson.ReportSummary = $ReportSummary
     $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
-    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 5
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 10
 
     # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
     # Convert those back to ASCII.
