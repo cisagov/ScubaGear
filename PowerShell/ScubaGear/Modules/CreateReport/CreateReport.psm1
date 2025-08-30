@@ -247,14 +247,29 @@ function New-Report {
 
                 $Config = $SettingsExport.scuba_config
 
+                # Save the original result details before any annotations are added. (Add-Annotation below modifies the contents of the details field)
+                $OriginalDetails = $Result.Details
+
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
+
+                # Declare annotation fields at the top level. If they exist, these fields need to be included 
+                # in the control object regardless if the control is omitted, incorrect, or normal
+                $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
+
+                $Comments = @()
+                if (-not [string]::IsNullOrEmpty($PolicyComment)) { $Comments += $PolicyComment }
 
                 # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
+                    $OmitExpiration = $Config.OmitPolicy.$($Control.Id).Expiration
+
+                    if(-not [string]::IsNullOrEmpty($OmitRationale)) { $Comments += $OmitRationale }
+
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
                         $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
@@ -272,6 +287,10 @@ function New-Report {
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
                         "IncorrectDetails"="N/A"
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$OriginalDetails
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($OmitExpiration)) {"N/A"} else {$OmitExpiration}
                     }
                     continue
                 }
@@ -279,8 +298,6 @@ function New-Report {
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
                 $IncorrectResult = Get-IncorrectResult $Config $Control.Id
                 if ($Result.DisplayString -eq "Fail") {
-                    $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
-                    $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
@@ -299,7 +316,11 @@ function New-Report {
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
-                        "IncorrectDetails"=$Result.Details
+                        "IncorrectDetails"=$OriginalDetails
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$OriginalDetails
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                     }
                     continue
                 }
@@ -316,21 +337,32 @@ function New-Report {
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"=$Result.DisplayString
+                    "OriginalDetails"=$OriginalDetails
+                    "Comments"=$Comments
+                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                 }
             }
             else {
                 # The test result is missing
                 $ReportSummary.Errors += 1
+                $ControlResult = "Error - Test results missing"
+                $ControlDetails = "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= "Error - Test results missing"
+                    "Result"= $ControlResult
                     "Criticality"= "-"
-                    "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                    "Details"= $ControlDetails
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"=$ControlResult
+                    "OriginalDetails"=$ControlDetails
+                    "Comments"=$Comments
+                    "AnnotationRemediationDate"="N/A"
+                    "OmissionExpirationDate"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
@@ -369,7 +401,7 @@ function New-Report {
     # Craft the json report
     $ReportJson.ReportSummary = $ReportSummary
     $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
-    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 5
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 10
 
     # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
     # Convert those back to ASCII.
