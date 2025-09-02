@@ -30,7 +30,7 @@ This configuration file includes the additional `OrgName` and `OrgUnitName` fiel
 
 ```yaml
 OrgName: Department of Example
-OrgUnitName: Subdepartment of Example  
+OrgUnitName: Subdepartment of Example
 ```
 
 ScubaGear can be invoked with this config file:
