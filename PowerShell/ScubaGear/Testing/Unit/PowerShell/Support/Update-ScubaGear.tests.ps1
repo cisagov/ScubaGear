@@ -16,6 +16,14 @@ InModuleScope 'Support' {
             $script:MockNewerVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor + 1).0"
             $script:MockOlderVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor - 1).0"
 
+            # For GitHub container
+            if (-not (Get-Command -Name 'Update-ScubaGearFromPSGallery' -ErrorAction SilentlyContinue)) {
+                function script:Update-ScubaGearFromPSGallery { param($Scope) }
+            }
+            if (-not (Get-Command -Name 'Update-ScubaGearFromGitHub' -ErrorAction SilentlyContinue)) {
+                function script:Update-ScubaGearFromGitHub { }
+            }
+
             # Set up default mocks at BeforeAll level to ensure they're available
             Mock Write-Output { }
             Mock Write-Information { }
@@ -23,7 +31,6 @@ InModuleScope 'Support' {
             Mock Write-Warning { }
             Mock Update-ScubaGearFromPSGallery { }
             Mock Update-ScubaGearFromGitHub { }
-
         }
 
         BeforeEach {

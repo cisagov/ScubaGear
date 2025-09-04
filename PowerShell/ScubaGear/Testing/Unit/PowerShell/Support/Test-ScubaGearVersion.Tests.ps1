@@ -22,6 +22,11 @@ InModuleScope 'Support' {
                 throw "Could not find ScubaGear.psd1 at expected path: $ManifestPath"
             }
 
+            # for GitHub container
+            if (-not (Get-Command -Name 'Get-DependencyStatus' -ErrorAction SilentlyContinue)) {
+                function script:Get-DependencyStatus { }
+            }
+
             $script:MockDependencyModules = @{}
             foreach ($module in $script:ScubaGearModuleList) {
                 # Create a mock version that's within the acceptable range
