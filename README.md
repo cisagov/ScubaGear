@@ -144,6 +144,20 @@ For all other instances:
 Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 ```
 
+### 7: Update ScubaGear
+
+The following will update ScubaGear.
+```powershell
+# The following will update ScubaGear to the latest version
+Update-ScubaGear
+```
+
+The following will baseline all ScubaGear dependencies, please review the [Update Guide](docs/installation/update.md) in detail before running.
+```powershell
+# The follwing will remove and re-install all ScubaGear dependencies
+Reset-ScubaGearDependencies
+```
+
 ## Table of Contents
 
 ### Getting Started
@@ -153,6 +167,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
   - [Install from PSGallery](docs/installation/psgallery.md)
   - [Download from GitHub](docs/installation/github.md)
   - [Uninstall](docs/installation/uninstall.md)
+  - [Update](docs/installation/update.md)
 
  #### Prerequisites
 
