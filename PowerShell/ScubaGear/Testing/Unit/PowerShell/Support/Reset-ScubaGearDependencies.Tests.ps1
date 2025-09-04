@@ -1,4 +1,4 @@
-Import-Module  '..\..\..\..\Modules\Support\Support.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support')
 
 InModuleScope 'Support' {
     Describe "Reset-ScubaGearDependencies" {
