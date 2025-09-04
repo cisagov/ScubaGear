@@ -18,7 +18,7 @@ InModuleScope 'Support' {
 
             # For GitHub container
             if (-not (Get-Command -Name 'Update-ScubaGearFromPSGallery' -ErrorAction SilentlyContinue)) {
-                function script:Update-ScubaGearFromPSGallery { param($Scope) }
+                function script:Update-ScubaGearFromPSGallery { }
             }
             if (-not (Get-Command -Name 'Update-ScubaGearFromGitHub' -ErrorAction SilentlyContinue)) {
                 function script:Update-ScubaGearFromGitHub { }
