@@ -29,7 +29,10 @@ InModuleScope 'Support' {
             Mock Write-Information { }
             Mock Write-Error { }
             Mock Write-Warning { }
-            Mock Update-ScubaGearFromPSGallery { }
+            Mock Update-ScubaGearFromPSGallery {
+                param($Scope)
+                $null = $Scope  # Satisfy PSScriptAnalyzer
+            }
             Mock Update-ScubaGearFromGitHub { }
         }
 
@@ -38,7 +41,10 @@ InModuleScope 'Support' {
             Mock Write-Information { }
             Mock Write-Error { }
             Mock Write-Warning { }
-            Mock Update-ScubaGearFromPSGallery { }
+            Mock Update-ScubaGearFromPSGallery {
+                param($Scope)
+                $null = $Scope  # Satisfy PSScriptAnalyzer
+            }
             Mock Update-ScubaGearFromGitHub { }
         }
 
