@@ -1006,11 +1006,6 @@ function Test-ScubaGearVersion {
         [switch]$CheckGitHub
     )
 
-    # Check PowerShell version first
-    if ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1) {
-        Write-Warning "This function requires Windows PowerShell 5.1. Current version: $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
-    }
-
     try {
         $modules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
         $latest = Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction SilentlyContinue
@@ -1318,11 +1313,6 @@ function Update-ScubaGear {
         [string]$Scope = 'CurrentUser'
     )
 
-    # Check PowerShell version
-    if ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1) {
-        throw "This function requires Windows PowerShell 5.1. Current version: $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
-    }
-
     Write-Output "Updating ScubaGear from $Source..."
 
     try {
@@ -1369,11 +1359,6 @@ function Reset-ScubaGearDependencies {
         [ValidateSet('CurrentUser','AllUsers')]
         [string]$Scope = 'CurrentUser'
     )
-
-    # Check PowerShell version
-    if ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1) {
-        throw "This function requires Windows PowerShell 5.1. Current version: $($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor)"
-    }
 
     $result = [PSCustomObject]@{
         Status = "Success"

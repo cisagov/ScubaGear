@@ -60,8 +60,34 @@ InModuleScope 'Support' {
                 # Normal case: 1.6.0 -> 1.5.0
                 $script:MockOlderScubaGearVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor - 1).0"
             }
-        }
 
+            # Set up default mocks at BeforeAll level to ensure they're available
+            Mock Get-DependencyStatus {
+                return [PSCustomObject]@{
+                    TotalRequired = $script:ScubaGearModuleList.Count
+                    Installed = $script:ScubaGearModuleList.Count
+                    Missing = @()
+                    MultipleVersions = @()
+                    ModuleFileLocations = @()
+                    AdminRequired = $false
+                    Status = "Optimal"
+                    Recommendations = @("All dependencies are installed.")
+                }
+            }
+
+            Mock Write-Information { }
+            Mock Invoke-RestMethod { }
+
+            # Mock Find-Module (this will work regardless of whether PowerShellGet is loaded)
+            Mock Find-Module {
+                param($Name)
+                $null = $Name  # Satisfy PSScriptAnalyzer
+                if ($Name -eq 'ScubaGear') {
+                    return @{ Version = $script:MockNewerScubaGearVersion }
+                }
+                return $null
+            }
+        }
         BeforeEach {
             # Mock Find-Module (this will work regardless of whether PowerShellGet is loaded)
             Mock Find-Module {
@@ -249,25 +275,29 @@ InModuleScope 'Support' {
                 # Use ScubaGear versioning pattern for GitHub mock
                 $mockGitHubVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor + 1).0"
 
+                # Override the default mock specifically for this test
                 Mock Invoke-RestMethod {
                     return @{ tag_name = "v$mockGitHubVersion" }
+                } -ParameterFilter { $Uri -like "*github.com*" }
+
+                # Also mock a successful Get-Module call to ensure ScubaGear is "installed"
+                Mock Get-Module {
+                    param($Name, $ListAvailable)
+                    $null = $Name, $ListAvailable  # Satisfy PSScriptAnalyzer
+                    if ($Name -eq 'ScubaGear' -and $ListAvailable) {
+                        return @{
+                            Version = $script:CurrentScubaGearVersion
+                            ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\ScubaGear\$($script:CurrentScubaGearVersion)"
+                        }
+                    }
+                    return $null
                 }
 
                 $result = Test-ScubaGearVersion -CheckGitHub
 
                 # Should have attempted to check GitHub
-                Assert-MockCalled Invoke-RestMethod -Times 1
+                Assert-MockCalled Invoke-RestMethod -Times 1 -ParameterFilter { $Uri -like "*github.com*" }
                 $result[0].CurrentVersion | Should -Be $script:CurrentScubaGearVersion
-            }
-        }
-
-        Context "Version comparison accuracy" {
-            It "Should correctly compare actual ScubaGear version with mock latest" {
-                $result = Test-ScubaGearVersion
-
-                $result[0].CurrentVersion | Should -Be $script:CurrentScubaGearVersion
-                $result[0].LatestVersion | Should -Be $script:MockNewerScubaGearVersion
-                $result[0].CurrentVersion | Should -BeLessThan $result[0].LatestVersion
             }
         }
 

@@ -16,8 +16,14 @@ InModuleScope 'Support' {
             $script:MockNewerVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor + 1).0"
             $script:MockOlderVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor - 1).0"
 
-            # Mock PowerShell version table
-            $script:MockPSVersionTable = @{ PSVersion = [version]"5.1.19041.1682" }
+            # Set up default mocks at BeforeAll level to ensure they're available
+            Mock Write-Output { }
+            Mock Write-Information { }
+            Mock Write-Error { }
+            Mock Write-Warning { }
+            Mock Update-ScubaGearFromPSGallery { }
+            Mock Update-ScubaGearFromGitHub { }
+
         }
 
         BeforeEach {
@@ -27,16 +33,6 @@ InModuleScope 'Support' {
             Mock Write-Warning { }
             Mock Update-ScubaGearFromPSGallery { }
             Mock Update-ScubaGearFromGitHub { }
-
-            # Mock PowerShell version check
-            Mock Get-Variable {
-                param($Name)
-                $null = $Name  # Satisfy PSScriptAnalyzer
-                if ($Name -eq "PSVersionTable") {
-                    return @{ Value = $script:MockPSVersionTable }
-                }
-                return $null
-            }
         }
 
         Context "PSGallery update scenarios" {
