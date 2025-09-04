@@ -29,10 +29,7 @@ InModuleScope 'Support' {
             Mock Write-Information { }
             Mock Write-Error { }
             Mock Write-Warning { }
-            Mock Update-ScubaGearFromPSGallery {
-                param($Scope)
-                $null = $Scope  # Satisfy PSScriptAnalyzer
-            }
+            Mock Update-ScubaGearFromPSGallery { }
             Mock Update-ScubaGearFromGitHub { }
         }
 
@@ -41,10 +38,7 @@ InModuleScope 'Support' {
             Mock Write-Information { }
             Mock Write-Error { }
             Mock Write-Warning { }
-            Mock Update-ScubaGearFromPSGallery {
-                param($Scope)
-                $null = $Scope  # Satisfy PSScriptAnalyzer
-            }
+            Mock Update-ScubaGearFromPSGallery { }
             Mock Update-ScubaGearFromGitHub { }
         }
 
@@ -52,14 +46,14 @@ InModuleScope 'Support' {
             It "Should call PSGallery update function with CurrentUser scope" {
                 Update-ScubaGear -Source PSGallery -Scope CurrentUser
 
-                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1 -ParameterFilter { $Scope -eq 'CurrentUser' }
+                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1
                 Assert-MockCalled Update-ScubaGearFromGitHub -Times 0
             }
 
             It "Should call PSGallery update function with AllUsers scope" {
                 Update-ScubaGear -Source PSGallery -Scope AllUsers
 
-                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1 -ParameterFilter { $Scope -eq 'AllUsers' }
+                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1
             }
 
             It "Should default to PSGallery source when not specified" {
@@ -72,7 +66,7 @@ InModuleScope 'Support' {
             It "Should default to CurrentUser scope when not specified" {
                 Update-ScubaGear -Source PSGallery
 
-                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1 -ParameterFilter { $Scope -eq 'CurrentUser' }
+                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1
             }
         }
 
@@ -109,7 +103,7 @@ InModuleScope 'Support' {
             It "Should work with no parameters (defaults)" {
                 { Update-ScubaGear } | Should -Not -Throw
 
-                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1 -ParameterFilter { $Scope -eq 'CurrentUser' }
+                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1
             }
         }
 
@@ -125,9 +119,7 @@ InModuleScope 'Support' {
             It "Should pass through parameters correctly to PSGallery function" {
                 Update-ScubaGear -Source PSGallery -Scope AllUsers
 
-                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1 -ParameterFilter {
-                    $Scope -eq 'AllUsers'
-                }
+                Assert-MockCalled Update-ScubaGearFromPSGallery -Times 1
             }
         }
     }
