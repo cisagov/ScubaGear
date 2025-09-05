@@ -35,36 +35,36 @@ The current version that should be installed is:<br>
 
 1. Open PowerShell.
 2. Run one of the following commands:
-   ```powershell
-   # The below will check in PSGallery for the latest ScubaGear version
-   PS C:\Users\ScubaGear> Test-ScubaGearVersion
+```powershell
+# The below will check in PSGallery for the latest ScubaGear version
+PS C:\Users\ScubaGear> Test-ScubaGearVersion
 
-   # The below will check in the ScubaGear GitHub repo for the latest version
-   PS C:\Users\ScubaGear> Test-ScubaGearVersion -CheckGitHub
-   ```
+# The below will check in the ScubaGear GitHub repo for the latest version
+PS C:\Users\ScubaGear> Test-ScubaGearVersion -CheckGitHub
+```
 
-   > [!NOTE]
-   > If the `Test-ScubaGearVersion` command is not recognized, ScubaGear may not be installed or the module may not be imported. Try running `Import-Module ScubaGear` first, or refer to the installation guides if ScubaGear is not installed: [PSGallery Installation](psgallery.md) | [GitHub Installation](github.md)
+> [!NOTE]
+> If the `Test-ScubaGearVersion` command is not recognized, ScubaGear may not be installed or the module may not be imported. Try running `Import-Module ScubaGear` first, or refer to the installation guides if ScubaGear is not installed: [PSGallery Installation](psgallery.md) | [GitHub Installation](github.md)
 
-   **If you see this error:**
-   ```powershell
-   PS C:\Users\ScubaGear> Test-ScubaGearVersion
-   Test-ScubaGearVersion : The term 'Test-ScubaGearVersion' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
-   At line:1 char:1
-   + Test-ScubaGearVersion
-   + ~~~~~~~~~~~~~~~~~~~~~
-      + CategoryInfo          : ObjectNotFound: (test-ScubaGearVersion:String) [], CommandNotFoundException
-      + FullyQualifiedErrorId : CommandNotFoundException
-   ```
-   **Solution:** ScubaGear is not installed or not loaded. Use the installation links above to install ScubaGear first.
+**If you see this error:**
+```powershell
+PS C:\Users\ScubaGear> Test-ScubaGearVersion
+Test-ScubaGearVersion : The term 'Test-ScubaGearVersion' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:1 char:1
++ Test-ScubaGearVersion
++ ~~~~~~~~~~~~~~~~~~~~~
+   + CategoryInfo          : ObjectNotFound: (test-ScubaGearVersion:String) [], CommandNotFoundException
+   + FullyQualifiedErrorId : CommandNotFoundException
+```
+**Solution:** ScubaGear is not installed or not loaded. Use the installation links above to install ScubaGear first.
 
 3. **Interpret your results** using the table below:
 
 | Status Output | What It Means | Next Action |
 |---------------|---------------|-------------|
-| Status: <span style="color:green">**Up to Date**</span><br>MultipleVersionsInstalled: <span style="color:green">**False**</span> | System is current | No action needed |
-| Status: <span style="color:orange">**Update Available**</span> | Newer version available | Run `Update-ScubaGear` |
-| Status: <span style="color:red">**Needs attention**</span><br>MultipleVersionsInstalled: <span style="color:red">**True**</span> | Multiple versions installed | Run `Update-ScubaGear` to clean up |
+| Status: **Up to Date**<br>MultipleVersionsInstalled: **False** | System is current | No action needed |
+| Status: **Update Available** | Newer version available | Run `Update-ScubaGear` to update |
+| Status: **Needs attention**<br>MultipleVersionsInstalled: **True** | Multiple versions installed | Run `Update-ScubaGear` to clean up |
 
 ### Example Outputs
 
