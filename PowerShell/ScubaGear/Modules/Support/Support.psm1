@@ -988,10 +988,10 @@ function Test-ScubaGearVersion {
         Also checks dependency status and provides detailed information about modules with multiple versions.
 
     .PARAMETER CheckGitHub
-        Also check GitHub releases for the latest version (slower but more comprehensive).
+        Also check GitHub releases for the latest version.
 
     .OUTPUTS
-        PSCustomObject with ScubaGear status and dependency information including detailed module locations.
+        PSCustomObject
 
     .EXAMPLE
         Test-ScubaGearVersion
@@ -1051,7 +1051,6 @@ function Test-ScubaGearVersion {
                 $scubaGearStatus.Recommendations += "No action needed. "
             } else {
                 $scubaGearStatus.Status = "Up to Date"
-                # Don't add "No action needed" here - let the multiple versions or admin required logic handle it
             }
 
             if ($scubaGearStatus.MultipleVersionsInstalled) {
@@ -1132,10 +1131,16 @@ function Test-ScubaGearVersion {
 function Get-DependencyStatus {
     <#
     .SYNOPSIS
-        Internal helper function to check dependency status with clean output.
+        Helper function to check dependency status with clean output.
 
     .DESCRIPTION
         Checks ScubaGear dependencies and returns status in clean, minimal format.
+
+    .OUTPUTS
+        PSCustomObject
+
+    .NOTES
+        Internal function used by Test-ScubaGearVersion
 
     #>
     [CmdletBinding()]
@@ -1286,23 +1291,28 @@ function Update-ScubaGear {
     <#
     .SYNOPSIS
         Updates ScubaGear to the latest version.
+
     .DESCRIPTION
         Removes old versions and installs the latest ScubaGear from PSGallery or GitHub.
         Supports both PSGallery and GitHub installation methods.
+
     .PARAMETER Source
         Specifies whether to update from PSGallery or GitHub. Default is PSGallery.
+
     .PARAMETER Scope
         Specifies the installation scope. Default is CurrentUser.
+
     .EXAMPLE
         Update-ScubaGear
+
     .EXAMPLE
         Update-ScubaGear -Source GitHub
+
     .EXAMPLE
         Update-ScubaGear -Scope AllUsers
-    .FUNCTIONALITY
-        Public
+
     #>
-    [CmdletBinding(SupportsShouldProcess)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
         [ValidateSet("PSGallery", "GitHub")]
@@ -1584,6 +1594,20 @@ function Reset-ScubaGearDependencies {
 }
 
 function Update-ScubaGearFromPSGallery {
+    <#
+    .SYNOPSIS
+        Updates ScubaGear to the latest version from PSGallery.
+
+    .DESCRIPTION
+        Internal helper function that removes existing ScubaGear installations and installs the latest version from PSGallery.
+        Handles version cleanup and admin privilege checks.
+
+    .PARAMETER Scope
+        Specifies the installation scope for the module. Valid values are 'CurrentUser' and 'AllUsers'.
+
+    .NOTES
+        This is an internal function called by Update-ScubaGear.
+    #>
     [CmdletBinding()]
     param(
         [string]$Scope
@@ -1634,6 +1658,22 @@ function Update-ScubaGearFromPSGallery {
 }
 
 function Update-ScubaGearFromGitHub {
+    <#
+    .SYNOPSIS
+        Updates ScubaGear to the latest version from GitHub releases.
+
+    .DESCRIPTION
+        Internal helper function that downloads and installs the latest ScubaGear release
+        directly from GitHub. Removes existing installations and performs manual installation
+        from the GitHub release archive.
+
+    .PARAMETER Scope
+        Specifies the installation scope for the module. Valid values are 'CurrentUser' and 'AllUsers'.
+        Default is 'CurrentUser'.
+
+    .NOTES
+        This is an internal function called by Update-ScubaGear.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
@@ -1674,7 +1714,8 @@ function Update-ScubaGearFromGitHub {
                 # Remove all versions (both PowerShellGet and manual)
                 foreach ($module in $installedModules) {
                     try {
-                        $psGetModule = Get-Module -Name ScubaGear -RequiredVersion $module.Version -ErrorAction SilentlyContinue
+                        # Check if this module version was installed via PowerShellGet
+                        $psGetModule = Get-InstalledModule -Name ScubaGear -RequiredVersion $module.Version -ErrorAction SilentlyContinue
                         if ($psGetModule) {
                             Uninstall-Module -Name ScubaGear -RequiredVersion $module.Version -Force
                         } else {
@@ -1706,10 +1747,10 @@ function Update-ScubaGearFromGitHub {
         Expand-Archive -Path $tempZip -DestinationPath $tempExtractPath -Force
 
         # Find the extracted ScubaGear folder (it will be named ScubaGear-X.X.X)
-        $extractedFolder = Get-ChildItem $tempExtractPath -Directory | Where-Object { $_.Name -like "ScubaGear-*" } #| Select-Object -First 1
-        $scubaGearPath = Get-ChildItem ($extractedFolder.fullname + "\PowerShell\ScubaGear")
+        $extractedFolder = Get-ChildItem $tempExtractPath -Directory | Where-Object { $_.Name -like "ScubaGear-*" }
+        $scubaGearPath = Join-Path $extractedFolder.FullName "PowerShell\ScubaGear"
 
-        if (-not $scubaGearPath) {
+        if (-not (Test-Path $scubaGearPath)) {
             throw "Could not find extracted ScubaGear folder in $tempExtractPath"
         }
 
@@ -1733,7 +1774,7 @@ function Update-ScubaGearFromGitHub {
         Write-Output "Installing ScubaGear $latestRelease..."
 
         # Copy the contents of the extracted folder to the final destination
-        Copy-Item -Path "$($extractedFolder.FullName)\*" -Destination $moduleDestination -Recurse -Force
+        Copy-Item -Path "$ScubaGearPath\*" -Destination $moduleDestination -Recurse -Force
 
         # Verify installation
         $PSDPath = $moduleDestination + "\ScubaGear.psd1"
@@ -1741,7 +1782,7 @@ function Update-ScubaGearFromGitHub {
             throw "Installation verification failed: ScubaGear.psd1 not found at $PSDPath"
         }
 
-        # Unblock files for security
+        # Unblock files
         Get-ChildItem $moduleDestination -Recurse | Unblock-File -ErrorAction SilentlyContinue
 
         # Import module
