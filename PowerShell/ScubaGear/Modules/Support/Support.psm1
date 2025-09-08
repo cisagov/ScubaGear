@@ -1025,7 +1025,7 @@ function Test-ScubaGearVersion {
             $scubaGearStatus.Status = "Unable to check latest version"
             $scubaGearStatus.Recommendations += "Check internet connection and PSGallery access. "
         } else {
-            $scubaGearStatus.LatestVersion = $latest.Version
+            $scubaGearStatus.LatestVersion = [version]$latest.Version
         }
 
         if (-not $modules) {
@@ -1036,7 +1036,7 @@ function Test-ScubaGearVersion {
             $moduleCount = $modules.Count
             $scubaGearStatus.MultipleVersionsInstalled = $moduleCount -gt 1
             $newestModule = $modules | Sort-Object Version -Descending | Select-Object -First 1
-            $scubaGearStatus.CurrentVersion = $newestModule.Version
+            $scubaGearStatus.CurrentVersion = [version]$newestModule.Version
 
             # Check if admin rights needed
             $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
@@ -1440,7 +1440,7 @@ function Reset-ScubaGearDependencies {
                 $moduleInfo = [PSCustomObject]@{
                     Name = $moduleName
                     RequiredRange = "$minVersion - $maxVersion"
-                    CurrentVersions = $installedModules.Version
+                    CurrentVersions = [version]$installedModules.Version
                     InProgramFiles = ($installedModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }).Count -gt 0
                     Action = $null
                     VersionToKeep = $null

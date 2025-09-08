@@ -27,7 +27,7 @@ The current version that should be installed is:<br>
 
 ## Verify if update is needed
 
-**What this does:** Checks your current ScubaGear installation status and provides update recommendations.
+**What this does:**  Checks the status of the ScubaGear module and related dependencies. Results are reported for the ScubaGear module and all related dependencies - see the [Dependency Updating of this page](#2-dependency-updating) for details.
 
 **Prerequisites:**
 - Internet connection to check latest versions
