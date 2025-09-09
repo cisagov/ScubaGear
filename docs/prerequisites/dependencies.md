@@ -9,7 +9,7 @@ Initialize-SCuBA
 
 > **Note**: ScubaGear utilizes several libraries from Microsoft to read data about their product configurations.  At least one of these libraries is tied to PowerShell 5.  Until Microsoft updates their library, ScubaGear will continue to use PowerShell 5.  As this version is only available on Windows, ScubaGear will only run on Windows.
 
-`Initialize-SCuBA` will install the modules in the PowerShell Module Dependencies Section on to your system. It will also install [OPA](https://www.openpolicyagent.org).
+`Initialize-SCuBA` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org).
 
 > **Note**: The `Initialize-SCuBA` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA and any other related files.
 
