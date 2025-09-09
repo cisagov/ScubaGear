@@ -48,6 +48,7 @@ for ($i = 0; $i -lt $newLines.Length; $i++) {
                 StartIndex = $moduleStartIndex
                 EndIndex = -1
                 IsPinned = $false
+                Purpose = $null
                 MaxVersionLineIndex = -1
                 MaxVersion = $null
             }
@@ -56,6 +57,11 @@ for ($i = 0; $i -lt $newLines.Length; $i++) {
         # Check if current module is pinned
         if ($line -match "IsPinned\s*=\s*[`"']([^`"']+)[`"']" -and $currentModuleName) {
             $moduleInfo[$currentModuleName].IsPinned = $matches[1] -eq "True"
+        }
+
+        # Track Purpose field
+        if ($line -match "Purpose\s*=\s*'([^']+)'" -and $currentModuleName) {
+            $moduleInfo[$currentModuleName].Purpose = $matches[1]
         }
 
         # Track MaximumVersion line
