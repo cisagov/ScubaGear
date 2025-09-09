@@ -85,17 +85,17 @@ function Update-DependenciesTable {
 
         if ($DependenciesContent -match $ExistingRowPattern) {
             $DependenciesContent = $DependenciesContent -replace $ExistingRowPattern, $NewRow
-            Write-Output "✅ Updated row for module: $($module.ModuleName)"
+            Write-Output "Updated row for module: $($module.ModuleName)"
             $updatedCount++
         } else {
-            Write-Warning "❌ Could not find existing row for module: $($module.ModuleName)"
+            Write-Warning "Could not find existing row for module: $($module.ModuleName)"
         }
     }
 
     # Write the updated content back to the file
     Set-Content -Path $DependenciesPath -Value $DependenciesContent -Encoding UTF8
 
-    Write-Output "✅ Successfully updated $updatedCount out of $($ModuleList.Count) modules in dependencies.md"
+    Write-Output "Successfully updated $updatedCount out of $($ModuleList.Count) modules in dependencies.md"
 
     return $updatedCount
 }
@@ -110,3 +110,5 @@ catch {
     Write-Error "Failed to update dependencies table: $_"
     exit 1
 }
+
+
