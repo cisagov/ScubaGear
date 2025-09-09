@@ -14,8 +14,8 @@
     --header-color: #005288;
     --note-color: #ee4e04;
     --header-bottom: black;
-    --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --link-color: #5b7844;
+    --unvisited-link-color: #006086;
     --text-color: black;
     --uuid-color: #424242;
     --border-color: black;
@@ -37,8 +37,8 @@ html[data-theme='dark'] {
     --header-color: #b7c8d2;
     --note-color: #ee4e04;
     --header-bottom: rgb(221, 221, 221);
-    --link-color: #85B065;
-    --unvisited-link-color: #0092CC;
+    --link-color: #9bc2a3;
+    --unvisited-link-color: #4da6d1;
     --text-color: #bdbdbd;
     --uuid-color: #999999;
     --border-color: #7b7b7b;
@@ -105,6 +105,27 @@ h4 {
     margin-left:20%;
     margin-right: 20%;
     margin-bottom: 0.313em;
+}
+
+/* Style links within AAD warning text */
+h4 a:link {
+    color: var(--unvisited-link-color);
+    text-decoration: underline;
+}
+
+h4 a:visited {
+    color: var(--link-color);
+    text-decoration: underline;
+}
+
+h4 a:hover {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+h4 a:active {
+    color: var(--link-color);
+    text-decoration: none;
 }
 
 
