@@ -520,6 +520,14 @@ class CapHelper {
                 $Table += $CapDetails
             }
 
+            # Sort the table by State before converting to JSON and sort the name alphabetically
+            $StateOrder = @{
+                "On" = 1
+                "Report-Only" = 2
+                "Off" = 3
+            }
+
+            $Table = $Table | Sort-Object { $StateOrder[$_.State] }, Name
             $CapTableJson = ConvertTo-Json $Table
             return $CapTableJson
     }

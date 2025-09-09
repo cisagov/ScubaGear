@@ -574,3 +574,58 @@ Describe "GetSessionControls" {
         $Controls | Should -Be ""
     }
 }
+
+Describe "ExportCapPolicies Sorting" {
+    BeforeEach {
+        # Load base CAP structure from existing snippets
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'BaseCap')]
+        $BaseCap = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "./CapSnippets/Users.json") | ConvertFrom-Json
+
+        # Create test policies with different states and names for sorting
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Caps')]
+        $Caps = @()
+
+        # Create "Off" policy (should be last)
+        $OffPolicy = $BaseCap.PSObject.Copy()
+        $OffPolicy | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "Z Policy"
+        $OffPolicy | Add-Member -MemberType NoteProperty -Name "State" -Value "disabled"
+        $Caps += $OffPolicy
+
+        # Create "On" policy (should be first)
+        $OnPolicy = $BaseCap.PSObject.Copy()
+        $OnPolicy | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "A Policy"
+        $OnPolicy | Add-Member -MemberType NoteProperty -Name "State" -Value "enabled"
+        $Caps += $OnPolicy
+
+        # Create "On" second policy (should be first)
+        $OnPolicy = $BaseCap.PSObject.Copy()
+        $OnPolicy | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "A Policy 2"
+        $OnPolicy | Add-Member -MemberType NoteProperty -Name "State" -Value "enabled"
+        $Caps += $OnPolicy
+
+        # Create "Report-only" policy (should be middle)
+        $ReportPolicy = $BaseCap.PSObject.Copy()
+        $ReportPolicy | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "B Policy"
+        $ReportPolicy | Add-Member -MemberType NoteProperty -Name "State" -Value "enabledForReportingButNotEnforced"
+        $Caps += $ReportPolicy
+    }
+
+    It "sorts policies by State first (On, Report-only, Off), then by Name alphabetically" {
+        # Suppress warnings since we're using incomplete CAP structures for testing
+        $Result = $CapHelper.ExportCapPolicies($Caps) 3>$null
+        $ParsedResult = ConvertFrom-Json $Result
+
+        # Verify the order: "A Policy" (On) -> "A Policy 2" (On) -> "B Policy" (Report-only) -> "Z Policy" (Off)
+        $ParsedResult[0].Name | Should -Be "A Policy"
+        $ParsedResult[0].State | Should -Be "On"
+
+        $ParsedResult[1].Name | Should -Be "A Policy 2"
+        $ParsedResult[1].State | Should -Be "On"
+
+        $ParsedResult[2].Name | Should -Be "B Policy"
+        $ParsedResult[2].State | Should -Be "Report-only"
+
+        $ParsedResult[3].Name | Should -Be "Z Policy"
+        $ParsedResult[3].State | Should -Be "Off"
+    }
+}
