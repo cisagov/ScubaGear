@@ -144,7 +144,27 @@ jobs:
             Write-Host "No existing pull requests found for PowerShell dependency bumps"
             echo "SHOULD_CREATE_PR=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           }
-
+          
+      - name: Delete branch if PR already exists
+        if: success() && env.SHOULD_CREATE_PR == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        shell: pwsh
+        run: |
+          Write-Host "Deleting branch $env:BRANCH_NAME because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
+          
+          # Delete the remote branch
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} --delete $env:BRANCH_NAME
+          
+          # Switch back to main branch locally to avoid issues
+          git checkout main
+          
+          # Delete the local branch
+          git branch -D $env:BRANCH_NAME
+          
+          Write-Host "✅ Successfully deleted branch $env:BRANCH_NAME"
+          
       - name: Create pull request
         if: success() && env.SHOULD_CREATE_PR == 'true'
         env:
