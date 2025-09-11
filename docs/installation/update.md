@@ -3,17 +3,14 @@
 ScubaGear releases new versions regularly. This guide provides detailed instructions for updating ScubaGear to the latest version, whether you installed it via PSGallery or from a GitHub release.
 
 ## Table of Contents
-- [ScubaGear Update Instructions](#scubagear-update-instructions)
-  - [Table of Contents](#table-of-contents)
 - [1. Updating ScubaGear](#1-updating-scubagear)
-  - [Verify if update is needed](#verify-if-update-is-needed)
-    - [Example Outputs](#example-outputs)
-  - [Option 1: Updating via PSGallery (Recommended)](#option-1-updating-via-psgallery-recommended)
+  - [Verify Status](#verify-if-update-is-needed)
+  - [Option 1: Updating via PSGallery](#option-1-updating-via-psgallery-recommended)
   - [Option 2: Updating via GitHub Release](#option-2-updating-via-github-release)
 - [2. Dependency Updating](#2-dependency-updating)
   - [Removing Old Dependencies](#removing-old-dependencies)
-  - [Option A: Reset All Dependencies](#option-a-reset-all-dependencies)
-  - [Option B: Install/Update Dependencies Only](#option-b-installupdate-dependencies-only)
+  - [Reset Dependencies](#option-a-reset-all-dependencies)
+  - [Install Dependencies](#option-b-installupdate-dependencies-only)
 - [3. Support and Resources](#3-support-and-resources)
   - [Troubleshooting](#troubleshooting)
   - [Additional Resources](#additional-resources)
