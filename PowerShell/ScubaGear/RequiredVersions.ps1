@@ -22,7 +22,7 @@ $ModuleList = @(
     @{
         ModuleName = 'PnP.PowerShell' # alternate for SharePoint PowerShell
         ModuleVersion = [version] '1.12.0'
-        MaximumVersion = [version] '2.2.0'
+        MaximumVersion = [version] '1.99.99999'
         IsPinned = "True"
         Purpose = 'SharePoint Online management and automation'
     },
