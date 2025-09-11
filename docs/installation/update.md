@@ -3,14 +3,17 @@
 ScubaGear releases new versions regularly. This guide provides detailed instructions for updating ScubaGear to the latest version, whether you installed it via PSGallery or from a GitHub release.
 
 ## Table of Contents
+- [ScubaGear Update Instructions](#scubagear-update-instructions)
+  - [Table of Contents](#table-of-contents)
 - [1. Updating ScubaGear](#1-updating-scubagear)
-  - [Verify Status](#verify-if-update-is-needed)
-  - [Option 1: Updating via PSGallery](#option-1-updating-via-psgallery-recommended)
+  - [Verify if update is needed](#verify-if-update-is-needed)
+    - [Example Outputs](#example-outputs)
+  - [Option 1: Updating via PSGallery (Recommended)](#option-1-updating-via-psgallery-recommended)
   - [Option 2: Updating via GitHub Release](#option-2-updating-via-github-release)
 - [2. Dependency Updating](#2-dependency-updating)
   - [Removing Old Dependencies](#removing-old-dependencies)
-  - [Reset Dependencies](#option-a-reset-all-dependencies)
-  - [Install Dependencies](#option-b-installupdate-dependencies-only)
+  - [Option A: Reset All Dependencies](#option-a-reset-all-dependencies)
+  - [Option B: Install/Update Dependencies Only](#option-b-installupdate-dependencies-only)
 - [3. Support and Resources](#3-support-and-resources)
   - [Troubleshooting](#troubleshooting)
   - [Additional Resources](#additional-resources)
@@ -27,7 +30,7 @@ The current version that should be installed is:<br>
 
 ## Verify if update is needed
 
-**What this does:**  Checks the status of the ScubaGear module and related dependencies. Results are reported for the ScubaGear module and all related dependencies - see the [Dependency Updating of this page](#2-dependency-updating) for details.
+**What this does:**  Checks the status of the ScubaGear module and related dependencies. Results are reported for the ScubaGear module and all related dependencies - see the [Dependency Updating section of this page](#2-dependency-updating) for details.
 
 **Prerequisites:**
 - Internet connection to check latest versions
