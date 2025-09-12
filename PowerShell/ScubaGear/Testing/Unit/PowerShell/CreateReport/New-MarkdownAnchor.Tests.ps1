@@ -31,7 +31,7 @@ InModuleScope CreateReport {
             @{ GroupNumber = "99 "; GroupName = "The trailing space"}
         ){
             $Anchor = New-MarkdownAnchor -GroupNumber $GroupNumber -GroupName $GroupName
-            $Anchor.StartsWith("#$($GroupNumber.Trim())") | Should -BeTrue
+            $Anchor.StartsWith("#$($GroupNumber -replace ' ', '')") | Should -BeTrue
             $Anchor -Contains " " | Should -BeFalse
             $GroupName.Split(' ').ForEach{
                 $Anchor -Like "*$($_.ToLower())*" | Should -BeTrue -Because "$Anchor contains $($_.ToLower())"}

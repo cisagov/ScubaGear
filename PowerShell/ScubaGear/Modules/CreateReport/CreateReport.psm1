@@ -802,7 +802,7 @@ function New-MarkdownAnchor{
     if ($true -eq [Int32]::TryParse($GroupNumber, [ref]$OutNumber)){
         # Remove commas, parentheses, and other special characters, then replace spaces with hyphens
         $MangledName = $GroupName.ToLower().Trim() -replace '[,\(\)]', '' -replace '\s+', '-'
-        return "#$($GroupNumber.Trim())-$MangledName"
+        return "#$GroupNumber-$MangledName"
     }
     else {
         $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
