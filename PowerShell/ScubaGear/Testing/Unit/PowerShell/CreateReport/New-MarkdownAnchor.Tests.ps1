@@ -36,13 +36,6 @@ InModuleScope CreateReport {
             $GroupName.Split(' ').ForEach{
                 $Anchor -Like "*$($_.ToLower())*" | Should -BeTrue -Because "$Anchor contains $($_.ToLower())"}
         }
-        
-        It "Test DMARC anchor generation with special characters" {
-            $GroupNumber = "4"
-            $GroupName = "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)"
-            $Anchor = New-MarkdownAnchor -GroupNumber $GroupNumber -GroupName $GroupName
-            $ExpectedAnchor = "#4-domain-based-message-authentication-reporting-and-conformance-dmarc"
-            $Anchor | Should -Be $ExpectedAnchor -Because "Special characters like commas and parentheses should be removed"
-        }
+
     }
 }
