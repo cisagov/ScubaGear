@@ -368,7 +368,11 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                 btn.className = "view-details-button";
                 btn.textContent = `View ${count} ${colLabel}`;
                 btn.addEventListener("click", () => {
-                    let node = renderKeyValueList(items);
+                    let dataType = "";
+                    if (col.name === "Permissions") dataType = "Permissions";
+                    if (col.name === "KeyCredentials" || col.name === "PasswordCredentials" || col.name === "FederatedCredentials") dataType = "Credentials";
+
+                    let node = renderKeyValueList(items, { advanced: true, dataType });
                     const title = `${rowLabel} - ${colLabel}`;
                     openDetailsModal(title, node);
                 });
@@ -511,48 +515,247 @@ const openDetailsModal = (title, contentNode) => {
  * Builds a unordered list of key-value pairs from an array of items.
  * 
  * @param {Array} items - Array of items to be displayed.
+ * @param {Object} options - Optional settings.
+ *  - advanced: If true, applies advanced formatting.
+ *  - dataType: If specified, applies special formatting based on the data type (e.g., "credentials", "permissions").
  * @returns {HTMLElement} - An unordered list element containing the key-value pairs.
  */
-const renderKeyValueList = (items) => {
-    const ul = document.createElement("ul");
+const renderKeyValueList = (items, options = {}) => {
+    if (!options.advanced) {
+        const ul = document.createElement("ul");
 
-    // Iterate through the list of "Key Credentials", "Permissions", etc.
-    items.forEach(item => {
-        const li = document.createElement("li");
+        // Iterate through the list of "Key Credentials", "Permissions", etc.
+        items.forEach(item => {
+            const li = document.createElement("li");
 
-        if (item && typeof item === "object") {
-            const entries = Object.entries(item);
-            
-            // Iterate through the key/value pairs for each object, e.g. key = "IsRisky", value = true
-            entries.forEach(([key, value], idx) => {
-                const strong = document.createElement("strong");
-                strong.textContent = `${key}:`;
-                li.appendChild(strong);
+            if (item && typeof item === "object") {
+                const entries = Object.entries(item);
 
-                let content = value;
+                // Iterate through the key/value pairs for each object, e.g. key = "IsRisky", value = true
+                entries.forEach(([key, value], idx) => {
+                    const strong = document.createElement("strong");
+                    strong.textContent = `${key}:`;
+                    li.appendChild(strong);
 
-                // Start/End dates come in the format of /Date(1675800895000)/ which isn't a standard Date() format.
-                // Parse it then apply .toLocaleString() to get the M/D/YYYY HH:MM:SS format.
-                if (typeof value === "string" && (key === "StartDateTime" || key === "EndDateTime")) {
-                    const date = parseDotNetDate(value);
-                    content = date ? date.toLocaleString() : value;
-                }
+                    let content = value;
 
-                li.appendChild(document.createTextNode(` ${String(content)}`));
+                    // Start/End dates come in the format of /Date(1675800895000)/ which isn't a standard Date() format.
+                    // Parse it then apply .toLocaleString() to get the M/D/YYYY HH:MM:SS format.
+                    if (typeof value === "string" && (key === "StartDateTime" || key === "EndDateTime")) {
+                        const date = parseDotNetDate(value);
+                        content = date ? date.toLocaleString() : value;
+                    }
 
-                if (idx < entries.length - 1) {
-                    li.appendChild(document.createElement("br"));
-                }
-            });
-        }
-        else {
-            li.textContent = String(item);
-        }
+                    li.appendChild(document.createTextNode(` ${String(content)}`));
 
-        ul.appendChild(li);
+                    if (idx < entries.length - 1) {
+                        li.appendChild(document.createElement("br"));
+                    }
+                });
+            }
+            else {
+                li.textContent = String(item);
+            }
+
+            ul.appendChild(li);
+        });
+
+        return ul;
+    }
+
+    // Proceed with advanced formatting if specified
+    const dataType = options.dataType;
+
+    const wrapper = document.createElement("div");
+    wrapper.classNames = "kv-advanced";
+
+    const controls = document.createElement("div");
+    controls.className = "kv-controls";
+    wrapper.appendChild(controls);
+
+    const searchInput = document.createElement("input");
+    searchInput.type = "search";
+    searchInput.placeholder = "Search...";
+    controls.appendChild(searchInput);
+
+    const groupSelect = document.createElement("select");
+    controls.appendChild(groupSelect);
+
+    const groupOptions = [];
+
+    if (dataType === "Permissions") {
+        groupOptions.push(
+            { value: "RoleType", label: "Role type" },
+            { value: "IsAdminConsented", label: "Admin consented" },
+            { value: "IsRisky", label: "Risky" }
+        );
+    }
+
+    if (dataType === "Credentials") {
+        groupOptions.push(
+            { value: "Status", label: "Status" }
+        );
+    }
+
+    groupOptions.forEach(o => {
+        const option = document.createElement("option");
+        option.value = o.value;
+        option.textContent = o.label;
+        groupSelect.appendChild(option);
     });
 
-    return ul;
+    const facetBar = document.createElement("div");
+    facetBar.className = "kv-facets";
+    wrapper.appendChild(facetBar);
+
+    // Results host
+    const contentHost = document.createElement("div");
+    contentHost.className = "kv-results";
+    wrapper.appendChild(contentHost);
+
+    // Helpers
+    const normalizeValue = v => {
+        if (v === null || v === undefined) return "";
+        return String(v);
+    };
+
+    const getStatus = (obj) => {
+        // Credentials only
+        const start = parseDotNetDate(obj?.StartDateTime);
+        const end = parseDotNetDate(obj?.EndDateTime);
+        const now = new Date();
+        if (start && end) {
+            if (now < start) return "NotYetValid";
+            if (now >= start && now <= end) return "Active";
+            if (now > end) return "Expired";
+        } else if (end && now > end) {
+            return "Expired";
+        }
+        return "Unknown";
+    };
+
+    const buildGroups = (data, groupKey) => {
+        if (groupKey === "none") return { All: data };
+
+        const map = {};
+        data.forEach(obj => {
+            let keyVal = "";
+            if (groupKey === "Status") {
+                keyVal = getStatus(obj);
+            } else {
+                keyVal = obj?.[groupKey];
+            }
+            if (keyVal === true) keyVal = "True";
+            if (keyVal === false) keyVal = "False";
+            if (keyVal === "" || keyVal === undefined || keyVal === null) keyVal = "Unknown";
+            map[keyVal] = map[keyVal] || [];
+            map[keyVal].push(obj);
+        });
+        return map;
+    };
+
+    const renderObject = (obj) => {
+        const li = document.createElement("li");
+        li.className = "kv-item";
+        const entries = Object.entries(obj);
+        entries.forEach(([key, value], idx) => {
+            const strong = document.createElement("strong");
+            strong.textContent = `${key}:`;
+            li.appendChild(strong);
+
+            let content = value;
+            if (typeof value === "string" && (key === "StartDateTime" || key === "EndDateTime")) {
+                const date = parseDotNetDate(value);
+                content = date ? date.toLocaleString() : value;
+            }
+            li.appendChild(document.createTextNode(` ${normalizeValue(content)}`));
+            if (idx < entries.length - 1) li.appendChild(document.createElement("br"));
+        });
+        return li;
+    };
+
+    const state = {
+        groupBy: "none",
+        search: "",
+        facetInclude: new Set()
+    };
+
+    const rebuildFacetBar = (groupMap) => {
+        facetBar.textContent = "";
+        const keys = Object.keys(groupMap);
+        if (keys.length <= 1) return; // No facets needed
+        keys.forEach(k => {
+            const id = `facet_${k}`;
+            const label = document.createElement("label");
+            label.className = "kv-facet";
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.id = id;
+            cb.value = k;
+            cb.checked = state.facetInclude.size === 0 || state.facetInclude.has(k);
+            cb.addEventListener("change", () => {
+                if (cb.checked) {
+                    state.facetInclude.add(k);
+                } else {
+                    state.facetInclude.delete(k);
+                }
+                render();
+            });
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(` ${k}`));
+            facetBar.appendChild(label);
+        });
+    };
+
+    const filterBySearch = (arr, term) => {
+        if (!term) return arr;
+        const lower = term.toLowerCase();
+        return arr.filter(o => {
+            if (!o || typeof o !== "object") return false;
+            return Object.values(o).some(v => normalizeValue(v).toLowerCase().includes(lower));
+        });
+    };
+
+    const render = () => {
+        contentHost.textContent = "";
+        const filtered = filterBySearch(items, state.search);
+        const groupMap = buildGroups(filtered, state.groupBy);
+
+        // Rebuild facets only if groupBy changed
+        rebuildFacetBar(groupMap);
+
+        Object.entries(groupMap).forEach(([groupName, groupItems]) => {
+            if (state.facetInclude.size > 0 && !state.facetInclude.has(groupName)) return;
+
+            const section = document.createElement("section");
+            section.className = "kv-group";
+
+            const h4 = document.createElement("h4");
+            h4.textContent = `${groupName} (${groupItems.length})`;
+            section.appendChild(h4);
+
+            const ul = document.createElement("ul");
+            groupItems.forEach(obj => ul.appendChild(renderObject(obj)));
+            section.appendChild(ul);
+
+            contentHost.appendChild(section);
+        });
+    };
+
+    searchInput.addEventListener("input", e => {
+        state.search = e.target.value;
+        render();
+    });
+
+    groupSelect.addEventListener("change", e => {
+        state.groupBy = e.target.value;
+        state.facetInclude.clear(); // reset facets
+        render();
+    });
+
+    // Initial paint
+    render();
+    return wrapper;
 };
 
 /**

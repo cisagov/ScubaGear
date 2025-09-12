@@ -470,3 +470,15 @@ a.control_group:active {
 .view-details-button {
     margin: 1rem;
 }
+
+.kv-advanced { display:flex; flex-direction:column; gap:0.75rem; }
+.kv-controls { display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center; }
+.kv-controls input[type=search] { padding:4px 8px; min-width:220px; }
+.kv-controls select { padding:4px 8px; }
+.kv-facets { display:flex; gap:0.75rem; flex-wrap:wrap; }
+.kv-facet { font-size:0.85rem; user-select:none; }
+.kv-results { display:flex; flex-direction:column; gap:1rem; max-height:420px; overflow:auto; border:1px solid #ccc; padding:0.75rem; background:var(--panel-bg,#fafafa); }
+.kv-group h4 { margin:0 0 0.35rem 0; font-size:0.95rem; }
+.kv-group ul { list-style:disc; padding-left:1.25rem; margin:0; }
+.kv-item { margin-bottom:0.5rem; }
+.kv-item strong { font-weight:600; }
