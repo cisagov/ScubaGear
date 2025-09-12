@@ -800,7 +800,8 @@ function New-MarkdownAnchor{
     [Int32]$OutNumber = $null
 
     if ($true -eq [Int32]::TryParse($GroupNumber, [ref]$OutNumber)){
-        $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
+        # Remove commas, parentheses, and other special characters, then replace spaces with hyphens
+        $MangledName = $GroupName.ToLower().Trim() -replace '[,\(\)]', '' -replace '\s+', '-'
         return "#$($GroupNumber.Trim())-$MangledName"
     }
     else {
@@ -837,5 +838,6 @@ function Resolve-HTMLMarkdown{
 
 Export-ModuleMember -Function @(
     'New-Report',
-    'Import-SecureBaseline'
+    'Import-SecureBaseline',
+    'New-MarkdownAnchor'
 )
