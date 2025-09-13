@@ -567,6 +567,7 @@ function New-Report {
     $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
     $EXOFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "EXOTableFunctions.js") -Raw
     $AADFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "AADTableFunctions.js") -Raw
+    $KeyValueListFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "KeyValueListFunctions.js") -Raw
 
     $JSFiles = @(
         $IndividualReportJS
@@ -574,6 +575,7 @@ function New-Report {
         $TableFunctionsJS
         $EXOFunctionsJS
         $AADFunctionsJS
+        $KeyValueListFunctionsJS
     ) -join "`n"
 
     $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
