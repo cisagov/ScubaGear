@@ -1264,9 +1264,15 @@ Function Start-SCuBAConfigApp {
         $syncHash.Window.Topmost = $True
 
         #hit esc to not force on top
+        #hit esc again to force on top
         $syncHash.Window.Add_KeyDown({
             if ($_.Key -eq [System.Windows.Input.Key]::Escape) {
-                $syncHash.Window.Topmost = $False
+                if ($syncHash.Window.Topmost) {
+                    Write-DebugOutput -Message "Escape key pressed - disabling always on top" -Source $source -Level "Info"
+                } else {
+                    Write-DebugOutput -Message "Escape key pressed - enabling always on top" -Source $source -Level "Info"
+                }
+                $syncHash.Window.Topmost = -not $syncHash.Window.Topmost
             }
         })
 

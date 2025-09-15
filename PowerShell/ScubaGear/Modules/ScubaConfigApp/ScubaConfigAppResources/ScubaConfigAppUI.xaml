@@ -1674,28 +1674,29 @@
 
                 <!-- Preview Tab -->
                 <TabItem x:Name="PreviewTab" Header="Preview">
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
-                        <!-- Preview Tab Content (Hidden by default) -->
-                        <Grid x:Name="PreviewTabContent">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
+                    <!-- Preview Tab Content (Hidden by default) -->
+                    <Grid x:Name="PreviewTabContent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                            <Border Grid.Row="0" Style="{StaticResource Card}">
-                                <StackPanel>
-                                    <TextBlock Text="YAML Preview"
+                        <!-- Header (unchanged) -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="YAML Preview"
                                         FontSize="18"
                                         FontWeight="SemiBold"
                                         Margin="0,0,0,16"/>
-                                    <TextBlock x:Name="PreviewTabInfo_TextBlock" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"/>
-                                </StackPanel>
-                            </Border>
+                                <TextBlock x:Name="PreviewTabInfo_TextBlock" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
 
-                            <Border Grid.Row="1" >
-                                <StackPanel Margin="0,16,0,0">
-                                    <TextBox x:Name="YamlPreview_TextBox"
-                                         Height="Auto"
+                        <!-- Scrollable YAML area -->
+                        <Border Grid.Row="1">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
+                                <TextBox x:Name="YamlPreview_TextBox"
                                          FontFamily="Consolas, Courier New, monospace"
                                          FontSize="14"
                                          TextWrapping="Wrap"
@@ -1705,20 +1706,22 @@
                                          Background="#F8F9FA"
                                          Padding="16"
                                          VerticalContentAlignment="Top"/>
+                            </ScrollViewer>
+                        </Border>
 
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                                        <Button x:Name="CopyYamlButton"
-                                            Style="{StaticResource SecondaryButton}"
-                                            Content="Copy to Clipboard"
-                                            Margin="0,0,8,0" Width="116"/>
-                                        <Button x:Name="DownloadYamlButton"
-                                            Style="{StaticResource PrimaryButton}"
-                                            Content="Save YAML" Height="37" Width="104"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </ScrollViewer>
+                        <!-- Fixed action buttons (always visible at bottom) -->
+                        <Border Grid.Row="2" Background="Transparent" Padding="0,12,0,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="CopyYamlButton"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Copy to Clipboard"
+                                        Margin="0,0,8,0" Width="116"/>
+                                <Button x:Name="DownloadYamlButton"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Content="Save YAML" Height="37" Width="104"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
                 </TabItem>
 
                 <!-- Scuba Run Tab Content -->

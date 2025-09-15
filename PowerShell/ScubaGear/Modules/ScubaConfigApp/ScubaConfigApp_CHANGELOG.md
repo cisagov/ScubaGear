@@ -1,11 +1,13 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
 
-## 1.8.21 [08/21/2025] - UI & Usability Improvements
+## 1.9.22 [09/15/2025] - UI & Usability Improvements
 
 ### Bug Fixes
  - Fixed Result Path button – now opens to the correct folder based on Outpath or default.
  - Removed debug log null message from ScubaRun when no process is running.
  - Fixed search and filter clearing issue when selecting cards.
+ - Fixed ESC key toggle. To allow UI to be in front or behind
+ - Fixed reports json parser to look for special characters in org name such as & % $
 
 ### Enhancements
 - Added ScubaGear icon to UI windows (using Scuba-themed PNG).
@@ -20,7 +22,6 @@
 - Added a title property to each Graph query in JSON – now displayed in the selector window for clearer guidance.
 - Removed unnecessary update functions; integrated logic directly into card generation functions for cleaner code.
 - Sped up launch time by developing runspace for results scan and reduced maximum reports to 10
-
 
 ## 1.8.18 [08/18/2025] - GlobalSettings and Baseline Exclusion Management Enhancement
 

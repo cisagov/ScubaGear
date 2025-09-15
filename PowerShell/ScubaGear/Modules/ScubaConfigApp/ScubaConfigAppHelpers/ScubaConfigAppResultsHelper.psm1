@@ -651,17 +651,31 @@ Function New-ResultsContent {
     # Process the data and replace placeholders
     $processedXaml = $xamlTemplate
 
-    # Replace tenant information placeholders
-    $displayName = [string]$ScubaData.MetaData.DisplayName
-    $domainName = [string]$ScubaData.MetaData.DomainName
-    $tenantId = [string]$ScubaData.MetaData.TenantId
-    $scubaVersion = if ($ScubaData.MetaData.ToolVersion) { [string]$ScubaData.MetaData.ToolVersion } else { "Unknown" }
-    $reportUuid = if ($ScubaData.MetaData.ReportUUID) { [string]$ScubaData.MetaData.ReportUUID } else { "Unknown" }
+    # Replace tenant information placeholders with proper XML escaping
+    function XmlEscape([string]$s) {
+        if ($null -eq $s) { return "" }
+        $s = [string]$s
+        # Remove control characters that are illegal in XML
+        $s = $s -replace '[\x00-\x08\x0B\x0C\x0E-\x1F]', ''
+        # Replace special XML characters with entities
+        $s = $s -replace '&', '&amp;'
+        $s = $s -replace '<', '&lt;'
+        $s = $s -replace '>', '&gt;'
+        $s = $s -replace '"', '&quot;'
+        $s = $s -replace "'", '&apos;'
+        return $s
+    }
+
+    $displayName = XmlEscape([string]$ScubaData.MetaData.DisplayName)
+    $domainName = XmlEscape([string]$ScubaData.MetaData.DomainName)
+    $tenantId = XmlEscape([string]$ScubaData.MetaData.TenantId)
+    $scubaVersion = XmlEscape($(if ($ScubaData.MetaData.ToolVersion) { [string]$ScubaData.MetaData.ToolVersion } else { "Unknown" }))
+    $reportUuid = XmlEscape($(if ($ScubaData.MetaData.ReportUUID) { [string]$ScubaData.MetaData.ReportUUID } else { "Unknown" }))
 
     $processedXaml = $processedXaml -replace '{DISPLAY_NAME}', $displayName
     $processedXaml = $processedXaml -replace '{DOMAIN_NAME}', $domainName
     $processedXaml = $processedXaml -replace '{TENANT_ID}', $tenantId
-    $processedXaml = $processedXaml -replace '{REPORT_DATE}', $RelativeTime
+    $processedXaml = $processedXaml -replace '{REPORT_DATE}', (XmlEscape([string]$RelativeTime))
     $processedXaml = $processedXaml -replace '{SCUBA_VERSION}', $scubaVersion
     $processedXaml = $processedXaml -replace '{REPORT_UUID}', $reportUuid
 
@@ -770,17 +784,45 @@ Function New-ResultsContent {
     # Replace the product tabs placeholder
     $processedXaml = $processedXaml -replace '\{PRODUCT_TABS\}', $productTabsXaml
 
+    # Sanitize XAML before parsing to prevent XML entity errors
+    # Remove any illegal control characters
+    if ($processedXaml -match '[\x00-\x08\x0B\x0C\x0E-\x1F]') {
+        Write-DebugOutput -Message "Warning: Removing illegal control characters from XAML" -Source $MyInvocation.MyCommand -Level "Warning"
+        $processedXaml = $processedXaml -replace '[\x00-\x08\x0B\x0C\x0E-\x1F]', ''
+    }
+
     # Parse the XAML into a WPF control
     try {
         # Add debug logging before parsing
         Write-DebugOutput -Message "About to parse XAML of length: $($processedXaml.Length)" -Source $MyInvocation.MyCommand -Level "Debug"
 
-        # Check for common XML issues
-        if ($processedXaml -match '[^\x09\x0A\x0D\x20-\xD7FF\xE000-\xFFFD\x10000-x10FFFF]') {
-            Write-DebugOutput -Message "Warning: XAML contains potentially problematic characters" -Source $MyInvocation.MyCommand -Level "Warning"
-        }
+        try {
+            $reportControl = [Windows.Markup.XamlReader]::Parse($processedXaml)
+        } catch [System.Xml.XmlException] {
+            # Provide detailed context to help diagnose the malformed XML
+            $xmlEx = $_.Exception
+            Write-DebugOutput -Message "XmlException parsing XAML: $($xmlEx.Message) at Line $($xmlEx.LineNumber), Position $($xmlEx.LinePosition)" -Source $MyInvocation.MyCommand -Level "Error"
 
-        $reportControl = [Windows.Markup.XamlReader]::Parse($processedXaml)
+            # Dump the XAML to a temp file for debugging
+            $dumpPath = Join-Path ([IO.Path]::GetTempPath()) ("ScubaGear_FailingReport_{0}.xaml" -f ([Guid]::NewGuid().ToString()))
+            try {
+                Set-Content -Path $dumpPath -Value $processedXaml -Encoding UTF8 -ErrorAction Stop
+                Write-DebugOutput -Message "Dumped failing XAML to: $dumpPath" -Source $MyInvocation.MyCommand -Level "Error"
+            } catch {
+                Write-DebugOutput -Message "Failed to write XAML dump: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+            }
+
+            # Try a conservative sanitization: escape stray '&' characters and retry once
+            $sanitized = $processedXaml -replace '&(?!amp;|lt;|gt;|quot;|apos;|#\d+;)', '&amp;'
+            Write-DebugOutput -Message "Attempting to parse sanitized XAML (escaped stray ampersands)" -Source $MyInvocation.MyCommand -Level "Warning"
+            try {
+                $reportControl = [Windows.Markup.XamlReader]::Parse($sanitized)
+                Write-DebugOutput -Message "Successfully parsed sanitized XAML after fallback" -Source $MyInvocation.MyCommand -Level "Debug"
+            } catch {
+                Write-DebugOutput -Message "Sanitized XAML parse failed: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                throw $xmlEx # Rethrow the original XML exception with context
+            }
+        }
         Write-DebugOutput -Message "Successfully parsed simplified XAML report content" -Source $MyInvocation.MyCommand -Level "Debug"
 
         # Set up button event handlers
@@ -867,8 +909,23 @@ Function New-ResultsContent {
 
     } catch {
         Write-DebugOutput -Message "Error parsing XAML: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-        Write-DebugOutput -Message "XAML snippet around error: $($processedXaml.Substring([Math]::Max(0, $processedXaml.Length - 200)))" -Source $MyInvocation.MyCommand -Level "Debug"
-        return New-ResultsNoDataTab -ReportPath $ReportPath -Message "Error creating simplified report: $($_.Exception.Message)"
+
+        # Save the processed XAML to a temp file for debugging
+        $dumpPath = $null
+        try {
+            $dumpPath = Join-Path ([IO.Path]::GetTempPath()) ("ScubaGear_FailingReport_{0}.xaml" -f ([Guid]::NewGuid().ToString()))
+            Set-Content -Path $dumpPath -Value $processedXaml -Encoding UTF8 -ErrorAction Stop
+            Write-DebugOutput -Message "Dumped failing XAML to: $dumpPath" -Source $MyInvocation.MyCommand -Level "Error"
+        } catch {
+            Write-DebugOutput -Message "Failed to write XAML dump: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        }
+
+        $errorMessage = "Error creating simplified report: $($_.Exception.Message)"
+        if ($dumpPath) {
+            $errorMessage += "`n`nFailing XAML saved to: $dumpPath"
+        }
+
+        return New-ResultsNoDataTab -ReportPath $ReportPath -Message $errorMessage
     }
 }
 
