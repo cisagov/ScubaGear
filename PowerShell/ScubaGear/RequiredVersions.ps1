@@ -29,7 +29,7 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
         ModuleVersion = [version] '2.0.198'
-        MaximumVersion = [version] '2.0.214'
+        MaximumVersion = [version] '2.0.216'
         Purpose = 'Power Platform administrative functions'
     },
     @{
@@ -51,3 +51,4 @@ $ModuleList = @(
         Purpose = 'YAML file processing and configuration management'
     }
 )
+
