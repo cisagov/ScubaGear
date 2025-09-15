@@ -1387,7 +1387,7 @@ function Invoke-ReportCreation {
             $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
             # Inject CSS into parent HTML report template
-            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
+            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
             $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
             $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 

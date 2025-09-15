@@ -25,7 +25,7 @@ const filterBySearch = (arr, term) => {
 
 const renderObject = (obj) => {
     const li = document.createElement("li");
-    li.className = "kv-item";
+    li.classList.add("kv-item");
     Object.entries(obj).forEach(([key, value], idx, arr) => {
         const strong = document.createElement("strong");
         strong.textContent = `${key}:`;
@@ -57,10 +57,10 @@ const groupPermissions = (data, groupKey) => {
 
 const renderAdvancedKeyValueList = (items, dataType) => {
     const wrapper = document.createElement("div");
-    wrapper.className = "kv-advanced";
+    wrapper.classList.add("kv-advanced");
 
     const controls = document.createElement("div");
-    controls.className = "kv-controls";
+    controls.classList.add("kv-controls");
     wrapper.appendChild(controls);
 
     const searchInput = document.createElement("input");
@@ -75,7 +75,7 @@ const renderAdvancedKeyValueList = (items, dataType) => {
         const groupOptions = [
             { value: "none", label: "No grouping" },
             { value: "RoleType", label: "Role type" },
-            { value: "IsAdminConsented", label: "Admin consented" },
+            { value: "IsAdminConsented", label: "Admin consent" },
             { value: "IsRisky", label: "Risky" }
         ];
 
@@ -89,7 +89,7 @@ const renderAdvancedKeyValueList = (items, dataType) => {
     }
 
     const contentHost = document.createElement("div");
-    contentHost.className = "kv-results";
+    contentHost.classList.add("kv-results");
     wrapper.appendChild(contentHost);
 
     const state = {
@@ -99,7 +99,7 @@ const renderAdvancedKeyValueList = (items, dataType) => {
 
     const renderGroupSection = (title, itemsArr) => {
         const section = document.createElement("section");
-        section.className = "kv-group";
+        section.classList.add("kv-group");
 
         const h4 = document.createElement("h4");
         h4.textContent = `${title} (${itemsArr.length})`;

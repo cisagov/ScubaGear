@@ -207,9 +207,6 @@ header h3:hover {
 }
 
 td {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     padding: 0.25em;
     margin: 0em;
     overflow-wrap: break-word;
