@@ -38,7 +38,9 @@ The current version that should be installed is:<br>
 ```powershell
 # The below will check in PSGallery for the latest ScubaGear version
 PS C:\Users\ScubaGear> Test-ScubaGearVersion
+```
 
+```powershell
 # The below will check in the ScubaGear GitHub repo for the latest version
 PS C:\Users\ScubaGear> Test-ScubaGearVersion -CheckGitHub
 ```
