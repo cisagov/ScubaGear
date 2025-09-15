@@ -115,20 +115,20 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 
 Follow this comprehensive step-by-step guide to use the ScubaConfigApp for configuration creation, ScubaGear execution, and report review:
 
-### Step 1: Launch the Application
+### Step 1. Launch the Application
 ```powershell
 Start-SCuBAConfigApp
 ```
 - The WPF application window will open with tabbed navigation
 - Begin with the "Organization" tab which is selected by default
 
-### Step 2: Configure Organization Information
+### Step 2. Configure Organization Information
 - **Tenant Domain**: Enter your organization's primary domain (e.g., contoso.onmicrosoft.com)
 - **Display Name**: Provide a descriptive name for your organization
 - **Description**: Add optional details about this assessment configuration
 - **M365 Environment**: Select your tenant environment (Commercial, GCC, GCC High, DoD)
 
-### Step 3: Select Products for Assessment
+### Step 3. Select Products for Assessment
 Navigate to the "Products" tab:
 - Check the boxes for products you want to assess:
   - **AAD (Entra)**: Azure Active Directory/Entra ID policies
@@ -139,60 +139,60 @@ Navigate to the "Products" tab:
   - **Power BI**: Power BI security settings
   - **Power Platform**: Power Platform governance
 
-### Step 4: Configure Exclusions (Optional)
+### Step 4. Configure Exclusions (Optional)
 In the "Exclusions" tab:
 - Add specific users, groups, or policies to exclude from assessment
 - Use the search functionality to find and select items
 - Document rationale for each exclusion
 
-### Step 5: Add Annotations (Optional)
+### Step 5. Add Annotations (Optional)
 In the "Annotations" tab:
 - Add contextual notes or explanations for specific policies
 - Provide additional information that will appear in reports
 - Useful for documenting organization-specific configurations
 
-### Step 6: Configure Omissions (Optional)
+### Step 6. Configure Omissions (Optional)
 In the "Omissions" tab:
 - Skip specific policies that don't apply to your organization
 - Provide rationale and expiration dates for omitted policies
 - Essential for compliance documentation
 
-### Step 7: Set Advanced Settings
+### Step 7. Set Advanced Settings
 In the "Advanced" tab:
 - **Output Path**: Specify where ScubaGear results will be saved
 - **Authentication Method**: Choose interactive login or certificate-based authentication
 - **Additional Parameters**: Set optional technical parameters
 
-### Step 8: Review Configuration Preview
+### Step 8. Review Configuration Preview
 Click "Preview & Generate" to enable the preview tab and generate the YAML file. This should automatically navigate to the "Preview" tab:
 - Review the generated YAML configuration
 - Verify all settings are correct
-- Make adjustments by returning to previous tabs if needed. 
+- Make adjustments by returning to previous tabs if needed.
 
 > [!IMPORTANT]
 > Be sure to click the "Preview & Generate" when done making updates to pull those changed into yaml output. Clicking on the _Preview_ tab won't show the update
 
-### Step 9: Save Configuration
+### Step 9. Save Configuration
 Click "Save YAML":
 - Save the configuration file to your desired location
 - The file will be named automatically based on your organization domain
 - Configuration is now ready for ScubaGear execution
 
-### Step 10: Execute ScubaGear Assessment **(beta)**
+### Step 10. Execute ScubaGear Assessment **(beta)**
 Click the "Run ScubaGear" button:
 - The "Results" tab will automatically activate
 - Real-time progress monitoring will begin
 - Watch the output window for execution details and status updates
 - Assessment may take 5-15 minutes depending on tenant size and products selected
 
-### Step 11: Monitor Execution Progress
+### Step 11. Monitor Execution Progress
 While ScubaGear runs:
 - Progress updates appear in real-time in the output area
 - Status messages indicate which products are being assessed
 - Any errors or warnings are displayed immediately
 - The interface remains responsive during execution
 
-### Step 12: Review Report Summary **(beta)**
+### Step 12. Review Report Summary **(beta)**
 Once execution completes:
 - Report tabs automatically appear for each assessed product
 - Navigate between product-specific reports using the dynamic tabs
@@ -203,7 +203,7 @@ Once execution completes:
   - **Blue badges**: Policies requiring manual review
   - **Gray badges**: Policies with errors or not implemented
 
-### Step 13: Analyze Results and Take Action
+### Step 13. Analyze Results and Take Action
 For each product report:
 - Click on individual policies to view detailed findings
 - Review recommendations for failed or warning policies
@@ -263,13 +263,13 @@ The native WPF report viewer provides a modern, integrated experience for review
 
 Each policy displays a colored status badge indicating compliance level:
 
-| Badge Color | Status | Icon | Meaning |
-|-------------|--------|------|---------|
-| **Green** | Pass | ✓ | Policy meets compliance requirements |
-| **Yellow** | Warning | ⚠ | Policy needs attention or has minor issues |
-| **Red** | Failure | ✗ | Policy fails compliance requirements |
-| **Blue** | Manual | 👁 | Policy requires manual review or verification |
-| **Gray** | Error/N/A | ? | Policy has errors or is not implemented |
+| Badge Color | Status | Meaning |
+|-------------|--------|---------|
+| **Green** | Pass | Policy meets compliance requirements |
+| **Yellow** | Warning | Policy needs attention or has minor issues |
+| **Red** | Failure | Policy fails compliance requirements |
+| **Blue** | Manual | Policy requires manual review or verification |
+| **Gray** | Error/N/A | Policy has errors or is not implemented |
 
 ### Report Navigation
 

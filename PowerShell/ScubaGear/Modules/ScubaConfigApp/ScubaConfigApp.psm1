@@ -173,29 +173,29 @@ Function Start-SCuBAConfigApp {
         try {
             #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
-            Write-Output "⏳ Connecting to Microsoft Graph..."
+            Write-Output "Connecting to Microsoft Graph..."
             Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
 
             #ensure user is authenticated
             Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
-            Write-Output "✅ Successfully connected to Microsoft Graph"
+            Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
         }
         catch {
-            Write-Error "❌ Failed to connect to Microsoft Graph: $($_.Exception.Message)"
+            Write-Error " - Failed to connect to Microsoft Graph: $($_.Exception.Message)"
             $GraphConnected = $false
             Break
         }
         finally {
-            Write-Output "📥 Attempting to pull Scuba baselines from online..."
+            Write-Output "Attempting to pull Scuba baselines from online..."
         }
     } else {
         $GraphConnected = $false
     }
 
-    Write-Output "🚀 Launching ScubaConfigApp...please wait."
+    Write-Output "Launching ScubaConfigApp...please wait."
     If($ConfigFilePath){
-        Write-Output "📥 Importing configuration from $ConfigFilePath..."
+        Write-Output "Importing configuration from $ConfigFilePath..."
     }
 
     # build a hash table with locale data to pass to runspace
@@ -1295,9 +1295,9 @@ Function Start-SCuBAConfigApp {
         Write-Output "🔌 Disconnected from Microsoft Graph"
     }
     if ($Data.Error.Count -eq 0) {
-        Write-Output "✅ ScubaConfigApp closed successfully with no errors"
+        Write-Output "ScubaConfigApp closed successfully with no errors"
     } else {
-        Write-Output "⚠️  ScubaConfigApp closed with $($Data.Error.Count) error(s)"
+        Write-Output "ScubaConfigApp closed with $($Data.Error.Count) error(s)"
     }
 
     If($Passthru){

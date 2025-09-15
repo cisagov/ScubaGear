@@ -19,11 +19,11 @@ ScubaGear is an assessment tool that verifies that a Microsoft 365 (M365) tenant
 
 ScubaGear is for M365 administrators who want to assess their tenant environments against CISA Secure Configuration Baselines.
 
-## What's New 🆕
+## What's New
 
 **Scuba Configuration UI**: SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
 
-#### 🚀 UI Key Features:
+#### UI Key Features:
 - Launch with `Start-ScubaConfigApp`
 - Step-by-step setup wizard covering all configuration options
 - Real-time validation with live YAML preview
@@ -64,47 +64,6 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 - **HTML Reports**: Interactive, user-friendly compliance reports. See SAMPLE: [Baselinereports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
 - **JSON Output**: Structured results for reporting and parsing. See SAMPLE: [ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
 - **CSV Export**: Spreadsheet-compatible data for analysis. See SAMPLE: [ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
-![ScubaGear Assessment Process Diagram](docs/images/scuba-process.png)
-
-## Key Features
-
-### 🖥️ Multiple Interfaces
-
-- **Configuration UI**: Graphical interface for easy setup and configuration management
-- **Command Line**: PowerShell cmdlets for automation and scripting
-- **Configuration Files**: YAML-based configuration for repeatable assessments
-
-### 🔒 Comprehensive Security Coverage
-
-- **Azure Active Directory (AAD)**: Identity and access management policies
-- **Microsoft Defender**: Advanced threat protection settings
-- **Exchange Online**: Email security and compliance configurations
-- **OneDrive**: File sharing and data protection policies
-- **Power Platform**: Low-code application security settings
-- **SharePoint**: Document collaboration and access controls
-- **Microsoft Teams**: Communication and meeting security policies
-
-### 📊 Rich Reporting
-
-- **HTML Reports**: Interactive, user-friendly compliance reports
-- **JSON Output**: Machine-readable results for automation
-- **CSV Export**: Spreadsheet-compatible data for analysis
-
-### 🎯 CISA SCuBA Alignment
-
-- Based on official [CISA SCuBA baselines](https://cisa.gov/scuba)
-- Regularly updated to match the latest security recommendations
-- Detailed policy mappings and explanations
-  - [Mappings](docs/misc/mappings.md)
-  - [Baselines](baselines/README.md)
-    - [Microsoft Entra ID](PowerShell/ScubaGear/baselines/aad.md)
-    - [Defender](PowerShell/ScubaGear/baselines/defender.md)
-    - [Exchange Online](PowerShell/ScubaGear/baselines/exo.md)
-    - [Power BI](PowerShell/ScubaGear/baselines/powerbi.md)
-    - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md)
-    - [SharePoint & OneDrive](PowerShell/ScubaGear/baselines/sharepoint.md)
-    - [Teams](PowerShell/ScubaGear/baselines/teams.md)
-    - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
 ## Getting Started
 
@@ -141,10 +100,10 @@ Please review the [Prerequisites](#prerequisites) section to verify that your sy
 
 ScubaGear is designed to be run multiple times to properly evaluate and apply baseline settings.
 
-1. **First Run (No Configuration File):**  
+1. **First Run (No Configuration File):**
    Start ScubaGear without a configuration file. This initial run generates a baseline template of your environment's current settings. It does not make changes but helps you understand the default posture.
 
-2. **Subsequent Runs (With Configuration File):**  
+2. **Subsequent Runs (With Configuration File):**
    After reviewing and editing the generated configuration file, run ScubaGear again with the configuration file as input. This allows ScubaGear to compare your intended settings against the actual environment and elevate discrepancies accordingly.
 
 This iterative approach ensures ScubaGear is aligned with your environment and that all policy evaluations are based on your customized baseline.
