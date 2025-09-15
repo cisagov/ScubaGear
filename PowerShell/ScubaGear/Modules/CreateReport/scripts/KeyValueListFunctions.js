@@ -129,7 +129,7 @@ const renderAdvancedKeyValueList = (items, dataType) => {
             return;
         }
 
-        renderGroupSection("Items", filtered);
+        renderGroupSection("All", filtered);
     };
 
     searchInput.addEventListener("input", e => {

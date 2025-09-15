@@ -172,12 +172,14 @@ const buildExpandableTable = (data, tableType) => {
         section.appendChild(buttons);
 
         const expandAll = document.createElement("button");
+        expandAll.classList.add("btn-primary");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
         expandAll.title = "Expands all rows in the table below";
         expandAll.addEventListener("click", () => expandAllRows(data, tableType));
         buttons.appendChild(expandAll);
 
         const collapseAll = document.createElement("button");
+        collapseAll.classList.add("btn-primary");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
         collapseAll.title = "Collapses all rows in the table below";
         collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
@@ -365,7 +367,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
 
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = "view-details-button";
+                btn.classList.add("btn-primary", "view-details-button");
                 btn.textContent = `View ${count} ${colLabel}`;
                 btn.addEventListener("click", () => {
                     let dataType = "";
@@ -596,7 +598,8 @@ const renderSummaryList = (colName, items) => {
         ul.appendChild(li);
     };
 
-    if (colName === "KeyCredentials" || colName === "PasswordCredentials" || colName === "FederatedCredentials") {
+    // Only display active/expired counts for key/password credentials
+    if (colName === "KeyCredentials" || colName === "PasswordCredentials") {
         const now = new Date();
         let active = 0, expired = 0;
 
@@ -623,6 +626,13 @@ const renderSummaryList = (colName, items) => {
         addItem(ul, "Total", count);
         addItem(ul, "Active", active);
         addItem(ul, "Expired", expired);
+        return ul;
+    }
+
+    // Federated credentials do not expire so only display the total count
+    if (colName === "FederatedCredentials") {
+        const ul = makeUl();
+        addItem(ul, "Total", count);
         return ul;
     }
 
