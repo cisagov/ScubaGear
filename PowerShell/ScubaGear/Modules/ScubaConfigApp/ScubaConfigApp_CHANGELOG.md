@@ -1,6 +1,6 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
 
-## 1.8.21 [08/21/2025] -UI & Usability Improvements
+## 1.8.21 [08/21/2025] - UI & Usability Improvements
 
 ### Bug Fixes
  - Fixed Result Path button – now opens to the correct folder based on Outpath or default.
