@@ -186,9 +186,9 @@ const renderAdvancedKeyValueList = (listItems, dataType) => {
         controls.appendChild(selectLabel);  
 
         groupSelect = document.createElement("select");
-        groupSelect.id = "modal-group-by"
+        groupSelect.id = "modal-group-by";
         const groupOptions = [
-            { value: "none", label: "No grouping" },
+            { value: "none", label: "None" },
             { value: "RoleType", label: "Role type" },
             { value: "IsAdminConsented", label: "Admin consent" },
             { value: "IsRisky", label: "Risk" }
