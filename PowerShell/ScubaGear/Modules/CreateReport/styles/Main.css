@@ -574,6 +574,12 @@ a.control_group:active {
     outline: none;
 }
 
+.kv-controls label {
+    font-size: 0.9rem;
+    line-height: 1.25;
+    color: var(--text-color);
+}
+
 .kv-results {
     display: flex;
     flex-direction: column;

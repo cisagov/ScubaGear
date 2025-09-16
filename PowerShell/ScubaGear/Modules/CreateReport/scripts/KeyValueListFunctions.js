@@ -173,18 +173,25 @@ const renderAdvancedKeyValueList = (listItems, dataType) => {
 
     const searchInput = document.createElement("input");
     searchInput.type = "search";
+    searchInput.id = "modal-search";
     searchInput.placeholder = "Search...";
     controls.appendChild(searchInput);
 
     // The option to group by is only present for permissions. Credentials only has "active"/"expired" fields.
     let groupSelect = null;
     if (dataType === "Permissions") {
+        const selectLabel = document.createElement("label");
+        selectLabel.htmlFor = "modal-group-by";
+        selectLabel.textContent = " Group by";
+        controls.appendChild(selectLabel);  
+
         groupSelect = document.createElement("select");
+        groupSelect.id = "modal-group-by"
         const groupOptions = [
             { value: "none", label: "No grouping" },
             { value: "RoleType", label: "Role type" },
             { value: "IsAdminConsented", label: "Admin consent" },
-            { value: "IsRisky", label: "Risky" }
+            { value: "IsRisky", label: "Risk" }
         ];
 
         groupOptions.forEach(o => {
