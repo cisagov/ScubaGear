@@ -548,7 +548,7 @@ function New-Report {
     }
 
     # Inject CSS into individual HTML report template
-    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
+    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction "Stop"
     $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
     $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
@@ -561,7 +561,7 @@ function New-Report {
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
     # Load JS files 
-    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
+    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
     $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
     $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
     $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw

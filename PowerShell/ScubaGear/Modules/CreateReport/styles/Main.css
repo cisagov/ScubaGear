@@ -23,13 +23,11 @@
     --toggle-width: 2.875em;
     --toggle-radius: 1.125em;
     --box-shadow-1: 0 1px 2px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
-
     --input-border: #c2c8cc;
     --input-border-hover: #95a1aa;
     --input-border-focus: #005288;
     --input-placeholder: #6b6f72;
     --focus-ring: 0 0 0 2px rgba(0,82,136,0.35);
-
     --btn-primary-bg: #ffffff;
     --btn-primary-text: #005288;
     --btn-primary-border: #005288;
@@ -56,13 +54,11 @@ html[data-theme='dark'] {
     --uuid-color: #999999;
     --border-color: #7b7b7b;
     --box-shadow-1: 0 1px 2px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-
     --input-border: #394651;
     --input-border-hover: #56636d;
     --input-border-focus: #4aa3d6;
     --input-placeholder: #8b949b;
     --focus-ring: 0 0 0 2px rgba(74,163,214,0.45);
-
     --btn-primary-bg: #10171D;
     --btn-primary-text: #ffffff;
     --btn-primary-border: #4aa3d6;
@@ -134,6 +130,17 @@ button.btn-primary {
     gap: 0.4rem;
     transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     text-decoration: none;
+}
+
+button.btn-primary:hover{
+    border-color: var(--input-border-hover);
+    background: var(--btn-primary-hover-bg);
+}
+
+button.btn-primary:focus {
+    border-color: var(--input-border-focus);
+    background: var(--btn-primary-active-bg);
+    outline: none;
 }
 
 hr {
@@ -595,7 +602,7 @@ a.control_group:active {
 
 .kv-item {
     margin-bottom: 0.75rem;
-    padding-bottom: 0.25rem;
+    padding-bottom: 0.75rem;
     font-size: 0.9rem;
     line-height: 1.25;
     color: var(--text-color);
