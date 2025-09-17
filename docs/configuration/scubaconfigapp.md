@@ -40,21 +40,25 @@ Start-SCuBAConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Onlin
 | M365Environment | String | Target M365 environment (commercial, gcc, gcchigh, dod) | "commercial" |
 | Passthru | Switch | Return the configuration objects | False |
 
-#### Examples
+#### Examples:
 
 ```powershell
 # Basic usage - Launch the configuration UI
 Start-SCuBAConfigApp
-
+```
+```powershell
 # Launch with Graph connectivity for commercial environment (Interactive)
 Start-SCuBAConfigApp -Online
-
+```
+```powershell
 # Import existing configuration
 Start-SCuBAConfigApp -ConfigFilePath "C:\configs\myconfig.yaml"
-
+```
+```powershell
 # Launch and connect to graph for GCC High environment
 Start-SCuBAConfigApp -Online -M365Environment gcchigh
-
+```
+```powershell
 #Use Passthru with a variable to retrieve all configurations in hashtables
 $SCuBAUI = Start-SCuBAConfigApp -Passthru
 #retrieving data
