@@ -1,0 +1,208 @@
+# ScubaGear Cached Execution
+
+`Invoke-SCuBACached` is a specialized version of the main ScubaGear function that allows you to run security assessments in two distinct modes:
+
+1. **Full mode** - Works identically to `Invoke-SCuBA` (exports provider data, runs Rego analysis, and generates reports)
+2. **Cached mode** - Skips data collection and authentication, running analysis only on previously exported provider JSON files
+
+This function is particularly useful for:
+- Re-running analysis on previously collected data
+- Testing different report configurations without re-authenticating
+- Offline analysis scenarios
+- Development and testing workflows
+
+## Key Parameters
+
+
+### All Parameters
+
+` Invoke-SCuBACached [-ExportProvider <Boolean>] [-ProductNames <String[]>] [-M365Environment <String>] [-OPAPath <String>] [-LogIn <Boolean>] [-Version] [-AppID <String>]
+    [-CertificateThumbprint <String>] [-Organization <String>] [-OutPath <String>] [-OutProviderFileName <String>] [-OutRegoFileName <String>] [-OutReportName <String>]
+    [-KeepIndividualJSON] [-OutJsonFileName <String>] [-OutCsvFileName <String>] [-OutActionPlanFileName <String>] [-Quiet] [-DarkMode] [-SilenceBODWarnings]
+    [-NumberOfUUIDCharactersToTruncate <Int32>] [<CommonParameters>]`
+
+### ExportProvider
+The most important parameter that distinguishes `Invoke-SCuBACached` from `Invoke-SCuBA`:
+
+- **`$true` (default)**: Functions exactly like `Invoke-SCuBA` - authenticates, exports provider data, runs Rego analysis, and generates reports
+- **`$false`**: Skips authentication and data export, runs analysis only on existing provider JSON files in the specified output path
+
+### Other Parameters
+All other parameters function identically to `Invoke-SCuBA`. See the [parameters documentation](../configuration/parameters.md) for complete details.
+
+## Usage Examples
+
+### Full Mode (Default Behavior)
+```powershell
+# Runs exactly like Invoke-SCuBA - authenticates and exports fresh data
+Invoke-SCuBACached -ProductNames teams, aad -OutPath "C:\ScubaResults"
+```
+
+```powershell
+# Explicitly set ExportProvider to true (same as default)
+Invoke-SCuBACached -ProductNames * -ExportProvider $true -OutPath "C:\ScubaResults"
+```
+
+### Cached Mode (Analysis Only)
+```powershell
+# Run analysis only on previously exported data
+Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\ScubaResults"
+```
+
+```powershell
+# Generate a new report with different settings using cached data
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\PreviousResults" -DarkMode -Quiet
+```
+
+## Cached Mode Requirements
+
+When using `ExportProvider $false`, the following conditions must be met:
+
+### Required Files
+The output directory must contain one of the following:
+
+1. **Individual provider file**: `ProviderSettingsExport.json` (or custom name specified by `-OutProviderFileName`)
+2. **Consolidated results file**: `ScubaResults*.json` file from a previous ScubaGear run
+
+### File Location
+Files must be located in the path specified by the `-OutPath` parameter. If no `-OutPath` is specified, ScubaGear will look in the current directory.
+
+### Product Compatibility
+The cached data must contain information for the products specified in `-ProductNames`. If the cached data doesn't include a requested product, the analysis will fail for that product.
+
+## Workflow Examples
+
+### Typical Development Workflow
+```powershell
+# Step 1: Export fresh data (full authentication)
+Invoke-SCuBACached -ProductNames * -OutPath "C:\MyAnalysis"
+
+# Step 2: Re-run analysis with different report settings (no authentication)
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\MyAnalysis" -DarkMode
+
+# Step 3: Generate CSV-only output (no authentication)
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\MyAnalysis" -Quiet
+```
+
+### Offline Analysis Workflow
+```powershell
+# On connected machine: Export data
+Invoke-SCuBACached -ProductNames teams, aad, exo -OutPath "C:\ExportForOfflineAnalysis"
+
+# Transfer files to offline machine, then run analysis
+Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "C:\OfflineAnalysis"
+```
+
+### Testing Different Product Combinations
+```powershell
+# Export all product data once
+Invoke-SCuBACached -ProductNames * -OutPath "C:\CompleteExport"
+
+# Run analysis on subset 1
+Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\CompleteExport"
+
+# Run analysis on subset 2
+Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\CompleteExport"
+```
+
+## Error Scenarios
+
+### Missing Provider Data
+If the required provider JSON file doesn't exist in the specified path:
+```
+FileNotFoundException: Could not find provider data file
+```
+
+**Solution**: Ensure the output directory contains the required `ProviderSettingsExport.json` or `ScubaResults*.json` file.
+
+### Product Mismatch
+If the cached data doesn't contain information for the requested products:
+```
+The cached provider data does not contain data for: [ProductName]
+```
+
+**Solution**: Either:
+- Export fresh data that includes the missing products
+- Adjust the `-ProductNames` parameter to match available cached data
+
+### Invalid JSON Format
+If the cached provider file is corrupted or in an invalid format:
+```
+ConvertFrom-Json: Invalid JSON format
+```
+
+**Solution**: Re-export the provider data using the full mode (`ExportProvider $true`).
+
+## Performance Considerations
+
+### Cached Mode Benefits
+- **Faster execution**: Skips authentication and data collection (typically 60-90% faster)
+- **No network dependencies**: Can run completely offline
+- **No credential requirements**: No need for M365 access
+- **Consistent data**: Analysis runs on the same dataset for reproducible results
+
+### Full Mode Benefits
+- **Fresh data**: Always uses current tenant configuration
+- **Complete workflow**: Single command for end-to-end assessment
+- **Automatic cleanup**: Handles file management automatically
+
+## File Management
+
+### Automatic File Detection
+When `ExportProvider $false` is used, ScubaGear will automatically:
+
+1. Look for `[OutProviderFileName].json` in the output directory
+2. If not found, search for `ScubaResults*.json` files
+3. If multiple `ScubaResults*.json` files exist, use the most recently created one
+4. Extract provider data from the consolidated file if needed
+
+### Custom Provider File Names
+```powershell
+# Export with custom provider file name
+Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\Results"
+
+# Use cached data with custom provider file name
+Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\Results"
+```
+
+## Best Practices
+
+### Development and Testing
+- Use cached mode during development to speed up iteration cycles
+- Keep a "golden" export for consistent testing across different configurations
+- Use descriptive output folder names to organize different test scenarios
+
+### Production Use
+- Use full mode for official assessments to ensure fresh data
+- Consider cached mode for generating multiple report formats from the same assessment
+- Document the date/time of the original data export when using cached mode
+
+### File Organization
+```
+C:\ScubaAssessments\
+├── 2024-01-15_Production\          # Full export folder
+│   ├── ProviderSettingsExport.json
+│   ├── ScubaResults_abc123.json
+│   └── BaselineReports.html
+├── 2024-01-15_DarkMode\            # Cached analysis with different theme
+│   ├── ProviderSettingsExport.json (copied)
+│   ├── ScubaResults_def456.json
+│   └── BaselineReports.html
+└── 2024-01-15_CSVOnly\             # Cached analysis for CSV export
+    ├── ProviderSettingsExport.json (copied)
+    └── ScubaResults.csv
+```
+
+## Known Issues
+
+- Running the function on the same JSON file will eventually cause a System out of memory error as the file gets bigger and bigger.
+
+## Version Compatibility
+
+The cached mode works with provider data from the same major version of ScubaGear. When upgrading ScubaGear versions:
+
+- **Minor version updates**: Cached data typically remains compatible
+- **Major version updates**: May require fresh data export due to schema changes
+- **Cross-version analysis**: Not recommended; re-export data with the new version
+
+Check the [release notes](../../RELEASES.md) for version-specific compatibility information.
