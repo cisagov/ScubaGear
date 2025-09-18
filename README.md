@@ -58,6 +58,8 @@ Before launching **ScubaGear**, it's important to ensure your environment is pro
 
 Please review the [prerequisites](#prerequisites) section to verify that your system meets all requirements. This will help avoid errors during execution and ensure a smooth experience when using ScubaGear.
 
+> [!NOTE]
+> After installing ScubaGear in your environment, we recommend using the built-in update functions and features when you need to update to the latest version. See the [Update Guide](docs/installation/update.md) for more information.
 
 ### Quick Start Guide
 
@@ -129,7 +131,7 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 > [full_config.yaml](PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module.
 
 
-### 6: Run ScubaGear with a configuration File
+### 6. Run ScubaGear with a configuration File
 
 When running `Invoke-SCuBA` for BOD 25-01 submissions:
 ```powershell
@@ -144,6 +146,20 @@ For all other instances:
 Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 ```
 
+### 7. Update ScubaGear
+
+The following will update ScubaGear.
+```powershell
+# The following will update ScubaGear to the latest version
+Update-ScubaGear
+```
+
+The following will baseline all ScubaGear dependencies, please review the [Update Guide](docs/installation/update.md) in detail before running.
+```powershell
+# The follwing will remove and re-install all ScubaGear dependencies
+Reset-ScubaGearDependencies
+```
+
 ## Table of Contents
 
 ### Getting Started
@@ -153,6 +169,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
   - [Install from PSGallery](docs/installation/psgallery.md)
   - [Download from GitHub](docs/installation/github.md)
   - [Uninstall](docs/installation/uninstall.md)
+  - [Update](docs/installation/update.md)
 
  #### Prerequisites
 
