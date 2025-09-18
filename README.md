@@ -46,6 +46,20 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
   - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
+### Scuba Configuration UI
+
+SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
+For more information review the [Configuration UI](docs/configuration/scubaconfigapp.md) doc.
+
+#### UI Key Features:
+- Launch with `Start-ScubaConfigApp`
+- Step-by-step setup wizard covering all configuration options
+- Real-time validation with live YAML preview
+- Microsoft Graph integration for user and group selection
+- Seamless import/export of existing configuration files
+
+> Ideal for users who prefer a visual interface over command-line tools.
+
 ### ScubaGear Output
 
 - **HTML Reports**: Interactive, user-friendly compliance reports. See SAMPLE: [Baselinereports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
@@ -109,7 +123,6 @@ Invoke-SCuBA -ProductNames *
 ```
 
 ### 5. Build YAML configuration file
-
 
 ScubaGear uses a YAML configuration file to define how your environment should be evaluated. This file serves several important purposes:
 
@@ -180,6 +193,7 @@ Reset-ScubaGearDependencies
 
 ## Configuration & Usage
 
+- [Configuration UI](docs/scubaconfigapp.md) - **Graphical interface**
 - [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
 - [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 

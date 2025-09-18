@@ -100,20 +100,12 @@ The **Configuration UI** provides an intuitive graphical interface for creating 
 
 ```powershell
 # Launch the Configuration UI
-Invoke-SCuBAConfigAppUI
+Start-SCuBAConfigApp
 ```
-
-The Configuration UI offers:
-- **User-friendly interface** with guided setup
-- **Real-time validation** of all configuration options
-- **YAML preview** before saving
-- **Import/export** existing configurations
-- **Microsoft Graph integration** for browsing users and groups
-- **Built-in help** and examples for all settings
 
 This is the **recommended method** for users who prefer visual interfaces or are new to ScubaGear configuration.
 
-For complete documentation on using the Configuration UI, see the [Configuration UI Guide](../scubaconfigui.md).
+For complete documentation on using the Configuration UI, see the [Configuration UI Guide](scubaconfigapp.md).
 
 ### Method 2: Command-Line Generation
 
