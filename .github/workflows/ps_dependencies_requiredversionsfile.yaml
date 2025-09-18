@@ -30,6 +30,10 @@ jobs:
         run: |
           pwsh -File ./utils/workflow/BumpPsDependencies.ps1
 
+      - name: Update dependencies documentation table
+        run: |
+          pwsh -File ./utils/workflow/UpdateDependenciesTable.ps1
+
       - name: Commit changes and create new branch
         id: create_branch
         shell: pwsh
@@ -39,34 +43,103 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./PowerShell/ScubaGear/RequiredVersions.ps1
-          git commit -m 'Bump PowerShell dependencies' || echo "No changes to commit"
+          git add ./docs/prerequisites/dependencies.md
+          git commit -m 'Bump PowerShell dependencies and update documentation' || echo "No changes to commit"
           $timestamp = Get-Date -Format "yyyyMMddHHmmss"
           $branchName = "bump-dependencies-$timestamp"
           git checkout -b $branchName
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:$branchName
           echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Trigger smoke test workflow
+      - name: Trigger and wait for smoke test workflow
         if: success()
+        id: smoke_test
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
         shell: pwsh
         run: |
-          $headers = @{
-            Authorization = "Bearer $env:GITHUB_TOKEN"
-            Accept = "application/vnd.github+json"
+          try {
+            $headers = @{
+              Authorization = "Bearer $env:GITHUB_TOKEN"
+              Accept = "application/vnd.github+json"
+            }
+
+            # Trigger the workflow
+            $body = @{
+              ref = "$env:BRANCH_NAME"
+            } | ConvertTo-Json
+
+            $response = Invoke-RestMethod -Method Post `
+              -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
+              -Headers $headers `
+              -Body $body
+
+            Write-Host "Smoke test workflow triggered successfully"
+
+            # Wait a bit for the workflow to start
+            Start-Sleep -Seconds 30
+
+            # Get the latest workflow run for our branch
+            $runsResponse = Invoke-RestMethod -Method Get `
+              -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/runs?branch=$env:BRANCH_NAME&per_page=1" `
+              -Headers $headers
+
+            if ($runsResponse.workflow_runs.Count -eq 0) {
+              throw "No smoke test workflow run found for branch $env:BRANCH_NAME"
+            }
+
+            $runId = $runsResponse.workflow_runs[0].id
+            $runUrl = $runsResponse.workflow_runs[0].html_url
+            Write-Host "Monitoring smoke test workflow run: $runUrl"
+
+            # Poll for completion
+            $maxWaitMinutes = 30
+            $pollIntervalSeconds = 30
+            $maxPolls = ($maxWaitMinutes * 60) / $pollIntervalSeconds
+            $pollCount = 0
+
+            do {
+              Start-Sleep -Seconds $pollIntervalSeconds
+              $pollCount++
+
+              $runStatus = Invoke-RestMethod -Method Get `
+                -Uri "https://api.github.com/repos/${{ github.repository }}/actions/runs/$runId" `
+                -Headers $headers
+
+              $status = $runStatus.status
+              $conclusion = $runStatus.conclusion
+
+              Write-Host "Smoke test status: $status, conclusion: $conclusion (poll $pollCount/$maxPolls)"
+
+              if ($status -eq "completed") {
+                if ($conclusion -eq "success") {
+                  Write-Host "✅ Smoke test workflow completed successfully"
+                  echo "SMOKE_TEST_PASSED=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+                  break
+                }
+                else {
+                  echo "SMOKE_TEST_PASSED=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+                  throw "❌ Smoke test workflow failed with conclusion: $conclusion. Check: $runUrl"
+                }
+              }
+
+              if ($pollCount -ge $maxPolls) {
+                echo "SMOKE_TEST_PASSED=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+                throw "⏰ Smoke test workflow timed out after $maxWaitMinutes minutes. Check: $runUrl"
+              }
+
+            } while ($status -ne "completed")
           }
-          $body = @{
-            ref = "$env:BRANCH_NAME"
-          } | ConvertTo-Json
-          Invoke-RestMethod -Method Post `
-            -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
-            -Headers $headers `
-            -Body $body
+          catch {
+            echo "SMOKE_TEST_PASSED=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            Write-Host "❌ Smoke test failed: $_"
+            # Don't exit with error code - let workflow continue to cleanup branch
+          }
 
       - name: Check for existing pull requests
-        if: success()
+        if: always()
         id: check_pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,8 +157,26 @@ jobs:
             echo "SHOULD_CREATE_PR=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           }
 
+      - name: Delete branch if PR already exists
+        if: always() && env.SHOULD_CREATE_PR == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        shell: pwsh
+        run: |
+          Write-Host "Deleting branch $env:BRANCH_NAME because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
+
+          # Delete the remote branch
+          try {
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} --delete $env:BRANCH_NAME
+            Write-Host "✅ Successfully deleted remote branch $env:BRANCH_NAME"
+          }
+          catch {
+            Write-Host "⚠️ Failed to delete remote branch (may not exist): $_"
+          }
+
       - name: Create pull request
-        if: success() && env.SHOULD_CREATE_PR == 'true'
+        if: env.SHOULD_CREATE_PR == 'true' && env.SMOKE_TEST_PASSED == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
@@ -94,6 +185,11 @@ jobs:
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
 
       - name: Skip pull request creation
-        if: success() && env.SHOULD_CREATE_PR == 'false'
+        if: env.SHOULD_CREATE_PR == 'false' || env.SMOKE_TEST_PASSED == 'false'
         run: |
-          Write-Host "Skipping pull request creation because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
+          if ($env:SHOULD_CREATE_PR -eq 'false') {
+            Write-Host "Skipped pull request creation because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
+          }
+          if ($env:SMOKE_TEST_PASSED -eq 'false') {
+            Write-Host "Skipped pull request creation because smoke test failed"
+          }
