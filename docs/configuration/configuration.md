@@ -8,7 +8,8 @@ ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters]
 
 - The configuration files use the Pascal case convention for variables, and their names are consistent with the parameters.
 
-> Important: When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
+> [!IMPORTANT]
+> When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
 
 ## Sample Configuration Files
 
@@ -82,7 +83,7 @@ You can also override authentication parameters at runtime:
 ```powershell
 # Override authentication parameters on command line
 Invoke-SCuBA `
-  -ConfigFilePath myconfig.yaml `
+  -ConfigFilePath "<path>\full_config.yaml" `
   -Organization example.onmicrosoft.com `
   -AppID abcdef0123456789abcde01234566789 `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98
