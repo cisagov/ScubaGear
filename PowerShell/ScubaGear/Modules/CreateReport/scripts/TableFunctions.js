@@ -92,7 +92,8 @@ const applyScopeAttributes = () => {
                 const rows = tbody.querySelectorAll("tr");
                 rows.forEach(row => {
                     const td = row.querySelectorAll("td");
-                    if (td.length > 0) td[0].setAttribute("scope", "row");
+                    // The expand/collapse button is set to td[0], use td[1] for scope="row" since its the "Name" column
+                    if (td.length > 0) td[1].setAttribute("scope", "row");
                 })
             }
             else {
