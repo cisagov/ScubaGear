@@ -66,37 +66,54 @@ const applyScopeAttributes = () => {
         const tables = document.querySelectorAll("table");
         for(let i = 0; i < tables.length; i++) {
             // each table has two children, <colgroup> and <tbody>
-            let tbody = tables[i].querySelector("tbody");
-            if(!tbody) throw new Error(
-                `Invalid HTML structure, <table id='${tables[i].getAttribute("id")}'> does not have a <tbody> tag.`
+            let table = tables[i];
+            if(!table) continue;
+
+            const isExpandableTable = (
+                table.classList.contains("caps_table") ||
+                table.classList.contains("riskyApps_table") ||
+                table.classList.contains("riskyThirdPartySPs_table")
             );
-            
-            /**
-             * the first <tr> in <tbody> represents columns. Label each nested <th> as scope="col"
-             * 
-             * second <tr> + ... are the rows
-             * for each <tr>, the first <td> should be labeled as scope="row", leave the rest
-             */
-            let cols, rows;
-            if(tbody.children && tbody.children.length > 1) {
-                cols = tbody.children[0].querySelectorAll("th");
-                for(let th = 0; th < cols.length; th++) {
-                    cols[th].setAttribute("scope", "col");
-                }
 
-                // change location of scope="row" if necessary (may have to adjust for structure of license info?)
-                let trIdx = (tables[i].classList.contains("caps_table")) ? 1 : 0;
+            if (isExpandableTable) {
+                const thead = table.querySelector("thead");
+                const tbody = table.querySelector("tbody");
+                if (!thead || !tbody) continue;
 
-                // skip column <tr>; for each remaining <tr> set the scope 
-                rows = tbody.children;
-                for(let tr = 1; tr < rows.length; tr++) {
-                    rows[tr].querySelectorAll("td")[trIdx].setAttribute("scope", "row");
+                /**
+                 * <thead> contains contains a single <tr> with <th> elements, label each with scope="col"
+                 * 
+                 * <tbody> contains multiple <tr>, each <tr> represents a row.
+                 * For each <tr>, the first <td> should be labeled as scope="row", leave the rest
+                 */
+                const cols = thead.querySelectorAll("th");
+                cols.forEach(col => col.setAttribute("scope", "col"));
+
+                const rows = tbody.querySelectorAll("tr");
+                rows.forEach(row => {
+                    const td = row.querySelectorAll("td");
+                    if (td.length > 0) td[0].setAttribute("scope", "row");
+                })
+            }
+            else {
+                const tbody = table.querySelector("tbody");
+                if (!tbody || !tbody.children || tbody.children.length === 0) continue;
+
+                /**
+                * the first <tr> in <tbody> represents columns. Label each nested <th> as scope="col"
+                * 
+                * second <tr> + ... are the rows
+                * for each <tr>, the first <td> should be labeled as scope="row", leave the rest
+                */
+                const colRow = tbody.children[0];
+                const cols = colRow.querySelectorAll("th");
+                cols.forEach(col => col.setAttribute("scope", "col"));
+
+                for (let tr = 1; tr < tbody.children.length; tr++) {
+                    const td = tbody.children[tr].querySelectorAll("td");
+                    if (td.length > 0) td[0].setAttribute("scope", "row");
                 }
             }
-            else throw new Error(
-                `Unable to apply scope attributes to columns/rows, 
-                <tbody> of <table id='${tables[i].getAttribute("id")}'> does not contain children or has no rows.`
-            );
         }
     }
     catch (error) {

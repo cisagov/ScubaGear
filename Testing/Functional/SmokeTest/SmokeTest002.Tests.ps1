@@ -132,8 +132,12 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         }
                     }
                 }
-                # AAD detailed report has a Conditional Access Policy table
-                elseif ($Table.GetAttribute("class") -eq "caps_table"){
+                # AAD detailed report has a Conditional Access Policy and risky apps/sp tables
+                elseif (
+                    $Table.GetAttribute("class") -eq "caps_table" -or
+                    $Table.GetAttribute("class") -eq "riskyApps_table" -or
+                    $Table.GetAttribute("class") -eq "riskyThirdPartySPs_table"
+                ){
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                         $RowData = Get-SeElement -Element $Row -By TagName 'td'
