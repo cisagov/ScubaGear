@@ -429,6 +429,16 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
+        # The template HTML files contain embedded expressions (e.g., {AADWARNING}) which act as placeholders for where dynamic content is inserted.
+        # This allows us to dynamically inject generated HTML sections into the final report output.
+        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
+
+        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
+        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
+
+        # Same for risky applications and third-party service principals
+        $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
+        $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -457,6 +467,7 @@ function New-Report {
 
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
 
         if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_service_principals) {
 
@@ -477,21 +488,18 @@ function New-Report {
             # Create a section header for the service principal information
             $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
-
         }
-        else{
+        else {
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-
         }
-        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
-        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
         $CapJson = "null"
+        $RiskyAppsJson = "null"
+        $RiskyThirdPartySPJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -539,22 +547,38 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", "")
     }
 
-    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-    $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>
-        $($MainCSS)
-    </style>")
+    # Inject CSS into individual HTML report template
+    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction "Stop"
+    $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
+    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
-    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-    $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
-    $MainJS = "const caps = $($CapJson);`n$($MainJS)"
-    $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-    $MainJS = "$($MainJS)`n$($UtilsJS)"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-        let darkMode = $($DarkMode.ToString().ToLower());
-        $($MainJS)
-    </script>")
+    $JsonScriptTags = @(
+        "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
+        "<script type='application/json' id='cap-json'> $($CapJson) </script>"
+        "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
+        "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
+    ) -join "`n"
+    $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
+    # Load JS files 
+    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
+    $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
+    $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
+    $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
+    $EXOFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "EXOTableFunctions.js") -Raw
+    $AADFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "AADTableFunctions.js") -Raw
+    $KeyValueListFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "KeyValueListFunctions.js") -Raw
+
+    $JSFiles = @(
+        $IndividualReportJS
+        $UtilsJS
+        $TableFunctionsJS
+        $EXOFunctionsJS
+        $AADFunctionsJS
+        $KeyValueListFunctionsJS
+    ) -join "`n"
+
+    $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName

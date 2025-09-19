@@ -312,7 +312,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 $FederatedCredentials = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplicationFederatedIdentityCredential" -M365Environment $M365Environment -Id $App.Id).Value
                 $FederatedCredentialsResults = @()
 
-                if ($null -ne $FederatedCredentials) {
+                if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
                     foreach ($FederatedCredential in $FederatedCredentials) {
                         $FederatedCredentialsResults += [PSCustomObject]@{
                             Id          = $FederatedCredential.Id
@@ -329,7 +329,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 }
 
                 # Exclude applications without risky permissions
-                if ($MappedPermissions.Count -gt 0) {
+                if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -473,7 +473,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                         }
 
                         # Exclude service principals without risky permissions
-                        if ($MappedPermissions.Count -gt 0) {
+                        if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
                                 ObjectId                = $ServicePrincipal.Id
                                 AppId                   = $ServicePrincipal.AppId
