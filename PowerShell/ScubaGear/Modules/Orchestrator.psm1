@@ -1379,6 +1379,9 @@ function Invoke-ReportCreation {
             $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
+            $JsonScriptTags = @(
+                "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
+            ) -join "`n"
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
@@ -1393,7 +1396,7 @@ function Invoke-ReportCreation {
 
             $ParentCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -Raw
             $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>`n $($ParentCSS) `n</style>")
-            $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>")
+            $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
