@@ -342,54 +342,6 @@ Exo:
       - "subsidiary.contoso.com"
 ```
 
-## Advanced Parameters
-
-### KeepIndividualJSON
-
-The **KeepIndividualJSON** parameter preserves the legacy ScubaGear output format where individual JSON files (e.g., `TeamsReport.json`) are kept in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results into one consolidated JSON file named `ScubaResults.json`. This parameter is for backwards compatibility with older versions of ScubaGear.
-
-| Parameter   | Value  |
-|-------------|--------|
-| Optional    | Yes    |
-| Datatype    | Switch |
-| Default     | false  |
-| Config File | No     |
-
-```powershell
-# Outputs legacy ScubaGear individual JSON output
-Invoke-SCuBA -ProductNames teams -KeepIndividualJSON
-```
-
-> **Note**: When using `-KeepIndividualJSON`, the `OutJsonFileName` parameter does not work since no consolidated JSON file is created.
-
-### ExportProvider
-
-The **ExportProvider** parameter is used with `Invoke-SCuBACached` to control whether ScubaGear should export provider data from M365 services or skip authentication and use existing provider JSON files.
-
-| Parameter   | Value   |
-|-------------|---------|
-| Optional    | Yes     |
-| Datatype    | Boolean |
-| Default     | true    |
-| Config File | No      |
-
-When set to `$true` (default), `Invoke-SCuBACached` behaves like `Invoke-SCuBA`, connecting to M365 services and exporting provider data.
-
-When set to `$false`, ScubaGear skips authentication and looks for existing provider JSON files in the specified `OutPath`, then runs only the Rego verification and report creation.
-
-```powershell
-# Run assessment using existing provider JSON files (no authentication)
-Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath ".\MyReport"
-
-# Export provider data like normal Invoke-SCuBA (authentication required)
-Invoke-SCuBACached -ProductNames aad -ExportProvider $true -OutPath ".\MyReport"
-```
-
-This parameter is useful for:
-- Running assessments on cached/saved provider data without re-authenticating
-- Testing different Rego policy configurations against the same provider data
-- Offline analysis scenarios where connectivity to M365 services is not available
-
 ## Anchors and Aliases
 
 If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the Defender configuration shown above, `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
