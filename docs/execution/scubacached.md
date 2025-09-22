@@ -6,6 +6,7 @@
 2. **Cached mode** - Skips data collection and authentication, running analysis only on previously exported provider JSON files
 
 This function is particularly useful for:
+
 - Re-running analysis on previously collected data
 - Testing different report configurations without re-authenticating
 - Offline analysis scenarios
@@ -22,36 +23,40 @@ This function is particularly useful for:
     [-NumberOfUUIDCharactersToTruncate <Int32>] [<CommonParameters>]`
 
 ### ExportProvider
+
 The most important parameter that distinguishes `Invoke-SCuBACached` from `Invoke-SCuBA`:
 
 - **`$true` (default)**: Functions exactly like `Invoke-SCuBA` - authenticates, exports provider data, runs Rego analysis, and generates reports
 - **`$false`**: Skips authentication and data export, runs analysis only on existing provider JSON files in the specified output path
 
 ### Other Parameters
+
 All other parameters function identically to `Invoke-SCuBA`. See the [parameters documentation](../configuration/parameters.md) for complete details.
 
 ## Usage Examples
 
 ### Full Mode (Default Behavior)
+
 ```powershell
 # Runs exactly like Invoke-SCuBA - authenticates and exports fresh data
-Invoke-SCuBACached -ProductNames teams, aad -OutPath "C:\ScubaResults"
+Invoke-SCuBACached -ProductNames teams, aad -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ```powershell
 # Explicitly set ExportProvider to true (same as default)
-Invoke-SCuBACached -ProductNames * -ExportProvider $true -OutPath "C:\ScubaResults"
+Invoke-SCuBACached -ProductNames * -ExportProvider $true -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Cached Mode (Analysis Only)
+
 ```powershell
 # Run analysis only on previously exported data
-Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\ScubaResults"
+Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ```powershell
 # Generate a new report with different settings using cached data
-Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\PreviousResults" -DarkMode -Quiet
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode -Quiet
 ```
 
 ## Cached Mode Requirements
@@ -59,50 +64,59 @@ Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\PreviousR
 When using `ExportProvider $false`, the following conditions must be met:
 
 ### Required Files
+
 The output directory must contain one of the following:
 
 1. **Individual provider file**: `ProviderSettingsExport.json` (or custom name specified by `-OutProviderFileName`)
 2. **Consolidated results file**: `ScubaResults*.json` file from a previous ScubaGear run
 
 ### File Location
+
 Files must be located in the path specified by the `-OutPath` parameter. If no `-OutPath` is specified, ScubaGear will look in the current directory.
 
+> [!TIP]
+> ScubaGear results are usually exported in a `<path>\M365BaselineConformance_yyyy_MM_dd_hh_mm_ss` folder format.
+
 ### Product Compatibility
+
 The cached data must contain information for the products specified in `-ProductNames`. If the cached data doesn't include a requested product, the analysis will fail for that product.
 
 ## Workflow Examples
 
 ### Typical Development Workflow
+
 ```powershell
 # Step 1: Export fresh data (full authentication)
-Invoke-SCuBACached -ProductNames * -OutPath "C:\MyAnalysis"
+Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 
 # Step 2: Re-run analysis with different report settings (no authentication)
-Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\MyAnalysis" -DarkMode
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode
 
-# Step 3: Generate CSV-only output (no authentication)
-Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\MyAnalysis" -Quiet
+# Step 3: Generate HTML and CSV report with (no authentication)
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -Quiet
 ```
 
 ### Offline Analysis Workflow
+
 ```powershell
 # On connected machine: Export data
-Invoke-SCuBACached -ProductNames teams, aad, exo -OutPath "C:\ExportForOfflineAnalysis"
+Invoke-SCuBACached -ProductNames teams, aad, exo -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 
 # Transfer files to offline machine, then run analysis
-Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "C:\OfflineAnalysis"
+Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "CC:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Testing Different Product Combinations
+
 ```powershell
 # Export all product data once
-Invoke-SCuBACached -ProductNames * -OutPath "C:\CompleteExport"
+Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 
 # Run analysis on subset 1
-Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\CompleteExport"
+Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 
 # Run analysis on subset 2
-Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\CompleteExport"
+Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ## Error Scenarios
@@ -121,14 +135,16 @@ If the cached data doesn't contain information for the requested products:
 > [!NOTE]
 > You may see this message repeated for each product not found:
 ```
-WARNING: No test results found for Control Id: [Control Id]
+WARNING: WARNING: No test results found for Control Id: [Control Id]
 ```
 
 **Solution**: Either:
+
 - Export fresh data that includes the missing products
 - Adjust the `-ProductNames` parameter to match available cached data
 
 ### Invalid JSON Format
+
 If the cached provider file is corrupted or in an invalid format:
 ```
 ConvertFrom-Json: Invalid JSON format
@@ -139,12 +155,14 @@ ConvertFrom-Json: Invalid JSON format
 ## Performance Considerations
 
 ### Cached Mode Benefits
+
 - **Faster execution**: Skips authentication and data collection (typically 60-90% faster)
 - **No network dependencies**: Can run completely offline
 - **No credential requirements**: No need for M365 access
 - **Consistent data**: Analysis runs on the same dataset for reproducible results
 
 ### Full Mode Benefits
+
 - **Fresh data**: Always uses current tenant configuration
 - **Complete workflow**: Single command for end-to-end assessment
 - **Automatic cleanup**: Handles file management automatically
@@ -152,6 +170,7 @@ ConvertFrom-Json: Invalid JSON format
 ## File Management
 
 ### Automatic File Detection
+
 When `ExportProvider $false` is used, ScubaGear will automatically:
 
 1. Look for `[OutProviderFileName].json` in the output directory
@@ -160,27 +179,31 @@ When `ExportProvider $false` is used, ScubaGear will automatically:
 4. Extract provider data from the consolidated file if needed
 
 ### Custom Provider File Names
+
 ```powershell
 # Export with custom provider file name
-Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\Results"
+Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 
 # Use cached data with custom provider file name
-Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\Results"
+Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ## Best Practices
 
 ### Development and Testing
+
 - Use cached mode during development to speed up iteration cycles
 - Keep a "golden" export for consistent testing across different configurations
 - Use descriptive output folder names to organize different test scenarios
 
 ### Production Use
+
 - Use full mode for official assessments to ensure fresh data
 - Consider cached mode for generating multiple report formats from the same assessment
 - Document the date/time of the original data export when using cached mode
 
 ### File Organization
+
 ```
 C:\ScubaAssessments\
 ├── 2024-01-15_Production\          # Full export folder
