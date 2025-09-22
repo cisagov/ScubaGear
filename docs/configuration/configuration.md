@@ -70,7 +70,7 @@ For automated or unattended execution, you can configure ScubaGear to use servic
 Example configuration with service principal authentication:
 
 ```yaml
-Organization: "contoso.onmicrosoft.com"
+Organization: "example.onmicrosoft.com"
 AppID: "abcdef01-2345-6789-abcd-e0123456789a"  # Application (client) ID
 CertificateThumbprint: "FEDCBA9876543210FEDCBA9876543210FEDCBA98"  # 40-character hex string
 ProductNames: ['aad', 'defender', 'exo']
@@ -83,7 +83,7 @@ You can also override authentication parameters at runtime:
 # Override authentication parameters on command line
 Invoke-SCuBA `
   -ConfigFilePath myconfig.yaml `
-  -Organization contoso.onmicrosoft.com `
+  -Organization example.onmicrosoft.com `
   -AppID abcdef0123456789abcde01234566789 `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98
 ```
@@ -120,7 +120,7 @@ Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values 
 
 ```powershell
 # Create config with pre-set values
-New-SCuBAConfig -Organization "contoso.onmicrosoft.com" -ProductNames "aad,defender"
+New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,defender"
 ```
 
 The generated file can then be manually edited to add your specific configuration settings.
@@ -131,7 +131,18 @@ In some cases, it may be appropriate to omit specific policies from ScubaGear ev
 - When a policy is implemented by a third-party service that ScubaGear does not audit
 - When a policy is not applicable to your organization (e.g., policy MS.EXO.4.3v1 is only applicable to federal, executive branch, departments and agencies)
 
-The `OmitPolicy` top-level key, shown in this [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/omit_policies.yaml), allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
+The `OmitPolicy` top-level key allows the user to specify the policies that should be omitted from the ScubaGear report. Omitted policies will show up as "Omitted" in the HTML report and will be colored gray. Omitting policies must only be done if the omissions are approved within an organization's security risk management process. **Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.**
+
+Example policy omissions configuration:
+
+```yaml
+OmitPolicy:
+  MS.EXO.4.3v1:
+    Rationale: "Policy only applies to federal executive branch agencies"
+    Expiration: 2025-12-31
+  MS.AAD.1.2v1:
+    Rationale: "Third-party MFA solution in use, not Azure MFA"
+```
 
 For each omitted policy, the config file allows you to indicate the following:
 - `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
@@ -146,7 +157,20 @@ documented in the config file, though this warning can be silenced with the `-Si
 - Allow users to identify incorrect results
 - Help contextualize results
 
-The `AnnotatePolicy` top-level key, shown in this [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/annotate_policies.yaml), allows the user to specify the policies that should be annotated.
+The `AnnotatePolicy` top-level key allows the user to specify the policies that should be annotated.
+
+Example policy annotations configuration:
+
+```yaml
+AnnotatePolicy:
+  MS.AAD.2.1v1:
+    IncorrectResult: false
+    Comment: "Remediation scheduled for Q2 2024"
+    RemediationDate: 2025-06-30
+  MS.EXO.3.1v1:
+    IncorrectResult: true
+    Comment: "False positive - DMARC is properly configured via third-party service"
+```
 
 For each annotated policy, the config file allows you to indicate the following:
 - `IncorrectResult`: Boolean, whether or not to mark the result incorrect. Optional, defaults to false.
@@ -157,19 +181,36 @@ For each annotated policy, the config file allows you to indicate the following:
 
 ## Product-specific Configuration
 
-Config files can include a top-level level key for a given product whose values are related to that specific product. For example, look for the value of `Defender` in this [Defender config file](../../PowerShell/ScubaGear/Sample-Config-Files/defender_config.yaml). Currently, only Entra ID, Defender, and Exchange Online use this extra configuration.
+Config files can include a top-level level key for a given product whose values are related to that specific product. For example, the `Defender` key contains Defender-specific configuration. Currently, only Entra ID, Defender, and Exchange Online use this extra configuration.
 
-Under a product key, there can be policy keys that provide configuration values unique to the product. In the Defender config file, for example, there is the `MS.DEFENDER.1.4v1` key.
+Under a product key, there can be policy keys that provide configuration values unique to the product. In the Defender configuration, for example, there is the `MS.DEFENDER.1.4v1` key.
 
 ### Entra ID Configuration
 
 The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks. For example, a user could exclude emergency access accounts from some of the policy checks. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce grave risks to your system and must be managed carefully**.
 
-An example configuration file for Entra ID can be found in this sample [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad_config.yaml).
+Example Entra ID configuration:
+
+```yaml
+Aad:
+  MS.AAD.1.1v1:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account 1
+        - "87654321-4321-4321-4321-210987654321"  # Emergency access account 2
+      Groups:
+        - "11111111-1111-1111-1111-111111111111"  # Break glass admin group
+  MS.AAD.7.4v1:
+    RoleExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account
+      Groups:
+        - "22222222-2222-2222-2222-222222222222"  # Service account group
+```
 
 #### Conditional Access Policy Exclusions
 
-The `Aad` top level key in the [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad_config.yaml) allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
+The `Aad` top level key allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
 
 CapExclusions are supported for the following policies:
 
@@ -184,7 +225,7 @@ CapExclusions are supported for the following policies:
 
 #### Privileged User Policy Exclusions
 
-In addition to defining exclusions for conditional access policies, the [configuration](../../PowerShell/ScubaGear/Sample-Config-Files/aad_config.yaml) also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
+In addition to defining exclusions for conditional access policies, the configuration also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
 
 RoleExclusions are supported for the following policies:
 
@@ -202,7 +243,47 @@ All Defender related policy-specific variables are found under the `Defender` co
 - MS.DEFENDER.2.2v1
 - MS.DEFENDER.2.3v1
 
-Several examples of using Defender policy-specific variables can be found in this [sample configuration](../../PowerShell/ScubaGear/Sample-Config-Files/defender_config.yaml). The sample configuration file also uses [Anchors and Aliases](#anchors-and-aliases) notation to reuse variable definitions across policy items with the same values.
+Example Defender configuration:
+
+```yaml
+Defender:
+  # Define sensitive accounts filter (used by both policies)
+  SensitiveAccountsFilter: &CommonSensitiveAccountFilter
+    IncludedUsers:
+      - "user1@contoso.com"
+      - "user2@contoso.com"
+    IncludedGroups:
+      - "C-Suite Executives"
+      - "IT Administrators"
+    IncludedDomains:
+      - "contoso.com"
+    ExcludedUsers: []
+    ExcludedGroups: []
+    ExcludedDomains: []
+
+  MS.DEFENDER.1.4v1:
+    SensitiveAccounts: *CommonSensitiveAccountFilter
+
+  MS.DEFENDER.1.5v1:
+    SensitiveAccounts: *CommonSensitiveAccountFilter
+
+  MS.DEFENDER.2.1v1:
+    SensitiveUsers:
+      - "John Doe;jdoe@contoso.com"
+      - "Jane Smith;jsmith@contoso.com"
+
+  MS.DEFENDER.2.2v1:
+    AgencyDomains:
+      - "contoso.gov"
+      - "example.gov"
+
+  MS.DEFENDER.2.3v1:
+    PartnerDomains:
+      - "partner1.com"
+      - "contractor.org"
+```
+
+This example uses [Anchors and Aliases](#anchors-and-aliases) notation (`&CommonSensitiveAccountFilter` and `*CommonSensitiveAccountFilter`) to reuse variable definitions across policy items with the same values.
 
 #### Sensitive Accounts
 
@@ -250,11 +331,68 @@ The ScubaGear configuration file provides the capability to exclude specific dom
 The policy `MS.EXO.1.1v2` supports a variable called `AllowedForwardingDomains` that expects a list of domain names for which automatic forwarding should be allowed.
 Each domain in the list should be given as the fully-qualified domain name.
 Exercise caution when allowing automatic forwarding to an external domain, as adversaries can use automatic forwarding to gain persistent access to a victim's email.
-Refer to the EXO [example ScubaGear configuration file](../../PowerShell/ScubaGear/Sample-Config-Files/exo_config.yaml) for more details.
+
+Example Exchange Online configuration:
+
+```yaml
+Exo:
+  MS.EXO.1.1v2:
+    AllowedForwardingDomains:
+      - "trusted-partner.com"
+      - "subsidiary.contoso.com"
+```
+
+## Advanced Parameters
+
+### KeepIndividualJSON
+
+The **KeepIndividualJSON** parameter preserves the legacy ScubaGear output format where individual JSON files (e.g., `TeamsReport.json`) are kept in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results into one consolidated JSON file named `ScubaResults.json`. This parameter is for backwards compatibility with older versions of ScubaGear.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | false  |
+| Config File | No     |
+
+```powershell
+# Outputs legacy ScubaGear individual JSON output
+Invoke-SCuBA -ProductNames teams -KeepIndividualJSON
+```
+
+> **Note**: When using `-KeepIndividualJSON`, the `OutJsonFileName` parameter does not work since no consolidated JSON file is created.
+
+### ExportProvider
+
+The **ExportProvider** parameter is used with `Invoke-SCuBACached` to control whether ScubaGear should export provider data from M365 services or skip authentication and use existing provider JSON files.
+
+| Parameter   | Value   |
+|-------------|---------|
+| Optional    | Yes     |
+| Datatype    | Boolean |
+| Default     | true    |
+| Config File | No      |
+
+When set to `$true` (default), `Invoke-SCuBACached` behaves like `Invoke-SCuBA`, connecting to M365 services and exporting provider data.
+
+When set to `$false`, ScubaGear skips authentication and looks for existing provider JSON files in the specified `OutPath`, then runs only the Rego verification and report creation.
+
+```powershell
+# Run assessment using existing provider JSON files (no authentication)
+Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath ".\MyReport"
+
+# Export provider data like normal Invoke-SCuBA (authentication required)
+Invoke-SCuBACached -ProductNames aad -ExportProvider $true -OutPath ".\MyReport"
+```
+
+This parameter is useful for:
+- Running assessments on cached/saved provider data without re-authenticating
+- Testing different Rego policy configurations against the same provider data
+- Offline analysis scenarios where connectivity to M365 services is not available
 
 ## Anchors and Aliases
 
-If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the [Defender config file](../../PowerShell/ScubaGear/Sample-Config-Files/defender_config.yaml), `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
+If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the Defender configuration shown above, `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
 
 Using anchors and aliases is optional, but supports reuse in a way that allows for updating variable values in a consistent way when they apply to multiple policies.
 

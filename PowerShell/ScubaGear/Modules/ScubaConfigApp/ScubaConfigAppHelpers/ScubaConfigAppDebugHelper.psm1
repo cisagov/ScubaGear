@@ -119,7 +119,7 @@ Function Get-DebugSanitizedString {
 
                 foreach ($match in $regexMatches) {
                     $originalValue = $match.Value
-                    $fakeValue = Get-DebugSanitizedValue-OriginalValue $originalValue -ValueType $validationName
+                    $fakeValue = Get-DebugSanitizedValue -OriginalValue $originalValue -ValueType $validationName
 
                     Write-DebugOutput -Message "Replacing '$originalValue' with '$fakeValue'" -Source $MyInvocation.MyCommand -Level "Debug"
 
