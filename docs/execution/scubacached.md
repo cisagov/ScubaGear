@@ -117,8 +117,11 @@ FileNotFoundException: Could not find provider data file
 
 ### Product Mismatch
 If the cached data doesn't contain information for the requested products:
+
+> [!NOTE]
+> You may see this message repeated for each product not found:
 ```
-The cached provider data does not contain data for: [ProductName]
+WARNING: No test results found for Control Id: [Control Id]
 ```
 
 **Solution**: Either:
