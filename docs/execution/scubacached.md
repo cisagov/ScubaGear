@@ -93,15 +93,12 @@ Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConform
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode
 
 # Step 3: Generate HTML and CSV report with (no authentication)
-Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -Quiet
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Offline Analysis Workflow
 
 ```powershell
-# On connected machine: Export data
-Invoke-SCuBACached -ProductNames teams, aad, exo -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
-
 # Transfer files to offline machine, then run analysis
 Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "CC:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
@@ -122,14 +119,21 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 ## Error Scenarios
 
 ### Missing Provider Data
+
 If the required provider JSON file doesn't exist in the specified path:
+
+>[!NOTE]
+> THis message is pretty lengthy, 
 ```
+...
 FileNotFoundException: Could not find provider data file
+...
 ```
 
 **Solution**: Ensure the output directory contains the required `ProviderSettingsExport.json` or `ScubaResults*.json` file.
 
 ### Product Mismatch
+
 If the cached data doesn't contain information for the requested products:
 
 > [!NOTE]
@@ -166,17 +170,6 @@ ConvertFrom-Json: Invalid JSON format
 - **Fresh data**: Always uses current tenant configuration
 - **Complete workflow**: Single command for end-to-end assessment
 - **Automatic cleanup**: Handles file management automatically
-
-## File Management
-
-### Automatic File Detection
-
-When `ExportProvider $false` is used, ScubaGear will automatically:
-
-1. Look for `[OutProviderFileName].json` in the output directory
-2. If not found, search for `ScubaResults*.json` files
-3. If multiple `ScubaResults*.json` files exist, use the most recently created one
-4. Extract provider data from the consolidated file if needed
 
 ### Custom Provider File Names
 
