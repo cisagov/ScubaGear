@@ -62,12 +62,6 @@ Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResu
 
 ### Optional Examples
 
-Export fresh data (full authentication). Opens HMTL results after complete
-
-```powershell
-Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
-```
-
 Re-run analysis with different report settings (no authentication). Opens HTML results in darkmode
 
 ```powershell
