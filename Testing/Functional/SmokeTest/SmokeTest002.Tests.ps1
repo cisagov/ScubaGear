@@ -43,6 +43,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
         #$script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
         $script:url = (Get-Item $BaselineReports).FullName
         Open-SeUrl $script:url -Driver $Driver | Out-Null
+
+        # Dot source functional test utils to use Get-ExpectedHeaderNames and Get-ExpectedColumnSize functions
+        . (Join-Path -Path $PSScriptRoot -ChildPath "../Products/FunctionalTestUtils.ps1")
 	}
 
     Context "Check Main HTML" {
@@ -108,17 +111,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                 $Rows.Count | Should -BeGreaterThan 0
 
                 $TableClass = $Table.GetAttribute("class")
-                $ExpectedColumnSize = switch ($TableClass) {
-                    "caps_table" { 8 }
-                    "riskyApps_table" { 7 }
-                    "riskyThirdPartySPs_table" { 6 }
-                    default { ($Rows[0] | Get-SeElement -By TagName 'td').Count }
-                }
-                $ExpectedHeaderNames = @{
-                    "caps_table"               = @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
-                    "riskyApps_table"          = @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
-                    "riskyThirdPartySPs_table" = @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
-                }
+                $ExpectedColumnSize = Get-ExpectedColumnSize -TableClass $TableClass
+                $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
 
                 # First Table in report is generally tenant data
                 if ($Table.GetProperty("id") -eq "tenant-data"){
@@ -151,7 +145,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     $TableClass -eq "riskyApps_table" -or
                     $TableClass -eq "riskyThirdPartySPs_table"
                 ){
-                    $ExpectedHeaders = $ExpectedHeaderNames[$TableClass]
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                         $RowData = Get-SeElement -Element $Row -By TagName 'td'

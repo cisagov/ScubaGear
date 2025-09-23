@@ -330,19 +330,11 @@ Describe "Policy Checks for <ProductName>" {
 
                 ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
+                    $Rows.Count | Should -BeGreaterThan 0
 
                     $TableClass = $Table.GetAttribute("class")
-                    $ExpectedColumnSize = switch ($TableClass) {
-                        "caps_table" { 8 }
-                        "riskyApps_table" { 7 }
-                        "riskyThirdPartySPs_table" { 6 }
-                        default { ($Rows[0] | Get-SeElement -By TagName 'td').Count }
-                    }
-                    $ExpectedHeaderNames = @{
-                        "caps_table"               = @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
-                        "riskyApps_table"          = @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
-                        "riskyThirdPartySPs_table" = @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
-                    }
+                    $ExpectedColumnSize = Get-ExpectedColumnSize -TableClass $TableClass
+                    $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
 
                     if ($Table.GetProperty("id") -eq "tenant-data"){
                         $Rows.Count | Should -BeExactly 2
@@ -356,7 +348,6 @@ Describe "Policy Checks for <ProductName>" {
                         $TableClass -eq "riskyThirdPartySPs_table"
                     ) {
                         $Rows.Count | Should -BeGreaterThan 0
-                        $ExpectedHeaders = $ExpectedHeaderNames[$TableClass]
                         ForEach ($Row in $Rows){
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
