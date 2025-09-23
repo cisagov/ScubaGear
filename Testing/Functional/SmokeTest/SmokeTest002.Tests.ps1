@@ -107,6 +107,14 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                 $Rows = Get-SeElement -Element $Table -By TagName 'tr'
                 $Rows.Count | Should -BeGreaterThan 0
 
+                $TableClass = $Table.GetAttribute("class")
+                $ExpectedColumnSize = switch ($TableClass) {
+                    "caps_table" { 8 }
+                    "riskyApps_table" { 7 }
+                    "riskyThirdPartySPs_table" { 6 }
+                    default { ($Rows[0] | Get-SeElement -By TagName 'td').Count }
+                }
+
                 # First Table in report is generally tenant data
                 if ($Table.GetProperty("id") -eq "tenant-data"){
                     $Rows.Count | Should -BeExactly 2
@@ -134,9 +142,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                 }
                 # AAD detailed report has a Conditional Access Policy and risky apps/sp tables
                 elseif (
-                    $Table.GetAttribute("class") -eq "caps_table" -or
-                    $Table.GetAttribute("class") -eq "riskyApps_table" -or
-                    $Table.GetAttribute("class") -eq "riskyThirdPartySPs_table"
+                    $TableClass -eq "caps_table" -or
+                    $TableClass -eq "riskyApps_table" -or
+                    $TableClass -eq "riskyThirdPartySPs_table"
                 ){
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
@@ -146,12 +154,12 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                         # NOTE: Checking for 8 columns since first is 'expand' column
                         if ($RowHeaders.Count -gt 0){
-                            $RowHeaders.Count | Should -BeExactly 8
+                            $RowHeaders.Count | Should -BeExactly $ExpectedColumnSize
                             $RowHeaders[1].text | Should -BeLikeExactly "Name"
                         }
 
                         if ($RowData.Count -gt 0){
-                            $RowData.Count | Should -BeExactly 8
+                            $RowData.Count | Should -BeExactly $ExpectedColumnSize
                         }
                     }
 
