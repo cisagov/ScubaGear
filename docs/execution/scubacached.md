@@ -85,19 +85,19 @@ The cached data must contain information for the products specified in `-Product
 
 ### Typical Development Workflow
 
-Step 1: Export fresh data (full authentication)
+Step 1: Export fresh data (full authentication) - Opens HMTL results after complete
 
 ```powershell
 Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
-Step 2: Re-run analysis with different report settings (no authentication)
+Step 2: Re-run analysis with different report settings (no authentication) - Opens HTML results in darkmode
 
 ```powershell
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode
 ```
 
-Step 3: Generate HTML and CSV report with (no authentication). The HTML will not auto-open when in quiet mode
+Step 3: Generate HTML and CSV report with (no authentication). The HTML results will not auto-open when in quiet mode
 
 ```powershell
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -Quiet
