@@ -114,6 +114,11 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     "riskyThirdPartySPs_table" { 6 }
                     default { ($Rows[0] | Get-SeElement -By TagName 'td').Count }
                 }
+                $ExpectedHeaderNames = @{
+                    "caps_table"               = @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
+                    "riskyApps_table"          = @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+                    "riskyThirdPartySPs_table" = @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+                }
 
                 # First Table in report is generally tenant data
                 if ($Table.GetProperty("id") -eq "tenant-data"){
@@ -146,16 +151,20 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     $TableClass -eq "riskyApps_table" -or
                     $TableClass -eq "riskyThirdPartySPs_table"
                 ){
+                    $ExpectedHeaders = $ExpectedHeaderNames[$TableClass]
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                         $RowData = Get-SeElement -Element $Row -By TagName 'td'
 
                         ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
 
-                        # NOTE: Checking for 8 columns since first is 'expand' column
-                        if ($RowHeaders.Count -gt 0){
+                        # Length of columns depends on the type of table, refer to $ExpectedColumnSize declared above for more information.
+                        if ($RowHeaders.Count -gt 0 -and $null -ne $ExpectedHeaders){
                             $RowHeaders.Count | Should -BeExactly $ExpectedColumnSize
-                            $RowHeaders[1].text | Should -BeLikeExactly "Name"
+
+                            for ($i = 0; $i -lt $RowHeaders.Count; $i++) {
+                                $RowHeaders[$i].text | Should -BeLikeExactly $ExpectedHeaders[$i] -Because "Table header column $i should match $($ExpectedHeaders[$i])"
+                            }
                         }
 
                         if ($RowData.Count -gt 0){
