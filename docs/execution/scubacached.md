@@ -85,34 +85,49 @@ The cached data must contain information for the products specified in `-Product
 
 ### Typical Development Workflow
 
+Step 1: Export fresh data (full authentication)
+
 ```powershell
-# Step 1: Export fresh data (full authentication)
 Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
 
-# Step 2: Re-run analysis with different report settings (no authentication)
+Step 2: Re-run analysis with different report settings (no authentication)
+
+```powershell
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode
+```
 
-# Step 3: Generate HTML and CSV report with (no authentication)
-Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+Step 3: Generate HTML and CSV report with (no authentication). The HTML will not auto-open when in quiet mode
+
+```powershell
+Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -Quiet
 ```
 
 ### Offline Analysis Workflow
 
+Transfer files to offline machine, then run analysis
+
 ```powershell
-# Transfer files to offline machine, then run analysis
 Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "CC:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Testing Different Product Combinations
 
+Export all product data once
+
 ```powershell
-# Export all product data once
 Invoke-SCuBACached -ProductNames * -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
 
-# Run analysis on subset 1
+Run analysis on subset 1
+
+```powershell
 Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
 
-# Run analysis on subset 2
+Run analysis on subset 2
+
+```powershell
 Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
@@ -123,7 +138,8 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 If the required provider JSON file doesn't exist in the specified path:
 
 >[!NOTE]
-> THis message is pretty lengthy, 
+> This message is pretty lengthy, this is a generic error: 
+
 ```
 ...
 FileNotFoundException: Could not find provider data file
@@ -138,6 +154,7 @@ If the cached data doesn't contain information for the requested products:
 
 > [!NOTE]
 > You may see this message repeated for each product not found:
+
 ```
 WARNING: WARNING: No test results found for Control Id: [Control Id]
 ```
@@ -150,6 +167,7 @@ WARNING: WARNING: No test results found for Control Id: [Control Id]
 ### Invalid JSON Format
 
 If the cached provider file is corrupted or in an invalid format:
+
 ```
 ConvertFrom-Json: Invalid JSON format
 ```
@@ -173,11 +191,15 @@ ConvertFrom-Json: Invalid JSON format
 
 ### Custom Provider File Names
 
-```powershell
-# Export with custom provider file name
-Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+Export with custom provider file name
 
-# Use cached data with custom provider file name
+```powershell
+Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
+
+Use cached data with custom provider file name
+
+```powershell
 Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
