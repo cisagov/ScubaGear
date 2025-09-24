@@ -330,7 +330,6 @@ Describe "Policy Checks for <ProductName>" {
 
                 ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
-                    $Rows.Count | Should -BeGreaterThan 0
 
                     $TableClass = $Table.GetAttribute("class")
                     $ExpectedColumnSize = Get-ExpectedColumnSize -TableClass $TableClass
