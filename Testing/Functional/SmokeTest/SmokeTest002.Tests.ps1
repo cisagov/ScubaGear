@@ -43,6 +43,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
         #$script:url = ([System.Uri](Get-Item $BaselineReports).FullName).AbsoluteUri
         $script:url = (Get-Item $BaselineReports).FullName
         Open-SeUrl $script:url -Driver $Driver | Out-Null
+
+        # Dot source functional test utils to use Get-ExpectedHeaderNames and Get-ExpectedColumnSize functions
+        . (Join-Path -Path $PSScriptRoot -ChildPath "../Products/FunctionalTestUtils.ps1")
 	}
 
     Context "Check Main HTML" {
@@ -107,6 +110,10 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                 $Rows = Get-SeElement -Element $Table -By TagName 'tr'
                 $Rows.Count | Should -BeGreaterThan 0
 
+                $TableClass = $Table.GetAttribute("class")
+                $ExpectedColumnSize = Get-ExpectedColumnSize -TableClass $TableClass
+                $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
+
                 # First Table in report is generally tenant data
                 if ($Table.GetProperty("id") -eq "tenant-data"){
                     $Rows.Count | Should -BeExactly 2
@@ -132,22 +139,29 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         }
                     }
                 }
-                # AAD detailed report has a Conditional Access Policy table
-                elseif ($Table.GetAttribute("class") -eq "caps_table"){
+                # AAD detailed report has a Conditional Access Policy and risky apps/sp tables
+                elseif (
+                    $TableClass -eq "caps_table" -or
+                    $TableClass -eq "riskyApps_table" -or
+                    $TableClass -eq "riskyThirdPartySPs_table"
+                ){
                     ForEach ($Row in $Rows){
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                         $RowData = Get-SeElement -Element $Row -By TagName 'td'
 
                         ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
 
-                        # NOTE: Checking for 8 columns since first is 'expand' column
-                        if ($RowHeaders.Count -gt 0){
-                            $RowHeaders.Count | Should -BeExactly 8
-                            $RowHeaders[1].text | Should -BeLikeExactly "Name"
+                        # Length of columns depends on the type of table, refer to $ExpectedColumnSize declared above for more information.
+                        if ($RowHeaders.Count -gt 0 -and $null -ne $ExpectedHeaders){
+                            $RowHeaders.Count | Should -BeExactly $ExpectedColumnSize
+
+                            for ($i = 0; $i -lt $RowHeaders.Count; $i++) {
+                                $RowHeaders[$i].text | Should -BeLikeExactly $ExpectedHeaders[$i] -Because "Table header column $i should match $($ExpectedHeaders[$i])"
+                            }
                         }
 
                         if ($RowData.Count -gt 0){
-                            $RowData.Count | Should -BeExactly 8
+                            $RowData.Count | Should -BeExactly $ExpectedColumnSize
                         }
                     }
 

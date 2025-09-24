@@ -1415,6 +1415,9 @@ function Invoke-ReportCreation {
             $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
+            $JsonScriptTags = @(
+                "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
+            ) -join "`n"
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
@@ -1422,25 +1425,31 @@ function Invoke-ReportCreation {
             $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
             $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
-            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
-            $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css") -ErrorAction 'Stop') -Join "`n"
-            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
+            # Inject CSS into parent HTML report template
+            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction "Stop"
+            $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
+            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
-            $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -ErrorAction 'Stop') -Join "`n"
-            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
+            $ParentCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -Raw
+            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>`n $($ParentCSS) `n</style>")
+            $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
-            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction 'Stop'
-            $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -ErrorAction 'Stop') -Join "`n"
-            $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -ErrorAction 'Stop') -Join "`n"
-            $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
-            $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-                let darkMode = $($DarkMode.ToString().ToLower());
-                $($ParentReportJS)
-            </script>")
+            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
+            $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
+            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
+            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
 
+            $JSFiles = @(
+                $ParentReportJS
+                $UtilsJS
+                $TableFunctionsJS
+            ) -join "`n"
+
+            $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
             Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
             $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html" -ErrorAction 'Stop'
             [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
+
             if (-Not $Quiet) {
                 Invoke-Item $ReportFileName
             }
