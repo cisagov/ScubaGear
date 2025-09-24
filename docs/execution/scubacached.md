@@ -14,13 +14,14 @@ This function is particularly useful for:
 
 ## Key Parameters
 
-
 ### All Parameters
 
-` Invoke-SCuBACached [-ExportProvider <Boolean>] [-ProductNames <String[]>] [-M365Environment <String>] [-OPAPath <String>] [-LogIn <Boolean>] [-Version] [-AppID <String>]
+`
+Invoke-SCuBACached [-ExportProvider <Boolean>] [-ProductNames <String[]>] [-M365Environment <String>] [-OPAPath <String>] [-LogIn <Boolean>] [-Version] [-AppID <String>]
     [-CertificateThumbprint <String>] [-Organization <String>] [-OutPath <String>] [-OutProviderFileName <String>] [-OutRegoFileName <String>] [-OutReportName <String>]
     [-KeepIndividualJSON] [-OutJsonFileName <String>] [-OutCsvFileName <String>] [-OutActionPlanFileName <String>] [-Quiet] [-DarkMode] [-SilenceBODWarnings]
-    [-NumberOfUUIDCharactersToTruncate <Int32>] [<CommonParameters>]`
+    [-NumberOfUUIDCharactersToTruncate <Int32>] [<CommonParameters>]
+`
 
 ### ExportProvider
 
@@ -59,7 +60,6 @@ Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode -Quiet
 ```
 
-
 ### Optional Examples
 
 Re-run analysis with different report settings (no authentication). Opens HTML results in darkmode
@@ -68,7 +68,7 @@ Re-run analysis with different report settings (no authentication). Opens HTML r
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -DarkMode
 ```
 
-Generate HTML and CSV report with (no authentication). The HTML results will not auto-open when in quiet mode
+Generate HTML and CSV report (no authentication). The HTML results will not auto-open when in quiet mode
 
 ```powershell
 Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -Quiet
@@ -99,10 +99,10 @@ The cached data must contain information for the products specified in `-Product
 
 ### Offline Analysis
 
-Transfer files to offline machine, then run analysis
+Transfer files to an offline machine, then run analysis
 
 ```powershell
-Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "CC:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+Invoke-SCuBACached -ProductNames teams, aad, exo -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Testing Different Product Combinations
@@ -132,7 +132,7 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 If the required provider JSON file doesn't exist in the specified path:
 
 >[!NOTE]
-> This message is pretty lengthy, this is a generic error: 
+> This message is pretty lengthy; this is a generic error:
 
 ```
 ...
@@ -230,7 +230,7 @@ C:\ScubaAssessments\
 
 ## Known Issues
 
-- Running the function on the same JSON file will eventually cause a System out of memory error as the file gets bigger and bigger.
+- Running the function on the same JSON file will eventually cause a system out of memory error as the file gets larger each time it ran.
 
 ## Version Compatibility
 
