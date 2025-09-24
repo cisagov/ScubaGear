@@ -1256,6 +1256,11 @@ Function New-FieldListCard {
         $policyId = $policyIdWithUnderscores.Replace("_", ".")
 
         Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.PolicySaving -f $CardName.ToLower(), $policyId) -Source $this.Name -Level "Info"
+        
+        # Disable preview tab immediately when save is initiated
+        $syncHash.PreviewTab.IsEnabled = $false
+        Write-DebugOutput -Message "Preview tab disabled due to configuration save" -Source $this.Name -Level "Verbose"
+
 
         # Get the details panel (parent of button panel)
         $detailsPanel = $this.Parent.Parent
@@ -1576,6 +1581,10 @@ Function New-FieldListCard {
 
         $result = $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardPolicyConfirmation -f $CardName.ToLower(), $policyId), $syncHash.UIConfigs.localeTitles.ConfirmRemove, "YesNo", "Question")
         if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+
+            # Disable preview tab immediately when remove is confirmed
+            $syncHash.PreviewTab.IsEnabled = $false
+            Write-DebugOutput -Message "Preview tab disabled due to configuration removal" -Source $this.Name -Level "Verbose"
 
             # Handle data structure based on configuration
             if ($OutPolicyOnly) {

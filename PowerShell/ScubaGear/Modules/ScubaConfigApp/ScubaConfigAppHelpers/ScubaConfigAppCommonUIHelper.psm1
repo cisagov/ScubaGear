@@ -26,6 +26,83 @@ Function Get-UIConfigCriticalValues {
     Write-DebugOutput -Message "Found criticality values: $($criticalityValues -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
     return $criticalityValues | Sort-Object
 }
+
+Function Update-CriticalityDropdowns {
+    <#
+    .SYNOPSIS
+    Updates criticality dropdown options based on currently loaded baseline data.
+    .DESCRIPTION
+    This function refreshes all criticality filter dropdowns to reflect the criticality values 
+    present in the currently loaded baseline policies.
+    #>
+    try {
+        # Get current criticality values from loaded baselines
+        $criticalityValues = Get-UIConfigCriticalValues
+        
+        if ($criticalityValues.Count -eq 0) {
+            Write-DebugOutput -Message "No criticality values found in loaded baselines" -Source $MyInvocation.MyCommand -Level "Warning"
+            return
+        }
+
+        Write-DebugOutput -Message "Updating criticality dropdowns with values: $($criticalityValues -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
+
+        # Update criticality dropdowns for each tab type
+        $tabTypes = $syncHash.UIConfigs.baselineControls.controlType
+        
+        foreach ($tabType in $tabTypes) {
+            $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+            
+            if ($criticalityComboBox) {
+                # Store current selection
+                $currentSelection = $null
+                if ($criticalityComboBox.SelectedItem) {
+                    $currentSelection = $criticalityComboBox.SelectedItem.Tag
+                }
+                
+                # Clear existing items
+                $criticalityComboBox.Items.Clear()
+                
+                # Add "All Baselines" option
+                $allItem = New-Object System.Windows.Controls.ComboBoxItem
+                $allItem.Content = "All Baselines"
+                $allItem.Tag = "ALL_BASELINES"
+                [void]$criticalityComboBox.Items.Add($allItem)
+                
+                # Add specific criticality values
+                foreach ($criticality in $criticalityValues) {
+                    $item = New-Object System.Windows.Controls.ComboBoxItem
+                    $item.Content = "$criticality only"
+                    $item.Tag = $criticality
+                    [void]$criticalityComboBox.Items.Add($item)
+                }
+                
+                # Restore previous selection or default to "All"
+                $criticalityComboBox.SelectedIndex = 0  # Default to "All Baselines"
+                
+                if ($currentSelection -and $currentSelection -ne "ALL_BASELINES") {
+                    # Try to restore previous selection
+                    for ($i = 0; $i -lt $criticalityComboBox.Items.Count; $i++) {
+                        if ($criticalityComboBox.Items[$i].Tag -eq $currentSelection) {
+                            $criticalityComboBox.SelectedIndex = $i
+                            break
+                        }
+                    }
+                }
+                
+                Write-DebugOutput -Message "Updated criticality dropdown for $tabType with $($criticalityValues.Count) values" -Source $MyInvocation.MyCommand -Level "Verbose"
+            }
+            else {
+                Write-DebugOutput -Message "Criticality dropdown not found for tab type: $tabType" -Source $MyInvocation.MyCommand -Level "Warning"
+            }
+        }
+        
+        Write-DebugOutput -Message "Successfully updated all criticality dropdowns" -Source $MyInvocation.MyCommand -Level "Info"
+    }
+    catch {
+        Write-DebugOutput -Message "Error updating criticality dropdowns: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+    }
+}
+
 # Helper Function to find controls in a container
 Function Find-UIControlInContainer {
     <#

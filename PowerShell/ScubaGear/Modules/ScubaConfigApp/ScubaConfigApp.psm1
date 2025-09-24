@@ -1297,8 +1297,8 @@ Function Start-SCuBAConfigApp {
 
     #show graph was disconnected if it was online
     if ($Data.GraphConnected -eq $true) {
-        Write-Output ""
-        Write-Output "🔌 Disconnected from Microsoft Graph"
+        Write-Output "================================="
+        Write-Output "Disconnected from Microsoft Graph"
     }
     if ($Data.Error.Count -eq 0) {
         Write-Output "ScubaConfigApp closed successfully with no errors"
