@@ -40,6 +40,7 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only peop
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+- Exclusion Field: N/A
 
 #### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
@@ -53,6 +54,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
@@ -67,7 +69,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -143,6 +145,7 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+- Exclusion Field: N/A
 
 #### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View.
@@ -155,6 +158,7 @@ File and folder default sharing permissions SHALL be set to View.
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -207,6 +211,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
@@ -220,6 +225,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+- Exclusion Field: N/A
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
@@ -233,6 +239,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
+- Exclusion Field: N/A
 
 ### License Requirements
 

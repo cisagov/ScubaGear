@@ -79,6 +79,7 @@ as an accepted domain in M365.
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+- Exclusion Field: [AllowedForwardingDomains](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#agency-partner-domain-impersonation)
 
 ### Resources
 

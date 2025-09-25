@@ -75,6 +75,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
@@ -130,8 +131,6 @@ Record an event SHOULD NOT be set to Always record.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-21a
 - _MITRE ATT&CK TTP Mapping:_
   - None
-
-
 
 ### Resources
 
@@ -248,7 +247,6 @@ To configure settings for anonymous users:
     policy, selecting the appropriate policy in step 3.
 
 
-
 ## 2. External User Access
 This section helps reduce security risks related to external and unmanaged user access. In this instance, external users refer to members of a different M365 tenant, and unmanaged users refer to users who are not members of any M365 tenant or organization.
 
@@ -282,6 +280,7 @@ External access for users SHALL only be enabled on a per-domain basis.
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.2.2v2
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
@@ -294,6 +293,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.2.3v2
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
@@ -306,6 +306,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -394,6 +395,7 @@ Teams email integration SHALL be disabled.
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
     - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -439,6 +441,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.5.2v2
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
@@ -451,6 +454,7 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.5.3v2
 Agencies SHOULD only allow installation of custom apps approved by the agency.
@@ -463,6 +467,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -582,6 +587,7 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 - _MITRE ATT&CK TTP Mapping:_
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
@@ -595,6 +601,7 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -640,6 +647,7 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
@@ -651,7 +659,7 @@ Users SHOULD be prevented from opening or downloading files detected as malware.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -720,6 +728,7 @@ URL comparison with a blocklist SHOULD be enabled.
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
   - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
+- Exclusion Field: N/A
 
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
@@ -735,6 +744,7 @@ User click tracking SHOULD be enabled.
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
   - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
+- Exclusion Field: N/A
 
 ### Resources
 

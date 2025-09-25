@@ -70,6 +70,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -113,6 +114,7 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -176,6 +178,7 @@ The Invite external users to your organization feature SHOULD be disabled unless
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -241,6 +244,7 @@ Service principals with access to APIs SHOULD be restricted to specific security
 - _MITRE ATT&CK TTP Mapping:_
   - [T1059: Command and Scripting Interpreter](https://attack.mitre.org/techniques/T1059/)
     - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
+- Exclusion Field: N/A
 
 #### MS.POWERBI.4.2v1
 Service principals creating and using profiles SHOULD be restricted to specific security groups.
@@ -252,6 +256,7 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -332,7 +337,7 @@ ResourceKey-based authentication SHOULD be blocked unless a specific use case (e
   - [T1134: Access Token Manipulation](https://attack.mitre.org/techniques/T1134/)
     - [T1134.001: Token Impersonation/Theft](https://attack.mitre.org/techniques/T1134/001/)
     - [T1134.003: Make and Impersonate Token](https://attack.mitre.org/techniques/T1134/003/)
-
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -382,6 +387,7 @@ Python and R interactions SHOULD be disabled.
     - [T1059.009: Cloud API](https://attack.mitre.org/techniques/T1059/009/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -434,6 +440,8 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
+- Exclusion Field: N/A
+
 ### Resources
 
 - [Enable sensitivity labels in Power BI \| Microsoft

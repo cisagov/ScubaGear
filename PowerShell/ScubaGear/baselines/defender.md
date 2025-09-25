@@ -58,7 +58,7 @@ The standard and strict preset security policies SHALL be enabled.
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
     - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
-
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
@@ -76,6 +76,7 @@ All users SHALL be added to Exchange Online Protection (EOP) in either the stand
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
     - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
@@ -93,6 +94,7 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
     - [T1566.003: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
@@ -107,6 +109,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+- Exclusion Field: [SensitiveAccounts](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#sensitive-accounts)
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
@@ -121,6 +124,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+- Exclusion Field: [SensitiveAccounts](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#sensitive-accounts)
 
 ### Resources
 
@@ -235,6 +239,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
+- Exclusion Field: [SensitiveUsers](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#user-impersonation-protection)
 
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
@@ -250,6 +255,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
+- Exclusion Field: [AgencyDomains](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#agency-domain-impersonation-protection)
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
@@ -265,6 +271,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
+- Exclusion Field: [PartnerDomains](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#agency-partner-domain-impersonation)
 
 ### Resources
 
@@ -359,6 +366,7 @@ Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams
   - [T1204.001: User Execution](https://attack.mitre.org/techniques/T1204/)
     - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
     - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -424,6 +432,7 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
@@ -441,6 +450,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.4.3v1
 The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
@@ -457,6 +467,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
@@ -488,6 +499,7 @@ A list of apps that are restricted from accessing files protected by DLP policy 
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
   - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+- Exclusion Field: N/A
 
 #### MS.DEFENDER.4.6v1
 The custom policy SHOULD include an action to block access to sensitive
@@ -513,6 +525,7 @@ information by restricted apps and unwanted Bluetooth applications.
   - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
   - [T1486: Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
+- Exclusion Field: N/A
 
 ### Resources
 

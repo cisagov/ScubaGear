@@ -87,6 +87,7 @@ The ability to create production and sandbox environments SHALL be restricted to
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+- Exclusion Field: N/A
 
 #### MS.POWERPLATFORM.1.2v1
 The ability to create trial environments SHALL be restricted to admins.
@@ -175,6 +176,7 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+- Exclusion Field: N/A
 
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy affecting them.
@@ -186,6 +188,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -278,6 +281,7 @@ Power Platform tenant isolation SHALL be enabled.
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
   - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+- Exclusion Field: N/A
 
 #### MS.POWERPLATFORM.3.2v1
 An inbound/outbound connection allowlist SHOULD be configured.
@@ -341,6 +345,7 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-10
 - _MITRE ATT&CK TTP Mapping:_
   - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -384,6 +389,7 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)
+- Exclusion Field: N/A
 
 ### Resources
 - [Control Portal Creation \| Microsoft
