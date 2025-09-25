@@ -1071,7 +1071,6 @@
                                                 Foreground="SteelBlue"
                                                 Cursor="Hand"/>
                                             <TextBlock Text="Organization Unit Name" FontWeight="Medium" Margin="0,0,0,4"/>
-                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
                                         <TextBox x:Name="OrgUnitName_TextBox"/>
                                     </StackPanel>
