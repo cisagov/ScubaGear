@@ -141,7 +141,6 @@
     "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
     "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
   },
-
   "localeStatusMessages": {
     "GraphConnected": "Graph Connected",
     "GraphDisconnected": "Graph Disconnected",
@@ -178,7 +177,7 @@
         "Title" : "Organization Domain",
         "Content" : "Enter your organization's domain (e.g., example.onmicrosoft.com). This is used to connect to your Microsoft 365 tenant.",
         "AdditionalSections": {
-            "Example" : "contoso.onmicrosoft.com",
+            "Example" : "example.onmicrosoft.com",
             "Required" : "Yes, this field is mandatory",
             "Note" : "Must be a valid Microsoft 365 tenant domain"
         },
@@ -188,7 +187,7 @@
         "Title" : "Organization Name",
         "Content" : "Enter the name of your organization. This is used for documentation purposes.",
         "AdditionalSections": {
-            "Example" : "Contoso Ltd.",
+            "Example" : "Example Ltd.",
             "Required" : "This option is required for SCuBA Compliance & BOD submissions",
             "Note" : "This will be included in the configuration file"
         },
@@ -199,7 +198,7 @@
         "Content" : "Enter the name of your organization subunit. This is used for documentation purposes.",
         "AdditionalSections": {
             "Example" : "Office of IT",
-            "Required" : "This option is required for SCuBA Compliance & BOD submissions",
+            "Required" : "This option is not required for SCuBA Compliance & BOD submissions",
             "Note" : "This will be included in the configuration file"
         },
         "Placement": "Right"
@@ -292,6 +291,33 @@
       "rationale": "Production environment for DOD tenants."
     }
   ],
+  "requiredFields": {
+    "Organization": {
+      "fieldName": "Organization_TextBox",
+      "validationPatternName": "tenantDomain",
+      "toggleTrigger": "OnClick"
+    },
+    "OrgName": {
+      "fieldName": "OrgName_TextBox",
+      "validationPatternName": "orgName",
+      "toggleTrigger": "OnClick"
+    },
+    "AppId" :{
+      "fieldName": "AppId_TextBox",
+      "validationPatternName": "appId",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "CertificateThumbprint": {
+      "fieldName": "CertificateThumbprint_TextBox",
+      "validationPatternName": "certificateThumbprint",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "OPAPath": {
+      "fieldName": "OPAPath_TextBox",
+      "validationPatternName": "opaPath",
+      "toggleTrigger": "OpaSection_Toggle"
+    }
+  },
   "settingsControl": {
     "MainTab": {
       "name": "Main",

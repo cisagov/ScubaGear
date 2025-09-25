@@ -752,3 +752,198 @@ Function Initialize-PlaceholderTextBox {
         }
     }.GetNewClosure())
 }
+
+
+# Create a new dynamic validation helper function
+Function Invoke-DynamicRequiredFieldValidation {
+    <#
+    .SYNOPSIS
+    Performs dynamic validation based on the requiredFields configuration
+    .DESCRIPTION
+    This function validates required fields based on JSON configuration, handling both always-required fields and conditionally-required fields based on toggle states
+    #>
+    
+    $validationResults = @{
+        IsValid = $true
+        Errors = @()
+        TabsToNavigate = @()
+    }
+    
+    try {
+        Write-DebugOutput -Message "Starting dynamic required field validation" -Source $MyInvocation.MyCommand -Level "Verbose"
+        
+        # Get required fields configuration
+        $requiredFields = $syncHash.UIConfigs.requiredFields
+        
+        foreach ($fieldKey in $requiredFields.PSObject.Properties.Name) {
+            $fieldConfig = $requiredFields.$fieldKey
+            $shouldValidate = $false
+            
+            Write-DebugOutput -Message "Processing required field: $fieldKey" -Source $MyInvocation.MyCommand -Level "Verbose"
+            
+            # Determine if this field should be validated based on trigger
+            switch ($fieldConfig.toggleTrigger) {
+                "OnClick" {
+                    # Always validate these fields
+                    $shouldValidate = $true
+                    Write-DebugOutput -Message "Field $fieldKey is always required (OnClick)" -Source $MyInvocation.MyCommand -Level "Verbose"
+                }
+                default {
+                    # Check if the toggle is checked for conditional validation
+                    $toggleControl = $syncHash.($fieldConfig.toggleTrigger)
+                    if ($toggleControl -and $toggleControl -is [System.Windows.Controls.CheckBox]) {
+                        $shouldValidate = $toggleControl.IsChecked
+                        Write-DebugOutput -Message "Field $fieldKey conditional validation - Toggle $($fieldConfig.toggleTrigger) is checked: $shouldValidate" -Source $MyInvocation.MyCommand -Level "Verbose"
+                    } else {
+                        Write-DebugOutput -Message "Toggle control $($fieldConfig.toggleTrigger) not found for field $fieldKey" -Source $MyInvocation.MyCommand -Level "Warning"
+                    }
+                }
+            }
+            
+            if ($shouldValidate) {
+                # Get the UI element
+                $uiElement = $syncHash.($fieldConfig.fieldName)
+                
+                if (-not $uiElement) {
+                    Write-DebugOutput -Message "UI element $($fieldConfig.fieldName) not found for field $fieldKey" -Source $MyInvocation.MyCommand -Level "Warning"
+                    continue
+                }
+                
+                # Get validation pattern
+                $validationPattern = $null
+                $placeholderText = ""
+                
+                if ($fieldConfig.validationPatternName -and $syncHash.UIConfigs.valueValidations.($fieldConfig.validationPatternName)) {
+                    $validationPattern = $syncHash.UIConfigs.valueValidations.($fieldConfig.validationPatternName).pattern
+                }
+                
+                if ($syncHash.UIConfigs.localePlaceholder.($fieldConfig.fieldName)) {
+                    $placeholderText = $syncHash.UIConfigs.localePlaceholder.($fieldConfig.fieldName)
+                }
+                
+                # Perform validation based on field type
+                $isFieldValid = $false
+                
+                if ($fieldKey -eq "OPAPath") {
+                    # Special validation for OPA path
+                    $isFieldValid = Confirm-UIRequiredField -UIElement $uiElement `
+                                                      -PlaceholderText $placeholderText `
+                                                      -TestPath `
+                                                      -RequiredFiles @("opa_windows_amd64.exe", "opa.exe")
+                } else {
+                    # Standard validation
+                    $isFieldValid = Confirm-UIRequiredField -UIElement $uiElement `
+                                                      -RegexPattern $validationPattern `
+                                                      -PlaceholderText $placeholderText
+                }
+                
+                if (-not $isFieldValid) {
+                    $validationResults.IsValid = $false
+                    
+                    # Get error message
+                    $errorKey = $fieldKey + "Validation"
+                    if ($syncHash.UIConfigs.localeErrorMessages.$errorKey) {
+                        $errorMessage = $syncHash.UIConfigs.localeErrorMessages.$errorKey
+                    } else {
+                        $errorMessage = "Field '$fieldKey' is required and must be valid."
+                    }
+                    
+                    $validationResults.Errors += $errorMessage
+                    
+                    # Find which tab this field belongs to
+                    $tabToNavigate = Find-TabForField -FieldKey $fieldKey
+                    if ($tabToNavigate -and $tabToNavigate -notin $validationResults.TabsToNavigate) {
+                        $validationResults.TabsToNavigate += $tabToNavigate
+                    }
+                    
+                    Write-DebugOutput -Message "Validation failed for field $fieldKey in tab $tabToNavigate" -Source $MyInvocation.MyCommand -Level "Info"
+                }
+            }
+        }
+        
+        # Special validation for ProductNames (not in requiredFields but still required)
+        $minimumRequired = if ($syncHash.UIConfigs.MinimumProductsRequired) { $syncHash.UIConfigs.MinimumProductsRequired } else { 1 }
+        if (-not $syncHash.GeneralSettingsData.ProductNames -or $syncHash.GeneralSettingsData.ProductNames.Count -lt $minimumRequired) {
+            $validationResults.IsValid = $false
+            $validationResults.Errors += ($syncHash.UIConfigs.localeErrorMessages.ProductSelection -f $minimumRequired)
+            
+            $tabToNavigate = Find-TabForField -FieldKey "ProductNames"
+            if ($tabToNavigate -and $tabToNavigate -notin $validationResults.TabsToNavigate) {
+                $validationResults.TabsToNavigate += $tabToNavigate
+            }
+        }
+        
+        Write-DebugOutput -Message "Dynamic validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"
+        
+    } catch {
+        Write-DebugOutput -Message "Error in dynamic validation: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        $validationResults.IsValid = $false
+        $validationResults.Errors += "Validation system error: $($_.Exception.Message)"
+    }
+    
+    return $validationResults
+}
+
+Function Find-TabForField {
+    <#
+    .SYNOPSIS
+    Finds which tab a field belongs to based on settingsControl configuration
+    .DESCRIPTION
+    Uses the settingsControl mapping to determine which tab contains a specific field
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FieldKey
+    )
+    
+    try {
+        $settingsControls = $syncHash.UIConfigs.settingsControl
+        
+        foreach ($tabName in $settingsControls.PSObject.Properties.Name) {
+            $tabConfig = $settingsControls.$tabName
+            
+            if ($tabConfig.validationKeys -and $tabConfig.validationKeys -contains $FieldKey) {
+                # Map tab names to actual tab controls
+                switch ($tabName) {
+                    "MainTab" { return $syncHash.MainTab }
+                    "AdvancedTab" { return $syncHash.AdvancedTab }
+                    "GlobalTab" { return $syncHash.GlobalTab }
+                    default { 
+                        # Try to find tab by name
+                        $tabControl = $syncHash.$tabName
+                        if ($tabControl) {
+                            return $tabControl
+                        }
+                    }
+                }
+            }
+        }
+        
+        # Fallback - if not found, return MainTab
+        Write-DebugOutput -Message "Tab not found for field $FieldKey, defaulting to MainTab" -Source $MyInvocation.MyCommand -Level "Warning"
+        return $syncHash.MainTab
+        
+    } catch {
+        Write-DebugOutput -Message "Error finding tab for field $FieldKey`: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        return $syncHash.MainTab
+    }
+}
+
+Function Navigate-ToFirstErrorTab {
+    <#
+    .SYNOPSIS
+    Navigates to the first tab that contains validation errors
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [array]$TabsToNavigate
+    )
+    
+    if ($TabsToNavigate.Count -gt 0) {
+        # Navigate to the first tab with errors
+        $firstTab = $TabsToNavigate[0]
+        $syncHash.MainTabControl.SelectedItem = $firstTab
+        
+        Write-DebugOutput -Message "Navigated to tab with validation errors" -Source $MyInvocation.MyCommand -Level "Info"
+    }
+}

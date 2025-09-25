@@ -750,116 +750,33 @@ Function Start-SCuBAConfigApp {
             }
         })
 
-        # Preview & Generate Button
+        # Preview & Generate Button - Dynamic Validation Version
         $syncHash.PreviewButton.Add_Click({
-            Write-DebugOutput -Message "Preview button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
+            Write-DebugOutput -Message "Preview button clicked - using dynamic validation" -Source $MyInvocation.MyCommand -Level "Verbose"
             $syncHash.Window.Dispatcher.Invoke([action]{
-                $errorMessages = @()
-
-                # Organization validation (required)
-                $orgValid = Confirm-UIRequiredField -UIElement $syncHash.Organization_TextBox `
-                                        -RegexPattern $syncHash.UIConfigs.valueValidations.tenantDomain.pattern `
-                                        -PlaceholderText $syncHash.UIConfigs.localePlaceholder.Organization_TextBox
-
-                if (-not $orgValid) {
-                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrganizationValidation
-                    #navigate to General tab
-                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
-                }
-
-                #check OrgName
-                $orgNameValid = Confirm-UIRequiredField -UIElement $syncHash.OrgName_TextBox `
-                                        -RegexPattern $syncHash.UIConfigs.valueValidations.orgName.pattern `
-                                        -PlaceholderText $syncHash.UIConfigs.localePlaceholder.OrgName_TextBox
-
-                if (-not $orgNameValid) {
-                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrgNameValidation
-                    #navigate to General tab
-                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
-                }
-
-                #check Org Unitname
-                $orgUnitNameValid = Confirm-UIRequiredField -UIElement $syncHash.OrgUnitName_TextBox `
-                                        -RegexPattern $syncHash.UIConfigs.valueValidations.orgUnitName.pattern `
-                                        -PlaceholderText $syncHash.UIConfigs.localePlaceholder.OrgUnitName_TextBox
-
-                if (-not $orgUnitNameValid) {
-                    $errorMessages += $syncHash.UIConfigs.localeErrorMessages.OrgUnitNameValidation
-                    #navigate to General tab
-                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
-                }
-
-                # Products validation (minimum products must be selected)
-                $minimumRequired = if ($syncHash.UIConfigs.MinimumProductsRequired) { $syncHash.UIConfigs.MinimumProductsRequired } else { 1 }
-                if (-not $syncHash.GeneralSettingsData.ProductNames -or $syncHash.GeneralSettingsData.ProductNames.Count -lt $minimumRequired) {
-                    $errorMessages += ($syncHash.UIConfigs.localeErrorMessages.ProductSelection -f $minimumRequired)
-                    $syncHash.MainTabControl.SelectedItem = $syncHash.GeneralTab
-                    $productsValid = $false
-                }else {
-                    $productsValid = $true
-                }
-
-                If(-not $productsValid) {
+                
+                # Perform dynamic validation based on requiredFields configuration
+                $validationResults = Invoke-DynamicRequiredFieldValidation
+                
+                if (-not $validationResults.IsValid) {
+                    # Disable preview tab
                     $syncHash.PreviewTab.IsEnabled = $false
-                    $syncHash.MainTabControl.SelectedItem = $syncHash.MainTab
-                }
-
-
-
-                # Advanced Tab Validations (only if sections are toggled on)
-                # Application Section Validations
-                if ($syncHash.ApplicationSection_Toggle.IsChecked) {
-
-                    # AppID validation (GUID format)
-                    $appIdValid = Confirm-UIRequiredField -UIElement $syncHash.AppId_TextBox `
-                                                    -RegexPattern $syncHash.UIConfigs.valueValidations.guid.pattern `
-                                                    -PlaceholderText $syncHash.UIConfigs.localePlaceholder.AppId_TextBox `
-
-                    if (-not $appIdValid) {
-                        $errorMessages += $syncHash.UIConfigs.localeErrorMessages.AppIdValidation
-                        $syncHash.MainTabControl.SelectedItem = $syncHash.AdvancedTab
-                    }
-
-                    # Certificate Thumbprint validation (40 character hex)
-                    $certValid = Confirm-UIRequiredField -UIElement $syncHash.CertificateThumbprint_TextBox `
-                                                    -RegexPattern $syncHash.UIConfigs.valueValidations.thumbprint.pattern `
-                                                    -PlaceholderText $syncHash.UIConfigs.localePlaceholder.CertificateThumbprint_TextBox
-
-                    if (-not $certValid) {
-                        $errorMessages += $syncHash.UIConfigs.localeErrorMessages.CertificateValidation
-                        $syncHash.MainTabControl.SelectedItem = $syncHash.AdvancedTab
-                    }
-                }
-
-                # OPA Section Validations
-                if ($syncHash.OpaSection_Toggle.IsChecked) {
-
-                    # OPA Path validation using enhanced Confirm-UIRequiredField
-                    $opaPathValid = Confirm-UIRequiredField -UIElement $syncHash.OpaPath_TextBox `
-                                                    -PlaceholderText $syncHash.UIConfigs.localePlaceholder.OpaPath_TextBox `
-                                                    -TestPath `
-                                                    -RequiredFiles @("opa_windows_amd64.exe", "opa.exe") `
-
-                    if (-not $opaPathValid) {
-                        $errorMessages += ($syncHash.UIConfigs.localeErrorMessages.OpaPathValidation -f $syncHash.OpaPath_TextBox.Text)
-                        $syncHash.MainTabControl.SelectedItem = $syncHash.AdvancedTab
-                    }
-
-                }
-
-                # Show consolidated error message if there are validation errors
-                if ($errorMessages.Count -gt 0) {
-                    $syncHash.PreviewTab.IsEnabled = $false
-                    #$errorMessages += $syncHash.UIConfigs.localeErrorMessages.PreviewValidation + "`n`n" + ($errorMessages -join "`n")
-                    #make message more user-friendly add a - and a new line to each error after first
-                    $errorMessages = $errorMessages | ForEach-Object { "`n - $_" }
-                    $errorMessages = "The following validation errors occurred: $($errorMessages -join '')"
-                    $syncHash.ShowMessageBox.Invoke($errorMessages, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
-                }else {
+                    
+                    # Navigate to the first tab with errors
+                    Navigate-ToFirstErrorTab -TabsToNavigate $validationResults.TabsToNavigate
+                    
+                    # Format and show error messages
+                    $formattedErrors = $validationResults.Errors | ForEach-Object { "`n - $_" }
+                    $errorMessage = "The following validation errors occurred: $($formattedErrors -join '')"
+                    
+                    Write-DebugOutput -Message "Validation failed with $($validationResults.Errors.Count) errors" -Source $MyInvocation.MyCommand -Level "Info"
+                    $syncHash.ShowMessageBox.Invoke($errorMessage, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                } else {
+                    # All validations passed
                     $syncHash.PreviewTab.IsEnabled = $true
-                }
-
-                if ($errorMessages.Count -eq 0) {
+                    
+                    Write-DebugOutput -Message "All validations passed - generating preview" -Source $MyInvocation.MyCommand -Level "Info"
+                    
                     # Update settings data for each section
                     Set-SettingsDataForGeneralSection
                     Set-SettingsDataForAdvancedSection
@@ -874,8 +791,6 @@ Function Start-SCuBAConfigApp {
                     If($syncHash.UIConfigs.EnableScubaRun){
                         Test-ScubaRunReadiness
                     }
-
-                    #Update-BaselineControlUIFromData
                 }
             }) #end Dispatcher.Invoke
         })
