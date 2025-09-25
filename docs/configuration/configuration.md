@@ -190,25 +190,6 @@ Under a product key, there can be policy keys that provide configuration values 
 
 The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks. For example, a user could exclude emergency access accounts from some of the policy checks. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce grave risks to your system and must be managed carefully**.
 
-Example Entra ID configuration:
-
-```yaml
-Aad:
-  MS.AAD.1.1v1:
-    CapExclusions:
-      Users:
-        - "12345678-1234-1234-1234-123456789012"  # Emergency access account 1
-        - "87654321-4321-4321-4321-210987654321"  # Emergency access account 2
-      Groups:
-        - "11111111-1111-1111-1111-111111111111"  # Break glass admin group
-  MS.AAD.7.4v1:
-    RoleExclusions:
-      Users:
-        - "12345678-1234-1234-1234-123456789012"  # Emergency access account
-      Groups:
-        - "22222222-2222-2222-2222-222222222222"  # Service account group
-```
-
 #### Conditional Access Policy Exclusions
 
 The `Aad` top level key allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
@@ -224,6 +205,19 @@ CapExclusions are supported for the following policies:
 - MS.AAD.3.7v1
 - MS.AAD.3.8v1
 
+Example Entra ID configuration for CapExclusions:
+
+```yaml
+Aad:
+  MS.AAD.1.1v1:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account 1
+        - "87654321-4321-4321-4321-210987654321"  # Emergency access account 2
+      Groups:
+        - "11111111-1111-1111-1111-111111111111"  # Break glass admin group
+```
+
 #### Privileged User Policy Exclusions
 
 In addition to defining exclusions for conditional access policies, the configuration also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
@@ -231,6 +225,16 @@ In addition to defining exclusions for conditional access policies, the configur
 RoleExclusions are supported for the following policies:
 
 - MS.AAD.7.4v1
+Example Entra ID configuration for RoleExclusions:
+
+```yaml
+Aad:
+  MS.AAD.7.4v1:
+    RoleExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account
+      Groups:
+```
 
 ### Defender Configuration
 

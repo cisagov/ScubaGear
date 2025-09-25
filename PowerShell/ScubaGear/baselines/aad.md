@@ -74,6 +74,7 @@ Legacy authentication SHALL be blocked.
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 ### Resources
 
@@ -123,6 +124,7 @@ Users detected as high risk SHALL be blocked.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -134,6 +136,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: N/A
 
 #### MS.AAD.2.3v1
 Sign-ins detected as high risk SHALL be blocked.
@@ -145,6 +148,7 @@ Sign-ins detected as high risk SHALL be blocked.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 ### Resources
 
@@ -219,6 +223,7 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 #### MS.AAD.3.2v1
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
@@ -233,7 +238,8 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
     - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
     - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
-    
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
 #### MS.AAD.3.3v2
 If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
@@ -246,6 +252,7 @@ If Microsoft Authenticator is enabled, it SHALL be configured to show login cont
     - [T1110.001: Password Guessing](https://attack.mitre.org/techniques/T1110/001/)
     - [T1110.002: Password Cracking](https://attack.mitre.org/techniques/T1110/002/)
     - [T1110.003: Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+- Exclusion Field: N/A
 
 
 #### MS.AAD.3.4v1
@@ -257,6 +264,7 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
 - _MITRE ATT&CK TTP Mapping:_
   - None
+- Exclusion Field: N/A
 
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
@@ -270,6 +278,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
   - [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+- Exclusion Field: N/A
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
@@ -285,6 +294,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
@@ -296,6 +306,7 @@ Managed devices SHOULD be required for authentication.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
@@ -309,6 +320,7 @@ Managed Devices SHOULD be required to register MFA.
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.005: Device Registration](https://attack.mitre.org/techniques/T1098/005/)
+- Exclusion Field: [CapExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 #### MS.AAD.3.9v1
 Device code authentication SHOULD be blocked.
@@ -321,6 +333,7 @@ Device code authentication SHOULD be blocked.
   - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -460,6 +473,7 @@ Security logs SHALL be sent to the agency's security operations center for monit
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -495,6 +509,7 @@ Only administrators SHALL be allowed to register applications.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.5.2v1
 Only administrators SHALL be allowed to consent to applications.
@@ -507,6 +522,7 @@ Only administrators SHALL be allowed to consent to applications.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.5.3v1
 An admin consent workflow SHALL be configured for applications.
@@ -519,6 +535,7 @@ An admin consent workflow SHALL be configured for applications.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -582,6 +599,7 @@ User passwords SHALL NOT expire.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5(1)
 - _MITRE ATT&CK TTP Mapping:_
   - None
+- Exclusion Field: N/A
 
 ### Resources
 
@@ -618,6 +636,7 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.2v1
 Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.
@@ -632,6 +651,7 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
   - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
   - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
     - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.3v1
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
@@ -643,6 +663,7 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 - _MITRE ATT&CK TTP Mapping:_
   - [T1556: Modify Authentication Process](https://attack.mitre.org/techniques/T1556/)
     - [T1556.007: Hybrid Identity](https://attack.mitre.org/techniques/T1556/007/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.4v1
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
@@ -657,6 +678,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: [RoleExclusions](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#privileged-user-policy-exclusions)
 
 #### MS.AAD.7.5v1
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
@@ -667,6 +689,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2
 - _MITRE ATT&CK TTP Mapping:_
   - [T1651: Cloud Administration Command](https://attack.mitre.org/techniques/T1651/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.6v1
 Activation of the Global Administrator role SHALL require approval.
@@ -678,6 +701,7 @@ Activation of the Global Administrator role SHALL require approval.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.7v1
 Eligible and Active highly privileged role assignments SHALL trigger an alert.
@@ -689,6 +713,7 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.8v1
 User activation of the Global Administrator role SHALL trigger an alert.
@@ -701,6 +726,7 @@ User activation of the Global Administrator role SHALL trigger an alert.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
@@ -714,6 +740,7 @@ User activation of other highly privileged roles SHOULD trigger an alert.
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
   - [T1136: Create Account](https://attack.mitre.org/techniques/T1136/)
     - [T1136.003: Cloud Account](https://attack.mitre.org/techniques/T1136/003/)
+- Exclusion Field: N/A
 
 
 ### Resources
@@ -873,6 +900,7 @@ Guest users SHOULD have limited or restricted access to Microsoft Entra ID direc
     - [T1087.003: Email Account](https://attack.mitre.org/techniques/T1087/003/)
     - [T1087.004: Cloud Account](https://attack.mitre.org/techniques/T1087/004/)
   - [T1526: Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)
+- Exclusion Field: N/A
 
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
@@ -884,6 +912,7 @@ Only users with the Guest Inviter role SHOULD be able to invite guest users.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
+- Exclusion Field: N/A
 
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
@@ -895,6 +924,7 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)
+- Exclusion Field: N/A
 
 ### Resources
 
