@@ -752,11 +752,11 @@ Function Start-SCuBAConfigApp {
 
         # Preview & Generate Button - Dynamic Validation Version
         $syncHash.PreviewButton.Add_Click({
-            Write-DebugOutput -Message "Preview button clicked - using dynamic validation" -Source $MyInvocation.MyCommand -Level "Verbose"
+            Write-DebugOutput -Message "Preview button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             $syncHash.Window.Dispatcher.Invoke([action]{
                 
                 # Perform dynamic validation based on requiredFields configuration
-                $validationResults = Invoke-DynamicRequiredFieldValidation
+                $validationResults = Invoke-RequiredFieldValidation
                 
                 if (-not $validationResults.IsValid) {
                     # Disable preview tab
@@ -775,7 +775,7 @@ Function Start-SCuBAConfigApp {
                     # All validations passed
                     $syncHash.PreviewTab.IsEnabled = $true
                     
-                    Write-DebugOutput -Message "All validations passed - generating preview" -Source $MyInvocation.MyCommand -Level "Info"
+                    Write-DebugOutput -Message "All validations passed; generating preview" -Source $MyInvocation.MyCommand -Level "Info"
                     
                     # Update settings data for each section
                     Set-SettingsDataForGeneralSection

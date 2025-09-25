@@ -754,8 +754,8 @@ Function Initialize-PlaceholderTextBox {
 }
 
 
-# Create a new dynamic validation helper function
-Function Invoke-DynamicRequiredFieldValidation {
+# Create a new validation helper function
+Function Invoke-RequiredFieldValidation {
     <#
     .SYNOPSIS
     Performs dynamic validation based on the requiredFields configuration
@@ -770,7 +770,7 @@ Function Invoke-DynamicRequiredFieldValidation {
     }
     
     try {
-        Write-DebugOutput -Message "Starting dynamic required field validation" -Source $MyInvocation.MyCommand -Level "Verbose"
+        Write-DebugOutput -Message "Starting required field validation" -Source $MyInvocation.MyCommand -Level "Verbose"
         
         # Get required fields configuration
         $requiredFields = $syncHash.UIConfigs.requiredFields
@@ -873,10 +873,10 @@ Function Invoke-DynamicRequiredFieldValidation {
             }
         }
         
-        Write-DebugOutput -Message "Dynamic validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"
+        Write-DebugOutput -Message "Validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"
         
     } catch {
-        Write-DebugOutput -Message "Error in dynamic validation: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+        Write-DebugOutput -Message "Error in validation: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
         $validationResults.IsValid = $false
         $validationResults.Errors += "Validation system error: $($_.Exception.Message)"
     }
