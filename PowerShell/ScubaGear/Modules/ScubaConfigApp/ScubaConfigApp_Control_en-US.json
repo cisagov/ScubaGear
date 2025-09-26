@@ -304,12 +304,12 @@
     },
     "AppId" :{
       "fieldName": "AppId_TextBox",
-      "validationPatternName": "appId",
+      "validationPatternName": "guid",
       "toggleTrigger": "ApplicationSection_Toggle"
     },
     "CertificateThumbprint": {
       "fieldName": "CertificateThumbprint_TextBox",
-      "validationPatternName": "certificateThumbprint",
+      "validationPatternName": "thumbprint",
       "toggleTrigger": "ApplicationSection_Toggle"
     },
     "OPAPath": {
