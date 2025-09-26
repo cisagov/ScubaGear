@@ -754,29 +754,29 @@ Function Start-SCuBAConfigApp {
         $syncHash.PreviewButton.Add_Click({
             Write-DebugOutput -Message "Preview button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             $syncHash.Window.Dispatcher.Invoke([action]{
-                
+
                 # Perform dynamic validation based on requiredFields configuration
                 $validationResults = Invoke-RequiredFieldValidation
-                
+
                 if (-not $validationResults.IsValid) {
                     # Disable preview tab
                     $syncHash.PreviewTab.IsEnabled = $false
-                    
+
                     # Navigate to the first tab with errors
-                    Navigate-ToFirstErrorTab -TabsToNavigate $validationResults.TabsToNavigate
-                    
+                    Switch-FirstErrorTab -TabsToNavigate $validationResults.TabsToNavigate
+
                     # Format and show error messages
                     $formattedErrors = $validationResults.Errors | ForEach-Object { "`n - $_" }
                     $errorMessage = "The following validation errors occurred: $($formattedErrors -join '')"
-                    
+
                     Write-DebugOutput -Message "Validation failed with $($validationResults.Errors.Count) errors" -Source $MyInvocation.MyCommand -Level "Info"
                     $syncHash.ShowMessageBox.Invoke($errorMessage, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                 } else {
                     # All validations passed
                     $syncHash.PreviewTab.IsEnabled = $true
-                    
+
                     Write-DebugOutput -Message "All validations passed; generating preview" -Source $MyInvocation.MyCommand -Level "Info"
-                    
+
                     # Update settings data for each section
                     Set-SettingsDataForGeneralSection
                     Set-SettingsDataForAdvancedSection

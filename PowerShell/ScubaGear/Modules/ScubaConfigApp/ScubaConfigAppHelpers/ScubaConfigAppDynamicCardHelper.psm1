@@ -1256,7 +1256,7 @@ Function New-FieldListCard {
         $policyId = $policyIdWithUnderscores.Replace("_", ".")
 
         Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.PolicySaving -f $CardName.ToLower(), $policyId) -Source $this.Name -Level "Info"
-        
+
         # Disable preview tab immediately when save is initiated
         $syncHash.PreviewTab.IsEnabled = $false
         Write-DebugOutput -Message "Preview tab disabled due to configuration save" -Source $this.Name -Level "Verbose"

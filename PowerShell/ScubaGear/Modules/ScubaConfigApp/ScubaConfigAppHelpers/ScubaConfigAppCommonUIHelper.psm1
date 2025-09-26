@@ -32,13 +32,13 @@ Function Update-CriticalityDropdowns {
     .SYNOPSIS
     Updates criticality dropdown options based on currently loaded baseline data.
     .DESCRIPTION
-    This function refreshes all criticality filter dropdowns to reflect the criticality values 
+    This function refreshes all criticality filter dropdowns to reflect the criticality values
     present in the currently loaded baseline policies.
     #>
     try {
         # Get current criticality values from loaded baselines
         $criticalityValues = Get-UIConfigCriticalValues
-        
+
         if ($criticalityValues.Count -eq 0) {
             Write-DebugOutput -Message "No criticality values found in loaded baselines" -Source $MyInvocation.MyCommand -Level "Warning"
             return
@@ -48,26 +48,26 @@ Function Update-CriticalityDropdowns {
 
         # Update criticality dropdowns for each tab type
         $tabTypes = $syncHash.UIConfigs.baselineControls.controlType
-        
+
         foreach ($tabType in $tabTypes) {
             $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
-            
+
             if ($criticalityComboBox) {
                 # Store current selection
                 $currentSelection = $null
                 if ($criticalityComboBox.SelectedItem) {
                     $currentSelection = $criticalityComboBox.SelectedItem.Tag
                 }
-                
+
                 # Clear existing items
                 $criticalityComboBox.Items.Clear()
-                
+
                 # Add "All Baselines" option
                 $allItem = New-Object System.Windows.Controls.ComboBoxItem
                 $allItem.Content = "All Baselines"
                 $allItem.Tag = "ALL_BASELINES"
                 [void]$criticalityComboBox.Items.Add($allItem)
-                
+
                 # Add specific criticality values
                 foreach ($criticality in $criticalityValues) {
                     $item = New-Object System.Windows.Controls.ComboBoxItem
@@ -75,10 +75,10 @@ Function Update-CriticalityDropdowns {
                     $item.Tag = $criticality
                     [void]$criticalityComboBox.Items.Add($item)
                 }
-                
+
                 # Restore previous selection or default to "All"
                 $criticalityComboBox.SelectedIndex = 0  # Default to "All Baselines"
-                
+
                 if ($currentSelection -and $currentSelection -ne "ALL_BASELINES") {
                     # Try to restore previous selection
                     for ($i = 0; $i -lt $criticalityComboBox.Items.Count; $i++) {
@@ -88,14 +88,14 @@ Function Update-CriticalityDropdowns {
                         }
                     }
                 }
-                
+
                 Write-DebugOutput -Message "Updated criticality dropdown for $tabType with $($criticalityValues.Count) values" -Source $MyInvocation.MyCommand -Level "Verbose"
             }
             else {
                 Write-DebugOutput -Message "Criticality dropdown not found for tab type: $tabType" -Source $MyInvocation.MyCommand -Level "Warning"
             }
         }
-        
+
         Write-DebugOutput -Message "Successfully updated all criticality dropdowns" -Source $MyInvocation.MyCommand -Level "Info"
     }
     catch {
@@ -762,25 +762,25 @@ Function Invoke-RequiredFieldValidation {
     .DESCRIPTION
     This function validates required fields based on JSON configuration, handling both always-required fields and conditionally-required fields based on toggle states
     #>
-    
+
     $validationResults = @{
         IsValid = $true
         Errors = @()
         TabsToNavigate = @()
     }
-    
+
     try {
         Write-DebugOutput -Message "Starting required field validation" -Source $MyInvocation.MyCommand -Level "Verbose"
-        
+
         # Get required fields configuration
         $requiredFields = $syncHash.UIConfigs.requiredFields
-        
+
         foreach ($fieldKey in $requiredFields.PSObject.Properties.Name) {
             $fieldConfig = $requiredFields.$fieldKey
             $shouldValidate = $false
-            
+
             Write-DebugOutput -Message "Processing required field: $fieldKey" -Source $MyInvocation.MyCommand -Level "Verbose"
-            
+
             # Determine if this field should be validated based on trigger
             switch ($fieldConfig.toggleTrigger) {
                 "OnClick" {
@@ -799,31 +799,31 @@ Function Invoke-RequiredFieldValidation {
                     }
                 }
             }
-            
+
             if ($shouldValidate) {
                 # Get the UI element
                 $uiElement = $syncHash.($fieldConfig.fieldName)
-                
+
                 if (-not $uiElement) {
                     Write-DebugOutput -Message "UI element $($fieldConfig.fieldName) not found for field $fieldKey" -Source $MyInvocation.MyCommand -Level "Warning"
                     continue
                 }
-                
+
                 # Get validation pattern
                 $validationPattern = $null
                 $placeholderText = ""
-                
+
                 if ($fieldConfig.validationPatternName -and $syncHash.UIConfigs.valueValidations.($fieldConfig.validationPatternName)) {
                     $validationPattern = $syncHash.UIConfigs.valueValidations.($fieldConfig.validationPatternName).pattern
                 }
-                
+
                 if ($syncHash.UIConfigs.localePlaceholder.($fieldConfig.fieldName)) {
                     $placeholderText = $syncHash.UIConfigs.localePlaceholder.($fieldConfig.fieldName)
                 }
-                
+
                 # Perform validation based on field type
                 $isFieldValid = $false
-                
+
                 if ($fieldKey -eq "OPAPath") {
                     # Special validation for OPA path
                     $isFieldValid = Confirm-UIRequiredField -UIElement $uiElement `
@@ -836,10 +836,10 @@ Function Invoke-RequiredFieldValidation {
                                                       -RegexPattern $validationPattern `
                                                       -PlaceholderText $placeholderText
                 }
-                
+
                 if (-not $isFieldValid) {
                     $validationResults.IsValid = $false
-                    
+
                     # Get error message
                     $errorKey = $fieldKey + "Validation"
                     if ($syncHash.UIConfigs.localeErrorMessages.$errorKey) {
@@ -847,40 +847,40 @@ Function Invoke-RequiredFieldValidation {
                     } else {
                         $errorMessage = "Field '$fieldKey' is required and must be valid."
                     }
-                    
+
                     $validationResults.Errors += $errorMessage
-                    
+
                     # Find which tab this field belongs to
                     $tabToNavigate = Find-TabForField -FieldKey $fieldKey
                     if ($tabToNavigate -and $tabToNavigate -notin $validationResults.TabsToNavigate) {
                         $validationResults.TabsToNavigate += $tabToNavigate
                     }
-                    
+
                     Write-DebugOutput -Message "Validation failed for field $fieldKey in tab $tabToNavigate" -Source $MyInvocation.MyCommand -Level "Info"
                 }
             }
         }
-        
+
         # Special validation for ProductNames (not in requiredFields but still required)
         $minimumRequired = if ($syncHash.UIConfigs.MinimumProductsRequired) { $syncHash.UIConfigs.MinimumProductsRequired } else { 1 }
         if (-not $syncHash.GeneralSettingsData.ProductNames -or $syncHash.GeneralSettingsData.ProductNames.Count -lt $minimumRequired) {
             $validationResults.IsValid = $false
             $validationResults.Errors += ($syncHash.UIConfigs.localeErrorMessages.ProductSelection -f $minimumRequired)
-            
+
             $tabToNavigate = Find-TabForField -FieldKey "ProductNames"
             if ($tabToNavigate -and $tabToNavigate -notin $validationResults.TabsToNavigate) {
                 $validationResults.TabsToNavigate += $tabToNavigate
             }
         }
-        
+
         Write-DebugOutput -Message "Validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"
-        
+
     } catch {
         Write-DebugOutput -Message "Error in validation: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
         $validationResults.IsValid = $false
         $validationResults.Errors += "Validation system error: $($_.Exception.Message)"
     }
-    
+
     return $validationResults
 }
 
@@ -895,20 +895,20 @@ Function Find-TabForField {
         [Parameter(Mandatory = $true)]
         [string]$FieldKey
     )
-    
+
     try {
         $settingsControls = $syncHash.UIConfigs.settingsControl
-        
+
         foreach ($tabName in $settingsControls.PSObject.Properties.Name) {
             $tabConfig = $settingsControls.$tabName
-            
+
             if ($tabConfig.validationKeys -and $tabConfig.validationKeys -contains $FieldKey) {
                 # Map tab names to actual tab controls
                 switch ($tabName) {
                     "MainTab" { return $syncHash.MainTab }
                     "AdvancedTab" { return $syncHash.AdvancedTab }
                     "GlobalTab" { return $syncHash.GlobalTab }
-                    default { 
+                    default {
                         # Try to find tab by name
                         $tabControl = $syncHash.$tabName
                         if ($tabControl) {
@@ -918,18 +918,18 @@ Function Find-TabForField {
                 }
             }
         }
-        
+
         # Fallback - if not found, return MainTab
         Write-DebugOutput -Message "Tab not found for field $FieldKey, defaulting to MainTab" -Source $MyInvocation.MyCommand -Level "Warning"
         return $syncHash.MainTab
-        
+
     } catch {
         Write-DebugOutput -Message "Error finding tab for field $FieldKey`: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
         return $syncHash.MainTab
     }
 }
 
-Function Navigate-ToFirstErrorTab {
+Function Switch-FirstErrorTab {
     <#
     .SYNOPSIS
     Navigates to the first tab that contains validation errors
@@ -938,12 +938,12 @@ Function Navigate-ToFirstErrorTab {
         [Parameter(Mandatory = $true)]
         [array]$TabsToNavigate
     )
-    
+
     if ($TabsToNavigate.Count -gt 0) {
         # Navigate to the first tab with errors
         $firstTab = $TabsToNavigate[0]
         $syncHash.MainTabControl.SelectedItem = $firstTab
-        
+
         Write-DebugOutput -Message "Navigated to tab with validation errors" -Source $MyInvocation.MyCommand -Level "Info"
     }
 }
