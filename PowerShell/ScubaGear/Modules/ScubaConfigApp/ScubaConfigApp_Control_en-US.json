@@ -579,9 +579,9 @@
       "fields": [
         {
           "type": "array",
-          "name": "Included User Service Principal Names",
+          "name": "Included User",
           "value": "IncludedUsers",
-          "description": "Users to include as sensitive accounts",
+          "description": "Users and Service Principal Names to include as sensitive accounts",
           "valueType": "email",
           "required": false
         },
@@ -603,9 +603,9 @@
         },
         {
           "type": "array",
-          "name": "Excluded User Service Principal Names",
+          "name": "Excluded User",
           "value": "ExcludedUsers",
-          "description": "Users to exclude from sensitive accounts",
+          "description": "Users and Service Principal Names to exclude from sensitive accounts",
           "valueType": "email",
           "required": false
         },
