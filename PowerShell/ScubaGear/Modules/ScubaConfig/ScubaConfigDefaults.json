@@ -1,0 +1,120 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "ScubaGear default configuration values",
+    "lastUpdated": "2024-09-08",
+    "compatibleOpaVersions": ["1.6.0", "1.7.0", "1.7.1"]
+  },
+  "defaults": {
+    "OPAPath": "~/.scubagear/Tools",
+    "ProductNames": ["aad", "defender", "exo", "sharepoint", "teams"],
+    "AllProductNames": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams"],
+    "M365Environment": "commercial",
+    "LogIn": true,
+    "DisconnectOnExit": false,
+    "OutPath": ".",
+    "OutFolderName": "M365BaselineConformance",
+    "OutProviderFileName": "ProviderSettingsExport",
+    "OutRegoFileName": "TestResults",
+    "OutReportName": "BaselineReports",
+    "OutJsonFileName": "ScubaResults",
+    "OutCsvFileName": "ScubaResults",
+    "OutActionPlanFileName": "ActionPlan",
+    "NumberOfUUIDCharactersToTruncate": 18,
+    "OPAVersion": "1.6.0"
+  },
+  "environments": {
+    "commercial": {
+      "name": "Commercial",
+      "description": "Production environment for public tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.com",
+        "login": "https://login.microsoftonline.com"
+      }
+    },
+    "gcc": {
+      "name": "Government Community Cloud",
+      "description": "Production environment for government tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "gcchigh": {
+      "name": "Government Community Cloud High",
+      "description": "Production environment for GCCH tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "dod": {
+      "name": "Department of Defense",
+      "description": "Production environment for DOD tenants",
+      "endpoints": {
+        "graph": "https://dod-graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    }
+  },
+  "products": {
+    "aad": {
+      "name": "Microsoft Entra ID",
+      "displayName": "Microsoft Entra ID (aad)",
+      "supportsExclusions": true,
+      "supportedExclusionTypes": ["CapExclusions", "RoleExclusions"]
+    },
+    "defender": {
+      "name": "Defender",
+      "displayName": "Defender (defender)",
+      "supportsExclusions": true,
+      "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers"]
+    },
+    "exo": {
+      "name": "Exchange Online",
+      "displayName": "Exchange Online (exo)",
+      "supportsExclusions": true,
+      "supportedExclusionTypes": ["AllowedForwardingDomains", "PartnerDomains", "AgencyDomains"]
+    },
+    "powerplatform": {
+      "name": "Power Platform",
+      "displayName": "Power Platform (powerplatform)",
+      "supportsExclusions": false,
+      "supportedExclusionTypes": []
+    },
+    "sharepoint": {
+      "name": "SharePoint & OneDrive",
+      "displayName": "SharePoint & OneDrive (sharepoint)",
+      "supportsExclusions": false,
+      "supportedExclusionTypes": []
+    },
+    "teams": {
+      "name": "Microsoft Teams",
+      "displayName": "Microsoft Teams (teams)",
+      "supportsExclusions": false,
+      "supportedExclusionTypes": []
+    }
+  },
+  "privilegedRoles": [
+    "Global Administrator",
+    "Privileged Role Administrator",
+    "User Administrator",
+    "SharePoint Administrator",
+    "Exchange Administrator",
+    "Hybrid Identity Administrator",
+    "Application Administrator",
+    "Cloud Application Administrator"
+  ],
+  "validation": {
+    "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
+    "policyIdExample": "MS.DEFENDER.1.1v1",
+    "supportedFileExtensions": [".yaml", ".yml"],
+    "maxFileSizeBytes": 1048576,
+    "requireProductInPolicy": true
+  },
+  "outputSettings": {
+    "fileNameMaxLength": 100,
+    "supportedFormats": ["html", "json", "csv"],
+    "defaultEncoding": "UTF-8"
+  }
+}
