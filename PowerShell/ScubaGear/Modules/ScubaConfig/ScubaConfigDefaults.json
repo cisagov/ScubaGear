@@ -1,9 +1,9 @@
   {
   "metadata": {
-    "version": "1.0.0",
+    "version": "1.7.0",
     "description": "ScubaGear default configuration values",
     "lastUpdated": "2024-09-08",
-    "compatibleOpaVersions": ["1.6.0", "1.7.0", "1.7.1"]
+    "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.0","1.7.1","1.8.0","1.9.0","1.10.1"]
   },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
@@ -21,45 +21,29 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.6.0"
+    "OPAVersion": "1.10.1",
+    "PreferredDnsResolvers": [],
+    "SkipDoH": false
   },
   "minRequired": [
-    "OrgName",
-    "ProductNames",
-    "M365Environment"
+    "ProductNames"
   ],
   "M365Environment": {
     "commercial": {
       "name": "Commercial",
-      "description": "Production environment for public tenants",
-      "endpoints": {
-        "graph": "https://graph.microsoft.com",
-        "login": "https://login.microsoftonline.com"
-      }
+      "description": "Production environment for public tenants"
     },
     "gcc": {
       "name": "Government Community Cloud",
-      "description": "Production environment for government tenants",
-      "endpoints": {
-        "graph": "https://graph.microsoft.us",
-        "login": "https://login.microsoftonline.us"
-      }
+      "description": "Production environment for government tenants"
     },
     "gcchigh": {
       "name": "Government Community Cloud High",
-      "description": "Production environment for GCCH tenants",
-      "endpoints": {
-        "graph": "https://graph.microsoft.us",
-        "login": "https://login.microsoftonline.us"
-      }
+      "description": "Production environment for GCCH tenants"
     },
     "dod": {
       "name": "Department of Defense",
-      "description": "Production environment for DOD tenants",
-      "endpoints": {
-        "graph": "https://dod-graph.microsoft.us",
-        "login": "https://login.microsoftonline.us"
-      }
+      "description": "Production environment for DOD tenants"
     }
   },
   "products": {
@@ -113,7 +97,7 @@
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
-    "supportedFileExtensions": [".yaml", ".yml"],
+  "supportedFileExtensions": [".yaml", ".json"],
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },

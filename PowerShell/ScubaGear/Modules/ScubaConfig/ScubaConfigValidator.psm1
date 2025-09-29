@@ -76,10 +76,6 @@ class ScubaConfigValidator {
     }
 
     static [ValidationResult] ValidateYamlFile([string]$FilePath) {
-        return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $false)
-    }
-
-    static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode) {
         # Add debug information to the result
         $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath")
         $Result = [ValidationResult]::new()
@@ -123,18 +119,15 @@ class ScubaConfigValidator {
 
         # Validate against schema
         $DebugInfo += "DEBUG: About to call ValidateAgainstSchema with object type: $($YamlObject.GetType().Name)"
-        $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($YamlObject, $DebugMode)
+        $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($YamlObject)
         $DebugInfo += "DEBUG: ValidateAgainstSchema returned with $($SchemaValidation.Errors.Count) errors"
         $Result.ValidationErrors += $SchemaValidation.Errors
         $Result.Warnings += $SchemaValidation.Warnings
-
-        # Add debug info as warnings only in debug mode
-        if ($DebugMode) {
-            $Result.Warnings += $DebugInfo
-        }
+        # Add debug info as warnings so we can see what happened
+        $Result.Warnings += $DebugInfo
 
         # Additional business logic validation
-        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($YamlObject, $DebugMode)
+        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($YamlObject)
         $Result.ValidationErrors += $BusinessValidation.Errors
         $Result.Warnings += $BusinessValidation.Warnings
 
@@ -142,19 +135,16 @@ class ScubaConfigValidator {
         return $Result
     }
 
-    hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject, [bool]$DebugMode) {
+    hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject) {
         $Validation = [PSCustomObject]@{
             Errors = @()
             Warnings = @()
         }
 
         $Schema = [ScubaConfigValidator]::GetSchema()
-
-        # Get required properties from defaults configuration (minRequired section)
-        $Defaults = [ScubaConfigValidator]::GetDefaults()
-        $RequiredProperties = if ($Defaults.minRequired) { $Defaults.minRequired } else { @() }
-
-        if ($RequiredProperties.Count -gt 0) {
+        
+        # Validate required properties
+        if ($Schema -and $Schema.required) {
             # Handle both hashtables and PSCustomObjects with robust key detection
             if ($ConfigObject -is [hashtable]) {
                 # For hashtables, use the Keys collection directly
@@ -170,71 +160,35 @@ class ScubaConfigValidator {
                     $ConfigProperties = @()
                 }
             }
-
-            # Add debugging output only in debug mode
-            if ($DebugMode) {
-                $Validation.Warnings += "DEBUG - Required properties from config: $($RequiredProperties -join ', ')"
-                $Validation.Warnings += "DEBUG - Config object type: $($ConfigObject.GetType().Name)"
-                $Validation.Warnings += "DEBUG - Config properties found: $($ConfigProperties -join ', ')"
-            }
-
-            foreach ($RequiredProp in $RequiredProperties) {
+            
+            # DEBUG: Add debugging output via warnings
+            $Validation.Warnings += "DEBUG - Schema required properties: $($Schema.required -join ', ')"
+            $Validation.Warnings += "DEBUG - Config object type: $($ConfigObject.GetType().Name)"
+            $Validation.Warnings += "DEBUG - Config properties found: $($ConfigProperties -join ', ')"
+            
+            foreach ($RequiredProp in $Schema.required) {
                 if ($RequiredProp -notin $ConfigProperties) {
                     $Validation.Errors += "Required property '$RequiredProp' is missing"
-                    if ($DebugMode) {
-                        $Validation.Warnings += "DEBUG - Missing property: $RequiredProp"
-                    }
+                    $Validation.Warnings += "DEBUG - Missing property: $RequiredProp"
                 } else {
-                    if ($DebugMode) {
-                        $Validation.Warnings += "DEBUG - Found property: $RequiredProp"
-                    }
+                    $Validation.Warnings += "DEBUG - Found property: $RequiredProp"
                 }
             }
         }
 
-        # Validate ProductNames - comprehensive schema-driven validation
-        if ($Schema.properties -and $Schema.properties.ProductNames) {
-            $ProductNamesSchema = $Schema.properties.ProductNames
-
-            # Check if ProductNames exists and handle null/empty cases
-            if (-not $ConfigObject.ProductNames) {
-                $Validation.Errors += "Property 'ProductNames' is required but missing or null"
-            } elseif ($ConfigObject.ProductNames -is [array] -and $ConfigObject.ProductNames.Count -eq 0) {
-                # Check minItems constraint from schema
-                if ($ProductNamesSchema.minItems -and $ProductNamesSchema.minItems -gt 0) {
-                    $Validation.Errors += "Property 'ProductNames' cannot be empty - at least $($ProductNamesSchema.minItems) product(s) must be specified"
+        # Validate ProductNames
+        if ($ConfigObject.ProductNames -and $Schema.properties -and $Schema.properties.ProductNames) {
+            $ValidProducts = $Schema.properties.ProductNames.items.enum
+            foreach ($Product in $ConfigObject.ProductNames) {
+                if ($Product -notin $ValidProducts) {
+                    $Validation.Errors += "Invalid product name '$Product'. Valid products: $($ValidProducts -join ', ')"
                 }
-            } else {
-                # Validate array constraints
-                if ($ProductNamesSchema.minItems -and $ConfigObject.ProductNames.Count -lt $ProductNamesSchema.minItems) {
-                    $Validation.Errors += "Property 'ProductNames' must contain at least $($ProductNamesSchema.minItems) product(s), found $($ConfigObject.ProductNames.Count)"
-                }
+            }
 
-                if ($ProductNamesSchema.maxItems -and $ConfigObject.ProductNames.Count -gt $ProductNamesSchema.maxItems) {
-                    $Validation.Errors += "Property 'ProductNames' cannot contain more than $($ProductNamesSchema.maxItems) product(s), found $($ConfigObject.ProductNames.Count)"
-                }
-
-                # Validate individual product values
-                if ($ProductNamesSchema.items -and $ProductNamesSchema.items.enum) {
-                    $ValidProducts = $ProductNamesSchema.items.enum
-                    foreach ($Product in $ConfigObject.ProductNames) {
-                        if ($Product -notin $ValidProducts) {
-                            $Validation.Errors += "Property 'ProductNames' contains invalid value '$Product'. Valid values: $($ValidProducts -join ', ')"
-                        }
-                    }
-                }
-
-                # Check uniqueItems constraint
-                if ($ProductNamesSchema.uniqueItems -and ($ConfigObject.ProductNames | Group-Object | Where-Object Count -gt 1)) {
-                    $Duplicates = ($ConfigObject.ProductNames | Group-Object | Where-Object Count -gt 1).Name
-                    $Validation.Errors += "Property 'ProductNames' contains duplicate values: $($Duplicates -join ', ')"
-                }
-
-                # Handle wildcard behavior (warning only)
-                if ($ConfigObject.ProductNames -contains '*') {
-                    if ($ConfigObject.ProductNames.Count -gt 1) {
-                        $Validation.Warnings += "Wildcard '*' found with other products. All products will be selected."
-                    }
+            # Handle wildcard
+            if ($ConfigObject.ProductNames -contains '*') {
+                if ($ConfigObject.ProductNames.Count -gt 1) {
+                    $Validation.Warnings += "Wildcard '*' found with other products. All products will be selected."
                 }
             }
         }
@@ -248,10 +202,10 @@ class ScubaConfigValidator {
         }
 
         # Validate Organization format
-        if ($ConfigObject.Organization -and $Schema.properties -and $Schema.properties.Organization) {
+        if ($ConfigObject.Organization) {
             $OrgPattern = $Schema.properties.Organization.pattern
-            if ($OrgPattern -and $ConfigObject.Organization -notmatch $OrgPattern) {
-                $Validation.Errors += "Property 'Organization' value '$($ConfigObject.Organization)' is not a valid fully qualified domain name (FQDN)"
+            if ($ConfigObject.Organization -notmatch $OrgPattern) {
+                $Validation.Errors += "Organization '$($ConfigObject.Organization)' does not match required format (e.g., example.onmicrosoft.com)"
             }
         }
 
@@ -274,11 +228,13 @@ class ScubaConfigValidator {
         return $Validation
     }
 
-    hidden static [PSCustomObject] ValidateBusinessRules([object]$ConfigObject, [bool]$DebugMode) {
+    hidden static [PSCustomObject] ValidateBusinessRules([object]$ConfigObject) {
         $Validation = [PSCustomObject]@{
             Errors = @()
             Warnings = @()
         }
+
+        $Defaults = [ScubaConfigValidator]::GetDefaults()
 
         # Validate policy IDs in OmitPolicy
         if ($ConfigObject.OmitPolicy) {
@@ -324,13 +280,13 @@ class ScubaConfigValidator {
             }
         }
 
-        # Enhanced validation for critical organizational fields (content quality only)
+        # Enhanced validation for critical organizational fields
         [ScubaConfigValidator]::ValidateOrganizationalFields($ConfigObject, $Validation)
 
-        # Enhanced validation for ProductNames (content quality only)
+        # Enhanced validation for ProductNames
         [ScubaConfigValidator]::ValidateProductNames($ConfigObject, $Validation)
 
-        # Enhanced validation for M365Environment (content quality only)
+        # Enhanced validation for M365Environment
         [ScubaConfigValidator]::ValidateM365Environment($ConfigObject, $Validation)
 
         return $Validation
@@ -442,9 +398,9 @@ class ScubaConfigValidator {
 
         if ($Object -is [hashtable]) {
             # For hashtables, filter out system properties that might get mixed in
-            return $Object.Keys | Where-Object {
-                $_ -is [string] -and
-                $_ -notmatch '^(Count|IsReadOnly|IsFixedSize|IsSynchronized|Keys|Values|SyncRoot|Comparer)$'
+            return $Object.Keys | Where-Object { 
+                $_ -is [string] -and 
+                $_ -notmatch '^(Count|IsReadOnly|IsFixedSize|IsSynchronized|Keys|Values|SyncRoot|Comparer)$' 
             }
         } elseif ($Object.PSObject -and $Object.PSObject.Properties) {
             # For PSCustomObjects, get property names
@@ -461,42 +417,40 @@ class ScubaConfigValidator {
 
     # Enhanced validation for organizational fields (Organization, OrgName, OrgUnitName)
     hidden static [void] ValidateOrganizationalFields([object]$ConfigObject, [PSCustomObject]$Validation) {
-        $Schema = [ScubaConfigValidator]::GetSchema()
-
-        # Validate Organization format using schema pattern (only if present - required check handled by JSON Schema)
-        if ($ConfigObject.Organization -and $Schema.properties -and $Schema.properties.Organization -and $Schema.properties.Organization.pattern) {
-            $OrgPattern = $Schema.properties.Organization.pattern
-            if ($ConfigObject.Organization -notmatch $OrgPattern) {
-                $Validation.Errors += "Property 'Organization' value '$($ConfigObject.Organization)' is not a valid fully qualified domain name (FQDN)"
-            }
+        # Validate Organization (required and must be valid tenant domain)
+        if (-not $ConfigObject.Organization) {
+            $Validation.Errors += "Organization is required and must be specified"
+        } elseif ($ConfigObject.Organization -notmatch '^[a-zA-Z0-9.-]+\.(onmicrosoft\.com|onmicrosoft\.us)$') {
+            $Validation.Errors += "Organization '$($ConfigObject.Organization)' must be a valid Microsoft tenant domain (e.g., 'tenant.onmicrosoft.com')"
         }
 
-        # Validate OrgName content (only if present - required check handled by JSON Schema)
-        if ($ConfigObject.OrgName) {
-            if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgName)) {
-                $Validation.Errors += "OrgName cannot be empty or contain only whitespace"
-            } elseif ($ConfigObject.OrgName.Length -gt 100) {
-                $Validation.Errors += "OrgName cannot exceed 100 characters"
-            }
+        # Validate OrgName (required and must not be empty/whitespace)
+        if (-not $ConfigObject.OrgName) {
+            $Validation.Errors += "OrgName is required and must be specified"
+        } elseif ([string]::IsNullOrWhiteSpace($ConfigObject.OrgName)) {
+            $Validation.Errors += "OrgName cannot be empty or contain only whitespace"
+        } elseif ($ConfigObject.OrgName.Length -gt 100) {
+            $Validation.Errors += "OrgName cannot exceed 100 characters"
         }
 
-        # Validate OrgUnitName content (only if present - required check handled by JSON Schema)
-        if ($ConfigObject.OrgUnitName) {
-            if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgUnitName)) {
-                $Validation.Errors += "OrgUnitName cannot be empty or contain only whitespace"
-            } elseif ($ConfigObject.OrgUnitName.Length -gt 100) {
-                $Validation.Errors += "OrgUnitName cannot exceed 100 characters"
-            }
+        # Validate OrgUnitName (required and must not be empty/whitespace)
+        if (-not $ConfigObject.OrgUnitName) {
+            $Validation.Errors += "OrgUnitName is required and must be specified"
+        } elseif ([string]::IsNullOrWhiteSpace($ConfigObject.OrgUnitName)) {
+            $Validation.Errors += "OrgUnitName cannot be empty or contain only whitespace"
+        } elseif ($ConfigObject.OrgUnitName.Length -gt 100) {
+            $Validation.Errors += "OrgUnitName cannot exceed 100 characters"
         }
     }
 
-    # Enhanced validation for ProductNames (warnings only, validation done in schema check)
+    # Enhanced validation for ProductNames
     hidden static [void] ValidateProductNames([object]$ConfigObject, [PSCustomObject]$Validation) {
-        # Only add warnings if ProductNames is present
         if (-not $ConfigObject.ProductNames) {
+            $Validation.Errors += "ProductNames is required and must contain at least one product"
             return
         }
 
+        $ValidProducts = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams", "*")
         $ProductList = if ($ConfigObject.ProductNames -is [array]) {
             $ConfigObject.ProductNames
         } else {
@@ -504,10 +458,18 @@ class ScubaConfigValidator {
         }
 
         if ($ProductList.Count -eq 0) {
-            return  # Empty array error already handled in ValidateAgainstSchema
+            $Validation.Errors += "ProductNames must contain at least one product"
+            return
         }
 
-        # Check for duplicates (warning only, not an error)
+        # Check for invalid product names
+        foreach ($Product in $ProductList) {
+            if ($Product -notin $ValidProducts) {
+                $Validation.Errors += "Invalid product name '$Product'. Valid products: $($ValidProducts -join ', ')"
+            }
+        }
+
+        # Check for duplicates
         $UniqueProducts = $ProductList | Sort-Object -Unique
         if ($UniqueProducts.Count -ne $ProductList.Count) {
             $Validation.Warnings += "ProductNames contains duplicate entries. Duplicates will be ignored."
@@ -519,11 +481,17 @@ class ScubaConfigValidator {
         }
     }
 
-    # Enhanced validation for M365Environment (warnings only, validation done in schema check)
+    # Enhanced validation for M365Environment
     hidden static [void] ValidateM365Environment([object]$ConfigObject, [PSCustomObject]$Validation) {
-        # Only add warnings if M365Environment is present and valid
+        $ValidEnvironments = @("commercial", "gcc", "gcchigh", "dod")
+        
         if (-not $ConfigObject.M365Environment) {
+            $Validation.Errors += "M365Environment is required and must be specified"
             return
+        }
+
+        if ($ConfigObject.M365Environment -notin $ValidEnvironments) {
+            $Validation.Errors += "Invalid M365Environment '$($ConfigObject.M365Environment)'. Valid environments: $($ValidEnvironments -join ', ')"
         }
 
         # Environment-specific validation warnings
@@ -551,3 +519,6 @@ class ValidationResult {
         $this.ParsedContent = $null
     }
 }
+
+# Export classes and functions
+Export-ModuleMember -Function * -Variable *
