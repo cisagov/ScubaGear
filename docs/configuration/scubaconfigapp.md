@@ -2,8 +2,6 @@
 
 The ScubaConfigApp is a PowerShell-driven UI built with Windows Presentation Framework. It’s not an executable—it’s lightweight, portable, and supports any Microsoft OS with graphical UI.
 
-[![SCuBAConfig App Version](https://img.shields.io/badge/ScubaConfigApp%20Version-v1.9.22-blue)](https://github.com/cisagov/ScubaGear/releases)
-
 ## Overview
 
 ScubaConfigApp module contains these elements:
