@@ -1,0 +1,169 @@
+using module '.\ScubaConfig.psm1'
+
+Describe "ScubaConfig JSON-based Configuration Tests" {
+    BeforeAll {
+        # Reset the instance before tests
+        [ScubaConfig]::ResetInstance()
+    }
+
+    AfterAll {
+        # Clean up after tests
+        [ScubaConfig]::ResetInstance()
+    }
+
+    It "Should load JSON configuration defaults" {
+        $Defaults = [ScubaConfig]::GetConfigDefaults()
+
+        $Defaults | Should -Not -BeNullOrEmpty
+        $Defaults.defaults | Should -Not -BeNullOrEmpty
+        $Defaults.defaults.ProductNames | Should -Contain "aad"
+        $Defaults.defaults.M365Environment | Should -Be "commercial"
+        $Defaults.defaults.OPAVersion | Should -Match "^\d+\.\d+\.\d+$"
+    }
+
+    It "Should validate valid YAML configuration" {
+        $ValidYaml = @"
+ProductNames:
+  - aad
+  - defender
+M365Environment: commercial
+Organization: example.onmicrosoft.com
+OrgName: Test Organization
+"@
+
+        $TempFile = New-TemporaryFile
+        $ValidYaml | Set-Content -Path $TempFile.FullName
+
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+
+        $ValidationResult.IsValid | Should -BeTrue
+        $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
+
+        Remove-Item -Path $TempFile.FullName -Force
+    }
+
+    It "Should reject invalid YAML configuration" {
+        $InvalidYaml = @"
+ProductNames:
+  - invalid_product
+M365Environment: invalid_environment
+Organization: invalid_format
+"@
+
+        $TempFile = New-TemporaryFile
+        $InvalidYaml | Set-Content -Path $TempFile.FullName
+
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+
+        $ValidationResult.IsValid | Should -BeFalse
+        $ValidationResult.ValidationErrors.Count | Should -BeGreaterThan 0
+
+        Remove-Item -Path $TempFile.FullName -Force
+    }
+
+    It "Should validate policy IDs correctly" {
+        $YamlWithPolicies = @"
+ProductNames:
+  - aad
+  - defender
+OmitPolicy:
+  MS.AAD.1.1v1: "Valid policy ID"
+  invalid_policy: "Invalid policy ID"
+AnnotatePolicy:
+  MS.DEFENDER.2.1v1: "Valid annotation"
+"@
+
+        $TempFile = New-TemporaryFile
+        $YamlWithPolicies | Set-Content -Path $TempFile.FullName
+
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+
+        # Should have validation errors for invalid policy ID
+        $ValidationResult.ValidationErrors | Should -Contain "Policy ID 'invalid_policy' does not match expected format. Expected: MS.DEFENDER.1.1v1"
+
+        Remove-Item -Path $TempFile.FullName -Force
+    }
+
+    It "Should handle exclusions configuration" {
+        $YamlWithExclusions = @"
+ProductNames:
+  - aad
+  - defender
+ExclusionsConfig:
+  aad:
+    CapExclusions:
+      Users:
+        - "user1@example.com"
+      Groups:
+        - "Group1"
+  defender:
+    SensitiveUsers:
+      - DisplayName: "John Doe"
+        EmailAddress: "john.doe@example.com"
+"@
+
+        $TempFile = New-TemporaryFile
+        $YamlWithExclusions | Set-Content -Path $TempFile.FullName
+
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+
+        $ValidationResult.IsValid | Should -BeTrue
+
+        Remove-Item -Path $TempFile.FullName -Force
+    }
+
+    It "Should get product information" {
+        $AadInfo = [ScubaConfig]::GetProductInfo("aad")
+
+        $AadInfo | Should -Not -BeNullOrEmpty
+        $AadInfo.name | Should -Be "Microsoft Entra ID"
+        $AadInfo.supportsExclusions | Should -BeTrue
+        $AadInfo.supportedExclusionTypes | Should -Contain "CapExclusions"
+    }
+
+    It "Should get supported products and environments" {
+        $Products = [ScubaConfig]::GetSupportedProducts()
+        $Environments = [ScubaConfig]::GetSupportedEnvironments()
+
+        $Products | Should -Contain "aad"
+        $Products | Should -Contain "powerplatform"
+
+        $Environments | Should -Contain "commercial"
+        $Environments | Should -Contain "gcc"
+    }
+
+    It "Should maintain backward compatibility with ScubaDefault method" {
+        $OpaVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
+        $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
+
+        $OpaVersion | Should -Match "^\d+\.\d+\.\d+$"
+        $ProductNames | Should -Contain "aad"
+    }
+
+    It "Should load configuration with validation" {
+        $ValidYaml = @"
+ProductNames:
+  - aad
+  - teams
+M365Environment: gcc
+Organization: testorg.onmicrosoft.us
+OrgName: Test Government Organization
+LogIn: false
+OutFolderName: CustomOutputFolder
+"@
+
+        $TempFile = New-TemporaryFile
+        $ValidYaml | Set-Content -Path $TempFile.FullName
+
+        $Config = [ScubaConfig]::GetInstance()
+        $LoadResult = $Config.LoadConfig($TempFile)
+
+        $LoadResult | Should -BeTrue
+        $Config.Configuration.ProductNames | Should -Contain "aad"
+        $Config.Configuration.ProductNames | Should -Contain "teams"
+        $Config.Configuration.M365Environment | Should -Be "gcc"
+        $Config.Configuration.OutFolderName | Should -Be "CustomOutputFolder"
+
+        Remove-Item -Path $TempFile.FullName -Force
+    }
+}
