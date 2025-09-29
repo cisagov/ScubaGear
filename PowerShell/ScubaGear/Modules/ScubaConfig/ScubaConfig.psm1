@@ -1,3 +1,5 @@
+using module '.\ScubaConfigValidator.psm1'
+
 class ScubaConfig {
     <#
     .SYNOPSIS
@@ -17,37 +19,67 @@ class ScubaConfig {
     #>
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
-    hidden static [hashtable]$ScubaDefaults = @{
-        DefaultOPAPath = try {Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"} catch {"."};
-        DefaultProductNames = @("aad", "defender", "exo", "sharepoint", "teams")
-        AllProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-        DefaultM365Environment = "commercial"
-        DefaultLogIn = $true
-        DefaultOutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
-        DefaultOutFolderName = "M365BaselineConformance"
-        DefaultOutProviderFileName = "ProviderSettingsExport"
-        DefaultOutRegoFileName = "TestResults"
-        DefaultOutReportName = "BaselineReports"
-        DefaultOutJsonFileName = "ScubaResults"
-        DefaultOutCsvFileName = "ScubaResults"
-        DefaultOutActionPlanFileName = "ActionPlan"
-        DefaultNumberOfUUIDCharactersToTruncate = 18
-        DefaultPrivilegedRoles = @(
-            "Global Administrator",
-            "Privileged Role Administrator",
-            "User Administrator",
-            "SharePoint Administrator",
-            "Exchange Administrator",
-            "Hybrid Identity Administrator",
-            "Application Administrator",
-            "Cloud Application Administrator")
-        DefaultOPAVersion = '1.10.1'
-        DefaultSkipDoH = $false
-        DefaultPreferredDnsResolvers = @()
+    hidden static [Boolean]$_ValidatorInitialized = $false
+    hidden static [object]$_ConfigDefaults = $null
+    hidden static [object]$_ConfigSchema = $null
+
+    static [void] InitializeValidator() {
+        if (-not [ScubaConfig]::_ValidatorInitialized) {
+            $ModulePath = Split-Path -Parent $PSCommandPath
+            [ScubaConfigValidator]::Initialize($ModulePath)
+            [ScubaConfig]::_ConfigDefaults = [ScubaConfigValidator]::GetDefaults()
+            [ScubaConfig]::_ConfigSchema = [ScubaConfigValidator]::GetSchema()
+            [ScubaConfig]::_ValidatorInitialized = $true
+        }
     }
 
     static [object]ScubaDefault ([string]$Name){
-        return [ScubaConfig]::ScubaDefaults[$Name]
+        [ScubaConfig]::InitializeValidator()
+
+        # Dynamically resolve configuration values based on naming conventions
+        # This eliminates the need to maintain mappings in multiple places
+
+        # Handle special cases that require processing
+        if ($Name -eq 'DefaultOPAPath') {
+            $Path = [ScubaConfig]::_ConfigDefaults.defaults.OPAPath
+            if ($Path -eq "~/.scubagear/Tools") {
+                try {
+                    return Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                } catch {
+                    return "."
+                }
+            }
+            return $Path
+        }
+        elseif ($Name -eq 'DefaultOutPath') {
+            $Path = [ScubaConfig]::_ConfigDefaults.defaults.OutPath
+            if ($Path -eq ".") {
+                return Get-Location | Select-Object -ExpandProperty ProviderPath
+            }
+            return $Path
+        }
+        elseif ($Name -eq 'AllProductNames') {
+            return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames
+        }
+        elseif ($Name -eq 'DefaultPrivilegedRoles') {
+            return [ScubaConfig]::_ConfigDefaults.privilegedRoles
+        }
+        elseif ($Name.StartsWith('Default')) {
+            # For standard "Default" prefixed names, auto-resolve from defaults section
+            $ConfigKey = $Name.Substring(7) # Remove 'Default' prefix
+
+            # Check if the property exists in defaults
+            if ([ScubaConfig]::_ConfigDefaults.defaults.PSObject.Properties.Name -contains $ConfigKey) {
+                return [ScubaConfig]::_ConfigDefaults.defaults.$ConfigKey
+            }
+            else {
+                throw "Unknown default configuration key: $Name. Property '$ConfigKey' not found in defaults section."
+            }
+        }
+        else {
+            # If no mapping found, throw error
+            throw "Unknown default configuration key: $Name. Available keys: $((Get-Member -InputObject [ScubaConfig]::_ConfigDefaults -MemberType NoteProperty).Name -join ', ')"
+        }
     }
 
     static [string]GetOpaVersion() {
@@ -58,65 +90,47 @@ class ScubaConfig {
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
         }
+
         [ScubaConfig]::ResetInstance()
-        $Content = Get-Content -Raw -Path $Path
-        try {
-            $this.Configuration = $Content | ConvertFrom-Yaml
+        [ScubaConfig]::InitializeValidator()
+
+        # Validate the YAML file before loading
+        Write-Debug "Validating configuration file: $Path"
+        $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName)
+
+        if (-not $ValidationResult.IsValid) {
+            $ErrorMessage = "Configuration validation failed:`n"
+            foreach ($ValidationError in $ValidationResult.ValidationErrors) {
+                $ErrorMessage += "  - $ValidationError`n"
+            }
+            throw $ErrorMessage.TrimEnd()
         }
-        catch {
-            $ParseError = $($_.Exception.Message) -Replace '^Exception calling "Load" with "1" argument\(s\): ', ''
-            throw "Error loading config file: $ParseError"
+
+        # Display warnings if any
+        if ($ValidationResult.Warnings.Count -gt 0) {
+            foreach ($Warning in $ValidationResult.Warnings) {
+                Write-Warning $Warning
+            }
+        }
+
+        # Use the already parsed content from validation
+        $this.Configuration = $ValidationResult.ParsedContent
+
+        # Convert to hashtable for compatibility
+        if ($this.Configuration -is [PSCustomObject]) {
+            $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
 
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
 
-        # If OmitPolicy was included in the config file, validate the policy IDs included there.
+        # Legacy validation for policy IDs - now handled by validator but kept for backwards compatibility
         if ($this.Configuration.ContainsKey("OmitPolicy")) {
-            foreach ($Policy in $this.Configuration.OmitPolicy.Keys) {
-                if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
-                    # Note that -match is a case insensitive match
-                    # Note that the regex does not validate the product name, this will be done later
-                    $Warning = "Config file indicates omitting $Policy, but $Policy is not a valid control ID. "
-                    $Warning += "Expected format is 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
-                    $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Control will not be omitted."
-                    Write-Warning $Warning
-                    Continue
-                }
-                $Product = ($Policy -Split "\.")[1]
-                # Here's where the product name is validated
-                if (-not ($this.Configuration.ProductNames -Contains $Product)) {
-                    $Warning = "Config file indicates omitting $Policy, but $Product is not one of the products "
-                    $Warning += "specified in the ProductNames parameter. Control will not be omitted."
-                    Write-Warning $Warning
-                    Continue
-                }
-            }
+            [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
         }
 
-        # If AnnotatePolicy was included in the config file, validate the policy IDs included there.
         if ($this.Configuration.ContainsKey("AnnotatePolicy")) {
-            foreach ($Policy in $this.Configuration.AnnotatePolicy.Keys) {
-                if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
-                    # Note that -match is a case insensitive match
-                    # Note that the regex does not validate the product name, this will be done later
-                    $Warning = "Config file adds annotation for $Policy, "
-                    $Warning += "but $Policy is not a valid control ID. "
-                    $Warning += "Expected format is 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
-                    $Warning += "e.g., 'MS.DEFENDER.1.1v1'."
-                    Write-Warning $Warning
-                    Continue
-                }
-                $Product = ($Policy -Split "\.")[1]
-                # Here's where the product name is validated
-                if (-not ($this.Configuration.ProductNames -Contains $Product)) {
-                    $Warning = "Config file adds annotation for $Policy, "
-                    $Warning += "but $Product is not one of the products "
-                    $Warning += "specified in the ProductNames parameter."
-                    Write-Warning $Warning
-                    Continue
-                }
-            }
+            [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
         }
 
         return [ScubaConfig]::_IsLoaded
@@ -126,85 +140,101 @@ class ScubaConfig {
         $this.Configuration = $null
     }
 
+    hidden static [hashtable] ConvertPSObjectToHashtable([PSCustomObject]$Object) {
+        $Hashtable = @{}
+        foreach ($Property in $Object.PSObject.Properties) {
+            if ($Property.Value -is [PSCustomObject]) {
+                $Hashtable[$Property.Name] = [ScubaConfig]::ConvertPSObjectToHashtable($Property.Value)
+            }
+            elseif ($Property.Value -is [Array]) {
+                $Array = @()
+                foreach ($Item in $Property.Value) {
+                    if ($Item -is [PSCustomObject]) {
+                        $Array += [ScubaConfig]::ConvertPSObjectToHashtable($Item)
+                    }
+                    else {
+                        $Array += $Item
+                    }
+                }
+                $Hashtable[$Property.Name] = $Array
+            }
+            else {
+                $Hashtable[$Property.Name] = $Property.Value
+            }
+        }
+        return $Hashtable
+    }
+
+    hidden static [void] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
+        [ScubaConfig]::InitializeValidator()
+        $Defaults = [ScubaConfig]::_ConfigDefaults
+
+        foreach ($Policy in $PolicyConfig.Keys) {
+            if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
+                $ErrorMessage = "Config file indicates $ActionType $Policy, but $Policy is not a valid control ID. "
+                $ErrorMessage += "Expected format is '$($Defaults.validation.policyIdExample)'. "
+                $ErrorMessage += "Policy ID does not match expected format."
+                throw $ErrorMessage
+            }
+
+            $Product = ($Policy -Split "\.")[1].ToLower()
+
+            # Handle wildcard in ProductNames
+            $EffectiveProducts = $ProductNames
+            if ($ProductNames -contains '*') {
+                $EffectiveProducts = $Defaults.defaults.AllProductNames
+            }
+
+            if (-not ($EffectiveProducts -Contains $Product)) {
+                $ErrorMessage = "Config file indicates $ActionType $Policy, but $Product is not one of the products "
+                $ErrorMessage += "specified in the ProductNames parameter (not in the selected ProductNames)."
+                throw $ErrorMessage
+            }
+        }
+    }
+
     hidden [Guid]$Uuid = [Guid]::NewGuid()
     hidden [hashtable]$Configuration
 
     hidden [void]SetParameterDefaults(){
-        Write-Debug "Setting ScubaConfig default values."
-        if (-Not $this.Configuration.ProductNames){
-            $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
+        Write-Debug "Setting ScubaConfig default values from configuration."
+
+        # Get defaults configuration
+        $Defaults = [ScubaConfig]::_ConfigDefaults.defaults
+
+        # Set defaults for any properties not specified in the YAML, using configuration-driven approach
+        foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
+            if (-not $this.Configuration.ContainsKey($PropertyName)) {
+                Write-Debug "Setting default value for '$PropertyName'"
+                $this.Configuration[$PropertyName] = $Defaults.$PropertyName
+            }
         }
-        else{
-            # Transform ProductNames into list of all products if it contains wildcard
-            if ($this.Configuration.ProductNames.Contains('*')){
+
+        # Special handling for ProductNames (wildcard expansion and uniqueness)
+        if ($this.Configuration.ProductNames) {
+            if ($this.Configuration.ProductNames.Contains('*')) {
                 $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames')
                 Write-Debug "Setting ProductNames to all products because of wildcard"
-            }
-            else{
-                Write-Debug "ProductNames provided - using as is."
+            } else {
+                Write-Debug "ProductNames provided - ensuring uniqueness."
                 $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
             }
         }
 
-        if (-Not $this.Configuration.M365Environment){
-            $this.Configuration.M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment')
+        # Special handling for OPAPath (expand tilde)
+        if ($this.Configuration.OPAPath -eq "~/.scubagear/Tools") {
+            try {
+                $this.Configuration.OPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+            } catch {
+                $this.Configuration.OPAPath = "."
+            }
         }
 
-        if (-Not $this.Configuration.OPAPath){
-            $this.Configuration.OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
+        # Special handling for OutPath (resolve current directory)
+        if ($this.Configuration.OutPath -eq ".") {
+            $this.Configuration.OutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
         }
 
-        if (-Not $this.Configuration.LogIn){
-            $this.Configuration.LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn')
-        }
-
-        if (-Not $this.Configuration.DisconnectOnExit){
-            $this.Configuration.DisconnectOnExit = $false
-        }
-
-        if (-Not $this.Configuration.OutPath){
-            $this.Configuration.OutPath = [ScubaConfig]::ScubaDefault('DefaultOutPath')
-        }
-
-        if (-Not $this.Configuration.OutFolderName){
-            $this.Configuration.OutFolderName = [ScubaConfig]::ScubaDefault('DefaultOutFolderName')
-        }
-
-        if (-Not $this.Configuration.OutProviderFileName){
-            $this.Configuration.OutProviderFileName = [ScubaConfig]::ScubaDefault('DefaultOutProviderFileName')
-        }
-
-        if (-Not $this.Configuration.OutRegoFileName){
-            $this.Configuration.OutRegoFileName = [ScubaConfig]::ScubaDefault('DefaultOutRegoFileName')
-        }
-
-        if (-Not $this.Configuration.OutReportName){
-            $this.Configuration.OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName')
-        }
-
-        if (-Not $this.Configuration.OutJsonFileName){
-            $this.Configuration.OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName')
-        }
-
-        if (-Not $this.Configuration.OutCsvFileName){
-            $this.Configuration.OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName')
-        }
-
-        if (-Not $this.Configuration.OutActionPlanFileName){
-            $this.Configuration.OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName')
-        }
-
-        if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
-            $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
-        }
-
-        if (-Not $this.Configuration.PreferredDnsResolvers){
-            $this.Configuration.PreferredDnsResolvers = [ScubaConfig]::ScubaDefault('DefaultPreferredDnsResolvers')
-        }
-
-        if (-Not $this.Configuration.SkipDoH){
-            $this.Configuration.SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
-        }
         return
     }
 
@@ -214,11 +244,53 @@ class ScubaConfig {
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
+        # Allow reinitialization of the validator when tests call ResetInstance
+        [ScubaConfig]::_ValidatorInitialized = $false
+
+        # Always: force cleanup for CI runs
+        [GC]::Collect()
+        [GC]::WaitForPendingFinalizers()
         return
     }
 
     static [ScubaConfig]GetInstance(){
+        [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_Instance
     }
-}
 
+    # Additional utility methods for JSON-based configuration
+    static [object] GetConfigDefaults() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigDefaults
+    }
+
+    static [object] GetConfigSchema() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigSchema
+    }
+
+    static [ValidationResult] ValidateConfigFile([string]$Path) {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfigValidator]::ValidateYamlFile($Path)
+    }
+
+    static [array] GetSupportedProducts() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames
+    }
+
+    static [array] GetSupportedEnvironments() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigDefaults.M365Environment.PSObject.Properties.Name
+    }
+
+    static [object] GetProductInfo([string]$ProductName) {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigDefaults.products.$ProductName
+    }
+
+    static [array] GetPrivilegedRoles() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigDefaults.privilegedRoles
+    }
+}
