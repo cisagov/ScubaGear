@@ -1,5 +1,32 @@
 using module '..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
 
+function Set-OPAVersionDoc {
+    <#
+    .Description
+    Replace OPA version in
+    ./docs/prerequisites/dependencies.md
+    .Functionality
+    Internal
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $LatestOpaVersion
+    )
+    $GitHubDocPath = './docs/prerequisites/dependencies.md'
+    $VerRegex = "v\d+\.\d+\.\d+"
+    $VerReplace = "v${$LatestOpaVersion}"
+    (Get-Content -Path $GitHubDocPath) | ForEach-Object {
+        $VerMatch = $_ -match $VerRegex
+        if ($VerMatch) {
+            $_ -replace $VerRegex, $VerReplace
+        }
+        else {
+            $_
+        }
+    } | Set-Content -Path $GitHubDocPath
+}
+
 function Confirm-OpaUpdateRequirements {
     <#
         .SYNOPSIS
@@ -197,6 +224,9 @@ function New-OpaUpdatePr {
     )
 
     $UnitTestResults = Invoke-UnitTestsWithNewOPAVersion -LatestOpaVersion $LatestOpaVersion
+
+    # Update the docs with the latest tested OPA version
+    Set-OPAVersionDoc -LatestOpaVersion $LatestOpaVersion
 
     # Create the PR body
     $PRTemplatePath = Join-Path -Path $RepoPath -ChildPath '.github/pull_request_template.md'
