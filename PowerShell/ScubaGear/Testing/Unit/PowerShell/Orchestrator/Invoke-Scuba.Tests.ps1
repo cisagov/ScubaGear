@@ -92,7 +92,9 @@ InModuleScope Orchestrator {
             }
             It 'Should only run each baseline once if provider names contains duplicates' {
                 {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
-                Should -Invoke Invoke-ReportCreation -ParameterFilter {$ProductNames -eq 'aad'}
+                # After refactor, -ProductNames are consolidated into ScubaConfig and duplicates removed
+                # Validate only a single invocation and that consolidated ProductNames contains exactly one 'aad'
+                Should -Invoke Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter { ($ScubaConfig.ProductNames.Count -eq 1) -and ($ScubaConfig.ProductNames -eq 'aad') }
             }
         }
         Context 'Service Principal provided'{
