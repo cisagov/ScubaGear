@@ -62,9 +62,9 @@ For more information review the [Configuration UI](docs/configuration/scubaconfi
 
 ### ScubaGear Output
 
-- **HTML Reports**: Interactive, user-friendly compliance reports. See SAMPLE: [Baselinereports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
-- **JSON Output**: Structured results for reporting and parsing. See SAMPLE: [ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
-- **CSV Export**: Spreadsheet-compatible data for analysis. See SAMPLE: [ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
+- **HTML Reports**: Interactive, user-friendly compliance reports. [Sample BaselineReports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
+- **JSON Output**: Structured results for reporting and parsing. [Sample ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
+- **CSV Export**: Spreadsheet-compatible data for analysis. [Sample ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
 
 ## Getting Started
 
