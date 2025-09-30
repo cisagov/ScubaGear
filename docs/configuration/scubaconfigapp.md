@@ -366,21 +366,3 @@ Instead, it is recommended to:
 4. Translate text elements: _name, rationale_ for each baseline item
 5. Set `PullOnlineBaselines:false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
 6. Update root module (`ScubaConfigApp.psm1`) to support new locale.
-
-### Contributing
-
-Follow the main ScubaGear contribution guidelines when making changes to this module.
-
-## Version History
-
-- Previous versions: See [ScubaConfigApp changelog](../../PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_CHANGELOG.md)
-
-## License
-
-Same license as the parent ScubaGear project.
-
-## Support
-
-For issues and questions:
-
-- **SCuBAGear Issues**: [GitHub Issues](https://github.com/cisagov/scubagear/issues)
