@@ -11,7 +11,7 @@ ScubaConfigApp module contains these elements:
 - **ScubaGear Execution**: Integrated ScubaGear assessment execution with real-time progress monitoring
 - **Native Report Viewer**: Built-in WPF report viewer with colorful status badges and space-optimized layouts
 - **Localization Support**: Multi-language UI text and validation messages. **Currently only supported locale is: _en-US_**
-- **Connected Support**: Simplify selection screen to pull in graph users and groups id's
+- **Connected Support**: Simplify selection screen to pull in Graph users and group IDs
 - **Debug Capabilities**: Comprehensive debugging features
 
 ![SCuBAGear Assessment Process Diagram](../images/scubaconfigapp_main.png)
@@ -160,7 +160,7 @@ In the "Advanced" tab:
 Click "Preview & Generate" to enable the preview tab and generate the YAML file. This should automatically navigate to the "Preview" tab:
 - Review the generated YAML configuration
 - Verify all settings are correct
-- Make adjustments by returning to previous tabs if needed.
+- Make adjustments by returning to previous tabs if needed
 
 > [!IMPORTANT]
 > **Be sure to click the "Preview & Generate" when done making updates to pull those changed into yaml output. Clicking on the _Preview_ tab won't show the update**
@@ -213,7 +213,7 @@ The integrated ScubaGear execution feature allows you to run assessments directl
 
 ### Requirements for Execution
 
-- _Initialize-Scuba_ has been ran to ensure all modules and dependencies are installed.
+- _Initialize-Scuba_ has been ran to ensure all modules and dependencies are installed
 - Valid configuration with at least one product selected
 - Appropriate Microsoft Graph permissions for your account
 - Network connectivity to Microsoft 365 services
@@ -230,12 +230,6 @@ During execution, you'll see:
 ## Report Summary Feature
 
 The native WPF report viewer provides a modern, integrated experience for reviewing ScubaGear assessment results.
-
-### Visual Design
-
-- **Colorful Status Badges**: Instantly recognizable policy status indicators
-- **Space-Optimized Layout**: Compact design reducing vertical scrolling
-- **Dynamic Tabs**: Automatically generated tabs for each assessed product
 
 ### Status Badge System
 
@@ -256,16 +250,9 @@ Each policy displays a colored status badge indicating compliance level:
 - **Status Filtering**: Visual scanning using color-coded badges
 - **Scroll Optimization**: Compact layout minimizes scrolling requirements
 
-### Integration Benefits
+## Integration with ScubaGear
 
-- **Immediate Results**: No need to open separate HTML reports
-- **Consistent Interface**: Same UI for configuration and results
-- **Performance**: Native WPF rendering for smooth scrolling and interaction
-- **Reliability**: Eliminates web browser compatibility issues
-
-## Integration with SCuBAGear
-
-The configurations created by this UI are fully compatible with the main SCuBAGear assessment tool:
+The configurations created by this UI are fully compatible with the main ScubaGear assessment tool:
 
 ```powershell
 # Use the generated configuration
@@ -305,10 +292,10 @@ Use debug window to get detailed information about:
 
 #### Enabling Debug Mode
 
-This is enabled by default. However if your not seeing the debug button, follow these steps
+This is enabled by default. However if your not seeing the debug button, follow these steps:
 
-1. Edit `ScubaConfigApp\ScubaConfigApp_Control_en-US.json` in the module directory
-2. Change `"DebugMode": true` to enable
+1. Edit `ScubaConfigApp\ScubaConfigApp_Control_en-US.json` in the module directory.
+2. Change `"DebugMode": true` to enable.
 3. Restart the UI application. There will be a debug button in the bottom right corner.
 
 Example:
@@ -341,7 +328,7 @@ Instead, it is recommended to:
   $SCuBAUI.error
   ```
 
-- **Graph connectivity fails**: Verify the `Microsoft.Graph.Authentication` module is installed and your authentication credentials has graph permissions. You must have these graph permissions.
+- **Graph connectivity fails**: Verify the `Microsoft.Graph.Authentication` module is installed and your authentication credentials have Graph permissions. You must have the following Graph permissions:
 
   ```
   User.Read.All
@@ -350,7 +337,7 @@ Instead, it is recommended to:
   Application.Read.All
   ```
 
-- **Configuration validation errors**: Review required fields and format requirements. Be sure to click `Save` for each configurations and then the click `Preview & Generate` button
+- **Configuration validation errors**: Review required fields and format requirements. Be sure to click `Save` for each configuration and then the click `Preview & Generate` button.
 
 
 
