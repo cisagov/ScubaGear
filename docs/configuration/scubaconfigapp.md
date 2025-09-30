@@ -7,14 +7,14 @@ The ScubaConfigApp is a PowerShell-driven UI built with Windows Presentation Fra
 ScubaConfigApp module contains these elements:
 
 - **Configuration UI**: WPF-based graphical interface for creating YAML configuration files
-- **Configuration Management**: Functions for loading, validating, and exporting SCuBAGear configurations
+- **Configuration Management**: Functions for loading, validating, and exporting ScubaGear configurations
 - **ScubaGear Execution**: Integrated ScubaGear assessment execution with real-time progress monitoring
 - **Native Report Viewer**: Built-in WPF report viewer with colorful status badges and space-optimized layouts
 - **Localization Support**: Multi-language UI text and validation messages. **Currently only supported locale is: _en-US_**
 - **Connected Support**: Simplify selection screen to pull in Graph users and group IDs
 - **Debug Capabilities**: Comprehensive debugging features
 
-![SCuBAGear Assessment Process Diagram](../images/scubaconfigapp_main.png)
+![ScubaGear Assessment Process Diagram](../images/scubaconfigapp_main.png)
 
 ## Main Function
 
@@ -89,13 +89,13 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 
 ### File Operations
 
-- **YAML Import**: Load existing SCuBAGear configuration files
-- **YAML Export**: Save configurations in SCuBAGear-compatible format
+- **YAML Import**: Load existing ScubaGear configuration files
+- **YAML Export**: Save configurations in ScubaGear-compatible format
 - **Clipboard Support**: Copy configurations for use elsewhere
 
 ### ScubaGear Execution
 
-- **Run ScubaGear**: Execute SCuBAGear assessments directly from the UI
+- **Run ScubaGear**: Execute ScubaGear assessments directly from the UI
 - **Real-time Progress**: Live monitoring of assessment execution with detailed progress updates
 
 ### Report Summary
@@ -197,7 +197,7 @@ For each product report:
 - Document remediation actions needed
 - Export or save reports for compliance documentation
 
-![SCuBAGear Assessment Process Diagram](../images/scubaconfigapp_preview.png)
+![ScubaGear Assessment Process Diagram](../images/scubaconfigapp_preview.png)
 
 ## Run ScubaGear Feature
 
@@ -277,7 +277,7 @@ Invoke-SCuBA -ConfigFilePath "path\to\generated\example.onmicrosoft.com.yaml"
 - **PowerShell 5.1** or later
 - **.NET Framework 4.5** or later
 - **Windows OS** with WPF support
-- **SCuBAGear Module** (parent module)
+- **ScubaGear Module** (parent module)
 
 ## Troubleshooting
 
@@ -316,7 +316,7 @@ Instead, it is recommended to:
 >[!IMPORTANT]
 >A **Sanitize** option is available to replace sensitive data with placeholder values.
 
-![SCuBAGear Debug Window](../images/scubaconfigapp_debug.png)
+![ScubaGear Debug Window](../images/scubaconfigapp_debug.png)
 
 ### Common Issues
 
@@ -369,7 +369,7 @@ Instead, it is recommended to:
 
 ### Contributing
 
-Follow the main SCuBAGear contribution guidelines when making changes to this module.
+Follow the main ScubaGear contribution guidelines when making changes to this module.
 
 ## Version History
 
@@ -377,12 +377,12 @@ Follow the main SCuBAGear contribution guidelines when making changes to this mo
 
 ## License
 
-Same license as the parent SCuBAGear project.
+Same license as the parent ScubaGear project.
 
 ## Support
 
 For issues and questions:
 
 - **SCuBAGear Issues**: [GitHub Issues](https://github.com/cisagov/scubagear/issues)
-- **Documentation**: [SCuBAGear Docs](https://github.com/cisagov/scubagear/docs)
+- **Documentation**: [ScubaGear Docs](https://github.com/cisagov/scubagear/docs)
 - **Discussions**: [GitHub Discussions](https://github.com/cisagov/scubagear/discussions)
