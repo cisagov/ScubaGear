@@ -978,6 +978,827 @@ function New-SCuBAConfig {
     convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
 }
 
+function Test-ScubaGearVersion {
+    <#
+    .SYNOPSIS
+        Checks ScubaGear and dependency status with detailed module information.
+
+    .DESCRIPTION
+        Compares the installed ScubaGear version with the latest available version from PSGallery or GitHub.
+        Also checks dependency status and provides detailed information about modules with multiple versions.
+
+    .PARAMETER CheckGitHub
+        Also check GitHub releases for the latest version.
+
+    .OUTPUTS
+        PSCustomObject
+
+    .EXAMPLE
+        Test-ScubaGearVersion
+
+    .EXAMPLE
+        Test-ScubaGearVersion -CheckGitHub
+
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [switch]$CheckGitHub
+    )
+
+    try {
+        $modules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
+        $latest = Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction SilentlyContinue
+
+        # ScubaGear Status Object
+        $scubaGearStatus = [PSCustomObject]@{
+            Component = "ScubaGear"
+            CurrentVersion = $null
+            LatestVersion = $null
+            Status = "Unknown"
+            MultipleVersionsInstalled = $false
+            AdminRequired = $false
+            Recommendations = @()
+        }
+
+        if (-not $latest) {
+            $scubaGearStatus.Status = "Unable to check latest version"
+            $scubaGearStatus.Recommendations += "Check internet connection and PSGallery access. "
+        } else {
+            $scubaGearStatus.LatestVersion = [version]$latest.Version
+        }
+
+        if (-not $modules) {
+            $scubaGearStatus.Status = "Not Installed"
+            $scubaGearStatus.Recommendations += "Run 'Install-Module ScubaGear' to install. "
+        } else {
+            # Handle multiple installations
+            $moduleCount = $modules.Count
+            $scubaGearStatus.MultipleVersionsInstalled = $moduleCount -gt 1
+            $newestModule = $modules | Sort-Object Version -Descending | Select-Object -First 1
+            $scubaGearStatus.CurrentVersion = [version]$newestModule.Version
+
+            # Check if admin rights needed
+            $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
+            $scubaGearStatus.AdminRequired = $programFilesModules -and -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+            if ($scubaGearStatus.CurrentVersion -lt $scubaGearStatus.LatestVersion) {
+                $scubaGearStatus.Status = "Update Available"
+                $scubaGearStatus.Recommendations += "Update available: $($scubaGearStatus.CurrentVersion) -> $($scubaGearStatus.LatestVersion), "
+                $scubaGearStatus.Recommendations += "Run 'Update-ScubaGear' to update to latest version. "
+            } elseif ($scubaGearStatus.CurrentVersion -eq $scubaGearStatus.LatestVersion -and -not $scubaGearStatus.MultipleVersionsInstalled) {
+                $scubaGearStatus.Status = "Up to Date"
+                $scubaGearStatus.Recommendations += "No action needed. "
+            } else {
+                $scubaGearStatus.Status = "Up to Date"
+            }
+
+            if ($scubaGearStatus.MultipleVersionsInstalled) {
+                $scubaGearStatus.Status = "Needs attention"
+                $scubaGearStatus.Recommendations += "$moduleCount versions installed. Run 'Update-ScubaGear' to clean up. "
+            }
+
+            if ($scubaGearStatus.AdminRequired) {
+                $scubaGearStatus.Recommendations += "Some operations require administrator privileges. "
+            }
+
+            # Optional GitHub check
+            if ($CheckGitHub) {
+                try {
+                    $gitHubRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest" -ErrorAction Stop).tag_name.replace("v","")
+                    $gitHubVersion = [version]$gitHubRelease
+                    if ($gitHubVersion -gt $scubaGearStatus.LatestVersion) {
+                        $scubaGearStatus.LatestVersion = $gitHubVersion
+                        $scubaGearStatus.Status = "Newer Version Available on GitHub"
+                        $scubaGearStatus.Recommendations += "Consider updating from GitHub for latest features. "
+                    }
+                }
+                catch {
+                    $scubaGearStatus.Recommendations += "Could not check GitHub releases. "
+                }
+            }
+        }
+
+        $scubaGearStatus.Recommendations = $scubaGearStatus.Recommendations -join "; "
+
+        # Create a collection for results
+        $results = @()
+
+        # Add dependency status objects
+        $dependencyStatus = Get-DependencyStatus
+
+        # Create dependency component with enhanced properties (always include detailed information)
+        $dependencyComponent = [PSCustomObject]@{
+            Component = "Dependencies"
+            ModulesInstalled = "$($dependencyStatus.Installed)/$($dependencyStatus.TotalRequired)"
+            Status = $dependencyStatus.Status
+            MultipleVersionsInstalled = $dependencyStatus.MultipleVersions.Count -gt 0
+            AdminRequired = $dependencyStatus.AdminRequired
+            MissingModules = $dependencyStatus.Missing
+            MultipleVersionModules = $dependencyStatus.MultipleVersions
+            ModuleFileLocations = $dependencyStatus.ModuleFileLocations
+            Recommendations = $dependencyStatus.Recommendations -join "; "
+        }
+
+        # Output structured results first
+        $results += $scubaGearStatus
+        $results += $dependencyComponent
+        Write-Output $results
+
+        # Display formatted information for modules with multiple versions
+        if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
+            Write-Information "`nModules with Multiple Versions:" -InformationAction Continue
+            Write-Information "================================" -InformationAction Continue
+
+            foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
+                Write-Information "`nModule: $($moduleInfo.ModuleName)" -InformationAction Continue
+                Write-Information "Version Count: $($moduleInfo.VersionCount)" -InformationAction Continue
+                Write-Information "File Locations:" -InformationAction Continue
+
+                foreach ($location in $moduleInfo.Locations) {
+                    Write-Information "  $location" -InformationAction Continue
+                }
+            }
+            Write-Information "" -InformationAction Continue
+        }
+
+    }
+    catch {
+        throw "Error checking ScubaGear version: $($_.Exception.Message)"
+    }
+}
+
+function Get-DependencyStatus {
+    <#
+    .SYNOPSIS
+        Helper function to check dependency status with clean output.
+
+    .DESCRIPTION
+        Checks ScubaGear dependencies and returns status in clean, minimal format.
+
+    .OUTPUTS
+        PSCustomObject
+
+    .NOTES
+        Internal function used by Test-ScubaGearVersion
+
+    #>
+    [CmdletBinding()]
+    param()
+
+    # Determine ScubaGear module location
+    $SupportPath = $PSScriptRoot
+    if ([string]::IsNullOrEmpty($SupportPath)) {
+        # Fallback: try to find ScubaGear module
+        $scubaModule = Get-Module ScubaGear -ErrorAction SilentlyContinue
+        if (-not $scubaModule) {
+            $scubaModule = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue | Select-Object -First 1
+        }
+        if ($scubaModule) {
+            $SupportPath = Join-Path -Path $scubaModule.ModuleBase -ChildPath "Modules\Support"
+        } else {
+            throw "Unable to determine ScubaGear module location. Please ensure ScubaGear module is properly loaded."
+        }
+    }
+
+    $ScubaModuleDir = Split-Path -Path $(Split-Path -Path $SupportPath -Parent) -Parent
+    $RequiredModulesPath = Join-Path -Path $ScubaModuleDir -ChildPath 'RequiredVersions.ps1'
+
+    if (-not (Test-Path -Path $RequiredModulesPath -PathType Leaf)) {
+        throw "RequiredVersions.ps1 not found at: $RequiredModulesPath"
+    }
+
+    try {
+        . $RequiredModulesPath
+    }
+    catch {
+        throw "Unable to load RequiredVersions.ps1 from: $RequiredModulesPath"
+    }
+
+    if (-not $ModuleList) {
+        throw "ModuleList not found in RequiredVersions.ps1"
+    }
+
+    # Extract module names from the ModuleList
+    $dependencies = ($ModuleList).ModuleName
+
+    $dependencyStatus = [PSCustomObject]@{
+        TotalRequired = $dependencies.Count
+        Installed = 0
+        Missing = @()
+        MultipleVersions = @()
+        ModuleFileLocations = @()
+        AdminRequired = $false
+        Status = "Unknown"
+        Recommendations = @()
+    }
+
+    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+    foreach ($dep in $dependencies) {
+        try {
+            $modules = Get-Module -Name $dep -ListAvailable -ErrorAction SilentlyContinue
+
+            if ($modules) {
+                $dependencyStatus.Installed++
+
+                # Check for multiple versions
+                if ($modules.Count -gt 1) {
+                    $dependencyStatus.MultipleVersions += $dep
+
+                    # Create simplified file location information
+                    $locationInfo = [PSCustomObject]@{
+                        ModuleName = $dep
+                        VersionCount = $modules.Count
+                        Locations = @()
+                    }
+
+                    foreach ($module in $modules) {
+                        # Determine installation scope based on path
+                        $installScope = "Unknown"
+                        if ($module.ModuleBase -like "$env:ProgramFiles*") {
+                            $installScope = "AllUsers"
+                        } elseif ($module.ModuleBase -like "$env:USERPROFILE*" -or $module.ModuleBase -like "$env:LOCALAPPDATA*") {
+                            $installScope = "CurrentUser"
+                        } elseif ($module.ModuleBase -like "$($env:SystemRoot)*") {
+                            $installScope = "System"
+                        }
+
+                        $locationInfo.Locations += "$($module.Version.ToString()) ($installScope): $($module.ModuleBase)"
+                    }
+
+                    $dependencyStatus.ModuleFileLocations += $locationInfo
+                }
+
+                # Check if admin rights needed for cleanup
+                $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
+                if ($programFilesModules -and -not $isAdmin) {
+                    $dependencyStatus.AdminRequired = $true
+                }
+            } else {
+                $dependencyStatus.Missing += $dep
+            }
+        }
+        catch {
+            $dependencyStatus.Missing += $dep
+        }
+    }
+
+    # Determine overall status
+    if ($dependencyStatus.Missing.Count -eq 0) {
+        if ($dependencyStatus.MultipleVersions.Count -eq 0) {
+            $dependencyStatus.Status = "Optimal"
+        } else {
+            $dependencyStatus.Status = "Needs Cleanup"
+        }
+    } else {
+        $dependencyStatus.Status = "Missing Modules"
+    }
+
+    # Generate recommendations
+    if ($dependencyStatus.MultipleVersions.Count -gt 0 -and $dependencyStatus.Missing.Count -gt 0) {
+        if($dependencyStatus.MultipleVersions.Count -gt '1'){
+            $dependencyStatus.Recommendations += "$($dependencyStatus.MultipleVersions.Count) modules have multiple versions installed. Also ($($dependencyStatus.Missing.Count)) modules are missing. Run 'Reset-ScubaGearDependencies' to clean up."
+        }else{
+            $dependencyStatus.Recommendations += "$($dependencyStatus.MultipleVersions.Count) module has multiple versions installed. Also ($($dependencyStatus.Missing.Count)) module is not installed. Run 'Reset-ScubaGearDependencies' to clean up."
+        }
+    } elseif ($dependencyStatus.Missing.Count -gt 0) {
+        if($dependencyStatus.Missing.Count -gt '1'){
+            $dependencyStatus.Recommendations += "Missing $($dependencyStatus.Missing.Count) dependencies. Run 'Initialize-SCuBA' to install."
+        }else{
+            $dependencyStatus.Recommendations += "Missing $($dependencyStatus.Missing.Count) dependency. Run 'Initialize-SCuBA' to install."
+        }
+    } elseif ($dependencyStatus.MultipleVersions.Count -gt 0) {
+        if($dependencyStatus.MultipleVersions.Count -gt '1'){
+            $dependencyStatus.Recommendations += "$($dependencyStatus.MultipleVersions.Count) modules have multiple versions installed. Run 'Reset-ScubaGearDependencies' to clean up."
+        }else{
+            $dependencyStatus.Recommendations += "$($dependencyStatus.MultipleVersions.Count) module has multiple versions installed. Run 'Reset-ScubaGearDependencies' to clean up."
+        }
+    }
+
+    if ($dependencyStatus.AdminRequired -and $dependencyStatus.Status -ne "Optimal") {
+        $dependencyStatus.Recommendations += "Administrator privileges required for some operations."
+    }
+
+    if ($dependencyStatus.Status -eq "Optimal") {
+        $dependencyStatus.Recommendations += "All dependencies are installed."
+    }
+
+    return $dependencyStatus
+}
+
+function Update-ScubaGear {
+    <#
+    .SYNOPSIS
+        Updates ScubaGear to the latest version.
+
+    .DESCRIPTION
+        Removes old versions and installs the latest ScubaGear from PSGallery or GitHub.
+        Supports both PSGallery and GitHub installation methods.
+
+    .PARAMETER Source
+        Specifies whether to update from PSGallery or GitHub. Default is PSGallery.
+
+    .PARAMETER Scope
+        Specifies the installation scope. Default is CurrentUser.
+
+    .EXAMPLE
+        Update-ScubaGear
+
+    .EXAMPLE
+        Update-ScubaGear -Source GitHub
+
+    .EXAMPLE
+        Update-ScubaGear -Scope AllUsers
+
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("PSGallery", "GitHub")]
+        [string]$Source = "PSGallery",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('CurrentUser','AllUsers')]
+        [string]$Scope = 'CurrentUser'
+    )
+
+    Write-Output "Updating ScubaGear from $Source..."
+
+    try {
+        if ($Source -eq "PSGallery") {
+            Update-ScubaGearFromPSGallery -Scope $Scope
+        } else {
+            Update-ScubaGearFromGitHub -Scope $Scope
+        }
+    }
+    catch {
+        Write-Error "Failed to update ScubaGear: $($_.Exception.Message)"
+    }
+}
+
+function Reset-ScubaGearDependencies {
+    <#
+    .SYNOPSIS
+        Manages ScubaGear dependencies based on version requirements defined in the RequiredVersions.ps1 file.
+
+    .DESCRIPTION
+        Checks each dependency against RequiredVersions.ps1 and only removes/updates when necessary:
+        - Installs missing modules
+        - Updates outdated modules (outside acceptable range)
+        - Cleans up multiple versions (keeps best version in range)
+        - Preserves modules that are already in acceptable range
+        Returns a comprehensive analysis and execution result.
+
+    .PARAMETER Scope
+        Specifies the installation scope for dependencies. Default is CurrentUser.
+
+    .EXAMPLE
+        Reset-ScubaGearDependencies
+
+    .EXAMPLE
+        Reset-ScubaGearDependencies -Scope AllUsers
+
+    .EXAMPLE
+        Reset-ScubaGearDependencies -WhatIf
+
+    #>
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('CurrentUser','AllUsers')]
+        [string]$Scope = 'CurrentUser'
+    )
+
+    $result = [PSCustomObject]@{
+        Status = "Success"
+        Timestamp = Get-Date
+        WhatIfMode = $WhatIfPreference
+        Scope = $Scope
+        AdminRequired = $false
+        AdminAvailable = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+        # Module status by action needed
+        ModulesUpToDate = @()
+        ModulesToInstall = @()
+        ModulesToUpdate = @()
+        ModulesToCleanup = @()
+
+        # Execution tracking
+        ActionsPerformed = @()
+        Errors = @()
+        Warnings = @()
+
+        # Summary counts
+        TotalModules = 0
+        ActionsNeeded = 0
+        ActionsCompleted = 0
+        ActionsFailed = 0
+    }
+
+    try {
+        Write-Information -MessageData "Analyzing ScubaGear dependencies..." -InformationAction Continue
+
+        # Load RequiredVersions.ps1
+        $SupportPath = $PSScriptRoot
+        $ScubaModuleDir = Split-Path -Path $(Split-Path -Path $SupportPath -Parent) -Parent
+        $RequiredModulesPath = Join-Path -Path $ScubaModuleDir -ChildPath 'RequiredVersions.ps1'
+
+        if (-not (Test-Path -Path $RequiredModulesPath -PathType Leaf)) {
+            throw "RequiredVersions.ps1 not found at: $RequiredModulesPath"
+        }
+
+        . $RequiredModulesPath
+
+        if (-not $ModuleList) {
+            throw "ModuleList not found in RequiredVersions.ps1"
+        }
+
+        $result.TotalModules = $ModuleList.Count
+
+        # Analyze each module
+        foreach ($RequiredModule in $ModuleList) {
+            $moduleName = $RequiredModule.ModuleName
+            $minVersion = $RequiredModule.ModuleVersion
+            $maxVersion = $RequiredModule.MaximumVersion
+
+            Write-Information -MessageData "Checking $moduleName..." -InformationAction Continue
+
+            $installedModules = Get-Module -Name $moduleName -ListAvailable -ErrorAction SilentlyContinue
+
+            if (-not $installedModules) {
+                # Module not installed
+                $result.ModulesToInstall += [PSCustomObject]@{
+                    Name = $moduleName
+                    RequiredRange = "$minVersion - $maxVersion"
+                    CurrentVersions = @()
+                    Action = "Install latest in range"
+                }
+            }
+            else {
+                # Analyze installed versions
+                $moduleInfo = [PSCustomObject]@{
+                    Name = $moduleName
+                    RequiredRange = "$minVersion - $maxVersion"
+                    CurrentVersions = [version]$installedModules.Version
+                    InProgramFiles = ($installedModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }).Count -gt 0
+                    Action = $null
+                    VersionToKeep = $null
+                    VersionsToRemove = @()
+                }
+
+                $versionsInRange = $installedModules | Where-Object { $_.Version -ge $minVersion -and $_.Version -le $maxVersion }
+                $versionsOutOfRange = $installedModules | Where-Object { $_.Version -lt $minVersion -or $_.Version -gt $maxVersion }
+
+                if ($versionsInRange.Count -eq 0) {
+                    # No acceptable versions - need update
+                    $moduleInfo.Action = "Update to acceptable version"
+                    if ($versionsOutOfRange.Count -gt 0) {
+                        $moduleInfo.VersionsToRemove = $versionsOutOfRange.Version
+                    }
+                    $result.ModulesToUpdate += $moduleInfo
+                }
+                elseif ($versionsInRange.Count -eq 1 -and $installedModules.Count -eq 1) {
+                    # Perfect state
+                    $moduleInfo.Action = "Already optimal"
+                    $result.ModulesUpToDate += $moduleInfo
+                }
+                else {
+                    # Multiple versions or cleanup needed
+                    $bestVersion = ($versionsInRange | Sort-Object Version -Descending)[0].Version
+                    $versionsToRemove = $installedModules | Where-Object { $_.Version -ne $bestVersion }
+
+                    $moduleInfo.Action = "Keep v$bestVersion, remove others"
+                    $moduleInfo.VersionToKeep = $bestVersion
+                    $moduleInfo.VersionsToRemove = $versionsToRemove.Version
+                    $result.ModulesToCleanup += $moduleInfo
+                }
+
+                # Check admin requirements
+                if ($moduleInfo.InProgramFiles -and ($moduleInfo.PSObject.Properties['VersionsToRemove'] -and $moduleInfo.VersionsToRemove.Count -gt 0)) {
+                    $result.AdminRequired = $true
+                }
+            }
+        }
+
+        # Calculate totals
+        $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count
+
+        # Admin check
+        if ($result.AdminRequired -and -not $result.AdminAvailable) {
+            $result.Warnings += "Administrator privileges required for some operations"
+        }
+
+        # Early return for WhatIf or no actions needed
+        if ($WhatIfPreference) {
+            $result.Status = "WhatIf - No changes made"
+            return $result
+        }
+
+        if ($result.ActionsNeeded -eq 0) {
+            $result.Status = "All dependencies optimal"
+            return $result
+        }
+
+        # Execute changes
+        Write-Information -MessageData "Executing dependency management..." -InformationAction Continue
+
+        # Install missing modules
+        foreach ($module in $result.ModulesToInstall) {
+            if ($PSCmdlet.ShouldProcess($module.Name, "Install module")) {
+                try {
+                    Install-Module -Name $module.Name -Repository PSGallery -Scope $Scope -Force
+                    $result.ActionsPerformed += "[OK] Installed $($module.Name)"
+                    $result.ActionsCompleted++
+                }
+                catch {
+                    $errors = "[FAIL] Failed to install $($module.Name): $($_.Exception.Message)"
+                    $result.Errors += $errors
+                    $result.ActionsFailed++
+                }
+            }
+        }
+
+        # Update modules
+        foreach ($module in $result.ModulesToUpdate) {
+            if ($PSCmdlet.ShouldProcess($module.Name, "Update module")) {
+                try {
+                    # Remove old versions if any
+                    if ($module.PSObject.Properties['VersionsToRemove']) {
+                        foreach ($version in $module.VersionsToRemove) {
+                            try {
+                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction SilentlyContinue
+                            }
+                            catch {
+                                $result.Warnings += "Could not remove $($module.Name) v$version (may require admin)"
+                            }
+                        }
+                    }
+
+                    Install-Module -Name $module.Name -Repository PSGallery -Scope $Scope -Force
+                    $result.ActionsPerformed += "[OK] Updated $($module.Name)"
+                    $result.ActionsCompleted++
+                }
+                catch {
+                    $errors = "[FAIL] Failed to update $($module.Name): $($_.Exception.Message)"
+                    $result.Errors += $errors
+                    $result.ActionsFailed++
+                }
+            }
+        }
+
+        # Cleanup modules
+        foreach ($module in $result.ModulesToCleanup) {
+            if ($PSCmdlet.ShouldProcess($module.Name, "Clean up module versions")) {
+                try {
+                    $cleanedVersions = @()
+                    foreach ($version in $module.VersionsToRemove) {
+                        try {
+                            Uninstall-Module -Name $module.Name -RequiredVersion $version -Force
+                            $cleanedVersions += "v$version"
+                        }
+                        catch {
+                            $result.Warnings += "Could not remove $($module.Name) v$version (may require admin)"
+                        }
+                    }
+
+                    if ($cleanedVersions.Count -gt 0) {
+                        $result.ActionsPerformed += " Cleaned $($module.Name): removed $($cleanedVersions -join ', ')"
+                        $result.ActionsCompleted++
+                    }
+                }
+                catch {
+                    $errors = "[FAIL] Failed to clean $($module.Name): $($_.Exception.Message)"
+                    $result.Errors += $errors
+                    $result.ActionsFailed++
+                }
+            }
+        }
+
+        # Final status
+        if ($result.ActionsFailed -eq 0) {
+            $result.Status = "All operations completed successfully"
+        } elseif ($result.ActionsCompleted -gt 0) {
+            $result.Status = "Partially completed - some operations failed"
+        } else {
+            $result.Status = "Failed - no operations completed"
+        }
+
+    }
+    catch {
+        $result.Status = "Error"
+        $result.Errors += $_.Exception.Message
+    }
+
+    return $result
+}
+
+function Update-ScubaGearFromPSGallery {
+    <#
+    .SYNOPSIS
+        Updates ScubaGear to the latest version from PSGallery.
+
+    .DESCRIPTION
+        Internal helper function that removes existing ScubaGear installations and installs the latest version from PSGallery.
+        Handles version cleanup and admin privilege checks.
+
+    .PARAMETER Scope
+        Specifies the installation scope for the module. Valid values are 'CurrentUser' and 'AllUsers'.
+
+    .NOTES
+        This is an internal function called by Update-ScubaGear.
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$Scope
+    )
+
+    $modules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
+    $latest = Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction Stop
+
+    if (-not $modules) {
+        Write-Information -MessageData "Installing ScubaGear from PSGallery..." -InformationAction Continue
+        Install-Module -Name ScubaGear -Repository PSGallery -Force -Scope $Scope
+        $installedModule = Get-InstalledModule -Name ScubaGear
+        Write-Information -MessageData "ScubaGear $($installedModule.Version) installed successfully." -InformationAction Continue
+        return
+    }
+
+    # Check admin requirements
+    $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
+    $adminNeeded = $programFilesModules -and -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+    if ($adminNeeded) {
+        throw "Administrator privileges required to update modules in Program Files. Please run as Administrator."
+    }
+
+    $null = $modules | Sort-Object Version -Descending | Select-Object -First 1
+    $latestInstalledModule = $modules | Where-Object { $_.Version -eq $latest.Version } | Select-Object -First 1
+
+    if ($latestInstalledModule) {
+        Write-Information -MessageData "ScubaGear is already up to date (Version: $($latest.Version))" -InformationAction Continue
+
+        # Clean up old versions if multiple exist
+        $outdatedModules = $modules | Where-Object { $_.Version -lt $latest.Version }
+        if ($outdatedModules) {
+            Write-Information -MessageData "Removing outdated versions..." -InformationAction Continue
+            foreach ($module in $outdatedModules) {
+                Uninstall-Module -Name ScubaGear -RequiredVersion $module.Version -Force
+            }
+        }
+        return
+    }
+
+    Write-Information -MessageData "Removing all existing ScubaGear versions..." -InformationAction Continue
+    Get-InstalledModule -Name ScubaGear -AllVersions -ErrorAction SilentlyContinue | Uninstall-Module -Force
+
+    Write-Information -MessageData "Installing latest ScubaGear from PSGallery..." -InformationAction Continue
+    Install-Module -Name ScubaGear -Repository PSGallery -Force -Scope $Scope
+    Write-Information -MessageData "ScubaGear updated to version $($latest.Version)" -InformationAction Continue
+}
+
+function Update-ScubaGearFromGitHub {
+    <#
+    .SYNOPSIS
+        Updates ScubaGear to the latest version from GitHub releases.
+
+    .DESCRIPTION
+        Internal helper function that downloads and installs the latest ScubaGear release
+        directly from GitHub. Removes existing installations and performs manual installation
+        from the GitHub release archive.
+
+    .PARAMETER Scope
+        Specifies the installation scope for the module. Valid values are 'CurrentUser' and 'AllUsers'.
+        Default is 'CurrentUser'.
+
+    .NOTES
+        This is an internal function called by Update-ScubaGear.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('CurrentUser','AllUsers')]
+        [string]$Scope = 'CurrentUser'
+    )
+
+    try {
+        # Get latest ScubaGear version from GitHub
+        $latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest").tag_name.replace("v","")
+
+        # Check admin requirements for AllUsers scope
+        $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+        if ($Scope -eq 'AllUsers' -and -not $isAdmin) {
+            throw "Administrator privileges required for AllUsers scope installation."
+        }
+
+        # Check for existing modules (both PowerShellGet and manual installations)
+        $installedModules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
+
+        # Check if existing Program Files modules require admin rights
+        if ($installedModules) {
+            $programFilesModules = $installedModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
+            if ($programFilesModules -and -not $isAdmin) {
+                throw "Administrator privileges required to remove modules from Program Files."
+            }
+        }
+
+        # Check if latest version is already installed
+        if ($installedModules) {
+            $newestModule = $installedModules | Sort-Object Version -Descending | Select-Object -First 1
+            if ($newestModule.Version -eq $latestRelease) {
+                Write-Output "ScubaGear is already up to date (Version: $($newestModule.Version))"
+                return
+            }
+            else {
+                Write-Output "Removing all existing ScubaGear versions..."
+                # Remove all versions (both PowerShellGet and manual)
+                foreach ($module in $installedModules) {
+                    try {
+                        # Check if this module version was installed via PowerShellGet
+                        $psGetModule = Get-InstalledModule -Name ScubaGear -RequiredVersion $module.Version -ErrorAction SilentlyContinue
+                        if ($psGetModule) {
+                            Uninstall-Module -Name ScubaGear -RequiredVersion $module.Version -Force
+                        } else {
+                            Remove-Item $module.ModuleBase -Recurse -Force
+                        }
+                    } catch {
+                        Write-Warning "Could not remove module at $($module.ModuleBase): $($_.Exception.Message)"
+                    }
+                }
+            }
+        }
+
+        # Download and install the latest release
+        Write-Output "Downloading ScubaGear $latestRelease from GitHub..."
+        $downloadUrl = "https://github.com/cisagov/ScubaGear/releases/download/v$latestRelease/ScubaGear-$latestRelease.zip"
+        $tempZip = "$env:TEMP\ScubaGear.zip"
+        $tempExtractPath = "$env:TEMP\ScubaGearExtract"
+
+        # Speed up download, disable progress bar
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $tempZip
+
+        # Clean up any existing temp extraction folder
+        if (Test-Path $tempExtractPath) {
+            Remove-Item $tempExtractPath -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+        # Extract to temporary location first
+        Expand-Archive -Path $tempZip -DestinationPath $tempExtractPath -Force
+
+        # Find the extracted ScubaGear folder (it will be named ScubaGear-X.X.X)
+        $extractedFolder = Get-ChildItem $tempExtractPath -Directory | Where-Object { $_.Name -like "ScubaGear-*" }
+        $scubaGearPath = Join-Path $extractedFolder.FullName "PowerShell\ScubaGear"
+
+        if (-not (Test-Path $scubaGearPath)) {
+            throw "Could not find extracted ScubaGear folder in $tempExtractPath"
+        }
+
+        # Prepare the final destination
+        if ($Scope -eq 'CurrentUser') {
+            $userModulesPath = [Environment]::GetFolderPath('MyDocuments') + "\WindowsPowerShell\Modules"
+        }
+        else {
+            $userModulesPath = [Environment]::GetFolderPath('ProgramFiles') + "\WindowsPowerShell\Modules"
+        }
+        $moduleDestination = Join-Path $userModulesPath "ScubaGear\$latestRelease"
+
+        # Remove existing destination if it exists
+        if (Test-Path $moduleDestination) {
+            Remove-Item $moduleDestination -Recurse -Force
+        }
+
+        # Create the destination directory
+        New-Item -ItemType Directory -Path $moduleDestination -Force | Out-Null
+
+        Write-Output "Installing ScubaGear $latestRelease..."
+
+        # Copy the contents of the extracted folder to the final destination
+        Copy-Item -Path "$ScubaGearPath\*" -Destination $moduleDestination -Recurse -Force
+
+        # Verify installation
+        $PSDPath = $moduleDestination + "\ScubaGear.psd1"
+        if (-not (Test-Path $PSDPath)) {
+            throw "Installation verification failed: ScubaGear.psd1 not found at $PSDPath"
+        }
+
+        # Unblock files
+        Get-ChildItem $moduleDestination -Recurse | Unblock-File -ErrorAction SilentlyContinue
+
+        # Import module
+        Import-Module $PSDPath -Force
+
+        # Cleanup temporary files
+        Remove-Item $tempZip -Force
+        Remove-Item $tempExtractPath -Recurse -Force
+
+        Write-Output "ScubaGear $latestRelease installed successfully from GitHub"
+    }
+    catch {
+        Write-Warning "Failed to update ScubaGear from GitHub: $($_.Exception.Message)"
+    }
+}
+
 Export-ModuleMember -Function @(
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
@@ -985,5 +1806,8 @@ Export-ModuleMember -Function @(
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
-    'New-SCuBAConfig'
+    'New-SCuBAConfig',
+    'Update-ScubaGear',
+    'Test-ScubaGearVersion',
+    'Reset-ScubaGearDependencies'
 )

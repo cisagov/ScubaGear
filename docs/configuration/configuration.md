@@ -8,7 +8,8 @@ ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters]
 
 - The configuration files use the Pascal case convention for variables, and their names are consistent with the parameters.
 
-> Important: When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
+> [!IMPORTANT]
+> When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
 
 ## Sample Configuration Files
 
@@ -82,7 +83,7 @@ You can also override authentication parameters at runtime:
 ```powershell
 # Override authentication parameters on command line
 Invoke-SCuBA `
-  -ConfigFilePath myconfig.yaml `
+  -ConfigFilePath "<path>\full_config.yaml" `
   -Organization example.onmicrosoft.com `
   -AppID abcdef0123456789abcde01234566789 `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98
@@ -341,54 +342,6 @@ Exo:
       - "trusted-partner.com"
       - "subsidiary.contoso.com"
 ```
-
-## Advanced Parameters
-
-### KeepIndividualJSON
-
-The **KeepIndividualJSON** parameter preserves the legacy ScubaGear output format where individual JSON files (e.g., `TeamsReport.json`) are kept in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results into one consolidated JSON file named `ScubaResults.json`. This parameter is for backwards compatibility with older versions of ScubaGear.
-
-| Parameter   | Value  |
-|-------------|--------|
-| Optional    | Yes    |
-| Datatype    | Switch |
-| Default     | false  |
-| Config File | No     |
-
-```powershell
-# Outputs legacy ScubaGear individual JSON output
-Invoke-SCuBA -ProductNames teams -KeepIndividualJSON
-```
-
-> **Note**: When using `-KeepIndividualJSON`, the `OutJsonFileName` parameter does not work since no consolidated JSON file is created.
-
-### ExportProvider
-
-The **ExportProvider** parameter is used with `Invoke-SCuBACached` to control whether ScubaGear should export provider data from M365 services or skip authentication and use existing provider JSON files.
-
-| Parameter   | Value   |
-|-------------|---------|
-| Optional    | Yes     |
-| Datatype    | Boolean |
-| Default     | true    |
-| Config File | No      |
-
-When set to `$true` (default), `Invoke-SCuBACached` behaves like `Invoke-SCuBA`, connecting to M365 services and exporting provider data.
-
-When set to `$false`, ScubaGear skips authentication and looks for existing provider JSON files in the specified `OutPath`, then runs only the Rego verification and report creation.
-
-```powershell
-# Run assessment using existing provider JSON files (no authentication)
-Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath ".\MyReport"
-
-# Export provider data like normal Invoke-SCuBA (authentication required)
-Invoke-SCuBACached -ProductNames aad -ExportProvider $true -OutPath ".\MyReport"
-```
-
-This parameter is useful for:
-- Running assessments on cached/saved provider data without re-authenticating
-- Testing different Rego policy configurations against the same provider data
-- Offline analysis scenarios where connectivity to M365 services is not available
 
 ## Anchors and Aliases
 

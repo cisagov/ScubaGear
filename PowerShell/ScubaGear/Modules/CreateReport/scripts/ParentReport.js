@@ -1,4 +1,6 @@
 window.addEventListener('DOMContentLoaded', () => {
+    const darkMode = getJsonData('dark-mode-flag') === "true";
+
     applyScopeAttributes();
-    mountDarkMode("Parent Report");
+    mountDarkMode(darkMode, "Parent Report");
 });
