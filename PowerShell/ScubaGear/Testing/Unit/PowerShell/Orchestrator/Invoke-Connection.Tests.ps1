@@ -8,20 +8,35 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Connect-Tenant {@('aad')}
         }
         It 'Login is false'{
-            Invoke-Connection -Login $false -ProductNames 'aad' -BoundParameters @{} | Should -BeNullOrEmpty
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
+                    LogIn = $false
+                    M365Environment = 'commercial'
+                }
+                Invoke-Connection -ScubaConfig $ScubaConfig -BoundParameters @{} | Should -BeNullOrEmpty
         }
         It 'Login is true'{
-            Invoke-Connection -Login $true -ProductNames 'aad' -BoundParameters @{} | Should -Not -BeNullOrEmpty
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
+                    LogIn = $true
+                    M365Environment = 'commercial'
+                }
+                Invoke-Connection -ScubaConfig $ScubaConfig -BoundParameters @{} | Should -Not -BeNullOrEmpty
         }
         It 'Has AppId'{
-            Mock -ModuleName Orchestrator Connect-Tenant {@('aad')}
-            $BoundParameters = @{
-                AppID = "a"
-                CertificateThumbprint = "b"
-                Organization = "c"
-            }
-            Invoke-Connection -Login $true -ProductNames 'aad' -BoundParameters $BoundParameters | Should -Not -BeNullOrEmpty
-            Should -Invoke -CommandName Connect-Tenant -Exactly -Times 1
+                Mock -ModuleName Orchestrator Connect-Tenant {@('aad')}
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
+                    LogIn = $true
+                    M365Environment = 'commercial'
+                }
+                $BoundParameters = @{
+                    AppID = "a"
+                    CertificateThumbprint = "b"
+                    Organization = "c"
+                }
+                Invoke-Connection -ScubaConfig $ScubaConfig -BoundParameters $BoundParameters | Should -Not -BeNullOrEmpty
+                Should -Invoke -CommandName Connect-Tenant -Exactly -Times 1
         }
     }
 }
