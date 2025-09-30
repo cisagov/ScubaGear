@@ -12,7 +12,8 @@ InModuleScope Orchestrator {
             Mock -CommandName Get-Content { "" }
             Mock -CommandName Format-PlainText { "" }
             Mock -CommandName Add-Member {}
-            Mock -CommandName Get-FileEncoding
+            # Return a valid encoding so Set-Content does not throw and trigger a warning
+            Mock -CommandName Get-FileEncoding { 'utf8' }
             Mock -CommandName ConvertTo-Csv { "" }
             Mock -CommandName Write-Warning {}
             Mock -CommandName Get-ChildItem {
