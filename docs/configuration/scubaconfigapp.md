@@ -84,7 +84,7 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 - **Tabbed Navigation**: Organized sections for different configuration areas
 - **Real-time Validation**: Input validation with immediate feedback
 - **Preview Generation**: Live YAML preview before export
-- **Import/Export**: Load existing configurations and save new ones (See [Known UI Issues](#Known UI Issues))
+- **Import/Export**: Load existing configurations and save new ones
 - **Graph Integration**: Browse users and groups via Microsoft Graph API
 
 ### File Operations
@@ -347,7 +347,7 @@ Instead, it is recommended to:
 - The UI does not support YAML anchors or aliases at this time. Use `-Online` parameter to help build exclusions
 - The UI does not support JSON export at this time.
 - The `-Online` parameter does not support using a service principal at this time when running the UI; it must be interactive. A service principal can be configured within the UI (see Advanced Section) and will be used to ScubaGear within UI.
-- If no baselines are showing after selecting productnames, it could be a communication issue to the github repo. Change `PullOnlineBaselines` to `false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
+- If no baselines are showing after selecting product names, it could be a communication issue with the GitHub repository. Change `PullOnlineBaselines` to `false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
 
 ### Run ScubaGear and Report Summary Notes
 
@@ -384,5 +384,3 @@ Same license as the parent ScubaGear project.
 For issues and questions:
 
 - **SCuBAGear Issues**: [GitHub Issues](https://github.com/cisagov/scubagear/issues)
-- **Documentation**: [ScubaGear Docs](https://github.com/cisagov/scubagear/docs)
-- **Discussions**: [GitHub Discussions](https://github.com/cisagov/scubagear/discussions)
