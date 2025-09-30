@@ -15,7 +15,7 @@ function Set-OPAVersionDoc {
     )
     $GitHubDocPath = './docs/prerequisites/dependencies.md'
     $VerRegex = "v\d+\.\d+\.\d+"
-    $VerReplace = "v${$LatestOpaVersion}"
+    $VerReplace = "v$($LatestOpaVersion)"
     (Get-Content -Path $GitHubDocPath) | ForEach-Object {
         $VerMatch = $_ -match $VerRegex
         if ($VerMatch) {
