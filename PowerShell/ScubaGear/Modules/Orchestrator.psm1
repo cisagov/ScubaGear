@@ -349,7 +349,7 @@ function Invoke-SCuBA {
             #
             # So to provide for a command line override of config values just set the corresponding
             # config value from the bound parameters to override.  This is redundant copy for
-            # the authentication parameters (but keeps the logic simpler)
+            # the authentication parameters ( but keeps the logic simpler)
             # We do not allow ConfigFilePath to be copied as it will be propagated to the
             # config module by reference and causes issues
             #
@@ -644,7 +644,7 @@ function Invoke-ProviderList {
 "@
 
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA (as of 0.68) appears to not
-            # be able to handle the "\u003c" character sequence if the input json is UTF-8 encoded with the BOM, resulting
+            # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
             $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
@@ -1341,6 +1341,60 @@ function Invoke-ReportCreation {
     }
 }
 
+function Get-TenantDetail {
+    <#
+    .Description
+    This function gets the details of the M365 Tenant using
+    the various M365 PowerShell modules
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    # organized by best tenant details information
+    if ($ProductNames.Contains("aad")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("sharepoint")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("teams")) {
+        Get-TeamsTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("powerplatform")) {
+        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("exo")) {
+        Get-EXOTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("defender")) {
+        Get-EXOTenantDetail -M365Environment $M365Environment
+    }
+    else {
+        $TenantInfo = @{
+            "DisplayName" = "Orchestrator Error retrieving Display name";
+            "DomainName" = "Orchestrator Error retrieving Domain name";
+            "TenantId" = "Orchestrator Error retrieving Tenant ID";
+            "AdditionalData" = "Orchestrator Error retrieving additional data";
+        }
+        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
+        $TenantInfo
+    }
+}
+
 function Invoke-Connection {
     <#
     .Description
@@ -1862,56 +1916,3 @@ Export-ModuleMember -Function @(
     'Invoke-SCuBACached'
 )
 
-function Get-TenantDetail {
-    <#
-    .Description
-    This function gets the details of the M365 Tenant using
-    the various M365 PowerShell modules
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $ProductNames,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
-    )
-
-    # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("teams")) {
-        Get-TeamsTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerplatform")) {
-        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("defender")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment
-    }
-    else {
-        $TenantInfo = @{
-            "DisplayName" = "Orchestrator Error retrieving Display name";
-            "DomainName" = "Orchestrator Error retrieving Domain name";
-            "TenantId" = "Orchestrator Error retrieving Tenant ID";
-            "AdditionalData" = "Orchestrator Error retrieving additional data";
-        }
-        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
-        $TenantInfo
-    }
-}
