@@ -33,8 +33,9 @@ InModuleScope 'ExportEXOProvider' {
                 if ($Uri.ToString().Contains("cloudflare-dns.com")) {
                     throw "some error"
                 }
-                elseif ($Uri.ToString().Contains("[2606:4700:4700::1111]")) {
-                    # Match compressed IPv6 form used in Select-DohServer so this path fails and triggers IPv4 fallback
+                elseif ($Uri.ToString().Contains("[2606:4700:4700::1111]") -or $Uri.ToString().Contains("[2606:4700:4700:0000:0000:0000:0000:1111]")) {
+                    # Note that $Uri.ToString() may expand [2606:4700:4700::1111] to
+                    # [2606:4700:4700:0000:0000:0000:0000:1111] depending on the PowerShell version
                     throw "some error"
                 }
                 else {}
