@@ -18,7 +18,6 @@ InModuleScope Orchestrator {
         Context 'When running the rego on a provider json' {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RunRegoParameters')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OPAPath = "./"
@@ -27,7 +26,9 @@ InModuleScope Orchestrator {
                     OutReportName = "BaselineReports"
                     LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ParentPath')]
                 $ParentPath = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $OutFolderPath = "./"
             }
             It 'With -ProductNames "aad", should not throw' {
