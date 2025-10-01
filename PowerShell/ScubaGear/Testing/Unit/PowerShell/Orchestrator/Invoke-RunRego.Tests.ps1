@@ -7,7 +7,7 @@ InModuleScope Orchestrator {
             function Invoke-Rego {}
             Mock -ModuleName Orchestrator Invoke-Rego
             function Get-FileEncoding {}
-            Mock -ModuleName Orchestrator Get-FileEncoding
+            Mock -ModuleName Orchestrator Get-FileEncoding { 'utf8' }
 
             Mock -CommandName Write-Progress {}
             Mock -CommandName Join-Path { "." }
