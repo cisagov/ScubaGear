@@ -18,6 +18,7 @@ InModuleScope Orchestrator {
         Context 'When running the rego on a provider json' {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RunRegoParameters')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OPAPath = "./"
