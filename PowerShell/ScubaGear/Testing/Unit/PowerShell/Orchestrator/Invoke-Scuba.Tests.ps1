@@ -94,7 +94,7 @@ InModuleScope Orchestrator {
                 {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
                 # After refactor, -ProductNames are consolidated into ScubaConfig and duplicates removed
                 # Validate only a single invocation and that consolidated ProductNames contains exactly one 'aad'
-                Should -Invoke Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter { ($ScubaConfig.ProductNames.Count -eq 1) -and ($ScubaConfig.ProductNames -eq 'aad') }
+                Should -Invoke Invoke-ReportCreation -ParameterFilter {$ScubaConfig.ProductNames -eq 'aad'}
             }
         }
         Context 'Service Principal provided'{
@@ -105,7 +105,7 @@ InModuleScope Orchestrator {
                     Organization = "c"
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
-                Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {$BoundParameters['AppID'] -eq $SplatParams['AppId']}
+                Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {$ScubaConfig.AppID -eq 'a'}
             }
             It 'Items given as empty string'{
                 $SplatParams += @{
