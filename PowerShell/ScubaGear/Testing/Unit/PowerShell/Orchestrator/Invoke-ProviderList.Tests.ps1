@@ -30,11 +30,6 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     }
     Context 'When running the providers on commercial tenants' {
         BeforeAll {
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'BoundParameters')]
               $ScubaConfig = [PSCustomObject]@{
                  ProductNames = @('aad')
                  OutProviderFileName = "ProviderSettingsExport"
@@ -44,10 +39,15 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                  OPAPath = "."
                  LogIn = $false
               }
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
               $TenantDetails = '{"DisplayName": "displayName"}'
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
               $ModuleVersion = '1.0'
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
               $OutFolderPath = "./output"
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
               $Guid = "00000000-0000-0000-0000-000000000000"
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'BoundParameters')]
               $BoundParameters = @{}
         }
         It 'With -ProductNames "aad", should not throw' {
