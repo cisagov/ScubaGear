@@ -30,7 +30,11 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     }
     Context 'When running the providers on commercial tenants' {
         BeforeAll {
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'BoundParameters')]
               $ScubaConfig = [PSCustomObject]@{
                  ProductNames = @('aad')
                  OutProviderFileName = "ProviderSettingsExport"
