@@ -370,7 +370,7 @@ Describe "Policy Checks for <ProductName>" {
                         foreach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
-    
+
                             if ($RowHeaders.Count -gt 0){
                                 $RowHeaders.Count | Should -BeExactly 4
                                 $RowHeaders[0].text | Should -BeLikeExactly "Query Name"
@@ -378,7 +378,7 @@ Describe "Policy Checks for <ProductName>" {
                                 $RowHeaders[2].text | Should -BeLikeExactly "Summary"
                                 $RowHeaders[3].text | Should -BeLikeExactly "Answers"
                             }
-    
+
                             if ($RowData.Count -gt 0){
                                 $RowData.Count | Should -BeExactly 4
                             }
