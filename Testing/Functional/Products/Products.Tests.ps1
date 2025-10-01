@@ -331,29 +331,39 @@ Describe "Policy Checks for <ProductName>" {
                 ForEach ($Table in $Tables) {
                     $Rows = Get-SeElement -Element $Table -By TagName 'tr'
 
+                    $TableClass = $Table.GetAttribute("class")
+                    $ExpectedColumnSize = Get-ExpectedColumnSize -TableClass $TableClass
+                    $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
+
                     if ($Table.GetProperty("id") -eq "tenant-data"){
                         $Rows.Count | Should -BeExactly 2
                         $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                         $Tenant = $TenantDataColumns[0].Text
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
                     }
-                    elseif ($Table.GetAttribute("class") -eq "caps_table") {
+                    elseif (
+                        $TableClass -eq "caps_table" -or
+                        $TableClass -eq "riskyApps_table" -or
+                        $TableClass -eq "riskyThirdPartySPs_table"
+                    ) {
                         $Rows.Count | Should -BeGreaterThan 0
-
                         ForEach ($Row in $Rows){
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
 
                             ($RowHeaders.Count -eq 0 ) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
 
-                            # NOTE: Checking for 8 columns since first is 'expand' column
-                            if ($RowHeaders.Count -gt 0){
-                                $RowHeaders.Count | Should -BeExactly 8
-                                $RowHeaders[1].text | Should -BeLikeExactly "Name"
+                            # Length of columns depends on the type of table, refer to $ExpectedColumnSize declared above for more information.
+                            if ($RowHeaders.Count -gt 0 -and $null -ne $ExpectedHeaders){
+                                $RowHeaders.Count | Should -BeExactly $ExpectedColumnSize
+
+                                for ($i = 0; $i -lt $RowHeaders.Count; $i++) {
+                                    $RowHeaders[$i].text | Should -BeLikeExactly $ExpectedHeaders[$i] -Because "Table header column $i should match $($ExpectedHeaders[$i])"
+                                }
                             }
 
                             if ($RowData.Count -gt 0){
-                                $RowData.Count | Should -BeExactly 8
+                                $RowData.Count | Should -BeExactly $ExpectedColumnSize
                             }
                         }
                     }

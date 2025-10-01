@@ -83,12 +83,16 @@ FunctionsToExport = @(
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
     'Initialize-SCuBA',
+    'Start-ScubaConfigApp',
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
     'New-SCuBAConfig',
     'Get-ScubaGearPermissions',
-    'Get-ScubaGearEntraMinimumPermissions'
+    'Get-ScubaGearEntraMinimumPermissions',
+    'Test-ScubaGearVersion',
+    'Update-ScubaGear',
+    'Reset-ScubaGearDependencies'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

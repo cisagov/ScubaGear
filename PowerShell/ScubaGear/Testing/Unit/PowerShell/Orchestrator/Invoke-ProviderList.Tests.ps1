@@ -48,7 +48,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
               $OutFolderPath = "./output"
               [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
               $Guid = "00000000-0000-0000-0000-000000000000"
-        }
+
         It 'With -ProductNames "aad", should not throw' {
               $ScubaConfig.ProductNames = @("aad")
             { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw

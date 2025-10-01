@@ -344,3 +344,37 @@ function LoadTestResults() {
   $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
   $IntermediateTestResults
 }
+
+function Get-ExpectedHeaderNames {
+    param(
+      [string]
+      $TableClass
+    )
+    switch ($TableClass) {
+        "caps_table" { 
+          return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
+        }
+        "riskyApps_table" {
+          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+        }
+        "riskyThirdPartySPs_table" {
+          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+        }
+        default {
+          return $null 
+        }
+    }
+}
+
+function Get-ExpectedColumnSize {
+    param(
+      [string]
+      $TableClass
+    )
+    switch ($TableClass) {
+        "caps_table" { return 8 }
+        "riskyApps_table" { return 7 }
+        "riskyThirdPartySPs_table" { return 6 }
+        default { return 0 }
+    }
+}

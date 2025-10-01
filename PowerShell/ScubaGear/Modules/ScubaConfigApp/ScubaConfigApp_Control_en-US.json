@@ -1,0 +1,1130 @@
+{
+  "DebugMode": true,
+  "AutoSaveProgress": false,
+  "EnableSearchAndFilter": true,
+  "EnableScubaRun": true,
+  "EnableResultReader": true,
+  "MinimumProductsRequired": 1,
+  "MaximumResults": 10,
+  "PullOnlineBaselines": true,
+  "OnlineBaselineMarkdownURL": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines",
+  "OnlineBaselineJsonURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/856-adding-a-gui-to-scubagear/PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaBaselines_en-US.json",
+  "localeContext": {
+    "Title_TextBlock": "SCuBAGear Configuration Editor",
+    "SubTitle_TextBlock": "Create a configuration file for SCuBAGear exclusions, annotations, and omissions baseline controls",
+    "M365Environment_TextBlock": "Select your M365 Environment",
+    "Products_TextBlock": "Select at least one product:",
+    "ExclusionsProducts_TextBlock": "Products supporting exclusions:",
+    "ExclusionsInfo_TextBlock": "Exclusions are supported for the following products: {0}",
+    "Organization_Required_TextBlock": "Required. Must be in format: name.onmicrosoft.com or name.onmicrosoft.us",
+    "OrgName_Required_TextBlock": "This option is required for BOD submissions.",
+    "ExclusionsTabInfo_TextBlock": "Configure exclusions for specific policies. Exclusions allow you to customize policy behavior by excluding specific users, groups, domains, or other entities from policy evaluation. Products must be selected on the main page before configuring exclusions.",
+    "AnnotationsTabInfo_TextBlock": "Add comments and annotations to policies for documentation and tracking purposes. Products must be selected on the main page before configuring annotations.",
+    "OmissionsTabInfo_TextBlock": "Select policies to omissions from the assessment and provide justification. Products must be selected on the main page before configuring omissions.",
+    "PreviewTabInfo_TextBlock": "Preview your configuration before saving. Ensure all exclusions and omissions are correctly set.",
+    "ScubaRunDescription_TextBlock": "Execute ScubaGear assessment using the current configuration. Ensure you have generated a valid YAML configuration before running."
+  },
+  "localePlaceholder": {
+    "Organization_TextBox": "Enter tenant name (e.g., example.onmicrosoft.com)",
+    "OrgName_TextBox": "Enter organization name",
+    "OrgUnitName_TextBox": "Enter organizational unit name",
+    "Description_TextBox": "Enter a description for this configuration (optional)",
+    "AppId_TextBox": "Enter Application ID (GUID format)",
+    "CertificateThumbprint_TextBox": "Enter Certificate Thumbprint (40 hexadecimal)",
+    "SearchPlaceholder_TextBox": "Search policies by name or ID...",
+    "ClearSearch_Button": "Clear search",
+    "AllCriticality_ComboBox": "All Criticality",
+    "CriticalityFilter_ComboBox": "{0} only",
+    "ResultCount_TextBlock": "{0} policies"
+  },
+  "localeTitles": {
+    "DuplicateEntry": "Duplicate Entry",
+    "Success": "Success",
+    "ValidationError": "Validation Error",
+    "ConfirmRemove": "Confirm Remove",
+    "Error": "Error",
+    "Information": "Information",
+    "Warning": "Warning",
+    "Confirmation": "Confirmation",
+    "RequiredFieldsMissing": "Required Fields Missing",
+    "GraphError": "Graph Error",
+    "ExportDebugLog": "Export Debug Log",
+    "ExportSanitizedDebugLog": "Export Sanitized Debug Log",
+    "ExportSuccessful": "Export Successful",
+    "ExportError": "Export Error",
+    "SessionRestored": "Session Restored",
+    "ConfigurationViewer": "Configuration Viewer",
+    "ReportNotFound": "Report Not Found",
+    "ConfigurationViewerError": "Configuration Viewer Error",
+    "ConnectionError": "Connection Error",
+    "NoSelection": "No Selection",
+    "DebugWindowError": "Debug Window Error"
+  },
+  "localeInfoMessages": {
+    "NoPoliciesAvailable": "No policies available for this product.",
+    "PolicySaving": "Saving {0} for policy: {1}",
+    "CollectedArrayField": "Collected array field [{0}][{1}]: {2}",
+    "CollectedBooleanField": "Collected boolean field [{0}][{1}]: {2}",
+    "CollectedStringField": "Collected string field [{0}][{1}]: {2}",
+    "MergedCardField": "{0} merged for [{1}][{2}][{3}]: {4}",
+    "SelectedCertificateThumbprint": "Selected certificate thumbprint: {0}",
+    "FilterApplied": "Filter applied: {0} policies visible",
+    "SearchCleared": "Search criteria cleared",
+    "ScubaRunReady": "Ready to run ScubaGear {0}"
+  },
+  "localeErrorMessages": {
+    "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
+    "WindowError": "Error loading screen",
+    "OrganizationValidation": "Organization Name is required and must be in format: example.onmicrosoft.com or example.onmicrosoft.us",
+    "OrgNameValidation": "Org Name is required. Please specify a valid organization name.",
+    "AppIdValidation": "Application ID must be in GUID format (e.g., 12345678-1234-1234-1234-123456789abc)",
+    "CertificateValidation": "Certificate Thumbprint must be 40 hexadecimal characters",
+    "CertificateStoreAccessError": "Error accessing certificate store: {0}",
+    "OpaPathValidation": "OPA executable not found. Please ensure 'opa_windows_amd64.exe' or 'opa.exe' exists in the specified path: {0}",
+    "OpaFileNotExist": "OPA path does not exist: {0}",
+    "PreviewValidation": "Please review all fields for errors before proceeding.",
+    "CopyError": "No YAML content to copy. Please generate the configuration first.",
+    "DownloadNullError": "No YAML content to download. Please generate the configuration first",
+    "NewFieldCardWarning": "Warning: Field '{0}' not found in {1} data for {2}",
+    "InvalidEmailFormat": "Invalid email format. Please use format: user@domain.com",
+    "InvalidGuidFormat": "Invalid GUID format. Please use format: 12345678-1234-1234-1234-123456789abc",
+    "InvalidDomainFormat": "Invalid domain format. Please use format: example.com",
+    "InvalidIpAddressFormat": "Invalid IP address format. Please use format: 192.168.1.1",
+    "FieldSelectionError": "Error selecting {0}: {1}",
+    "RequiredFieldValidation": "Required field '{0}' cannot be empty",
+    "RequiredFieldsValidation": "The following required fields cannot be empty: {0}",
+    "SkippingNullCard": "Skipping null card for policy: {0}",
+    "RemoveEventHandlerError": "Failed to remove event handler for: {0}",
+    "CertificateSelectionError": "Certificate selection error: {0}",
+    "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid.",
+    "ScubRunIncomplete": "Configuration incomplete - check Main tab",
+    "ScubRunConfigFailed": "Failed to generate temporary configuration",
+    "GraphConnectionError": "Microsoft Graph is not connected. Please check your connection and try again.",
+    "PleaseSelectItem": "Please select an item.",
+    "ConfigurationFileNotFound": "Configuration file not found: {0}",
+    "ConfigurationViewerError": "Error opening configuration viewer: {0}",
+    "ConfigurationFileNotFoundInResults": "Configuration file not found in results folder: {0}",
+    "NoConfigurationFileAvailable": "No configuration file available. Run ScubaGear first to generate a configuration file.",
+    "HtmlReportNotFound": "HTML report not found in folder.",
+    "FailedToOpenDebugWindow": "Failed to open debug window: {0}",
+    "ConfigurationCopiedToClipboard": "Configuration copied to clipboard",
+    "FailedToCopyToClipboard": "Failed to copy to clipboard: {0}"
+  },
+  "localePopupMessages": {
+    "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
+    "ImportSuccess": "Configuration imported successfully.",
+    "CopySuccess": "YAML configuration copied to clipboard successfully.",
+    "AnnotationSavedSuccess": "[{0}] annotation saved successfully.",
+    "AnnotationRemoveSuccess": "[{0}] annotation removed successfully.",
+    "AnnotationRemoveConfirmation": "Are you sure you want to remove the annotation for [{0}]?",
+    "DuplicateEntry": "Value already exists in the list.",
+    "FieldSelectionError": "There was an error selecting {0}: {1}",
+    "CardSavedSuccess": "[{0}] {1} saved successfully for: {2}",
+    "NoEntriesFound": "No {0} entries entered. Please fill in at least one field in any of the available {0} fields.",
+    "RemoveCardPolicyConfirmation": "Are you sure you want to remove all {0} for [{1}]?",
+    "RemoveCardEntrySuccess": "[{0}] {1} removed successfully.",
+    "YamlClipboardComplete": "YAML preview copied to clipboard successfully.",
+    "YamlClipboardNoPreview": "No YAML preview to copy.",
+    "YamlClipboardError": "Error copying YAML preview to clipboard: {0}",
+    "YamlSaveSuccess": "Configuration saved successfully to: {0}",
+    "YamlSaveError": "Error saving configuration to YAML: {0}",
+    "DebugLogsCopied": "Debug logs copied to clipboard successfully.",
+    "DebugLogsNoEntries": "No debug logs to copy.",
+    "DebugLogsError": "Error copying debug logs to clipboard: {0}",
+    "ProductSelectionError": "At least {0} product(s) must be selected for the configuration to be valid.",
+    "NoUsersSelected": "Please select at least one user.",
+    "AtLeastOneSelectionRequired": "Please make at least one selection.",
+    "InvalidPolicyId": "Invalid Policy ID format.",
+    "ConfirmRemovalOfCard": "Are you sure you want to remove this item?",
+    "ValidationErrors": "Please correct the validation errors before proceeding.",
+    "GraphError": "Error retrieving data from Graph: {0}",
+    "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
+    "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
+  },
+  "localeStatusMessages": {
+    "GraphConnected": "Graph Connected",
+    "GraphDisconnected": "Graph Disconnected",
+    "DebugLogExported": "Debug log exported to: {0}",
+    "SanitizedLogExported": "Sanitized debug log exported to {0}, mapping file: {1}",
+    "DebugLogExportedNoSensitiveData": "Debug log exported (no sensitive data found): {0}",
+    "ExportFailed": "Export failed: {0}",
+    "SessionRestored": "Session restored successfully from: {0}",
+    "SessionRestoreCompleted": "Session restore completed.",
+    "NoSearchText": "No text to search",
+    "RestoreFrom": "Restore from: {0}",
+    "ChangelogSource": "Source: {0}"
+  },
+  "localeYamlComments": {
+    "ConfigurationFile": "# ScubaGear Configuration File",
+    "GeneratedOn": "# Generated on: {0}",
+    "OrganizationConfiguration": "# Organization Configuration",
+    "ConfigurationDetails": "# Configuration Details",
+    "AdvancedSettings": "# Advanced Settings",
+    "GlobalSettings": "# Global Settings",
+    "BaselineControl": "#  Baseline Control: {0}"
+  },
+  "localeProgressMessages": {
+    "SanitizedDebugLogExportSuccess": "Sanitized debug log exported successfully!\n\nLog file: {0}\nMapping file: {1}\n\nThe mapping file contains the correlation between original and sanitized values for troubleshooting purposes.",
+    "DebugLogExportSuccess": "Debug log exported successfully to:\n{0}",
+    "DebugLogExportNoSensitiveData": "Debug log exported successfully to:\n{0}\n\nNo sensitive data was detected for sanitization.",
+    "DebugLogExportError": "Error exporting debug log: {0}",
+    "SessionRestoreSuccess": "Previous session restored successfully! Restored {0} policies and {1} settings configurations.",
+    "SessionRestoreFinalize": "Finalizing restore...",
+    "SessionRestoreStatus": "Session restored successfully"
+  },
+  "localeHelpTips": {
+    "Organization_HelpLabel": {
+        "Title" : "Organization Domain",
+        "Content" : "Enter your organization's domain (e.g., example.onmicrosoft.com). This is used to connect to your Microsoft 365 tenant.",
+        "AdditionalSections": {
+            "Example" : "example.onmicrosoft.com",
+            "Required" : "Yes, this field is mandatory",
+            "Note" : "Must be a valid Microsoft 365 tenant domain"
+        },
+        "Placement": "Right"
+    },
+    "OrgName_HelpLabel": {
+        "Title" : "Organization Name",
+        "Content" : "Enter the name of your organization. This is used for documentation purposes.",
+        "AdditionalSections": {
+            "Example" : "Example Ltd.",
+            "Required" : "This option is required for SCuBA Compliance & BOD submissions",
+            "Note" : "This will be included in the configuration file"
+        },
+        "Placement": "Right"
+    },
+    "OrgUnitName_HelpLabel": {
+        "Title" : "Organization Unit Name",
+        "Content" : "Enter the name of your organization subunit. This is used for documentation purposes.",
+        "AdditionalSections": {
+            "Example" : "Office of IT",
+            "Required" : "This option is not required for SCuBA Compliance & BOD submissions",
+            "Note" : "This will be included in the configuration file"
+        },
+        "Placement": "Right"
+    },
+    "ProductNames_HelpLabel": {
+        "Title": "Product Names",
+        "Content": "Select the products to be included in the configuration.",
+        "AdditionalSections": {
+            "Required": "At least one product must be selected.",
+            "Note": "This will be included in the configuration file"
+        },
+        "Placement": "Right"
+    }
+  },
+  "defaultAdvancedSettings": {
+    "OutPath_TextBox": ".",
+    "OutFolderName_TextBox": "M365BaselineConformance",
+    "OutProviderFileName_TextBox": "ProviderSettingsExport",
+    "OutRegoFileName_TextBox": "TestResults",
+    "OutReportName_TextBox": "BaselineReports",
+    "OutJsonFileName_TextBox": "ScubaResults",
+    "OutCsvFileName_TextBox": "ScubaResults",
+    "OutActionPlanFileName_TextBox": "ActionPlan",
+    "OutReportsName_TextBox": "ScubaReports",
+    "OpaPath_TextBox": ".",
+    "LogIn_CheckBox": true,
+    "DisconnectOnExit`_CheckBox": false
+  },
+  "products": [
+    {
+      "id": "Aad",
+      "name": "Microsoft Entra ID",
+      "displayName": "Microsoft Entra ID (aad)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "Defender",
+      "name": "Defender",
+      "displayName": "Defender (defender)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "Exo",
+      "name": "Exchange Online",
+      "displayName": "Exchange Online (exo)",
+      "supportsExclusions": true
+    },
+    {
+      "id": "PowerPlatform",
+      "name": "Power Platform",
+      "displayName": "Power Platform (powerplatform)",
+      "supportsExclusions": false
+    },
+    {
+      "id": "Sharepoint",
+      "name": "SharePoint & OneDrive",
+      "displayName": "SharePoint & OneDrive (sharepoint)",
+      "supportsExclusions": false
+    },
+    {
+      "id": "Teams",
+      "name": "Microsoft Teams",
+      "displayName": "Microsoft Teams (teams)",
+      "supportsExclusions": false
+    }
+  ],
+  "M365Environment": [
+    {
+      "id": "commercial",
+      "name": "commercial",
+      "displayName": "Commercial",
+      "rationale": "Production environment for public tenants."
+    },
+    {
+      "id": "gcc",
+      "name": "gcc",
+      "displayName": "Government Community Cloud",
+      "rationale": "Production environment for government tenants."
+    },
+    {
+      "id": "gcchigh",
+      "name": "gcchigh",
+      "displayName": "Government Community Cloud High",
+      "rationale": "Production environment for GCCH tenants."
+    },
+    {
+      "id": "dod",
+      "name": "dod",
+      "displayName": "Department of Defense",
+      "rationale": "Production environment for DOD tenants."
+    }
+  ],
+  "requiredFields": {
+    "Organization": {
+      "fieldName": "Organization_TextBox",
+      "validationPatternName": "tenantDomain",
+      "toggleTrigger": "OnClick"
+    },
+    "OrgName": {
+      "fieldName": "OrgName_TextBox",
+      "validationPatternName": "orgName",
+      "toggleTrigger": "OnClick"
+    },
+    "AppId" :{
+      "fieldName": "AppId_TextBox",
+      "validationPatternName": "guid",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "CertificateThumbprint": {
+      "fieldName": "CertificateThumbprint_TextBox",
+      "validationPatternName": "thumbprint",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "OPAPath": {
+      "fieldName": "OPAPath_TextBox",
+      "validationPatternName": "opaPath",
+      "toggleTrigger": "OpaSection_Toggle"
+    }
+  },
+  "settingsControl": {
+    "MainTab": {
+      "name": "Main",
+      "dataControlOutput": "GeneralSettingsData",
+      "validationKeys": [
+        "Organization",
+        "OrgName",
+        "OrgUnitName",
+        "Description",
+        "ProductNames",
+        "M365Environment"
+      ]
+    },
+    "AdvancedTab": {
+      "name": "Advanced",
+      "dataControlOutput": "AdvancedSettingsData",
+      "validationKeys": [
+        "AppId",
+        "CertificateThumbprint",
+        "OutPath",
+        "OutFolderName",
+        "OutProviderFileName",
+        "OutRegoFileName",
+        "OutReportName",
+        "OutJsonFileName",
+        "OutCsvFileName",
+        "OutActionPlanFileName",
+        "OPAPath",
+        "LogIn",
+        "DisconnectOnExit"
+      ],
+      "sectionControl": {
+        "ApplicationSection_Toggle": {
+          "sectionName": "Application Authentication",
+          "fields": [
+            "AppId_TextBox",
+            "CertificateThumbprint_TextBox"
+          ]
+        },
+        "OutputSection_Toggle": {
+          "sectionName": "Output Configuration",
+          "fields": [
+            "OutPath_TextBox",
+            "OutFolderName_TextBox",
+            "OutProviderFileName_TextBox",
+            "OutRegoFileName_TextBox",
+            "OutReportName_TextBox",
+            "OutJsonFileName_TextBox",
+            "OutCsvFileName_TextBox",
+            "OutActionPlanFileName_TextBox"
+          ]
+        },
+        "OpaSection_Toggle": {
+          "sectionName": "OPA Configuration",
+          "fields": [
+            "OpaPath_TextBox"
+          ]
+        },
+        "GeneralSection_Toggle": {
+          "sectionName": "General Settings",
+          "fields": [
+            "LogIn_CheckBox",
+            "DisconnectOnExit_CheckBox"
+          ]
+        }
+      }
+    },
+    "GlobalTab": {
+      "name": "Global Settings",
+      "description": "Configure global settings that apply across all policies and configurations",
+      "dataControlOutput": "GlobalSettingsData",
+      "validationKeys": [
+        "PreferredDnsResolvers",
+        "SkipDoH"
+      ],
+      "sectionControl": {
+        "GlobalSettingsContainer": {
+          "sectionName": "Global Settings",
+          "fields": [
+            "PreferredDnsResolvers",
+            "SkipDoH"
+          ]
+        }
+      }
+    }
+  },
+  "baselineControls": [
+    {
+      "tabName": "Exclusions",
+      "yamlValue": "[ProductName][PolicyId]",
+      "controlType": "Exclusions",
+      "dataControlOutput": "ExclusionData",
+      "fieldControlName": "exclusionField",
+      "defaultFields": "None",
+      "cardName": "Exclusion",
+      "showFieldType": true,
+      "showDescription": false,
+      "supportsAllProducts": false
+    },
+    {
+      "tabName": "Annotate Policies",
+      "yamlValue": "AnnotatePolicy",
+      "controlType": "Annotations",
+      "dataControlOutput": "AnnotationData",
+      "fieldControlName": "annotationField",
+      "defaultFields": "Annotations",
+      "cardName": "Annotate",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    },
+    {
+      "tabName": "Omit Policies",
+      "yamlValue": "OmitPolicy",
+      "controlType": "Omissions",
+      "dataControlOutput": "OmissionData",
+      "fieldControlName": "omissionField",
+      "defaultFields": "Omissions",
+      "cardName": "Omit",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    }
+  ],
+  "ScubaRunConfig": {
+    "sectionName": "Run ScubaGear Configuration",
+    "description": "This section allows you to run ScubaGear with the current configuration.",
+    "powershell": {
+      "version": "5.1",
+      "modules": [
+        "ScubaGear"
+      ],
+      "preCommands": [
+        "Import-Module ScubaGear -Force -Verbose",
+        "$Scope = If(([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match \"S-1-5-32-544\"){\"AllUsers\"}Else{\"CurrentUser\"}",
+        "Write-Output \"Running with scope: $Scope\""
+      ],
+      "cmdlets": "Invoke-Scuba",
+      "postCommands": [
+        "Write-Output 'ScubaGear execution completed'",
+        "Get-ChildItem \"$env:temp\\ScubaConfigRun\" | Remove-Item -Force -ErrorAction SilentlyContinue -Verbose"
+      ],
+      "parameters" : {
+        "SilenceBODWarnings": {
+          "name": "Silence BOD Warnings",
+          "type": "boolean",
+          "description": "Suppress BOD warnings.",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "DarkMode": {
+          "name": "Dark Mode",
+          "type": "boolean",
+          "description": "Show ScubaGear report in dark mode.",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "Quiet": {
+          "name": "Quiet Mode",
+          "type": "boolean",
+          "description": "Run ScubaGear in quiet mode, suppressing report",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "name": "Number of UUID Characters to Truncate",
+          "type": "dropdown",
+          "items": [
+            0,
+            13,
+            18,
+            36
+          ],
+          "description": "Specify the number of characters to truncate from the UUID.",
+          "defaultValue": 18,
+          "hidden": false,
+          "readOnly": false
+        }
+      }
+    }
+  },
+  "Reports": {
+    "tabName": "Report Summary",
+    "ShowProductSummaryReports": true,
+    "summaryColumns": [
+      "Manual",
+      "Failures",
+      "Warnings",
+      "Errors",
+      "Passes",
+      "Omits",
+      "IncorrectResults"
+    ],
+    "ProductColumns": [
+      "GroupReferenceURL",
+      "Control ID",
+      "Requirement",
+      "Result",
+      "Criticality",
+      "Details",
+      "OmittedEvaluationResult",
+      "IncorrectResult"
+    ]
+  },
+  "inputTypes": {
+    "CapExclusions": {
+      "name": "Conditional Access Policy Excluded Groups and Users",
+      "value": "CapExclusions",
+      "description": "Exclude specific groups or users from conditional access policies",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "description": "Group IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "description": "User IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        }
+      ]
+    },
+    "RoleExclusions": {
+      "name": "Privilege Identity Management Excluded Roles",
+      "value": "RoleExclusions",
+      "description": "Exclude specific groups or users from role requirements",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "description": "Group IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "description": "User IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        }
+      ]
+    },
+    "SensitiveAccounts": {
+      "name": "Sensitive Accounts",
+      "value": "SensitiveAccounts",
+      "description": "Defines sensitive accounts filters used to select accounts to assign to the strict preset security policy",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Included User",
+          "value": "IncludedUsers",
+          "description": "Users and Service Principal Names to include as sensitive accounts",
+          "valueType": "email",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Included Groups Names",
+          "value": "IncludedGroups",
+          "description": "Groups to include as sensitive accounts",
+          "valueType": "string",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Included Domain Names",
+          "value": "IncludedDomains",
+          "description": "Domains to include as sensitive accounts",
+          "valueType": "domain",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded User",
+          "value": "ExcludedUsers",
+          "description": "Users and Service Principal Names to exclude from sensitive accounts",
+          "valueType": "email",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded Groups Names",
+          "value": "ExcludedGroups",
+          "description": "Groups to exclude from sensitive accounts",
+          "valueType": "string",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded Domains Names",
+          "value": "ExcludedDomains",
+          "description": "Domains to exclude from sensitive accounts",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "SensitiveUsers": {
+      "name": "Defender's Sensitive Users",
+      "value": "SensitiveUsers",
+      "description": "Defines sensitive user accounts by display name and email address",
+      "fields": [
+        {
+          "type": "string",
+          "name": "Sensitive Users",
+          "value": "SensitiveUsers",
+          "description": "Each value should be a string in the form of the display name and email address separated by a semicolon.",
+          "valueType": "semicolonList",
+          "required": false
+        }
+      ]
+    },
+    "PartnerDomains": {
+      "name": "Partner Domains",
+      "value": "PartnerDomains",
+      "description": "Defines a list of frequent partner domain names",
+      "fields": [
+        {
+          "type": "array",
+          "name": "PartnerDomains",
+          "value": "PartnerDomains",
+          "description": "Defines a list of frequent partner domain names",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "AllowedForwardingDomains": {
+      "name": "Allowed Forwarding Domains",
+      "value": "",
+      "description": "Domains allowed for automatic email forwarding",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Enter domains allowed for forwarding",
+          "value": "AllowedForwardingDomains",
+          "description": "List of domains allowed for automatic email forwarding",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "AgencyDomains": {
+      "name": "Agency Domains",
+      "value": "AgencyDomains",
+      "description": "Defines a list of agency domain names that should be specified",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Agency Domains",
+          "value": "AgencyDomains",
+          "description": "Defines a list of agency domain names that should be specified",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "PreferredDnsResolvers": {
+      "name": "Preferred DNS Resolver IP Addresses",
+      "value": "",
+      "description": "Use this parameter to control what DNS resolver is used to fetch the SPF, DKIM, and DMARC records",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Enter preferred DNS resolver IP addresses:",
+          "value": "PreferredDnsResolvers",
+          "description": "Defines a list of preferred DNS resolvers",
+          "valueType": "ipAddress",
+          "required": false
+        }
+      ]
+    },
+    "skipDoH": {
+      "name": "Skip DNS over HTTPS",
+      "value": "",
+      "description": "Use this parameter if you prefer ScubaGear not retry any failed DNS queries",
+      "fields": [
+        {
+          "type": "boolean",
+          "name": "Check to skip DNS over HTTPS:",
+          "value": "SkipDoH",
+          "description": "Set to true to skip DoH for failed DNS queries",
+          "valueType": "boolean",
+          "required": false
+        }
+      ]
+    },
+    "Annotations": {
+      "name": "Annotation",
+      "value": "AnnotatePolicy",
+      "description": "Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.",
+      "fields": [
+        {
+          "type": "boolean",
+          "name": "Incorrect Result (aka False Positive)",
+          "value": "IncorrectResult",
+          "description": "Check to indicate that the result is incorrect",
+          "valueType": "boolean",
+          "required": false
+        },
+        {
+          "type": "longstring",
+          "name": "Comment",
+          "value": "Comment",
+          "description": "The annotation to add to the report. A warning will be printed if control is marked incorrect with no comment provided as justification",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "type": "dateString",
+          "name": "Remediation Date",
+          "value": "RemediationDate",
+          "description": "The date a failing control is anticipated to be implemented",
+          "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
+          "required": false
+        }
+      ]
+    },
+    "Omissions": {
+      "name": "Omissions",
+      "Value": "OmitPolicy",
+      "description": "Exercise care when omitting policies because this can inadvertently introduce blind spots when assessing your system.",
+      "fields": [
+        {
+          "type": "longstring",
+          "name": "Rationale",
+          "value": "Rationale",
+          "description": "Provide a reason the policy should be omitted from the report",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "type": "dateString",
+          "name": "Expiration Date",
+          "value": "Expiration",
+          "description": "A date after which the policy should no longer be omitted from the report.",
+          "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
+          "required": false
+        }
+      ]
+    }
+  },
+  "valueValidations": {
+    "email": {
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "sample": "user@example.com",
+      "format": "user@example.com",
+      "invalidScriptMessage": "Email domain must be accessible and not temporary.",
+      "invalidScriptChecks": [
+        "$value -notmatch 'tempmail|disposable'"
+      ],
+      "sensitive": true
+    },
+    "domain": {
+      "pattern": "^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.[A-Za-z0-9-]{1,63})+$",
+      "sample": "example.com",
+      "format": "user@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "ipAddress": {
+      "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+      "sample": "192.168.1.1",
+      "format": "x.x.x.x",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "guid": {
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
+      "sample": "123e4567-e89b-12d3-a456-426614174000",
+      "format": "123e4567-e89b-12d3-a456-426614174000",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "yearmonthday": {
+      "pattern": "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+      "sample": "2023-03-15",
+      "format": "yyyy-MM-dd",
+      "invalidScriptMessage": "Date must be between today and five years from now.",
+      "invalidScriptChecks": [
+        "[DateTime]::Parse($value) -gt (Get-Date).AddDays(-1)",
+        "[DateTime]::Parse($value) -lt (Get-Date).AddYears(5)"
+      ],
+      "sensitive": false
+    },
+    "semicolonList": {
+      "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,};?)+$",
+      "sample": "John Doe;jdoe@example.com",
+      "format": "John Doe;jdoe@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "thumbprint": {
+      "pattern": "^[A-Fa-f0-9]{40}$",
+      "sample": "1234567890abcdef1234567890abcdef12345678",
+      "format": "1234567890abcdef1234567890abcdef12345678",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "tenantDomain": {
+      "pattern": "^(.*\\.)?(onmicrosoft\\.com|onmicrosoft\\.us)$",
+      "sample": "example.onmicrosoft.com",
+      "format": "example.onmicrosoft.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "orgName": {
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Department of Example",
+      "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "orgUnitName": {
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Division of Example",
+      "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    }
+  },
+  "graphQueries": {
+    "Users": {
+      "windowTitle": "Select user id(s) to include:",
+      "name": "Users",
+      "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
+      "outProperty": "id",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "Groups": {
+      "windowTitle": "Select group id(s) to include:",
+      "name": "Groups",
+      "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "id",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "IncludedUsers": {
+      "windowTitle": "Select user names(s) to include:",
+      "name": "Users",
+      "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
+      "outProperty": "userPrincipalName",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "IncludedGroups": {
+      "windowTitle": "Select group names(s) to include:",
+      "name": "Groups",
+      "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "displayName",
+      "tipProperty": "description",
+      "allowMultipleSelection": true
+    },
+    "ExcludedUsers": {
+      "windowTitle": "Select user names(s) to exclude:",
+      "name": "Users",
+      "endpoint": "/v1.0/users",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "User Name",
+          "value": "displayName"
+        },
+        {
+          "name": "User Principal Name",
+          "value": "userPrincipalName"
+        },
+        {
+          "name": "Email",
+          "value": "mail"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Account Enabled",
+          "value": "accountEnabled"
+        },
+        {
+          "name": "User Type",
+          "value": "userType"
+        }
+      ],
+      "outProperty": "userPrincipalName",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "ExcludedGroups": {
+      "windowTitle": "Select group names(s) to exclude:",
+      "name": "Groups",
+      "endpoint": "/v1.0/groups",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Group Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Description",
+          "value": "description"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        },
+        {
+          "name": "Group Type",
+          "value": "groupTypes"
+        },
+        {
+          "name": "Mail Enabled",
+          "value": "mailEnabled"
+        },
+        {
+          "name": "Security Enabled",
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "displayName",
+      "tipProperty": "description",
+      "allowMultipleSelection": true
+
+    },
+    "AppId_TextBox": {
+      "windowTitle": "Select a registered Scuba service principal application:",
+      "name": "Applications",
+      "endpoint": "/v1.0/applications",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,appId,displayName"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "name": "Application Name",
+          "value": "displayName"
+        },
+        {
+          "name": "Application ID",
+          "value": "appId"
+        },
+        {
+          "name": "Object ID",
+          "value": "id"
+        }
+      ],
+      "outProperty": "appId",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": false
+    }
+  }
+}
