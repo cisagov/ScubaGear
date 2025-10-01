@@ -25,10 +25,6 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
@@ -37,9 +33,13 @@ InModuleScope Orchestrator {
                     OPAPath = "."
                     LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
                 $TenantDetails = '{"DisplayName": "displayName"}'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
                 $DarkMode = $false
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
                 $ModuleVersion = '1.0'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $OutFolderPath = "./"
             }
             It 'Do it quietly (Do not automatically show report)' {
@@ -85,10 +85,6 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports with -Quiet True' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
@@ -97,10 +93,15 @@ InModuleScope Orchestrator {
                     OPAPath = "."
                     LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
                 $DarkMode = $false
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
                 $TenantDetails = '{"DisplayName": "displayName"}'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
                 $ModuleVersion = '1.0'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $OutFolderPath = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Quiet')]
                 $Quiet = $true
             }
             It 'With all products, should not throw' {
