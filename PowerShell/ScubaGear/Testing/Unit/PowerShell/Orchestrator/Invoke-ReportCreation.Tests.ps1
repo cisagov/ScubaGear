@@ -25,7 +25,10 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
@@ -38,7 +41,6 @@ InModuleScope Orchestrator {
                 $DarkMode = $false
                 $ModuleVersion = '1.0'
                 $OutFolderPath = "./"
-                $BoundParameters = @{}
             }
             It 'Do it quietly (Do not automatically show report)' {
                 $ScubaConfig.ProductNames = @("aad")
@@ -83,7 +85,10 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports with -Quiet True' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
@@ -97,7 +102,6 @@ InModuleScope Orchestrator {
                 $ModuleVersion = '1.0'
                 $OutFolderPath = "./"
                 $Quiet = $true
-                $BoundParameters = @{}
             }
             It 'With all products, should not throw' {
                 $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
