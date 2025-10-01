@@ -48,36 +48,34 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
               $OutFolderPath = "./output"
               [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
               $Guid = "00000000-0000-0000-0000-000000000000"
-              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'BoundParameters')]
-              $BoundParameters = @{}
         }
         It 'With -ProductNames "aad", should not throw' {
               $ScubaConfig.ProductNames = @("aad")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "defender", should not throw' {
               $ScubaConfig.ProductNames = @("defender")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "exo", should not throw' {
               $ScubaConfig.ProductNames = @("exo")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "powerplatform", should not throw' {
               $ScubaConfig.ProductNames = @("powerplatform")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "sharepoint", should not throw' {
               $ScubaConfig.ProductNames = @("sharepoint")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "teams", should not throw' {
               $ScubaConfig.ProductNames = @("teams")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With all products, should not throw' {
               $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $BoundParameters } | Should -Not -Throw
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
     }
     }
