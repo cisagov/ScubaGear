@@ -49,7 +49,7 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 ### Scuba Configuration UI
 
 SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
-For more information review the [Configuration UI](docs/configuration/scubaconfigapp.md) doc.
+For more information review the [Configuration UI](docs/configuration/scubaconfigapp.md) documentation.
 
 #### UI Key Features:
 - Launch with `Start-ScubaConfigApp`
