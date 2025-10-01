@@ -308,6 +308,9 @@ function Invoke-SCuBA {
                 'OutCsvFileName' = $OutCsvFileName
                 'OutActionPlanFileName' = $OutActionPlanFileName
                 'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
+                'AppID' = $AppID
+                'CertificateThumbprint' = $CertificateThumbprint
+                'Organization' = $Organization
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -383,7 +386,7 @@ function Invoke-SCuBA {
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
 
         # Product Authentication - parameters consolidated into ScubaConfig
-        $ProdAuthFailed = Invoke-Connection -ScubaConfig $ScubaConfig -BoundParameters $PSBoundParameters
+        $ProdAuthFailed = Invoke-Connection -ScubaConfig $ScubaConfig
         if ($ProdAuthFailed.Count -gt 0) {
             $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
             -ProductsFailed $ProdAuthFailed `
@@ -399,7 +402,7 @@ function Invoke-SCuBA {
         try {
             # Provider Execution
             # Provider parameters consolidated into ScubaConfig; remaining args passed explicitly
-            $ProdProviderFailed = Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $PSBoundParameters
+            $ProdProviderFailed = Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
             if ($ProdProviderFailed.Count -gt 0) {
                 $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
                 -ProductsFailed $ProdProviderFailed `
@@ -536,11 +539,7 @@ function Invoke-ProviderList {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Guid,
-
-        [Parameter(Mandatory = $true)]
-        [hashtable]
-        $BoundParameters
+        $Guid
     )
     process {
         try {
@@ -559,8 +558,8 @@ function Invoke-ProviderList {
             }
 
             $PnPFlag = $false
-            if ($BoundParameters.AppID) {
-                $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+            if ($ScubaConfig.AppID) {
+                $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
                 $PnPFlag = $true
                 $SPOProviderParams += @{PnPFlag = $PnPFlag }
@@ -625,7 +624,7 @@ function Invoke-ProviderList {
                 $TimeZone = ($GetTimeZone).StandardName
             }
 
-        $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
+        $ConfigDetails = @(ConvertTo-Json -Depth 100 $ScubaConfig)
         if(! $ConfigDetails) {
             $ConfigDetails = "{}"
         }
@@ -1410,11 +1409,7 @@ function Invoke-Connection {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScubaConfig,
-
-        [Parameter(Mandatory = $true)]
-        [hashtable]
-        $BoundParameters
+        $ScubaConfig
     )
 
     $ConnectTenantParams = @{
@@ -1422,8 +1417,8 @@ function Invoke-Connection {
         'M365Environment' = $ScubaConfig.M365Environment
     }
 
-    if ($BoundParameters.AppID) {
-        $ServicePrincipalParams = Get-ServicePrincipalParams -BoundParameters $BoundParameters
+    if ($ScubaConfig.AppID) {
+        $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
         $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
     }
 
@@ -1482,20 +1477,20 @@ function Get-ServicePrincipalParams {
     param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [hashtable]
-    $BoundParameters
+    [object]
+    $ScubaConfig
     )
 
     $ServicePrincipalParams = @{}
 
-    $CheckThumbprintParams = ($BoundParameters.CertificateThumbprint) `
-    -and ($BoundParameters.AppID) -and ($BoundParameters.Organization)
+    $CheckThumbprintParams = ($ScubaConfig.CertificateThumbprint) `
+    -and ($ScubaConfig.AppID) -and ($ScubaConfig.Organization)
 
     if ($CheckThumbprintParams) {
         $CertThumbprintParams = @{
-            CertificateThumbprint = $BoundParameters.CertificateThumbprint;
-            AppID = $BoundParameters.AppID;
-            Organization = $BoundParameters.Organization;
+            CertificateThumbprint = $ScubaConfig.CertificateThumbprint;
+            AppID = $ScubaConfig.AppID;
+            Organization = $ScubaConfig.Organization;
         }
         $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
     }
@@ -1836,7 +1831,15 @@ function Invoke-SCuBACached {
                 'OutRegoFileName' = $OutRegoFileName;
                 'OutReportName' = $OutReportName;
                 'OPAPath' = $OPAPath;
-                'LogIn' = $LogIn
+                'LogIn' = $LogIn;
+                'AppID' = $AppID;
+                'CertificateThumbprint' = $CertificateThumbprint;
+                'Organization' = $Organization;
+                'KeepIndividualJSON' = $KeepIndividualJSON;
+                'OutJsonFileName' = $OutJsonFileName;
+                'OutCsvFileName' = $OutCsvFileName;
+                'OutActionPlanFileName' = $OutActionPlanFileName;
+                'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
             }
 
             if ($ExportProvider) {
@@ -1850,7 +1853,7 @@ function Invoke-SCuBACached {
                 }
 
                 # authenticate
-                $ProdAuthFailed = Invoke-Connection -ScubaConfig $TempScubaConfig -BoundParameters $PSBoundParameters
+                $ProdAuthFailed = Invoke-Connection -ScubaConfig $TempScubaConfig
                 if ($ProdAuthFailed.Count -gt 0) {
                     $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
                     if (-not $Difference) {
@@ -1865,7 +1868,7 @@ function Invoke-SCuBACached {
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
 
-                Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -BoundParameters $PSBoundParameters
+                Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
             }
 
             $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
@@ -1908,6 +1911,37 @@ function Invoke-SCuBACached {
             $TenantDetails = $SettingsExport.tenant_details
             Invoke-RunRego -ScubaConfig $TempScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath
             Invoke-ReportCreation -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
+
+            $FullNameParams = @{
+                'OutJsonFileName'                  = $TempScubaConfig.OutJsonFileName;
+                'Guid'                             = $Guid;
+                'NumberOfUUIDCharactersToTruncate' = $TempScubaConfig.NumberOfUUIDCharactersToTruncate;
+            }
+            $FullScubaResultsName = Get-FullOutJsonName @FullNameParams
+
+            if (-not $KeepIndividualJSON) {
+                # Craft the complete json version of the output
+                $JsonParams = @{
+                    'ProductNames'         = $TempScubaConfig.ProductNames;
+                    'OutFolderPath'        = $OutFolderPath;
+                    'OutProviderFileName'  = $TempScubaConfig.OutProviderFileName;
+                    'TenantDetails'        = $TenantDetails;
+                    'ModuleVersion'        = $ModuleVersion;
+                    'FullScubaResultsName' = $FullScubaResultsName;
+                    'Guid'                 = $Guid;
+                    'SilenceBODWarnings'   = $SilenceBODWarnings;
+                }
+                Merge-JsonOutput @JsonParams
+            }
+            # Craft the csv version of just the results
+            $CsvParams = @{
+                'ProductNames'          = $TempScubaConfig.ProductNames;
+                'OutFolderPath'         = $OutFolderPath;
+                'FullScubaResultsName'  = $FullScubaResultsName;
+                'OutCsvFileName'        = $TempScubaConfig.OutCsvFileName;
+                'OutActionPlanFileName' = $TempScubaConfig.OutActionPlanFileName;
+            }
+            ConvertTo-ResultsCsv @CsvParams
         }
     }
 
