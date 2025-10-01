@@ -284,14 +284,14 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [AllowEmptyCollection()]
         [string[]]
-        $PreferredDnsResolvers = [ScubaConfig]::ScubaDefault('DefaultPreferredDnsResolvers'),
+        $PreferredDnsResolvers = @(),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
+        $SkipDoH = $false
     )
     process {
         # Retrieve ScubaGear Module versions
@@ -618,8 +618,7 @@ function Invoke-ProviderList {
                             $RetVal = Export-AADProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
                         }
                         "exo" {
-                            $RetVal = Export-EXOProvider -PreferredDnsResolvers $PreferredDnsResolvers `
-                                        -SkipDoH $SkipDoH | Select-Object -Last 1
+                            $RetVal = Export-EXOProvider | Select-Object -Last 1
                         }
                         "defender" {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
@@ -1356,13 +1355,13 @@ function Invoke-ReportCreation {
 
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
-            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
-            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
+            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
+            $MainJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "main.js") -Raw
 
             $JSFiles = @(
                 $ParentReportJS
                 $UtilsJS
-                $TableFunctionsJS
+                $MainJS
             ) -join "`n"
 
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
@@ -1992,4 +1991,3 @@ Export-ModuleMember -Function @(
     'Invoke-SCuBA',
     'Invoke-SCuBACached'
 )
-
