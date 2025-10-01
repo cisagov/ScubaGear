@@ -25,6 +25,7 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
@@ -85,6 +86,7 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports with -Quiet True' {
             BeforeAll {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
