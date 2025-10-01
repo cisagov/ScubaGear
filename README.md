@@ -204,13 +204,16 @@ Reset-ScubaGearDependencies
 
 ### Troubleshooting & Support
 
-- [Multiple Tenants](docs/troubleshooting/tenants.md)
-- [Product-Specific Issues](docs/troubleshooting/)
-  - [Defender](docs/troubleshooting/defender.md)
-  - [Exchange Online](docs/troubleshooting/exchange.md)
-  - [Power Platform](docs/troubleshooting/power.md)
-  - [Microsoft Graph](docs/troubleshooting/graph.md)
-- [Network & Proxy](docs/troubleshooting/proxy.md)
+| Topic | Resource | Notes |
+|-------|----------|-------|
+| Multiple Tenants | [tenants.md](docs/troubleshooting/tenants.md) | Solutions for organizations managing multiple M365 tenants - covers tenant switching, authentication across environments, and consolidated reporting strategies |
+| Product-Specific Issues | | Common issues and solutions for individual M365 products |
+| └ Defender | [defender.md](docs/troubleshooting/defender.md) | Resolves Microsoft Defender for Office 365 connection errors, API permission issues, and policy assessment failures specific to threat protection features |
+| └ Exchange Online | [exchange.md](docs/troubleshooting/exchange.md) | Fixes Exchange Online PowerShell connectivity problems, mailbox access errors, and transport rule assessment issues |
+| └ Power Platform | [power.md](docs/troubleshooting/power.md) | Addresses Power Apps and Power Automate assessment challenges including environment access, DLP policy evaluation, and connector permissions |
+| └ Microsoft Graph | [graph.md](docs/troubleshooting/graph.md) | Comprehensive Graph API troubleshooting including authentication failures, insufficient permissions, throttling, and API version compatibility |
+| Network & Proxy | [proxy.md](docs/troubleshooting/proxy.md) | Corporate network troubleshooting for firewall configurations, proxy settings, certificate issues, and connectivity problems in restricted environments |
+| Cached Execution | [scubacached.md](docs/execution/scubacached.md) | Guide for using Invoke-SCuBACached to run assessments on previously exported data, enabling offline analysis and faster iteration cycles | 
 
 ### Automation
 
