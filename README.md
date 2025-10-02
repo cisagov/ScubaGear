@@ -46,11 +46,25 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
   - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
+### Scuba Configuration UI
+
+SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
+For more information review the [Configuration UI](docs/configuration/scubaconfigapp.md) documentation.
+
+#### UI Key Features:
+- Launch with `Start-ScubaConfigApp`
+- Step-by-step setup wizard covering all configuration options
+- Real-time validation with live YAML preview
+- Microsoft Graph integration for user and group selection
+- Seamless import/export of existing configuration files
+
+> Ideal for users who prefer a visual interface over command-line tools.
+
 ### ScubaGear Output
 
-- **HTML Reports**: Interactive, user-friendly compliance reports. See SAMPLE: [Baselinereports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
-- **JSON Output**: Structured results for reporting and parsing. See SAMPLE: [ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
-- **CSV Export**: Spreadsheet-compatible data for analysis. See SAMPLE: [ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
+- **HTML Reports**: Interactive, user-friendly compliance reports. [Sample BaselineReports.html](PowerShell/ScubaGear/Sample-Reports/BaselineReports.html)
+- **JSON Output**: Structured results for reporting and parsing. [Sample ScubaResults.json](PowerShell/ScubaGear/Sample-Reports/ScubaResults_0d275954-350e-4a22.json)
+- **CSV Export**: Spreadsheet-compatible data for analysis. [Sample ScubaResults.csv](PowerShell/ScubaGear/Sample-Reports/ScubaResults.csv)
 
 ## Getting Started
 
@@ -58,6 +72,8 @@ Before launching **ScubaGear**, it's important to ensure your environment is pro
 
 Please review the [prerequisites](#prerequisites) section to verify that your system meets all requirements. This will help avoid errors during execution and ensure a smooth experience when using ScubaGear.
 
+> [!NOTE]
+> After installing ScubaGear in your environment, we recommend using the built-in update functions and features when you need to update to the latest version. See the [Update Guide](docs/installation/update.md) for more information.
 
 ### Quick Start Guide
 
@@ -108,7 +124,6 @@ Invoke-SCuBA -ProductNames *
 
 ### 5. Build YAML configuration file
 
-
 ScubaGear uses a YAML configuration file to define how your environment should be evaluated. This file serves several important purposes:
 
 - **Customization** – Specify which products, baselines, and rules apply to your environment.
@@ -129,7 +144,7 @@ ScubaGear uses a YAML configuration file to define how your environment should b
 > [full_config.yaml](PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml) is included to help you get started. This file should be customized to reflect your tenant’s unique configuration before using it with the ScubaGear module.
 
 
-### 6: Run ScubaGear with a configuration File
+### 6. Run ScubaGear with a configuration File
 
 When running `Invoke-SCuBA` for BOD 25-01 submissions:
 ```powershell
@@ -144,6 +159,20 @@ For all other instances:
 Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 ```
 
+### 7. Update ScubaGear
+
+The following will update ScubaGear.
+```powershell
+# The following will update ScubaGear to the latest version
+Update-ScubaGear
+```
+
+The following will baseline all ScubaGear dependencies, please review the [Update Guide](docs/installation/update.md) in detail before running.
+```powershell
+# The follwing will remove and re-install all ScubaGear dependencies
+Reset-ScubaGearDependencies
+```
+
 ## Table of Contents
 
 ### Getting Started
@@ -153,6 +182,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
   - [Install from PSGallery](docs/installation/psgallery.md)
   - [Download from GitHub](docs/installation/github.md)
   - [Uninstall](docs/installation/uninstall.md)
+  - [Update](docs/installation/update.md)
 
  #### Prerequisites
 
@@ -163,6 +193,7 @@ Invoke-SCuBA -ConfigFilePath "path/to/your/config.yaml" -SilenceBODWarnings
 
 ## Configuration & Usage
 
+- [Configuration UI](docs/scubaconfigapp.md) - **Graphical interface**
 - [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
 - [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 

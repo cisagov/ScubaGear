@@ -41,7 +41,9 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
-        DefaultOPAVersion = '1.8.0'
+        DefaultOPAVersion = '1.9.0'
+        DefaultSkipDoH = $false
+        DefaultPreferredDnsResolvers = @()
     }
 
     static [object]ScubaDefault ([string]$Name){
@@ -194,6 +196,14 @@ class ScubaConfig {
 
         if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
             $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
+        }
+
+        if (-Not $this.Configuration.PreferredDnsResolvers){
+            $this.Configuration.PreferredDnsResolvers = [ScubaConfig]::ScubaDefault('DefaultPreferredDnsResolvers')
+        }
+
+        if (-Not $this.Configuration.SkipDoH){
+            $this.Configuration.SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
         }
         return
     }

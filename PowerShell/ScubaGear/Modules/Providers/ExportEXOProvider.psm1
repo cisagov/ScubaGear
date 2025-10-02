@@ -9,7 +9,17 @@ function Export-EXOProvider {
 
     [CmdletBinding()]
     [OutputType([String])]
-    param()
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH
+    )
 
     # Manually importing the module name here to bypass cmdlet name conflicts
     # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
@@ -27,18 +37,30 @@ function Export-EXOProvider {
     MS.EXO.2.1v1 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
-    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{"Domains"=$domains})) -Depth 4
+    $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{
+        "Domains"=$domains;
+        "PreferredDnsResolvers"=$PreferredDnsResolvers;
+        "SkipDoH"=$SkipDoH;
+    })) -Depth 4
 
     <#
     MS.EXO.3.1v1 DKIM
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
-    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{"Domains"=$domains})) -Depth 4
+    $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{
+        "Domains"=$domains;
+        "PreferredDnsResolvers"=$PreferredDnsResolvers;
+        "SkipDoH"=$SkipDoH;
+    })) -Depth 4
 
     <#
     MS.EXO.4.1v1 DMARC
     #>
-    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{"Domains"=$domains})) -Depth 4
+    $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{
+        "Domains"=$domains;
+        "PreferredDnsResolvers"=$PreferredDnsResolvers;
+        "SkipDoH"=$SkipDoH;
+    })) -Depth 4
 
     <#
     MS.EXO.5.1v1
@@ -188,6 +210,10 @@ function Invoke-RobustDnsTxt {
     but retries over DoH in the event of failure.
     .Parameter Qname
     The fully-qualified domain name to request.
+    .Parameter PreferredDnsResolvers
+    IP addresses of DNS resolvers that should be used. If empty, the system default will be used.
+    .Parameter SkipDoH
+    If true, do not try over DoH if the traditional query fails.
     .Parameter MaxTries
     The number of times to retry each kind of query. If all queries are unsuccessful, the traditional
     queries and the DoH queries will each be made $MaxTries times. Default is 2.
@@ -202,6 +228,17 @@ function Invoke-RobustDnsTxt {
         [string]
         $Qname,
 
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH,
+
         [Parameter(Mandatory=$false)]
         [ValidateRange(1, [int]::MaxValue)]
         [int]
@@ -215,13 +252,14 @@ function Invoke-RobustDnsTxt {
         "Errors" = @()
     }
 
-    $TradResult = Invoke-TraditionalDns -Qname $Qname -MaxTries $MaxTries
+    $TradResult = Invoke-TraditionalDns -Qname $Qname -MaxTries $MaxTries `
+        -PreferredDnsResolvers $PreferredDnsResolvers
     $Results['Answers'] += $TradResult['Answers']
     $Results['NXDomain'] = $TradResult['NXDomain']
     $Results['LogEntries'] += $TradResult['LogEntries']
     $Results['Errors'] += $TradResult['Errors']
 
-    if ($Results.Answers.Length -eq 0) {
+    if ($Results.Answers.Length -eq 0 -and -not $SkipDoH) {
         # The traditional DNS query(ies) failed. Retry with DoH
         $DoHResult = Invoke-DoH -Qname $Qname -MaxTries $MaxTries
         $Results['Answers'] += $DoHResult['Answers']
@@ -239,6 +277,8 @@ function Invoke-TraditionalDns {
     Requests the TXT record for the given qname over traditional DNS.
     .Parameter Qname
     The fully-qualified domain name to request.
+    .Parameter PreferredDnsResolvers
+    IP addresses of DNS resolvers that should be used. If empty, the system default will be used.
     .Parameter MaxTries
     The number of times to retry the query.
     .Functionality
@@ -251,6 +291,11 @@ function Invoke-TraditionalDns {
         [ValidateNotNullOrEmpty()]
         [string]
         $Qname,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
 
         [Parameter(Mandatory=$false)]
         [ValidateRange(1, [int]::MaxValue)]
@@ -267,7 +312,13 @@ function Invoke-TraditionalDns {
     while ($TryNumber -lt $MaxTries) {
         $TryNumber += 1
         try {
-            $Response = Resolve-DnsName $Qname txt -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
+            if ($PreferredDnsResolvers.Length -gt 0) {
+                $Response = Resolve-DnsName $Qname txt -Server $PreferredDnsResolvers `
+                    -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
+            }
+            else {
+                $Response = Resolve-DnsName $Qname txt -ErrorAction Stop | Where-Object {$_.Section -eq "Answer"}
+            }
             if ($Response.Strings.Length -gt 0) {
                 # We got our answer, so break out of the retry loop, no
                 # need to retry the traditional query or retry with DoH.
@@ -479,14 +530,25 @@ function Get-ScubaSpfRecord {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Object[]]
-        $Domains
+        $Domains,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH
     )
 
     $SPFRecords = @()
 
     foreach ($d in $Domains) {
         $Compliant = $false
-        $Response = Invoke-RobustDnsTxt $d.DomainName
+        $Response = Invoke-RobustDnsTxt $d.DomainName -PreferredDnsResolvers $PreferredDnsResolvers `
+            -SkipDoH $SkipDoH
         $DomainName = $d.DomainName
         if ($Response.Answers.Length -gt 0) {
             # We got some answers - are they SPF records?
@@ -543,7 +605,17 @@ function Get-ScubaDkimRecord {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Object[]]
-        $Domains
+        $Domains,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH
     )
 
     $DKIMRecords = @()
@@ -562,7 +634,8 @@ function Get-ScubaDkimRecord {
 
         $LogEntries = @()
         foreach ($s in $selectors) {
-            $Response = Invoke-RobustDnsTxt "$s._domainkey.$DomainName"
+            $Response = Invoke-RobustDnsTxt "$s._domainkey.$DomainName" -PreferredDnsResolvers $PreferredDnsResolvers `
+            -SkipDoH $SkipDoH
             $LogEntries += $Response.LogEntries
             if ($Response.Answers.Length -eq 0) {
                 # The DKIM record does not exist with this selector, we need to try again with
@@ -597,7 +670,17 @@ function Get-ScubaDmarcRecord {
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [System.Object[]]
-        $Domains
+        $Domains,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $PreferredDnsResolvers,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH
     )
 
     $DMARCRecords = @()
@@ -611,7 +694,8 @@ function Get-ScubaDmarcRecord {
         $LogEntries = @()
         # First check to see if the record is available at the full domain level
         $DomainName = $d.DomainName
-        $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName"
+        $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName" -PreferredDnsResolvers $PreferredDnsResolvers `
+            -SkipDoH $SkipDoH
         $LogEntries += $Response.LogEntries
         if ($Response.Answers.Length -eq 0) {
             # The domain does not exist. If the record is not available at the full domain
@@ -619,7 +703,8 @@ function Get-ScubaDmarcRecord {
             $Labels = $d.DomainName.Split(".")
             $Labels = $d.DomainName.Split(".")
             $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-            $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain"
+            $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain" -PreferredDnsResolvers $PreferredDnsResolvers `
+                -SkipDoH $SkipDoH
             $LogEntries += $Response.LogEntries
         }
 
