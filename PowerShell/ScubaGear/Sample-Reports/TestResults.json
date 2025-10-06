@@ -19,7 +19,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.AAD.4.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -31,7 +31,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.AAD.2.2v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -43,7 +43,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.AAD.8.3v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -55,12 +55,12 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.AAD.3.5v1",
-        "ReportDetails":  "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "ReportDetails":  "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/aad.md#msaad34v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  false
     },
     {
         "ActualValue":  [
-                            "preMigration"
+                            "migrationInProgress"
                         ],
         "Commandlet":  [
                            "Get-MgBetaPolicyAuthenticationMethodPolicy"
@@ -145,6 +145,26 @@
     },
     {
         "ActualValue":  {
+                            "FederatedDomains":  [
+
+                                                 ],
+                            "InvalidDomains":  [
+
+                                               ],
+                            "ValidDomains":  [
+
+                                             ]
+                        },
+        "Commandlet":  [
+                           "Get-MgBetaDomain"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.6.1v1",
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  {
                             "all_admin_consent_policies":  [
                                                                {
                                                                    "Name":  "EnableAdminConsentRequests",
@@ -202,7 +222,7 @@
                                                                 "DefaultUser_DefaultGrantPolicy":  [
                                                                                                        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                                                                                                        "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
-                                                                                                       "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+                                                                                                       "ManagePermissionGrantsForSelf.microsoft-user-default-recommended"
                                                                                                    ],
                                                                 "PolicyId":  "authorizationPolicy"
                                                             }
@@ -213,8 +233,8 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.5.2v1",
-        "ReportDetails":  "1 authorization policies found that allow non-admin users to consent to third-party applications:\u003cbr/\u003eauthorizationPolicy",
-        "RequirementMet":  false
+        "ReportDetails":  "0 authorization policies found that allow non-admin users to consent to third-party applications",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  {
@@ -233,26 +253,6 @@
         "PolicyId":  "MS.AAD.8.1v1",
         "ReportDetails":  "Permission level set to \"Limited access\" (authorizationPolicy)",
         "RequirementMet":  true
-    },
-    {
-        "ActualValue":  {
-                            "federated_domains":  [
-
-                                                  ],
-                            "invalid_domains":  [
-
-                                                ],
-                            "valid_domains":  [
-
-                                              ]
-                        },
-        "Commandlet":  [
-                           "Get-MgBetaDomain"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.6.1v1",
-        "ReportDetails":  "Requirement not met",
-        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -488,7 +488,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.6.3v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -500,7 +500,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.4.5v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -512,7 +512,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.4.6v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -524,7 +524,7 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.DEFENDER.5.2v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -617,13 +617,16 @@
     {
         "ActualValue":  {
                             "Credit_Card":  [
-                                                "Baseline Rule"
+                                                "Baseline Rule",
+                                                "test rule"
                                             ],
                             "ITIN":  [
-                                         "Baseline Rule"
+                                         "Baseline Rule",
+                                         "test rule"
                                      ],
                             "SSN":  [
-                                        "Baseline Rule"
+                                        "Baseline Rule",
+                                        "test rule"
                                     ]
                         },
         "Commandlet":  [
@@ -637,9 +640,22 @@
     {
         "ActualValue":  {
                             "Devices":  [
-
+                                            {
+                                                "Locations":  [
+                                                                  "All"
+                                                              ],
+                                                "Name":  "Custom policy Test",
+                                                "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
+                                            }
                                         ],
                             "Exchange":  [
+                                             {
+                                                 "Locations":  [
+                                                                   "All"
+                                                               ],
+                                                 "Name":  "Custom policy Test",
+                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
+                                             },
                                              {
                                                  "Locations":  [
                                                                    "All"
@@ -653,6 +669,13 @@
                                                  "Locations":  [
                                                                    "All"
                                                                ],
+                                                 "Name":  "Custom policy Test",
+                                                 "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
+                                             },
+                                             {
+                                                 "Locations":  [
+                                                                   "All"
+                                                               ],
                                                  "Name":  "Default Office 365 DLP policy",
                                                  "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                              }
@@ -662,11 +685,25 @@
                                                    "Locations":  [
                                                                      "All"
                                                                  ],
+                                                   "Name":  "Custom policy Test",
+                                                   "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
+                                               },
+                                               {
+                                                   "Locations":  [
+                                                                     "All"
+                                                                 ],
                                                    "Name":  "Default Office 365 DLP policy",
                                                    "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, OnPremisesScanner"
                                                }
                                            ],
                             "Teams":  [
+                                          {
+                                              "Locations":  [
+                                                                "All"
+                                                            ],
+                                              "Name":  "Custom policy Test",
+                                              "Workload":  "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices, OnPremisesScanner"
+                                          },
                                           {
                                               "Locations":  [
                                                                 "All"
@@ -681,8 +718,8 @@
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.DEFENDER.4.2v1",
-        "ReportDetails":  "DLP custom policy applied to the following locations: Exchange, OneDrive, SharePoint, Teams. Custom policy protecting sensitive info types NOT applied to: Devices. Devices location requires DLP for Endpoint licensing and at least one registered device. For full policy details, see the ActualValue field in the results file: ./TestResults.json",
-        "RequirementMet":  false
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     },
     {
         "ActualValue":  {
@@ -753,24 +790,24 @@
 
                         ],
         "Commandlet":  [
-                           "Get-DlpComplianceRule"
-                       ],
-        "Criticality":  "Should",
-        "PolicyId":  "MS.DEFENDER.4.4v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
                            "Get-ProtectionAlert"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.DEFENDER.5.1v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            "test rule"
+                        ],
+        "Commandlet":  [
+                           "Get-DlpComplianceRule"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.DEFENDER.4.4v1",
+        "ReportDetails":  "1 rule(s) found that do(es) not notify at least one user: test rule",
+        "RequirementMet":  false
     },
     {
         "ActualValue":  [
@@ -811,7 +848,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.10.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo101v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo101v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -823,7 +860,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.10.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo102v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo102v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -835,7 +872,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.1v2",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo141v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo141v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -847,7 +884,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo142v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo142v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -859,7 +896,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.14.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo143v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo143v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -871,7 +908,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.16.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo161v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo161v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -883,7 +920,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo171v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -895,7 +932,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.17.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo173v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo173v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -907,7 +944,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.8.1v2",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo81v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo81v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -919,7 +956,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.8.2v2",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo82v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo82v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -931,7 +968,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.8.4v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo84v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo84v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -943,7 +980,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.9.1v2",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo91v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo91v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -955,7 +992,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.EXO.9.3v2",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo93v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo93v2\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -967,7 +1004,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.10.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo103v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo103v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -979,7 +1016,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo111v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo111v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -991,7 +1028,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo112v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo112v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1003,7 +1040,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.11.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo113v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo113v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1015,7 +1052,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.14.4v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo144v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo144v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1027,7 +1064,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo151v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo151v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1039,7 +1076,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo152v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo152v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1051,7 +1088,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.15.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo153v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo153v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1063,7 +1100,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.16.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo162v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo162v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1075,7 +1112,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.8.3v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo83v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1087,7 +1124,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.9.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo92v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo92v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1099,7 +1136,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.9.4v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo94v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo94v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1111,7 +1148,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.EXO.9.5v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/exo.md#msexo95v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/exo.md#msexo95v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -1199,7 +1236,7 @@
                                 "OrganizationFederatedMailbox":  "johndoe@example.com",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
                                 "OtherWellKnownObjects":  [
 
                                                           ],
@@ -1250,8 +1287,8 @@
                                 "TransportRuleSizeLimit":  "8 KB (8,192 bytes)",
                                 "VerifySecureSubmitEnabled":  false,
                                 "VoicemailJournalingEnabled":  true,
-                                "WhenChanged":  "/Date(1751995521000)/",
-                                "WhenChangedUTC":  "/Date(1751995521000)/",
+                                "WhenChanged":  "/Date(1759732723000)/",
+                                "WhenChangedUTC":  "/Date(1759732723000)/",
                                 "WhenCreated":  "/Date(1619484398000)/",
                                 "WhenCreatedUTC":  "/Date(1619484398000)/",
                                 "Xexch50Enabled":  true
@@ -1290,9 +1327,9 @@
                                 "ObjectState":  "Changed",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1742335677000)/",
-                                "WhenChangedUTC":  "/Date(1742335677000)/",
+                                "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1742335684000)/",
+                                "WhenChangedUTC":  "/Date(1742335684000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
                                 "WhenCreatedUTC":  "/Date(1619484547000)/"
                             }
@@ -1330,9 +1367,9 @@
                                 "ObjectState":  "Changed",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1742335677000)/",
-                                "WhenChangedUTC":  "/Date(1742335677000)/",
+                                "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1742335684000)/",
+                                "WhenChangedUTC":  "/Date(1742335684000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
                                 "WhenCreatedUTC":  "/Date(1619484547000)/"
                             }
@@ -1374,9 +1411,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1751996009000)/",
-                                "WhenChangedUTC":  "/Date(1751996009000)/",
+                                "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1759733278000)/",
+                                "WhenChangedUTC":  "/Date(1759733278000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1418,9 +1455,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
-                                "WhenChanged":  "/Date(1751996009000)/",
-                                "WhenChangedUTC":  "/Date(1751996009000)/",
+                                "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1759733278000)/",
+                                "WhenChangedUTC":  "/Date(1759733278000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
                                 "WhenCreatedUTC":  "/Date(1619484586000)/"
                             }
@@ -1519,7 +1556,7 @@
                                     "ObjectState":  "Unchanged",
                                     "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                    "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1653949318610)/",
                                     "Selector1CNAME":  "selector1-tqhjy-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -1564,7 +1601,7 @@
                                     "ObjectState":  "Unchanged",
                                     "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/tqhjy.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/tqhjy.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "tqhjy.onmicrosoft.com",
-                                    "OriginatingServer":  "SA1PR09A06DC005.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "BY1PR09A06DC004.NAMPR09A006.PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1701717485274)/",
                                     "Selector1CNAME":  "selector1-tqhjy-mail-onmicrosoft-com._domainkey.tqhjy.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -1575,8 +1612,8 @@
                                     "SelectorAfterRotateOnDate":  "selector1",
                                     "SelectorBeforeRotateOnDate":  "selector2",
                                     "Status":  "Valid",
-                                    "WhenChanged":  "/Date(1739376140000)/",
-                                    "WhenChangedUTC":  "/Date(1739376140000)/",
+                                    "WhenChanged":  "/Date(1739376145000)/",
+                                    "WhenChangedUTC":  "/Date(1739376145000)/",
                                     "WhenCreated":  "/Date(1701717486000)/",
                                     "WhenCreatedUTC":  "/Date(1701717486000)/"
                                 }
@@ -1871,7 +1908,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.POWERPLATFORM.4.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform41v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
@@ -1883,14 +1920,14 @@
                        ],
         "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.POWERPLATFORM.3.2v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false
     },
     {
         "ActualValue":  {
                             "AllEnvironments":  [
                                                     {
-                                                        "EnvironmentName":  "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269",
+                                                        "EnvironmentName":  "Default-3c19c757-3b55-411f-b03f-2bcc514a598d",
                                                         "IsDefault":  true
                                                     }
                                                 ],
@@ -1900,7 +1937,7 @@
                             "NonDefaultEnvWithPolicies":  [
                                                               {
                                                                   "environmentType":  "SingleEnvironment",
-                                                                  "name":  "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                                                                  "name":  "Default-3c19c757-3b55-411f-b03f-2bcc514a598d"
                                                               }
                                                           ]
                         },
@@ -1946,23 +1983,11 @@
 
                         ],
         "Commandlet":  [
-
-                       ],
-        "Criticality":  "Shall/Not-Implemented",
-        "PolicyId":  "MS.SHAREPOINT.1.2v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint12v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
-        "RequirementMet":  false
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
                            "Get-SPOTenant"
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.1v1",
-        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint31v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint31v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  false
     },
     {
@@ -1975,7 +2000,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.1.3v1",
-        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to Only People In Your Organization. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint13v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to Only People In Your Organization. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint13v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  false
     },
     {
@@ -1988,7 +2013,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.2v1",
-        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  false
     },
     {
@@ -2001,7 +2026,7 @@
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.3v1",
-        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone or New and Existing Guests. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
+        "ReportDetails":  "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to Anyone or New and Existing Guests. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  false
     },
     {
@@ -2014,6 +2039,19 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.1.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            0
+                        ],
+        "Commandlet":  [
+                           "Get-SPOTenant",
+                           "Get-PnPTenant"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SHAREPOINT.1.2v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2082,7 +2120,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.TEAMS.6.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2094,7 +2132,7 @@
                        ],
         "Criticality":  "Shall/3rd Party",
         "PolicyId":  "MS.TEAMS.6.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2106,7 +2144,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.7.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams71v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams71v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2118,7 +2156,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.7.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams72v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams72v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2130,7 +2168,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.8.1v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams81v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams81v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2142,7 +2180,7 @@
                        ],
         "Criticality":  "Should/3rd Party",
         "PolicyId":  "MS.TEAMS.8.2v1",
-        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.6.0/PowerShell/ScubaGear/baselines/teams.md#msteams82v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
+        "ReportDetails":  "A custom product can be used to fulfill this policy requirement. If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance. If you are using Defender for Office 365 to implement this policy, ensure when running ScubaGear that \u0027defender\u0027 is an argument to the -ProductNames parameter. Then, review the corresponding Defender policy that fulfills the requirements of this policy on the Defender ScubaGear HTML report. See the \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.0/PowerShell/ScubaGear/baselines/teams.md#msteams82v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on a manual check.",
         "RequirementMet":  false
     },
     {
@@ -2200,7 +2238,7 @@
                            "Get-CsTeamsAppPermissionPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.TEAMS.5.1v1",
+        "PolicyId":  "MS.TEAMS.5.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2212,7 +2250,7 @@
                            "Get-CsTeamsAppPermissionPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.TEAMS.5.2v1",
+        "PolicyId":  "MS.TEAMS.5.2v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2224,7 +2262,7 @@
                            "Get-CsTeamsAppPermissionPolicy"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.TEAMS.5.3v1",
+        "PolicyId":  "MS.TEAMS.5.3v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2236,7 +2274,7 @@
                            "Get-CsTeamsMeetingPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.TEAMS.1.2v1",
+        "PolicyId":  "MS.TEAMS.1.2v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2272,7 +2310,7 @@
                            "Get-CsTenantFederationConfiguration"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.TEAMS.2.1v1",
+        "PolicyId":  "MS.TEAMS.2.1v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2284,19 +2322,7 @@
                            "Get-CsTenantFederationConfiguration"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.TEAMS.2.2v1",
-        "ReportDetails":  "Requirement met",
-        "RequirementMet":  true
-    },
-    {
-        "ActualValue":  [
-
-                        ],
-        "Commandlet":  [
-                           "Get-CsTenantFederationConfiguration"
-                       ],
-        "Criticality":  "Shall",
-        "PolicyId":  "MS.TEAMS.3.1v1",
+        "PolicyId":  "MS.TEAMS.2.2v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
@@ -2308,7 +2334,7 @@
                            "Get-CsTenantFederationConfiguration"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.TEAMS.2.3v1",
+        "PolicyId":  "MS.TEAMS.2.3v2",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     }
