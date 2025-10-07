@@ -1,4 +1,4 @@
-using module '.\ScubaConfig.psm1'
+using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "ScubaConfig JSON-based Configuration Tests" {
     BeforeAll {
@@ -29,17 +29,18 @@ ProductNames:
 M365Environment: commercial
 Organization: example.onmicrosoft.com
 OrgName: Test Organization
+OrgUnitName: IT Department
 "@
 
-        $TempFile = New-TemporaryFile
-        $ValidYaml | Set-Content -Path $TempFile.FullName
+        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+        $ValidYaml | Set-Content -Path $TempFile
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
         $ValidationResult.IsValid | Should -BeTrue
         $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
 
-        Remove-Item -Path $TempFile.FullName -Force
+        Remove-Item -Path $TempFile -Force
     }
 
     It "Should reject invalid YAML configuration" {
@@ -50,15 +51,15 @@ M365Environment: invalid_environment
 Organization: invalid_format
 "@
 
-        $TempFile = New-TemporaryFile
-        $InvalidYaml | Set-Content -Path $TempFile.FullName
+        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+        $InvalidYaml | Set-Content -Path $TempFile
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
         $ValidationResult.IsValid | Should -BeFalse
         $ValidationResult.ValidationErrors.Count | Should -BeGreaterThan 0
 
-        Remove-Item -Path $TempFile.FullName -Force
+        Remove-Item -Path $TempFile -Force
     }
 
     It "Should validate policy IDs correctly" {
@@ -73,15 +74,15 @@ AnnotatePolicy:
   MS.DEFENDER.2.1v1: "Valid annotation"
 "@
 
-        $TempFile = New-TemporaryFile
-        $YamlWithPolicies | Set-Content -Path $TempFile.FullName
+        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+        $YamlWithPolicies | Set-Content -Path $TempFile
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
         # Should have validation errors for invalid policy ID
         $ValidationResult.ValidationErrors | Should -Contain "Policy ID 'invalid_policy' does not match expected format. Expected: MS.DEFENDER.1.1v1"
 
-        Remove-Item -Path $TempFile.FullName -Force
+        Remove-Item -Path $TempFile -Force
     }
 
     It "Should handle exclusions configuration" {
@@ -89,6 +90,10 @@ AnnotatePolicy:
 ProductNames:
   - aad
   - defender
+M365Environment: commercial
+Organization: example.onmicrosoft.com
+OrgName: Test Organization
+OrgUnitName: IT Department
 ExclusionsConfig:
   aad:
     CapExclusions:
@@ -102,14 +107,14 @@ ExclusionsConfig:
         EmailAddress: "john.doe@example.com"
 "@
 
-        $TempFile = New-TemporaryFile
-        $YamlWithExclusions | Set-Content -Path $TempFile.FullName
+        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+        $YamlWithExclusions | Set-Content -Path $TempFile
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile.FullName)
+        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
         $ValidationResult.IsValid | Should -BeTrue
 
-        Remove-Item -Path $TempFile.FullName -Force
+        Remove-Item -Path $TempFile -Force
     }
 
     It "Should get product information" {
@@ -148,12 +153,13 @@ ProductNames:
 M365Environment: gcc
 Organization: testorg.onmicrosoft.us
 OrgName: Test Government Organization
+OrgUnitName: IT Department
 LogIn: false
 OutFolderName: CustomOutputFolder
 "@
 
-        $TempFile = New-TemporaryFile
-        $ValidYaml | Set-Content -Path $TempFile.FullName
+        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+        $ValidYaml | Set-Content -Path $TempFile
 
         $Config = [ScubaConfig]::GetInstance()
         $LoadResult = $Config.LoadConfig($TempFile)
@@ -164,6 +170,6 @@ OutFolderName: CustomOutputFolder
         $Config.Configuration.M365Environment | Should -Be "gcc"
         $Config.Configuration.OutFolderName | Should -Be "CustomOutputFolder"
 
-        Remove-Item -Path $TempFile.FullName -Force
+        Remove-Item -Path $TempFile -Force
     }
 }

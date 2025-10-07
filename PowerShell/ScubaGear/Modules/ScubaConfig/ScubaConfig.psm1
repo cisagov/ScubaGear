@@ -36,48 +36,50 @@ class ScubaConfig {
     static [object]ScubaDefault ([string]$Name){
         [ScubaConfig]::InitializeValidator()
 
-        # Map old default names to new structure
-        $DefaultMappings = @{
-            'DefaultOPAPath' = {
-                $Path = [ScubaConfig]::_ConfigDefaults.defaults.OPAPath
-                if ($Path -eq "~/.scubagear/Tools") {
-                    try {
-                        return Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
-                    } catch {
-                        return "."
-                    }
-                }
-                return $Path
-            }
-            'DefaultProductNames' = { return [ScubaConfig]::_ConfigDefaults.defaults.ProductNames }
-            'AllProductNames' = { return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames }
-            'DefaultM365Environment' = { return [ScubaConfig]::_ConfigDefaults.defaults.M365Environment }
-            'DefaultLogIn' = { return [ScubaConfig]::_ConfigDefaults.defaults.LogIn }
-            'DefaultDisconnectOnExit' = { return [ScubaConfig]::_ConfigDefaults.defaults.DisconnectOnExit }
-            'DefaultOutPath' = {
-                $Path = [ScubaConfig]::_ConfigDefaults.defaults.OutPath
-                if ($Path -eq ".") {
-                    return Get-Location | Select-Object -ExpandProperty ProviderPath
-                }
-                return $Path
-            }
-            'DefaultOutFolderName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutFolderName }
-            'DefaultOutProviderFileName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutProviderFileName }
-            'DefaultOutRegoFileName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutRegoFileName }
-            'DefaultOutReportName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutReportName }
-            'DefaultOutJsonFileName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutJsonFileName }
-            'DefaultOutCsvFileName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutCsvFileName }
-            'DefaultOutActionPlanFileName' = { return [ScubaConfig]::_ConfigDefaults.defaults.OutActionPlanFileName }
-            'DefaultNumberOfUUIDCharactersToTruncate' = { return [ScubaConfig]::_ConfigDefaults.defaults.NumberOfUUIDCharactersToTruncate }
-            'DefaultPrivilegedRoles' = { return [ScubaConfig]::_ConfigDefaults.privilegedRoles }
-            'DefaultOPAVersion' = { return [ScubaConfig]::_ConfigDefaults.defaults.OPAVersion }
-        }
+        # Dynamically resolve configuration values based on naming conventions
+        # This eliminates the need to maintain mappings in multiple places
 
-        if ($DefaultMappings.ContainsKey($Name)) {
-            return & $DefaultMappings[$Name]
+        # Handle special cases that require processing
+        if ($Name -eq 'DefaultOPAPath') {
+            $Path = [ScubaConfig]::_ConfigDefaults.defaults.OPAPath
+            if ($Path -eq "~/.scubagear/Tools") {
+                try {
+                    return Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                } catch {
+                    return "."
+                }
+            }
+            return $Path
         }
+        elseif ($Name -eq 'DefaultOutPath') {
+            $Path = [ScubaConfig]::_ConfigDefaults.defaults.OutPath
+            if ($Path -eq ".") {
+                return Get-Location | Select-Object -ExpandProperty ProviderPath
+            }
+            return $Path
+        }
+        elseif ($Name -eq 'AllProductNames') {
+            return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames
+        }
+        elseif ($Name -eq 'DefaultPrivilegedRoles') {
+            return [ScubaConfig]::_ConfigDefaults.privilegedRoles
+        }
+        elseif ($Name.StartsWith('Default')) {
+            # For standard "Default" prefixed names, auto-resolve from defaults section
+            $ConfigKey = $Name.Substring(7) # Remove 'Default' prefix
 
-        throw "Unknown default configuration key: $Name"
+            # Check if the property exists in defaults
+            if ([ScubaConfig]::_ConfigDefaults.defaults.PSObject.Properties.Name -contains $ConfigKey) {
+                return [ScubaConfig]::_ConfigDefaults.defaults.$ConfigKey
+            }
+            else {
+                throw "Unknown default configuration key: $Name. Property '$ConfigKey' not found in defaults section."
+            }
+        }
+        else {
+            # If no mapping found, throw error
+            throw "Unknown default configuration key: $Name. Available keys: $((Get-Member -InputObject [ScubaConfig]::_ConfigDefaults -MemberType NoteProperty).Name -join ', ')"
+        }
     }
 
     static [string]GetOpaVersion() {
@@ -197,73 +199,44 @@ class ScubaConfig {
     hidden [hashtable]$Configuration
 
     hidden [void]SetParameterDefaults(){
-        Write-Debug "Setting ScubaConfig default values."
-        if (-Not $this.Configuration.ProductNames){
-            $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
+        Write-Debug "Setting ScubaConfig default values from configuration."
+
+        # Get defaults configuration
+        $Defaults = [ScubaConfig]::_ConfigDefaults.defaults
+
+        # Set defaults for any properties not specified in the YAML, using configuration-driven approach
+        foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
+            if (-not $this.Configuration.ContainsKey($PropertyName)) {
+                Write-Debug "Setting default value for '$PropertyName'"
+                $this.Configuration[$PropertyName] = $Defaults.$PropertyName
+            }
         }
-        else{
-            # Transform ProductNames into list of all products if it contains wildcard
-            if ($this.Configuration.ProductNames.Contains('*')){
+
+        # Special handling for ProductNames (wildcard expansion and uniqueness)
+        if ($this.Configuration.ProductNames) {
+            if ($this.Configuration.ProductNames.Contains('*')) {
                 $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames')
                 Write-Debug "Setting ProductNames to all products because of wildcard"
-            }
-            else{
-                Write-Debug "ProductNames provided - using as is."
+            } else {
+                Write-Debug "ProductNames provided - ensuring uniqueness."
                 $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
             }
         }
 
-        if (-Not $this.Configuration.M365Environment){
-            $this.Configuration.M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment')
+        # Special handling for OPAPath (expand tilde)
+        if ($this.Configuration.OPAPath -eq "~/.scubagear/Tools") {
+            try {
+                $this.Configuration.OPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+            } catch {
+                $this.Configuration.OPAPath = "."
+            }
         }
 
-        if (-Not $this.Configuration.OPAPath){
-            $this.Configuration.OPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
+        # Special handling for OutPath (resolve current directory)
+        if ($this.Configuration.OutPath -eq ".") {
+            $this.Configuration.OutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
         }
 
-        if (-Not $this.Configuration.LogIn){
-            $this.Configuration.LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn')
-        }
-
-        if (-Not $this.Configuration.DisconnectOnExit){
-            $this.Configuration.DisconnectOnExit = [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
-        }
-
-        if (-Not $this.Configuration.OutPath){
-            $this.Configuration.OutPath = [ScubaConfig]::ScubaDefault('DefaultOutPath')
-        }
-
-        if (-Not $this.Configuration.OutFolderName){
-            $this.Configuration.OutFolderName = [ScubaConfig]::ScubaDefault('DefaultOutFolderName')
-        }
-
-        if (-Not $this.Configuration.OutProviderFileName){
-            $this.Configuration.OutProviderFileName = [ScubaConfig]::ScubaDefault('DefaultOutProviderFileName')
-        }
-
-        if (-Not $this.Configuration.OutRegoFileName){
-            $this.Configuration.OutRegoFileName = [ScubaConfig]::ScubaDefault('DefaultOutRegoFileName')
-        }
-
-        if (-Not $this.Configuration.OutReportName){
-            $this.Configuration.OutReportName = [ScubaConfig]::ScubaDefault('DefaultOutReportName')
-        }
-
-        if (-Not $this.Configuration.OutJsonFileName){
-            $this.Configuration.OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName')
-        }
-
-        if (-Not $this.Configuration.OutCsvFileName){
-            $this.Configuration.OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName')
-        }
-
-        if (-Not $this.Configuration.OutActionPlanFileName){
-            $this.Configuration.OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName')
-        }
-
-        if (-Not $this.Configuration.NumberOfUUIDCharactersToTruncate){
-            $this.Configuration.NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
-        }
         return
     }
 
