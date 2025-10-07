@@ -336,29 +336,6 @@ class ScubaConfigValidator {
         return $Validation
     }
 
-    hidden static [PSCustomObject] ValidateExclusions([object]$ExclusionsConfig, [array]$ProductNames) {
-        <#
-        .SYNOPSIS
-        Validates ExclusionsConfig section (GUID and UPN format validation)
-        .DESCRIPTION
-        This method will be implemented later to validate:
-        - GUID formats in AAD CapExclusions
-        - UPN formats in Defender SensitiveAccounts
-        - Other exclusion-specific validation rules
-        .NOTES
-        Currently returns empty validation (to be implemented)
-        #>
-        $Validation = [PSCustomObject]@{
-            Errors = @()
-            Warnings = @()
-        }
-
-        # TODO: Implement GUID and UPN validation for exclusions
-        # This is a placeholder that will be implemented in a future update
-
-        return $Validation
-    }
-
     hidden static [PSCustomObject] ValidatePolicyId([string]$PolicyId, [array]$ProductNames) {
         $Result = [PSCustomObject]@{
             IsValid = $false
