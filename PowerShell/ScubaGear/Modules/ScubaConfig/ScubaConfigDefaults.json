@@ -1,4 +1,4 @@
-{
+  {
   "metadata": {
     "version": "1.0.0",
     "description": "ScubaGear default configuration values",
@@ -23,7 +23,12 @@
     "NumberOfUUIDCharactersToTruncate": 18,
     "OPAVersion": "1.6.0"
   },
-  "environments": {
+  "minRequired": [
+    "OrgName",
+    "ProductNames",
+    "M365Environment"
+  ],
+  "M365Environment": {
     "commercial": {
       "name": "Commercial",
       "description": "Production environment for public tenants",

@@ -84,8 +84,8 @@
     },
     "Organization": {
       "type": "string",
-      "description": "Organization domain name",
-      "pattern": "^[a-zA-Z0-9.-]+\\.(onmicrosoft\\.com|onmicrosoft\\.us)$"
+      "description": "Organization domain name (Fully Qualified Domain Name)",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$"
     },
     "OrgName": {
       "type": "string",
@@ -291,6 +291,5 @@
       }
     }
   },
-  "required": ["ProductNames", "M365Environment", "Organization", "OrgName", "OrgUnitName"],
   "additionalProperties": false
 }
