@@ -310,6 +310,18 @@ tests contains {
 # MS.TEAMS.2.2v2
 #--
 
+# GCC/GCC High/DoD environments: Not applicable
+tests contains {
+    "PolicyId": "MS.TEAMS.2.2v2",
+    "Criticality": "Shall",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": "N/A: Control not applicable in GCC environments",
+    "RequirementMet": false
+} if {
+    IsUSGovTenantRegion
+}
+
 # There are two relevant settings:
 #    - AllowTeamsConsumer: Is contact to or from unmanaged users allowed at all?
 #    - AllowTeamsConsumerInbound: Are unamanged users able to initiate contact?
@@ -343,6 +355,7 @@ tests contains {
     "ReportDetails": ReportDetailsArray(Status, Policies, String),
     "RequirementMet": Status
 } if {
+    not IsUSGovTenantRegion
     Policies := FederationConfiguration
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
     Status := count(Policies) == 0
@@ -352,6 +365,18 @@ tests contains {
 #
 # MS.TEAMS.2.3v2
 #--
+
+# GCC/GCC High/DoD environments: Not applicable
+tests contains {
+    "PolicyId": "MS.TEAMS.2.3v2",
+    "Criticality": "Should",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": "N/A: Control not applicable in GCC environments",
+    "RequirementMet": false
+} if {
+    IsUSGovTenantRegion
+}
 
 # Iterate through all meeting policies. For each, check if AllowTeamsConsumer
 # is true. If so, save the policy Identity to the InternalCannotEnable list.
@@ -369,6 +394,7 @@ tests contains {
     "ReportDetails": ReportDetailsArray(Status, Policies, String),
     "RequirementMet": Status
 } if {
+    not IsUSGovTenantRegion
     Policies := InternalCannotEnable
     String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
     Status := count(Policies) == 0
