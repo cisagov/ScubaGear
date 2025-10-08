@@ -2,16 +2,22 @@
 function Invoke-CheckScubaGearVersion {
     <#
     .SYNOPSIS
-    Complain if a newer version of ScubaGear is available from the Github release page.
+    Complain if a newer version of ScubaGear is available from PSGallery.
 
     .DESCRIPTION
-    Checks latest version available on the Github release page and compares it to the current running version.
+    Checks latest version available on PSGallery and compares it to the current running version.
     #>
-    $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $PSScriptRoot -ChildPath 'ScubaGear.psd1' -Resolve  -ErrorAction 'Stop' ) -ErrorAction 'Stop'
-    $CurrentVersion = [System.Version]$ScubaManifest.ModuleVersion
-    $LatestVersion = [System.Version]$(Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest" -ErrorAction 'Stop').tag_name.TrimStart("v")
-    if ($CurrentVersion -lt $LatestVersion) {
-        Write-Warning "A newer version of ScubaGear ($latestVersion) is available. Please consider updating at: https://github.com/cisagov/ScubaGear/releases. This notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
+    try{
+        $ScubaManifest = Import-PowerShellDataFile (Join-Path -Path $PSScriptRoot -ChildPath 'ScubaGear.psd1' -Resolve  -ErrorAction 'Stop' ) -ErrorAction 'Stop'
+        $CurrentVersion = [System.Version]$ScubaManifest.ModuleVersion
+        $LatestVersion = [System.Version](Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction SilentlyContinue).Version
+
+        if ($null -ne $LatestVersion -and $CurrentVersion -lt $LatestVersion) {
+            Write-Warning "A newer version of ScubaGear ($LatestVersion) is available. Please consider running: Update-ScubaGear, this notification can be disabled by setting `$env:SCUBAGEAR_SKIP_VERSION_CHECK = `$true before running ScubaGear."
+        }
+    }
+    catch{
+        Write-Warning "The ScubaGear version check failed: $($_.Exception.Message)"
     }
 }
 
