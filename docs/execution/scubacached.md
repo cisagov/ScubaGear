@@ -125,6 +125,58 @@ Run analysis on subset 2
 Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
+### Custom Provider File Names
+
+Export with custom provider file name
+
+```powershell
+Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
+
+Use cached data with custom provider file name
+
+```powershell
+Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+```
+
+### Testing Rego on Modified Settings
+
+When testing Rego policies against specific configuration scenarios that can't be replicated in a live tenant, you can modify the exported JSON data and use cached mode to test the policy logic.
+
+For example, when testing AAD authentication policy migration settings
+
+1. Export provider data in full mode:
+```powershell
+Invoke-SCuBACached -ProductNames aad -OutPath "C:\ScubaResults\AAD_Policy_Test"
+```
+
+2. Manually modify the `ProviderSettingsExport.json` file to inject test scenarios (example):
+```json
+{
+  "conditional_access_policies": [
+    {
+      "DisplayName": "Test Migration Policy",
+      "State": "enabled",
+      "Conditions": {
+        "Users": {
+          "IncludeUsers": ["All"]
+        }
+      },
+      "GrantControls": {
+        "BuiltInControls": ["mfa"]
+      }
+    }
+  ]
+}
+```
+
+3. Run analysis on the modified data:
+```powershell
+Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath "C:\ScubaResults\AAD_Policy_Test"
+```
+
+This approach allows you to test edge cases, policy combinations, or specific configurations that would be difficult or impossible to create in a live Microsoft 365 environment.
+
 ## Error Scenarios
 
 ### Missing Provider Data
@@ -182,20 +234,6 @@ ConvertFrom-Json: Invalid JSON format
 - **Fresh data**: Always uses current tenant configuration
 - **Complete workflow**: Single command for end-to-end assessment
 - **Automatic cleanup**: Handles file management automatically
-
-### Custom Provider File Names
-
-Export with custom provider file name
-
-```powershell
-Invoke-SCuBACached -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
-```
-
-Use cached data with custom provider file name
-
-```powershell
-Invoke-SCuBACached -ExportProvider $false -OutProviderFileName "MyCustomExport" -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
-```
 
 ## Best Practices
 
