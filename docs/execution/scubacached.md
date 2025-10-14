@@ -240,4 +240,4 @@ The cached mode works with provider data from the same major version of ScubaGea
 - **Major version updates**: May require fresh data export due to schema changes
 - **Cross-version analysis**: Not recommended; re-export data with the new version
 
-Check the [release notes](../../RELEASES.md) for version-specific compatibility information.
+Check the [release notes](https://github.com/cisagov/ScubaGear/releases) for version-specific compatibility information.
