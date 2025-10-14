@@ -146,11 +146,13 @@ When testing Rego policies against specific configuration scenarios that can't b
 For example, when testing AAD authentication policy migration settings
 
 1. Export provider data in full mode:
+
 ```powershell
 Invoke-SCuBACached -ProductNames aad -OutPath "C:\ScubaResults\AAD_Policy_Test"
 ```
 
 2. Manually modify the `ProviderSettingsExport.json` file to inject test scenarios (example):
+
 ```json
 {
   "conditional_access_policies": [
@@ -171,6 +173,7 @@ Invoke-SCuBACached -ProductNames aad -OutPath "C:\ScubaResults\AAD_Policy_Test"
 ```
 
 3. Run analysis on the modified data:
+
 ```powershell
 Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath "C:\ScubaResults\AAD_Policy_Test"
 ```
