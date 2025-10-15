@@ -126,13 +126,13 @@ The ability to create trial environments SHALL be restricted to admins.
 
 3.  Select **Power Platform settings**.
 
-4.  Under **Who can create production and sandbox environments**, select
+4.  Under **Production environment assignments**, select
     **Only specific admins.**
 
 #### MS.POWERPLATFORM.1.2v1 Instructions
 1.  Follow the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.
 
-2.  Under **Who can create trial environments**, select **Only specific admins.**
+2.  Under **Trial environment assignments**, select **Only specific admins.**
 
 ## 2. Power Platform Data Loss Prevention Policies
 
@@ -212,9 +212,9 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 1.  Sign in to your tenant environment's respective [Power Platform admin
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
-2.  On the left pane, select **Policies** \> **Data Policies.**
+2.  On the left pane, select **Security** -\> **Data and privacy.**
 
-3.  Select the **+ New Policy** icon to create a new policy.
+3.   Select **Data policy,** then select **+ New Policy** icon to create a new policy.
 
 4.  Give the policy a suitable agency name and click **Next.**
 
@@ -233,9 +233,11 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 
 11.  Click **Next**.
 
-12.  At the **Scope** section for the default environment, select **Add multiple environments** and add the default environment.
+12.  At the **Scope** section for the default environment, select **Add multiple environments** then click **Next**.
 
-13.  Select **Next**-\> **Create Policy** to finish.
+13.  Select the default environment, then select the **+ Add to policy** button at the top of the screen, then select **Next**.
+
+14. Select **Next**-\> **Create Policy** to finish.
 
 #### MS.POWERPLATFORM.2.2v1 Instructions
 1.  Repeat steps 1 to 11 in the MS.POWERPLATFORM.2.1v1 instructions.
@@ -305,16 +307,16 @@ An inbound/outbound connection allowlist SHOULD be configured.
 1.  Sign in to your tenant environment's respective [Power Platform admin
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
-2.  On the left pane, select **Policies -\> Tenant Isolation**.
+2.  On the left pane, select **Security -\> Identity and access -\> Tenant Isolation**.
 
-3.  Set the slider in the center of the screen to **On** then click **Save**
+3.  Set the slider **Restrict cross-tenant connections** to **On,** then click **Save**
     on the bottom of the screen.
 
 #### MS.POWERPLATFORM.3.2v1 Instructions
 1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to
 arrive at the same page.
 
-2.  The tenant isolation allowlist can be configured by clicking **New tenant rule**
+2.  The tenant isolation exceptions can be configured by clicking **+ Add exceptions**
 on the Tenant Isolation page.
 
 3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.
@@ -357,13 +359,13 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 1.  Sign in to your tenant environment's respective [Power Platform admin
 center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
-2.  On the left-hand pane click on **Environments** and then select an environment from the list.
+2.  On the left-hand pane click on **Manage -\> Environments** and then select an environment from the list.
 
 3.  Select the **Settings** icon at the top of the page.
 
 4.  Click on **Product** then click on **Privacy + Security** from the options that appear.
 
-5.  At the bottom of the page under the **Content security policy** section, turn the slider **On** for **Model-driven** and **Canvas**.
+5.  At the bottom of the page under the **Content security policy** section, set **Enforce content security policy** to **On** for **Model-driven** and **Canvas**.
 
 6.  At the same location, set **Enable reporting**  to **On** and add an appropriate endpoint for reporting CSP violations can be reported to.
 
