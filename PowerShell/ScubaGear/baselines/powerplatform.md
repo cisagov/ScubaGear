@@ -411,12 +411,7 @@ Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/p
 
 ## 6. Power Apps Sharing Controls
 
-Power Apps includes a “Share with Everyone” option intended to accelerate adoption by making apps easily discoverable across the organization. While convenient for pilots and broad awareness, this control grants access to a special directory-wide principal that represents the entire tenant, often labeled “Everyone” or “Everyone in your org.” This principal is not a standard Microsoft Entra ID security group; its membership is implicit and effectively includes all users present in the directory, typically including B2B guest accounts that have authenticated into the tenant. Because it is not a normal group, it cannot be viewed, scoped, or edited, which makes audience review and access governance difficult.
-
-In contrast, sharing an app with specific users or managed security groups creates a bounded, auditable audience that aligns with least-privilege access. Group-based sharing benefits from existing identity governance—membership changes, role transitions, and periodic access reviews naturally add or remove access as business needs evolve. “Share with Everyone” bypasses these controls and can unintentionally expose apps and their connected data to far more users than intended. It also obscures the true audience of an app, complicating risk assessments and incident response when sensitive connectors or data sources are involved.
-
-This section defines a policy to disable tenant-wide “Share with Everyone,” require targeted sharing to users or managed groups, and provides implementation and validation guidance to reduce overexposure while preserving appropriate discoverability and collaboration.
-
+Power Platform supports discovery of apps by allowing makers to share canvas apps with individuals and security groups. Sharing with **Everyone**, or all users present in the directory, is disabled by default. When the **Share with Everyone** feature is disabled, only Dynamics 365 administrators, Power Platform administrators, and global administrators have the ability to share an application with everyone in the environment. 
 
 ### Policies
 
@@ -424,7 +419,7 @@ This section defines a policy to disable tenant-wide “Share with Everyone,” 
 The Share with Everyone feature SHOULD be disabled.
 
 <!--Policy: MS.POWERPLATFORM.2.3v1; Criticality: SHOULD -->
-- _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization which is not a standard Microsoft Entra ID security group. It's membership includes all users who have ever logged in to your tenant.
+- _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, which complicates auditing and access governance.
 - _Last Modified:_ October 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TODO
 - _MITRE ATT&CK TTP Mapping:_
@@ -433,5 +428,30 @@ The Share with Everyone feature SHOULD be disabled.
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
     - [T1098.007: Additional Local or Domain Groups](https://attack.mitre.org/techniques/T1098/007/)
 
+### Resources
+- [Limit Sharing with Everyone \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/power-platform/guidance/adoption/secure-default-environment#limit-sharing-with-everyone)
+- [Everyone Security Group \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-special-identities-groups#everyone)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+#### MS.POWERPLATFORM.6.1v1 Instructions
+1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+
+3. Then run the following PowerShell commands to get the settings object and set the variable `disableShareWithEveryone` to `$true`.
+
+    ```
+    $tenantSettings = Get-TenantSettings
+    $tenantSettings.powerPlatform.powerApps.disableShareWithEveryone = $true
+    Set-TenantSettings $tenantSettings
+    ```
 
 **`TLP:CLEAR`**
