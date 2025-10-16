@@ -170,7 +170,7 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 <!--Policy: MS.POWERPLATFORM.2.1v1; Criticality: SHALL -->
 - _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while also maintaining the agency's security posture.
 - _Last Modified:_ June 2023
-- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
+- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -408,5 +408,30 @@ Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/p
     ```
     Set-TenantSettings -RequestBody @{ “disablePortalsCreationByNonAdminUsers” = $true }
     ```
+
+## 6. Power Apps Sharing Controls
+
+Power Apps includes a “Share with Everyone” option intended to accelerate adoption by making apps easily discoverable across the organization. While convenient for pilots and broad awareness, this control grants access to a special directory-wide principal that represents the entire tenant, often labeled “Everyone” or “Everyone in your org.” This principal is not a standard Microsoft Entra ID security group; its membership is implicit and effectively includes all users present in the directory, typically including B2B guest accounts that have authenticated into the tenant. Because it is not a normal group, it cannot be viewed, scoped, or edited, which makes audience review and access governance difficult.
+
+In contrast, sharing an app with specific users or managed security groups creates a bounded, auditable audience that aligns with least-privilege access. Group-based sharing benefits from existing identity governance—membership changes, role transitions, and periodic access reviews naturally add or remove access as business needs evolve. “Share with Everyone” bypasses these controls and can unintentionally expose apps and their connected data to far more users than intended. It also obscures the true audience of an app, complicating risk assessments and incident response when sensitive connectors or data sources are involved.
+
+This section defines a policy to disable tenant-wide “Share with Everyone,” require targeted sharing to users or managed groups, and provides implementation and validation guidance to reduce overexposure while preserving appropriate discoverability and collaboration.
+
+
+### Policies
+
+#### MS.POWERPLATFORM.6.1v1
+The Share with Everyone feature SHOULD be disabled.
+
+<!--Policy: MS.POWERPLATFORM.2.3v1; Criticality: SHOULD -->
+- _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization which is not a standard Microsoft Entra ID security group. It's membership includes all users who have ever logged in to your tenant.
+- _Last Modified:_ October 2025
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TODO
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.007: Additional Local or Domain Groups](https://attack.mitre.org/techniques/T1098/007/)
+
 
 **`TLP:CLEAR`**
