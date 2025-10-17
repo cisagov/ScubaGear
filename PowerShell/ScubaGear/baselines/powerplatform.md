@@ -421,7 +421,7 @@ The Share with Everyone feature SHOULD be disabled.
 <!--Policy: MS.POWERPLATFORM.6.1v1; Criticality: SHOULD -->
 - _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, which complicates auditing and access governance.
 - _Last Modified:_ October 2025
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TODO
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(5), AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
