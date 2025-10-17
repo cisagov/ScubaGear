@@ -319,7 +319,7 @@ TestPlan:
                 DisablePortalsCreationByNonAdminUsers: true
         Postconditions: []
         ExpectedResult: true
-  
+
   - PolicyId: MS.POWERPLATFORM.6.1v1
     TestDriver: RunScuba
     Tests:
