@@ -32,8 +32,8 @@ function Export-PowerPlatformProvider {
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
     Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
 
-    # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1
-    $EnvironmentCreation = ConvertTo-Json @($Tracker.TryCommand("Get-TenantSettings"))
+    # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1, MS.POWERPLATFORM.6.1v1
+    $EnvironmentCreation = ConvertTo-Json -Depth 4 @($Tracker.TryCommand("Get-TenantSettings"))
 
     # MS.POWERPLATFORM.2.1v1, MS.POWERPLATFORM.2.2v1, MS.POWERPLATFORM.2.3v1
     $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
@@ -165,7 +165,7 @@ function Test-M365EnvironmentConfiguration {
     catch {
         $EnvCheckWarning = @"
     Power Platform Provider Warning: $($_). Unable to check if M365Environment is set correctly in the Power Platform Provider. This MAY impact the output of the Power Platform Baseline report.
-    See the 'Running the Script Behind Some Proxies' in the README.md for a possible solution to this warning.
+    See https://github.com/cisagov/ScubaGear/blob/main/docs/troubleshooting/proxy.md for a possible solution to this warning.
 "@
         Write-Warning $EnvCheckWarning
     }

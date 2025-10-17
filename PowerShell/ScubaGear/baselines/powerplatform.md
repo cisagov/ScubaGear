@@ -400,7 +400,7 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 #### MS.POWERPLATFORM.5.1v1 Instructions
 1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
-2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenants Power Platform.
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
 Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
@@ -418,7 +418,7 @@ Power Platform supports discovery of apps by allowing makers to share canvas app
 #### MS.POWERPLATFORM.6.1v1
 The Share with Everyone feature SHOULD be disabled.
 
-<!--Policy: MS.POWERPLATFORM.2.3v1; Criticality: SHOULD -->
+<!--Policy: MS.POWERPLATFORM.6.1v1; Criticality: SHOULD -->
 - _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, which complicates auditing and access governance.
 - _Last Modified:_ October 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TODO
