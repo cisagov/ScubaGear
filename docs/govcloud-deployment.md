@@ -11,6 +11,7 @@
 - Python 3.8 or later and Git installed on the workstation.
 - Network egress to AWS APIs from the execution environment.
 - Use **temporary roles** rather than permanent credentials.
+- Windows example shown; macOS/Linux follow the same steps with shell syntax adjustments.
 
 ---
 
