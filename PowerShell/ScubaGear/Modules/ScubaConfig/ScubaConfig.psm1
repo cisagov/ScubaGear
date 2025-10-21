@@ -246,6 +246,8 @@ class ScubaConfig {
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
+        # Allow reinitialization of the validator when tests call ResetInstance
+        [ScubaConfig]::_ValidatorInitialized = $false
         return
     }
 

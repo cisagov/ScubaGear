@@ -24,11 +24,43 @@
     "OPAVersion": "1.6.0"
   },
   "minRequired": [
-    "OrgName",
-    "ProductNames",
-    "M365Environment"
+    "ProductNames"
   ],
   "M365Environment": {
+    "commercial": {
+      "name": "Commercial",
+      "description": "Production environment for public tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.com",
+        "login": "https://login.microsoftonline.com"
+      }
+    },
+    "gcc": {
+      "name": "Government Community Cloud",
+      "description": "Production environment for government tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "gcchigh": {
+      "name": "Government Community Cloud High",
+      "description": "Production environment for GCCH tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "dod": {
+      "name": "Department of Defense",
+      "description": "Production environment for DOD tenants",
+      "endpoints": {
+        "graph": "https://dod-graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    }
+  },
+  "environments": {
     "commercial": {
       "name": "Commercial",
       "description": "Production environment for public tenants",
@@ -113,7 +145,7 @@
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
-    "supportedFileExtensions": [".yaml", ".yml"],
+  "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },

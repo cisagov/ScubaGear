@@ -123,7 +123,7 @@
           "description": "Justification for omitting the policy"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "AnnotatePolicy": {
       "type": "object",
@@ -134,7 +134,7 @@
           "description": "Annotation text for the policy"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "ExclusionsConfig": {
       "type": "object",
