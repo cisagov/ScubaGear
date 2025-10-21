@@ -95,13 +95,6 @@ function Invoke-SCuBA {
     .Parameter NumberOfUUIDCharactersToTruncate
     Controls how many characters will be truncated from the report UUID when appended to the end of OutJsonFileName.
     Valid values are 0, 13, 18, 36
-    .Parameter PreferredDnsResolvers
-    IP addresses of DNS resolvers that should be used to retrieve any DNS
-    records required by specific SCuBA policies. Optional; if not provided, the
-    system default will be used.
-    .Parameter SkipDoH
-    If true, do not fallback to DoH should the traditional DNS requests fail
-    when retrieving any DNS records required by specific SCuBA policies.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -278,20 +271,7 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [ValidateSet(0, 13, 18, 36)]
         [int]
-        $NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate'),
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [AllowEmptyCollection()]
-        [string[]]
-        $PreferredDnsResolvers = [ScubaConfig]::ScubaDefault('DefaultPreferredDnsResolvers'),
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
-        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet($true, $false)]
-        [boolean]
-        $SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
+        $NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate')
     )
     process {
         # Retrieve ScubaGear Module versions
@@ -328,8 +308,6 @@ function Invoke-SCuBA {
                 'OutCsvFileName' = $OutCsvFileName
                 'OutActionPlanFileName' = $OutActionPlanFileName
                 'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
-                'PreferredDnsResolvers' = $PreferredDnsResolvers
-                'SkipDoH' = $SkipDoH
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -433,16 +411,14 @@ function Invoke-SCuBA {
         try {
             # Provider Execution
             $ProviderParams = @{
-                'ProductNames'          = $ScubaConfig.ProductNames;
-                'M365Environment'       = $ScubaConfig.M365Environment;
-                'TenantDetails'         = $TenantDetails;
-                'ModuleVersion'         = $ModuleVersion;
-                'OutFolderPath'         = $OutFolderPath;
-                'OutProviderFileName'   = $ScubaConfig.OutProviderFileName;
-                'Guid'                  = $Guid;
-                'BoundParameters'       = $PSBoundParameters;
-                'PreferredDnsResolvers' = $ScubaConfig.PreferredDnsResolvers;
-                'SkipDoH'               = $ScubaConfig.SkipDoH;
+                'ProductNames'        = $ScubaConfig.ProductNames;
+                'M365Environment'     = $ScubaConfig.M365Environment;
+                'TenantDetails'       = $TenantDetails;
+                'ModuleVersion'       = $ModuleVersion;
+                'OutFolderPath'       = $OutFolderPath;
+                'OutProviderFileName' = $ScubaConfig.OutProviderFileName;
+                'Guid'                = $Guid;
+                'BoundParameters'     = $PSBoundParameters;
             }
             $ProdProviderFailed = Invoke-ProviderList @ProviderParams
             if ($ProdProviderFailed.Count -gt 0) {
@@ -616,18 +592,7 @@ function Invoke-ProviderList {
 
         [Parameter(Mandatory = $true)]
         [hashtable]
-        $BoundParameters,
-
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [string[]]
-        $PreferredDnsResolvers,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet($true, $false)]
-        [boolean]
-        $SkipDoH
+        $BoundParameters
     )
     process {
         try {
@@ -673,8 +638,7 @@ function Invoke-ProviderList {
                             $RetVal = Export-AADProvider -M365Environment $M365Environment | Select-Object -Last 1
                         }
                         "exo" {
-                            $RetVal = Export-EXOProvider -PreferredDnsResolvers $PreferredDnsResolvers `
-                                        -SkipDoH $SkipDoH | Select-Object -Last 1
+                            $RetVal = Export-EXOProvider | Select-Object -Last 1
                         }
                         "defender" {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
@@ -1421,9 +1385,6 @@ function Invoke-ReportCreation {
             $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
-            $JsonScriptTags = @(
-                "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
-            ) -join "`n"
             $ReportHTML = (Get-Content $(Join-Path -Path $ReportHtmlPath -ChildPath "ParentReport.html") -ErrorAction 'Stop') -Join "`n"
             $ReportHTML = $ReportHTML.Replace("{TENANT_DETAILS}", $TenantMetaData)
             $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragment)
@@ -1431,31 +1392,25 @@ function Invoke-ReportCreation {
             $ReportHTML = $ReportHTML.Replace("{MODULE_VERSION}", "v$ModuleVersion")
             $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
-            # Inject CSS into parent HTML report template
-            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction "Stop"
-            $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
-            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
+            $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction 'Stop'
+            $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>$($MainCSS)</style>")
 
-            $ParentCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -Raw
-            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>`n $($ParentCSS) `n</style>")
-            $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
+            $ParentCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "ParentReportStyle.css") -ErrorAction 'Stop') -Join "`n"
+            $ReportHTML = $ReportHTML.Replace("{PARENT_CSS}", "<style>$($ParentCSS)</style>")
 
-            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
-            $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
-            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
-            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
+            $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction 'Stop'
+            $ParentReportJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -ErrorAction 'Stop') -Join "`n"
+            $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js") -ErrorAction 'Stop') -Join "`n"
+            $ParentReportJS = "$($ParentReportJS)`n$($UtilsJS)"
+            $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
+                let darkMode = $($DarkMode.ToString().ToLower());
+                $($ParentReportJS)
+            </script>")
 
-            $JSFiles = @(
-                $ParentReportJS
-                $UtilsJS
-                $TableFunctionsJS
-            ) -join "`n"
-
-            $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
             Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
             $ReportFileName = Join-Path -Path $OutFolderPath "$($OutReportName).html" -ErrorAction 'Stop'
             [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
-
             if (-Not $Quiet) {
                 Invoke-Item $ReportFileName
             }
