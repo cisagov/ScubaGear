@@ -42,11 +42,6 @@ function Get-RegoResult {
         $MissingString = $MissingCommands -Join ", "
         $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
     }
-    elseif ($Test.ReportDetails -is [string] -and $Test.ReportDetails.Trim().StartsWith("N/A")) {
-        $Result.DisplayString = "N/A"
-        $Result.SummaryKey = "Manual"
-        $Result.Details = $Test.ReportDetails
-    }
     elseif ($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
         $Result.SummaryKey = "Passes"
