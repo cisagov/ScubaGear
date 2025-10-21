@@ -46,6 +46,40 @@
       "description": "Production environment for DOD tenants"
     }
   },
+  "environments": {
+    "commercial": {
+      "name": "Commercial",
+      "description": "Production environment for public tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.com",
+        "login": "https://login.microsoftonline.com"
+      }
+    },
+    "gcc": {
+      "name": "Government Community Cloud",
+      "description": "Production environment for government tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "gcchigh": {
+      "name": "Government Community Cloud High",
+      "description": "Production environment for GCCH tenants",
+      "endpoints": {
+        "graph": "https://graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    },
+    "dod": {
+      "name": "Department of Defense",
+      "description": "Production environment for DOD tenants",
+      "endpoints": {
+        "graph": "https://dod-graph.microsoft.us",
+        "login": "https://login.microsoftonline.us"
+      }
+    }
+  },
   "products": {
     "aad": {
       "name": "Microsoft Entra ID",
@@ -97,7 +131,11 @@
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
+<<<<<<< HEAD
   "supportedFileExtensions": [".yaml", ".json"],
+=======
+  "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
+>>>>>>> ef7cb5e (update files to fix test)
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },
