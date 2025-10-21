@@ -3,6 +3,7 @@ import rego.v1
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.FilterArray
 import data.utils.key.FAIL
 import data.utils.key.PASS
@@ -313,12 +314,13 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
-    "Criticality": "Shall",
+    "Criticality": "Shall/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": "N/A: Control not applicable in GCC environments",
+    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
     "RequirementMet": false
 } if {
+    Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
     IsUSGovTenantRegion
 }
 
@@ -369,12 +371,13 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
-    "Criticality": "Should",
+    "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": "N/A: Control not applicable in GCC environments",
+    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
     "RequirementMet": false
 } if {
+    Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
     IsUSGovTenantRegion
 }
 
@@ -427,22 +430,34 @@ default IsUSGovTenantRegion := false
 IsUSGovTenantRegion := true if {
     GCCConditions := [
         contains(AssignedPlans, "GCC"),
+        contains(AssignedPlans, "GCCHigh"),
         contains(AssignedPlans, "DOD")
     ]
     count(FilterArray(GCCConditions, true)) > 0
 }
 
+# GCC/GCC High/DoD environments: Not applicable
+tests contains {
+    "PolicyId": "MS.TEAMS.4.1v1",
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+    "ActualValue": {
+        "ClientConfig": input.client_configuration,
+        "AssignedPlans": AssignedPlans
+    },
+    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.4.1v1", Reason),
+    "RequirementMet": false
+} if {
+    Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    IsUSGovTenantRegion
+}
+
 # Create descriptive report string based on what passed variables equal
-ReportDetails4_1(true, _) := "N/A: Feature is unavailable in GCC environments"
+ReportDetails4_1(true) := PASS
 
-ReportDetails4_1(false, true) := PASS
+ReportDetails4_1(false) := FAIL
 
-ReportDetails4_1(false, false) := FAIL
-
-# As long as either:
-#     1) Get-CsTeamsClientConfiguration reports email integration is disabled or
-#     2) Get-CsTenant reports this as a gov tenant
-# this test should pass.
+# As long as email integration is disabled, this test should pass.
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
@@ -451,16 +466,12 @@ tests contains {
         "ClientConfig": input.client_configuration,
         "AssignedPlans": AssignedPlans
     },
-    "ReportDetails": ReportDetails4_1(IsGCC, IsEnabled),
+    "ReportDetails": ReportDetails4_1(IsEnabled),
     "RequirementMet": Status
 } if {
+    not IsUSGovTenantRegion
     IsEnabled := count(ConfigsAllowingEmail) == 0
-    IsGCC := IsUSGovTenantRegion
-    Conditions := [
-        IsEnabled,
-        IsGCC
-    ]
-    Status := count(FilterArray(Conditions, true)) > 0
+    Status := IsEnabled
 }
 
 # Edge case where pulling configuration from tenant fails

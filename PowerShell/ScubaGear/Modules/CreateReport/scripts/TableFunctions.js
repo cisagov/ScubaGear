@@ -28,10 +28,6 @@ const colorRows = () => {
             else if (rows[i].children[statusCol].innerHTML === "Omitted") {
                 rows[i].style.background = "var(--test-other)";
             }
-            else if (rows[i].children[statusCol].innerHTML === "N/A") {
-                // Treat N/A as a neutral/other color (grey) for consistency
-                rows[i].style.background = "var(--test-other)";
-            }
             else if (rows[i].children[statusCol].innerHTML === "Incorrect result") {
                 if (rows[i].children[criticalityCol].innerHTML === "Shall") {
                     rows[i].style.background = "linear-gradient(to right, var(--test-fail), var(--test-pass))";
