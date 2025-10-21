@@ -6,5 +6,5 @@ function Install-AzureSignTool {
 
   Write-Warning "Installing AST..."
 
-  dotnet tool install --global AzureSignTool --version 5.0.0
+  dotnet tool install --global AzureSignTool --version 6.0.1
 }
