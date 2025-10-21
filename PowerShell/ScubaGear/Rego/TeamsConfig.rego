@@ -430,7 +430,7 @@ default IsUSGovTenantRegion := false
 IsUSGovTenantRegion := true if {
     GCCConditions := [
         contains(AssignedPlans, "GCC"),
-        contains(AssignedPlans, "GCCHigh"),
+        contains(AssignedPlans, "GCCHIGH"),
         contains(AssignedPlans, "DOD")
     ]
     count(FilterArray(GCCConditions, true)) > 0
