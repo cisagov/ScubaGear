@@ -1,28 +1,10 @@
-# How to update Scuba baselines (step-by-step)
+# How to update ScubaGear baselines json from markdown
 
-This guide walks through the recommended process to update Scuba baseline JSON files using the Rego-based baseline tooling, test the results locally, and open a PR with the changes.
-
-> Note: These commands are written for PowerShell (pwsh) on Windows. Adjust paths as needed.
+This guide walks through the recommended process to update Scuba baseline JSON files using both the markdown and the Rego-based baseline tooling.
 
 ## Prerequisites
 
-- A working checkout of the ScubaGear repository (or the branch you will target).
-- pwsh / PowerShell available (version 7+ recommended).
-- Git CLI configured with your account.
-- The `Update-ScubaConfigBaselineWithRego` helper (part of the ScubaGear modules) available in the repo (it is in `PowerShell\ScubaGear\Modules\ScubaConfigApp`).
-- Optional: an editor (VS Code) and access to run Pester tests.
-
-## Overview
-
-1. Create a feature branch for the baseline update.
-2. Run the baseline update command to modify the JSON baseline(s).
-3. Inspect and verify changes locally.
-4. Run unit/functional tests (Pester).
-5. Commit and push changes, open a PR.
-6. Validate CI results and address feedback.
-7. Merge and optionally delete the branch.
-
----
+- The `Update-ScubaConfigBaselineWithRego` helper (part of the ScubaConfigApp module) available in the repo (it is in `PowerShell\ScubaGear\Modules\ScubaConfigApp\ScubaConfigAppHelpers`).
 
 
 ## Example Commands
@@ -35,7 +17,7 @@ Before running any commands, ensure the module is imported:
 
 ```powershell
 [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm1')
+Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigAppBaselineHelper.psm1')
 ```
 
 ### Get Rego Mappings
@@ -43,24 +25,36 @@ Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm
 Retrieve the Rego exclusion mappings:
 
 ```powershell
-$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
+Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
 ```
 
 ### Update Configuration Using Rego Mappings
 
-Update the configuration file using Rego mappings:
+Update the configuration file using Rego mappings. There are two ways to pull this data:
+
+A. from the Repo
 
 ```powershell
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+```
+
+B. From local markdown
+
+```powershell
+
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -RegoDirectory "..\..\Rego"
 ```
 
-### Filter Specific Products
+#### Update but filter specific products (repo_)
 
-Filter the update to specific products:
+This will only pull baseline from certain products. 
 
 ```powershell
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+```
+
+
+```powershell
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
 ```
 
