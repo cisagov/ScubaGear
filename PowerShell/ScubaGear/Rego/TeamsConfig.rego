@@ -315,7 +315,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [Get-CsTenantFederationConfiguration],
+    "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
     "RequirementMet": false
@@ -372,7 +372,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should/Not-Implemented",
-    "Commandlet": [Get-CsTenantFederationConfiguration],
+    "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
     "RequirementMet": false
