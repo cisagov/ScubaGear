@@ -620,13 +620,15 @@ Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm
 $regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
 
 # Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US copy.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines"  -RegoDirectory "..\..\Rego"
 
 # Filter specific products
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
 
 # Update configuration with additional fields
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
 #>
 # export
 #Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigRegoExclusionMappings, Update-ScubaConfigBaselineWithRego

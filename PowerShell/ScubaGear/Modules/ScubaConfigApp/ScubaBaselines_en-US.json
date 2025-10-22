@@ -9,7 +9,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad11v1",
+        "link": "/aad.md#msaad11v1",
         "lastModified": "June 2023",
         "implementation": "1. [Determine if an agency’s existing applications use legacy authentication](https://learn.microsoft.com/en-us/entra/identity/conditional-access/block-legacy-authentication#identify-legacy-authentication-use) before blocking legacy authentication across the entire application base.\n\n2. Create a Conditional Access policy to block legacy authentication\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
         "mitreMapping": [
@@ -33,7 +33,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad21v1",
+        "link": "/aad.md#msaad21v1",
         "lastModified": "June 2023",
         "implementation": "1.  Create a conditional access policy blocking users categorized as high risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy as per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > <b>High</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
         "mitreMapping": [
@@ -49,7 +49,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad22v1",
+        "link": "/aad.md#msaad22v1",
         "lastModified": "June 2023",
         "implementation": "1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high risk.",
         "mitreMapping": [
@@ -65,7 +65,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad23v1",
+        "link": "/aad.md#msaad23v1",
         "lastModified": "June 2023",
         "implementation": "1.  Create a Conditional Access policy blocking sign-ins determined high risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy as per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Sign-in risk > <b>High</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
         "mitreMapping": [
@@ -86,7 +86,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad31v1",
+        "link": "/aad.md#msaad31v1",
         "lastModified": "June 2023",
         "implementation": "1. Create a conditional access policy enforcing phishing-resistant MFA for all users. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>\n</pre>",
         "mitreMapping": [
@@ -103,7 +103,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad32v1",
+        "link": "/aad.md#msaad32v1",
         "lastModified": "June 2023",
         "implementation": "1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate MFA method. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>\n</pre>",
         "mitreMapping": [
@@ -121,7 +121,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad33v2",
+        "link": "/aad.md#msaad33v2",
         "lastModified": "March 2025",
         "implementation": "If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.\n\n1. In **Microsoft Entra admin center**, click **Protection > Authentication methods > Microsoft Authenticator**.\n2. Click the **Configure** tab.\n3. For **Allow use of Microsoft Authenticator OTP** select *No*.\n4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.\n5. Under **Show geographic location in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.\n6. Select **Save**",
         "mitreMapping": [
@@ -139,7 +139,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad34v1",
+        "link": "/aad.md#msaad34v1",
         "lastModified": "June 2023",
         "implementation": "1. Go through the process of [How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).\n2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration)."
       },
@@ -151,7 +151,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad35v1",
+        "link": "/aad.md#msaad35v1",
         "lastModified": "June 2023",
         "implementation": "1. In **Microsoft Entra admin center** , click **Protection > Authentication methods**\n2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.",
         "mitreMapping": [
@@ -168,7 +168,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad36v1",
+        "link": "/aad.md#msaad36v1",
         "lastModified": "June 2023",
         "implementation": "1. Create a conditional access policy enforcing phishing-resistant MFA for highly privileged roles.  Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > Select users and groups > Directory roles > <b>select each of the roles listed in the Highly Privileged Roles section at the top of this document</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>\n</pre>",
         "mitreMapping": [
@@ -187,7 +187,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad37v1",
+        "link": "/aad.md#msaad37v1",
         "lastModified": "June 2023",
         "implementation": "1. Create a conditional access policy requiring a user's device to be either Microsoft Entra ID hybrid joined or compliant during authentication. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>\n</pre>",
         "mitreMapping": [
@@ -203,7 +203,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad38v1",
+        "link": "/aad.md#msaad38v1",
         "lastModified": "June 2023",
         "implementation": "1. Create a conditional access policy requiring a user to be on a managed device when registering for MFA. Configure the following policy settings in the new conditional access policy, per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > User actions > <b>Register security information</b>\n\n  Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>\n</pre>",
         "mitreMapping": [
@@ -221,7 +221,7 @@
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad39v1",
+        "link": "/aad.md#msaad39v1",
         "lastModified": "February 2025",
         "implementation": "1. Create a Conditional Access policy to block device code flow\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>\n\n  Access controls > Grant > <b>Block Access</b>\n</pre>",
         "mitreMapping": [
@@ -250,7 +250,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad41v1",
+        "link": "/aad.md#msaad41v1",
         "lastModified": "June 2023",
         "implementation": "Follow the configuration instructions unique to the products and integration patterns at your organization to send the security logs to the security operations center for monitoring.",
         "mitreMapping": [
@@ -271,7 +271,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad51v1",
+        "link": "/aad.md#msaad51v1",
         "lastModified": "June 2023",
         "implementation": "1.  In **Microsoft Entra admin center**, select **Users**.\n\n2. Select **User settings**.\n\n3. For **Users can register applications**, select **No**.\n\n4. Click **Save**.",
         "mitreMapping": [
@@ -288,7 +288,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad52v1",
+        "link": "/aad.md#msaad52v1",
         "lastModified": "June 2023",
         "implementation": "1.  In **Microsoft Entra admin center** select **Enterprise Applications**.\n\n2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.\n\n3. Under **User consent for applications**, select **Do not allow user consent**.\n\n4. Click **Save**.",
         "mitreMapping": [
@@ -305,7 +305,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad53v1",
+        "link": "/aad.md#msaad53v1",
         "lastModified": "June 2023",
         "implementation": "1.  In **Microsoft Entra admin center**  create a new Microsoft Entra ID Group that contains admin users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.\n\n2. Then in **Microsoft Entra admin center**  under **Applications**, select **Enterprise Applications**.\n\n3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.\n\n4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.\n\n5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).\n\n6. Click **Save**.",
         "mitreMapping": [
@@ -327,7 +327,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad61v1",
+        "link": "/aad.md#msaad61v1",
         "lastModified": "June 2023",
         "implementation": "1. [Configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).",
         "resources": [
@@ -344,7 +344,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad71v1",
+        "link": "/aad.md#msaad71v1",
         "lastModified": "June 2023",
         "implementation": "When counting the number of users assigned to the Global Administrator role, count each user only once.\n\n1. In **Microsoft Entra admin center**  count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.\n\n2. Validate that there are a total of two to eight users assigned to the Global Administrator role.",
         "mitreMapping": [
@@ -360,7 +360,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad72v1",
+        "link": "/aad.md#msaad72v1",
         "lastModified": "June 2023",
         "implementation": "This policy is based on the ratio below:\n\n`X = (Number of users assigned to the Global Administrator role) / (Number of users assigned to other highly privileged roles)`\n\n1. Follow the instructions for policy MS.AAD.7.1v1 above to get a count of users assigned to the Global Administrator role.\n\n2. Follow the instructions for policy MS.AAD.7.1v1 above but get a count of users assigned to the other highly privileged roles (not Global Administrator). If a user is assigned to both Global Administrator and other roles, only count that user for the Global Administrator assignment.\n\n3. Divide the value from step 2 from the value from step 1 to calculate X. If X is less than or equal to 1 then the tenant is compliant with the policy.",
         "mitreMapping": [
@@ -379,7 +379,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad73v1",
+        "link": "/aad.md#msaad73v1",
         "lastModified": "June 2023",
         "implementation": "1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. Create a list of all the users assigned to the **Global Administrator** role. Include users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, include both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also include group members from the PIM for Groups portal **Eligible** assignments.\n\n3. For each highly privileged user in the list, execute the Powershell code below but replace the `username@somedomain.com` with the principal name of the user who is specific to your environment. You can get the data value from the **Principal name** field displayed in the Microsoft Entra ID portal.\n\n    ```\n    Connect-MgGraph\n    Get-MgBetaUser -Filter \"userPrincipalName eq 'username@somedomain.com'\" | FL\n    ```\n\n6. Review the output field named **OnPremisesImmutableId**. If this field contains a data value, it means that the  user is not cloud-only. If the user is not cloud-only, create a cloud-only account for that user, assign the user to their respective roles and then remove the account that is not cloud-only from Microsoft Entra ID.",
         "mitreMapping": [
@@ -395,7 +395,7 @@
         "exclusionField": "RoleExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad74v1",
+        "link": "/aad.md#msaad74v1",
         "lastModified": "June 2023",
         "implementation": "1. In **Microsoft Entra admin center**  select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. Select the **Global administrator role**.\n\n3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.\n\n4. Verify there are no users or groups with a value of **Permanent** in the **End time** column. If there are any, recreate those assignments to have an expiration date using Microsoft Entra ID PIM or an alternative PAM system. If a group is identified and it is enrolled in PIM for Groups, see the exception cases below for details.\n\nException cases:\n- Emergency access accounts that require perpetual active assignment.\n- Service accounts that require perpetual active assignment.\n- If using PIM for Groups, a group that is enrolled in PIM is allowed to have a perpetual active assignment to a role because activation is handled by PIM for Groups.",
         "mitreMapping": [
@@ -411,7 +411,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad75v1",
+        "link": "/aad.md#msaad75v1",
         "lastModified": "June 2023",
         "implementation": "1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n2. In **Microsoft Entra admin center**  select **Roles and admins**.\n\n3. Select the **Global administrator role**.\n\n4. Under **Manage**, select **Assignments** and click the **Active assignments** tab.\n\n5. For each user or group listed, examine the value in the **Start time** column. If it contains a value of **-**, this indicates the respective user/group was assigned to that role outside of Microsoft Entra ID PIM. If the role was assigned outside of Microsoft Entra ID PIM, delete the assignment and recreate it using Microsoft Entra ID PIM.",
         "mitreMapping": [
@@ -426,7 +426,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad76v1",
+        "link": "/aad.md#msaad76v1",
         "lastModified": "June 2023",
         "implementation": "1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**.\n\n  1.  Select the **Global Administrator** role in the list.\n  2.  Click **Settings**.\n  3.  Click **Edit**.\n  4.  Select the **Require approval to activate** option.\n  5.  Click **Update**.\n\n3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 2 above to each PIM group's **Member** settings.",
         "mitreMapping": [
@@ -442,7 +442,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad77v1",
+        "link": "/aad.md#msaad77v1",
         "lastModified": "June 2023",
         "implementation": "1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.\n\n3. Click the **Global Administrator** role.\n\n4. Click **Settings** and then click **Edit**.\n\n5. Click the **Notification** tab.\n\n6. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.\n\n7. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.\n\n8. Click **Update**.\n\n9. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per the steps above to each PIM group's **Member** settings.",
         "mitreMapping": [
@@ -458,7 +458,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad78v1",
+        "link": "/aad.md#msaad78v1",
         "lastModified": "June 2023",
         "implementation": "1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.\n\n2. Under **Manage**, select **Roles**.\n\n3. Click the **Global Administrator** role.\n\n4. Click **Settings** and then click **Edit**.\n\n5. Click the **Notification** tab.\n\n6. Under **Send notifications when eligible members activate this role**, in the **Role activation alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.\n\n7. Click **Update**.\n\n8. If the Global Administrator role has any PIM groups actively assigned to it, then also apply the same configurations per the steps above to each PIM group's **Member** settings.",
         "mitreMapping": [
@@ -474,7 +474,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/aad.md#msaad79v1",
+        "link": "/aad.md#msaad79v1",
         "lastModified": "June 2023",
         "implementation": "1. Follow the same instructions as MS.AAD.7.8v1 for each of the highly privileged roles (other than Global Administrator) but enter a security monitoring mailbox different from the one used to monitor Global Administrator activations.\n\n 2. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per step 1 to each PIM group's **Member** settings.",
         "mitreMapping": [
@@ -491,6 +491,60 @@
           "- [Approve or deny requests for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-approval-workflow)",
           "- [Configure security alerts for Microsoft Entra roles in Privileged Identity Management](https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-how-to-configure-security-alerts)"
         ]
+      },
+      {
+        "id": "MS.AAD.8.1v1",
+        "name": "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.",
+        "rationale": "Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "link": "/aad.md#msaad81v1",
+        "lastModified": "June 2023",
+        "implementation": "1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.\n\n2. Under **Guest user access**, select either **Guest users have limited access to properties and memberships of directory objects** or **Guest user access is restricted to properties and memberships of their own directory objects (most restrictive)**.\n\n3. Click **Save**.",
+        "mitreMapping": [
+          "- [T1087: Account Discovery](https://attack.mitre.org/techniques/T1087/)",
+          "- [T1087.003: Email Account](https://attack.mitre.org/techniques/T1087/003/)",
+          "- [T1087.004: Cloud Account](https://attack.mitre.org/techniques/T1087/004/)",
+          "- [T1526: Cloud Service Discovery](https://attack.mitre.org/techniques/T1526/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.8.2v1",
+        "name": "Only users with the Guest Inviter role SHOULD be able to invite guest users.",
+        "rationale": "By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized account creation.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "link": "/aad.md#msaad82v1",
+        "lastModified": "June 2023",
+        "implementation": "1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.\n\n2.  Under **Guest invite settings**, select **Only users assigned to specific admin roles can invite guest users**.\n\n3. Click **Save**.",
+        "mitreMapping": [
+          "- [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)",
+          "- [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)"
+        ]
+      },
+      {
+        "id": "MS.AAD.8.3v1",
+        "name": "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.",
+        "rationale": "Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "link": "/aad.md#msaad83v1",
+        "lastModified": "June 2023",
+        "implementation": "1. In **Microsoft Entra admin center**  select **External Identities > External collaboration settings**.\n\n2. Under **Collaboration restrictions**, select **Allow invitations\n    only to the specified domains (most restrictive)**.\n\n3. Select **Target domains** and enter the names of the external domains authorized by the agency for guest user access.\n\n4. Click **Save**.\n\n\n# Appendix A: Microsoft Entra ID hybrid Guidance\n\nMost of this document does not focus on securing Microsoft Entra ID hybrid environments. CISA released a separate [Hybrid Identity Solutions Architecture](https://www.cisa.gov/sites/default/files/2023-03/csso-scuba-guidance_document-hybrid_identity_solutions_architecture-2023.03.22-final.pdf) document addressing the unique implementation requirements of Microsoft Entra ID hybrid infrastructure.\n\n# Appendix B: Cross-tenant Access Guidance\n\nSome of the conditional access policies contained in this security baseline, if implemented as described, will impact guest user access to a tenant. For example, the policies require users to perform MFA and originate from a managed device to gain access. These requirements are also enforced for guest users. For these policies to work effectively with guest users, both the home tenant (the one the guest user belongs to) and the resource tenant (the target tenant) may need to configure their Microsoft Entra ID cross-tenant access settings.\n\nMicrosoft’s [Authentication and Conditional Access for External ID](https://learn.microsoft.com/en-us/entra/external-id/authentication-conditional-access) provides an understanding of how MFA and device claims are passed from the home tenant to the resource tenant. To configure the inbound and outbound cross-tenant access settings in Microsoft Entra External ID, refer to Microsoft’s [Overview: Cross-tenant access with Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/cross-tenant-access-overview).\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
+          "- [T1078.001: Default Accounts](https://attack.mitre.org/techniques/T1078/001/)"
+        ],
+        "resources": [
+          "- [Configure external collaboration settings for B2B in Microsoft Entra External ID](https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure)",
+          "- [Compare member and guest default permissions](https://learn.microsoft.com/en-us/entra/fundamentals/users-default-permissions#compare-member-and-guest-default-permissions)"
+        ]
       }
     ],
     "defender": [
@@ -502,7 +556,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender11v1",
+        "link": "/defender.md#msdefender11v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Standard protection**, slide the toggle switch to the right so the text next to the toggle reads **Standard protection is on**.\n6. Under **Strict protection**, slide the toggle switch to the right so the text next to the toggle reads **Strict protection is on**.\n\nNote: If the toggle slider in step 5 is grayed out, click on **Manage protection settings**\ninstead and configure the policy settings according to [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users).",
         "mitreMapping": [
@@ -520,7 +574,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender12v1",
+        "link": "/defender.md#msdefender12v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Select **Manage protection settings** under either **Standard protection**\n   or **Strict protection**.\n6. On the **Apply Exchange Online Protection** page, select **All recipients**.\n7. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -538,7 +592,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender13v1",
+        "link": "/defender.md#msdefender13v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.\n7. On the **Apply Defender for Office 365 protection** page, select **All recipients**.\n8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n9. Select **Next** on each page until the **Review and confirm your changes** page.\n10. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -556,7 +610,7 @@
         "exclusionField": "SensitiveAccounts",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender14v1",
+        "link": "/defender.md#msdefender14v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Strict protection**, select **Manage protection settings**.\n6. On the **Apply Exchange Online Protection** page, select **Specific recipients**.\n7. Add all sensitive accounts via the **User** and **Group** boxes using the\n   names of mailboxes, users, contacts, M365 groups, and distribution groups.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -573,7 +627,7 @@
         "exclusionField": "SensitiveAccounts",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender15v1",
+        "link": "/defender.md#msdefender15v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under **Strict protection**, select **Manage protection settings**.\n6. Select **Next** until you reach the **Apply Defender for Office 365 protection** page.\n7. On the **Apply Defender for Office 365 protection** page, select\n   **Specific recipients** or **Previously selected recipients** if sensitive\n   accounts were already set on the EOP page.\n8. If adding sensitive accounts separately via **Specific recipients**, add all\n   sensitive accounts via the **User** and **Group** boxes using the names of\n   mailboxes, users, contacts, M365 groups, and distribution groups.\n9. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**\n   to be exempted from the preset policies.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -599,7 +653,7 @@
         "exclusionField": "SensitiveUsers",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender21v1",
+        "link": "/defender.md#msdefender21v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom users** page, add a name and valid email address for each\n   sensitive account and click **Add** after each.\n8. Select **Next** until you reach the **Trusted senders and domains** page.\n9. (Optional) Add specific email addresses here to not flag as impersonation\n   when sending messages and prevent false positives. Click **Add** after each.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -617,7 +671,7 @@
         "exclusionField": "AgencyDomains",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender22v1",
+        "link": "/defender.md#msdefender22v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom domains** page, add each agency domain\n   and click **Add** after each.\n8. Select **Next** until you reach the **Trusted senders and domains** page.\n9. (Optional) Add specific domains here to not flag as impersonation when\n   sending messages and prevent false positives. Click **Add** after each.\n10. Select **Next** on each page until the **Review and confirm your changes** page.\n11. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -635,7 +689,7 @@
         "exclusionField": "PartnerDomains",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender23v1",
+        "link": "/defender.md#msdefender23v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.\n3. Select **Threat Policies**.\n4. From the **Templated policies** section, select **Preset Security Policies**.\n5. Under either **Standard protection** or **Strict protection**, select **Manage\n   protection settings**.\n6. Select **Next** until you reach the **Impersonation Protection** page, then\n   select **Next** once more.\n7. On the **Protected custom domains** page, add each partner domain\n   and click **Add** after each.\n8. Select **Next** on each page until the **Review and confirm your changes** page.\n9. On the **Review and confirm your changes** page, select **Confirm**.",
         "mitreMapping": [
@@ -657,7 +711,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender31v1",
+        "link": "/defender.md#msdefender31v1",
         "lastModified": "June 2023",
         "implementation": "To enable Safe Attachments for SharePoint, OneDrive, and Microsoft\nTeams, follow the instructions listed at [Turn on Safe Attachments for\nSharePoint, OneDrive, and Microsoft Teams \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide).\n\n1.  Sign in to **Microsoft 365 Defender**.\n\n2.  Under **Email & collaboration**, select **Policies & rules**.\n\n3.  Select **Threat policies**.\n\n4.  Under **Policies**, select **Safe Attachments**.\n\n5.  Select **Global settings**.\n\n6.  Toggle the **Turn on Defender for Office 365 for SharePoint, OneDrive, and\n    Microsoft Teams** slider to **On**.",
         "mitreMapping": [
@@ -676,7 +730,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender41v2",
+        "link": "/defender.md#msdefender41v2",
         "lastModified": "November 2024",
         "implementation": "1. Sign in to the **Microsoft Purview portal**.\n\n2. Under the **Solutions** section on the left-hand menu, select **Data loss\n   prevention**.\n\n3. Select **Policies** from the top of the page.\n\n4. Select **Create policy**.\n\n5. From the **Categories** list, select **Custom**.\n\n6. From the **Regulations** list, select **Custom policy** and then click\n   **Next**.\n\n7. Edit the name and description of the policy if desired, then click\n   **Next**.\n\n8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.\n   \n9. Under **Choose where to apply the policy**, set **Status** to **On**\n   for at least the Exchange email, OneDrive accounts, SharePoint\n   sites, Teams chat and channel messages, and Devices locations, then\n   click **Next**.\n\n10. Under **Define policy settings**, select **Create or customize advanced\n   DLP rules**, and then click **Next**.\n\n11. Click **Create rule**. Assign the rule an appropriate name and\n   description.\n\n12. Click **Add condition**, then **Content contains**.\n\n13. Click **Add**, then **Sensitive info types**.\n\n14. Add information types that protect information sensitive to the agency.\n    At a minimum, the agency should protect:\n\n    - Credit card numbers\n    - U.S. Individual Taxpayer Identification Numbers (ITIN)\n    - U.S. Social Security Numbers (SSN)\n    - All agency-defined PII and sensitive information\n\n15. Click **Add**.\n\n16. Under **Actions**, click **Add an action**.\n\n17. Check **Restrict Access or encrypt the content in Microsoft 365\n    locations**.\n\n18. Under this action, select **Block Everyone**.\n\n19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.\n\n20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**.\n\n21. Click **Save**, then **Next**.\n\n22. Select **Turn the policy on immediately**, then click **Next**.\n\n23. Click **Submit**.",
         "mitreMapping": [
@@ -693,7 +747,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender42v1",
+        "link": "/defender.md#msdefender42v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) step 8\n   for details on enforcing DLP policy in specific M365 service locations.",
         "mitreMapping": [
@@ -711,7 +765,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender43v1",
+        "link": "/defender.md#msdefender43v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps\n   15-17 for details on configuring DLP policy to block sharing sensitive\n   information with everyone.",
         "mitreMapping": [
@@ -728,7 +782,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender44v1",
+        "link": "/defender.md#msdefender44v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) steps\n   18-19 for details on configuring DLP policy to notify users when accessing\n   sensitive information."
       },
@@ -740,7 +794,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1",
+        "link": "/defender.md#msdefender45v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to the **Microsoft Purview portal**.\n\n2. Go to **Settings**, under **Solution Settings** select **Data loss prevention**.\n\n3. Go to **Endpoint DLP Settings**.\n\n4. Go to **Restricted apps and app groups**.\n\n5. Click **Add or edit Restricted Apps**.\n\n6. Enter an app and executable name to disallow said app from\n   accessing protected files, and log the incident.\n\n7. Return and click **Unallowed Bluetooth apps**.\n\n8. Click **Add or edit unallowed Bluetooth apps**.\n\n9. Enter an app and executable name to disallow said app from\n   accessing protected files, and log the incident.",
         "mitreMapping": [
@@ -757,7 +811,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1",
+        "link": "/defender.md#msdefender46v1",
         "lastModified": "June 2023",
         "implementation": "If restricted app and unwanted Bluetooth app restrictions are desired,\nassociated devices must be onboarded with Defender for Endpoint\nbefore the instructions below can be completed.\n\n1. Sign in to the **Microsoft Purview portal**.\n\n2. Under **Solutions**, select **Data loss prevention**.\n\n3. Select **Policies** from the top of the page.\n\n4. Find the custom DLP policy configured under\n   [MS.DEFENDER.4.1v2 Instructions](#msdefender41v2-instructions) in the list\n   and click the Policy name to select.\n\n5. Select **Edit Policy**.\n\n6. Click **Next** on each page in the policy wizard until you reach the\n   Advanced DLP rules page.\n\n7. Select the relevant rule and click the pencil icon to edit it.\n\n8. Under **Actions**, click **Add an action**.\n\n9. Choose **Audit or restrict activities on device**\n\n10. Under **File activities for all apps**, select\n    **Apply restrictions to specific activity**.\n\n11. Check the box next to **Copy or move using unallowed Bluetooth app**\n    and set its action to **Block**.\n\n12. Under **Restricted app activities**, check the **Access by restricted apps** box\n   and set the action drop-down to **Block**.\n\n13. Click **Save** to save the changes.\n\n14. Click **Next** on each page until reaching the\n    **Review your policy and create it** page.\n\n15. Review the policy and click **Submit** to complete the policy changes.",
         "mitreMapping": [
@@ -775,7 +829,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender51v1",
+        "link": "/defender.md#msdefender51v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender**.\n\n2. Under **Email & collaboration**, select **Policies & rules**.\n\n3. Select **Alert Policy**.\n\n4. Select the checkbox next to each alert to enable as determined by the\n   agency and at a minimum those referenced in the\n   [_CISA M365 Secure Configuration Baseline for Exchange Online_](./exo.md#msexo161v1) which are:\n\n   a. **Suspicious email sending patterns detected.**\n\n   b. **Suspicious connector activity.**\n\n   c. **Suspicious Email Forwarding Activity.**\n\n   d. **Messages have been delayed.**\n\n   e. **Tenant restricted from sending unprovisioned email.**\n\n   f. **Tenant restricted from sending email.**\n\n   g. **A potentially malicious URL click was detected.**\n\n5. Click the pencil icon from the top menu.\n\n6. Select the **Enable selected policies** action from the **Bulk actions**\n   menu.",
         "mitreMapping": [
@@ -791,7 +845,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1",
+        "link": "/defender.md#msdefender52v1",
         "lastModified": "June 2023",
         "implementation": "For each enabled alert, to add one or more email recipients:\n\n1. Sign in to **Microsoft 365 Defender**.\n\n2. Under **Email & collaboration**, select **Policies & rules**.\n\n3. Select **Alert Policy**.\n\n4. Click the alert policy to modify.\n\n5. Click the pencil icon next to **Set your recipients**.\n\n6. Check the **Opt-In for email notifications** box.\n\n7. Add one or more email addresses to the **Email recipients** text box.\n\n8. Click **Next**.\n\n9. On the **Review** page, click **Submit** to save the notification settings.",
         "mitreMapping": [
@@ -807,7 +861,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender61v1",
+        "link": "/defender.md#msdefender61v1",
         "lastModified": "March 2025",
         "implementation": "To enable auditing via the **Microsoft Purview portal**:\n\n1. Sign in to the **Microsoft Purview portal**.\n\n2. Under **Solutions**, select **Audit**.\n\n3. If auditing is not enabled, a banner is displayed to notify the\nadministrator to start recording user and admin activity.\n\n4. Click the **Start recording user and admin activity**.",
         "mitreMapping": [
@@ -823,7 +877,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1",
+        "link": "/defender.md#msdefender63v1",
         "lastModified": "June 2023",
         "implementation": "To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.\nEnsure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. \n\nAs noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/defender.md#license-requirements-1) section above, the creation of a custom audit log retention policy and its retention in the M365 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses. No additional license is required to view and export logs. To view and export audit logs follow [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records) and/or [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)\n\n**`TLP:CLEAR`**",
         "mitreMapping": [
@@ -845,7 +899,7 @@
         "exclusionField": "AllowedForwardingDomains",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo11v2",
+        "link": "/exo.md#msexo11v2",
         "lastModified": "March 2025",
         "implementation": "To disallow automatic forwarding to external domains:\n\n1.  Sign in to the **Exchange admin center**.\n\n2.  Select **Mail flow**, then **Remote domains**.\n\n3.  Select **Default**.\n\n4.  Under **Email reply types**, select **Edit reply types**.\n\n5.  Clear the checkbox next to **Allow automatic forwarding**, then\n    click **Save**.\n\n6.  Return to **Remote domains** and review each\n    additional remote domain in the list, ensuring that automatic forwarding\n    is only allowed for approved domains.",
         "mitreMapping": [
@@ -863,7 +917,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo22v2",
+        "link": "/exo.md#msexo22v2",
         "lastModified": "March 2024",
         "implementation": "First, identify any approved senders specific to your agency, e.g., any on-premises mail servers. SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.\n\nSPF is not configured through the Exchange admin center, but rather via\nDNS records hosted by the agency's domain. Thus, the exact steps needed\nto set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.\n\nTo test your SPF configuration, consider using a web-based tool, such as\nthose listed under [How can I validate SPF records for my domain? \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/setup/domains-faq?view=o365-worldwide#how-can-i-validate-spf-records-for-my-domain).\nAdditionally, SPF records can be requested using the\nPowerShell tool `Resolve-DnsName`. For example:\n\n```\nResolve-DnsName example.onmicrosoft.com txt\n```\n\nIf SPF is configured, you will see a response resembling `v=spf1 include:spf.protection.outlook.com -all`\nreturned; though by necessity, the contents of the SPF\npolicy may vary by agency. In this example, the SPF policy indicates\nthe IP addresses listed by the policy for \"spf.protection.outlook.com\" are\nthe only approved senders for \"example.onmicrosoft.com.\" These IPs can be determined\nvia an additional SPF lookup, this time for \"spf.protection.outlook.com.\" Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; this directive indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \\| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion\nof SPF record syntax.",
         "mitreMapping": [
@@ -879,7 +933,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo31v1",
+        "link": "/exo.md#msexo31v1",
         "lastModified": "June 2023",
         "implementation": "1. To enable DKIM, follow the instructions listed on [Steps to Create,\nenable and disable DKIM from Microsoft 365 Defender portal \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dkim-configure?view=o365-worldwide#steps-to-create-enable-and-disable-dkim-from-microsoft-365-defender-portal).",
         "mitreMapping": [
@@ -896,7 +950,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo41v1",
+        "link": "/exo.md#msexo41v1",
         "lastModified": "June 2023",
         "implementation": "DMARC is not configured through the Exchange admin center, but rather via\nDNS records hosted by the agency's domain. As such, implementation varies\ndepending on how an agency manages its DNS records. See [Form the DMARC TXT record for your domain \\| Microsoft\nLearn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-dmarc-configure?view=o365-worldwide#step-4-form-the-dmarc-txt-record-for-your-domain)\nfor Microsoft guidance.\n\nA DMARC record published at the second-level domain will protect all subdomains.\nIn other words, a DMARC record published for `example.com` will protect both\n`a.example.com` and `b.example.com`, but a separate record would need to be\npublished for `c.example.gov`.\n\nTo test your DMARC configuration, consider using one of many publicly available\nweb-based tools. Additionally, DMARC records can be requested using the\nPowerShell tool `Resolve-DnsName`. For example:\n\n```\nResolve-DnsName _dmarc.example.com txt\n```\n\nIf DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com`\nwill be returned, though by necessity, the contents of the record will vary\nby agency. In this example, the policy indicates all emails failing the\nSPF/DKIM checks are to be rejected and aggregate reports sent to\nreports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be\nsent to reports@example.com.",
         "mitreMapping": [
@@ -913,7 +967,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo42v1",
+        "link": "/exo.md#msexo42v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.",
         "mitreMapping": [
@@ -930,7 +984,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo43v1",
+        "link": "/exo.md#msexo43v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes <reports@dmarc.cyber.dhs.gov>\nas one of the emails for the RUA field.",
         "mitreMapping": [
@@ -945,7 +999,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo44v1",
+        "link": "/exo.md#msexo44v1",
         "lastModified": "June 2023",
         "implementation": "See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes:\n- A point of contact specific to your agency in the RUA field.\n- <reports@dmarc.cyber.dhs.gov> as one of the emails in the RUA field.\n- One or more agency-defined points of contact in the RUF field.",
         "mitreMapping": [
@@ -960,7 +1014,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo51v1",
+        "link": "/exo.md#msexo51v1",
         "lastModified": "June 2023",
         "implementation": "To disable SMTP AUTH for the organization:\n\n1. Sign in to the **Exchange admin center**.\n\n2. On the left hand pane, select **Settings**; then from the settings list, select **Mail Flow**.\n\n3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked."
       },
@@ -972,7 +1026,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo61v1",
+        "link": "/exo.md#msexo61v1",
         "lastModified": "June 2023",
         "implementation": "To restrict sharing with all domains:\n\n1. Sign in to the **Exchange admin center**.\n\n2. On the left-hand pane under **Organization**, select **Sharing**.\n\n3. Select **Individual Sharing**.\n\n4. For all existing policies, select the policy, then select **Manage domains**.\n\n5. For all sharing rules under all existing policies, ensure **Sharing with all domains** is not selected.",
         "mitreMapping": [
@@ -988,7 +1042,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo62v1",
+        "link": "/exo.md#msexo62v1",
         "lastModified": "June 2023",
         "implementation": "To restrict sharing calendar details with all domains:\n\n1. Refer to step 5 in [MS.EXO.6.1v1 Instructions](#msexo61v1-instructions) to implement\nthis policy.",
         "mitreMapping": [
@@ -1004,7 +1058,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo71v1",
+        "link": "/exo.md#msexo71v1",
         "lastModified": "June 2023",
         "implementation": "To create a mail flow rule to produce external sender warnings:\n\n1.  Sign in to the **Exchange admin center**.\n\n2.  Under **Mail flow**, select **Rules**.\n\n3.  Click the plus (**+**) button to create a new rule.\n\n4.  Select **Modify messages…**.\n\n5.  Give the rule an appropriate name.\n\n6.  Under **Apply this rule if…,** select **The sender is external/internal**.\n\n7.  Under **select sender location**, select **Outside the organization**, then click **OK**.\n\n8.  Under **Do the following…,** select **Prepend the subject of the message with…**.\n\n9.  Under **specify subject prefix**, enter a message such as\n    \"\\[External\\]\" (without the quotation marks), then click **OK**.\n\n10. Click **Next**.\n\n11. Under **Choose a mode for this rule**, select **Enforce**.\n\n12. Leave the **Severity** as **Not Specified**.\n\n13. Leave the **Match sender address in message** as **Header** and click **Next**.\n\n14. Click **Finish** and then **Done**.\n\n15. The new rule will be disabled.  Re-select the new rule to show its\n    settings and slide the **Enable or disable rule** slider to the right\n    until it shows as **Enabled**.",
         "mitreMapping": [
@@ -1019,7 +1073,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo81v2",
+        "link": "/exo.md#msexo81v2",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
         "mitreMapping": [
@@ -1036,7 +1090,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo82v2",
+        "link": "/exo.md#msexo82v2",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.",
         "mitreMapping": [
@@ -1055,7 +1109,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo83v1",
+        "link": "/exo.md#msexo83v1",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
         "mitreMapping": [
@@ -1072,7 +1126,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo84v1",
+        "link": "/exo.md#msexo84v1",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [protecting PII](./defender.md#msdefender41v2-instructions) for additional guidance.",
         "mitreMapping": [
@@ -1091,7 +1145,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo91v2",
+        "link": "/exo.md#msexo91v2",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude email filtering based on attachment file type.",
         "mitreMapping": [
@@ -1107,7 +1161,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo92v1",
+        "link": "/exo.md#msexo92v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\nattempt to determine the true file type and assess the file extension.",
         "mitreMapping": [
@@ -1125,7 +1179,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo93v2",
+        "link": "/exo.md#msexo93v2",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
         "mitreMapping": [
@@ -1141,7 +1195,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo94v1",
+        "link": "/exo.md#msexo94v1",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
         "mitreMapping": [
@@ -1157,7 +1211,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo95v1",
+        "link": "/exo.md#msexo95v1",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ndisallow click-to-run file types.",
         "mitreMapping": [
@@ -1176,7 +1230,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo101v1",
+        "link": "/exo.md#msexo101v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude anti-malware protection.",
         "mitreMapping": [
@@ -1192,7 +1246,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo102v1",
+        "link": "/exo.md#msexo102v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude anti-malware protection to quarantine malware in email.",
         "mitreMapping": [
@@ -1210,7 +1264,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo103v1",
+        "link": "/exo.md#msexo103v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#implementation), which\ninclude zero-hour auto purge (ZAP) to retroactively detect malware in messages\nalready delivered to mailboxes and removes them.",
         "mitreMapping": [
@@ -1226,7 +1280,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo111v1",
+        "link": "/exo.md#msexo111v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling impersonation protection](./defender.md#msdefender21v1-instructions).",
         "mitreMapping": [
@@ -1242,7 +1296,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo112v1",
+        "link": "/exo.md#msexo112v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1) which\ninclude user safety tips to warn users.",
         "mitreMapping": [
@@ -1258,7 +1312,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo113v1",
+        "link": "/exo.md#msexo113v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1) which\ninclude mailbox intelligence for detecting phishing attacks using AI.",
         "mitreMapping": [
@@ -1274,7 +1328,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo121v1",
+        "link": "/exo.md#msexo121v1",
         "lastModified": "June 2023",
         "implementation": "To modify the connection filters, follow the instructions found in [Use\nthe Microsoft 365 Defender portal to modify the default connection\nfilter\npolicy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/connection-filter-policies-configure?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-modify-the-default-connection-filter-policy).\n\n1. Sign in to **Microsoft 365 Defender portal**.\n\n2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.\n\n3. Select **Threat Policies** from the list of policy names.\n\n4. Under **Policies**, select **Anti-spam**.\n\n5. Select **Connection filter policy (Default)**.\n\n6. Click **Edit connection filter policy**.\n\n7. Ensure no addresses are specified under **Always allow messages from\n   the following IP addresses or address range**.\n\n8. Ensure **Turn on safe list** is not selected."
       },
@@ -1286,7 +1340,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo122v1",
+        "link": "/exo.md#msexo122v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to **Microsoft 365 Defender portal**.\n\n2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.\n\n3. Select **Threat Policies** from the list of policy names.\n\n4. Under **Policies**, select **Anti-spam**.\n\n5. Select **Connection filter policy (Default)**.\n\n6. Click **Edit connection filter policy**.\n\n7. (Optional) Enter addresses under **Always block messages from the following\n   IP addresses or address range** as needed.\n\n8. Ensure **Turn on safe list** is not selected."
       },
@@ -1298,7 +1352,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo131v1",
+        "link": "/exo.md#msexo131v1",
         "lastModified": "June 2023",
         "implementation": "Mailbox auditing can be managed from the Exchange Online PowerShell.\nFollow the instructions listed on [Manage mailbox auditing in Office\n365](https://learn.microsoft.com/en-us/microsoft-365/compliance/audit-mailboxes?view=o365-worldwide).\n\nTo check the current mailbox auditing status for your organization via PowerShell:\n\n1.  Connect to the Exchange Online PowerShell.\n\n2.  Run the following command:\n\n    `Get-OrganizationConfig | Format-List AuditDisabled`\n\n3.  An `AuditDisabled : False` result indicates mailbox auditing is enabled.\n\nTo enable mailbox auditing by default for your organization via PowerShell:\n\n1.  Connect to the Exchange Online PowerShell.\n\n2.  Run the following command:\n\n    `Set-OrganizationConfig –AuditDisabled $false`",
         "mitreMapping": [
@@ -1322,7 +1376,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo141v2",
+        "link": "/exo.md#msexo141v2",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering.",
         "mitreMapping": [
@@ -1337,7 +1391,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo142v1",
+        "link": "/exo.md#msexo142v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering that moves high confidence spam to either the junk\n or quarantine folder.",
         "mitreMapping": [
@@ -1352,7 +1406,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo143v1",
+        "link": "/exo.md#msexo143v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which do not\ninclude any allowed sender domains by default.",
         "mitreMapping": [
@@ -1367,7 +1421,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo144v1",
+        "link": "/exo.md#msexo144v1",
         "lastModified": "May 2024",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender12v1), which\ninclude spam filtering.",
         "mitreMapping": [
@@ -1385,7 +1439,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo151v1",
+        "link": "/exo.md#msexo151v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links protections to scan URLs in email messages against a list\nof known, malicious links.",
         "mitreMapping": [
@@ -1401,7 +1455,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo152v1",
+        "link": "/exo.md#msexo152v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links protections to scan links to files for malware.",
         "mitreMapping": [
@@ -1417,7 +1471,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo153v1",
+        "link": "/exo.md#msexo153v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender for Office 365, see the following\nimplementation steps for\n[enabling preset security policies](./defender.md#msdefender13v1), which\ninclude Safe Links click protections to track user clicks on links in email.",
         "mitreMapping": [
@@ -1433,7 +1487,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo161v1",
+        "link": "/exo.md#msexo161v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft 365 alert policies, see the following implementation steps for\n[enabling alerts](./defender.md#msdefender51v1-instructions) for additional\nguidance.",
         "mitreMapping": [
@@ -1454,7 +1508,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo162v1",
+        "link": "/exo.md#msexo162v1",
         "lastModified": "June 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft 365 alert policies, see the following implementation steps to\n[add email recipients to an alert](./defender.md#msdefender51v1-instructions)\nfor additional guidance.",
         "mitreMapping": [
@@ -1470,7 +1524,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo171v1",
+        "link": "/exo.md#msexo171v1",
         "lastModified": "March 2025",
         "implementation": "See the following implementation steps for enabling [Unified Audit logging](./defender.md#msdefender61v1-instructions) for additional\nguidance.",
         "mitreMapping": [
@@ -1486,7 +1540,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/exo.md#msexo173v1",
+        "link": "/exo.md#msexo173v1",
         "lastModified": "June 2023",
         "implementation": "See the following implementation steps to\n[create an audit retention policy](./defender.md#msdefender63v1-instructions)\nfor additional guidance.\n\n**`TLP:CLEAR`**",
         "mitreMapping": [
@@ -1508,7 +1562,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi11v1",
+        "link": "/powerbi.md#mspowerbi11v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click **Publish to web** set to **Disabled**",
         "mitreMapping": [
@@ -1523,7 +1577,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi21v1",
+        "link": "/powerbi.md#mspowerbi21v1",
         "lastModified": "June 2023",
         "implementation": "To Disable Completely:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Disabled**\n\nTo Enable with Security Group(s):\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Enabled**\n\n5. Select the security group(s) you want to have access to the PowerBI tenant.\n> Note:\n> You may need to make a specific security group(s)",
         "mitreMapping": [
@@ -1542,7 +1596,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi31v1",
+        "link": "/powerbi.md#mspowerbi31v1",
         "lastModified": "June 2023",
         "implementation": "To disable completely:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Invite external users to your organization** and set to **Disabled**\n\nTo enable with security groups:\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant Settings**\n\n3. Scroll to **Export and sharing settings**\n\n4. Click on **Invite external users to your organization** and set to **Enabled**\n\n5. Select the security group(s) needed.\n> Note:\n> You may need to make a specific security group(s)",
         "mitreMapping": [
@@ -1562,7 +1616,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi41v1",
+        "link": "/powerbi.md#mspowerbi41v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.\nChoose a specific security group allowed to use service principles for the APIs.",
         "mitreMapping": [
@@ -1578,7 +1632,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi42v1",
+        "link": "/powerbi.md#mspowerbi42v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.\nChoose a specific security group allowed to use service principles to create and use profiles",
         "mitreMapping": [
@@ -1594,7 +1648,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi51v1",
+        "link": "/powerbi.md#mspowerbi51v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Block ResourceKey Authentication** and set to **Enabled**",
         "mitreMapping": [
@@ -1611,7 +1665,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi61v1",
+        "link": "/powerbi.md#mspowerbi61v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **R and Python Visuals Settings**\n\n4. Click on **Interact with and share R and Python visuals** and set to **Disabled**",
         "mitreMapping": [
@@ -1629,7 +1683,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerbi.md#mspowerbi71v1",
+        "link": "/powerbi.md#mspowerbi71v1",
         "lastModified": "June 2023",
         "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Information protection**\n\n4. Click on **Allow users to apply sensitivity labels for content** and set to **Enabled**\n   Define who can apply and change sensitivity labels in Power BI assets.\n\n# Appendix A: Implementation Considerations",
         "mitreMapping": [
@@ -1650,9 +1704,9 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform11v1",
+        "link": "/powerplatform.md#mspowerplatform11v1",
         "lastModified": "June 2023",
-        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  In the upper-right corner of the Microsoft Power Platform site,\n    select the **Gear icon** (Settings icon).\n\n3.  Select **Power Platform settings**.\n\n4.  Under **Who can create production and sandbox environments**, select\n    **Only specific admins.**",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  In the upper-right corner of the Microsoft Power Platform site,\n    select the **Gear icon** (Settings icon).\n\n3.  Select **Power Platform settings**.\n\n4.  Under **Production environment assignments**, select\n    **Only specific admins.**",
         "mitreMapping": [
           "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
           "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
@@ -1666,9 +1720,9 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform12v1",
+        "link": "/powerplatform.md#mspowerplatform12v1",
         "lastModified": "June 2023",
-        "implementation": "1.  Follow the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.\n\n2.  Under **Who can create trial environments**, select **Only specific admins.**"
+        "implementation": "1.  Follow the MS.POWERPLATFORM.1.1v1 instructions up to step **3**.\n\n2.  Under **Trial environment assignments**, select **Only specific admins.**"
       },
       {
         "id": "MS.POWERPLATFORM.2.1v1",
@@ -1678,9 +1732,9 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform21v1",
+        "link": "/powerplatform.md#mspowerplatform21v1",
         "lastModified": "June 2023",
-        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Policies** \\> **Data Policies.**\n\n3.  Select the **+ New Policy** icon to create a new policy.\n\n4.  Give the policy a suitable agency name and click **Next.**\n\n5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab containing sensitive data that can be utilized to create flows and apps.\n\n6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. \n\n7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. \n\n8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.\n\n9.  At the bottom of the screen, select **Next** to move on.\n\n10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \\| Microsoft\n  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.\n\n11.  Click **Next**.\n\n12.  At the **Scope** section for the default environment, select **Add multiple environments** and add the default environment.\n\n13.  Select **Next**-\\> **Create Policy** to finish.",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Security** -\\> **Data and privacy.**\n\n3.   Select **Data policy,** then select **+ New Policy** icon to create a new policy.\n\n4.  Give the policy a suitable agency name and click **Next.**\n\n5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab containing sensitive data that can be utilized to create flows and apps.\n\n6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. \n\n7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. \n\n8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.\n\n9.  At the bottom of the screen, select **Next** to move on.\n\n10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \\| Microsoft\n  Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.\n\n11.  Click **Next**.\n\n12.  At the **Scope** section for the default environment, select **Add multiple environments** then click **Next**.\n\n13.  Select the default environment, then select the **+ Add to policy** button at the top of the screen, then select **Next**.\n\n14. Select **Next**-\\> **Create Policy** to finish.",
         "mitreMapping": [
           "- [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)",
           "- [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)"
@@ -1694,7 +1748,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform22v1",
+        "link": "/powerplatform.md#mspowerplatform22v1",
         "lastModified": "June 2023",
         "implementation": "1.  Repeat steps 1 to 11 in the MS.POWERPLATFORM.2.1v1 instructions.\n\n2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments where you wish to enforce a DLP policy upon. If you wish to apply the DLP policy for all environments including environments created in the future select **Add all environments**.\n\n4.  Select **Next**-\\> **Create Policy** to finish.",
         "mitreMapping": [
@@ -1710,9 +1764,9 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform31v1",
+        "link": "/powerplatform.md#mspowerplatform31v1",
         "lastModified": "June 2023",
-        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Policies -\\> Tenant Isolation**.\n\n3.  Set the slider in the center of the screen to **On** then click **Save**\n    on the bottom of the screen.",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\n    center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left pane, select **Security -\\> Identity and access -\\> Tenant Isolation**.\n\n3.  Set the slider **Restrict cross-tenant connections** to **On,** then click **Save**\n    on the bottom of the screen.",
         "mitreMapping": [
           "- [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)",
           "- [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)",
@@ -1727,9 +1781,39 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1",
+        "link": "/powerplatform.md#mspowerplatform32v1",
         "lastModified": "June 2023",
-        "implementation": "1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to\narrive at the same page.\n\n2.  The tenant isolation allowlist can be configured by clicking **New tenant rule**\non the Tenant Isolation page.\n\n3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.\n\n4.  If Tenant Isolation is switched **Off**, these rules will not be enforced until tenant\nisolation is turned **On**."
+        "implementation": "1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to\narrive at the same page.\n\n2.  The tenant isolation exceptions can be configured by clicking **+ Add exceptions**\non the Tenant Isolation page.\n\n3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.\n\n4.  If Tenant Isolation is switched **Off**, these rules will not be enforced until tenant\nisolation is turned **On**."
+      },
+      {
+        "id": "MS.POWERPLATFORM.4.1v1",
+        "name": "Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.",
+        "rationale": "Adds CSP as a defense mechanism for Power Apps against common website attacks.",
+        "criticality": "SHALL",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "link": "/powerplatform.md#mspowerplatform41v1",
+        "lastModified": "March 2025",
+        "implementation": "1.  Sign in to your tenant environment's respective [Power Platform admin\ncenter](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).\n\n2.  On the left-hand pane click on **Manage -\\> Environments** and then select an environment from the list.\n\n3.  Select the **Settings** icon at the top of the page.\n\n4.  Click on **Product** then click on **Privacy + Security** from the options that appear.\n\n5.  At the bottom of the page under the **Content security policy** section, set **Enforce content security policy** to **On** for **Model-driven** and **Canvas**.\n\n6.  At the same location, set **Enable reporting**  to **On** and add an appropriate endpoint for reporting CSP violations can be reported to.\n\n7.  Repeat steps 2 to 6 for all active Power Platform environments.",
+        "mitreMapping": [
+          "- [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)"
+        ]
+      },
+      {
+        "id": "MS.POWERPLATFORM.5.1v1",
+        "name": "The ability to create Power Pages sites SHOULD be restricted to admins.",
+        "rationale": "Users may unintentionally misconfigure their Power Pages to expose sensitive information or leave the website in a vulnerable state.",
+        "criticality": "SHOULD",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "link": "/powerplatform.md#mspowerplatform51v1",
+        "lastModified": "June 2023",
+        "implementation": "1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).\n\n2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenants Power Platform.\nDiscover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.\n\n3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.\n\n    ```\n    Set-TenantSettings -RequestBody @{ “disablePortalsCreationByNonAdminUsers” = $true }\n    ```\n\n**`TLP:CLEAR`**",
+        "mitreMapping": [
+          "- [T1190: Exploit Public-Facing Application](https://attack.mitre.org/techniques/T1190/)"
+        ]
       }
     ],
     "sharepoint": [
@@ -1741,7 +1825,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint11v1",
+        "link": "/sharepoint.md#mssharepoint11v1",
         "lastModified": "June 2023",
         "implementation": "1. Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Adjust external sharing slider for SharePoint to **Existing guests** or **Only people in your organization**.\n\n4. Select **Save**.",
         "mitreMapping": [
@@ -1758,7 +1842,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint12v1",
+        "link": "/sharepoint.md#mssharepoint12v1",
         "lastModified": "June 2023",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Adjust external sharing slider for OneDrive to **Existing Guests** or **Only people in your organization**.\n\n4. Select **Save**.",
         "mitreMapping": [
@@ -1776,7 +1860,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint13v1",
+        "link": "/sharepoint.md#mssharepoint13v1",
         "lastModified": "March 2025",
         "implementation": "Note: If SharePoint external sharing is set to its most restrictive setting of \"Only people in your organization\", then no external sharing is allowed and no implementation changes are required for this policy item.\n\n1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Expand **More external sharing settings**.\n\n4.  Select **Limit external sharing by domain**.\n\n5.  Select **Add domains**.\n\n6.  Add each approved external domain users are allowed to share files with.\n\n7.  Select **Manage security groups**\n\n8. Add each approved security group. Members of these groups will be allowed to share files externally.\n\n9.  Select **Save**.",
         "mitreMapping": [
@@ -1798,7 +1882,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint21v1",
+        "link": "/sharepoint.md#mssharepoint21v1",
         "lastModified": "June 2023",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**\n\n3.  Under **File and folder links**, set the default link type to **Specific people (only the people the user specifies)**\n\n4.  Select **Save**",
         "mitreMapping": [
@@ -1817,7 +1901,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint22v1",
+        "link": "/sharepoint.md#mssharepoint22v1",
         "lastModified": "June 2023",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2. Select **Policies** \\> **Sharing**.\n\n3. Under **File and folder links**, set the permission that is selected by default for sharing links to **View**.\n\n4. Select **Save**.",
         "mitreMapping": [
@@ -1834,7 +1918,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint31v1",
+        "link": "/sharepoint.md#mssharepoint31v1",
         "lastModified": "March 2025",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.\n\n4.  Select the checkbox **These links must expire within this many days**.\n\n5.  Enter **30** days or less.\n\n6.  Select **Save**.",
         "mitreMapping": [
@@ -1852,7 +1936,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint32v1",
+        "link": "/sharepoint.md#mssharepoint32v1",
         "lastModified": "March 2025",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Scroll to the section **Choose expiration and permissions options for Anyone links**.\n\n4.  Set the configuration items in the section **These links can give these permissions**.\n\n5.  Set the **Files** option to **View**.\n\n6.  Set the **Folders** option to **View**.\n\n7.  Select **Save**.",
         "mitreMapping": [
@@ -1869,7 +1953,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/sharepoint.md#mssharepoint33v1",
+        "link": "/sharepoint.md#mssharepoint33v1",
         "lastModified": "March 2025",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Expand **More external sharing settings**.\n\n4. Select **People who use a verification code must reauthenticate after this many days**.\n\n5.  Enter **30** days or less.\n\n6. Select **Save**.\n\n**`TLP:CLEAR`**",
         "mitreMapping": [
@@ -1888,7 +1972,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams11v1",
+        "link": "/teams.md#msteams11v1",
         "lastModified": "July 2023",
         "implementation": "To help ensure external participants do not have the ability to request\ncontrol of the shared desktop or window in the meeting:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Select the **Global (Org-wide default)** policy.\n\n4.  Under the **Content sharing** section, set **External\n    participants can give or request control** to **Off**.\n\n5.  If custom policies were created, repeat these steps for each\n    policy, selecting the appropriate policy in step 3."
       },
@@ -1900,7 +1984,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams12v2",
+        "link": "/teams.md#msteams12v2",
         "lastModified": "August 2025",
         "implementation": "To configure settings for anonymous users:\n\n1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, ensure the **Anonymous users and dial-in callers can start a meeting** setting remains at the default position of **Off**.\n\n5.\tIf custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.",
         "mitreMapping": [
@@ -1916,7 +2000,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams13v1",
+        "link": "/teams.md#msteams13v1",
         "lastModified": "July 2023",
         "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.\n\n5.\tIn the same section, set **People dialing in can bypass the lobby** to **Off**."
       },
@@ -1928,7 +2012,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams14v1",
+        "link": "/teams.md#msteams14v1",
         "lastModified": "July 2023",
         "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is set to **People in my org**.\n\n5.\tIn the same section, set **People dialing in can bypass the lobby** to **Off**."
       },
@@ -1940,7 +2024,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams15v1",
+        "link": "/teams.md#msteams15v1",
         "lastModified": "July 2023",
         "implementation": "1.\tSign in to the **Microsoft Teams admin center**.\n\n2.\tSelect **Meetings** > **Meeting policies**.\n\n3.\tSelect the **Global (Org-wide default)** policy.\n\n4.\tUnder the **Meeting join & lobby** section, set **People dialing in can bypass the lobby** to **Off**."
       },
@@ -1952,7 +2036,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams16v1",
+        "link": "/teams.md#msteams16v1",
         "lastModified": "March 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Select the **Global (Org-wide default)** policy.\n\n4.  Under the **Recording & transcription** section, set **Meeting\n    recording** to **Off**.\n\n5.  Select **Save**."
       },
@@ -1964,7 +2048,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams17v2",
+        "link": "/teams.md#msteams17v2",
         "lastModified": "March 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin\n    center**.\n\n2.  Select **Meetings** > **Live events policies**.\n\n3.  Select **Global (Org-wide default)** policy.\n\n4.  Set **Record an event** to either  **Organizer can record** or **Never record**\n\n5.  Click **Save**.\n\n6.  If custom policies were created, repeat these steps for each\n    policy, selecting the appropriate policy in step 3.",
         "resources": [
@@ -1979,7 +2063,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams21v2",
+        "link": "/teams.md#msteams21v2",
         "lastModified": "August 2025",
         "implementation": "To enable external access for only specific domains:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users** > **External access** > **Organization settings**.\n\n3.  Next to **Teams and Skype for Business users in external organizations**,\n    select **Allow only specific external domains**\n\n4.  Select **Add external domains**. Enter domains allowed, and then select **Done**\n   \n    **NOTE:** Domains will need to be added in this step in order for users to communicate with them.\n\n5.  Click **Save**.",
         "mitreMapping": [
@@ -1996,7 +2080,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams22v2",
+        "link": "/teams.md#msteams22v2",
         "lastModified": "August 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users > External access**.\n\n3.  Select **Policies**.\n\n4.  Select **Global (Org-wide Default)**.\n\n5. Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to one of the following:\n    1. To completely block contact with unmanaged users, toggle the setting to **Off**.\n    2. To allow contact with unmanaged users only if the internal user initiates the contact:\n        - Toggle the setting to **On**.\n        - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.",
         "mitreMapping": [
@@ -2012,7 +2096,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams23v2",
+        "link": "/teams.md#msteams23v2",
         "lastModified": "August 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Users > External access**.\n\n3.  Select **Policies**.\n\n4.  Select **Global (Org-wide Default)**.\n\n4.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my organization can communicate with unmanaged Teams accounts** to **Off**.",
         "mitreMapping": [
@@ -2028,7 +2112,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams41v1",
+        "link": "/teams.md#msteams41v1",
         "lastModified": "July 2023",
         "implementation": "1.  Sign in to the **Microsoft Teams admin\n    center**.\n\n2.  Select **Teams** > **Teams Settings**.\n\n3.  Under the **Email integration** section, set **Users can send\n    emails to a channel email address** to **Off**.",
         "mitreMapping": [
@@ -2045,7 +2129,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams51v2",
+        "link": "/teams.md#msteams51v2",
         "lastModified": "August 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Manage apps**.\n\n3.  In the upper right-hand corner select **Actions**\n\n4.  Select **Org-wide app settings**.\n\n5.  Under **Microsoft apps** > Select **On**\n\n6.  Click **Save**.\n\n    **NOTE:** This will make Microsoft apps in the application list available to \"Everyone.\" If adjustments are needed follow the remaining instructions\n\n7. Select **Teams apps** > **Manage apps**.\n\n8. Select each individual app.\n\n9. Select **Users and groups** > **Edit availability**\n\n10. Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)\n\n11. Repeat steps 7 to 10 for each application",
         "mitreMapping": [
@@ -2060,7 +2144,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams52v2",
+        "link": "/teams.md#msteams52v2",
         "lastModified": "August 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Manage apps**.\n   \n3.  In the upper right-hand corner select **Actions**\n\n4.  Select **Org-wide app settings**.\n\n5.  Under **Third-party apps** > Select **Off**\n\n6.  Click **Save**.\n   \n    **NOTE:** This will make third party apps in the application list available to \"No one.\" If adjustments are needed follow the remaining                     instructions\n   \n7.  Select **Teams apps** > **Manage apps**.\n\n8.  Select each individual app.\n\n9.  Select **Users and groups** > **Edit availability**\n\n10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)\n\n11.  Repeat steps 7 to 10 for each application",
         "mitreMapping": [
@@ -2076,7 +2160,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams53v2",
+        "link": "/teams.md#msteams53v2",
         "lastModified": "August 2025",
         "implementation": "1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Teams apps** > **Manage apps**.\n   \n3.  In the upper right-hand corner select **Actions**\n\n4.  Select **Org-wide app settings**.\n\n5.  Under **Custom apps** > Select **Off**\n\n6.  Click **Save**.\n   \n    **NOTE:** This will make Custom apps in the application list available to \"No one.\" If adjustments are needed follow the remaining                     instructions\n   \n7.  Select **Teams apps** > **Manage apps**.\n\n8.  Select each individual app.\n\n9.  Select **Users and groups** > **Edit availability**\n\n10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)\n\n11.  Repeat steps 7 to 10 for each application",
         "mitreMapping": [
@@ -2096,7 +2180,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams61v1",
+        "link": "/teams.md#msteams61v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
         "mitreMapping": [
@@ -2112,7 +2196,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams62v1",
+        "link": "/teams.md#msteams62v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.",
         "mitreMapping": [
@@ -2131,7 +2215,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams71v1",
+        "link": "/teams.md#msteams71v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.",
         "mitreMapping": [
@@ -2147,7 +2231,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams72v1",
+        "link": "/teams.md#msteams72v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.",
         "mitreMapping": [
@@ -2163,7 +2247,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams81v1",
+        "link": "/teams.md#msteams81v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.",
         "mitreMapping": [
@@ -2183,7 +2267,7 @@
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "link": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines/teams.md#msteams82v1",
+        "link": "/teams.md#msteams82v1",
         "lastModified": "July 2023",
         "implementation": "Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.\n\n\n[^1]: Note that B2B guest users and all anonymous users except for\n    external users appear in Teams calls as _John Doe (Guest)_. To avoid\n    potential confusion, true guest users are always referred to as B2B guest users in this document.\n\n# Appendix A - Custom Meeting Policies\n\nIf there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them. For example, custom meeting policies can be configured with _specific_ users having\npermission to record meetings. To allow specific users the ability to\nrecord meetings:\n\n1.  Sign in to the **Microsoft Teams admin center**.\n\n2.  Select **Meetings** > **Meeting policies**.\n\n3.  Create a new policy by selecting **Add**. Give this new policy a\n    name and appropriate description.\n\n4.  Under the **Recording & transcription** section, set **Cloud\n    recording** to **On**.\n\n5.  Select **Save**.\n\n6.  After selecting **Save**, a table displays the set of policies.\n    Select the row containing the new policy, then select **Manage\n    users**.\n\n7.  Assign the users who need the ability to record to this policy.\n\n8.  Select **Apply**.\n\n**`TLP:CLEAR`**",
         "mitreMapping": [
