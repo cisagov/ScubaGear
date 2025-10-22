@@ -8,7 +8,7 @@
   "MaximumResults": 10,
   "PullOnlineBaselines": true,
   "OnlineBaselineMarkdownURL": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines",
-  "OnlineBaselineJsonURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/856-adding-a-gui-to-scubagear/PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaBaselines_en-US.json",
+  "OnlineBaselineJsonURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaBaselines_en-US.json",
   "localeContext": {
     "Title_TextBlock": "SCuBAGear Configuration Editor",
     "SubTitle_TextBlock": "Create a configuration file for SCuBAGear exclusions, annotations, and omissions baseline controls",
