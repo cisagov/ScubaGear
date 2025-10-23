@@ -37,7 +37,6 @@ function Export-EXOProvider {
     MS.EXO.2.2v3 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
-    $domains += @{DomainName="scubagws.org"}
     $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{
         "Domains"=$domains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
