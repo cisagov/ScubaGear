@@ -123,15 +123,15 @@ points.
 
 ### Policies
 
-#### MS.EXO.2.2v2
+#### MS.EXO.2.2v3
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
-<!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.2.2v3; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
-- _Last modified:_ March 2024
-- _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Fail, as used in this baseline policy, refers to hardfail (i.e., `-`).
+- _Last modified:_ October 2025
+- _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Either hard or soft fail may be used to comply with this baseline policy.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2d
 - _MITRE ATT&CK TTP Mapping:_
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -159,7 +159,7 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### Implementation
 
-#### MS.EXO.2.2v2 Instructions
+#### MS.EXO.2.2v3 Instructions
 First, identify any approved senders specific to your agency, e.g., any on-premises mail servers. SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.
 
 SPF is not configured through the Exchange admin center, but rather via
@@ -180,7 +180,7 @@ returned; though by necessity, the contents of the SPF
 policy may vary by agency. In this example, the SPF policy indicates
 the IP addresses listed by the policy for "spf.protection.outlook.com" are
 the only approved senders for "example.onmicrosoft.com." These IPs can be determined
-via an additional SPF lookup, this time for "spf.protection.outlook.com." Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; this directive indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion
+via an additional SPF lookup, this time for "spf.protection.outlook.com." Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or `~all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; these directives indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion
 of SPF record syntax.
 
 ## 3. DomainKeys Identified Mail
