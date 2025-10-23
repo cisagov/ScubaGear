@@ -34,9 +34,10 @@ function Export-EXOProvider {
     $RemoteDomains = ConvertTo-Json @($Tracker.TryCommand("Get-RemoteDomain"))
 
     <#
-    MS.EXO.2.1v1 SPF
+    MS.EXO.2.2v3 SPF
     #>
     $domains = $Tracker.TryCommand("Get-AcceptedDomain")
+    $domains += @{DomainName="scubagws.org"}
     $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{
         "Domains"=$domains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
@@ -554,16 +555,16 @@ function Get-ScubaSpfRecord {
             # We got some answers - are they SPF records?
             $SPFAnswers = ($Response.Answers | Where-Object { $_.StartsWith("v=spf1 ") }  )
             if ($SPFAnswers.Length -gt 0) {
-                # We have an SPF record - does it hardfail?
-                $SPFReject = ($SPFAnswers | Where-Object { $_.Contains("-all") -or $_.Contains("redirect") }  )
+                # We have an SPF record - does it fail?
+                $SPFReject = ($SPFAnswers | Where-Object { $_.Contains("-all") -or $_.Contains("~all") -or $_.Contains("redirect") }  )
                 if ($SPFReject.Length -gt 0) {
                     # Yes! This is the "good" case
                     $Message = "SPF record found."
                     $Compliant = $true
                 }
                 else {
-                    # There is an SPF record but it doesn't hardfail
-                    $Message = "SPF record found, but it does not hardfail (`"-all`") or redirect to one that does."
+                    # There is an SPF record but it doesn't fail
+                    $Message = "SPF record found, but it does not fail unapproved senders or redirect to one that does."
                 }
             }
             else {
