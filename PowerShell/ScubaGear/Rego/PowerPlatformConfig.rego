@@ -438,3 +438,21 @@ tests contains {
     Status := EnvironmentCreation.disablePortalsCreationByNonAdminUsers == true
 }
 #--
+
+######################
+# MS.POWERPLATFORM.6 #
+######################
+
+# Pass if disableShareWithEveryone is true
+tests contains {
+    "PolicyId": "MS.POWERPLATFORM.6.1v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-TenantSettings"],
+    "ActualValue": EnvironmentCreation.powerPlatform.powerApps.disableShareWithEveryone,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    some EnvironmentCreation in input.environment_creation
+    Status := EnvironmentCreation.powerPlatform.powerApps.disableShareWithEveryone == true
+}
+#--
