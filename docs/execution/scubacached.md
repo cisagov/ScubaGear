@@ -129,7 +129,7 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 
 When testing Rego policies against specific configuration scenarios that can't be replicated in a live tenant, you can modify the exported JSON data and use cached mode to test the policy logic.
 
-#### EXAMPLE 1 
+#### EXAMPLE 1
 
 For example, when testing AAD authentication policy migration settings
 
@@ -245,7 +245,7 @@ If the results are looking incorrect when it generates a html report, this may b
 > [!IMPORTANT]
 > Make sure the file is named to: `opa_windows_amd64.exe`
 
-**Solution**: Rerun the Invoke-SCuBACached with -OpaPath c:\ScubaResults 
+**Solution**: Rerun the Invoke-SCuBACached with -OpaPath c:\ScubaResults
 
 ```powershell
 Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "<OPA path>"
