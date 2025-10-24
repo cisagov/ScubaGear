@@ -129,6 +129,8 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 
 When testing Rego policies against specific configuration scenarios that can't be replicated in a live tenant, you can modify the exported JSON data and use cached mode to test the policy logic.
 
+#### EXAMPLE 1 
+
 For example, when testing AAD authentication policy migration settings
 
 1. Export provider data in full mode:
@@ -165,6 +167,33 @@ Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath "C:\ScubaRe
 ```
 
 This approach allows you to test edge cases, policy combinations, or specific configurations that would be difficult or impossible to create in a live Microsoft 365 environment.
+
+#### EXAMPLE 2
+
+Testing if the tenant had the migration complete configured. Newer tenants do not have this option. To test this, you can change the results json to simulate an alternate pass. For exmample change:
+
+```json
+"authentication_method_policy":  {
+    "AuthenticationMethodConfigurations@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22,
+    "PolicyVersion":  "1.5",
+    "PolicyMigrationState":  migrationComplete,
+    "DisplayName":  null,
+```
+
+to :
+
+```json
+"authentication_method_policy":  {
+    "AuthenticationMethodConfigurations@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22,
+    "PolicyVersion":  "1.5",
+    "PolicyMigrationState":  null,
+    "DisplayName":  "Authentication Methods Policy",
+ ```
+
+```powershell
+Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath "C:\ScubaResults\AAD_Policy_Test"
+```
+
 
 ## Error Scenarios
 
@@ -208,6 +237,19 @@ ConvertFrom-Json: Invalid JSON format
 ```
 
 **Solution**: Re-export the provider data using the full mode (`ExportProvider $true`).
+
+### Invalid or incorrect results
+
+If the results are looking incorrect when it generates a html report, this may be due to opa executable missing. Download opa from https://github.com/open-policy-agent/opa/releases
+
+> [!IMPORTANT]
+> Make sure the file is named to: `opa_windows_amd64.exe`
+
+**Solution**: Rerun the Invoke-SCuBACached with -OpaPath c:\ScubaResults 
+
+```powershell
+Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "<OPA path>"
+```
 
 ## Performance Considerations
 
