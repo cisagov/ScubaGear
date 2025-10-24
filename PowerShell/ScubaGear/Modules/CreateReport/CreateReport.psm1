@@ -47,7 +47,7 @@ function Get-RegoResult {
         $Result.SummaryKey = "Passes"
         $Result.Details = $Test.ReportDetails
     }
-    elseif ($Test.Criticality -eq "Should") {
+    elseif ($Test.Criticality -eq "Should" -or $Test.Criticality.EndsWith('Should/Conditional')) {
         $Result.DisplayString = "Warning"
         $Result.SummaryKey = "Warnings"
         $Result.Details = $Test.ReportDetails
@@ -57,6 +57,16 @@ function Get-RegoResult {
         $Result.SummaryKey = "Manual"
         $Result.Details = $Test.ReportDetails
     }
+    elseif ($Test.Criticality -eq "Shall/Conditional") {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Manual"
+        $Result.Details = $Test.ReportDetails
+    }
+     elseif ($Test.Criticality -eq "Shall/Conditional") {
+        $Result.DisplayString = "Pass"
+        $Result.SummaryKey = "Passes"
+        $Result.Details = $Test.ReportDetails
+    }   
     else {
         $Result.DisplayString = "Fail"
         $Result.SummaryKey = "Failures"

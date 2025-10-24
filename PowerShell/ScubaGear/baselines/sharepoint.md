@@ -57,7 +57,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
-<!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only people in your organization**.
@@ -197,7 +197,7 @@ Sharing files with external users via the usage of **Anyone links** or **Verific
 #### MS.SHAREPOINT.3.1v1
 Expiration days for Anyone links SHALL be set to 30 days or less.
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators can prevent unintended sustained access to the link.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
@@ -211,7 +211,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
 
-<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
@@ -224,7 +224,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
-<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.

@@ -251,7 +251,7 @@ If Microsoft Authenticator is enabled, it SHALL be configured to show login cont
 #### MS.AAD.3.4v1
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
-<!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.4v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ To disable the legacy authentication methods screen for the tenant, configure the Manage Migration feature to Migration Complete. The MFA and Self-Service Password Reset (SSPR) authentication methods are both managed from a central admin page, thereby reducing administrative complexity and potential security misconfigurations.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
@@ -261,7 +261,7 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
-<!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.5v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
