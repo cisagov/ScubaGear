@@ -328,7 +328,7 @@ function Invoke-SCuBA {
             }
             catch {
                 # Display clean validation error without PowerShell stack trace
-                Write-Host $_.Exception.Message -ForegroundColor Red
+                Write-Warning $_.Exception.Message
                 return
             }
 
