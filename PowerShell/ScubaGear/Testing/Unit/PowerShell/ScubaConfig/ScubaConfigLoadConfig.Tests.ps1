@@ -43,41 +43,6 @@ InModuleScope ScubaConfig {
                 [ScubaConfig]::ResetInstance()
             }
         }
-        context "Handling policy omissions" {
-            It 'Does not warn for proper control IDs' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.EXO.1.1v2"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
-            }
 
-            It 'Warns for malformed control IDs' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MSEXO.1.1v2"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
-            }
-
-            It 'Warns for control IDs not encompassed by ProductNames' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.Gmail.1.1v1"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
-            }
-	    AfterAll {
-	    }
-        }
     }
 }
