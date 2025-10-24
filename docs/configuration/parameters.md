@@ -96,7 +96,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## DisconnectOnExit
 
-**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will for you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
+**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will require you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
 
 | Parameter   | Value  |
 |-------------|--------|
@@ -397,6 +397,34 @@ Invoke-SCuBA -ProductNames teams `
 
 > **Note**: ScubaGear will automatically add the `.html` to this filename.
 
+## PreferredDnsResolvers
+
+**PreferredDnsResolvers** is a list of IP addresses of DNS resolvers that should
+be used to retrieve any DNS records required by specific SCuBA policies. Currently,
+the only applicable SCuBA polices are the following:
+- MS.EXO.2.2v2
+- MS.EXO.3.1v1
+- MS.EXO.4.1v1
+- MS.EXO.4.2v1
+- MS.EXO.4.3v1
+- MS.EXO.4.4v1
+
+Optional; if not provided, the system default resolver will be used.
+
+| Parameter   | Value           |
+|-------------|-----------------|
+| Optional    | Yes             |
+| Datatype    | List of strings |
+| Default     | []              |
+| Config File | Yes             |
+
+Here is an example using `-PreferredDnsResolvers`:
+
+```powershell
+Invoke-SCuBA -ProductNames exo `
+  -PreferredDnsResolvers 8.8.8.8,8.8.4.4
+```
+
 ## ProductNames
 
 **ProductNames** provides one or more M365 shortened product names that ScubaGear will assess.
@@ -459,6 +487,26 @@ Invoke-SCuBA -ProductNames teams `
 Invoke-SCuBA -SilenceBODWarnings
 ```
 
+## SkipDoH
+
+**SkipDoH** allows the user to disable the DoH fallback which would normally be
+done if the traditional DNS requests fail when retrieving any DNS records
+required by specific SCuBA policies. See [PreferredDnsResolvers](#preferreddnsresolvers)
+for the list of applicable policies.
+
+| Parameter   | Value   |
+|-------------|---------|
+| Optional    | Yes     |
+| Datatype    | Boolean |
+| Default     | $false  |
+| Config File | Yes     |
+
+Here is an example using `-SkipDoH`:
+
+```powershell
+Invoke-SCuBA -ProductNames exo `
+  -SkipDoH $true
+```
 
 ## Version
 

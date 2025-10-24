@@ -1,0 +1,2077 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="ScubaConfigApp"
+    Height="900"
+    Width="1280"
+    WindowStartupLocation="CenterScreen"
+    Background="#F6FBFE"
+    Foreground="#333333"
+    ShowInTaskbar="False"
+    >
+
+    <Window.Resources>
+        <!-- ScubaGear Icon as DrawingImage -->
+        <DrawingImage x:Key="ScubaGearIconImage">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <!-- Background -->
+                    <GeometryDrawing>
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="0,0,48,48" RadiusX="12" RadiusY="12"/>
+                        </GeometryDrawing.Geometry>
+                        <GeometryDrawing.Brush>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#2A4365" Offset="0"/>
+                                <GradientStop Color="#319795" Offset="1"/>
+                            </LinearGradientBrush>
+                        </GeometryDrawing.Brush>
+                    </GeometryDrawing>
+
+                    <!-- Shield -->
+                    <GeometryDrawing>
+                        <GeometryDrawing.Geometry>
+                            <PathGeometry Figures="M24,10.5 L13.5,13.5 L13.5,24 Q13.5,29 24,37.5 Q34.5,29 34.5,24 L34.5,13.5 Z"/>
+                        </GeometryDrawing.Geometry>
+                        <GeometryDrawing.Brush>
+                            <SolidColorBrush Color="#4DFFFFFF"/>
+                        </GeometryDrawing.Brush>
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="White" Thickness="1.5"/>
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+
+                    <!-- Wave lines and S-curve would go here -->
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+
+        <!-- Colors from the ScubaGear theme -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#3D5B96"/>
+        <!-- Deep blue -->
+        <SolidColorBrush x:Key="AccentBrush" Color="#62C0DA"/>
+        <!-- Teal accent -->
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#F9FAFC"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D0D5E0"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#8CC9E8"/>
+        <!-- Light blue -->
+        <SolidColorBrush x:Key="TextBrush" Color="#333333"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#666666"/>
+
+        <!-- Button Styles -->
+        <!-- Custom ScubaRun Button Style with better disabled state and hover effects -->
+        <Style TargetType="Button" x:Key="ScubaRunButton">
+            <Setter Property="Background" Value="#28A745"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Hover effect when enabled -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsEnabled" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="#218838"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <!-- Click effect when enabled -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsPressed" Value="True"/>
+                                    <Condition Property="IsEnabled" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="#1E7E34"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </MultiTrigger>
+                            <!-- Disabled state - gray appearance -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#6C757D"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="Button" x:Key="PrimaryButton">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2E4A85"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#1D3A74"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="SecondaryButton">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                    <Setter Property="BorderBrush" Value="#BBBBBB"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#EEEEEE"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="AccentButton">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#51B0C9"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#3FA0B9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Toggle Switch Style -->
+        <Style x:Key="ToggleSwitch" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="ToggleBorder" Width="44" Height="24" CornerRadius="12"
+                                Background="#CCCCCC" BorderThickness="1" BorderBrush="#AAAAAA">
+                            <Ellipse x:Name="ToggleThumb" Width="18" Height="18" Fill="White"
+                                    HorizontalAlignment="Left" Margin="2,0,0,0"
+                                    RenderTransformOrigin="0.5,0.5">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform X="0"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter TargetName="ToggleThumb" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform X="20"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Card Style -->
+        <Style TargetType="Border" x:Key="Card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.1" Direction="270" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Tab Headers Panel -->
+                            <Border Background="#EAF6FF" CornerRadius="8" Margin="0,0,0,8">
+                                <TabPanel x:Name="HeaderPanel"
+                                  IsItemsHost="True"
+                                  Background="Transparent"
+                                  Margin="8,4"/>
+                            </Border>
+
+                            <!-- Content Panel -->
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                                      Grid.Row="1"
+                                      Margin="0"
+                                      ContentSource="SelectedContent"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PillTabItemStyle" TargetType="TabItem">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Width" Value="130"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Background"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        Padding="{TemplateBinding Padding}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="1">
+                            <ContentPresenter x:Name="Content"
+                                      ContentSource="Header"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Background" Property="Panel.ZIndex" Value="100"/>
+                                <Setter TargetName="Background" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="1"
+                                              BlurRadius="4"
+                                              Opacity="0.1"
+                                              Direction="270"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="Background" Property="Background" Value="#F9F9F9"/>
+                                <Setter TargetName="Background" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Background" Property="Background" Value="#F2F9FF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#A0A0A0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SubTabItemStyle" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="Background"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0,0,0,2"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="ContentSite"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            ContentSource="Header"
+                                            Margin="0,0,0,0"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Panel.ZIndex" Value="100"/>
+                                <Setter TargetName="Background" Property="Background" Value="White"/>
+                                <Setter TargetName="Background" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Background" Property="Background" Value="#F5F5F5"/>
+                            </Trigger>
+                            <!-- Add this trigger for disabled state -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="#AAAAAA"/>
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Tab Button Style -->
+        <Style TargetType="RadioButton" x:Key="TabButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="border"
+                                Background="Transparent"
+                                BorderThickness="0,0,0,2"
+                                BorderBrush="Transparent"
+                                Padding="16,10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter TargetName="border" Property="Background" Value="#F0F5FF"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#F0F0F0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Form Styles -->
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+        </Style>
+
+        <!-- Modern Thin ScrollBar Style -->
+        <Style x:Key="ModernScrollBar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="MinWidth" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="GridRoot" Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.00001*"/>
+                            </Grid.RowDefinitions>
+
+                            <Track x:Name="PART_Track" Grid.Row="0" IsDirectionReversed="true" Focusable="false">
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Background="#C1C1C1" Style="{DynamicResource ScrollBarTrackThumb}"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton x:Name="PageUp" Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="false"/>
+                                </Track.IncreaseRepeatButton>
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton x:Name="PageDown" Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="false"/>
+                                </Track.DecreaseRepeatButton>
+                            </Track>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger SourceName="Thumb" Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Thumb" Property="Background" Value="#8C8C8C"/>
+                            </Trigger>
+                            <Trigger SourceName="Thumb" Property="IsDragging" Value="true">
+                                <Setter TargetName="Thumb" Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter TargetName="Thumb" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="Orientation" Value="Horizontal">
+                                <Setter Property="Width" Value="Auto"/>
+                                <Setter Property="MinWidth" Value="0"/>
+                                <Setter Property="Height" Value="8"/>
+                                <Setter Property="MinHeight" Value="8"/>
+                                <Setter TargetName="GridRoot" Property="LayoutTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="-90"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="PART_Track" Property="LayoutTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="-90"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Width" Value="Auto"/>
+                                <Setter Property="MinWidth" Value="0"/>
+                                <Setter Property="Height" Value="8"/>
+                                <Setter Property="MinHeight" Value="8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern ScrollBar Thumb Style -->
+        <Style x:Key="ScrollBarTrackThumb" TargetType="{x:Type Thumb}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Grid x:Name="Grid">
+                            <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto"
+                                    Fill="{TemplateBinding Background}" RadiusX="4" RadiusY="4"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="Horizontal">
+                                <Setter TargetName="Grid" Property="LayoutTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="-90"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern ScrollViewer Style -->
+        <Style x:Key="ModernScrollViewer" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <ScrollContentPresenter Grid.Column="0" Grid.Row="0" Margin="{TemplateBinding Padding}"
+                                                Content="{TemplateBinding Content}"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                CanContentScroll="{TemplateBinding CanContentScroll}"/>
+
+                            <!-- Vertical ScrollBar -->
+                            <ScrollBar Grid.Column="1" Grid.Row="0" x:Name="PART_VerticalScrollBar"
+                                    Style="{StaticResource ModernScrollBar}"
+                                    Value="{TemplateBinding VerticalOffset}"
+                                    Maximum="{TemplateBinding ScrollableHeight}"
+                                    ViewportSize="{TemplateBinding ViewportHeight}"
+                                    Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                    Margin="0,0,-3,0"/>
+
+                            <!-- Horizontal ScrollBar -->
+                            <ScrollBar Grid.Column="0" Grid.Row="1" x:Name="PART_HorizontalScrollBar"
+                                    Style="{StaticResource ModernScrollBar}"
+                                    Orientation="Horizontal"
+                                    Value="{TemplateBinding HorizontalOffset}"
+                                    Maximum="{TemplateBinding ScrollableWidth}"
+                                    ViewportSize="{TemplateBinding ViewportWidth}"
+                                    Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                        Focusable="false"
+                                        HorizontalScrollBarVisibility="Hidden"
+                                        VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" Value="0.6"/>
+                                <Setter TargetName="border" Property="Background" Value="#F5F5F5"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern ComboBox Style -->
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <Popup x:Name="PART_Popup"
+                                AllowsTransparency="true"
+                                Grid.ColumnSpan="2"
+                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Margin="1"
+                                PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}"
+                                Placement="Bottom">
+                                <Border x:Name="dropDownBorder"
+                                        BorderBrush="{StaticResource BorderBrush}"
+                                        BorderThickness="1"
+                                        Background="#FFFFFF"
+                                        CornerRadius="6"
+                                        MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                                        MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
+                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                        <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
+                                            <Canvas x:Name="canvas" HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
+                                                <Rectangle x:Name="opaqueRect"
+                                                        Fill="{Binding Background, ElementName=dropDownBorder}"
+                                                        Height="{Binding ActualHeight, ElementName=dropDownBorder}"
+                                                        Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
+                                            </Canvas>
+                                            <ItemsPresenter x:Name="ItemsPresenter"
+                                                            KeyboardNavigation.DirectionalNavigation="Contained"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                            <ToggleButton x:Name="toggleButton"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}"
+                                        Grid.ColumnSpan="2"
+                                        IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Style>
+                                    <Style TargetType="ToggleButton">
+                                        <Setter Property="OverridesDefaultStyle" Value="true"/>
+                                        <Setter Property="IsTabStop" Value="false"/>
+                                        <Setter Property="Focusable" Value="false"/>
+                                        <Setter Property="ClickMode" Value="Press"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ToggleButton">
+                                                    <Border x:Name="templateRoot"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            Background="{TemplateBinding Background}"
+                                                            CornerRadius="6"
+                                                            SnapsToDevicePixels="true">
+                                                        <Border x:Name="splitBorder"
+                                                                BorderBrush="Transparent"
+                                                                BorderThickness="1"
+                                                                HorizontalAlignment="Right"
+                                                                Margin="0"
+                                                                SnapsToDevicePixels="true"
+                                                                Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                                                            <Path x:Name="arrow"
+                                                                Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z"
+                                                                Fill="{StaticResource TextBrush}"
+                                                                HorizontalAlignment="Center"
+                                                                Margin="0"
+                                                                VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <MultiDataTrigger>
+                                                            <MultiDataTrigger.Conditions>
+                                                                <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false"/>
+                                                            </MultiDataTrigger.Conditions>
+                                                            <Setter Property="Fill" TargetName="arrow" Value="#FFBFBFBF"/>
+                                                        </MultiDataTrigger>
+                                                        <Trigger Property="IsMouseOver" Value="true">
+                                                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource AccentBrush}"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed" Value="true">
+                                                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource PrimaryBrush}"/>
+                                                            <Setter Property="BorderThickness" TargetName="templateRoot" Value="2"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsEnabled" Value="false">
+                                                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="#FFD9D9D9"/>
+                                                            <Setter Property="Background" TargetName="templateRoot" Value="#FFF0F0F0"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                            <ContentPresenter x:Name="contentPresenter"
+                                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                            Content="{TemplateBinding SelectionBoxItem}"
+                                            ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            IsHitTestVisible="false"
+                                            Margin="{TemplateBinding Padding}"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
+                                <Setter Property="Margin" TargetName="dropDownBorder" Value="0,0,5,5"/>
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsGrouping" Value="true"/>
+                                    <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </MultiTrigger>
+                            <Trigger Property="ScrollViewer.CanContentScroll" SourceName="DropDownScrollViewer" Value="false">
+                                <Setter Property="Canvas.Top" TargetName="opaqueRect" Value="{Binding VerticalOffset, ElementName=DropDownScrollViewer}"/>
+                                <Setter Property="Canvas.Left" TargetName="opaqueRect" Value="{Binding HorizontalOffset, ElementName=DropDownScrollViewer}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#FF838383"/>
+                                <Setter Property="Background" Value="#FFF0F0F0"/>
+                                <Setter Property="BorderBrush" Value="#FFD9D9D9"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="toggleButton" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="BorderThickness" TargetName="toggleButton" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEditable" Value="true">
+                    <Setter Property="IsTabStop" Value="false"/>
+                    <Setter Property="Padding" Value="8,6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="ClearButton" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Foreground" Value="#DC3545"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Background" Value="#FFF5F5"/>
+            <Setter Property="BorderBrush" Value="#DC3545"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F8D7DA"/>
+                    <Setter Property="BorderBrush" Value="#DC3545"/>
+                    <Setter Property="Foreground" Value="#721C24"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#F1B6BB"/>
+                    <Setter Property="Foreground" Value="#491217"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Debug Button Style -->
+        <Style x:Key="DebugButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="16">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F5F5"/>
+                    <Setter Property="BorderBrush" Value="#BBBBBB"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#EEEEEE"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.6"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
+         <Style x:Key="PolicySavedByTagCheckBox" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid x:Name="Root" SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="6"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Box -->
+                            <Border x:Name="Box"
+                                    Width="18" Height="18"
+                                    CornerRadius="4"
+                                    BorderBrush="#9E9E9E"
+                                    BorderThickness="1"
+                                    Background="White"
+                                    VerticalAlignment="Center"/>
+
+                            <!-- Check tick (only for IsChecked) -->
+                            <Path x:Name="Tick"
+                                Data="M 3 9 L 7 13 L 15 4"
+                                Stroke="White"
+                                StrokeThickness="2"
+                                StrokeEndLineCap="Round"
+                                StrokeStartLineCap="Round"
+                                Visibility="Collapsed"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"/>
+
+                            <!-- Saved badge (green dot) -->
+                            <Ellipse x:Name="SavedBadge"
+                                    Width="10" Height="10"
+                                    Fill="#28A745"
+                                    Stroke="White" StrokeThickness="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="-2,-2,0,0"
+                                    Visibility="Collapsed"/>
+
+                            <!-- Content -->
+                            <ContentPresenter Grid.Column="2"
+                                            VerticalAlignment="Center"
+                                            RecognizesAccessKey="True"
+                                            Content="{TemplateBinding Content}"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!-- Hover -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#757575"/>
+                            </Trigger>
+
+                            <!-- Checked visual -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="#28A745"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#28A745"/>
+                                <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+
+                            <!-- Disabled -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Box" Property="Opacity" Value="0.6"/>
+                                <Setter Property="Foreground" Value="#9E9E9E"/>
+                            </Trigger>
+
+                            <!-- Show saved badge when Tag == "Saved" -->
+                            <Trigger Property="Tag" Value="Saved">
+                                <Setter TargetName="SavedBadge" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+
+                            <!-- Keyboard focus cue -->
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Box" Property="BorderBrush" Value="#2962FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style x:Key="PolicyGreenDotCheckBox" TargetType="CheckBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <!-- Green Dot -->
+                            <Ellipse x:Name="SavedDot"
+                                    Width="16" Height="16"
+                                    Fill="#28A745"
+                                    Visibility="Collapsed"/>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <!-- Show dot only when Tag == Saved -->
+                            <Trigger Property="Tag" Value="Saved">
+                                <Setter TargetName="SavedDot" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Arrow"/> <!-- not a clickable look -->
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Logo Icon -->
+            <Image x:Name="LogoImage" Grid.Column="0"
+                   Width="52"
+                   Height="52"
+                   Margin="0,0,16,0"
+                   VerticalAlignment="Top"/>
+
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <TextBlock x:Name="Title_TextBlock" FontSize="22" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                <TextBlock x:Name="SubTitle_TextBlock" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- Graph Status Indicator -->
+                <Border x:Name="GraphStatusBorder"
+                        Background="LightGray"
+                        CornerRadius="12"
+                        Padding="8,4"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Visibility="Visible">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="GraphStatusIndicator"
+                                Width="8"
+                                Height="8"
+                                Fill="Gray"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"/>
+                        <TextBlock x:Name="GraphStatusText"
+                                Text="Graph Disconnected"
+                                FontSize="11"
+                                Foreground="DarkGray"
+                                VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                <Button x:Name="NewSessionButton" Style="{StaticResource ClearButton}" Content="Reset" Margin="0,0,8,0" Width="96"/>
+                <Button x:Name="RestoreSessionButton" Style="{StaticResource SecondaryButton}" Content="Restore Session" Margin="0,0,8,0" Width="110" Visibility="Collapsed"/>
+                <Button x:Name="ImportButton" Style="{StaticResource SecondaryButton}" Content="Import" Margin="0,0,8,0" Width="70"/>
+                <Button x:Name="PreviewButton" Style="{StaticResource PrimaryButton}" Content="Preview &amp; Generate" Width="141"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <!-- Tab Content -->
+            <TabControl x:Name="MainTabControl" Grid.Row="1">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem" BasedOn="{StaticResource PillTabItemStyle}"/>
+                </TabControl.Resources>
+                <!-- Main Tab -->
+                <TabItem x:Name="MainTab" Header="Main">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10,0,-10,0" Style="{StaticResource ModernScrollViewer}">
+                        <!-- Main Tab -->
+                        <Grid x:Name="MainTabContent" Visibility="Visible">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Organization Information" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16" />
+
+                                    <!-- Organization -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Label x:Name="Organization_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
+                                            <TextBlock Text="Organization" FontWeight="Medium"/>
+                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="Organization_TextBox"/>
+                                        <TextBlock x:Name="Organization_Required_TextBlock" Foreground="{StaticResource MutedTextBrush}" FontSize="12" Margin="0,4,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Organization Name -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                             <Label x:Name="OrgName_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
+                                            <TextBlock Text="Organization Name"  FontWeight="Medium"  Margin="0,0,0,4"/>
+                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="OrgName_TextBox"/>
+                                    </StackPanel>
+
+                                    <!-- Organization Unit Name -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                             <Label x:Name="OrgUnitName_HelpLabel" Content="&#x2139;"
+                                                Padding="0"
+                                                Margin="0,0,5,0"
+                                                FontSize="14"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="SteelBlue"
+                                                Cursor="Hand"/>
+                                            <TextBlock Text="Organization Unit Name" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        </StackPanel>
+                                        <TextBox x:Name="OrgUnitName_TextBox"/>
+                                    </StackPanel>
+
+                                    <!-- Description -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <TextBlock Text="Description" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <TextBox x:Name="Description_TextBox" Height="66" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" Padding="8"/>
+                                    </StackPanel>
+
+                                    <!-- M365 Environment -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <TextBlock x:Name="M365Environment_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <ComboBox x:Name="M365Environment_ComboBox" Width="380" HorizontalAlignment="Left" Style="{StaticResource ModernComboBox}"/>
+                                    </StackPanel>
+
+                                    <!-- Products -->
+                                    <StackPanel Margin="0,0,0,16">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <TextBlock x:Name="Products_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
+                                            <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
+                                        </StackPanel>
+
+                                        <Grid x:Name="ProductsGrid">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+
+                                        </Grid>
+                                    </StackPanel>
+
+                                    <!-- Products Supporting Exclusions -->
+                                    <StackPanel Margin="0,0,0,0">
+                                        <TextBlock x:Name="ExclusionsProducts_TextBlock" FontWeight="Medium" Margin="0,0,0,4"/>
+                                        <TextBlock x:Name="ExclusionsInfo_TextBlock" Foreground="{StaticResource MutedTextBrush}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- NEW: Exclusions Tab -->
+                <TabItem x:Name="ExclusionsPolicyTab" Header="Exclusions">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Information -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Policy Exclusions"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource PrimaryBrush}"
+                                        Margin="0,0,0,8"/>
+                                <TextBlock x:Name="ExclusionsTabInfo_TextBlock"
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Search and Filter Controls -->
+                        <Border x:Name="ExclusionsSearchAndFilterBorder" Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Search TextBox -->
+                                <TextBox x:Name="ExclusionsSearch_TextBox"
+                                        Grid.Column="0"
+                                        Margin="0,0,10,0"
+                                        Tag="Search policies by name or ID..." />
+
+                                <!-- Clear Search Button -->
+                                <Button x:Name="ExclusionsClearSearch_Button"
+                                        Grid.Column="1"
+                                        Content="&#x2715;"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ClearButton}"
+                                        ToolTip="Clear search"/>
+
+                                <!-- Criticality Filter ComboBox -->
+                                <ComboBox x:Name="ExclusionsCriticality_ComboBox"
+                                        Grid.Column="2"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="ExclusionsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Results Count -->
+                                <TextBlock x:Name="ExclusionsResultCount_TextBlock"
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource MutedTextBrush}"
+                                        Text="0 policies"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Nested Tab Control for Products -->
+                        <TabControl x:Name="ExclusionsProductTabControl" Grid.Row="2">
+                            <TabControl.Resources>
+                                <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
+                            </TabControl.Resources>
+
+                            <!-- AAD Exclusionss Tab -->
+                            <TabItem x:Name="AadExclusionsTab" Header="AAD" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="AadExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Defender Exclusionss Tab -->
+                            <TabItem x:Name="DefenderExclusionsTab" Header="DEFENDER" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="DefenderExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- EXO Exclusionss Tab -->
+                            <TabItem x:Name="ExoExclusionsTab" Header="EXO" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="ExoExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- PowerPlatform Exclusionss Tab -->
+                            <TabItem x:Name="PowerPlatformExclusionsTab" Header="POWERPLATFORM" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="PowerPlatformExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- SharePoint Exclusionss Tab -->
+                            <TabItem x:Name="SharePointExclusionsTab" Header="SHAREPOINT" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="SharePointExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Teams Exclusionss Tab -->
+                            <TabItem x:Name="TeamsExclusionsTab" Header="TEAMS" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="TeamsExclusionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+
+                <!-- Annotations Policy Tab -->
+                <TabItem x:Name="AnnotationsPolicyTab" Header="Annotate Policies">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Information -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Policy Annotations"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource PrimaryBrush}"
+                                        Margin="0,0,0,8"/>
+                                <TextBlock x:Name="AnnotationsTabInfo_TextBlock"
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Search and Filter Controls -->
+                        <Border x:Name="AnnotationsSearchAndFilterBorder" Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Search TextBox -->
+                                <TextBox x:Name="AnnotationsSearch_TextBox"
+                                        Grid.Column="0"
+                                        Margin="0,0,10,0"
+                                        Tag="Search policies by name or ID..." />
+
+                                <!-- Clear Search Button -->
+                                <Button x:Name="AnnotationsClearSearch_Button"
+                                        Grid.Column="1"
+                                        Content="&#x2715;"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ClearButton}"
+                                        ToolTip="Clear search"/>
+
+                                <!-- Criticality Filter ComboBox -->
+                                <ComboBox x:Name="AnnotationsCriticality_ComboBox"
+                                        Grid.Column="2"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="AnnotationsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Results Count -->
+                                <TextBlock x:Name="AnnotationsResultCount_TextBlock"
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource MutedTextBrush}"
+                                        Text="0 policies"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Nested Tab Control for Products -->
+                        <TabControl x:Name="AnnotationsProductTabControl" Grid.Row="2">
+                             <TabControl.Resources>
+                                <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
+                            </TabControl.Resources>
+
+                            <!-- AAD Annotations Tab -->
+                            <TabItem x:Name="AadAnnotationsTab" Header="AAD" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="AadAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Defender Annotations Tab -->
+                            <TabItem x:Name="DefenderAnnotationsTab" Header="DEFENDER" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="DefenderAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- EXO Annotations Tab -->
+                            <TabItem x:Name="ExoAnnotationsTab" Header="EXO" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="ExoAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- PowerPlatform Annotations Tab -->
+                            <TabItem x:Name="PowerPlatformAnnotationsTab" Header="POWERPLATFORM" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="PowerPlatformAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- SharePoint Annotations Tab -->
+                            <TabItem x:Name="SharePointAnnotationsTab" Header="SHAREPOINT" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="SharePointAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Teams Annotations Tab -->
+                            <TabItem x:Name="TeamsAnnotationsTab" Header="TEAMS" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="TeamsAnnotationsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+                <!-- Omissions Policy Tab -->
+                <TabItem x:Name="OmissionsPolicyTab" Header="Omit Policies">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Information -->
+                        <!-- Header Information -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <TextBlock Text="Policy Omissions"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource PrimaryBrush}"
+                                        Margin="0,0,0,8"/>
+                                <TextBlock x:Name="OmissionsTabInfo_TextBlock"
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Search and Filter Controls -->
+                        <Border x:Name="OmissionsSearchAndFilterBorder" Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Search TextBox -->
+                                <TextBox x:Name="OmissionsSearch_TextBox"
+                                        Grid.Column="0"
+                                        Margin="0,0,10,0"
+                                        Tag="Search policies by name or ID..." />
+
+                                <!-- Clear Search Button -->
+                                <Button x:Name="OmissionsClearSearch_Button"
+                                        Grid.Column="1"
+                                        Content="&#x2715;"
+                                        Width="30"
+                                        Height="30"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ClearButton}"
+                                        ToolTip="Clear search"/>
+
+                                <!-- Criticality Filter ComboBox -->
+                                <ComboBox x:Name="OmissionsCriticality_ComboBox"
+                                        Grid.Column="2"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Configured Filter ComboBox -->
+                                <ComboBox x:Name="OmissionsConfigured_ComboBox"
+                                        Grid.Column="3"
+                                        Margin="0,0,10,0"
+                                        Style="{StaticResource ModernComboBox}">
+                                </ComboBox>
+
+                                <!-- Results Count -->
+                                <TextBlock x:Name="OmissionsResultCount_TextBlock"
+                                        Grid.Column="4"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource MutedTextBrush}"
+                                        Text="0 policies"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Nested Tab Control for Products -->
+                        <TabControl x:Name="OmissionsProductTabControl" Grid.Row="2">
+                             <TabControl.Resources>
+                                <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
+                            </TabControl.Resources>
+
+                            <!-- AAD Omissions Tab -->
+                            <TabItem x:Name="AadOmissionsTab" Header="AAD" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="AadOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Defender Omissions Tab -->
+                            <TabItem x:Name="DefenderOmissionsTab" Header="DEFENDER" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="DefenderOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- EXO Omissions Tab -->
+                            <TabItem x:Name="ExoOmissionsTab" Header="EXO" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="ExoOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- PowerPlatform Omissions Tab -->
+                            <TabItem x:Name="PowerPlatformOmissionsTab" Header="POWERPLATFORM" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="PowerPlatformOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- SharePoint Omissions Tab -->
+                            <TabItem x:Name="SharePointOmissionsTab" Header="SHAREPOINT" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="SharePointOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+
+                            <!-- Teams Omissions Tab -->
+                            <TabItem x:Name="TeamsOmissionsTab" Header="TEAMS" IsEnabled="False">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
+                                    <StackPanel x:Name="TeamsOmissionsContent">
+                                        <!-- Will be populated dynamically -->
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+                <!-- Advanced Tab -->
+                <TabItem x:Name="AdvancedTab" Header="Advanced">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
+                        <Grid x:Name="AdvancedTabContent">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Advanced Configuration" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+
+                                    <!-- Application Section -->
+                                    <Border BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="4" Padding="16" Margin="0,0,0,16">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                <CheckBox x:Name="ApplicationSection_Toggle" Style="{StaticResource ToggleSwitch}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Application Settings" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <StackPanel x:Name="ApplicationSection_Content" Visibility="Collapsed">
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="AppID:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="AppId_TextBox" Width="300"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Certificate:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="CertificateThumbprint_TextBox" MinWidth="300" Width="Auto"/>
+                                                    <Button x:Name="SelectCertificateButton" Content="Select..." Style="{StaticResource SecondaryButton}" Width="70" Height="24" Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Output Section -->
+                                    <Border BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="4" Padding="16" Margin="0,0,0,16">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                <CheckBox x:Name="OutputSection_Toggle" Style="{StaticResource ToggleSwitch}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Output Settings" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <StackPanel x:Name="OutputSection_Content" Visibility="Collapsed">
+                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Output Path:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutPath_TextBox" Width="220" Text="."/>
+                                                    <Button x:Name="BrowseOutPathButton" Content="Browse..." Style="{StaticResource SecondaryButton}"
+                                                            Width="70" Height="24" Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Folder Name:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutFolderName_TextBox" Width="300" Text="M365BaselineConformance"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Provider FileName:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutProviderFileName_TextBox" Width="300" Text="ProviderSettingsExport"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Rego FileName:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutRegoFileName_TextBox" Width="300" Text="TestResults"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Report Name:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutReportName_TextBox" Width="300" Text="BaselineReports"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="JSON FileName:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutJsonFileName_TextBox" Width="300" Text="ScubaResults"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="CSV FileName:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutCsvFileName_TextBox" Width="300" Text="ScubaResults"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <TextBlock Text="Action Plan FileName:" Width="120" VerticalAlignment="Center"/>
+                                                    <TextBox x:Name="OutActionPlanFileName_TextBox" Width="300" Text="ActionPlan"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- OPA Section -->
+                                    <Border BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="4" Padding="16" Margin="0,0,0,16">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                <CheckBox x:Name="OpaSection_Toggle" Style="{StaticResource ToggleSwitch}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="OPA Settings" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <StackPanel x:Name="OpaSection_Content" Visibility="Collapsed">
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                <TextBlock Text="OPA Path:" Width="120" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="OpaPath_TextBox" Width="220" Text="."/>
+                                                <Button x:Name="BrowseOpaPathButton" Content="Browse..." Style="{StaticResource SecondaryButton}"
+                                                        Width="70" Height="24" Margin="8,0,0,0"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- General Settings -->
+                                    <Border BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="4" Padding="16" Margin="0,0,0,16">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                                <CheckBox x:Name="GeneralSection_Toggle" Style="{StaticResource ToggleSwitch}" Margin="0,0,8,0"/>
+                                                <TextBlock Text="General Settings" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+
+                                            <StackPanel x:Name="GeneralSection_Content" Visibility="Collapsed">
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <CheckBox x:Name="LogIn_CheckBox" Content="Login Required" IsChecked="True"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                    <CheckBox x:Name="DisconnectOnExit_CheckBox" Content="Disconnect on Exit"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Global Settings Tab -->
+                <TabItem x:Name="GlobalSettingsTab" Header="Global Settings">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
+                        <Grid x:Name="GlobalSettingsTabContent">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Global Settings" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16"/>
+                                    <TextBlock x:Name="GlobalSettingsInfo_TextBlock" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,16">
+                                        Configure global settings that apply across all policies and configurations.
+                                    </TextBlock>
+
+                                    <!-- Dynamic Global Settings Container -->
+                                    <StackPanel x:Name="GlobalSettingsContainer">
+                                        <!-- Global settings fields will be dynamically added here -->
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- Preview Tab -->
+                <TabItem x:Name="PreviewTab" Header="Preview">
+                    <!-- Preview Tab Content (Hidden by default) -->
+                    <Grid x:Name="PreviewTabContent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header (unchanged) -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="YAML Preview"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Margin="0,0,0,16"/>
+                                <TextBlock x:Name="PreviewTabInfo_TextBlock" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Scrollable YAML area -->
+                        <Border Grid.Row="1">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Style="{StaticResource ModernScrollViewer}">
+                                <TextBox x:Name="YamlPreview_TextBox"
+                                         FontFamily="Consolas, Courier New, monospace"
+                                         FontSize="14"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto"
+                                         IsReadOnly="True"
+                                         Background="#F8F9FA"
+                                         Padding="16"
+                                         VerticalContentAlignment="Top"/>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- Fixed action buttons (always visible at bottom) -->
+                        <Border Grid.Row="2" Background="Transparent" Padding="0,12,0,0">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button x:Name="CopyYamlButton"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Copy to Clipboard"
+                                        Margin="0,0,8,0" Width="116"/>
+                                <Button x:Name="DownloadYamlButton"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Content="Save YAML" Height="37" Width="104"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!-- Scuba Run Tab Content -->
+                <TabItem x:Name="ScubaRunTab" Header="Run ScubaGear">
+                    <Grid x:Name="ScubaRunTabContent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>    <!-- Header/Description -->
+                            <RowDefinition Height="Auto"/>    <!-- Control Panel -->
+                            <RowDefinition Height="*"/>       <!-- Status and Progress -->
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Section -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Run ScubaGear Configuration"
+                                            FontSize="18"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            Margin="0,0,12,0"/>
+
+                                    <!-- Cool Beta Badge
+                                    <Border Background="#E3F2FD"
+                                            BorderBrush="#2196F3"
+                                            BorderThickness="1"
+                                            CornerRadius="16"
+                                            Padding="10,4"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="BETA"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="#1976D2"/>
+                                    </Border>
+                                     -->
+                                </StackPanel>
+
+                                <TextBlock x:Name="ScubaRunDescription_TextBlock"
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Control Panel -->
+                        <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>  <!-- Run Button -->
+                                    <ColumnDefinition Width="*"/>     <!-- Parameters -->
+                                    <ColumnDefinition Width="Auto"/>  <!-- Product Progress -->
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Run Button Section -->
+                                <StackPanel Grid.Column="0" VerticalAlignment="Top" Margin="0,0,24,0">
+                                    <Button x:Name="ScubaRunStart_Button"
+                                            Style="{StaticResource ScubaRunButton}"
+                                            Content="Run ScubaGear"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            Width="220"
+                                            Height="150"
+                                            IsEnabled="False"
+                                            Margin="0,0,0,12"/>
+                                    <Button x:Name="ScubaRunStop_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Stop Execution"
+                                            Width="220"
+                                            Height="150"
+                                            IsEnabled="False"
+                                            Background="#DC3545"
+                                            Foreground="White"
+                                            Visibility="Collapsed"/>
+                                    <TextBlock x:Name="ScubaRunPowerShellVersion_TextBlock"
+                                            FontSize="10"
+                                            Foreground="{StaticResource MutedTextBrush}"
+                                            HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Margin="0,0,24,0">
+                                    <TextBlock Text="Execution Parameters:"
+                                            FontWeight="SemiBold"
+                                            Margin="0,0,0,8"/>
+
+                                    <!-- Dynamic Parameters Container -->
+                                    <StackPanel x:Name="ScubaRunParametersContainer">
+                                        <!-- Parameters will be dynamically added here -->
+                                    </StackPanel>
+
+                                </StackPanel>
+
+                               <!-- Product Progress Section -->
+                                <Border Grid.Column="2"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="12"
+                                    Background="#FAFAFA"
+                                    Width="300">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Status Text with ScrollViewer -->
+                                        <ScrollViewer Grid.Row="0"
+                                                    VerticalScrollBarVisibility="Auto"
+                                                    HorizontalScrollBarVisibility="Disabled"
+                                                    MaxHeight="120"
+                                                    Style="{StaticResource ModernScrollViewer}">
+                                            <TextBlock x:Name="ScubaRunStatus_TextBlock"
+                                                FontWeight="SemiBold"
+                                                Margin="0,8,0,8"
+                                                TextWrapping="Wrap"
+                                                Text="Status: Not Started"
+                                                Foreground="{StaticResource PrimaryBrush}"
+                                                Width="276"/>
+                                        </ScrollViewer>
+
+                                        <!-- Product Progress -->
+                                        <StackPanel Grid.Row="1" x:Name="ProductProgress_StackPanel">
+                                            <!-- Dynamic product progress items will be added here -->
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Status and Output Section -->
+                        <Border Grid.Row="2" Style="{StaticResource Card}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Status Header -->
+                                <Grid Grid.Row="0" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                            Text="Execution Output"
+                                            FontWeight="SemiBold"/>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Button x:Name="ScubaRunClearOutput_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Clear"
+                                            Width="60"
+                                            Height="24"
+                                            FontSize="10"
+                                            Margin="0,0,8,0"/>
+                                        <Button x:Name="ScubaRunCopyOutput_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="Copy"
+                                            Width="60"
+                                            Height="24"
+                                            FontSize="10"
+                                            Margin="0,0,8,0"/>
+                                        <Button x:Name="ScubaRunViewConfig_Button"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Content="View Config"
+                                            Width="80"
+                                            Height="24"
+                                            FontSize="10"
+                                            IsEnabled="False"
+                                            ToolTip="View the configuration file used in the last successful run"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Output TextBox -->
+                                <Border Grid.Row="1"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4">
+                                    <TextBox x:Name="ScubaRunOutput_TextBox"
+                                            IsReadOnly="True"
+                                            VerticalScrollBarVisibility="Auto"
+                                            HorizontalScrollBarVisibility="Auto"
+                                            FontFamily="Consolas"
+                                            FontSize="11"
+                                            Background="#1E1E1E"
+                                            Foreground="#FFFFFF"
+                                            Padding="8"
+                                            TextWrapping="NoWrap"
+                                            AcceptsReturn="True"
+                                            Text="Ready to execute ScubaGear configuration...&#x0A;"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabItem>
+
+                <!-- Results Tab -->
+                <TabItem x:Name="ResultsTab" Header="Results" IsEnabled="False">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header Information -->
+                        <Border Grid.Row="0" Style="{StaticResource Card}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBlock Text="ScubaGear Results"
+                                            FontSize="18"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource PrimaryBrush}"
+                                            Margin="0,0,12,0"/>
+                                    <!-- Cool Beta Badge
+                                    <Border Background="#E3F2FD"
+                                            BorderBrush="#2196F3"
+                                            BorderThickness="1"
+                                            CornerRadius="16"
+                                            Padding="10,4"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="BETA"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="#1976D2"/>
+                                    </Border>
+                                    -->
+                                    <!-- Results Badge -->
+                                    <Border x:Name="ResultsCountBorder"
+                                        Background="#E8F5E8"
+                                        BorderBrush="#4CAF50"
+                                        BorderThickness="1"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        VerticalAlignment="Center">
+                                        <TextBlock x:Name="ResultsCountText"
+                                                Text="0 Reports"
+                                                FontSize="11"
+                                                Foreground="#2E7D32"
+                                                FontWeight="SemiBold"/>
+                                    </Border>
+
+                                </StackPanel>
+
+                                <TextBlock x:Name="ResultsDescription_TextBlock"
+                                        Text="View ScubaGear compliance reports from previous runs. Each tab represents a different execution with timestamp."
+                                        TextWrapping="Wrap"
+                                        Foreground="{StaticResource MutedTextBrush}"/>
+
+                                <!-- Control Buttons -->
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <Button x:Name="ResultsRefresh_Button"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Refresh Results"
+                                        Margin="0,0,8,0"
+                                        Width="120"
+                                        Height="32"/>
+                                    <Button x:Name="ResultsOpenFolder_Button"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Open Results Folder"
+                                        Margin="0,0,8,0"
+                                        Width="140"
+                                        Height="32"/>
+                                </StackPanel>
+
+                                <!-- Progress Bar for Scanning -->
+                                <StackPanel x:Name="ResultsScanProgress" Visibility="Collapsed" Margin="0,12,0,0">
+                                    <TextBlock x:Name="ResultsScanStatus"
+                                             Text="Scanning for ScubaGear reports..."
+                                             FontSize="12"
+                                             Foreground="{StaticResource MutedTextBrush}"
+                                             Margin="0,0,0,4"/>
+                                    <ProgressBar x:Name="ResultsProgressBar"
+                                               Height="4"
+                                               IsIndeterminate="True"
+                                               Background="#E0E0E0"
+                                               Foreground="{StaticResource PrimaryBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Results Tab Control -->
+                        <TabControl x:Name="ResultsTabControl" Grid.Row="1">
+                            <TabControl.Resources>
+                                <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
+                            </TabControl.Resources>
+
+                            <!-- Default "No Results" Tab -->
+                            <TabItem x:Name="ResultsEmptyTab" Header="No Results Available">
+                                <Border Style="{StaticResource Card}">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="No ScubaGear results found"
+                                                FontSize="18"
+                                                FontWeight="SemiBold"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,0,0,8"/>
+                                        <TextBlock Text="Run ScubaGear to generate compliance reports that will appear here."
+                                                FontSize="14"
+                                                Foreground="{StaticResource MutedTextBrush}"
+                                                HorizontalAlignment="Center"
+                                                TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </TabItem>
+
+                            <!-- Dynamic result tabs will be added here by PowerShell -->
+
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+
+            </TabControl>
+        </Grid>
+
+        <!-- Footer -->
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="Version_TextBlock" Text="v1.0.0" FontSize="12" Foreground="Gray" VerticalAlignment="Center"/>
+                <Button x:Name="ChangelogButton"
+                        Content="What's New"
+                        FontSize="10"
+                        Padding="6,2"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderBrush="LightGray"
+                        BorderThickness="1"
+                        Cursor="Hand"/>
+            </StackPanel>
+
+            <!-- Centered Content -->
+            <TextBlock Grid.Column="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    TextAlignment="Center">
+                <Run Text="ScubaConfigApp" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
+                <Run Text=" | "/>
+                <Hyperlink NavigateUri="https://github.com/cisagov/ScubaGear">
+                    GitHub Repository
+                </Hyperlink>
+            </TextBlock>
+
+            <!-- Debug Button - Bottom Right -->
+            <Button x:Name="DebugButton" Grid.Column="2" Content="Debug"
+                        Style="{StaticResource DebugButtonStyle}" ToolTip="Open Debug Window"
+                        Width="80" Height="32" Margin="0,0,0,0" HorizontalAlignment="Right"/>
+        </Grid>
+    </Grid>
+</Window>

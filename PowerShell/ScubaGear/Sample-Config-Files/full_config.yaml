@@ -58,6 +58,16 @@ OutProviderFileName: ProviderSettingsExport
 OutRegoFileName: TestResults
 OutReportName: BaselineReports
 
+# Use this parameter to control what DNS resolver is used to fetch the SPF,
+# DKIM, and DMARC records
+# PreferredDnsResolvers:
+#   - 8.8.8.8
+#   - 8.8.4.4
+
+# Uncomment the following line if you prefer ScubaGear not retry any failed DNS
+# queries over DoH (using Cloudflare)
+# SkipDoH: true
+
 # An anObject is equivalent to an array of objects in JSON.
 # This is an example of a custom variable that can be used in Rego policies.
 # AnObject:
@@ -213,7 +223,7 @@ AnnotatePolicy:
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1:
     Comment: Implementation in progress.
-    RemediationDate: 12/1/2025
+    RemediationDate: 2025-12-01
   # -------------------------------------
   # ANNOTATEPOLICY : EXO SAMPLE
   # -------------------------------------

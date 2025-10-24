@@ -247,14 +247,29 @@ function New-Report {
 
                 $Config = $SettingsExport.scuba_config
 
+                # Save the original result details before any annotations are added. (Add-Annotation below modifies the contents of the details field)
+                $OriginalDetails = $Result.Details
+
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
+
+                # Declare annotation fields at the top level. If they exist, these fields need to be included 
+                # in the control object regardless if the control is omitted, incorrect, or normal
+                $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
+                $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
+
+                $Comments = @()
+                if (-not [string]::IsNullOrEmpty($PolicyComment)) { $Comments += $PolicyComment }
 
                 # Check if the config file indicates the control should be omitted
                 $Omit = Get-OmissionState $Config $Control.Id
                 if ($Omit) {
                     $ReportSummary.Omits += 1
                     $OmitRationale = $Config.OmitPolicy.$($Control.Id).Rationale
+                    $OmitExpiration = $Config.OmitPolicy.$($Control.Id).Expiration
+
+                    if(-not [string]::IsNullOrEmpty($OmitRationale)) { $Comments += $OmitRationale }
+
                     if ([string]::IsNullOrEmpty($OmitRationale)) {
                         Write-Warning "Config file indicates omitting $($Control.Id), but no rationale provided."
                         $Details = "Test omitted by user. <span class='comment-heading'>User justification not provided</span>"
@@ -272,6 +287,10 @@ function New-Report {
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
                         "IncorrectDetails"="N/A"
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$OriginalDetails
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($OmitExpiration)) {"N/A"} else {$OmitExpiration}
                     }
                     continue
                 }
@@ -279,8 +298,6 @@ function New-Report {
                 # If the user commented on a failed control, save the comment to the failed control to comment mapping
                 $IncorrectResult = Get-IncorrectResult $Config $Control.Id
                 if ($Result.DisplayString -eq "Fail") {
-                    $UserComment = $Config.AnnotatePolicy.$($Control.Id).Comment
-                    $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
@@ -299,7 +316,11 @@ function New-Report {
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
-                        "IncorrectDetails"=$Result.Details
+                        "IncorrectDetails"=$OriginalDetails
+                        "OriginalResult"=$Result.DisplayString
+                        "OriginalDetails"=$OriginalDetails
+                        "Comments"=$Comments
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                     }
                     continue
                 }
@@ -316,21 +337,32 @@ function New-Report {
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"=$Result.DisplayString
+                    "OriginalDetails"=$OriginalDetails
+                    "Comments"=$Comments
+                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
                 }
             }
             else {
                 # The test result is missing
                 $ReportSummary.Errors += 1
+                $ControlResult = "Error - Test results missing"
+                $ControlDetails = "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
                     "Requirement"=$Control.Value
-                    "Result"= "Error - Test results missing"
+                    "Result"= $ControlResult
                     "Criticality"= "-"
-                    "Details"= "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
+                    "Details"= $ControlDetails
                     "OmittedEvaluationResult"="N/A"
                     "OmittedEvaluationDetails"="N/A"
                     "IncorrectResult"="N/A"
                     "IncorrectResultDetails"="N/A"
+                    "OriginalResult"=$ControlResult
+                    "OriginalDetails"=$ControlDetails
+                    "Comments"=$Comments
+                    "AnnotationRemediationDate"="N/A"
+                    "OmissionExpirationDate"="N/A"
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
@@ -369,7 +401,7 @@ function New-Report {
     # Craft the json report
     $ReportJson.ReportSummary = $ReportSummary
     $JsonFileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.json"
-    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 5
+    $ReportJson = ConvertTo-Json @($ReportJson) -Depth 10
 
     # ConvertTo-Json for some reason converts the <, >, and ' characters into unicode escape sequences.
     # Convert those back to ASCII.
@@ -397,6 +429,16 @@ function New-Report {
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
+        # The template HTML files contain embedded expressions (e.g., {AADWARNING}) which act as placeholders for where dynamic content is inserted.
+        # This allows us to dynamically inject generated HTML sections into the final report output.
+        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
+
+        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
+        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
+
+        # Same for risky applications and third-party service principals
+        $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
+        $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -425,6 +467,7 @@ function New-Report {
 
         # Create a section header for the licensing information
         $LicensingHTML = "<h2>Tenant Licensing Information</h2>" + $LicenseTable
+        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
 
         if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_service_principals) {
 
@@ -445,21 +488,18 @@ function New-Report {
             # Create a section header for the service principal information
             $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
-
         }
-        else{
+        else {
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-
         }
-        $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
-        $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", $LicensingHTML)
-        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
         $CapJson = "null"
+        $RiskyAppsJson = "null"
+        $RiskyThirdPartySPJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -507,22 +547,38 @@ function New-Report {
         $ReportHTML = $ReportHTML.Replace("{DNS_LOGS}", "")
     }
 
-    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles"
-    $MainCSS = (Get-Content $(Join-Path -Path $CssPath -ChildPath "main.css")) -Join "`n"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>
-        $($MainCSS)
-    </style>")
+    # Inject CSS into individual HTML report template
+    $CssPath = Join-Path -Path $ReporterPath -ChildPath "styles" -ErrorAction "Stop"
+    $MainCSS = Get-Content (Join-Path -Path $CssPath -ChildPath "Main.css") -Raw
+    $ReportHTML = $ReportHTML.Replace("{MAIN_CSS}", "<style>`n $($MainCSS) `n</style>")
 
-    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts"
-    $MainJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "main.js")) -Join "`n"
-    $MainJS = "const caps = $($CapJson);`n$($MainJS)"
-    $UtilsJS = (Get-Content $(Join-Path -Path $ScriptsPath -ChildPath "utils.js")) -Join "`n"
-    $MainJS = "$($MainJS)`n$($UtilsJS)"
-    $ReportHTML = $ReportHTML.Replace("{MAIN_JS}", "<script>
-        let darkMode = $($DarkMode.ToString().ToLower());
-        $($MainJS)
-    </script>")
+    $JsonScriptTags = @(
+        "<script type='application/json' id='dark-mode-flag'> $($DarkMode.ToString().ToLower()) </script>"
+        "<script type='application/json' id='cap-json'> $($CapJson) </script>"
+        "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
+        "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
+    ) -join "`n"
+    $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
+    # Load JS files 
+    $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
+    $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
+    $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
+    $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
+    $EXOFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "EXOTableFunctions.js") -Raw
+    $AADFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "AADTableFunctions.js") -Raw
+    $KeyValueListFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "KeyValueListFunctions.js") -Raw
+
+    $JSFiles = @(
+        $IndividualReportJS
+        $UtilsJS
+        $TableFunctionsJS
+        $EXOFunctionsJS
+        $AADFunctionsJS
+        $KeyValueListFunctionsJS
+    ) -join "`n"
+
+    $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
     [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
@@ -768,8 +824,9 @@ function New-MarkdownAnchor{
     [Int32]$OutNumber = $null
 
     if ($true -eq [Int32]::TryParse($GroupNumber, [ref]$OutNumber)){
-        $MangledName = $GroupName.ToLower().Trim().Replace(' ', '-')
-        return "#$($GroupNumber.Trim())-$MangledName"
+        # Remove commas, parentheses, and other special characters, then replace spaces with hyphens
+        $MangledName = $GroupName.ToLower().Trim() -replace '[,\(\)]', '' -replace '\s+', '-'
+        return "#$GroupNumber-$MangledName"
     }
     else {
         $InvalidGroupNumber = New-Object System.ArgumentException "$GroupNumber is not valid"
@@ -805,5 +862,6 @@ function Resolve-HTMLMarkdown{
 
 Export-ModuleMember -Function @(
     'New-Report',
-    'Import-SecureBaseline'
+    'Import-SecureBaseline',
+    'New-MarkdownAnchor'
 )
