@@ -21,9 +21,13 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
+<<<<<<< HEAD
     "OPAVersion": "1.10.1",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
+=======
+    "OPAVersion": "1.9.0"
+>>>>>>> ae23be9 (Update PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json)
   },
   "minRequired": [
     "ProductNames"
