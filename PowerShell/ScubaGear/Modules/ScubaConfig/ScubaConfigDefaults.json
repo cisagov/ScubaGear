@@ -21,7 +21,7 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.6.0"
+    "OPAVersion": "1.9.0"
   },
   "minRequired": [
     "ProductNames"
