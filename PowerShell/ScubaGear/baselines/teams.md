@@ -388,7 +388,7 @@ Teams email integration SHALL be disabled.
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
-- _Note:_ Teams email integration is not available in GCC, GCC High, or DoD regions.
+- _Note:_ Teams email integration is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8, SC-7(10)(a), AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
