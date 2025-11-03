@@ -31,9 +31,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
-**Sensitive Accounts**: This term denotes a set of user accounts that have
-access to sensitive and high-value information. As a result, these accounts
-may be at a higher risk of being targeted.
+**Sensitive Accounts**: This term denotes a set of user accounts that have access to sensitive and high-value information. Certain accounts—like those belonging to CEOs, CFOs, CISOs, and IT administrators—have access to highly sensitive data and critical systems, making them prime targets for cyberattacks. These accounts, referred to as priority accounts, require enhanced security measures to minimize the risk of compromise.
 
 # Baseline Policies
 
@@ -252,7 +250,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.DEFENDER.2.3v1
-Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
+Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
