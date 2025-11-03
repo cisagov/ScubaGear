@@ -40,8 +40,7 @@ InModuleScope Orchestrator {
                 function Disconnect-SCuBATenant {
                     $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
-                function Get-ScubaDefault {throw 'this will be mocked'}
-                Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
+                # Get-ScubaDefault function removed - now uses [ScubaConfig]::ScubaDefault() static method
                 Mock -CommandName New-Item {}
                 Mock -CommandName Copy-Item {}
             }
@@ -62,8 +61,8 @@ InModuleScope Orchestrator {
                         OutRegoFileName='ScubaTestResults'
                         OutReportName='ScubaReports'
                         Organization='sub.domain.com'
-                        AppID='7892dfe467aef9023be'
-                        CertificateThumbprint='8A673F1087453ABC894'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
                 [ScubaConfig]::ResetInstance()
@@ -82,8 +81,8 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
                 @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
-                @{ Parameter = "AppID";                 Value = "7892dfe467aef9023be"  },
-                @{ Parameter = "CertificateThumbprint"; Value = "8A673F1087453ABC894"  }
+                @{ Parameter = "AppID";                 Value = "12345678-1234-1234-1234-123456789012"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "1234567890ABCDEF1234567890ABCDEF12345678"  }
                 ){
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
@@ -104,8 +103,8 @@ InModuleScope Orchestrator {
                   -OutReportName "MyReport" `
                   -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `
-                  -AppID "1212121212121212121" `
-                  -CertificateThumbprint "AB123456789ABCDEF01" `
+                  -AppID "87654321-4321-4321-4321-210987654321" `
+                  -CertificateThumbprint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
                   -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
@@ -121,8 +120,8 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutReportName";         Value = "MyReport"             },
                 @{ Parameter = "OutJsonFileName";       Value = "JsonResults"          },
                 @{ Parameter = "Organization";          Value = "good.four.us"         },
-                @{ Parameter = "AppID";                 Value = "1212121212121212121"  },
-                @{ Parameter = "CertificateThumbprint"; Value = "AB123456789ABCDEF01"  }
+                @{ Parameter = "AppID";                 Value = "87654321-4321-4321-4321-210987654321"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "ABCDEF1234567890ABCDEF1234567890ABCDEF12"  }
                 ){
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
@@ -156,8 +155,8 @@ InModuleScope Orchestrator {
                         OutRegoFileName='ScubaTestResults'
                         OutReportName='ScubaReports'
                         Organization='sub.domain.com'
-                        AppID='7892dfe467aef9023be'
-                        CertificateThumbprint='8A673F1087453ABC894'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
                 Invoke-SCuBA `

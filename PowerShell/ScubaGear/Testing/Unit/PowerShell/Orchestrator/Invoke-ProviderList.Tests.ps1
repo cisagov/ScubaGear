@@ -18,12 +18,13 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-TeamsProvider {}
         function Get-FileEncoding {}
         Mock -ModuleName Orchestrator Get-FileEncoding {}
+        function Set-Utf8NoBom {}
+        Mock -ModuleName Orchestrator Set-Utf8NoBom {}
 
         Mock -CommandName Write-Progress {}
         Mock -CommandName Join-Path {"."}
         Mock -CommandName Set-Content {}
         Mock -CommandName Get-TimeZone {}
-        Mock -CommandName Set-Utf8NoBom {}
         Mock -CommandName Write-Debug {}
     }
     Context 'When running the providers on commercial tenants' {
@@ -37,8 +38,6 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                     ModuleVersion         = '1.0';
                     BoundParameters       = @{};
                     Guid                  = "00000000-0000-0000-0000-000000000000";
-                    PreferredDnsResolvers = @();
-                    SkipDoH               = $false;
             }
         }
         It 'With -ProductNames "aad", should not throw' {
