@@ -1,15 +1,12 @@
-#Requires -Modules @{ModuleName = 'Pester'; ModuleVersion = '5.0.0'}
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
 
-BeforeAll {
-    # Import required modules
-    Import-Module powershell-yaml -Force -ErrorAction Stop
+Describe "ScubaConfigValidator Basic Validation" {
+    BeforeAll {
+        # Initialize the validator
+        [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
 
-    # Initialize the validator
-    [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
-
-    # Test YAML configurations
-    $script:ValidConfigYaml = @"
+        # Test YAML configurations
+        $script:ValidConfigYaml = @"
 ProductNames:
   - aad
   - defender
@@ -71,7 +68,6 @@ ExclusionsConfig:
 "@
 }
 
-Describe "ScubaConfigValidator Basic Validation" {
     Context "Valid Configurations" {
         It "Should validate configuration with proper structure and required fields" {
             $script:ValidConfigYaml | Out-File -FilePath "TestData_Valid.yaml" -Encoding UTF8

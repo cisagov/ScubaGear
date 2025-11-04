@@ -1,17 +1,13 @@
-#Requires -Modules @{ModuleName = 'Pester'; ModuleVersion = '5.0.0'}
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
-BeforeAll {
-    # Import required modules
-    Import-Module powershell-yaml -Force -ErrorAction Stop
-
-    # Initialize the system
-    [ScubaConfig]::InitializeValidator()
-}
-
 InModuleScope ScubaConfig {
 Describe "JSON-based Configuration System" {
+    BeforeAll {
+        # Initialize the system
+        [ScubaConfig]::InitializeValidator()
+    }
+
     Context "System Initialization" {
         It "Should initialize the validator successfully" {
             { [ScubaConfig]::InitializeValidator() } | Should -Not -Throw
