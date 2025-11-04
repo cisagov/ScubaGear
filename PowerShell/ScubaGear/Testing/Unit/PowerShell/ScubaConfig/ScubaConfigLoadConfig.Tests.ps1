@@ -8,6 +8,12 @@ InModuleScope ScubaConfig {
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
 	    Remove-Item function:\ConvertFrom-Yaml
         }
+
+        AfterAll {
+            # Reset instance after all tests in this file
+            [ScubaConfig]::ResetInstance()
+        }
+
         context 'Handling repeated keys in YAML file' {
             It 'Load config with dupliacte keys'{
                 # Load the first file and check the ProductNames value.

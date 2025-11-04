@@ -5,6 +5,11 @@ InModuleScope ScubaConfig {
         BeforeAll {
             [ScubaConfig]::ResetInstance()
         }
+
+        AfterAll {
+            [ScubaConfig]::ResetInstance()
+        }
+
         Context 'General case'{
             It 'Get Instance without loading'{
                $Config1 = [ScubaConfig]::GetInstance()
