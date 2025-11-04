@@ -47,9 +47,14 @@ function Get-RegoResult {
         $Result.SummaryKey = "Passes"
         $Result.Details = $Test.ReportDetails
     }
-    elseif ($Test.Criticality -eq "Should" -or $Test.Criticality.EndsWith('Should/Conditional')) {
+    elseif ($Test.Criticality -eq "Should") {
         $Result.DisplayString = "Warning"
         $Result.SummaryKey = "Warnings"
+        $Result.Details = $Test.ReportDetails
+    }
+        elseif ($Test.Criticality -eq "Should/Conditional") {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Manual"
         $Result.Details = $Test.ReportDetails
     }
     elseif ($Test.Criticality.EndsWith('3rd Party') -or $Test.Criticality.EndsWith('Not-Implemented')) {
@@ -58,17 +63,17 @@ function Get-RegoResult {
         $Result.Details = $Test.ReportDetails
     }
     elseif ($Test.Criticality -eq "Shall/Conditional") {
-    if($Test.RequirementMet) {
+        if($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
         $Result.SummaryKey = "Passes"
         $Result.Details = $Test.ReportDetails
     }
-     else {
+    else {
         $Result.DisplayString = "N/A"
         $Result.SummaryKey = "Manual"
         $Result.Details = $Test.ReportDetails
-  }
-} 
+    }
+    } 
     else {
         $Result.DisplayString = "Fail"
         $Result.SummaryKey = "Failures"
