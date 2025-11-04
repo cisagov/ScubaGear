@@ -6,6 +6,11 @@ Describe "ScubaConfig JSON-based Configuration Tests" {
         [ScubaConfig]::ResetInstance()
     }
 
+    AfterEach {
+        # Reset the instance after each test to prevent state bleed
+        [ScubaConfig]::ResetInstance()
+    }
+
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
@@ -37,7 +42,7 @@ OrgUnitName: IT Department
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
-        $ValidationResult.IsValid | Should -BeTrue
+        $ValidationResult.IsValid | Should -Be $True
         $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
 
         Remove-Item -Path $TempFile -Force
@@ -56,7 +61,7 @@ Organization: invalid_format
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
-        $ValidationResult.IsValid | Should -BeFalse
+        $ValidationResult.IsValid | Should -Be $False
         $ValidationResult.ValidationErrors.Count | Should -BeGreaterThan 0
 
         Remove-Item -Path $TempFile -Force
@@ -112,7 +117,7 @@ ExclusionsConfig:
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
-        $ValidationResult.IsValid | Should -BeTrue
+        $ValidationResult.IsValid | Should -Be $True
 
         Remove-Item -Path $TempFile -Force
     }
@@ -122,7 +127,7 @@ ExclusionsConfig:
 
         $AadInfo | Should -Not -BeNullOrEmpty
         $AadInfo.name | Should -Be "Microsoft Entra ID"
-        $AadInfo.supportsExclusions | Should -BeTrue
+        $AadInfo.supportsExclusions | Should -Be $True
         $AadInfo.supportedExclusionTypes | Should -Contain "CapExclusions"
     }
 
@@ -164,7 +169,7 @@ OutFolderName: CustomOutputFolder
         $Config = [ScubaConfig]::GetInstance()
         $LoadResult = $Config.LoadConfig($TempFile)
 
-        $LoadResult | Should -BeTrue
+        $LoadResult | Should -Be $True
         $Config.Configuration.ProductNames | Should -Contain "aad"
         $Config.Configuration.ProductNames | Should -Contain "teams"
         $Config.Configuration.M365Environment | Should -Be "gcc"
