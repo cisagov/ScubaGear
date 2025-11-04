@@ -58,15 +58,17 @@ function Get-RegoResult {
         $Result.Details = $Test.ReportDetails
     }
     elseif ($Test.Criticality -eq "Shall/Conditional") {
-        $Result.DisplayString = "N/A"
-        $Result.SummaryKey = "Manual"
-        $Result.Details = $Test.ReportDetails
-    }
-     elseif ($Test.Criticality -eq "Shall/Conditional") {
+    if($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
         $Result.SummaryKey = "Passes"
         $Result.Details = $Test.ReportDetails
-    }   
+    }
+     else {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Manual"
+        $Result.Details = $Test.ReportDetails
+  }
+} 
     else {
         $Result.DisplayString = "Fail"
         $Result.SummaryKey = "Failures"
