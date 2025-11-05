@@ -87,7 +87,7 @@ The Publish to Web feature SHOULD be disabled unless the agency mission requires
 ### Implementation
 #### MS.POWERBI.1.1v1 Instructions
 
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
 
@@ -129,24 +129,28 @@ Guest user access to the Power BI tenant SHOULD be disabled unless the agency mi
 ### Implementation
 #### MS.POWERBI.2.1v1 Instructions
 To Disable Completely:
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Guest users can access Microsoft Fabric** and set to **Disabled**
+4. For **Commercial** tenants Click on **Guest users can access Microsoft Fabric** and set to **Disabled**
+
+5. For **GCC, GCC High and DoD** tenants Click on **Allow Azure Active Directory guest users to access Power BI** and set to **Disabled**
 
 To Enable with Security Group(s):
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Guest users can access Microsoft Fabric** and set to **Enabled**
+4. For **Commercial** tenants Click on **Guest users can access Microsoft Fabric** and set to **Enabled**
 
-5. Select the security group(s) you want to have access to the PowerBI tenant.
+5. For **GCC, GCC High and DoD** tenants Click on **Allow Azure Active Directory guest users to access Power BI** and set to **Enabled**
+
+6. Select the security group(s) you want to have access to the PowerBI tenant.
 > Note:
 > You may need to make a specific security group(s)
 
@@ -197,7 +201,7 @@ The Invite external users to your organization feature SHOULD be disabled unless
 ### Implementation
 #### MS.POWERBI.3.1v1 Instructions
 To disable completely:
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
 
@@ -206,7 +210,7 @@ To disable completely:
 4. Click on **Users can invite guest users to collaborate through item sharing and permissions** and set to **Disabled**
 
 To enable with security groups:
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant Settings**
 
@@ -285,7 +289,7 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 
 ### Implementation
 #### MS.POWERBI.4.1v1 Instructions
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -296,7 +300,7 @@ Choose a specific security group allowed to use service principles for the APIs.
 
 
 #### MS.POWERBI.4.2v1 Instructions
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -349,7 +353,7 @@ ResourceKey-based authentication SHOULD be blocked unless a specific use case (e
 
 ### Implementation
 #### MS.POWERBI.5.1v1 Instructions
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -395,7 +399,7 @@ Python and R interactions SHOULD be disabled.
 
 ### Implementation
 #### MS.POWERBI.6.1v1 Instructions
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -472,7 +476,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 ### Implementation
 #### MS.POWERBI.7.1v1 Instructions
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -510,7 +514,7 @@ sources, see below:
 
 ***To enable sensitivity label inheritance from data sources:***
 
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
@@ -533,7 +537,7 @@ tenant setting is enabled and a report has a sensitivity label with
 protection settings, then users cannot create sharing links for people in
 the agency.
 
-1. Navigate to the **Microsoft Fabric Admin portal**
+1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
