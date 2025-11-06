@@ -67,8 +67,8 @@ Describe "JSON-based Configuration System" {
 
         It "Should have environments defined in defaults" {
             $defaults = [ScubaConfig]::GetConfigDefaults()
-            $defaults.environments | Should -Not -BeNullOrEmpty
-            $defaults.environments.PSObject.Properties.Count | Should -BeGreaterThan 0
+            $defaults.M365Environment | Should -Not -BeNullOrEmpty
+            $defaults.M365Environment.PSObject.Properties.Count | Should -BeGreaterThan 0
         }
 
         It "Should have validation settings defined" {

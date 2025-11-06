@@ -131,7 +131,7 @@ ExclusionsConfig:
         $AadInfo.supportedExclusionTypes | Should -Contain "CapExclusions"
     }
 
-    It "Should get supported products and environments" {
+    It "Should get supported products and M365environments" {
         $Products = [ScubaConfig]::GetSupportedProducts()
         $Environments = [ScubaConfig]::GetSupportedEnvironments()
 
