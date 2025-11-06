@@ -279,7 +279,7 @@ class ScubaConfig {
 
     static [array] GetSupportedEnvironments() {
         [ScubaConfig]::InitializeValidator()
-        return [ScubaConfig]::_ConfigDefaults.environments.PSObject.Properties.Name
+        return [ScubaConfig]::_ConfigDefaults.M365Environment.PSObject.Properties.Name
     }
 
     static [object] GetProductInfo([string]$ProductName) {
