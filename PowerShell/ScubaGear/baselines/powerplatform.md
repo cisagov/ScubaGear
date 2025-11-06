@@ -431,8 +431,6 @@ The Share with Everyone feature SHOULD be disabled.
 ### Resources
 - [Limit Sharing with Everyone \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/guidance/adoption/secure-default-environment#limit-sharing-with-everyone)
-- [Everyone Security Group \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-special-identities-groups#everyone)
 
 ### License Requirements
 
