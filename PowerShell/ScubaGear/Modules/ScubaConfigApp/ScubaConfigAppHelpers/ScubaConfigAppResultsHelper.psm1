@@ -426,6 +426,7 @@ Function Test-ResultsDataValidity {
                 $passes = [string]$productSummary.Passes
                 $warnings = [string]$productSummary.Warnings
                 $failures = [string]$productSummary.Failures
+                $Conditional = [string]$productSummary.Conditional
                 $manual = [string]$productSummary.Manual
                 $errors = [string]$productSummary.Errors
 
@@ -878,6 +879,7 @@ Function New-ResultsContent {
             $passes = [string]$productData.Passes
             $warnings = [string]$productData.Warnings
             $failures = [string]$productData.Failures
+            $Conditional = [string]$productData.Conditional
             $manual = [string]$productData.Manual
             $errors = [string]$productData.Errors
 

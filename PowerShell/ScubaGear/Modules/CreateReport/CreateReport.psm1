@@ -54,7 +54,7 @@ function Get-RegoResult {
     }
         elseif ($Test.Criticality -eq "Should/Conditional") {
         $Result.DisplayString = "N/A"
-        $Result.SummaryKey = "Manual"
+        $Result.SummaryKey = "Conditional"
         $Result.Details = $Test.ReportDetails
     }
     elseif ($Test.Criticality.EndsWith('3rd Party') -or $Test.Criticality.EndsWith('Not-Implemented')) {
@@ -70,7 +70,7 @@ function Get-RegoResult {
     }
     else {
         $Result.DisplayString = "N/A"
-        $Result.SummaryKey = "Manual"
+        $Result.SummaryKey = "Conditional"
         $Result.Details = $Test.ReportDetails
     }
     } 
@@ -245,6 +245,7 @@ function New-Report {
         "Passes" = 0;
         "Omits" = 0;
         "IncorrectResults" = 0;
+        "Conditional" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
