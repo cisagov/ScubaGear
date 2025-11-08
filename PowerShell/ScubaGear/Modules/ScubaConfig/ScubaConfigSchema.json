@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://scubagear.cisa.gov/schemas/config/v1.0.0",
   "title": "ScubaGear Configuration Schema",
   "description": "JSON Schema for ScubaGear configuration validation",
   "type": "object",
