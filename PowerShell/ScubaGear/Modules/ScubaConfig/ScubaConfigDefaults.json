@@ -26,12 +26,18 @@
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
 <<<<<<< HEAD
+<<<<<<< HEAD
     "OPAVersion": "1.10.1",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
 =======
     "OPAVersion": "1.9.0"
 >>>>>>> ae23be9 (Update PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json)
+=======
+    "OPAVersion": "1.9.0",
+    "PreferredDnsResolvers": [],
+    "SkipDoH": false
+>>>>>>> 645c499 (fixes extension support and exo smoketest)
   },
   "minRequired": [
     "ProductNames"
@@ -106,10 +112,14 @@
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
 <<<<<<< HEAD
+<<<<<<< HEAD
   "supportedFileExtensions": [".yaml", ".json"],
 =======
   "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
 >>>>>>> ef7cb5e (update files to fix test)
+=======
+  "supportedFileExtensions": [".yaml", ".yml", ".json"],
+>>>>>>> 645c499 (fixes extension support and exo smoketest)
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },

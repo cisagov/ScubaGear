@@ -125,4 +125,53 @@ ExclusionsConfig:
             }
         }
     }
+
+    Context "Supported File Extensions" {
+        It "Should accept valid config file extensions: <Extension>" -ForEach @(
+            @{Extension = ".yaml"}
+            @{Extension = ".yml"}
+            @{Extension = ".json"}
+        ) {
+            $testFile = "TestConfig$Extension"
+            $script:ValidConfigYaml | Out-File -FilePath $testFile -Encoding UTF8
+
+            try {
+                $result = [ScubaConfigValidator]::ValidateYamlFile($testFile)
+                $result | Should -Not -BeNullOrEmpty
+                # File should be processed without extension errors
+            }
+            finally {
+                Remove-Item $testFile -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Should reject invalid config file extensions: <Extension>" -ForEach @(
+            @{Extension = ".ps1"}
+            @{Extension = ".txt"}
+            @{Extension = ".xml"}
+            @{Extension = ".csv"}
+        ) {
+            $testFile = "TestConfig$Extension"
+            $script:ValidConfigYaml | Out-File -FilePath $testFile -Encoding UTF8
+
+            try {
+                $result = [ScubaConfigValidator]::ValidateYamlFile($testFile)
+                $result.IsValid | Should -Be $false
+                $result.ValidationErrors | Should -Match "Unsupported file extension"
+            }
+            finally {
+                Remove-Item $testFile -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Should validate supported extensions from defaults JSON" {
+            $defaults = [ScubaConfigValidator]::GetDefaults()
+            $supportedExtensions = $defaults.validation.supportedFileExtensions
+            
+            $supportedExtensions | Should -Contain ".yaml"
+            $supportedExtensions | Should -Contain ".yml"
+            $supportedExtensions | Should -Contain ".json"
+            $supportedExtensions | Should -Not -Contain ".ps1"
+        }
+    }
 }
