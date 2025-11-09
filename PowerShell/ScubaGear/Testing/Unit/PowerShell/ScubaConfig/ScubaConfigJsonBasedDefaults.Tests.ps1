@@ -61,7 +61,7 @@ Describe "JSON-based Configuration System" {
     Context "JSON Structure Validation" {
         It "Should have products defined in defaults" {
             $defaults = [ScubaConfig]::GetConfigDefaults()
-            $defaults.products | Should -Not -BeNullOrEmpty
+            $defaults.products | Should -Not -Be NullOrEmpty
             $defaults.products.PSObject.Properties.Count | Should -BeGreaterThan 0
         }
 

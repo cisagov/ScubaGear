@@ -25,6 +25,12 @@ InModuleScope ScubaConfig {
             }
         }
         context 'Handling repeated LoadConfig invocations' {
+            BeforeAll {
+                # Create a temporary YAML file for testing
+                $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+            }
             It 'Load valid config file followed by another'{
                 $cfg = [ScubaConfig]::GetInstance()
                 # Load the first file and check the ProductNames value.
@@ -33,7 +39,7 @@ InModuleScope ScubaConfig {
                         ProductNames=@('teams')
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
                 function global:ConvertFrom-Yaml {
@@ -41,12 +47,15 @@ InModuleScope ScubaConfig {
                         ProductNames=@('exo')
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
+                if (Test-Path $script:TempConfigFile) {
+                    Remove-Item $script:TempConfigFile -Force
+                }
             }
         }
 

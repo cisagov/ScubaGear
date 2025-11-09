@@ -23,6 +23,12 @@ InModuleScope ScubaConfig {
             }
         }
         context 'JSON Configuration' {
+            BeforeAll {
+                # Create a temporary YAML file for testing
+                $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+            }
             It 'Load valid config file'{
                 function global:ConvertFrom-Yaml {
                     @{
@@ -33,7 +39,7 @@ InModuleScope ScubaConfig {
                     }
                 }
                 [ScubaConfig]::ResetInstance()
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath)
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
                 $Result | Should -Be $true
             }
             It 'Valid string parameter'{
@@ -44,6 +50,11 @@ InModuleScope ScubaConfig {
             }
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false
+            }
+            AfterAll {
+                if (Test-Path $script:TempConfigFile) {
+                    Remove-Item $script:TempConfigFile -Force
+                }
             }
         }
     }
