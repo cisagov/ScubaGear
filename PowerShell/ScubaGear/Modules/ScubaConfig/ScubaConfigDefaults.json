@@ -21,7 +21,9 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.9.0"
+    "OPAVersion": "1.9.0",
+    "PreferredDnsResolvers": [],
+    "SkipDoH": false
   },
   "minRequired": [
     "ProductNames"
@@ -95,7 +97,7 @@
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
-  "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
+  "supportedFileExtensions": [".yaml", ".yml", ".json"],
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },

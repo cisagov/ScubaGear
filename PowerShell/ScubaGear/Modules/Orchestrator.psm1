@@ -638,7 +638,19 @@ function Invoke-ProviderList {
                             $RetVal = Export-AADProvider -M365Environment $M365Environment | Select-Object -Last 1
                         }
                         "exo" {
-                            $RetVal = Export-EXOProvider | Select-Object -Last 1
+                            # Try to get configuration from ScubaConfig instance if it exists
+                            try {
+                                $ScubaConfigInstance = [ScubaConfig]::GetInstance()
+                                $PreferredDnsResolvers = $ScubaConfigInstance.Configuration.PreferredDnsResolvers
+                                $SkipDoH = $ScubaConfigInstance.Configuration.SkipDoH
+                            }
+                            catch {
+                                # ScubaConfig instance doesn't exist (no config file used)
+                                $PreferredDnsResolvers = @()
+                                $SkipDoH = $false
+                            }
+                            
+                            $RetVal = Export-EXOProvider -PreferredDnsResolvers $PreferredDnsResolvers -SkipDoH $SkipDoH | Select-Object -Last 1
                         }
                         "defender" {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
@@ -677,9 +689,23 @@ function Invoke-ProviderList {
                 $TimeZone = ($GetTimeZone).StandardName
             }
 
-        $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
+        try {
+            $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
+        }
+        catch {
+            # If ScubaConfig instance doesn't exist (when not using config file), create minimal empty config structure
+            $EmptyConfig = [PSCustomObject]@{
+                AnnotatePolicy = @{}
+                OmitPolicy = @{}
+            }
+            $ConfigDetails = ConvertTo-Json -Depth 100 $EmptyConfig
+        }
         if(! $ConfigDetails) {
-            $ConfigDetails = "{}"
+            $EmptyConfig = [PSCustomObject]@{
+                AnnotatePolicy = @{}
+                OmitPolicy = @{}
+            }
+            $ConfigDetails = ConvertTo-Json -Depth 100 $EmptyConfig
         }
 
         $BaselineSettingsExport = @"
