@@ -5,68 +5,84 @@ InModuleScope ScubaConfig {
         context 'Delete configuration' {
             BeforeAll{
                 [ScubaConfig]::ResetInstance()
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@("teams", "exo", "defender", "aad", "powerplatform", "sharepoint")
-                        AnObject=@{name='MyObjectName'}
-                    }
-                }
-                # Create a temporary YAML file for testing
-                $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
-                $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
-                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+                
+                # Create temporary YAML files for testing
+                $script:TempConfigFile1 = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile1 = [System.IO.Path]::ChangeExtension($script:TempConfigFile1, '.yaml')
+                
+                $script:TempConfigFile2 = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile2 = [System.IO.Path]::ChangeExtension($script:TempConfigFile2, '.yaml')
+                
+                # First config with multiple products and an object
+                @"
+ProductNames:
+  - teams
+  - exo
+  - defender
+  - aad
+  - powerplatform
+  - sharepoint
+AnObject:
+  name: MyObjectName
+"@ | Set-Content -Path $script:TempConfigFile1
+                
+                # Second config with single product and different object
+                @"
+ProductNames:
+  - teams
+MissingObject:
+  name: MyMissingObjectName
+"@ | Set-Content -Path $script:TempConfigFile2
             }
-            It 'Valid config file'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
+            
+            It 'Valid config file loads successfully'{
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile1)
                 $Result | Should -Be $true
             }
-            It '6 Product names'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
-                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -HaveCount 6 -Because "$([ScubaConfig]::GetInstance().Configuration.ParameterNames)"
+            
+            It 'Configuration has 6 product names'{
+                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -HaveCount 6
             }
-            It 'Valid object parameter'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
+            
+            It 'Configuration has valid object parameter AnObject'{
                 [ScubaConfig]::GetInstance().Configuration.AnObject.name | Should -Be 'MyObjectName'
             }
-            It 'Valid object parameter'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
-                [ScubaConfig]::GetInstance().Configuration.MissingObject.name | Should -BeNullOrEmpty
+            
+            It 'Configuration does not have MissingObject'{
+                [ScubaConfig]::GetInstance().Configuration.MissingObject | Should -BeNullOrEmpty
             }
-            It 'Reset Instance'{
+            
+            It 'Reset instance clears configuration'{
                 [ScubaConfig]::ResetInstance()
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@("teams")
-                        MissingObject=@{name='MyMissingObjectName'}
-                    }
-                }
+                [ScubaConfig]::GetInstance().Configuration | Should -BeNullOrEmpty
             }
-            It 'A different valid config file'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
+            
+            It 'Load second config file successfully'{
+                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile2)
                 $Result | Should -Be $true
             }
-            It '1 Product names'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
-                [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -HaveCount 1
+            
+            It 'Second configuration has 1 product name'{
+                $ProductNames = [ScubaConfig]::GetInstance().Configuration.ProductNames
+                $ProductNames.Count | Should -Be 1
+                $ProductNames | Should -Contain 'teams'
             }
-            It 'Valid object parameter'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
-                [ScubaConfig]::GetInstance().Configuration.AnObject.name | Should -BeNullOrEmpty
+            
+            It 'Second configuration does not have AnObject'{
+                [ScubaConfig]::GetInstance().Configuration.AnObject | Should -BeNullOrEmpty
             }
-            It 'Valid object parameter'{
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
+            
+            It 'Second configuration has MissingObject'{
                 [ScubaConfig]::GetInstance().Configuration.MissingObject.name | Should -Be 'MyMissingObjectName'
             }
+            
             AfterAll{
                 [ScubaConfig]::ResetInstance()
-                if (Test-Path $script:TempConfigFile) {
-                    Remove-Item $script:TempConfigFile -Force
+                if (Test-Path $script:TempConfigFile1) {
+                    Remove-Item $script:TempConfigFile1 -Force
+                }
+                if (Test-Path $script:TempConfigFile2) {
+                    Remove-Item $script:TempConfigFile2 -Force
                 }
             }
         }

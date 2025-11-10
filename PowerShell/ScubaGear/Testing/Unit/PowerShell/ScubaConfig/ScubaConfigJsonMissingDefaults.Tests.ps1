@@ -22,35 +22,40 @@ InModuleScope ScubaConfig {
                 {[ScubaConfig]::GetInstance().LoadConfig('Bad path name')}| Should -Throw -ExceptionType([System.IO.FileNotFoundException])
             }
         }
+        
         context 'JSON Configuration' {
             BeforeAll {
                 # Create a temporary YAML file for testing
                 $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
                 $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
-                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+                
+                # Create a valid YAML config with specific values
+                @"
+ProductNames:
+  - aad
+M365Environment: commercial
+DisconnectOnExit: false
+"@ | Set-Content -Path $script:TempConfigFile
             }
+            
             It 'Load valid config file'{
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('aad')
-                        M365Environment='commercial'
-                        AnObject=@{name='MyObjectName'}
-                        DisconnectOnExit = $false
-                    }
-                }
                 [ScubaConfig]::ResetInstance()
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
                 $Result | Should -Be $true
             }
+            
             It 'Valid string parameter'{
                 [ScubaConfig]::GetInstance().Configuration.M365Environment | Should -Be 'commercial'
             }
+            
             It 'Valid array parameter'{
                 [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -Contain 'aad'
             }
+            
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false
             }
+            
             AfterAll {
                 if (Test-Path $script:TempConfigFile) {
                     Remove-Item $script:TempConfigFile -Force
