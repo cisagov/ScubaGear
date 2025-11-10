@@ -122,5 +122,9 @@ Describe "JSON-based Configuration System" {
             [ScubaConfig]::ScubaDefault('DefaultOPAVersion') | Should -Be $jsonDefaults.defaults.OPAVersion
         }
     }
+
+    AfterAll {
+        [ScubaConfig]::ResetInstance()
+    }
 }
 }

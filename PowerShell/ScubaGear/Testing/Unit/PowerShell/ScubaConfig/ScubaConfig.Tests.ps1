@@ -2,8 +2,8 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "ScubaConfig JSON-based Configuration Tests" {
     BeforeAll {
-        # Reset the instance before tests
-        [ScubaConfig]::ResetInstance()
+        # Initialize the system
+        [ScubaConfig]::InitializeValidator()
     }
 
     AfterEach {

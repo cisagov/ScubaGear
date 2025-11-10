@@ -3,7 +3,8 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigDelete - First Configuration' {
         BeforeAll{
-            [ScubaConfig]::ResetInstance()
+            # Initialize the system
+            [ScubaConfig]::InitializeValidator()
 
             # Create temporary YAML file for testing
             $script:TempConfigFile1 = [System.IO.Path]::GetTempFileName()
@@ -50,7 +51,8 @@ AnObject:
 
     Describe -tag "Utils" -name 'ScubaConfigDelete - Second Configuration' {
         BeforeAll{
-            [ScubaConfig]::ResetInstance()
+            # Initialize the system
+            [ScubaConfig]::InitializeValidator()
 
             # Create temporary YAML file for testing
             $script:TempConfigFile2 = [System.IO.Path]::GetTempFileName()
