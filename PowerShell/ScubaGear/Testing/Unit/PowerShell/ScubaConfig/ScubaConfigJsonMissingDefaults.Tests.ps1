@@ -36,12 +36,14 @@ ProductNames:
 M365Environment: commercial
 DisconnectOnExit: false
 "@ | Set-Content -Path $script:TempConfigFile
+                
+                # Load the config once for all tests in this context
+                [ScubaConfig]::ResetInstance()
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
             }
 
-            It 'Load valid config file'{
-                [ScubaConfig]::ResetInstance()
-                $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
-                $Result | Should -Be $true
+            It 'Configuration loaded successfully'{
+                [ScubaConfig]::GetInstance().Configuration | Should -Not -BeNullOrEmpty
             }
 
             It 'Valid string parameter'{

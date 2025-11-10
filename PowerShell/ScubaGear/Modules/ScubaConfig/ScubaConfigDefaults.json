@@ -113,6 +113,7 @@
     "policyIdExample": "MS.DEFENDER.1.1v1",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "supportedFileExtensions": [".yaml", ".json"],
 =======
   "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
@@ -120,6 +121,9 @@
 =======
   "supportedFileExtensions": [".yaml", ".yml", ".json"],
 >>>>>>> 645c499 (fixes extension support and exo smoketest)
+=======
+  "supportedFileExtensions": [".yaml", ".json"],
+>>>>>>> 5f3eade (updates pester extention check)
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },
