@@ -167,7 +167,7 @@ ExclusionsConfig:
         It "Should validate supported extensions from defaults JSON" {
             $defaults = [ScubaConfigValidator]::GetDefaults()
             $supportedExtensions = $defaults.validation.supportedFileExtensions
-            
+
             $supportedExtensions | Should -Contain ".yaml"
             $supportedExtensions | Should -Contain ".yml"
             $supportedExtensions | Should -Contain ".json"

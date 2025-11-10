@@ -22,13 +22,13 @@ InModuleScope ScubaConfig {
                 {[ScubaConfig]::GetInstance().LoadConfig('Bad path name')}| Should -Throw -ExceptionType([System.IO.FileNotFoundException])
             }
         }
-        
+
         context 'JSON Configuration' {
             BeforeAll {
                 # Create a temporary YAML file for testing
                 $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
                 $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
-                
+
                 # Create a valid YAML config with specific values
                 @"
 ProductNames:
@@ -37,25 +37,25 @@ M365Environment: commercial
 DisconnectOnExit: false
 "@ | Set-Content -Path $script:TempConfigFile
             }
-            
+
             It 'Load valid config file'{
                 [ScubaConfig]::ResetInstance()
                 $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile)
                 $Result | Should -Be $true
             }
-            
+
             It 'Valid string parameter'{
                 [ScubaConfig]::GetInstance().Configuration.M365Environment | Should -Be 'commercial'
             }
-            
+
             It 'Valid array parameter'{
                 [ScubaConfig]::GetInstance().Configuration.ProductNames | Should -Contain 'aad'
             }
-            
+
             It 'Valid boolean parameter'{
                 [ScubaConfig]::GetInstance().Configuration.DisconnectOnExit | Should -Be $false
             }
-            
+
             AfterAll {
                 if (Test-Path $script:TempConfigFile) {
                     Remove-Item $script:TempConfigFile -Force
