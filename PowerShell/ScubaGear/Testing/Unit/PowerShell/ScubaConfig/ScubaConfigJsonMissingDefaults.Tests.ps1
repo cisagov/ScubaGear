@@ -3,7 +3,8 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigMissingDefaults' {
         BeforeAll {
-            [ScubaConfig]::ResetInstance()
+            # Initialize the system
+            [ScubaConfig]::InitializeValidator()
         }
 
         AfterAll {

@@ -3,6 +3,8 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigLoadConfig' {
         BeforeAll {
+            # Initialize the system
+            [ScubaConfig]::InitializeValidator()
             Mock -CommandName Write-Warning {}
         }
 
