@@ -96,7 +96,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## DisconnectOnExit
 
-**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will for you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
+**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will require you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
 
 | Parameter   | Value  |
 |-------------|--------|

@@ -2,6 +2,7 @@ package teams_test
 import rego.v1
 import data.teams
 import data.utils.key.TestResult
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.FAIL
 import data.utils.key.PASS
 
@@ -52,8 +53,8 @@ test_AllowEmailIntoChannel_Correct_V2 if {
     Output := teams.tests with input.client_configuration as [ClientConfiguration]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2_multi if {
@@ -63,8 +64,8 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
     Output := teams.tests with input.client_configuration as [ClientConfiguration, Config]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
@@ -74,8 +75,8 @@ test_AllowEmailIntoChannel_Correct_V3 if {
     Output := teams.tests with input.client_configuration as [Config]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3_multi if {
@@ -88,8 +89,8 @@ test_AllowEmailIntoChannel_Correct_V3_multi if {
     Output := teams.tests with input.client_configuration as [Config1, Config2]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4 if {
@@ -102,8 +103,8 @@ test_AllowEmailIntoChannel_Correct_V4 if {
     Output := teams.tests with input.client_configuration as [Config1, Config2]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4_multi if {
@@ -116,7 +117,7 @@ test_AllowEmailIntoChannel_Correct_V4_multi if {
     Output := teams.tests with input.client_configuration as [Config1, Config2]
                             with input.teams_tenant_info as [Tenant]
 
-    ReportDetailString := "N/A: Feature is unavailable in GCC environments"
-    TestResult("MS.TEAMS.4.1v1", Output, ReportDetailString, true) == true
+    ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
 }
 #--
