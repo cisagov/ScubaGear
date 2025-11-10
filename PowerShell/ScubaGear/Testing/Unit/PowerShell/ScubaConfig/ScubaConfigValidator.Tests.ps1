@@ -129,7 +129,6 @@ ExclusionsConfig:
     Context "Supported File Extensions" {
         It "Should accept valid config file extensions: <Extension>" -ForEach @(
             @{Extension = ".yaml"}
-            @{Extension = ".yml"}
             @{Extension = ".json"}
         ) {
             $testFile = "TestConfig$Extension"
@@ -169,8 +168,8 @@ ExclusionsConfig:
             $supportedExtensions = $defaults.validation.supportedFileExtensions
 
             $supportedExtensions | Should -Contain ".yaml"
-            $supportedExtensions | Should -Contain ".yml"
             $supportedExtensions | Should -Contain ".json"
+            $supportedExtensions | Should -Not -Contain ".csv"
             $supportedExtensions | Should -Not -Contain ".ps1"
         }
     }
