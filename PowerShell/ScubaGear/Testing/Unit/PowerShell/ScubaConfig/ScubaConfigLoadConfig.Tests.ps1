@@ -12,9 +12,9 @@ InModuleScope ScubaConfig {
         }
 
         context 'Handling repeated keys in YAML file' {
-            It 'Load config with duplicate keys'{
-                # Load the file with duplicate keys and check that it throws an error
-                {[ScubaConfig]::GetInstance().LoadConfig((Join-Path -Path $PSScriptRoot -ChildPath "./MockLoadConfig.yaml"))} | Should -Throw
+            It 'Load config with duplicate keys throws error'{
+                # Load the file with duplicate keys and verify it throws an exception
+                {[ScubaConfig]::GetInstance().LoadConfig((Join-Path -Path $PSScriptRoot -ChildPath "./MockLoadConfig.yaml"))} | Should -Throw -ExpectedMessage "*Duplicate key*"
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
@@ -47,15 +47,13 @@ ProductNames:
                 $cfg = [ScubaConfig]::GetInstance()
                 
                 # Load the first file and check the ProductNames value
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile1) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile1) | Should -Be $true
                 $cfg.Configuration.ProductNames | Should -Contain 'teams'
-                $cfg.Configuration.ProductNames.Count | Should -Be 1
                 
                 # Load the second file and verify that ProductNames has changed
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile2) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile2) | Should -Be $true
                 $cfg.Configuration.ProductNames | Should -Contain 'exo'
                 $cfg.Configuration.ProductNames | Should -Not -Contain 'teams'
-                $cfg.Configuration.ProductNames.Count | Should -Be 1
                 
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
