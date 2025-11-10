@@ -171,11 +171,10 @@ class ScubaConfig {
 
         foreach ($Policy in $PolicyConfig.Keys) {
             if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
-                $Warning = "Config file indicates $ActionType $Policy, but $Policy is not a valid control ID. "
-                $Warning += "Expected format is '$($Defaults.validation.policyIdExample)'. "
-                $Warning += "Control will not be processed."
-                Write-Warning $Warning
-                Continue
+                $ErrorMessage = "Config file indicates $ActionType $Policy, but $Policy is not a valid control ID. "
+                $ErrorMessage += "Expected format is '$($Defaults.validation.policyIdExample)'. "
+                $ErrorMessage += "Policy ID does not match expected format."
+                throw $ErrorMessage
             }
 
             $Product = ($Policy -Split "\.")[1].ToLower()
@@ -187,10 +186,9 @@ class ScubaConfig {
             }
 
             if (-not ($EffectiveProducts -Contains $Product)) {
-                $Warning = "Config file indicates $ActionType $Policy, but $Product is not one of the products "
-                $Warning += "specified in the ProductNames parameter. Control will not be processed."
-                Write-Warning $Warning
-                Continue
+                $ErrorMessage = "Config file indicates $ActionType $Policy, but $Product is not one of the products "
+                $ErrorMessage += "specified in the ProductNames parameter (not in the selected ProductNames)."
+                throw $ErrorMessage
             }
         }
     }
