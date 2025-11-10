@@ -153,7 +153,7 @@ ExclusionsConfig:
     It "Should load configuration" {
         # Reset to ensure clean state
         [ScubaConfig]::ResetInstance()
-        
+
         $ValidYaml = @"
 ProductNames:
   - exo
