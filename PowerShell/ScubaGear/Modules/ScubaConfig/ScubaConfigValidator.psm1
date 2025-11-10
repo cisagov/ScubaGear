@@ -117,6 +117,10 @@ class ScubaConfigValidator {
             $Result.ParsedContent = $YamlObject
         }
         catch {
+            # Check if this is a duplicate key error - if so, rethrow it
+            if ($_.Exception.Message -like "*Duplicate key*") {
+                throw
+            }
             $Result.ValidationErrors += "Failed to parse YAML content: $($_.Exception.Message)"
             return $Result
         }
