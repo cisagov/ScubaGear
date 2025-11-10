@@ -22,11 +22,13 @@ ProductNames:
 AnObject:
   name: MyObjectName
 "@ | Set-Content -Path $script:TempConfigFile1
+
+            # Load the config once for all tests in this Describe
+            [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile1)
         }
 
         It 'Valid config file loads successfully'{
-            $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile1)
-            $Result | Should -Be $true
+            [ScubaConfig]::GetInstance().Configuration | Should -Not -BeNullOrEmpty
         }
 
         It 'Configuration has 6 product names'{
@@ -65,11 +67,13 @@ ProductNames:
 MissingObject:
   name: MyMissingObjectName
 "@ | Set-Content -Path $script:TempConfigFile2
+
+            # Load the config once for all tests in this Describe
+            [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile2)
         }
 
         It 'Valid config file loads successfully'{
-            $Result = [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile2)
-            $Result | Should -Be $true
+            [ScubaConfig]::GetInstance().Configuration | Should -Not -BeNullOrEmpty
         }
 
         It 'Configuration has 1 product name'{
