@@ -8,6 +8,11 @@ InModuleScope ScubaConfig {
             Mock -CommandName Write-Warning {}
         }
 
+        AfterEach {
+            # Reset the instance after each test to prevent state bleed
+            [ScubaConfig]::ResetInstance()
+        }
+
         AfterAll {
             # Reset instance after all tests in this file
             [ScubaConfig]::ResetInstance()
