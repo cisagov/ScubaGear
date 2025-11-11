@@ -879,7 +879,7 @@ Function New-ResultsContent {
             $passes = [string]$productData.Passes
             $warnings = [string]$productData.Warnings
             $failures = [string]$productData.Failures
-            $Conditional = [string]$productData.Conditional
+            $conditional = [string]$productData.Conditional
             $manual = [string]$productData.Manual
             $errors = [string]$productData.Errors
 
@@ -891,6 +891,9 @@ Function New-ResultsContent {
             }
             if ([int]$failures -gt 0) {
                 $statusItems += [PSCustomObject]@{ Text = "FAIL: $failures failure$(if([int]$failures -gt 1){'s'})"; Color = "#dc3545"; TextColor = "White" }
+            }
+            if ([int]$conditional -gt 0) {
+                $statusItems += [PSCustomObject]@{ Text = "CONDITIONAL: $conditional conditional result$(if([int]$conditional -gt 1){'s'})"; Color = "#6f42c1"; TextColor = "White" }
             }
             if ([int]$manual -gt 0) {
                 $statusItems += [PSCustomObject]@{ Text = "MANUAL: $manual manual check$(if([int]$manual -gt 1){'s'})"; Color = "#6f42c1"; TextColor = "White" }

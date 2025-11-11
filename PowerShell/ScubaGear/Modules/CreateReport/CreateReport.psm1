@@ -73,7 +73,6 @@ function Get-RegoResult {
         $Result.SummaryKey = "Conditional"
         $Result.Details = $Test.ReportDetails
     }
-    } 
     else {
         $Result.DisplayString = "Fail"
         $Result.SummaryKey = "Failures"
