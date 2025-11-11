@@ -1379,8 +1379,8 @@ function Invoke-ReportCreation {
                 }
 
                 if ($Report.Conditional -gt 0) {
-                    $Noun = Pluralize -SingularNoun "check" -PluralNoun "checks" -Count $Report.Conditional
-                    $ConditionalSummary = "<div class='summary manual'>$($Report.Conditional) Conditional $($Noun)</div>"
+                    $Noun = Pluralize -SingularNoun "result" -PluralNoun "results" -Count $Report.Conditional
+                    $ConditionalSummary = "<div class='summary manual'>$($Report.Conditional) conditional $($Noun)</div>"
                 }
 
                 if ($Report.Manual -gt 0) {
