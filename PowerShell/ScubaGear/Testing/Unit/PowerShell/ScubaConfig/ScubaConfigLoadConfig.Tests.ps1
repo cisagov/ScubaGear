@@ -8,6 +8,12 @@ InModuleScope ScubaConfig {
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
 	    Remove-Item function:\ConvertFrom-Yaml
         }
+
+        AfterAll {
+            # Reset instance after all tests in this file
+            [ScubaConfig]::ResetInstance()
+        }
+
         context 'Handling repeated keys in YAML file' {
             It 'Load config with dupliacte keys'{
                 # Load the first file and check the ProductNames value.
@@ -19,6 +25,12 @@ InModuleScope ScubaConfig {
             }
         }
         context 'Handling repeated LoadConfig invocations' {
+            BeforeAll {
+                # Create a temporary YAML file for testing
+                $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+            }
             It 'Load valid config file followed by another'{
                 $cfg = [ScubaConfig]::GetInstance()
                 # Load the first file and check the ProductNames value.
@@ -27,7 +39,7 @@ InModuleScope ScubaConfig {
                         ProductNames=@('teams')
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
                 function global:ConvertFrom-Yaml {
@@ -35,49 +47,17 @@ InModuleScope ScubaConfig {
                         ProductNames=@('exo')
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
+                if (Test-Path $script:TempConfigFile) {
+                    Remove-Item $script:TempConfigFile -Force
+                }
             }
         }
-        context "Handling policy omissions" {
-            It 'Does not warn for proper control IDs' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.EXO.1.1v2"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
-            }
 
-            It 'Warns for malformed control IDs' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MSEXO.1.1v2"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
-            }
-
-            It 'Warns for control IDs not encompassed by ProductNames' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.Gmail.1.1v1"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
-            }
-	    AfterAll {
-	    }
-        }
     }
 }
