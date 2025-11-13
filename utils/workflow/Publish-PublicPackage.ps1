@@ -262,7 +262,7 @@ function Test-PublishedModule {
         }
     }
     catch {
-        Write-Error "Failed to find published module: $($_.Exception.Message)"
+        Write-Verbose "Failed to find published module: $($_.Exception.Message)"
         return $false
     }
 }
@@ -309,4 +309,5 @@ function Get-PSGalleryApiKey {
         Write-Error "Failed to retrieve PSGallery API key: $($_.Exception.Message)"
         throw
     }
+
 }
