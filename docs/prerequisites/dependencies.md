@@ -50,7 +50,7 @@ If that fails, you can manually download the OPA executable.
 ![version](../images/opa_version.png)
 
 [![OPA Latest Version](https://img.shields.io/github/v/release/open-policy-agent/opa?label=OPA%20Latest%20Version&color=blue)](https://github.com/open-policy-agent/opa/releases)
-[![OPA Tested Version](https://img.shields.io/badge/SCuBA%20OPA%20Tested%20Version-v1.9.0-green)](https://github.com/open-policy-agent/opa/releases/tag/v1.9.0)
+[![OPA Tested Version](https://img.shields.io/badge/SCuBA%20OPA%20Tested%20Version-v1.10.1-green)](https://github.com/open-policy-agent/opa/releases/tag/v1.10.1)
 
 > **Note**: You can also find the default supported version in the ScubaGear module: go to the [ScubaConfig](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1) file, look for the variable `$ScubaDefaults`, and find its parameter `DefaultOPAVersion`.
 
