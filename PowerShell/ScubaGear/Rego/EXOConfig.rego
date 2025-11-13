@@ -143,7 +143,7 @@ tests contains {
 ############
 
 #
-# MS.EXO.2.2v2
+# MS.EXO.2.2v3
 #--
 
 # Loop through domains and save the details for domains without proper SPF records
@@ -174,7 +174,7 @@ SpfStatusMessage := Message if {
     ])
 
 tests contains {
-    "PolicyId": "MS.EXO.2.2v2",
+    "PolicyId": "MS.EXO.2.2v3",
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": DomainsWithoutSpf,
