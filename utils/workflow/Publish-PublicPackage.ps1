@@ -231,6 +231,13 @@ function Test-PublishedModule {
         [int]$WaitSeconds = 30
     )
 
+        # Validate required parameters for prerelease
+    if ($IsPrerelease) {
+        if ([string]::IsNullOrEmpty($ModuleVersion) -or [string]::IsNullOrEmpty($PrereleaseTag)) {
+            throw "ModuleVersion and PrereleaseTag are required when IsPrerelease is true"
+        }
+    }
+
     try {
         Write-Verbose "Testing published module..."
 
@@ -241,10 +248,6 @@ function Test-PublishedModule {
         }
 
         if ($IsPrerelease) {
-            if ([string]::IsNullOrEmpty($ModuleVersion) -or [string]::IsNullOrEmpty($PrereleaseTag)) {
-                throw "ModuleVersion and PrereleaseTag are required when IsPrerelease is true"
-            }
-
             $RequiredVersion = "$ModuleVersion-$PrereleaseTag"
             Write-Verbose "Checking for prerelease version: $RequiredVersion"
 
@@ -311,3 +314,4 @@ function Get-PSGalleryApiKey {
     }
 
 }
+
