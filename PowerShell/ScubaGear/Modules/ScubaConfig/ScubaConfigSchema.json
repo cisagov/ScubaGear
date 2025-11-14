@@ -105,13 +105,50 @@
     },
     "AppId": {
       "type": "string",
-      "description": "Azure AD Application ID for service principal authentication",
+      "description": "Entra ID Application ID for service principal authentication",
       "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$"
     },
     "CertificateThumbprint": {
       "type": "string",
       "description": "Certificate thumbprint for service principal authentication",
       "pattern": "^[A-Fa-f0-9]{40}$"
+    },
+    "PreferredDnsResolvers": {
+      "type": "array",
+      "description": "Preferred DNS resolver IP addresses",
+      "items": {
+        "type": "string",
+        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+      }
+    },
+    "SkipDoH": {
+      "type": "boolean",
+      "description": "Skip DNS over HTTPS for DNS queries",
+      "default": false
+    },
+    "Aad": {
+      "$ref": "#/definitions/AadExclusions",
+      "description": "Azure Active Directory (Entra ID) exclusions configuration"
+    },
+    "Defender": {
+      "$ref": "#/definitions/DefenderExclusions",
+      "description": "Microsoft Defender exclusions configuration"
+    },
+    "Exo": {
+      "$ref": "#/definitions/ExoExclusions",
+      "description": "Exchange Online exclusions configuration"
+    },
+    "PowerPlatform": {
+      "$ref": "#/definitions/PowerPlatformExclusions",
+      "description": "Power Platform exclusions configuration"
+    },
+    "SharePoint": {
+      "$ref": "#/definitions/SharePointExclusions",
+      "description": "SharePoint exclusions configuration"
+    },
+    "Teams": {
+      "$ref": "#/definitions/TeamsExclusions",
+      "description": "Teams exclusions configuration"
     },
     "OmitPolicy": {
       "type": "object",
@@ -134,43 +171,9 @@
         }
       },
       "additionalProperties": true
-    },
-    "ExclusionsConfig": {
-      "type": "object",
-      "description": "Product-specific exclusions configuration",
-      "properties": {
-        "aad": {
-          "$ref": "#/definitions/AadExclusions"
-        },
-        "defender": {
-          "$ref": "#/definitions/DefenderExclusions"
-        },
-        "exo": {
-          "$ref": "#/definitions/ExoExclusions"
-        }
-      },
-      "additionalProperties": false
-    },
-    "GlobalSettings": {
-      "type": "object",
-      "description": "Global settings that apply across all products",
-      "properties": {
-        "PreferredDnsResolvers": {
-          "type": "array",
-          "description": "Preferred DNS resolver IP addresses",
-          "items": {
-            "type": "string",
-            "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-          }
-        },
-        "SkipDoH": {
-          "type": "boolean",
-          "description": "Skip DNS over HTTPS for DNS queries",
-          "default": false
-        }
-      }
     }
   },
+  "additionalProperties": true,
   "definitions": {
     "AadExclusions": {
       "type": "object",
@@ -288,7 +291,21 @@
           "description": "Agency domain names"
         }
       }
+    },
+    "PowerPlatformExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "Power Platform exclusions (structure to be defined)"
+    },
+    "SharePointExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "SharePoint exclusions (structure to be defined)"
+    },
+    "TeamsExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "Teams exclusions (structure to be defined)"
     }
-  },
-  "additionalProperties": true
+  }
 }
