@@ -30,6 +30,7 @@ InModuleScope ScubaConfig {
                 "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
             }
             It 'Load valid config file'{
+                #uses global function instead of mocking
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('aad')

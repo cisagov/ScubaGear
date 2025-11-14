@@ -23,15 +23,8 @@ class ScubaConfigValidator {
         }
         try {
             $SchemaContent = Get-Content -Path $SchemaPath -Raw
-            # PowerShell 5.1 compatible JSON parsing
-            try {
-                # Try with -Depth parameter first (PowerShell Core/7+)
-                [ScubaConfigValidator]::_Cache['Schema'] = $SchemaContent | ConvertFrom-Json -Depth 20
-            }
-            catch {
-                # Fall back to without -Depth parameter (PowerShell 5.1)
-                [ScubaConfigValidator]::_Cache['Schema'] = $SchemaContent | ConvertFrom-Json
-            }
+            # Convert JSON schema content
+            [ScubaConfigValidator]::_Cache['Schema'] = $SchemaContent | ConvertFrom-Json
         }
         catch {
             throw "Failed to load configuration schema: $($_.Exception.Message)"
@@ -46,15 +39,9 @@ class ScubaConfigValidator {
         }
         try {
             $DefaultsContent = Get-Content -Path $DefaultsPath -Raw
-            # PowerShell 5.1 compatible JSON parsing
-            try {
-                # Try with -Depth parameter first (PowerShell Core/7+)
-                [ScubaConfigValidator]::_Cache['Defaults'] = $DefaultsContent | ConvertFrom-Json -Depth 20
-            }
-            catch {
-                # Fall back to without -Depth parameter (PowerShell 5.1)
-                [ScubaConfigValidator]::_Cache['Defaults'] = $DefaultsContent | ConvertFrom-Json
-            }
+            # Convert JSON defaults content
+            [ScubaConfigValidator]::_Cache['Defaults'] = $DefaultsContent | ConvertFrom-Json
+            
         }
         catch {
             throw "Failed to load configuration defaults: $($_.Exception.Message)"
@@ -272,6 +259,36 @@ class ScubaConfigValidator {
             $ThumbprintPattern = $Schema.properties.CertificateThumbprint.pattern
             if ($ConfigObject.CertificateThumbprint -notmatch $ThumbprintPattern) {
                 $Validation.Errors += "CertificateThumbprint '$($ConfigObject.CertificateThumbprint)' must be 40 hexadecimal characters"
+            }
+        }
+
+        # Validate additionalProperties constraint (enforce "additionalProperties": false)
+        if ($Schema.additionalProperties -eq $false) {
+            # Get all properties from the config object
+            $ConfigProperties = if ($ConfigObject -is [hashtable]) {
+                @($ConfigObject.Keys)
+            } elseif ($ConfigObject.PSObject -and $ConfigObject.PSObject.Properties) {
+                @($ConfigObject.PSObject.Properties.Name)
+            } else {
+                try {
+                    @($ConfigObject | Get-Member -MemberType NoteProperty, Property | Select-Object -ExpandProperty Name)
+                } catch {
+                    @()
+                }
+            }
+
+            # Get all allowed properties from schema
+            $AllowedProperties = if ($Schema.properties) {
+                @($Schema.properties.PSObject.Properties.Name)
+            } else {
+                @()
+            }
+
+            # Find properties in config that are not in schema
+            $InvalidProperties = $ConfigProperties | Where-Object { $_ -notin $AllowedProperties }
+
+            if ($InvalidProperties.Count -gt 0) {
+                $Validation.Errors += "Configuration contains properties that are not allowed: $($InvalidProperties -join ', '). Valid properties are: $($AllowedProperties -join ', ')"
             }
         }
 

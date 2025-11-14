@@ -5,6 +5,7 @@ InModuleScope ScubaConfig {
         context 'Delete configuration' {
             BeforeAll{
                 [ScubaConfig]::ResetInstance()
+                #uses global function instead of mocking
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@("teams", "exo", "defender", "aad", "powerplatform", "sharepoint")
@@ -37,6 +38,7 @@ InModuleScope ScubaConfig {
             }
             It 'Reset Instance'{
                 [ScubaConfig]::ResetInstance()
+                #uses global function instead of mocking
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@("teams")
