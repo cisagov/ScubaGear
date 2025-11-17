@@ -417,6 +417,16 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
     emails to a channel email address** to **Off**.
 
 ## 5. App Management
+
+The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following commands in the Teams Powershell module.
+
+Set-CsTeamsAppPermissionPolicy -Identity Global `
+    -DefaultCatalogAppsType AllowedAppList `
+    -GlobalCatalogAppsType AllowedAppList `
+    -PrivateCatalogAppsType AllowedAppList
+
+ScubaGear will continue to look for the legacy policies when running in noninteractive mode because of a limitation in the API when gathering the data for the report. Users can utilize interactive mode, and ScubaGear will gather the data for the newer portal based settings.
+
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
 - *Microsoft apps*: apps published by Microsoft.
