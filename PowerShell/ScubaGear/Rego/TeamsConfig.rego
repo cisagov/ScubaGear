@@ -571,7 +571,7 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+BuildDefaultAppDetails(SettingValue, TenantDetails, _) := concat("", [
     "Org-wide tenant setting (Microsoft apps): ",
     SettingValue,
     TenantDetails
@@ -682,7 +682,7 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+BuildGlobalAppDetails(SettingValue, TenantDetails, _) := concat("", [
     "Org-wide tenant setting (third-party apps): ",
     SettingValue,
     TenantDetails
@@ -793,7 +793,7 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+BuildPrivateAppDetails(SettingValue, TenantDetails, _) := concat("", [
     "Org-wide tenant setting (custom apps): ",
     SettingValue,
     TenantDetails
