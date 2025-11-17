@@ -116,6 +116,11 @@ This section provides policies that reduce security risks related to potentially
 #### MS.AAD.2.1v1
 Users detected as high risk SHALL be blocked.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
+![Manual](https://img.shields.io/badge/Manual-green)
+![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)
+![Configurable](https://img.shields.io/badge/Configurable-purple)
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
