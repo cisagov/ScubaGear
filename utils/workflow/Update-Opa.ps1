@@ -55,7 +55,7 @@ function Confirm-OpaUpdateRequirements {
 
     # Check to see if updates are required, and if not, why not.
     $Summary = ''
-    if ($LatestOPAVersion -gt $CurrentOPAVersion) {
+    if ([System.Version]::Parse($LatestOPAVersion) -gt [System.Version]::Parse($CurrentOPAVersion)) {
         if (-not $OPAVersionBranchExists) {
             $Summary = "OPA version update required."
             $UpdateRequired = $true

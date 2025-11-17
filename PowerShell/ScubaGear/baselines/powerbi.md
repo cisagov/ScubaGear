@@ -135,7 +135,9 @@ To Disable Completely:
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Disabled**
+4. For **Commercial** tenants Click on **Guest users can access Microsoft Fabric** and set to **Disabled**
+
+5. For **GCC, GCC High and DoD** tenants Click on **Allow Azure Active Directory guest users to access Power BI** and set to **Disabled**
 
 To Enable with Security Group(s):
 1. Navigate to the **PowerBI Admin Portal**
@@ -144,9 +146,11 @@ To Enable with Security Group(s):
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Allow Microsoft Entra guest users to edit and manage content in the organization** and set to **Enabled**
+4. For **Commercial** tenants Click on **Guest users can access Microsoft Fabric** and set to **Enabled**
 
-5. Select the security group(s) you want to have access to the PowerBI tenant.
+5. For **GCC, GCC High and DoD** tenants Click on **Allow Azure Active Directory guest users to access Power BI** and set to **Enabled**
+
+6. Select the security group(s) you want to have access to the PowerBI tenant.
 > Note:
 > You may need to make a specific security group(s)
 
@@ -203,7 +207,7 @@ To disable completely:
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Invite external users to your organization** and set to **Disabled**
+4. Click on **Users can invite guest users to collaborate through item sharing and permissions** and set to **Disabled**
 
 To enable with security groups:
 1. Navigate to the **PowerBI Admin Portal**
@@ -212,7 +216,7 @@ To enable with security groups:
 
 3. Scroll to **Export and sharing settings**
 
-4. Click on **Invite external users to your organization** and set to **Enabled**
+4. Click on **Users can invite guest users to collaborate through item sharing and permissions** and set to **Enabled**
 
 5. Select the security group(s) needed.
 > Note:
@@ -291,7 +295,7 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 
 3. Scroll to **Developer settings**
 
-4. Click on **Allow service principals to use Power BI APIs** set to **Enabled**.
+4. Click on **Service Principals can call Fabric public APIs** set to **Enabled**.
 Choose a specific security group allowed to use service principles for the APIs.
 
 
@@ -478,8 +482,7 @@ Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive dat
 
 3. Scroll to **Information protection**
 
-4. Click on **Allow users to apply sensitivity labels for content** and set to **Enabled**
-   Define who can apply and change sensitivity labels in Power BI assets.
+4. Click on **Allow users to apply sensitivity labels for content** and set to **Enabled**. Define who can apply and change sensitivity labels in Power BI assets.
 
 # Appendix A: Implementation Considerations
 
@@ -499,7 +502,7 @@ data in Power BI:
 
 - Implement row-level security in Power BI datasets.
 
-**Implementation Steps**
+**Implementation**
 
 **Apply sensitivity labels from data sources to their data in Power BI**
 
@@ -511,13 +514,16 @@ sources, see below:
 
 ***To enable sensitivity label inheritance from data sources:***
 
-1.  Navigate to the Power BI tenant settings.
+1. Navigate to the **PowerBI Admin Portal**
 
-2. Select **Information protection** -\> **Apply sensitivity labels
-    from data sources to their data in Power BI (preview).**
+2. Click on **Tenant settings**
 
-3. Enable **Restrict content with protected labels from being shared
-    via link with everyone in your agency**.
+3. Scroll to **Information protection**
+
+3. Click on **Apply sensitivity labels from data sources to their data in Power BI.** and set to **Enabled** for your organization, or select security groups.
+
+
+**Restrict content with protected labels from being shared via link with everyone in your agency**
 
 When this setting is enabled, users can't generate a sharing link for
 people in the agency for content with protection settings in the
@@ -530,6 +536,14 @@ Confidential" watermark to content with this label. When this
 tenant setting is enabled and a report has a sensitivity label with
 protection settings, then users cannot create sharing links for people in
 the agency.
+
+1. Navigate to the **PowerBI Admin Portal**
+
+2. Click on **Tenant settings**
+
+3. Scroll to **Information protection**
+
+4. Click on **Restrict content with protected labels from being shared via link with everyone in your agency** and set to **Enabled**. 
 
 **Information Protection Prerequisites Specific to Power BI**
 
