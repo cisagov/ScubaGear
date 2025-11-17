@@ -496,25 +496,111 @@ tests contains {
 # MS.TEAMS.5.1v2
 #--
 
-# Iterate through all meeting policies. For each, check if DefaultCatalogAppsType
+# Iterate through all app permission policies. For each, check if DefaultCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
 PoliciesBlockingDefaultApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesBlockingDefaultApps does not have any policies saved.
+# Check if the DefaultApp tenant setting exists and is set to "None"
+DefaultAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "DefaultApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+DefaultAppTenantSettingCompliant := true if {
+    DefaultAppTenantSetting
+    DefaultAppTenantSetting.SettingValue == "None"
+}
+
+DefaultAppTenantSettingCompliant := false if {
+    not DefaultAppTenantSetting
+}
+
+DefaultAppTenantSettingCompliant := false if {
+    DefaultAppTenantSetting
+    DefaultAppTenantSetting.SettingValue != "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+DefaultAppSettingValue := DefaultAppTenantSetting.SettingValue if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "DefaultApp"]) > 0
+}
+
+DefaultAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+DefaultAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "DefaultApp"]) == 0
+}
+
+# Check passes if either:
+# 1. No legacy policies are blocking AND tenant setting is compliant, OR
+# 2. No legacy policies are blocking AND tenant setting doesn't exist (legacy mode)
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": DefaultAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesBlockingDefaultApps
-    String := "app permission policy(ies) found that does not restrict installation of Microsoft Apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    TenantCompliant := DefaultAppTenantSettingCompliant
+    
+    # Overall status: pass if legacy is compliant OR tenant setting is compliant
+    # Count how many are compliant - if any are compliant (count > 0), we pass
+    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
+    Status := CompliantCount > 0
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of Microsoft Apps by default:")
+    
+    # Determine tenant details based on setting state - using separate rules for each case
+    TenantDetails := GetDefaultAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+}
+
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+}
+
+# Helper rule to determine DefaultApp tenant setting details
+GetDefaultAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    DefaultAppTenantSettingCompliant
+}
+
+GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not DefaultAppTenantSettingCompliant
+    DefaultAppSettingValue != "Not Checked"
+}
+
+GetDefaultAppTenantDetails := " - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+    DefaultAppSettingValue == "Not Checked"
 }
 #--
 
@@ -522,52 +608,221 @@ tests contains {
 # MS.TEAMS.5.2v2
 #--
 
-# Iterate through all meeting policies. For each, check if GlobalCatalogAppsType
+# Iterate through all app permission policies. For each, check if GlobalCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
 PoliciesAllowingGlobalApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesAllowingGlobalApps does not have any policies saved.
+# Check if the GlobalApp tenant setting exists and is set to "None"
+GlobalAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "GlobalApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+GlobalAppTenantSettingCompliant := true if {
+    GlobalAppTenantSetting
+    GlobalAppTenantSetting.SettingValue == "None"
+}
+
+GlobalAppTenantSettingCompliant := false if {
+    not GlobalAppTenantSetting
+}
+
+GlobalAppTenantSettingCompliant := false if {
+    GlobalAppTenantSetting
+    GlobalAppTenantSetting.SettingValue != "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+GlobalAppSettingValue := GlobalAppTenantSetting.SettingValue if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "GlobalApp"]) > 0
+}
+
+GlobalAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+GlobalAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "GlobalApp"]) == 0
+}
+
+# Check passes if either:
+# 1. No legacy policies are blocking AND tenant setting is compliant, OR
+# 2. No legacy policies are blocking AND tenant setting doesn't exist (legacy mode)
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": GlobalAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingGlobalApps
-    String := "app permission policy(ies) found that does not restrict installation of third-party apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    TenantCompliant := GlobalAppTenantSettingCompliant
+    
+    # Overall status: pass if legacy is compliant OR tenant setting is compliant
+    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
+    Status := CompliantCount > 0
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of third-party apps by default:")
+    
+    # Determine tenant details based on setting state - using separate rules for each case
+    TenantDetails := GetGlobalAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+}
+
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+}
+
+# Helper rule to determine GlobalApp tenant setting details
+GetGlobalAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    GlobalAppTenantSettingCompliant
+}
+
+GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not GlobalAppTenantSettingCompliant
+    GlobalAppSettingValue != "Not Checked"
+}
+
+GetGlobalAppTenantDetails := " - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+    GlobalAppSettingValue == "Not Checked"
 }
 #--
 
 #
 # MS.TEAMS.5.3v2
 #--
-#
 
-# Iterate through all meeting policies. For each, check if PrivateCatalogAppsType
+# Iterate through all app permission policies. For each, check if PrivateCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
 PoliciesAllowingCustomApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesAllowingCustomApps does not have any policies saved.
+# Check if the PrivateApp tenant setting exists and is set to "None"
+PrivateAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "PrivateApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+PrivateAppTenantSettingCompliant := true if {
+    PrivateAppTenantSetting
+    PrivateAppTenantSetting.SettingValue == "None"
+}
+
+PrivateAppTenantSettingCompliant := false if {
+    not PrivateAppTenantSetting
+}
+
+PrivateAppTenantSettingCompliant := false if {
+    PrivateAppTenantSetting
+    PrivateAppTenantSetting.SettingValue != "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+PrivateAppSettingValue := PrivateAppTenantSetting.SettingValue if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "PrivateApp"]) > 0
+}
+
+PrivateAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+PrivateAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "PrivateApp"]) == 0
+}
+
+# Check passes if either:
+# 1. No legacy policies are blocking AND tenant setting is compliant, OR
+# 2. No legacy policies are blocking AND tenant setting doesn't exist (legacy mode)
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": PrivateAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingCustomApps
-    String := "app permission policy(ies) found that does not restrict installation of custom apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    TenantCompliant := PrivateAppTenantSettingCompliant
+    
+    # Overall status: pass if legacy is compliant OR tenant setting is compliant
+    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
+    Status := CompliantCount > 0
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of custom apps by default:")
+    
+    # Determine tenant details based on setting state - using separate rules for each case
+    TenantDetails := GetPrivateAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+}
+
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+}
+
+# Helper rule to determine PrivateApp tenant setting details
+GetPrivateAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    PrivateAppTenantSettingCompliant
+}
+
+GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not PrivateAppTenantSettingCompliant
+    PrivateAppSettingValue != "Not Checked"
+}
+
+GetPrivateAppTenantDetails := " - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+    PrivateAppSettingValue == "Not Checked"
 }
 #--
 
