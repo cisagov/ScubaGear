@@ -1,16 +1,43 @@
 # ScubaGear Cached Execution
 
-`Invoke-SCuBACached` is a specialized version of the main ScubaGear function that allows you to run security assessments in two distinct modes:
+## Overview
 
-1. **Full mode** - Works identically to `Invoke-SCuBA` (exports provider data, runs Rego analysis, and generates reports)
-2. **Cached mode** - Skips data collection and authentication, running analysis only on previously exported provider JSON files
+`Invoke-SCuBACached` is a specialized version of the main ScubaGear function designed for development and testing workflows. It differs from `Invoke-SCuBA` in two key ways:
+
+### Output Folder Structure
+
+**`Invoke-SCuBA`** creates a timestamped subfolder:
+```
+OutPath\
+  └── M365BaselineConformance_2025_11_18_14_30_45\
+      ├── ProviderSettingsExport.json
+      ├── ScubaResults_abc123.json
+      └── BaselineReports.html
+```
+
+**`Invoke-SCuBACached`** places output files directly in the specified path:
+```
+OutPath\
+  ├── ProviderSettingsExport.json
+  ├── ScubaResults_abc123.json
+  └── BaselineReports.html
+```
+
+This simplified structure makes iterative development easier—you can run full mode once to export provider data, then repeatedly run in cached mode without adjusting the `OutPath` parameter.
+
+### Execution Modes
+
+`Invoke-SCuBACached` supports two distinct execution modes:
+
+1. **Full mode** (`-ExportProvider $true`, default) - Authenticates, exports provider data, runs Rego analysis, and generates reports (similar to `Invoke-SCuBA` but outputs directly to `OutPath` without creating a timestamped subfolder)
+2. **Cached mode** (`-ExportProvider $false`) - Skips data collection and authentication, running analysis only on previously exported provider JSON files
 
 This function is particularly useful for:
 
-- Re-running analysis on previously collected data
-- Testing different report configurations without re-authenticating
+- Rego policy development and testing
+- Re-running analysis on previously collected data without re-authentication
+- Testing different report configurations
 - Offline analysis scenarios
-- Development and testing workflows
 
 ## Key Parameters
 
@@ -76,14 +103,14 @@ Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath "C:\ScubaResu
 
 ## Cached Mode Requirements
 
-When using `ExportProvider $false`, the following conditions must be met:
+When using `-ExportProvider $false`, the following conditions must be met:
 
 ### Required Files
 
 The output directory must contain one of the following:
 
 1. **Individual provider file**: `ProviderSettingsExport.json` (or custom name specified by `-OutProviderFileName`)
-2. **Consolidated results file**: `ScubaResults*.json` file from a previous ScubaGear run
+2. **Consolidated results file**: `ScubaResults_<guid>.json` file from a previous ScubaGear run
 
 ### File Location
 
@@ -139,7 +166,7 @@ For example, when testing AAD authentication policy migration settings
 Invoke-SCuBACached -ProductNames aad -OutPath "C:\ScubaResults\AAD_Policy_Test"
 ```
 
-2. Manually modify the `ProviderSettingsExport.json` file to inject test scenarios (example):
+2. Manually modify the `ScubaResults_<guid>.json` file to inject test scenarios (example):
 
 ```json
 {
@@ -174,9 +201,9 @@ Testing if the tenant had the migration complete configured. Newer tenants do no
 
 ```json
 "authentication_method_policy":  {
-    "AuthenticationMethodConfigurations@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22,
+    "AuthenticationMethodConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22",
     "PolicyVersion":  "1.5",
-    "PolicyMigrationState":  migrationComplete,
+    "PolicyMigrationState":  "migrationComplete",
     "DisplayName":  null,
 ```
 
@@ -184,7 +211,7 @@ to :
 
 ```json
 "authentication_method_policy":  {
-    "AuthenticationMethodConfigurations@odata.context":  "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22,
+    "AuthenticationMethodConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22",
     "PolicyVersion":  "1.5",
     "PolicyMigrationState":  null,
     "DisplayName":  "Authentication Methods Policy",
@@ -210,7 +237,7 @@ FileNotFoundException: Could not find provider data file
 ...
 ```
 
-**Solution**: Ensure the output directory contains the required `ProviderSettingsExport.json` or `ScubaResults*.json` file.
+**Solution**: Ensure the output directory contains the required `ScubaResults_<guid>.json` file
 
 ### Product Mismatch
 
@@ -245,10 +272,10 @@ If the results are looking incorrect when it generates a html report, this may b
 > [!IMPORTANT]
 > Make sure the file is named to: `opa_windows_amd64.exe`
 
-**Solution**: Rerun the Invoke-SCuBACached with -OpaPath c:\ScubaResults
+**Solution**: Rerun the Invoke-SCuBACached in cache mode with a new OPA path:
 
 ```powershell
-Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "<OPA path>"
+Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "c:\ScubaResults\opadownload"
 ```
 
 ## Performance Considerations
@@ -270,9 +297,29 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 
 ### Development and Testing
 
-- Use cached mode during development to speed up iteration cycles
+**Rego Policy Development (Primary Use Case)**
+
+`Invoke-SCuBACached` was originally designed for Rego policy development workflows. Developers can:
+
+- Run full mode once to export provider data
+- Modify Rego policies and quickly re-run in cached mode to see changes in the HTML report
+- Avoid waiting for lengthy provider data collection on each iteration
+- Test policy logic changes rapidly without authentication delays
+
+**Functional Testing and CI/CD Pipelines**
+
+The ScubaGear functional test pipeline makes extensive use of `Invoke-SCuBACached` to:
+
+- Manipulate cached JSON files to test baseline policies that can't be tested safely in live environments
+- Simulate specific configuration scenarios (e.g., MFA conditional access policies, risky settings)
+- Test edge cases and policy combinations without impacting production tenants
+- Validate Rego policy behavior across different configuration states
+
+**General Best Practices**
+
 - Keep a "golden" export for consistent testing across different configurations
 - Use descriptive output folder names to organize different test scenarios
+- Document any manual JSON modifications made for testing purposes
 
 ### Production Use
 
@@ -280,26 +327,9 @@ Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "
 - Consider cached mode for generating multiple report formats from the same assessment
 - Document the date/time of the original data export when using cached mode
 
-### File Organization
-
-```
-C:\ScubaAssessments\
-├── 2024-01-15_Production\          # Full export folder
-│   ├── ProviderSettingsExport.json
-│   ├── ScubaResults_abc123.json
-│   └── BaselineReports.html
-├── 2024-01-15_DarkMode\            # Cached analysis with different theme
-│   ├── ProviderSettingsExport.json (copied)
-│   ├── ScubaResults_def456.json
-│   └── BaselineReports.html
-└── 2024-01-15_CSVOnly\             # Cached analysis for CSV export
-    ├── ProviderSettingsExport.json (copied)
-    └── ScubaResults.csv
-```
-
 ## Known Issues
 
-- Running the function on the same JSON file will eventually cause a system out of memory error as the file gets larger each time it ran.
+- Running the function on the same JSON file will eventually cause a system out of memory error as the file gets larger each time its ran.
 
 ## Version Compatibility
 
