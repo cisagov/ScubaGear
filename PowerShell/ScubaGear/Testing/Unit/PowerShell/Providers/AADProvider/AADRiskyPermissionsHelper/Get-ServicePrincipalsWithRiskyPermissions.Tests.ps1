@@ -1,11 +1,11 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
-$PermissionsHelper = "$($ModulesPath)/Permissions/PermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsHelper) -Function Get-ScubaGearPermissions
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ServicePrincipalsWithRiskyPermissions" {
+        $PermissionsModule = "../../../../../../Modules/Permissions/PermissionsHelper.psm1"
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsModule) -Function Get-ScubaGearPermissions
         BeforeAll {
             # Import mock data
             $MockServicePrincipals = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "../RiskyPermissionsSnippets/MockServicePrincipals.json") | ConvertFrom-Json
