@@ -105,17 +105,17 @@ InModuleScope -ModuleName ExportTeamsProvider {
         It "returns valid JSON" {
                 $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should Be $true
+                $ValidJson | Should -Be $true
             }
         It "returns valid JSON with CertificateBasedAuth" {
                 $Json = Export-TeamsProvider -CertificateBasedAuth
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should Be $true
+                $ValidJson | Should -Be $true
             }
         It "returns valid JSON with UseNewSettings" {
                 $Json = Export-TeamsProvider -UseNewSettings
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should Be $true
+                $ValidJson | Should -Be $true
             }
         AfterAll {
             Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
