@@ -10,7 +10,11 @@ function Export-TeamsProvider {
     param(
         [Parameter(Mandatory = $false)]
         [switch]
-        $CertificateBasedAuth = $false
+        $CertificateBasedAuth = $false,
+
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $UseNewSettings = $false
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -24,30 +28,46 @@ function Export-TeamsProvider {
     $AppPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsAppPermissionPolicy"))
     $BroadcastPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsMeetingBroadcastPolicy"))
     
-    # Get-M365UnifiedTenantSettings requires delegated (user) authentication.
-    # Skip this cmdlet when using certificate-based auth to avoid unnecessary errors.
-    # Policies MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will validate using legacy app permission policies only.
+    # Determine which Teams app settings to retrieve based on authentication method and user preference
+    # Three scenarios:
+    # 1. Certificate-based auth: Always use legacy settings (Get-M365UnifiedTenantSettings unavailable)
+    # 2. Interactive auth with -UseNewTeamsAppSettings: Use new org-wide settings by user choice
+    # 3. Interactive auth without switch: Use legacy settings (default)
+    
     if ($CertificateBasedAuth) {
+        # Scenario 1: Certificate-based authentication - legacy only
         Write-Warning @"
 Certificate-based authentication detected. 
-- Legacy Teams app permission policies will be validated for the MS.TEAMS.5.1v1, 5.2v1, and 5.3v1 policies. This is default.
+- Legacy Teams app permission policies will be validated for MS.TEAMS.5.1v1, 5.2v1, and 5.3v1 policies.
 - Org-wide app settings cannot be retrieved with certificate authentication (Get-M365UnifiedTenantSettings requires user login).
 - If your organization uses the newer Teams Admin Center org-wide app settings, 
-  please re-run ScubaGear using interactive user authentication (Connect-MicrosoftTeams without certificate) 
+  please re-run ScubaGear using interactive user authentication with the -UseNewTeamsAppSettings parameter
   to validate policies MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 against new settings.
 "@
         $TenantAppSettings = ConvertTo-Json @()
     }
-    else {
+    elseif ($UseNewSettings) {
+        # Scenario 2: Interactive auth with explicit new settings preference
         Write-Warning @"
-- Interactive/user authentication detected. 
-- Org-wide app settings (Non-legacy) retrieved. This follows the MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 policies.
-- Legacy Teams app permission (MS.TEAMS.5.1v1, 5.2v1, and 5.3v1) policies will be not validated (Get-CsTeamsAppPermissionPolicy). 
-- If your organization uses the Legacy Teams Admin Center/Set-CsTeamsAppPermissionPolicy org-wide app settings, please re-run ScubaGear using noninteractive authentication 
-  (Connect-MicrosoftTeams with certificate) to validate policies MS.TEAMS.5.1v1, 5.2v1, and 5.3v1 against legacy settings.
+Interactive authentication with -UseNewTeamsAppSettings parameter detected.
+- Org-wide app settings (newer v2 policies) will be validated for MS.TEAMS.5.1v2, 5.2v2, and 5.3v2.
+- Legacy Teams app permission policies (MS.TEAMS.5.1v1, 5.2v1, 5.3v1) will NOT be validated.
+- To validate legacy Teams app permission policies instead, 
+  re-run ScubaGear without the -UseNewTeamsAppSettings parameter.
 "@
         # Interactive/user authentication - attempt to get org-wide app settings
         $TenantAppSettings = ConvertTo-Json @($Tracker.TryCommand("Get-M365UnifiedTenantSettings"))
+    }
+    else {
+        # Scenario 3: Interactive auth, default behavior - use legacy settings
+        Write-Warning @"
+Interactive/user authentication detected (default mode).
+- Legacy Teams app permission policies will be validated for MS.TEAMS.5.1v1, 5.2v1, and 5.3v1 policies.
+- Org-wide app settings (newer v2 policies) will NOT be retrieved.
+- If your organization uses the newer Teams Admin Center org-wide app settings,
+  re-run ScubaGear with the -UseNewTeamsAppSettings parameter to validate MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 instead.
+"@
+        $TenantAppSettings = ConvertTo-Json @()
     }
 
     $TeamsSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
