@@ -107,7 +107,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'teams', 'sharepoint', 'scubatank')]
+        [ValidateSet('aad', 'exo', 'defender', 'teams', 'sharepoint', 'scubatank', 'powerPlatform', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -132,11 +132,16 @@ Function Get-ScubaGearPermissions {
     Begin{
         $ErrorActionPreference = 'Stop'
 
-        iF($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
+        # If ProductName is * then set Product to all possible values
+        if ($Product -contains '*') {
+            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerPlatform')
+        }
+
+        if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
             Write-Error -Message "Parameter [-Domain] is required when OutAs is endpoint"
         }
 
-        If($OutAs -eq 'api' -and $Product -match 'aad|teams' -and !$Id){
+        if($OutAs -eq 'api' -and $Product -match 'aad|teams' -and !$Id){
             Write-Error -Message "Parameter [-id] is required when OutAs is api or endpoint and Product is aad or teams"
         }
 
@@ -170,20 +175,34 @@ Function Get-ScubaGearPermissions {
             }
 
             'Product' {
-                Foreach($ProductItem in $Product){
-                    $conditions += {$_.scubaGearProduct -contains $ProductItem }
-                    $conditionsmsg = '`$_.scubaGearProduct -contains "' + $ProductItem + '"'
-                    If($ServicePrincipal -and $ProductItem -ne 'teams'){
-                        # Filter the resourceAPIAppId based on the product
-                        $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
-                        $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
-                    }elseif($OutAs -eq 'endpoint'){
-                        #do no filter the resourceAPIAppId
-                    }elseif($ProductItem -match 'exo|sharepoint|defender'){
-                        # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
-                        # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
-                        $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}
-                        $conditionsmsg += '`$_.resourceAPIAppId -notmatch "' + ($ResourceAPIHash[$ProductItem] -join '|') + '"'
+                # Build OR condition for products - item should match ANY of the specified products
+                $productCondition = {
+                    $item = $_
+                    $matchFound = $false
+                    foreach($prod in $Product) {
+                        if ($item.scubaGearProduct -contains $prod) {
+                            $matchFound = $true
+                            break
+                        }
+                    }
+                    return $matchFound
+                }
+                $conditions += $productCondition
+                $conditionsmsg += '`$_.scubaGearProduct -contains any of "' + ($Product -join '", "') + '"'
+
+                # Don't add resourceAPIAppId filters when querying for roles or endpoints
+                If($OutAs -ne 'role' -and $OutAs -ne 'endpoint'){
+                    Foreach($ProductItem in $Product){
+                        If($ServicePrincipal -and $ProductItem -ne 'teams'){
+                            # Filter the resourceAPIAppId based on the product
+                            $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
+                            $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
+                        }elseif($ProductItem -match 'exo|sharepoint|defender'){
+                            # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
+                            # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
+                            $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}
+                            $conditionsmsg += '`$_.resourceAPIAppId -notmatch "' + ($ResourceAPIHash[$ProductItem] -join '|') + '"'
+                        }
                     }
                 }
             }
@@ -297,7 +316,7 @@ Function Get-ScubaGearPermissions {
             'role' {
                 Try{
                     Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty sprolePermissions -Unique"
-                    $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty sprolePermissions -Unique
+                    $output += $collection | Where-Object $filterScript | Where-Object { $null -ne $_.sprolePermissions } | Select-Object -ExpandProperty sprolePermissions -Unique
                 }Catch{
                     $output += $null
                 }
@@ -396,30 +415,44 @@ Function Get-ServicePrincipalPermissions {
         [string]$Environment = 'commercial'
     )
 
+    $ProductNames = "aad", "exo", "sharepoint"
+
     # Create a list to hold the filtered permissions
     $filteredPermissions = @()
 
     # get all modules with least and higher permissions
-    $allPermissions = "aad","exo","sharepoint" | Get-ScubaGearPermissions -OutAs all -Environment $Environment -servicePrincipal
+    $allPermissions = $ProductNames | Get-ScubaGearPermissions -OutAs all -Environment $Environment -servicePrincipal
 
-    # filter to get the higher overwriting permissions
-    $OverwriteHigherPermissions = Get-ScubaGearEntraMinimumPermissions -Environment $Environment
+    # Only get overwrite higher permissions if AAD is in the product list
+    if ($ProductNames -contains 'aad') {
+        $OverwriteHigherPermissions = Get-ScubaGearEntraMinimumPermissions -Environment $Environment
+    } else {
+        $OverwriteHigherPermissions = @()
+    }
 
     # if the ServicePrincipal switch is used, then add the appropriate resourceAPIAppId to $OverwriteHigherPermissions from line 356 by looking at the $allPermissions
     $newOverwriteHigherPermissions = @()
-    ForEach($permission in $OverwriteHigherPermissions) {
-        $resourceAPIAppId = ($allPermissions | Where-Object { $_.leastPermissions -contains $permission } | Select-Object -ExpandProperty resourceAPIAppId -Unique)
-        $newObject = [PSCustomObject]@{
-            resourceAPIAppId   = $resourceAPIAppId
-            leastPermissions   = $permission
+    if ($OverwriteHigherPermissions.Count -gt 0) {
+        ForEach($permission in $OverwriteHigherPermissions) {
+            $resourceAPIAppId = ($allPermissions | Where-Object { $_.leastPermissions -contains $permission } | Select-Object -ExpandProperty resourceAPIAppId -Unique)
+
+            # Get the scubaGearProduct for this permission - combine all products that use this permission
+            $products = ($allPermissions | Where-Object { $_.leastPermissions -contains $permission } | Select-Object -ExpandProperty scubaGearProduct) | Sort-Object -Unique
+
+            $newObject = [PSCustomObject]@{
+                resourceAPIAppId   = $resourceAPIAppId
+                leastPermissions   = $permission
+                scubaGearProduct   = $products  # This will be an array of all products
+            }
+            $newOverwriteHigherPermissions += $newObject
         }
-        $newOverwriteHigherPermissions += $newObject
     }
 
     # loop thru each module and grab the least permissions unless the higher permissions is one from the $overriteHigherPermissions
     # Don't include the least permissions that are overwriten by the higher permissions
     foreach($permission in $allPermissions){
-        if( (Compare-Object $permission.higherPermissions -DifferenceObject $OverwriteHigherPermissions -IncludeEqual).SideIndicator -notcontains "=="){
+        if ($OverwriteHigherPermissions.Count -eq 0 -or 
+            (Compare-Object $permission.higherPermissions -DifferenceObject $OverwriteHigherPermissions -IncludeEqual).SideIndicator -notcontains "=="){
             $filteredPermissions += $permission
         }
     }
@@ -429,11 +462,41 @@ Function Get-ServicePrincipalPermissions {
 
     $NewPermissions += $filteredPermissions
 
-    # include overwrite higher permissions
-    $NewPermissions += $newOverwriteHigherPermissions
+    # include overwrite higher permissions only if they exist
+    if ($newOverwriteHigherPermissions.Count -gt 0) {
+        $NewPermissions += $newOverwriteHigherPermissions
+    }
 
-    # Display the filtered permissions
-    return $NewPermissions | Select-Object -Property LeastPermissions,ResourceAPiAppID -Unique
+    # Group by permission name and resourceAPIAppId to combine duplicate entries with different products
+    $groupedPermissions = $NewPermissions | Group-Object -Property @{Expression={$_.leastPermissions}}, @{Expression={$_.resourceAPIAppId}}
+
+    $deduplicatedPermissions = @()
+    foreach ($group in $groupedPermissions) {
+        # Combine all products from duplicate entries
+        $allProducts = @()
+        foreach ($item in $group.Group) {
+            if ($item.scubaGearProduct) {
+                # Handle both arrays and single values
+                if ($item.scubaGearProduct -is [array]) {
+                    $allProducts += $item.scubaGearProduct
+                } else {
+                    $allProducts += $item.scubaGearProduct
+                }
+            }
+        }
+
+        # Get unique products
+        $uniqueProducts = $allProducts | Sort-Object -Unique
+
+        # Take the first item and update its scubaGearProduct with all unique products
+        $consolidatedItem = $group.Group[0].PSObject.Copy()
+        $consolidatedItem.scubaGearProduct = $uniqueProducts
+
+        $deduplicatedPermissions += $consolidatedItem
+    }
+
+    # Display the filtered permissions - return deduplicated results
+    return $deduplicatedPermissions | Select-Object -Property LeastPermissions, ResourceAPIAppID, scubaGearProduct -Unique
 }
 
 Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions
