@@ -179,7 +179,9 @@ function Connect-Tenant {
                    }
                }
                "teams" {
-                   $TeamsParams = @{'ErrorAction'= 'Stop'}
+                   # Suppress warnings on connect. The teams module can throw confusing warnings about migration when connecting to the TeamsGCCH and TeamsDOD environments. These warnings are benign and can be ignored.
+                   Write-Warning "Connecting to Microsoft Teams...using SilentlyContinue for Warning Action - to suppress known migration warnings in TeamsGCCH and TeamsDOD environments."
+                   $TeamsParams = @{'ErrorAction'= 'Stop';'WarningAction'='SilentlyContinue';}
                    if ($ServicePrincipalParams.CertThumbprintParams) {
                        $TeamsConnectToTenant = @{
                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
