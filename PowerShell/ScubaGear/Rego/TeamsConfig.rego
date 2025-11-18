@@ -581,12 +581,13 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
-BuildDefaultAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (Microsoft apps): ",
@@ -594,6 +595,7 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := con
     TenantDetails
 ]) if {
     SettingValue == "Not Checked"
+    LegacyCompliant == false
 }
 
 # Helper rule to determine DefaultApp tenant setting details
@@ -699,12 +701,13 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
-BuildGlobalAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (third-party apps): ",
@@ -712,6 +715,7 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := conc
     TenantDetails
 ]) if {
     SettingValue == "Not Checked"
+    LegacyCompliant == false
 }
 
 # Helper rule to determine GlobalApp tenant setting details
@@ -817,12 +821,13 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
-BuildPrivateAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (custom apps): ",
@@ -830,6 +835,7 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := con
     TenantDetails
 ]) if {
     SettingValue == "Not Checked"
+    LegacyCompliant == false
 }
 
 # Helper rule to determine PrivateApp tenant setting details
