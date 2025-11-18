@@ -90,7 +90,7 @@ jobs:
 
           # Test that the module was published successfully
           $TestResult = Test-PublishedModule `
-            -IsPrerelease '${{ inputs.IsPrerelease }}' `
+            -IsPrerelease ('true' -eq '${{ inputs.IsPrerelease }}') `
             -ModuleVersion '${{ inputs.OverrideModuleVersion }}' `
             -PrereleaseTag '${{ inputs.PrereleaseTag }}' `
             -WaitSeconds 30
