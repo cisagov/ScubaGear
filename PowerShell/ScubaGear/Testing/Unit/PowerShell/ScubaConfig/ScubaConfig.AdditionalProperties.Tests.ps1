@@ -5,9 +5,51 @@ Describe "ScubaConfig Additional Properties Validation" {
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
         
-        # Remove any global ConvertFrom-Yaml function that may have been defined by other tests
-        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue | Where-Object { $_.CommandType -eq 'Function' }) {
-            Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        # Mock ConvertFrom-Yaml to avoid dependency on powershell-yaml module in CI
+        # This mock parses simple YAML structures that our tests use
+        function global:ConvertFrom-Yaml {
+            param([Parameter(ValueFromPipeline)]$YamlString)
+            
+            if (-not $YamlString) { return @{} }
+            
+            $result = @{}
+            $lines = $YamlString -split "`n" | Where-Object { $_.Trim() -and -not $_.Trim().StartsWith('#') }
+            $currentKey = $null
+            $arrayMode = $false
+            
+            foreach ($line in $lines) {
+                $trimmed = $line.Trim()
+                
+                # Handle array items
+                if ($trimmed.StartsWith('- ')) {
+                    if ($arrayMode -and $currentKey) {
+                        $result[$currentKey] += @($trimmed.Substring(2).Trim())
+                    }
+                }
+                # Handle key-value pairs
+                elseif ($trimmed -match '^([^:]+):\s*(.*)$') {
+                    $key = $matches[1].Trim()
+                    $value = $matches[2].Trim()
+                    
+                    if ($value -eq '') {
+                        # Start of array
+                        $result[$key] = @()
+                        $currentKey = $key
+                        $arrayMode = $true
+                    }
+                    elseif ($value -match '^\{.*\}$') {
+                        # Inline object - skip for now
+                        $result[$key] = @{}
+                    }
+                    else {
+                        # Simple value
+                        $result[$key] = $value
+                        $arrayMode = $false
+                    }
+                }
+            }
+            
+            return $result
         }
     }
 
