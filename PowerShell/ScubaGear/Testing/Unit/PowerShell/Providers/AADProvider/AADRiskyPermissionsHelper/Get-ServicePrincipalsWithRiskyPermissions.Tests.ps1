@@ -1,6 +1,8 @@
 $ModulesPath = "../../../../../../Modules"
 $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRiskyPermissionsHelper.psm1"
+$PermissionsHelper = "$($ModulesPath)/Permissions/PermissionsHelper.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper)
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsHelper) -Function Get-ScubaGearPermissions
 
 InModuleScope AADRiskyPermissionsHelper {
     Describe "Get-ServicePrincipalsWithRiskyPermissions" {

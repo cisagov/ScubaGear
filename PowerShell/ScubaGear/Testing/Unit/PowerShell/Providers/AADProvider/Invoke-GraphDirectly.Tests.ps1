@@ -58,7 +58,7 @@ InModuleScope Utility {
     Describe -Tag 'Utility' -Name "Invoke-GraphDirectly" {
         BeforeAll {
             Mock -ModuleName Utility Invoke-GraphDirectly -MockWith {
-                param($Cmdlet, $M365Environment, $ID)
+                param($Commandlet, $M365Environment, $ID)
                 if(-not $ID){
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL to verify the configuration file hasn't been modified
                     return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment)
@@ -76,9 +76,9 @@ InModuleScope Utility {
             $expected = "$EnvUrl/$Path"
 
             if ($NeedsID -and $IdValue) {
-                $result = Invoke-GraphDirectly -Cmdlet $Cmdlet -M365Environment $EnvName -Id $IdValue
+                $result = Invoke-GraphDirectly -Commandlet $Cmdlet -M365Environment $EnvName -Id $IdValue
             } else {
-                $result = Invoke-GraphDirectly -Cmdlet $Cmdlet -M365Environment $EnvName
+                $result = Invoke-GraphDirectly -Commandlet $Cmdlet -M365Environment $EnvName
             }
 
             $result | Should -Be $expected
