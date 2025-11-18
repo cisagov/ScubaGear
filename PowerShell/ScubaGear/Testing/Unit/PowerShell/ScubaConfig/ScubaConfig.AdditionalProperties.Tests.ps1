@@ -4,6 +4,11 @@ Describe "ScubaConfig Additional Properties Validation" {
     BeforeAll {
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
+        
+        # Remove any global ConvertFrom-Yaml function that may have been defined by other tests
+        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue | Where-Object { $_.CommandType -eq 'Function' }) {
+            Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        }
     }
 
     AfterEach {
@@ -81,7 +86,7 @@ CustomProperty: this-is-now-allowed
             Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
         }
 
-        It "Should REJECT configuration with typo in ProductNames (ProductName)" {
+        It "Should REJECT configuration with typo in ProductNames (ProductName)" -Tag "test-typo" {
             $InvalidYaml = @"
 ProductName:
   - aad
@@ -89,8 +94,13 @@ M365Environment: commercial
 "@
 
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            $InvalidYaml | Set-Content -Path $TempFile
+            # Ensure we're writing fresh content
+            if (Test-Path $TempFile) {
+                Remove-Item $TempFile -Force
+            }
+            $InvalidYaml | Set-Content -Path $TempFile -Force
 
+            [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
             # This should still fail because ProductNames is REQUIRED
             { $Config.LoadConfig($TempFile) } | Should -Throw -ExpectedMessage "*ProductNames*"
@@ -161,6 +171,7 @@ MyCustomProperty: test-value
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
 
+            [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
             $Config.LoadConfig($TempFile)
             $Config.Configuration.MyCustomProperty | Should -Be 'test-value'
@@ -181,6 +192,7 @@ CustomProp3: value3
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
 
+            [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
             $Config.LoadConfig($TempFile)
             $Config.Configuration.CustomProp1 | Should -Be 'value1'
