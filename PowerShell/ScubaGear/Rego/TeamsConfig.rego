@@ -567,11 +567,12 @@ tests contains {
     TenantDetails := GetDefaultAppTenantDetails
     
     # Use helper function to build details with proper prioritization
-    Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails)
+    Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildDefaultAppDetails(SettingValue, TenantDetails, _) := concat("", [
+# When org-wide setting is available (not "Not Checked"), show it first
+BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (Microsoft apps): ",
     SettingValue,
     TenantDetails
@@ -579,7 +580,13 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, _) := concat("", [
     SettingValue != "Not Checked"
 }
 
-BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildDefaultAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+    SettingValue == "Not Checked"
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (Microsoft apps): ",
@@ -678,11 +685,12 @@ tests contains {
     TenantDetails := GetGlobalAppTenantDetails
     
     # Use helper function to build details with proper prioritization
-    Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails)
+    Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildGlobalAppDetails(SettingValue, TenantDetails, _) := concat("", [
+# When org-wide setting is available (not "Not Checked"), show it first
+BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (third-party apps): ",
     SettingValue,
     TenantDetails
@@ -690,7 +698,13 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, _) := concat("", [
     SettingValue != "Not Checked"
 }
 
-BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildGlobalAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+    SettingValue == "Not Checked"
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (third-party apps): ",
@@ -789,11 +803,12 @@ tests contains {
     TenantDetails := GetPrivateAppTenantDetails
     
     # Use helper function to build details with proper prioritization
-    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails)
+    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-BuildPrivateAppDetails(SettingValue, TenantDetails, _) := concat("", [
+# When org-wide setting is available (not "Not Checked"), show it first
+BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (custom apps): ",
     SettingValue,
     TenantDetails
@@ -801,7 +816,13 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, _) := concat("", [
     SettingValue != "Not Checked"
 }
 
-BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails) := concat("", [
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildPrivateAppDetails(SettingValue, _, LegacyDetails, true) := LegacyDetails if {
+    SettingValue == "Not Checked"
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, false) := concat("", [
     "Legacy app permission policy check: ",
     LegacyDetails,
     ". Org-wide tenant setting (custom apps): ",
