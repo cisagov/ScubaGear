@@ -59,6 +59,7 @@ InModuleScope Utility {
         BeforeAll {
             Mock -ModuleName Utility Invoke-GraphDirectly -MockWith {
                 param($Commandlet, $M365Environment, $ID)
+                $Commandlet = ""
                 if(-not $ID){
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL to verify the configuration file hasn't been modified
                     return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment)
