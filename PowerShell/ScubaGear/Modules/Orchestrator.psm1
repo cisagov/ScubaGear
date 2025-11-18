@@ -102,6 +102,12 @@ function Invoke-SCuBA {
     .Parameter SkipDoH
     If true, do not fallback to DoH should the traditional DNS requests fail
     when retrieving any DNS records required by specific SCuBA policies.
+    .Parameter UseNewTeamsAppSettings
+    When using interactive authentication for Teams, this switch enables ScubaGear to validate
+    the newer org-wide app settings (MS.TEAMS.5.1v2, 5.2v2, 5.3v2) instead of the legacy 
+    app permission policies (MS.TEAMS.5.1v1, 5.2v1, 5.3v1). By default, interactive authentication
+    validates the legacy v1 settings. Certificate-based authentication always validates legacy settings
+    regardless of this parameter.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
@@ -291,7 +297,13 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
+        $SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH'),
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [switch]
+        $UseNewTeamsAppSettings
     )
     process {
         # Retrieve ScubaGear Module versions
@@ -680,7 +692,14 @@ function Invoke-ProviderList {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "teams" {
-                            $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                            $TeamsProviderParams = @{}
+                            if ($BoundParameters.AppID) {
+                                $TeamsProviderParams += @{CertificateBasedAuth = $true}
+                            }
+                            if ($BoundParameters.UseNewTeamsAppSettings) {
+                                $TeamsProviderParams += @{UseNewSettings = $true}
+                            }
+                            $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"
@@ -707,8 +726,8 @@ function Invoke-ProviderList {
                 $TimeZone = ($GetTimeZone).StandardName
             }
 
-        $ConfigDetails = @(ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration))
-        if(! $ConfigDetails) {
+        $ConfigDetails = ConvertTo-Json -Depth 100 $([ScubaConfig]::GetInstance().Configuration)
+        if((! $ConfigDetails) -or ($ConfigDetails -eq "null")) {
             $ConfigDetails = "{}"
         }
 
