@@ -299,15 +299,12 @@ class ScubaConfig {
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
-<<<<<<< HEAD
-=======
         # Allow reinitialization of the validator when tests call ResetInstance
         [ScubaConfig]::_ValidatorInitialized = $false
 
         # Always: force cleanup for CI runs
         [GC]::Collect()
         [GC]::WaitForPendingFinalizers()
->>>>>>> 9c48c8c (added InitializeValidator before all)
         return
     }
 
