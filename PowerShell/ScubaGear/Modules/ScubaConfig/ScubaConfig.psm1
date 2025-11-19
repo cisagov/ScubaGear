@@ -193,61 +193,6 @@ class ScubaConfig {
         }
     }
 
-    hidden static [hashtable] ConvertPSObjectToHashtable([PSCustomObject]$Object) {
-        $Hashtable = @{}
-        foreach ($Property in $Object.PSObject.Properties) {
-            if ($Property.Value -is [PSCustomObject]) {
-                $Hashtable[$Property.Name] = [ScubaConfig]::ConvertPSObjectToHashtable($Property.Value)
-            }
-            elseif ($Property.Value -is [Array]) {
-                $Array = @()
-                foreach ($Item in $Property.Value) {
-                    if ($Item -is [PSCustomObject]) {
-                        $Array += [ScubaConfig]::ConvertPSObjectToHashtable($Item)
-                    }
-                    else {
-                        $Array += $Item
-                    }
-                }
-                $Hashtable[$Property.Name] = $Array
-            }
-            else {
-                $Hashtable[$Property.Name] = $Property.Value
-            }
-        }
-        return $Hashtable
-    }
-
-    hidden static [void] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
-        [ScubaConfig]::InitializeValidator()
-        $Defaults = [ScubaConfig]::_ConfigDefaults
-
-        foreach ($Policy in $PolicyConfig.Keys) {
-            if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
-                $Warning = "Config file indicates $ActionType $Policy, but $Policy is not a valid control ID. "
-                $Warning += "Expected format is '$($Defaults.validation.policyIdExample)'. "
-                $Warning += "Control will not be processed."
-                Write-Warning $Warning
-                Continue
-            }
-
-            $Product = ($Policy -Split "\.")[1].ToLower()
-
-            # Handle wildcard in ProductNames
-            $EffectiveProducts = $ProductNames
-            if ($ProductNames -contains '*') {
-                $EffectiveProducts = $Defaults.defaults.AllProductNames
-            }
-
-            if (-not ($EffectiveProducts -Contains $Product)) {
-                $Warning = "Config file indicates $ActionType $Policy, but $Product is not one of the products "
-                $Warning += "specified in the ProductNames parameter. Control will not be processed."
-                Write-Warning $Warning
-                Continue
-            }
-        }
-    }
-
     hidden [Guid]$Uuid = [Guid]::NewGuid()
     hidden [hashtable]$Configuration
 
