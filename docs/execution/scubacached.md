@@ -7,7 +7,8 @@
 ### Output Folder Structure
 
 **`Invoke-SCuBA`** creates a timestamped subfolder:
-```
+
+```text
 OutPath\
   └── M365BaselineConformance_2025_11_18_14_30_45\
       ├── ProviderSettingsExport.json
@@ -16,7 +17,8 @@ OutPath\
 ```
 
 **`Invoke-SCuBACached`** places output files directly in the specified path:
-```
+
+```text
 OutPath\
   ├── ProviderSettingsExport.json
   ├── ScubaResults_abc123.json
