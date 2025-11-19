@@ -1,5 +1,3 @@
-using module '..\ScubaConfig\ScubaConfig.psm1'
-
 Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
 function Export-AADProvider {
