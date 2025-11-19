@@ -3,11 +3,7 @@
     "version": "1.7.0",
     "description": "ScubaGear default configuration values",
     "lastUpdated": "2024-09-08",
-<<<<<<< HEAD
     "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.0","1.7.1","1.8.0","1.9.0","1.10.1"]
-=======
-    "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.0","1.7.1","1.8.0","1.9.0"]
->>>>>>> 5b6ebe8 (update opa and pester)
   },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
@@ -25,19 +21,9 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-<<<<<<< HEAD
-<<<<<<< HEAD
     "OPAVersion": "1.10.1",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
-=======
-    "OPAVersion": "1.9.0"
->>>>>>> ae23be9 (Update PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json)
-=======
-    "OPAVersion": "1.9.0",
-    "PreferredDnsResolvers": [],
-    "SkipDoH": false
->>>>>>> 645c499 (fixes extension support and exo smoketest)
   },
   "minRequired": [
     "ProductNames"
@@ -111,19 +97,7 @@
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
     "policyIdExample": "MS.DEFENDER.1.1v1",
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "supportedFileExtensions": [".yaml", ".json"],
-=======
-  "supportedFileExtensions": [".yaml", ".yml", ".ps1"],
->>>>>>> ef7cb5e (update files to fix test)
-=======
-  "supportedFileExtensions": [".yaml", ".yml", ".json"],
->>>>>>> 645c499 (fixes extension support and exo smoketest)
-=======
-  "supportedFileExtensions": [".yaml", ".json"],
->>>>>>> 5f3eade (updates pester extention check)
+    "supportedFileExtensions": [".yaml", ".yml", ".json"],
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true
   },

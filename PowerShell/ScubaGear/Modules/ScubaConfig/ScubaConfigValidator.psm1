@@ -41,7 +41,6 @@ class ScubaConfigValidator {
             $DefaultsContent = Get-Content -Path $DefaultsPath -Raw
             # Convert JSON defaults content
             [ScubaConfigValidator]::_Cache['Defaults'] = $DefaultsContent | ConvertFrom-Json
-            
         }
         catch {
             throw "Failed to load configuration defaults: $($_.Exception.Message)"

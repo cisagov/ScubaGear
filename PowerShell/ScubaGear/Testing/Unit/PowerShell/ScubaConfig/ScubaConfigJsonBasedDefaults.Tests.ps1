@@ -37,7 +37,7 @@ Describe "JSON-based Configuration System" {
 
         It "Should read OPAVersion default from JSON" {
             $opaVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
-            $opaVersion | Should -Be "1.9.0"
+            $opaVersion | Should -Be "1.10.1"
         }
 
         It "Should read M365Environment default as commercial from JSON" {
