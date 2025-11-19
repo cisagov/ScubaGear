@@ -607,7 +607,7 @@ function Invoke-ProviderList {
                             $RetVal = Export-AADProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
                         }
                         "exo" {
-                            $RetVal = Export-EXOProvider | Select-Object -Last 1
+                            $RetVal = Export-EXOProvider -PreferredDnsResolvers $ScubaConfig.PreferredDnsResolvers -SkipDoH $ScubaConfig.SkipDoH | Select-Object -Last 1
                         }
                         "defender" {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
@@ -1344,13 +1344,11 @@ function Invoke-ReportCreation {
 
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
-            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "utils.js") -Raw
-            $MainJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "main.js") -Raw
+            $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
 
             $JSFiles = @(
                 $ParentReportJS
                 $UtilsJS
-                $MainJS
             ) -join "`n"
 
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
