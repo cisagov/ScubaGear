@@ -28,8 +28,12 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of Microsoft Apps by default: Global. Org-wide tenant setting (Microsoft apps): Not Checked - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of Microsoft Apps by default: Global. Org-wide tenant setting (Microsoft apps): ",
+        "Not Checked - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
 }
@@ -41,8 +45,12 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of Microsoft Apps by default: Tag:TestPolicy. Org-wide tenant setting (Microsoft apps): Not Checked - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of Microsoft Apps by default: Tag:TestPolicy. Org-wide tenant setting (Microsoft apps): ",
+        "Not Checked - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
 }
@@ -88,8 +96,12 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of third-party apps by default: Global. Org-wide tenant setting (third-party apps): Not Checked - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of third-party apps by default: Global. Org-wide tenant setting (third-party apps): ",
+        "Not Checked - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
 }
@@ -101,8 +113,12 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of third-party apps by default: Tag:TestPolicy. Org-wide tenant setting (third-party apps): Not Checked - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of third-party apps by default: Tag:TestPolicy. Org-wide tenant setting (third-party apps): ",
+        "Not Checked - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
 }
@@ -147,8 +163,12 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of custom apps by default: Global. Org-wide tenant setting (custom apps): Not Checked - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of custom apps by default: Global. Org-wide tenant setting (custom apps): ",
+        "Not Checked - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
 }
@@ -160,8 +180,12 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
 
     Output := teams.tests with input.app_policies as [App]
 
-    ReportDetailStr :=
-    "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict installation of custom apps by default: Tag:TestPolicy. Org-wide tenant setting (custom apps): Not Checked - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated"
+    ReportDetailStr := concat("", [
+        "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
+        "installation of custom apps by default: Tag:TestPolicy. Org-wide tenant setting (custom apps): ",
+        "Not Checked - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive ",
+        "authentication; legacy policies were validated"
+    ])
 
     TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
 }
