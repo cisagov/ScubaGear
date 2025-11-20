@@ -39,6 +39,8 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                  OutReportName = "BaselineReports"
                  OPAPath = "."
                  LogIn = $false
+                 PreferredDnsResolvers = @()
+                 SkipDoH = $false
               }
               [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
               $TenantDetails = '{"DisplayName": "displayName"}'
