@@ -249,7 +249,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
-#### MS.DEFENDER.2.3v2
+#### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
