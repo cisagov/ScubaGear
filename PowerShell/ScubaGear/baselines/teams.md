@@ -276,6 +276,8 @@ Similar to external users, blocking contact with unmanaged Teams users prevents 
 #### MS.TEAMS.2.1v2
 External access for users SHALL only be enabled on a per-domain basis.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ August 2025
@@ -287,6 +289,8 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 #### MS.TEAMS.2.2v2
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
@@ -386,6 +390,8 @@ This section helps reduce security risks related to Teams email integration. Tea
 ### Policies
 #### MS.TEAMS.4.1v1
 Teams email integration SHALL be disabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  

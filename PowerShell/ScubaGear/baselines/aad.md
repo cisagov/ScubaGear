@@ -135,8 +135,6 @@ Users detected as high risk SHALL be blocked.
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
 
-[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-
 <!--Policy: MS.AAD.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
 - _Last modified:_ June 2023
