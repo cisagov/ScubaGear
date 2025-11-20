@@ -284,14 +284,14 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [AllowEmptyCollection()]
         [string[]]
-        $PreferredDnsResolvers = @(),
+        $PreferredDnsResolvers = [ScubaConfig]::ScubaDefault('DefaultPreferredDnsResolvers'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $SkipDoH = $false
+        $SkipDoH = [ScubaConfig]::ScubaDefault('DefaultSkipDoH')
     )
     process {
         # Retrieve ScubaGear Module versions
