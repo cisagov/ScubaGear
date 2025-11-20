@@ -608,7 +608,10 @@ GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
     DefaultAppSettingValue != "Not Checked"
 }
 
-GetDefaultAppTenantDetails := " - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+GetDefaultAppTenantDetails := concat("", [
+    " - If MS.TEAMS.5.1V2 implemented in the portal, then it requires interactive authentication; ",
+    "legacy policies were validated"
+]) if {
     DefaultAppSettingValue == "Not Checked"
 }
 #--
@@ -728,7 +731,10 @@ GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
     GlobalAppSettingValue != "Not Checked"
 }
 
-GetGlobalAppTenantDetails := " - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+GetGlobalAppTenantDetails := concat("", [
+    " - If MS.TEAMS.5.2V2 implemented in the portal, then it requires interactive authentication; ",
+    "legacy policies were validated"
+]) if {
     GlobalAppSettingValue == "Not Checked"
 }
 #--
@@ -848,7 +854,10 @@ GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
     PrivateAppSettingValue != "Not Checked"
 }
 
-GetPrivateAppTenantDetails := " - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive authentication; legacy policies were validated" if {
+GetPrivateAppTenantDetails := concat("", [
+    " - If MS.TEAMS.5.3V2 implemented in the portal, then it requires interactive authentication; ",
+    "legacy policies were validated"
+]) if {
     PrivateAppSettingValue == "Not Checked"
 }
 #--
