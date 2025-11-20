@@ -203,10 +203,10 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
     }
 
@@ -274,7 +274,7 @@ Describe "Policy Checks for <ProductName>" {
 
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Delete the modified settings so next test scenario starts from original cached settings
                 Remove-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json"
