@@ -67,6 +67,8 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 #### MS.TEAMS.1.2v2
 Anonymous users SHALL NOT be enabled to start meetings.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
 - _Last modified:_ August 2025

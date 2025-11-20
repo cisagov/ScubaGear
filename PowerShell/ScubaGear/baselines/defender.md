@@ -47,6 +47,9 @@ Within the standard and strict preset policies, users can be enrolled in [Exchan
 #### MS.DEFENDER.1.1v1
 The standard and strict preset security policies SHALL be enabled.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
+
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Defender includes a large number of features and settings to protect users against threats. Using the preset security policies, administrators can help ensure all new and existing users automatically have secure defaults applied.
 - _Last modified:_ June 2023
@@ -60,6 +63,9 @@ The standard and strict preset security policies SHALL be enabled.
 
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Important user protections are provided by EOP, including anti-spam, anti-malware, and anti-phishing protections. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
@@ -78,6 +84,9 @@ All users SHALL be added to Exchange Online Protection (EOP) in either the stand
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
+
 <!--Policy: MS.DEFENDER.1.3v1; Criticality: SHALL -->
 - _Rationale:_ Important user protections are provided by Defender for Office 365 protection, including safe attachments and safe links. By using the preset policies, administrators can help ensure all new and existing users have secure defaults applied automatically.
 - _Last modified:_ June 2023
@@ -95,6 +104,9 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
+
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
 - _Last modified:_ June 2023
@@ -108,6 +120,9 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 
 <!--Policy: MS.DEFENDER.1.5v1; Criticality: SHALL -->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.
@@ -411,6 +426,8 @@ their environment and needs.
 #### MS.DEFENDER.4.1v2
 A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.DEFENDER.4.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
                others who should not have access to it. DLP policies
@@ -702,6 +719,9 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 #### MS.DEFENDER.5.1v1
 At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
+
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
 - _Last modified:_ June 2023
@@ -809,6 +829,8 @@ types to the Unified Audit Log.
 ### Policies
 #### MS.DEFENDER.6.1v1
 Unified Audit logging SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.

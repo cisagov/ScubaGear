@@ -126,6 +126,8 @@ points.
 #### MS.EXO.2.2v2
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
@@ -249,6 +251,8 @@ sent from your domain that fail SPF and DKIM checks.
 #### MS.EXO.4.1v1
 A DMARC policy SHALL be published for every second-level domain.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.EXO.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
 may improperly handle SPF and DKIM failures, possibly enabling spoofed
@@ -264,6 +268,8 @@ second-level domain protects the second-level domains and all subdomains.
 #### MS.EXO.4.2v1
 The DMARC message rejection option SHALL be p=reject.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.EXO.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (i.e., none, quarantine, and reject),
 reject provides the strongest protection. Reject is the level of protection
@@ -277,6 +283,9 @@ required by BOD 18-01 for FCEB departments and agencies.
 
 #### MS.EXO.4.3v1
 The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -380,6 +389,8 @@ SMTP Auth needs to be enabled for any use case.
 #### MS.EXO.5.1v1
 SMTP AUTH SHALL be disabled.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.EXO.5.1v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
 Therefore, disabling it as the global default conforms to the principle of
@@ -420,6 +431,8 @@ Exchange Online allows creation of sharing polices that soften default restricti
 #### MS.EXO.6.1v1
 Contact folders SHALL NOT be shared with all domains.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 <!--Policy: MS.EXO.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
 for specific legitimate use as needed.
@@ -433,6 +446,8 @@ for specific legitimate use as needed.
 
 #### MS.EXO.6.2v1
 Calendar details SHALL NOT be shared with all domains.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.EXO.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
@@ -489,6 +504,9 @@ Mail flow rules allow incoming email modification, such that email from external
 
 #### MS.EXO.7.1v1
 External sender warnings SHALL be implemented.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+
 
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
 - _Rationale:_ Phishing is an ever-present threat. Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
@@ -1093,6 +1111,8 @@ this policy helps avoid inadvertent disabling.
 
 #### MS.EXO.13.1v1
 Mailbox auditing SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.EXO.13.1v1; Criticality: SHALL -->
 - _Rationale:_ Exchange Online user accounts can be compromised or misused. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.
