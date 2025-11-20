@@ -25,100 +25,95 @@ InModuleScope Orchestrator {
         }
         Context 'When creating the reports from Provider and OPA results JSON' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
-                $ProviderParameters = @{
-                    TenantDetails       = '{"DisplayName": "displayName"}';
-                    DarkMode            = $false;
-                    ModuleVersion       = '1.0';
-                    OutFolderPath       = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName     = "TestResults"
-                    OutReportName       = "BaselineReports"
+                    OutRegoFileName = "TestResults"
+                    OutReportName = "BaselineReports"
+                    OPAPath = "."
+                    LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+                $TenantDetails = '{"DisplayName": "displayName"}'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
+                $DarkMode = $false
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+                $ModuleVersion = '1.0'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
+                $OutFolderPath = "./"
             }
             It 'Do it quietly (Do not automatically show report)' {
-                $ProviderParameters += @{
-                    ProductNames = @("aad")
-                }
-                { Invoke-ReportCreation @ProviderParameters -Quiet} | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet } | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 0
-                $ProviderParameters.ProductNames = @()
+                $ScubaConfig.ProductNames = @()
             }
             It 'Show report' {
-                $ProviderParameters += @{
-                    ProductNames = @("aad")
-                }
-                { Invoke-ReportCreation @ProviderParameters} | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter {-Not [string]::IsNullOrEmpty($Path) }
-                $ProviderParameters.ProductNames = @()
+                $ScubaConfig.ProductNames = @()
             }
             It 'With -ProductNames "aad", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("aad")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "defender", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("defender")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("defender")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "exo", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("exo")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("exo")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "powerplatform", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("powerplatform")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("powerplatform")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "sharepoint", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("sharepoint")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("sharepoint")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "teams", should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("teams")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("teams")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With all products, should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
         }
         Context 'When creating the reports with -Quiet True' {
             BeforeAll {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
-                $ProviderParameters = @{
-                    DarkMode            = $false;
-                    TenantDetails       = '{"DisplayName": "displayName"}';
-                    ModuleVersion       = '1.0';
-                    OutFolderPath       = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName     = "TestResults"
-                    OutReportName       = "BaselineReports"
-                    Quiet               = $true
+                    OutRegoFileName = "TestResults"
+                    OutReportName = "BaselineReports"
+                    OPAPath = "."
+                    LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'DarkMode')]
+                $DarkMode = $false
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+                $TenantDetails = '{"DisplayName": "displayName"}'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+                $ModuleVersion = '1.0'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
+                $OutFolderPath = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Quiet')]
+                $Quiet = $true
             }
             It 'With all products, should not throw' {
-                $ProviderParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-                }
-                { Invoke-ReportCreation @ProviderParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet } | Should -Not -Throw
             }
         }
     }
-}
+ }
 
 AfterAll {
-    Remove-Module Orchestrator -ErrorAction SilentlyContinue
-}
+     Remove-Module Orchestrator -ErrorAction SilentlyContinue
+ }
