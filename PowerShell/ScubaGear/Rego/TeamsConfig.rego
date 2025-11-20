@@ -561,7 +561,10 @@ tests contains {
     Status := CompliantCount > 0
     
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of Microsoft Apps by default:")
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "Microsoft Apps by default:"
+    ]))
     
     # Determine tenant details based on setting state - using separate rules for each case
     TenantDetails := GetDefaultAppTenantDetails
@@ -684,7 +687,10 @@ tests contains {
     Status := CompliantCount > 0
     
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of third-party apps by default:")
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "third-party apps by default:"
+    ]))
     
     # Determine tenant details based on setting state - using separate rules for each case
     TenantDetails := GetGlobalAppTenantDetails
@@ -807,7 +813,10 @@ tests contains {
     Status := CompliantCount > 0
     
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, "app permission policy(ies) found that does not restrict installation of custom apps by default:")
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "custom apps by default:"
+    ]))
     
     # Determine tenant details based on setting state - using separate rules for each case
     TenantDetails := GetPrivateAppTenantDetails
