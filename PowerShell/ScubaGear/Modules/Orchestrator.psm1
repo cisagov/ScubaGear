@@ -344,11 +344,17 @@ function Invoke-SCuBA {
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             [ScubaConfig]::ResetInstance()
-            if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
-                Write-Error -Message "The config file failed to load: $ConfigFilePath"
-            }
-            else {
+            try {
+                if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
+                    Write-Error -Message "The config file failed to load: $ConfigFilePath"
+                    return
+                }
                 $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+            }
+            catch {
+                # Display clean validation error without PowerShell stack trace
+                Write-Warning $_.Exception.Message
+                return
             }
 
             # Authentications parameters use below
