@@ -33,9 +33,9 @@ InModuleScope 'ExportEXOProvider' {
                 if ($Uri.ToString().Contains("cloudflare-dns.com")) {
                     throw "some error"
                 }
-                elseif ($Uri.ToString().Contains("[2606:4700:4700:0000:0000:0000:0000:1111]")) {
-                    # Note that $Uri.ToString() expands [2606:4700:4700::1111] to
-                    # [2606:4700:4700:0000:0000:0000:0000:1111]
+                elseif ($Uri.ToString().Contains("[2606:4700:4700::1111]") -or $Uri.ToString().Contains("[2606:4700:4700:0000:0000:0000:0000:1111]")) {
+                    # Note that $Uri.ToString() may expand [2606:4700:4700::1111] to
+                    # [2606:4700:4700:0000:0000:0000:0000:1111] depending on the PowerShell version
                     throw "some error"
                 }
                 else {}
@@ -52,7 +52,4 @@ InModuleScope 'ExportEXOProvider' {
             $Server | Should -Be $null
         }
     }
-}
-AfterAll {
-    Remove-Module ExportEXOProvider -Force -ErrorAction SilentlyContinue
 }
