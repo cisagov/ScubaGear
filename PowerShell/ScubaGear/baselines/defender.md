@@ -256,7 +256,7 @@ Domain impersonation protection SHOULD be added for important partners in both t
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2025
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
