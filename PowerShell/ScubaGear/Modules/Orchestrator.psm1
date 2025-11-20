@@ -752,7 +752,7 @@ function Invoke-RunRego {
 
             $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $TestResultsJson | Set-Content -Path $FileName -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }
