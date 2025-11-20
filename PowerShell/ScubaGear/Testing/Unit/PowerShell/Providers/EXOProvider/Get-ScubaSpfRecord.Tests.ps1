@@ -33,9 +33,26 @@ InModuleScope 'ExportEXOProvider' {
                 $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
                     -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
+                $Response.Compliant | Should -Be $true
+                $Response.Message |
+                    Should -Be "SPF record found."
+            }
+
+            It "Handles no fail" {
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    @{
+                        "Answers" = @("v=spf1 include:spf.protection.outlook.com");
+                        "Errors" = @();
+                        "NXDomain" = $false
+                        "LogEntries" = @()
+                    }
+                }
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
                 $Response.Compliant | Should -Be $false
                 $Response.Message |
-                    Should -Be "SPF record found, but it does not hardfail (`"-all`") or redirect to one that does."
+                    Should -Be "SPF record found, but it does not fail unapproved senders or redirect to one that does."
             }
 
             It "Handles no SPF record" {
