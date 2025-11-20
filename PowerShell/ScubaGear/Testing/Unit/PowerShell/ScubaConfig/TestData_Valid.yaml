@@ -1,0 +1,24 @@
+ProductNames:
+  - aad
+  - defender
+M365Environment: commercial
+OrgName: Test Organization
+Description: Test configuration for validation
+
+ExclusionsConfig:
+  aad:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789abc"
+      Groups:
+        - "87654321-4321-4321-4321-cba987654321"
+    RoleExclusions:
+      Users:
+        - "11111111-2222-3333-4444-555555555555"
+  defender:
+    SensitiveAccounts:
+      IncludedUsers:
+        - "user@example.com"
+        - "admin@company.org"
+      ExcludedUsers:
+        - "testuser@example.com"

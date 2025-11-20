@@ -2,6 +2,9 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
 
 Describe "ScubaConfigValidator Basic Validation" {
     BeforeAll {
+        # Remove any global mocks from other tests
+        Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        
         # Initialize the validator
         [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
 

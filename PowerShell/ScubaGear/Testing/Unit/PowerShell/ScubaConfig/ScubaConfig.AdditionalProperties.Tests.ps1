@@ -131,8 +131,8 @@ CustomProperty: this-is-now-allowed
             Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
         }
 
-        It "Should REJECT configuration with typo in ProductNames (ProductName)" -Tag "test-typo" {
-            $InvalidYaml = @"
+        It "Should ALLOW configuration with typo in ProductNames (ProductName) because ProductNames has a default" -Tag "test-typo" {
+            $YamlWithTypo = @"
 ProductName:
   - aad
 M365Environment: commercial
@@ -143,12 +143,21 @@ M365Environment: commercial
             if (Test-Path $TempFile) {
                 Remove-Item $TempFile -Force
             }
-            $InvalidYaml | Set-Content -Path $TempFile -Force
+            $YamlWithTypo | Set-Content -Path $TempFile -Force
 
             [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
-            # This should still fail because ProductNames is REQUIRED
-            { $Config.LoadConfig($TempFile) } | Should -Throw -ExpectedMessage "*ProductNames*"
+            # ProductNames is not in the file, but has a default value, so config loads successfully
+            { $Config.LoadConfig($TempFile) } | Should -Not -Throw
+            
+            # ProductName (typo) should be treated as a custom property
+            $Config.Configuration.ProductName | Should -Not -BeNullOrEmpty
+            $Config.Configuration.ProductName | Should -Contain 'aad'
+            
+            # ProductNames (correct) should come from default (not from typo)
+            $Config.Configuration.ProductNames | Should -Not -BeNullOrEmpty
+            # Default value should be applied
+            $Config.Configuration.ProductNames.Count | Should -BeGreaterThan 1
 
             Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
         }

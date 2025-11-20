@@ -87,6 +87,10 @@ class ScubaConfig {
     }
 
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
+        return $this.LoadConfig($Path, $false)
+    }
+
+    [Boolean]LoadConfig([System.IO.FileInfo]$Path, [Boolean]$SkipValidation){
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
         }
@@ -94,12 +98,13 @@ class ScubaConfig {
         [ScubaConfig]::ResetInstance()
         [ScubaConfig]::InitializeValidator()
 
-        # Validate the YAML file before loading
-        Write-Debug "Validating configuration file: $Path"
-        $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName)
+        # Always validate file format (extension, size, YAML syntax)
+        Write-Debug "Loading configuration file: $Path"
+        $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName, $false, $true)
 
+        # Check for file format errors (extension, size, YAML parsing)
         if (-not $ValidationResult.IsValid) {
-            $ErrorMessage = "Configuration validation failed:`n"
+            $ErrorMessage = "Configuration file format validation failed:`n"
             foreach ($ValidationError in $ValidationResult.ValidationErrors) {
                 $ErrorMessage += "  - $ValidationError`n"
             }
@@ -124,16 +129,77 @@ class ScubaConfig {
         $this.SetParameterDefaults()
         [ScubaConfig]::_IsLoaded = $true
 
-        # Legacy validation for policy IDs - now handled by validator but kept for backwards compatibility
-        if ($this.Configuration.ContainsKey("OmitPolicy")) {
-            [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
-        }
-
-        if ($this.Configuration.ContainsKey("AnnotatePolicy")) {
-            [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
+        # Perform full validation if not skipped
+        if (-not $SkipValidation) {
+            $this.ValidateConfiguration()
         }
 
         return [ScubaConfig]::_IsLoaded
+    }
+
+    [void]ValidateConfiguration(){
+        <#
+        .SYNOPSIS
+        Validates the current configuration after all overrides have been applied.
+        .DESCRIPTION
+        This method performs business rule validation on the current configuration state.
+        It should be called after command-line parameters have been applied to override
+        config file values, ensuring the final configuration is validated rather than
+        just the file contents.
+        #>
+        [ScubaConfig]::InitializeValidator()
+        
+        Write-Debug "Validating final configuration state"
+        
+        # Convert hashtable back to PSCustomObject for validation
+        $ConfigObject = [PSCustomObject]$this.Configuration
+        
+        # Perform schema validation
+        $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false)
+        
+        # Perform business rule validation
+        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($ConfigObject, $false)
+        
+        # Collect all errors
+        $AllErrors = @()
+        $AllErrors += $SchemaValidation.Errors
+        $AllErrors += $BusinessValidation.Errors
+        
+        # Display warnings
+        foreach ($Warning in $SchemaValidation.Warnings) {
+            Write-Warning $Warning
+        }
+        foreach ($Warning in $BusinessValidation.Warnings) {
+            Write-Warning $Warning
+        }
+        
+        # Legacy validation for policy IDs
+        if ($this.Configuration.ContainsKey("OmitPolicy")) {
+            try {
+                [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
+            }
+            catch {
+                $AllErrors += $_.Exception.Message
+            }
+        }
+        
+        if ($this.Configuration.ContainsKey("AnnotatePolicy")) {
+            try {
+                [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
+            }
+            catch {
+                $AllErrors += $_.Exception.Message
+            }
+        }
+        
+        # Throw if any validation errors
+        if ($AllErrors.Count -gt 0) {
+            $ErrorMessage = "Configuration validation failed:`n"
+            foreach ($ValidationError in $AllErrors) {
+                $ErrorMessage += "  - $ValidationError`n"
+            }
+            throw $ErrorMessage.TrimEnd()
+        }
     }
 
     hidden [void]ClearConfiguration(){

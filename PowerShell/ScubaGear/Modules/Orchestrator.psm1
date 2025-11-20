@@ -342,7 +342,8 @@ function Invoke-SCuBA {
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             [ScubaConfig]::ResetInstance()
             try {
-                if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
+                # Load config without validation to allow command-line parameter overrides
+                if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath, $true))){
                     Write-Error -Message "The config file failed to load: $ConfigFilePath"
                     return
                 }
@@ -386,6 +387,16 @@ function Invoke-SCuBA {
                 {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
+            }
+
+            # Validate the final configuration after all overrides have been applied
+            try {
+                [ScubaConfig]::GetInstance().ValidateConfiguration()
+            }
+            catch {
+                # Display clean validation error without PowerShell stack trace
+                Write-Warning $_.Exception.Message
+                return
             }
         }
 

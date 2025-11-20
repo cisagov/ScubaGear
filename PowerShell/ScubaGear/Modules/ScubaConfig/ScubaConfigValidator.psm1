@@ -62,12 +62,16 @@ class ScubaConfigValidator {
     }
 
     static [ValidationResult] ValidateYamlFile([string]$FilePath) {
-        return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $false)
+        return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $false, $false)
     }
 
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode) {
+        return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $DebugMode, $false)
+    }
+
+    static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipBusinessRules) {
         # Add debug information to the result
-        $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath")
+        $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath (SkipBusinessRules: $SkipBusinessRules)")
         $Result = [ValidationResult]::new()
         $Result.IsValid = $false
         $Result.ValidationErrors = @()
@@ -108,6 +112,12 @@ class ScubaConfigValidator {
                 throw
             }
             $Result.ValidationErrors += "Failed to parse YAML content: $($_.Exception.Message)"
+            return $Result
+        }
+
+        # If skipping business rules, only return parsed content without validation
+        if ($SkipBusinessRules) {
+            $Result.IsValid = $true
             return $Result
         }
 
