@@ -293,7 +293,7 @@ Function Start-SCuBAConfigApp {
         # Set TaskbarItemInfo to display custom icon as overlay in taskbar
         try {
             $taskbarInfo = New-Object System.Windows.Shell.TaskbarItemInfo
-            
+
             # Load the icon for taskbar overlay
             if (Test-Path $syncHash.IcoPath) {
                 $iconStream = [System.IO.File]::OpenRead($syncHash.IcoPath)
@@ -304,17 +304,17 @@ Function Start-SCuBAConfigApp {
                 )
                 $taskbarInfo.Overlay = $iconDecoder.Frames[0]
                 $iconStream.Close()
-                
+
                 Write-DebugOutput -Message "TaskbarItemInfo overlay icon set successfully" -Source $source -Level "Info"
             }
-            
+
             # Set initial progress state to None (no progress bar shown)
             $taskbarInfo.ProgressState = [System.Windows.Shell.TaskbarItemProgressState]::None
-            
+
             # Attach TaskbarItemInfo to the window
             $syncHash.Window.TaskbarItemInfo = $taskbarInfo
             $syncHash.TaskbarInfo = $taskbarInfo
-            
+
             Write-DebugOutput -Message "TaskbarItemInfo initialized successfully" -Source $source -Level "Info"
         }
         catch {
@@ -324,19 +324,57 @@ Function Start-SCuBAConfigApp {
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
         Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source $source -Level "Info"
 
-        # Cascading baseline loading strategy without scriptblocks
+        # Cascading baseline loading strategy
         $syncHash.Baselines = $null
         $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
-        $RegoTestPath = Join-Path $ModuleBasePath "..\..\Rego"
+        $RegoTestPath = Join-Path $ModuleBasePath $syncHash.UIConfigs.OfflineRegoFolderPath
 
-        # Strategy 1: Online Markdown with Rego processing (if online and enabled)
-        if ($syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
+        # Strategy 1: Local Rego parsing from markdown baselines (primary strategy when PullOnlineBaselines is false)
+        if (-not $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
+            try {
+                Write-DebugOutput -Message "Attempting to dynamically parse baselines from local Rego markdown files" -Source $source -Level "Verbose"
+
+                $RegoResolvedPath = (Resolve-Path $RegoTestPath).Path
+                $BaselineDestPath = "$env:Temp\ScubaBaselines_Dynamic.json"
+
+                # Create empty baseline structure for Rego to populate
+                $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
+                $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
+
+                # Use local markdown baselines directory
+                $LocalBaselineMarkdownPath = Join-Path $ModuleBasePath $syncHash.UIConfigs.OfflineBaselineMarkdownPath
+                $LocalBaselineMarkdownResolved = (Resolve-Path $LocalBaselineMarkdownPath).Path
+
+                Write-DebugOutput -Message "Local baseline markdown path: $LocalBaselineMarkdownResolved" -Source $source -Level "Verbose"
+                Write-DebugOutput -Message "Local Rego path: $RegoResolvedPath" -Source $source -Level "Verbose"
+
+                Update-ScubaConfigBaselineWithRego `
+                    -ConfigFilePath $BaselineDestPath `
+                    -GitHubDirectoryUrl $LocalBaselineMarkdownResolved `
+                    -RegoDirectory $RegoResolvedPath `
+                    -AdditionalFields @('criticality')
+
+                $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
+                $syncHash.Baselines = $JsonConfigData.baselines
+                Write-DebugOutput -Message "Successfully loaded baselines using: Local Rego Dynamic Parsing" -Source $source -Level "Info"
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to load baselines using Local Rego parsing: $($_.Exception.Message)" -Source $source -Level "Warning"
+                $syncHash.Baselines = $null
+            }
+        }
+
+        # Strategy 2: Online Markdown with Rego processing (if online and enabled)
+        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
             try {
                 Write-DebugOutput -Message "Attempting to load baselines from online markdown files in this directory: $($syncHash.UIConfigs.OnlineBaselineMarkdownURL)" -Source $source -Level "Verbose"
 
                 $RegoResolvedPath = (Resolve-Path $RegoTestPath).Path
                 $BaselineDestPath = "$env:Temp\ScubaBaselines.json"
-                Copy-Item -Path $syncHash.BaselineConfigPath -Destination $BaselineDestPath -Force | Out-Null
+
+                # Create empty baseline structure for Rego to populate
+                $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
+                $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
 
                 Update-ScubaConfigBaselineWithRego `
                     -ConfigFilePath $BaselineDestPath `
@@ -354,7 +392,7 @@ Function Start-SCuBAConfigApp {
             }
         }
 
-        # Strategy 2: Online JSON baseline (if strategy 1 failed and online is enabled)
+        # Strategy 3: Online JSON baseline (if previous strategies failed and online is enabled)
         if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines) {
             try {
                 Write-DebugOutput -Message "Attempting to load baselines from online JSON: $($syncHash.UIConfigs.OnlineBaselineJsonURL)" -Source $source -Level "Verbose"
@@ -369,17 +407,23 @@ Function Start-SCuBAConfigApp {
             }
         }
 
-        # Strategy 3: Local baseline file (final fallback)
-        if (-not $syncHash.Baselines) {
+        # Strategy 4: Local baseline JSON file (final fallback)
+        if (-not $syncHash.Baselines -and (Test-Path $syncHash.BaselineConfigPath)) {
             try {
-                Write-DebugOutput -Message "Loading baselines from local file: $($syncHash.BaselineConfigPath)" -Source $source -Level "Verbose"
+                Write-DebugOutput -Message "Loading baselines from local JSON file: $($syncHash.BaselineConfigPath)" -Source $source -Level "Verbose"
                 $syncHash.Baselines = ((Get-Content -Path $syncHash.BaselineConfigPath -Raw) | ConvertFrom-Json).baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Local Baseline File" -Source $source -Level "Info"
+                Write-DebugOutput -Message "Successfully loaded baselines using: Local Baseline JSON File" -Source $source -Level "Info"
             }
             catch {
-                Write-DebugOutput -Message "Failed to load baselines using Local Baseline File: $($_.Exception.Message)" -Source $source -Level "Error"
-                Write-Error "All baseline loading strategies failed. Unable to load baseline configuration."
+                Write-DebugOutput -Message "Failed to load baselines using Local Baseline JSON File: $($_.Exception.Message)" -Source $source -Level "Warning"
+                $syncHash.Baselines = $null
             }
+        }
+
+        # Final error if all strategies failed
+        if (-not $syncHash.Baselines) {
+            Write-DebugOutput -Message "All baseline loading strategies failed. Unable to load baseline configuration." -Source $source -Level "Error"
+            Write-Error "Failed to load baseline configuration. Please ensure Rego files and baseline markdown files are available."
         }
 
         # Add global event handlers to all UI controls after everything is loaded
