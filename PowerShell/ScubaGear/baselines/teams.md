@@ -286,7 +286,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 #### MS.TEAMS.2.2v2
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
-<!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
+<!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL/Conditional -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
@@ -298,7 +298,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 #### MS.TEAMS.2.3v2
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
-<!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
+<!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD/Conditional -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
@@ -385,7 +385,7 @@ This section helps reduce security risks related to Teams email integration. Tea
 #### MS.TEAMS.4.1v1
 Teams email integration SHALL be disabled.
 
-<!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
+<!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
