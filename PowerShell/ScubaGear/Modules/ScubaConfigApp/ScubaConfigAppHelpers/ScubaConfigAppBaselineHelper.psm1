@@ -1,4 +1,33 @@
-﻿function Get-ScubaConfigRegoExclusionMappings {
+﻿<#
+.SYNOPSIS
+Helper functions to update ScubaConfigApp baseline configuration using Rego files.
+
+.DESCRIPTION
+This module provides functions to parse Rego files for exclusion type mappings
+and update the ScubaConfigApp baseline configuration accordingly.
+
+.EXAMPLE
+
+#import module
+[string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigAppBaselineHelper.psm1')
+
+# Get the REGO mappings
+$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
+
+# Update configuration using Rego mappings
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines"  -RegoDirectory "..\..\Rego"
+
+# Filter specific products
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
+
+# Update configuration with additional fields
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
+#>
+
+function Get-ScubaConfigRegoExclusionMappings {
     <#
     .SYNOPSIS
     Parses Rego configuration files to extract the actual exclusion type mappings for each policy.
@@ -611,24 +640,6 @@ function Get-ScubaPolicyContent {
     }
     return $result
 }
-<#
-#import module
-[string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm1')
 
-# Get the REGO mappings
-$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
-
-# Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines"  -RegoDirectory "..\..\Rego"
-
-# Filter specific products
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
-
-# Update configuration with additional fields
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
-#>
 # export
 #Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigRegoExclusionMappings, Update-ScubaConfigBaselineWithRego
