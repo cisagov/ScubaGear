@@ -2955,7 +2955,7 @@
                            "Get-AcceptedDomain"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.EXO.2.2v2",
+        "PolicyId":  "MS.EXO.2.2v3",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
