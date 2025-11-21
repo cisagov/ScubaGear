@@ -186,9 +186,6 @@ Function Start-SCuBAConfigApp {
             $GraphConnected = $false
             Break
         }
-        finally {
-            Write-Output "Attempting to pull Scuba baselines from online..."
-        }
     } else {
         $GraphConnected = $false
     }
@@ -212,6 +209,7 @@ Function Start-SCuBAConfigApp {
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
     $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
+    $syncHash.IcoPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.ico"
     $syncHash.UIConfigPath = "$PSScriptRoot\ScubaConfigApp_Control_$Language.json"
     $syncHash.BaselineConfigPath = "$PSScriptRoot\ScubaBaselines_$Language.json"
     $syncHash.HelperModulesPath = "$PSScriptRoot\ScubaConfigAppHelpers"
@@ -289,8 +287,39 @@ Function Start-SCuBAConfigApp {
         #===========================================================================
         $source = "Initialization"
         # Set window icon from DrawingImage resource
-        $syncHash.Window.Icon = $syncHash.ImgPath
+        $syncHash.Window.Icon = $syncHash.IcoPath
         $syncHash.LogoImage.Source = $syncHash.ImgPath
+
+        # Set TaskbarItemInfo to display custom icon as overlay in taskbar
+        try {
+            $taskbarInfo = New-Object System.Windows.Shell.TaskbarItemInfo
+            
+            # Load the icon for taskbar overlay
+            if (Test-Path $syncHash.IcoPath) {
+                $iconStream = [System.IO.File]::OpenRead($syncHash.IcoPath)
+                $iconDecoder = New-Object System.Windows.Media.Imaging.IconBitmapDecoder(
+                    $iconStream,
+                    [System.Windows.Media.Imaging.BitmapCreateOptions]::PreservePixelFormat,
+                    [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
+                )
+                $taskbarInfo.Overlay = $iconDecoder.Frames[0]
+                $iconStream.Close()
+                
+                Write-DebugOutput -Message "TaskbarItemInfo overlay icon set successfully" -Source $source -Level "Info"
+            }
+            
+            # Set initial progress state to None (no progress bar shown)
+            $taskbarInfo.ProgressState = [System.Windows.Shell.TaskbarItemProgressState]::None
+            
+            # Attach TaskbarItemInfo to the window
+            $syncHash.Window.TaskbarItemInfo = $taskbarInfo
+            $syncHash.TaskbarInfo = $taskbarInfo
+            
+            Write-DebugOutput -Message "TaskbarItemInfo initialized successfully" -Source $source -Level "Info"
+        }
+        catch {
+            Write-DebugOutput -Message "Failed to set TaskbarItemInfo: $($_.Exception.Message)" -Source $source -Level "Warning"
+        }
 
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
         Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source $source -Level "Info"
@@ -1064,6 +1093,8 @@ Function Start-SCuBAConfigApp {
 
         # Add Loaded event once
         $syncHash.Window.Add_Loaded({
+            #once window loads, set to not be on top anymore
+            $syncHash.Window.Topmost = $false
             $syncHash.isLoaded = $true
 
             # Restore AutoSave data after the window is fully loaded
@@ -1175,7 +1206,7 @@ Function Start-SCuBAConfigApp {
             }
         })
 
-        #always force windows on top
+        #always force windows on top first
         $syncHash.Window.Topmost = $True
 
         #hit esc to not force on top
