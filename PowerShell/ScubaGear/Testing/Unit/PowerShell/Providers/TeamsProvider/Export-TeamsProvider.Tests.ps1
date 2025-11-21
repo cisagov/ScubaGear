@@ -41,6 +41,10 @@ InModuleScope -ModuleName ExportTeamsProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-M365UnifiedTenantSettings" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }
@@ -99,13 +103,23 @@ InModuleScope -ModuleName ExportTeamsProvider {
             }
         }
         It "returns valid JSON" {
-                $Json = Export-TeamsProvider -M365Environment 'commercial'
+                $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
+        It "returns valid JSON with CertificateBasedAuth" {
+                $Json = Export-TeamsProvider -CertificateBasedAuth
+                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+                $ValidJson | Should -Be $true
+            }
+        It "returns valid JSON with UseNewSettings" {
+                $Json = Export-TeamsProvider -UseNewSettings
+                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+                $ValidJson | Should -Be $true
+            }
+        AfterAll {
+            Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
+            Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
+        }
     }
-}
-AfterAll {
-    Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
 }
