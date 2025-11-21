@@ -425,7 +425,7 @@ Set-CsTeamsAppPermissionPolicy -Identity Global `
     -GlobalCatalogAppsType AllowedAppList `
     -PrivateCatalogAppsType AllowedAppList
 
-The legacy command should not be used in tenants that have not previously been configured for application policies. New implementations should follow the policy guide below. 
+**The legacy command above should not be used in tenants that have not previously been configured for application policies. New implementations should follow the policy guide below.** 
 
 ScubaGear will continue to look for the legacy policies when running in noninteractive mode because of a limitation in the API when gathering the data for the report. Users can utilize interactive mode, and ScubaGear will gather the data for the newer portal based settings.
 
