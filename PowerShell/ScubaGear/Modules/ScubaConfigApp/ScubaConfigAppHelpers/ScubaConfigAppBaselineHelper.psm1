@@ -429,7 +429,10 @@ function Get-ScubaBaselinePolicy {
 
     $files = @()
 
-    if ($GitHubDirectoryUrl) {
+    # Determine if we're using GitHub URL or local directory
+    $isGitHubUrl = $GitHubDirectoryUrl -and $GitHubDirectoryUrl -match '^https?://'
+
+    if ($isGitHubUrl) {
         # Convert GitHub URL to API URL
         if ($GitHubDirectoryUrl -match '^https://github.com/([^/]+)/([^/]+)/tree/([^/]+)(?:/(.*))?$') {
             $owner = $matches[1]
@@ -442,25 +445,38 @@ function Get-ScubaBaselinePolicy {
                 $apiUrl = "https://api.github.com/repos/$owner/$repo/contents`?ref=$branch"
             }
         } else {
-            throw "Invalid GitHub directory URL."
+            throw "Invalid GitHub directory URL format."
         }
 
         # Get list of markdown files in the directory
         $response = Invoke-RestMethod -Uri $apiUrl
         $files = $response | Where-Object { $_.name -like "*.md" }
     } elseif ($BaselineDirectory) {
+        # Use local directory
+        if (-not (Test-Path $BaselineDirectory)) {
+            throw "Baseline directory not found: $BaselineDirectory"
+        }
         $files = Get-ChildItem -Path $BaselineDirectory -Filter *.md
+    } elseif ($GitHubDirectoryUrl) {
+        # GitHubDirectoryUrl is provided but it's a local path (not HTTP/HTTPS)
+        # Treat it as a local directory path
+        if (-not (Test-Path $GitHubDirectoryUrl)) {
+            throw "Baseline directory not found: $GitHubDirectoryUrl"
+        }
+        $files = Get-ChildItem -Path $GitHubDirectoryUrl -Filter *.md
+        $BaselineDirectory = $GitHubDirectoryUrl  # Set this for consistent processing below
     } else {
         throw "You must provide either -BaselineDirectory or -GitHubDirectoryUrl."
     }
 
     foreach ($file in $files) {
-        if ($GitHubDirectoryUrl) {
+        if ($isGitHubUrl) {
             $rawUrl = $file.download_url
             $content = Invoke-WebRequest -Uri $rawUrl -UseBasicParsing | Select-Object -ExpandProperty Content
             $product = [System.IO.Path]::GetFileNameWithoutExtension($file.name)
             $lines = $content -split "`n"
         } else {
+            # Local file
             $product = $file.BaseName
             $lines = Get-Content $file.FullName
         }
