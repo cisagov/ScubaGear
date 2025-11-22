@@ -17,7 +17,8 @@ runs:
         Import-Module -Name Selenium
         cd repo
 
-        . utils/action/Test-Product.ps1 `
+        . utils/action/Test-Product.ps1
+        Test-Product `
           -thumbprint "${{ inputs.Thumbprint }}" `
           -productAlias "${{ inputs.Alias }}" `
           -params "${{ inputs.TestParams }}"
