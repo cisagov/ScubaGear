@@ -19,7 +19,7 @@ runs:
 
         . utils/action/Test-Product.ps1
         Test-Product `
-          -thumbprint "${{ inputs.Thumbprint }}" `
-          -productAlias "${{ inputs.Alias }}" `
-          -params "${{ inputs.TestParams }}"
+          -Thumbprint "${{ inputs.Thumbprint }}" `
+          -ProductAlias "${{ inputs.Alias }}" `
+          -TestParams "${{ inputs.TestParams }}"
       shell: powershell
