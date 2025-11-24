@@ -225,55 +225,24 @@ TestPlan:
   - PolicyId: MS.TEAMS.2.2v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.2v2 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
-              AllowTeamsConsumerInbound: true
+      - TestDescription: MS.TEAMS.2.2v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
-              AllowTeamsConsumerInbound: false
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
-              AllowTeamsConsumerInbound: true
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
-              AllowTeamsConsumerInbound: false
-        Postconditions: []
-        ExpectedResult: true
   - PolicyId: MS.TEAMS.2.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.3v2 Non-compliant - AllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
+      - TestDescription: MS.TEAMS.2.3v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.3v2 Compliant - DoNotAllowTeamsConsumer
-        Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
+  - PolicyId: MS.TEAMS.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.4.1v1 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
   - PolicyId: MS.TEAMS.5.1v2
     TestDriver: RunScuba
     Tests:
