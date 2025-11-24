@@ -149,11 +149,11 @@ M365Environment: commercial
             $Config = [ScubaConfig]::GetInstance()
             # ProductNames is not in the file, but has a default value, so config loads successfully
             { $Config.LoadConfig($TempFile) } | Should -Not -Throw
-            
+
             # ProductName (typo) should be treated as a custom property
             $Config.Configuration.ProductName | Should -Not -BeNullOrEmpty
             $Config.Configuration.ProductName | Should -Contain 'aad'
-            
+
             # ProductNames (correct) should come from default (not from typo)
             $Config.Configuration.ProductNames | Should -Not -BeNullOrEmpty
             # Default value should be applied

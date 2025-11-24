@@ -11,11 +11,11 @@ Describe "ScubaConfigValidator Basic Validation" {
                 $Result = @{}
                 $CurrentKey = $null
                 $CurrentArray = $null
-                
+
                 foreach ($Line in $Lines) {
                     $Line = $Line.Trim()
                     if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
-                    
+
                     if ($Line -match '^(\w+):\s*$') {
                         # Key with no value (likely an object or array follows)
                         $CurrentKey = $Matches[1]
@@ -54,11 +54,11 @@ Describe "ScubaConfigValidator Basic Validation" {
                         $Result[$CurrentKey][$NestedKey] = $Value
                     }
                 }
-                
+
                 return [PSCustomObject]$Result
             }
         }
-        
+
         # Initialize the validator
         [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
 

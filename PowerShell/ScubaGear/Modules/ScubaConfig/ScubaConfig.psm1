@@ -148,23 +148,23 @@ class ScubaConfig {
         just the file contents.
         #>
         [ScubaConfig]::InitializeValidator()
-        
+
         Write-Debug "Validating final configuration state"
-        
+
         # Convert hashtable back to PSCustomObject for validation
         $ConfigObject = [PSCustomObject]$this.Configuration
-        
+
         # Perform schema validation
         $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false)
-        
+
         # Perform business rule validation
         $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($ConfigObject, $false)
-        
+
         # Collect all errors
         $AllErrors = @()
         $AllErrors += $SchemaValidation.Errors
         $AllErrors += $BusinessValidation.Errors
-        
+
         # Display warnings
         foreach ($Warning in $SchemaValidation.Warnings) {
             Write-Warning $Warning
@@ -172,7 +172,7 @@ class ScubaConfig {
         foreach ($Warning in $BusinessValidation.Warnings) {
             Write-Warning $Warning
         }
-        
+
         # Legacy validation for policy IDs
         if ($this.Configuration.ContainsKey("OmitPolicy")) {
             try {
@@ -182,7 +182,7 @@ class ScubaConfig {
                 $AllErrors += $_.Exception.Message
             }
         }
-        
+
         if ($this.Configuration.ContainsKey("AnnotatePolicy")) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
@@ -191,7 +191,7 @@ class ScubaConfig {
                 $AllErrors += $_.Exception.Message
             }
         }
-        
+
         # Throw if any validation errors
         if ($AllErrors.Count -gt 0) {
             $ErrorMessage = "Configuration validation failed:`n"
