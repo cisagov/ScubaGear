@@ -222,27 +222,6 @@ TestPlan:
               AllowFederatedUsers: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.2v2
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.TEAMS.2.2v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
-        Preconditions: []
-        Postconditions: []
-        ExpectedResult: false
-  - PolicyId: MS.TEAMS.2.3v2
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.TEAMS.2.3v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
-        Preconditions: []
-        Postconditions: []
-        ExpectedResult: false
-  - PolicyId: MS.TEAMS.4.1v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.TEAMS.4.1v1 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
-        Preconditions: []
-        Postconditions: []
-        ExpectedResult: false
   - PolicyId: MS.TEAMS.5.1v2
     TestDriver: RunScuba
     Tests:
