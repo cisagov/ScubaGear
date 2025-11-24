@@ -6,56 +6,58 @@ Describe "ScubaConfigValidator Basic Validation" {
         if (-not (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue)) {
             function Global:ConvertFrom-Yaml {
                 param([Parameter(ValueFromPipeline)] [string]$Yaml)
-                # Simple YAML to object conversion for testing
-                $Lines = $Yaml -split "`n"
-                $Result = @{}
-                $CurrentKey = $null
-                $CurrentArray = $null
 
-                foreach ($Line in $Lines) {
-                    $Line = $Line.Trim()
-                    if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
+                process {
+                    # Simple YAML to object conversion for testing
+                    $Lines = $Yaml -split "`n"
+                    $Result = @{}
+                    $CurrentKey = $null
 
-                    if ($Line -match '^(\w+):\s*$') {
-                        # Key with no value (likely an object or array follows)
-                        $CurrentKey = $Matches[1]
-                        $Result[$CurrentKey] = @{}
-                    }
-                    elseif ($Line -match '^(\w+):\s*(.+)$') {
-                        # Key with value
-                        $Key = $Matches[1]
-                        $Value = $Matches[2].Trim()
-                        $Result[$Key] = $Value
-                        $CurrentKey = $null
-                    }
-                    elseif ($Line -match '^\-\s+(.+)$' -and $CurrentKey) {
-                        # Array item
-                        $Item = $Matches[1].Trim()
-                        if ($Result[$CurrentKey] -is [hashtable] -and $Result[$CurrentKey].Count -eq 0) {
-                            $Result[$CurrentKey] = @()
-                        }
-                        $Result[$CurrentKey] += $Item
-                    }
-                    elseif ($Line -match '^\s+(\w+):\s*$' -and $CurrentKey) {
-                        # Nested object key
-                        $NestedKey = $Matches[1]
-                        if ($Result[$CurrentKey] -isnot [hashtable]) {
+                    foreach ($Line in $Lines) {
+                        $Line = $Line.Trim()
+                        if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
+
+                        if ($Line -match '^(\w+):\s*$') {
+                            # Key with no value (likely an object or array follows)
+                            $CurrentKey = $Matches[1]
                             $Result[$CurrentKey] = @{}
                         }
-                        $Result[$CurrentKey][$NestedKey] = @{}
-                    }
-                    elseif ($Line -match '^\s+(\w+):\s*(.+)$' -and $CurrentKey) {
-                        # Nested key with value
-                        $NestedKey = $Matches[1]
-                        $Value = $Matches[2].Trim()
-                        if ($Result[$CurrentKey] -isnot [hashtable]) {
-                            $Result[$CurrentKey] = @{}
+                        elseif ($Line -match '^(\w+):\s*(.+)$') {
+                            # Key with value
+                            $Key = $Matches[1]
+                            $Value = $Matches[2].Trim()
+                            $Result[$Key] = $Value
+                            $CurrentKey = $null
                         }
-                        $Result[$CurrentKey][$NestedKey] = $Value
+                        elseif ($Line -match '^\-\s+(.+)$' -and $CurrentKey) {
+                            # Array item
+                            $Item = $Matches[1].Trim()
+                            if ($Result[$CurrentKey] -is [hashtable] -and $Result[$CurrentKey].Count -eq 0) {
+                                $Result[$CurrentKey] = @()
+                            }
+                            $Result[$CurrentKey] += $Item
+                        }
+                        elseif ($Line -match '^\s+(\w+):\s*$' -and $CurrentKey) {
+                            # Nested object key
+                            $NestedKey = $Matches[1]
+                            if ($Result[$CurrentKey] -isnot [hashtable]) {
+                                $Result[$CurrentKey] = @{}
+                            }
+                            $Result[$CurrentKey][$NestedKey] = @{}
+                        }
+                        elseif ($Line -match '^\s+(\w+):\s*(.+)$' -and $CurrentKey) {
+                            # Nested key with value
+                            $NestedKey = $Matches[1]
+                            $Value = $Matches[2].Trim()
+                            if ($Result[$CurrentKey] -isnot [hashtable]) {
+                                $Result[$CurrentKey] = @{}
+                            }
+                            $Result[$CurrentKey][$NestedKey] = $Value
+                        }
                     }
+
+                    return [PSCustomObject]$Result
                 }
-
-                return [PSCustomObject]$Result
             }
         }
 
