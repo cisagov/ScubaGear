@@ -4,7 +4,12 @@ import rego.v1
 EnvironmentCreation := {
     "disableEnvironmentCreationByNonAdminUsers": true,
     "disableTrialEnvironmentCreationByNonAdminUsers": true,
-    "disablePortalsCreationByNonAdminUsers": true
+    "disablePortalsCreationByNonAdminUsers": true,
+    "powerPlatform": {
+        "powerApps": {
+            "disableShareWithEveryone": true
+        }
+    }
 }
 
 DlpPolicies := {

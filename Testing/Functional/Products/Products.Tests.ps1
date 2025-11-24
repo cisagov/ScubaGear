@@ -203,10 +203,10 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
     }
 
@@ -274,7 +274,7 @@ Describe "Policy Checks for <ProductName>" {
 
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON
+                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Delete the modified settings so next test scenario starts from original cached settings
                 Remove-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json"
@@ -380,7 +380,7 @@ Describe "Policy Checks for <ProductName>" {
                         foreach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
                             $RowData = Get-SeElement -Element $Row -By TagName 'td'
-    
+
                             if ($RowHeaders.Count -gt 0){
                                 $RowHeaders.Count | Should -BeExactly 4
                                 $RowHeaders[0].text | Should -BeLikeExactly "Query Name"
@@ -388,7 +388,7 @@ Describe "Policy Checks for <ProductName>" {
                                 $RowHeaders[2].text | Should -BeLikeExactly "Summary"
                                 $RowHeaders[3].text | Should -BeLikeExactly "Answers"
                             }
-    
+
                             if ($RowData.Count -gt 0){
                                 $RowData.Count | Should -BeExactly 4
                             }

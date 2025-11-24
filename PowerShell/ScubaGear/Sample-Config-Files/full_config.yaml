@@ -228,7 +228,7 @@ AnnotatePolicy:
   # ANNOTATEPOLICY : EXO SAMPLE
   # -------------------------------------
   # An SPF policy SHALL be published for each domain that fails all non-approved senders.
-  MS.EXO.2.2v2:
+  MS.EXO.2.2v3:
     IncorrectResult: true # use this to mark the result incorrect.
     Comment: "Known incorrect result; our SPF policy currently cannot to be retrieved via ScubaGear due to a split
       horizon setup but is available publicly."
