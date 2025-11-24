@@ -79,7 +79,7 @@ function Test-Product {
     }
 
     if (-not $aliasExists) {
-        Write-Error "No test parameters found for alias '$ProductAlias'. Please check that TestParams includes 'alias=$ProductAlias'."
+        Write-Error "No test parameters found for alias '$ProductAlias'."
         exit 1
     }
 }
