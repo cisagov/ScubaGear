@@ -105,6 +105,7 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
@@ -122,6 +123,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 
 <!--Policy: MS.DEFENDER.1.5v1; Criticality: SHALL -->
@@ -237,6 +239,8 @@ impersonation attempt, the email is quarantined.
 #### MS.DEFENDER.2.1v1
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
+
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
 - _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
@@ -252,6 +256,8 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
+
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
@@ -266,6 +272,8 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
+
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad41v1-instructions)
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
