@@ -32,6 +32,11 @@ Microsoft Entra ID tenant.
 
 **Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
+**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**API Support**: This indicator means that policy is can be checked via Microsoft API
+**Configurable**: This indicator means that policy is can be customized via config file
+**Manual**: This indicator means that policy requires manual verification of configuration checking
+
 ## Highly Privileged Roles
 
 This section provides a list of what CISA considers highly privileged [built-in roles in Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference).

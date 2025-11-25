@@ -43,6 +43,10 @@ the types of users are defined as follows:
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
 
+**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**API Support**: This indicator means that policy is can be checked via Microsoft API
+**Manual**: This indicator means that policy requires manual verification of configuration checking
+
 # Baseline Policies
 
 ## 1. Meeting Policies

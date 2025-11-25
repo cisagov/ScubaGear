@@ -62,6 +62,10 @@ often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
 
+**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**API Support**: This indicator means that policy is can be checked via Microsoft API
+**Manual**: This indicator means that policy requires manual verification of configuration checking
+
 # Baseline Policies
 
 Baseline Policies in this document are targeted towards administrative controls that apply to
@@ -80,6 +84,7 @@ By default, any user in the Microsoft Entra ID Tenant can create additional envi
 The ability to create production and sandbox environments SHALL be restricted to admins.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.POWERPLATFORM.1.1v1; Criticality: SHALL -->
@@ -95,6 +100,7 @@ The ability to create production and sandbox environments SHALL be restricted to
 The ability to create trial environments SHALL be restricted to admins.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.POWERPLATFORM.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
@@ -173,6 +179,7 @@ creating apps in all other created environments.
 A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.POWERPLATFORM.2.1v1; Criticality: SHALL -->
 - _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while also maintaining the agency's security posture.
@@ -185,6 +192,8 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy affecting them.
+
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.POWERPLATFORM.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
@@ -280,6 +289,7 @@ source.
 Power Platform tenant isolation SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.POWERPLATFORM.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
@@ -292,6 +302,10 @@ Power Platform tenant isolation SHALL be enabled.
 
 #### MS.POWERPLATFORM.3.2v1
 An inbound/outbound connection allowlist SHOULD be configured.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](./powerplatform.md#mspowerplatform32v1-instructions)
+
+
 
 <!--Policy: MS.POWERPLATFORM.3.2v1; Criticality: SHOULD -->
 - _Rationale:_ Depending on agency needs an allowlist can be configured to allow cross tenant collaboration via connectors.
@@ -345,6 +359,8 @@ current canvas apps and model-driven apps at the Power Platform environment leve
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.
 
+[![Manual](https://img.shields.io/badge/Manual-green)](./powerplatform.md#mspowerplatform32v1-instructions)
+
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
 - _Last Modified:_ March 2025
@@ -388,6 +404,8 @@ Power Pages formerly known as Power Portals are Power Apps specifically designed
 
 #### MS.POWERPLATFORM.5.1v1
 The ability to create Power Pages sites SHOULD be restricted to admins.
+
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.POWERPLATFORM.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may unintentionally misconfigure their Power Pages to expose sensitive information or leave the website in a vulnerable state.
