@@ -149,7 +149,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
@@ -290,7 +290,7 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad35v1)
+[![Manual](https://img.shields.io/badge/Manual-green)](./aad.md#msaad35v1-instructions)
 
 <!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
@@ -324,8 +324,8 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
 
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
@@ -338,8 +338,8 @@ Managed devices SHOULD be required for authentication.
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
@@ -494,7 +494,7 @@ This section provides policies to reduce security risks related to the lack of s
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's security operations center for monitoring.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad35v1)
+[![Manual](https://img.shields.io/badge/Manual-green)](./aad.md#msaad41v1-instructions)
 
 <!--Policy: MS.AAD.4.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.
@@ -721,7 +721,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#privileged-user-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#privileged-user-policy-exclusions)
 
 
 <!--Policy: MS.AAD.7.4v1; Criticality: SHALL -->
@@ -987,7 +987,7 @@ Only users with the Guest Inviter role SHOULD be able to invite guest users.
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad83v1)
+[![Manual](https://img.shields.io/badge/Manual-green)](./aad.md#msaad83v1-instructions)
 
 <!--Policy: MS.AAD.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.

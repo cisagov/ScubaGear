@@ -605,7 +605,7 @@ required, guidance for configuring Microsoft's DLP solution can be found in the 
 #### MS.EXO.8.1v2
 A DLP solution SHALL be used.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/exo.md#msexo81v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./exo.md#msexo81v2-instructions)
 
 <!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.
@@ -619,6 +619,9 @@ A DLP solution SHALL be used.
 
 #### MS.EXO.8.2v2
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](./exo.md#msexo82v2-instructions)
+
 
 <!--Policy: MS.EXO.8.2v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
@@ -634,6 +637,8 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 
 #### MS.EXO.8.3v1
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](./exo.md#msexo83v2-instructions)
 
 <!--Policy: MS.EXO.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Any alternative DLP solution should be able to detect sensitive information in Exchange Online and block access to unauthorized entities.
