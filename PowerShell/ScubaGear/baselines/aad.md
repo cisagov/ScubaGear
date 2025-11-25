@@ -121,7 +121,7 @@ Users detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
@@ -134,7 +134,7 @@ Users detected as high risk SHALL be blocked.
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad22v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./aad.md#msaad22v1-instructions)
 
 <!--Policy: MS.AAD.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
@@ -226,7 +226,7 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
@@ -307,7 +307,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
@@ -324,7 +324,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
 
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
@@ -338,7 +338,7 @@ Managed devices SHOULD be required for authentication.
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
