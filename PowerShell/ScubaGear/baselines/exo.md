@@ -63,6 +63,7 @@ forwarding rules to exfiltrate data to external recipients.
 Automatic forwarding to external domains SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
@@ -129,6 +130,7 @@ points.
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -200,6 +202,8 @@ Exchange Online Protection (EOP) features include DKIM signing capabilities.
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for all domains.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
+
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
@@ -254,6 +258,7 @@ sent from your domain that fail SPF and DKIM checks.
 A DMARC policy SHALL be published for every second-level domain.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
@@ -271,6 +276,7 @@ second-level domain protects the second-level domains and all subdomains.
 The DMARC message rejection option SHALL be p=reject.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (i.e., none, quarantine, and reject),
@@ -287,7 +293,7 @@ required by BOD 18-01 for FCEB departments and agencies.
 The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -302,6 +308,8 @@ Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports 
 
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and failure reports.
+
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.4.4v1; Criticality: SHOULD -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -392,6 +400,7 @@ SMTP Auth needs to be enabled for any use case.
 SMTP AUTH SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.5.1v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
@@ -434,6 +443,7 @@ Exchange Online allows creation of sharing polices that soften default restricti
 Contact folders SHALL NOT be shared with all domains.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
@@ -450,6 +460,7 @@ for specific legitimate use as needed.
 Calendar details SHALL NOT be shared with all domains.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.EXO.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
@@ -508,6 +519,7 @@ Mail flow rules allow incoming email modification, such that email from external
 External sender warnings SHALL be implemented.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
@@ -592,6 +604,8 @@ required, guidance for configuring Microsoft's DLP solution can be found in the 
 
 #### MS.EXO.8.1v2
 A DLP solution SHALL be used.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/exo.md#msexo81v2-instructions)
 
 <!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.
