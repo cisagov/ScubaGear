@@ -48,6 +48,7 @@ Within the standard and strict preset policies, users can be enrolled in [Exchan
 The standard and strict preset security policies SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
@@ -65,6 +66,7 @@ The standard and strict preset security policies SHALL be enabled.
 All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
@@ -85,6 +87,7 @@ All users SHALL be added to Exchange Online Protection (EOP) in either the stand
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.DEFENDER.1.3v1; Criticality: SHALL -->
@@ -105,6 +108,7 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 
@@ -123,6 +127,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 
@@ -239,6 +244,7 @@ impersonation attempt, the email is quarantined.
 #### MS.DEFENDER.2.1v1
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
@@ -256,6 +262,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
@@ -273,6 +280,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad41v1-instructions)
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
@@ -370,6 +378,8 @@ action is needed to enable it for other products.
 #### MS.DEFENDER.3.1v1
 Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
+
 <!--Policy: MS.DEFENDER.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
 - _Last modified:_ June 2023
@@ -435,6 +445,7 @@ their environment and needs.
 A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.DEFENDER.4.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
@@ -450,6 +461,8 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
 
 #### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
+
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
@@ -468,6 +481,8 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 #### MS.DEFENDER.4.3v1
 The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
+
 <!--Policy: MS.DEFENDER.4.3v1; Criticality: SHOULD -->
 - _Rationale:_ Access to sensitive information should be prohibited unless
                explicitly allowed. Specific exemptions can be made based
@@ -484,6 +499,8 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
 
+![API Support](https://img.shields.io/badge/API_Support-blue)
+
 <!--Policy: MS.DEFENDER.4.4v1; Criticality: SHOULD -->
 - _Rationale:_ Some users may not be aware of agency policies on
                proper use of sensitive information. Enabling
@@ -498,6 +515,8 @@ Notifications to inform users and help educate them on the proper use of sensiti
 
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/defender.md#msdefender45v1-instructions)
 
 <!--Policy: MS.DEFENDER.4.5v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files or not
@@ -515,6 +534,8 @@ A list of apps that are restricted from accessing files protected by DLP policy 
 #### MS.DEFENDER.4.6v1
 The custom policy SHOULD include an action to block access to sensitive
 information by restricted apps and unwanted Bluetooth applications.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/defender.md#msdefender46v1-instructions)
 
 <!--Policy: MS.DEFENDER.4.6v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files
@@ -728,7 +749,7 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
@@ -740,6 +761,8 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
+
+[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/defender.md#msdefender52v1-instructions)
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
@@ -839,6 +862,7 @@ types to the Unified Audit Log.
 Unified Audit logging SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
@@ -850,6 +874,8 @@ Unified Audit logging SHALL be enabled.
 
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
+
+[![Manual](https://img.shields.io/badge/Manual-green)](https://github.com/cisagov/ScubaGear/blob/1864-add-indicators/PowerShell/ScubaGear/baselines/defender.md#msdefender63v1-instructions)
 
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
