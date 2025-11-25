@@ -64,8 +64,9 @@ This section provides policies that reduce security risks related to legacy auth
 Legacy authentication SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
 - _Last modified:_ June 2023
@@ -147,8 +148,8 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 Sign-ins detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
@@ -224,8 +225,8 @@ The phishing-resistant methods **Microsoft Entra ID certificate-based authentica
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
@@ -305,9 +306,8 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
@@ -768,7 +768,7 @@ Activation of the Global Administrator role SHALL require approval.
 Eligible and Active highly privileged role assignments SHALL trigger an alert.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[[API Support](https://img.shields.io/badge/API_Support-blue)
+![API Support](https://img.shields.io/badge/API_Support-blue)
 
 
 <!--Policy: MS.AAD.7.7v1; Criticality: SHALL -->
