@@ -65,7 +65,7 @@ Legacy authentication SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![API Support](https://img.shields.io/badge/API_Support-blue)
-[![Configurable](https://img.shields.io/badge/Configurable-purple)](./docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](./configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
