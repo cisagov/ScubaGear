@@ -1,0 +1,311 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScubaGear Configuration Schema",
+  "description": "JSON Schema for ScubaGear configuration validation",
+  "type": "object",
+  "properties": {
+    "ProductNames": {
+      "type": "array",
+      "description": "List of products to assess",
+      "items": {
+        "type": "string",
+        "enum": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams", "*"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "M365Environment": {
+      "type": "string",
+      "description": "Microsoft 365 environment type",
+      "enum": ["commercial", "gcc", "gcchigh", "dod"],
+      "default": "commercial"
+    },
+    "OPAPath": {
+      "type": "string",
+      "description": "Path to OPA executable directory",
+      "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$"
+    },
+    "LogIn": {
+      "type": "boolean",
+      "description": "Whether to perform login during execution",
+      "default": true
+    },
+    "DisconnectOnExit": {
+      "type": "boolean",
+      "description": "Whether to disconnect from services on exit",
+      "default": false
+    },
+    "OutPath": {
+      "type": "string",
+      "description": "Output directory path"
+    },
+    "OutFolderName": {
+      "type": "string",
+      "description": "Output folder name",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutProviderFileName": {
+      "type": "string",
+      "description": "Provider settings export filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutRegoFileName": {
+      "type": "string",
+      "description": "Rego test results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutReportName": {
+      "type": "string",
+      "description": "HTML report filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutJsonFileName": {
+      "type": "string",
+      "description": "JSON results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutCsvFileName": {
+      "type": "string",
+      "description": "CSV results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "OutActionPlanFileName": {
+      "type": "string",
+      "description": "Action plan filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "NumberOfUUIDCharactersToTruncate": {
+      "type": "integer",
+      "description": "Number of UUID characters to truncate in output",
+      "minimum": 0,
+      "maximum": 36,
+      "default": 18
+    },
+    "Organization": {
+      "type": "string",
+      "description": "Organization domain name (Fully Qualified Domain Name)",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$"
+    },
+    "OrgName": {
+      "type": "string",
+      "description": "Organization display name",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "OrgUnitName": {
+      "type": "string",
+      "description": "Organizational unit name",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "Description": {
+      "type": "string",
+      "description": "Configuration description",
+      "maxLength": 500
+    },
+    "AppId": {
+      "type": "string",
+      "description": "Entra ID Application ID for service principal authentication",
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$"
+    },
+    "CertificateThumbprint": {
+      "type": "string",
+      "description": "Certificate thumbprint for service principal authentication",
+      "pattern": "^[A-Fa-f0-9]{40}$"
+    },
+    "PreferredDnsResolvers": {
+      "type": "array",
+      "description": "Preferred DNS resolver IP addresses",
+      "items": {
+        "type": "string",
+        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+      }
+    },
+    "SkipDoH": {
+      "type": "boolean",
+      "description": "Skip DNS over HTTPS for DNS queries",
+      "default": false
+    },
+    "Aad": {
+      "$ref": "#/definitions/AadExclusions",
+      "description": "Azure Active Directory (Entra ID) exclusions configuration"
+    },
+    "Defender": {
+      "$ref": "#/definitions/DefenderExclusions",
+      "description": "Microsoft Defender exclusions configuration"
+    },
+    "Exo": {
+      "$ref": "#/definitions/ExoExclusions",
+      "description": "Exchange Online exclusions configuration"
+    },
+    "PowerPlatform": {
+      "$ref": "#/definitions/PowerPlatformExclusions",
+      "description": "Power Platform exclusions configuration"
+    },
+    "SharePoint": {
+      "$ref": "#/definitions/SharePointExclusions",
+      "description": "SharePoint exclusions configuration"
+    },
+    "Teams": {
+      "$ref": "#/definitions/TeamsExclusions",
+      "description": "Teams exclusions configuration"
+    },
+    "OmitPolicy": {
+      "type": "object",
+      "description": "Policies to omit from assessment",
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
+          "type": "string",
+          "description": "Justification for omitting the policy"
+        }
+      },
+      "additionalProperties": true
+    },
+    "AnnotatePolicy": {
+      "type": "object",
+      "description": "Policy annotations",
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
+          "type": "string",
+          "description": "Annotation text for the policy"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "AadExclusions": {
+      "type": "object",
+      "properties": {
+        "CapExclusions": {
+          "type": "object",
+          "properties": {
+            "Users": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "description": "User object IDs (GUIDs) to exclude from CAP evaluation"
+            },
+            "Groups": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "description": "Group object IDs (GUIDs) to exclude from CAP evaluation"
+            }
+          }
+        },
+        "RoleExclusions": {
+          "type": "object",
+          "properties": {
+            "Users": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "description": "User object IDs (GUIDs) to exclude from role requirements"
+            },
+            "Groups": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "description": "Group object IDs (GUIDs) to exclude from role requirements"
+            }
+          }
+        }
+      }
+    },
+    "DefenderExclusions": {
+      "type": "object",
+      "properties": {
+        "SensitiveAccounts": {
+          "type": "object",
+          "properties": {
+            "IncludedUsers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              },
+              "description": "User Principal Names (UPNs) to include in sensitive accounts"
+            },
+            "IncludedDomains": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Domains to include in sensitive accounts"
+            },
+            "ExcludedUsers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              },
+              "description": "User Principal Names (UPNs) to exclude from sensitive accounts"
+            },
+            "ExcludedDomains": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Domains to exclude from sensitive accounts"
+            }
+          }
+        },
+        "SensitiveUsers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "DisplayName": {"type": "string"},
+              "EmailAddress": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              }
+            },
+            "required": ["DisplayName", "EmailAddress"]
+          }
+        }
+      }
+    },
+    "ExoExclusions": {
+      "type": "object",
+      "properties": {
+        "AllowedForwardingDomains": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Domains allowed for automatic email forwarding"
+        },
+        "PartnerDomains": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Partner domain names"
+        },
+        "AgencyDomains": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Agency domain names"
+        }
+      }
+    },
+    "PowerPlatformExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "Power Platform exclusions (structure to be defined)"
+    },
+    "SharePointExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "SharePoint exclusions (structure to be defined)"
+    },
+    "TeamsExclusions": {
+      "type": "object",
+      "properties": {},
+      "description": "Teams exclusions (structure to be defined)"
+    }
+  }
+}
