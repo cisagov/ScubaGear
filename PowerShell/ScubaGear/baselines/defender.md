@@ -34,8 +34,11 @@ The following are key terms and descriptions used in this document.
 **Sensitive Accounts**: This term denotes a set of user accounts that have access to sensitive and high-value information. Certain accounts—like those belonging to CEOs, CFOs, CISOs, and IT administrators—have access to highly sensitive data and critical systems, making them prime targets for cyberattacks. These accounts, referred to as priority accounts, require enhanced security measures to minimize the risk of compromise.
 
 **BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+
 **API Support**: This indicator means that policy is can be checked via Microsoft API
+
 **Requires Configuration**: This indicator means that policy requires configuration via config file
+
 **Manual**: This indicator means that policy requires manual verification of configuration checking
 
 # Baseline Policies

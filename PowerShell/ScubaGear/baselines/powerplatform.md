@@ -63,7 +63,9 @@ a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
 
 **BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+
 **API Support**: This indicator means that policy is can be checked via Microsoft API
+
 **Manual**: This indicator means that policy requires manual verification of configuration checking
 
 # Baseline Policies

@@ -51,7 +51,9 @@ interpreted as described in
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 **BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+
 **API Support**: This indicator means that policy is can be checked via Microsoft API
+
 **Manual**: This indicator means that policy requires manual verification of configuration checking
 
 # Baseline Policies
