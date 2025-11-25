@@ -63,7 +63,8 @@ PowerShellVersion = '5.1'
 ScriptsToProcess = @(
     './RaiseFunctionCap.ps1',
     './Dependencies.ps1',
-    './CheckVersion.ps1'
+    './CheckVersion.ps1',
+    './Get-VersionIssues.ps1'
 )
 
 # Type files (.ps1xml) to be loaded when importing this module
