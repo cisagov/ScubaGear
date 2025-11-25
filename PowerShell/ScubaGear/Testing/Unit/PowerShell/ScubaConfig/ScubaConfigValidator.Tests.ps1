@@ -2,62 +2,65 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
 
 Describe "ScubaConfigValidator Basic Validation" {
     BeforeAll {
-        # Mock ConvertFrom-Yaml if powershell-yaml module is not available
-        if (-not (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue)) {
-            function Global:ConvertFrom-Yaml {
-                param([Parameter(ValueFromPipeline)] [string]$Yaml)
+        # Remove any existing ConvertFrom-Yaml mock from previous tests
+        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
+            Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        }
 
-                process {
-                    # Simple YAML to object conversion for testing
-                    $Lines = $Yaml -split "`n"
-                    $Result = @{}
-                    $CurrentKey = $null
+        # Create a proper Global mock for ConvertFrom-Yaml
+        function Global:ConvertFrom-Yaml {
+            param([Parameter(ValueFromPipeline)] [string]$Yaml)
 
-                    foreach ($Line in $Lines) {
-                        $Line = $Line.Trim()
-                        if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
+            process {
+                # Simple YAML to object conversion for testing
+                $Lines = $Yaml -split "`n"
+                $Result = @{}
+                $CurrentKey = $null
 
-                        if ($Line -match '^(\w+):\s*$') {
-                            # Key with no value (likely an object or array follows)
-                            $CurrentKey = $Matches[1]
+                foreach ($Line in $Lines) {
+                    $Line = $Line.Trim()
+                    if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
+
+                    if ($Line -match '^(\w+):\s*$') {
+                        # Key with no value (likely an object or array follows)
+                        $CurrentKey = $Matches[1]
+                        $Result[$CurrentKey] = @{}
+                    }
+                    elseif ($Line -match '^(\w+):\s*(.+)$') {
+                        # Key with value
+                        $Key = $Matches[1]
+                        $Value = $Matches[2].Trim()
+                        $Result[$Key] = $Value
+                        $CurrentKey = $null
+                    }
+                    elseif ($Line -match '^\-\s+(.+)$' -and $CurrentKey) {
+                        # Array item
+                        $Item = $Matches[1].Trim().Trim('"')  # Remove quotes if present
+                        if ($Result[$CurrentKey] -is [hashtable] -and $Result[$CurrentKey].Count -eq 0) {
+                            $Result[$CurrentKey] = @()
+                        }
+                        $Result[$CurrentKey] += $Item
+                    }
+                    elseif ($Line -match '^\s+(\w+):\s*$' -and $CurrentKey) {
+                        # Nested object key
+                        $NestedKey = $Matches[1]
+                        if ($Result[$CurrentKey] -isnot [hashtable]) {
                             $Result[$CurrentKey] = @{}
                         }
-                        elseif ($Line -match '^(\w+):\s*(.+)$') {
-                            # Key with value
-                            $Key = $Matches[1]
-                            $Value = $Matches[2].Trim()
-                            $Result[$Key] = $Value
-                            $CurrentKey = $null
-                        }
-                        elseif ($Line -match '^\-\s+(.+)$' -and $CurrentKey) {
-                            # Array item
-                            $Item = $Matches[1].Trim()
-                            if ($Result[$CurrentKey] -is [hashtable] -and $Result[$CurrentKey].Count -eq 0) {
-                                $Result[$CurrentKey] = @()
-                            }
-                            $Result[$CurrentKey] += $Item
-                        }
-                        elseif ($Line -match '^\s+(\w+):\s*$' -and $CurrentKey) {
-                            # Nested object key
-                            $NestedKey = $Matches[1]
-                            if ($Result[$CurrentKey] -isnot [hashtable]) {
-                                $Result[$CurrentKey] = @{}
-                            }
-                            $Result[$CurrentKey][$NestedKey] = @{}
-                        }
-                        elseif ($Line -match '^\s+(\w+):\s*(.+)$' -and $CurrentKey) {
-                            # Nested key with value
-                            $NestedKey = $Matches[1]
-                            $Value = $Matches[2].Trim()
-                            if ($Result[$CurrentKey] -isnot [hashtable]) {
-                                $Result[$CurrentKey] = @{}
-                            }
-                            $Result[$CurrentKey][$NestedKey] = $Value
-                        }
+                        $Result[$CurrentKey][$NestedKey] = @{}
                     }
-
-                    return [PSCustomObject]$Result
+                    elseif ($Line -match '^\s+(\w+):\s*(.+)$' -and $CurrentKey) {
+                        # Nested key with value
+                        $NestedKey = $Matches[1]
+                        $Value = $Matches[2].Trim()
+                        if ($Result[$CurrentKey] -isnot [hashtable]) {
+                            $Result[$CurrentKey] = @{}
+                        }
+                        $Result[$CurrentKey][$NestedKey] = $Value
+                    }
                 }
+
+                return [PSCustomObject]$Result
             }
         }
 
@@ -133,7 +136,6 @@ ExclusionsConfig:
 
             try {
                 $result = [ScubaConfigValidator]::ValidateYamlFile("TestData_Valid.yaml")
-                Write-Information "Debug: Validation errors: $($result.ValidationErrors -join '; ')" -InformationAction Continue
                 $result.IsValid | Should -Be $true
                 $result.ValidationErrors.Count | Should -Be 0
             }
@@ -230,6 +232,13 @@ ExclusionsConfig:
             $supportedExtensions | Should -Contain ".json"
             $supportedExtensions | Should -Not -Contain ".csv"
             $supportedExtensions | Should -Not -Contain ".ps1"
+        }
+    }
+
+    AfterAll {
+        # Clean up the global ConvertFrom-Yaml mock
+        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
+            Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
         }
     }
 }

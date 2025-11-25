@@ -6,7 +6,7 @@ InModuleScope ScubaConfig {
             Mock -CommandName Write-Warning {}
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
-	    Remove-Item function:\ConvertFrom-Yaml
+            Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
         }
 
         AfterAll {
@@ -37,6 +37,7 @@ InModuleScope ScubaConfig {
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('teams')
+                        M365Environment='commercial'
                     }
                 }
                 [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
@@ -45,6 +46,7 @@ InModuleScope ScubaConfig {
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('exo')
+                        M365Environment='commercial'
                     }
                 }
                 [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
