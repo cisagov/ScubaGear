@@ -21,50 +21,58 @@
       "default": "commercial"
     },
     "OPAPath": {
-      "$ref": "#/definitions/patterns/filePath",
+      "type": "string",
       "description": "Path to OPA executable directory",
-      "testPath": true
+      "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$"
     },
     "LogIn": {
-      "$ref": "#/definitions/types/booleanWithTrueDefault",
-      "description": "Whether to perform login during execution"
+      "type": "boolean",
+      "description": "Whether to perform login during execution",
+      "default": true
     },
     "DisconnectOnExit": {
-      "$ref": "#/definitions/types/booleanWithFalseDefault",
-      "description": "Whether to disconnect from services on exit"
+      "type": "boolean",
+      "description": "Whether to disconnect from services on exit",
+      "default": false
     },
     "OutPath": {
       "type": "string",
-      "description": "Output directory path",
-      "testPath": true
+      "description": "Output directory path"
     },
     "OutFolderName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "Output folder name"
+      "type": "string",
+      "description": "Output folder name",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutProviderFileName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "Provider settings export filename"
+      "type": "string",
+      "description": "Provider settings export filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutRegoFileName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "Rego test results filename"
+      "type": "string",
+      "description": "Rego test results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutReportName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "HTML report filename"
+      "type": "string",
+      "description": "HTML report filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutJsonFileName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "JSON results filename"
+      "type": "string",
+      "description": "JSON results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutCsvFileName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "CSV results filename"
+      "type": "string",
+      "description": "CSV results filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "OutActionPlanFileName": {
-      "$ref": "#/definitions/patterns/filename",
-      "description": "Action plan filename"
+      "type": "string",
+      "description": "Action plan filename",
+      "pattern": "^[a-zA-Z0-9_-]+$"
     },
     "NumberOfUUIDCharactersToTruncate": {
       "type": "integer",
@@ -74,8 +82,9 @@
       "default": 18
     },
     "Organization": {
-      "$ref": "#/definitions/patterns/orgDomain",
-      "description": "Organization domain name (Fully Qualified Domain Name)"
+      "type": "string",
+      "description": "Organization domain name (Fully Qualified Domain Name)",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$"
     },
     "OrgName": {
       "type": "string",
@@ -95,27 +104,31 @@
       "maxLength": 500
     },
     "AppId": {
-      "$ref": "#/definitions/patterns/appGuid",
-      "description": "Entra ID Application ID for service principal authentication"
+      "type": "string",
+      "description": "Entra ID Application ID for service principal authentication",
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$"
     },
     "CertificateThumbprint": {
-      "$ref": "#/definitions/patterns/thumbprint",
-      "description": "Certificate thumbprint for service principal authentication"
+      "type": "string",
+      "description": "Certificate thumbprint for service principal authentication",
+      "pattern": "^[A-Fa-f0-9]{40}$"
     },
     "PreferredDnsResolvers": {
       "type": "array",
       "description": "Preferred DNS resolver IP addresses",
       "items": {
-        "$ref": "#/definitions/patterns/ipv4"
+        "type": "string",
+        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
       }
     },
     "SkipDoH": {
-      "$ref": "#/definitions/types/booleanWithFalseDefault",
-      "description": "Skip DNS over HTTPS for DNS queries"
+      "type": "boolean",
+      "description": "Skip DNS over HTTPS for DNS queries",
+      "default": false
     },
     "Aad": {
       "$ref": "#/definitions/AadExclusions",
-      "description": "Azure Entra ID exclusions configuration"
+      "description": "Azure Active Directory (Entra ID) exclusions configuration"
     },
     "Defender": {
       "$ref": "#/definitions/DefenderExclusions",
@@ -142,110 +155,26 @@
       "description": "Policies to omit from assessment",
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "Justification for omitting the policy"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "Rationale": {
-                  "type": "string",
-                  "description": "Justification for omitting the policy"
-                }
-              },
-              "required": ["Rationale"],
-              "additionalProperties": false
-            }
-          ]
+          "type": "string",
+          "description": "Justification for omitting the policy"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     },
     "AnnotatePolicy": {
       "type": "object",
       "description": "Policy annotations",
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "Annotation text for the policy"
-            },
-            {
-              "type": "object",
-              "properties": {
-                "Comment": {
-                  "type": "string",
-                  "description": "Annotation text for the policy"
-                }
-              },
-              "required": ["Comment"],
-              "additionalProperties": false
-            }
-          ]
+          "type": "string",
+          "description": "Annotation text for the policy"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": true
     }
   },
   "additionalProperties": true,
   "definitions": {
-    "types": {
-      "booleanWithTrueDefault": {
-        "type": "boolean",
-        "default": true
-      },
-      "booleanWithFalseDefault": {
-        "type": "boolean",
-        "default": false
-      }
-    },
-    "patterns": {
-      "guid": {
-        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-        "friendlyName": "GUID format"
-      },
-      "fqdn": {
-        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-        "friendlyName": "displayname@fqdn format"
-      },
-      "appGuid": {
-        "type": "string",
-        "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
-        "friendlyName": "application GUID format"
-      },
-      "thumbprint": {
-        "type": "string",
-        "pattern": "^[A-Fa-f0-9]{40}$",
-        "friendlyName": "certificate thumbprint (40 hex chars)"
-      },
-      "ipv4": {
-        "type": "string",
-        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-        "friendlyName": "IPv4 address format"
-      },
-      "filename": {
-        "type": "string",
-        "pattern": "^[a-zA-Z0-9._-]+$",
-        "friendlyName": "filename without extensions"
-      },
-      "filePath": {
-        "type": "string",
-        "pattern": "^([a-zA-Z]:[\\\\/].*|[\\\\/]{2}[^\\\\/]+[\\\\/].*|\\.|\\.\\\\/.*|\\.\\\\\\..*|\\.[\\\\/].*|[^\\.:][^\\\\/]*[\\\\/]?.*)$",
-        "friendlyName": "file path (absolute, UNC, or relative)"
-      },
-      "sensitiveUser": {
-        "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-        "friendlyName": "DisplayName;EmailAddress format"
-      },
-      "orgDomain": {
-        "type": "string",
-        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$",
-        "friendlyName": "domain name (FQDN)"
-      }
-    },
     "AadExclusions": {
       "type": "object",
       "properties": {
@@ -307,14 +236,6 @@
               },
               "description": "User Principal Names (UPNs) to include in sensitive accounts"
             },
-            "IncludedGroups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              },
-              "description": "Group Principal Names (fully qualified domain names) to include in sensitive accounts"
-            },
             "IncludedDomains": {
               "type": "array",
               "items": {"type": "string"},
@@ -328,14 +249,6 @@
               },
               "description": "User Principal Names (UPNs) to exclude from sensitive accounts"
             },
-            "ExcludedGroups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              },
-              "description": "Group Principal Names (fully qualified domain names) to exclude from sensitive accounts"
-            },
             "ExcludedDomains": {
               "type": "array",
               "items": {"type": "string"},
@@ -346,11 +259,16 @@
         "SensitiveUsers": {
           "type": "array",
           "items": {
-            "type": "string",
-            "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            "description": "Sensitive user in format 'DisplayName;EmailAddress'"
-          },
-          "description": "List of sensitive users with display name and email separated by semicolon"
+            "type": "object",
+            "properties": {
+              "DisplayName": {"type": "string"},
+              "EmailAddress": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              }
+            },
+            "required": ["DisplayName", "EmailAddress"]
+          }
         }
       }
     },

@@ -1,24 +1,12 @@
 class ScubaConfigValidator {
     <#
     .SYNOPSIS
-    ScubaConfigValidator provides validation of ScubaGear configuration files using JSON Schema
-
+    Validates ScubaGear YAML configuration files against JSON schema
     .DESCRIPTION
-    ScubaConfigValidator implements a validation system that combines multiple validation checks to ensure configuration correctness and provide user-friendly feedback.
-
-    .EXAMPLE
-    # Initialize validator and perform basic file validation
-    [ScubaConfigValidator]::Initialize("C:\ScubaGear\Modules\ScubaConfig")
-    $Result = [ScubaConfigValidator]::ValidateYamlFile("C:\Config\my-config.yaml")
-
-    .EXAMPLE
-    # Validate with debug mode enabled for troubleshooting
-    [ScubaConfigValidator]::Initialize($ModulePath)
-    $Result = [ScubaConfigValidator]::ValidateYamlFile("config.yaml", $true)  # Enable debug
-    $Result.Warnings
+    This class provides validation functionality for ScubaGear configuration files,
+    ensuring they conform to the defined schema and contain valid values.
     #>
 
-    # Static cache for loaded resources
     hidden static [hashtable]$_Cache = @{}
 
     static [void] Initialize([string]$ModulePath) {
@@ -27,7 +15,6 @@ class ScubaConfigValidator {
         [ScubaConfigValidator]::LoadDefaults()
     }
 
-    # Loads and caches JSON schema file for configuration validation.
     hidden static [void] LoadSchema() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
         $SchemaPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigSchema.json"
@@ -44,7 +31,6 @@ class ScubaConfigValidator {
         }
     }
 
-    # Loads and caches default configuration values from JSON file.
     hidden static [void] LoadDefaults() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
         $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigDefaults.json"
@@ -61,7 +47,6 @@ class ScubaConfigValidator {
         }
     }
 
-    # Returns cached configuration defaults object. Throws if validator not initialized.
     static [object] GetDefaults() {
         if (-not [ScubaConfigValidator]::_Cache.ContainsKey('Defaults')) {
             throw "Validator not initialized. Call Initialize() first."
@@ -69,7 +54,6 @@ class ScubaConfigValidator {
         return [ScubaConfigValidator]::_Cache['Defaults']
     }
 
-    # Returns cached JSON schema object. Throws if validator not initialized.
     static [object] GetSchema() {
         if (-not [ScubaConfigValidator]::_Cache.ContainsKey('Schema')) {
             throw "Validator not initialized. Call Initialize() first."
@@ -77,17 +61,14 @@ class ScubaConfigValidator {
         return [ScubaConfigValidator]::_Cache['Schema']
     }
 
-    # Validates YAML configuration file with default settings (no debug, full validation).
     static [ValidationResult] ValidateYamlFile([string]$FilePath) {
         return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $false, $false)
     }
 
-    # Validates YAML configuration file with debug mode option (full validation enabled).
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode) {
         return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $DebugMode, $false)
     }
 
-    # Main YAML validation method with full control over debug mode and default configurations validation.
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipBusinessRules) {
         # Add debug information to the result
         $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath (SkipBusinessRules: $SkipBusinessRules)")
@@ -134,7 +115,7 @@ class ScubaConfigValidator {
             return $Result
         }
 
-        # If skipping default configurations, only return parsed content without validation
+        # If skipping business rules, only return parsed content without validation
         if ($SkipBusinessRules) {
             $Result.IsValid = $true
             return $Result
@@ -161,7 +142,6 @@ class ScubaConfigValidator {
         return $Result
     }
 
-    # Performs JSON Schema Draft-7 validation against configuration objects.
     hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject, [bool]$DebugMode) {
         $Validation = [PSCustomObject]@{
             Errors = @()
@@ -212,7 +192,7 @@ class ScubaConfigValidator {
             }
         }
 
-        # Validate ProductNames - schema-driven validation
+        # Validate ProductNames - comprehensive schema-driven validation
         if ($Schema.properties -and $Schema.properties.ProductNames) {
             $ProductNamesSchema = $Schema.properties.ProductNames
 
@@ -263,12 +243,33 @@ class ScubaConfigValidator {
         if ($ConfigObject.M365Environment) {
             $ValidEnvironments = $Schema.properties.M365Environment.enum
             if ($ConfigObject.M365Environment -notin $ValidEnvironments) {
-                $Validation.Errors += "Property 'M365Environment' value '$($ConfigObject.M365Environment)' is not valid. Valid environments: $($ValidEnvironments -join ', ')"
+                $Validation.Errors += "Invalid M365Environment '$($ConfigObject.M365Environment)'. Valid environments: $($ValidEnvironments -join ', ')"
             }
         }
 
-        # Validate properties that use $ref patterns by resolving the reference
-        [ScubaConfigValidator]::ValidateRefProperties($ConfigObject, $Schema, $Validation)
+        # Validate Organization format
+        if ($ConfigObject.Organization -and $Schema.properties -and $Schema.properties.Organization) {
+            $OrgPattern = $Schema.properties.Organization.pattern
+            if ($OrgPattern -and $ConfigObject.Organization -notmatch $OrgPattern) {
+                $Validation.Errors += "Property 'Organization' value '$($ConfigObject.Organization)' is not a valid fully qualified domain name (FQDN)"
+            }
+        }
+
+        # Validate AppId format
+        if ($ConfigObject.AppId) {
+            $GuidPattern = $Schema.properties.AppId.pattern
+            if ($ConfigObject.AppId -notmatch $GuidPattern) {
+                $Validation.Errors += "AppId '$($ConfigObject.AppId)' is not a valid GUID format"
+            }
+        }
+
+        # Validate CertificateThumbprint format
+        if ($ConfigObject.CertificateThumbprint) {
+            $ThumbprintPattern = $Schema.properties.CertificateThumbprint.pattern
+            if ($ConfigObject.CertificateThumbprint -notmatch $ThumbprintPattern) {
+                $Validation.Errors += "CertificateThumbprint '$($ConfigObject.CertificateThumbprint)' must be 40 hexadecimal characters"
+            }
+        }
 
         # Validate additionalProperties constraint (enforce "additionalProperties": false)
         if ($Schema.additionalProperties -eq $false) {
@@ -300,130 +301,50 @@ class ScubaConfigValidator {
             }
         }
 
-        # Get validation settings from defaults
-        $Defaults = [ScubaConfigValidator]::GetDefaults()
-        $ValidationSettings = $Defaults.validation
-
-        # Validate product exclusions configurations (if enabled)
-        if ($ValidationSettings.validateExclusions -ne $false) {
-            [ScubaConfigValidator]::ValidateProductExclusions($ConfigObject, $Schema, $Validation)
-        }
-
-        # Generic validation of all properties against schema
-        if ($Schema.properties) {
-            # Get config properties
-            $ConfigProperties = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
-
-            foreach ($PropertyName in $ConfigProperties) {
-                $PropertyValue = $ConfigObject.$PropertyName
-                $PropertySchema = $Schema.properties.$PropertyName
-
-                # Skip validation for OmitPolicy and AnnotatePolicy if disabled
-                if ($PropertyName -eq "OmitPolicy" -and $ValidationSettings.validateOmitPolicy -eq $false) {
-                    continue
-                }
-                if ($PropertyName -eq "AnnotatePolicy" -and $ValidationSettings.validateAnnotatePolicy -eq $false) {
-                    continue
-                }
-
-                if ($PropertySchema -and $PropertyValue) {
-                    # Validate this property against its schema
-                    [ScubaConfigValidator]::ValidatePropertyAgainstSchema($PropertyValue, $PropertySchema, $Validation, "Property '$PropertyName'")
-                }
-            }
-        }
-
         return $Validation
     }
 
-    # Validates properties that use $ref by resolving the pattern from definitions
-    static [void] ValidateRefProperties([object]$ConfigObject, [object]$Schema, [PSCustomObject]$Validation) {
-        # Get all config properties
-        $ConfigProperties = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
-
-        foreach ($PropertyName in $ConfigProperties) {
-            $PropertyValue = $ConfigObject.$PropertyName
-            $PropertySchema = $Schema.properties.$PropertyName
-
-            # Skip if no property value or schema
-            if (-not $PropertyValue -or -not $PropertySchema) {
-                continue
-            }
-
-            # Check if this property uses $ref
-            if ($PropertySchema.'$ref') {
-                $RefPath = $PropertySchema.'$ref'
-
-                # Handle pattern references like "#/definitions/patterns/thumbprint"
-                if ($RefPath -match '^#/definitions/patterns/(.+)$') {
-                    $PatternName = $Matches[1]
-                    $PatternDef = $Schema.definitions.patterns.$PatternName
-
-                    if ($PatternDef -and $PatternDef.pattern) {
-                        # Validate the property value against the pattern
-                        if ($PropertyValue -notmatch $PatternDef.pattern) {
-                            $FriendlyName = if ($PatternDef.friendlyName) { $PatternDef.friendlyName } else { "required pattern" }
-                            $Validation.Errors += "Property '$PropertyName' value '$PropertyValue' does not match: $FriendlyName"
-                        }
-
-                        # Additional path existence validation if testPath is true
-                        if ($PatternDef.testPath -eq $true -and $PropertyValue -ne ".") {
-                            if (-not (Test-Path -Path $PropertyValue -PathType Container)) {
-                                $Validation.Errors += "Property '$PropertyName' path '$PropertyValue' does not exist or is not a directory"
-                            }
-                        }
-                    }
-                }
-
-                # Handle type references like "#/definitions/types/booleanWithTrueDefault"
-                if ($RefPath -match '^#/definitions/types/(.+)$') {
-                    $TypeName = $Matches[1]
-                    $TypeDef = $Schema.definitions.types.$TypeName
-
-                    if ($TypeDef -and $TypeDef.type) {
-                        # Validate the property value against the expected type
-                        $ExpectedType = $TypeDef.type
-                        $ActualType = [ScubaConfigValidator]::GetValueType($PropertyValue)
-
-                        if ($ActualType -ne $ExpectedType) {
-                            $Validation.Errors += "Property '$PropertyName' expected type '$ExpectedType' but got '$ActualType'"
-                        }
-                    }
-                }
-            }
-
-            # Check for testPath property directly on the property schema (for non-$ref properties)
-            if ($PropertySchema.testPath -eq $true -and $PropertyValue -and $PropertyValue -ne ".") {
-                if (-not (Test-Path -Path $PropertyValue -PathType Container)) {
-                    $Validation.Errors += "Property '$PropertyName' path '$PropertyValue' does not exist or is not a directory"
-                }
-            }
-
-            # Handle array items that use $ref (like PreferredDnsResolvers)
-            if ($PropertySchema.type -eq "array" -and $PropertySchema.items -and $PropertySchema.items.'$ref') {
-                $RefPath = $PropertySchema.items.'$ref'
-                if ($RefPath -match '^#/definitions/patterns/(.+)$') {
-                    $PatternName = $Matches[1]
-                    $PatternDef = $Schema.definitions.patterns.$PatternName
-
-                    if ($PatternDef -and $PatternDef.pattern -and $PropertyValue -is [array]) {
-                        foreach ($Item in $PropertyValue) {
-                            if ($Item -notmatch $PatternDef.pattern) {
-                                $FriendlyName = if ($PatternDef.friendlyName) { $PatternDef.friendlyName } else { "required pattern" }
-                                $Validation.Errors += "Property '$PropertyName' contains invalid item '$Item'. Expected: $FriendlyName"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    # Performs business logic validation beyond basic schema compliance.
     hidden static [PSCustomObject] ValidateBusinessRules([object]$ConfigObject, [bool]$DebugMode) {
         $Validation = [PSCustomObject]@{
             Errors = @()
             Warnings = @()
+        }
+
+        # Validate policy IDs in OmitPolicy
+        if ($ConfigObject.OmitPolicy) {
+            $OmitPolicyKeys = if ($ConfigObject.OmitPolicy -is [hashtable]) {
+                $ConfigObject.OmitPolicy.Keys
+            } else {
+                $ConfigObject.OmitPolicy.PSObject.Properties.Name
+            }
+            foreach ($PolicyId in $OmitPolicyKeys) {
+                $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($PolicyId, $ConfigObject.ProductNames)
+                if (-not $PolicyValidation.IsValid) {
+                    $Validation.Errors += $PolicyValidation.Error
+                }
+            }
+        }
+
+        # Validate policy IDs in AnnotatePolicy
+        if ($ConfigObject.AnnotatePolicy) {
+            $AnnotatePolicyKeys = if ($ConfigObject.AnnotatePolicy -is [hashtable]) {
+                $ConfigObject.AnnotatePolicy.Keys
+            } else {
+                $ConfigObject.AnnotatePolicy.PSObject.Properties.Name
+            }
+            foreach ($PolicyId in $AnnotatePolicyKeys) {
+                $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($PolicyId, $ConfigObject.ProductNames)
+                if (-not $PolicyValidation.IsValid) {
+                    $Validation.Errors += $PolicyValidation.Error
+                }
+            }
+        }
+
+        # Validate exclusions configuration
+        if ($ConfigObject.ExclusionsConfig) {
+            $ExclusionValidation = [ScubaConfigValidator]::ValidateExclusions($ConfigObject.ExclusionsConfig, $ConfigObject.ProductNames)
+            $Validation.Errors += $ExclusionValidation.Errors
+            $Validation.Warnings += $ExclusionValidation.Warnings
         }
 
         # Validate OPA path if specified
@@ -445,7 +366,6 @@ class ScubaConfigValidator {
         return $Validation
     }
 
-    # Validates individual policy ID format and product alignment.
     hidden static [PSCustomObject] ValidatePolicyId([string]$PolicyId, [array]$ProductNames) {
         $Result = [PSCustomObject]@{
             IsValid = $false
@@ -456,14 +376,7 @@ class ScubaConfigValidator {
         $PolicyPattern = $Defaults.validation.policyIdPattern
 
         if ($PolicyId -notmatch $PolicyPattern) {
-            # Try to extract product from malformed policy ID to give better error message
-            $PolicyParts = $PolicyId -split "\."
-            $ProductInPolicy = if ($PolicyParts.Length -ge 2 -and $PolicyParts[1]) { $PolicyParts[1] } else { $null }
-
-            # Generate format example from pattern
-            $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($PolicyPattern, $ProductInPolicy)
-
-            $Result.Error = "Policy ID: '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
+            $Result.Error = "Policy ID '$PolicyId' does not match expected format. Expected: $($Defaults.validation.policyIdExample)"
             return $Result
         }
 
@@ -479,7 +392,7 @@ class ScubaConfigValidator {
             }
 
             if ($Defaults.validation.requireProductInPolicy -and $ProductInPolicy -notin $EffectiveProducts) {
-                $Result.Error = "Policy ID: '$PolicyId' references product '$ProductInPolicy' which is not in the selected ProductNames: $($EffectiveProducts -join ', ')"
+                $Result.Error = "Policy '$PolicyId' references product '$ProductInPolicy' which is not in the selected ProductNames: $($EffectiveProducts -join ', ')"
                 return $Result
             }
         }
@@ -488,295 +401,70 @@ class ScubaConfigValidator {
         return $Result
     }
 
-    # Converts regex patterns to user-friendly format examples.
-    static [string] ConvertPatternToExample([string]$Pattern, [string]$Product) {
-        # For the pattern: ^[Mm][Ss]\.[a-zA-Z]+\.[0-9]+\.[0-9]+[Vv][0-9]+$
-        # Generate: MS.PRODUCT.#.#v# or MS.AAD.#.#v# (if product specified)
-
-        if ($Product) {
-            return "MS.$($Product.ToUpper()).#.#v#"
-        } else {
-            return "MS.<PRODUCT>.#.#v#"
+    hidden static [PSCustomObject] ValidateExclusions([object]$ExclusionsConfig, [array]$ProductNames) {
+        $Validation = [PSCustomObject]@{
+            Errors = @()
+            Warnings = @()
         }
-    }
 
-    # Validates product-specific exclusion configurations against schema definitions.
-    static [void] ValidateProductExclusions([object]$ConfigObject, [object]$Schema, [PSCustomObject]$Validation) {
         $Defaults = [ScubaConfigValidator]::GetDefaults()
-        $ProductNames = $Defaults.defaults.AllProductNames
 
-        foreach ($ProductName in $ProductNames) {
-            # Check both lowercase and capitalized versions
-            $ProductData = $null
-            if ($ConfigObject.$ProductName) {
-                $ProductData = $ConfigObject.$ProductName
-            } else {
-                $CapitalizedProductName = $ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1)
-                if ($ConfigObject.$CapitalizedProductName) {
-                    $ProductData = $ConfigObject.$CapitalizedProductName
-                }
-            }
-
-            if ($ProductData) {
-                # Validate the exclusions structure for this product using schema
-                [ScubaConfigValidator]::ValidateProductExclusionStructure($ProductName, $ProductData, $Schema, $Validation)
-            }
-        }
-    }
-
-    # Validates individual product exclusion structure against its schema definition.
-    static [void] ValidateProductExclusionStructure([string]$ProductName, [object]$ProductExclusions, [object]$Schema, [PSCustomObject]$Validation) {
-        # Get the schema definition for this product's exclusions
-        $ProductSchemaName = $ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1).ToLower() + "Exclusions"
-        $ProductSchema = $Schema.definitions.$ProductSchemaName
-
-        if (-not $ProductSchema) {
-            return # No schema definition for this product
-        }
-
-        # Get policy IDs from the product exclusions
-        $PolicyIds = if ($ProductExclusions -is [hashtable]) {
-            @($ProductExclusions.Keys)
-        } elseif ($ProductExclusions.PSObject -and $ProductExclusions.PSObject.Properties) {
-            @($ProductExclusions.PSObject.Properties.Name)
+        # Handle both hashtables and PSCustomObjects with robust key detection
+        # Get product names from exclusions config, handling different object types
+        if ($ExclusionsConfig -is [hashtable]) {
+            $ProductNamesInConfig = @($ExclusionsConfig.Keys)
+        } elseif ($ExclusionsConfig.PSObject -and $ExclusionsConfig.PSObject.Properties) {
+            $ProductNamesInConfig = @($ExclusionsConfig.PSObject.Properties.Name)
         } else {
-            @()
-        }
-
-        foreach ($PolicyId in $PolicyIds) {
-            $PolicyExclusions = $ProductExclusions.$PolicyId
-
-            if ($PolicyExclusions) {
-                # Validate against the schema recursively
-                [ScubaConfigValidator]::ValidateObjectAgainstSchema($PolicyExclusions, $ProductSchema, $Validation, "Policy ID: '$PolicyId'")
+            try {
+                $ProductNamesInConfig = @($ExclusionsConfig | Get-Member -MemberType NoteProperty, Property | Select-Object -ExpandProperty Name)
+            } catch {
+                $ProductNamesInConfig = @()
             }
         }
-    }
 
-    # Performs recursive schema validation for complex objects.
-    static [void] ValidateObjectAgainstSchema([object]$Object, [object]$Schema, [PSCustomObject]$Validation, [string]$Context) {
-        if (-not $Schema -or -not $Schema.properties) {
-            return
-        }
-
-        # Validate each property in the schema
-        foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
-            $PropertySchema = $Schema.properties.$PropertyName
-            $PropertyValue = $Object.$PropertyName
-
-            if ($PropertyValue) {
-                [ScubaConfigValidator]::ValidatePropertyAgainstSchema($PropertyValue, $PropertySchema, $Validation, "$Context $PropertyName")
+        foreach ($ProductName in $ProductNamesInConfig) {
+            # Check if product supports exclusions
+            $ProductInfo = $Defaults.products.$ProductName
+            if (-not $ProductInfo) {
+                $Validation.Errors += "Unknown product '$ProductName' in exclusions configuration"
+                continue
             }
-        }
-    }
 
-    # Validates individual properties against their schema definitions.
-    static [void] ValidatePropertyAgainstSchema([object]$Value, [object]$PropertySchema, [PSCustomObject]$Validation, [string]$Context) {
-        # Handle array validation
-        if ($PropertySchema.type -eq "array" -and $PropertySchema.items) {
-            $IsArray = $Value -is [array] -or ($Value -is [System.Collections.IEnumerable] -and $Value -isnot [string])
+            if (-not $ProductInfo.supportsExclusions) {
+                $Validation.Errors += "Product '$ProductName' does not support exclusions"
+                continue
+            }
 
-            if ($IsArray) {
-                foreach ($Item in $Value) {
-                    [ScubaConfigValidator]::ValidateItemAgainstSchema($Item, $PropertySchema.items, $Validation, $Context)
-                }
+            # Check if product is in selected ProductNames
+            $EffectiveProducts = $ProductNames
+            if ($ProductNames -contains '*') {
+                $EffectiveProducts = $Defaults.defaults.AllProductNames
+            }
+
+            if ($ProductName -notin $EffectiveProducts) {
+                $Validation.Warnings += "Exclusions configured for '$ProductName' but product is not selected in ProductNames"
+            }
+
+            # Validate exclusion types for the product
+            $ProductExclusions = $ExclusionsConfig.$ProductName
+            # Validate each exclusion type
+            $ExclusionTypeKeys = if ($ProductExclusions -is [hashtable]) {
+                $ProductExclusions.Keys
             } else {
-                $ActualType = [ScubaConfigValidator]::GetValueType($Value)
-                $Validation.Errors += "$Context must be an array but got $ActualType"
+                $ProductExclusions.PSObject.Properties.Name
             }
-        }
-        # Handle object validation
-        elseif ($PropertySchema.type -eq "object") {
-            [ScubaConfigValidator]::ValidateObjectAgainstSchema($Value, $PropertySchema, $Validation, $Context)
-
-            # Handle patternProperties validation (for OmitPolicy, AnnotatePolicy, etc.)
-            if ($PropertySchema.patternProperties) {
-                $ObjectKeys = [ScubaConfigValidator]::GetObjectKeys($Value)
-                foreach ($Key in $ObjectKeys) {
-                    $KeyValue = $Value.$Key
-                    $PatternMatched = $false
-
-                    # Check each pattern in patternProperties
-                    foreach ($Pattern in $PropertySchema.patternProperties.PSObject.Properties.Name) {
-                        if ($Key -match $Pattern) {
-                            $PatternSchema = $PropertySchema.patternProperties.$Pattern
-                            [ScubaConfigValidator]::ValidateItemAgainstSchema($KeyValue, $PatternSchema, $Validation, "$Context key '$Key'")
-                            $PatternMatched = $true
-
-                            # Additional validation for policy IDs (OmitPolicy/AnnotatePolicy)
-                            if ($Context -match "OmitPolicy|AnnotatePolicy") {
-                                $Defaults = [ScubaConfigValidator]::GetDefaults()
-                                $ProductNames = $Defaults.defaults.AllProductNames
-                                $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($Key, $ProductNames)
-                                if (-not $PolicyValidation.IsValid) {
-                                    $Validation.Errors += $PolicyValidation.Error
-                                }
-                            }
-                            break  # Stop after first matching pattern
-                        }
-                    }
-
-                    # If no pattern matched, report error
-                    if (-not $PatternMatched) {
-                        $Validation.Errors += "$Context key '$Key' does not match any allowed pattern"
-                    }
+            foreach ($ExclusionType in $ExclusionTypeKeys) {
+                if ($ExclusionType -notin $ProductInfo.supportedExclusionTypes) {
+                    $Validation.Errors += "Product '$ProductName' does not support exclusion type '$ExclusionType'. Supported types: $($ProductInfo.supportedExclusionTypes -join ', ')"
                 }
             }
         }
-        # Handle other types
-        else {
-            [ScubaConfigValidator]::ValidateItemAgainstSchema($Value, $PropertySchema, $Validation, $Context)
-        }
+
+        return $Validation
     }
 
-    # Validates individual items against schema with support for oneOf and complex patterns.
-    static [void] ValidateItemAgainstSchema([object]$Item, [object]$ItemSchema, [PSCustomObject]$Validation, [string]$Context) {
-        # Handle oneOf validation (for OmitPolicy/AnnotatePolicy flexible formats)
-        if ($ItemSchema.oneOf) {
-            $OneOfValid = $false
-            $OneOfErrors = @()
-
-            foreach ($Option in $ItemSchema.oneOf) {
-                $TempValidation = [PSCustomObject]@{ Errors = @() }
-
-                # Handle different types in oneOf options
-                if ($Option.type -eq "object") {
-                    # For object validation, check type first, then properties
-                    $ActualType = [ScubaConfigValidator]::GetValueType($Item)
-                    if ($ActualType -eq "object") {
-                        # Validate required properties
-                        if ($Option.required) {
-                            foreach ($RequiredProp in $Option.required) {
-                                $HasProperty = if ($Item -is [hashtable]) {
-                                    $Item.ContainsKey($RequiredProp)
-                                } else {
-                                    $null -ne $Item.$RequiredProp
-                                }
-
-                                if (-not $HasProperty) {
-                                    $TempValidation.Errors += "$Context is missing required property '$RequiredProp'"
-                                }
-                            }
-                        }
-
-                        # Validate properties
-                        if ($Option.properties) {
-                            foreach ($PropName in $Option.properties.PSObject.Properties.Name) {
-                                $PropertyValue = if ($Item -is [hashtable]) {
-                                    $Item[$PropName]
-                                } else {
-                                    $Item.$PropName
-                                }
-
-                                if ($null -ne $PropertyValue) {
-                                    $PropSchema = $Option.properties.$PropName
-                                    [ScubaConfigValidator]::ValidateItemAgainstSchema($PropertyValue, $PropSchema, $TempValidation, "$Context.$PropName")
-                                }
-                            }
-                        }
-
-                        # Check for additionalProperties: false
-                        if ($Option.additionalProperties -eq $false) {
-                            $AllowedProps = if ($Option.properties) { $Option.properties.PSObject.Properties.Name } else { @() }
-                            $ItemProps = [ScubaConfigValidator]::GetObjectKeys($Item)
-                            foreach ($ItemProp in $ItemProps) {
-                                if ($ItemProp -notin $AllowedProps) {
-                                    $TempValidation.Errors += "$Context has unexpected property '$ItemProp'"
-                                }
-                            }
-                        }
-                    } else {
-                        $TempValidation.Errors += "$Context expected type 'object' but got '$ActualType'"
-                    }
-                } else {
-                    # For non-object types, use standard validation
-                    [ScubaConfigValidator]::ValidateItemAgainstSchema($Item, $Option, $TempValidation, $Context)
-                }
-
-                if ($TempValidation.Errors.Count -eq 0) {
-                    $OneOfValid = $true
-                    break
-                } else {
-                    $OneOfErrors += $TempValidation.Errors
-                }
-            }
-
-            if (-not $OneOfValid) {
-                $Validation.Errors += "$Context does not match any of the allowed formats"
-            }
-            return
-        }
-
-        # Validate pattern if specified
-        if ($ItemSchema.pattern -and $Item) {
-            if ($Item -notmatch $ItemSchema.pattern) {
-                # Generate user-friendly error based on the pattern and context
-                $ErrorMessage = [ScubaConfigValidator]::GeneratePatternErrorMessage($Item, $ItemSchema.pattern, $Context)
-                $Validation.Errors += $ErrorMessage
-            }
-        }
-
-        # Validate type
-        if ($ItemSchema.type) {
-            $ExpectedType = $ItemSchema.type
-            $ActualType = [ScubaConfigValidator]::GetValueType($Item)
-
-            if ($ActualType -ne $ExpectedType) {
-                $Validation.Errors += "$Context expected type '$ExpectedType' but got '$ActualType'"
-            }
-        }
-
-        # Validate required properties for objects
-        if ($ItemSchema.required -and $Item) {
-            foreach ($RequiredProp in $ItemSchema.required) {
-                if (-not $Item.$RequiredProp) {
-                    $Validation.Errors += "$Context is missing required property '$RequiredProp'"
-                }
-            }
-        }
-    }
-
-    # Retrieves human-readable descriptions for regex patterns from schema definitions.
-    hidden static [string] GetPatternFriendlyName([string]$Pattern) {
-        try {
-            $Schema = [ScubaConfigValidator]::GetSchema()
-            if ($Schema.definitions -and $Schema.definitions.patterns) {
-                foreach ($PatternDef in $Schema.definitions.patterns.PSObject.Properties) {
-                    if ($PatternDef.Value.pattern -eq $Pattern -and $PatternDef.Value.friendlyName) {
-                        return $PatternDef.Value.friendlyName
-                    }
-                }
-            }
-        } catch {
-            # Silently fall back to regex if schema lookup fails
-            Write-Debug "Failed to lookup friendly name for pattern: $Pattern"
-        }
-        return $null
-    }
-
-    # Generates user-friendly error messages for pattern validation failures.
-    static [string] GeneratePatternErrorMessage([string]$Value, [string]$Pattern, [string]$Context) {
-        $FriendlyName = [ScubaConfigValidator]::GetPatternFriendlyName($Pattern)
-        if ($FriendlyName) {
-            return "$Context value '$Value' does not match: $FriendlyName"
-        }
-        return "$Context value '$Value' does not match required pattern: $Pattern"
-    }
-
-    # Determines PowerShell object types in JSON Schema compatible format.
-    static [string] GetValueType([object]$Value) {
-        if ($null -eq $Value) { return "null" }
-        elseif ($Value -is [string]) { return "string" }
-        elseif ($Value -is [bool]) { return "boolean" }
-        elseif ($Value -is [int] -or $Value -is [long]) { return "integer" }
-        elseif ($Value -is [double] -or $Value -is [float]) { return "number" }
-        elseif ($Value -is [hashtable] -or $Value.PSObject) { return "object" }
-        elseif ($Value -is [array]) { return "array" }
-        elseif ($Value -is [System.Collections.IEnumerable]) { return "array" }
-        else { return "unknown ($($Value.GetType().Name))" }
-    }
-
-    # Safely extracts property names from objects while filtering system properties.
+    # Helper method to safely get keys/properties from objects, filtering out system properties
     static [array] GetObjectKeys([object]$Object) {
         if ($null -eq $Object) {
             return @()
@@ -801,7 +489,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Validates organizational field content quality and default configurations.
+    # Enhanced validation for organizational fields (Organization, OrgName, OrgUnitName)
     hidden static [void] ValidateOrganizationalFields([object]$ConfigObject, [PSCustomObject]$Validation) {
         $Schema = [ScubaConfigValidator]::GetSchema()
 
@@ -817,6 +505,8 @@ class ScubaConfigValidator {
         if ($ConfigObject.OrgName) {
             if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgName)) {
                 $Validation.Errors += "OrgName cannot be empty or contain only whitespace"
+            } elseif ($ConfigObject.OrgName.Length -gt 100) {
+                $Validation.Errors += "OrgName cannot exceed 100 characters"
             }
         }
 
@@ -824,11 +514,13 @@ class ScubaConfigValidator {
         if ($ConfigObject.OrgUnitName) {
             if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgUnitName)) {
                 $Validation.Errors += "OrgUnitName cannot be empty or contain only whitespace"
+            } elseif ($ConfigObject.OrgUnitName.Length -gt 100) {
+                $Validation.Errors += "OrgUnitName cannot exceed 100 characters"
             }
         }
     }
 
-    # Validates ProductNames array for duplicates and wildcard logic.
+    # Enhanced validation for ProductNames (warnings only, validation done in schema check)
     hidden static [void] ValidateProductNames([object]$ConfigObject, [PSCustomObject]$Validation) {
         # Only add warnings if ProductNames is present
         if (-not $ConfigObject.ProductNames) {
@@ -857,7 +549,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Provides environment-specific validation warnings and guidance.
+    # Enhanced validation for M365Environment (warnings only, validation done in schema check)
     hidden static [void] ValidateM365Environment([object]$ConfigObject, [PSCustomObject]$Validation) {
         # Only add warnings if M365Environment is present and valid
         if (-not $ConfigObject.M365Environment) {

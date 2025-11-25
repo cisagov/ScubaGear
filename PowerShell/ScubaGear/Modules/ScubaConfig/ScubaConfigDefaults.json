@@ -96,12 +96,10 @@
   ],
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
+    "policyIdExample": "MS.DEFENDER.1.1v1",
     "supportedFileExtensions": [".yaml", ".yml", ".json"],
     "maxFileSizeBytes": 1048576,
-    "requireProductInPolicy": true,
-    "validateExclusions": false,
-    "validateOmitPolicy": false,
-    "validateAnnotatePolicy": false
+    "requireProductInPolicy": true
   },
   "outputSettings": {
     "fileNameMaxLength": 100,
@@ -109,29 +107,3 @@
     "defaultEncoding": "UTF-8"
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

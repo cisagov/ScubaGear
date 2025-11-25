@@ -16,9 +16,9 @@ InModuleScope Orchestrator {
                 }
                 Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
                 Mock -ModuleName Orchestrator Invoke-ProviderList {
-                    $script:TestSplat.Add('AppID', $ScubaConfig.AppID)
-                    $script:TestSplat.Add('Organization', $ScubaConfig.Organization)
-                    $script:TestSplat.Add('CertificateThumbprint', $ScubaConfig.CertificateThumbprint)
+                    $script:TestSplat.Add('AppID', $BoundParameters.AppID)
+                    $script:TestSplat.Add('Organization', $BoundParameters.Organization)
+                    $script:TestSplat.Add('CertificateThumbprint', $BoundParameters.CertificateThumbprint)
                 }
                 Mock -ModuleName Orchestrator Invoke-RunRego {
                     $script:TestSplat.Add('OPAPath', $OPAPath)
@@ -26,8 +26,8 @@ InModuleScope Orchestrator {
                     $script:TestSplat.Add('OutRegoFileName', $OutRegoFileName)
                 }
                 Mock -ModuleName Orchestrator Invoke-ReportCreation {
-                    $script:TestSplat.Add('ProductNames', $ScubaConfig.ProductNames)
-                    $script:TestSplat.Add('M365Environment', $ScubaConfig.M365Environment)
+                    $script:TestSplat.Add('ProductNames', $ProductNames)
+                    $script:TestSplat.Add('M365Environment', $M365Environment)
                     $script:TestSplat.Add('OutPath', $ScubaConfig.OutPath)
                     $script:TestSplat.Add('OutFolderName', $ScubaConfig.OutFolderName)
                     $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
@@ -51,7 +51,7 @@ InModuleScope Orchestrator {
                 SetupMocks
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@("teams")
+                        ProductNames=,"teams"
                         M365Environment='commercial'
                         OPAPath=$PSScriptRoot
                         Login=$true
@@ -65,16 +65,19 @@ InModuleScope Orchestrator {
                         CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
+                [ScubaConfig]::ResetInstance()
                 Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "commercial"           },
                 @{ Parameter = "ProductNames";          Value = @("teams")             },
+                @{ Parameter = "OPAPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "LogIn";                 Value = $true                  },
+                @{ Parameter = "OutPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
-                @{ Parameter = "OutProviderFileName";   Value = "ProviderSettingsExport" },
-                @{ Parameter = "OutRegoFileName";       Value = "TestResults"     },
+                @{ Parameter = "OutProviderFileName";   Value = "TenantSettingsExport" },
+                @{ Parameter = "OutRegoFileName";       Value = "ScubaTestResults"     },
                 @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
                 @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
@@ -87,6 +90,7 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
             BeforeAll {
                 SetupMocks
+                [ScubaConfig]::ResetInstance()
                 Invoke-SCuBA `
                   -M365Environment "gcc" `
                   -ProductNames "aad" `
