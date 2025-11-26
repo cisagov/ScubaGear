@@ -212,7 +212,7 @@ class ScubaConfig {
             if ($Property.Value -is [PSCustomObject]) {
                 $Hashtable[$Property.Name] = [ScubaConfig]::ConvertPSObjectToHashtable($Property.Value)
             }
-            elseif ($Property.Value -is [Array]) {
+            elseif ($Property.Value -is [Array] -or $Property.Value -is [System.Collections.IList]) {
                 $Array = @()
                 foreach ($Item in $Property.Value) {
                     if ($Item -is [PSCustomObject]) {
@@ -283,7 +283,7 @@ class ScubaConfig {
                 Write-Debug "Setting ProductNames to all products because of wildcard"
             } else {
                 Write-Debug "ProductNames provided - ensuring uniqueness."
-                $this.Configuration.ProductNames = $this.Configuration.ProductNames | Sort-Object -Unique
+                $this.Configuration.ProductNames = @($this.Configuration.ProductNames | Sort-Object -Unique)
             }
         }
 
