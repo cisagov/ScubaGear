@@ -1,0 +1,108 @@
+{
+    "AppID":  "00000000-0000-0000-0000-000000000001",
+    "M365Environment":  "commercial",
+    "MissingPermissions":  false,
+    "ExtraPermissionsDetails":  false,
+    "MissingRoles":  "Global Reader",
+    "CurrentPermissions":  [
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850417546)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQVZ8zOnpLklBkitO4GsO5i0",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "69e67828-780e-47fd-b28c-7b27d14864e6"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850417238)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQavtFf9xyKJNlR5ZYoQ3yH8",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850415872)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQSBE_Y7TfrZBv8fcoWBj7Ws",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850417845)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQQ2uTfo7YNtCuGVMgQfyle0",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "df021288-bdef-4463-88db-98f22de89214"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850416561)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQe2bTVSjmPVFrbRubnwQGd8",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "01e37dc9-c035-40bd-b438-b2879c4870a6"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1762880053644)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQTVbsaiHaJFKo4UkFn32T4A",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "246dd0d5-5bd0-4def-940b-0421030a5b68"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "5fb6ddd9-1610-40f0-8ea8-7ab955172625",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850416882)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQYy1O61kha9FiLA4VOx7piA",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Microsoft Graph",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "edb419d6-7edc-42a3-9345-509bfdf5d87c"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "e0a2f320-7107-4464-ad5a-1c5a9a69900a",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850418894)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQVgNi71PcbRIhYCWjHmmSv0",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Office 365 SharePoint Online",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "678536fe-1083-478a-9c59-b99265e6b0d3"
+        },
+        {
+            "DeletedDateTime":  null,
+            "ResourceId":  "6e69ce2a-afe7-4a7a-9f13-ab1ce3fc4fcf",
+            "PrincipalType":  "ServicePrincipal",
+            "CreatedDateTime":  "\/Date(1749850418386)\/",
+            "Id":  "fncIg8b6IUGrbAGPRsPMQRU61M_5aWdNmGzb_tz-6vM",
+            "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+            "ResourceDisplayName":  "Office 365 Exchange Online",
+            "PrincipalDisplayName":  "ScubaGear Application",
+            "AppRoleId":  "dc50a0fb-09a3-484d-be87-e023b12c6440"
+        }
+    ]
+}

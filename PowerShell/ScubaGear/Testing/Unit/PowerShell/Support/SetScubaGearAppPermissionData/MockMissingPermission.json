@@ -1,0 +1,11 @@
+{
+    "AppID":  "00000000-0000-0000-0000-000000000001",
+    "M365Environment":  "commercial",
+    "MissingPermissions":  {
+        "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+        "Permission":  "Policy.Read.All",
+        "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+        "Product":  "aad"
+    },
+    "ExtraPermissionsDetails":  false
+}

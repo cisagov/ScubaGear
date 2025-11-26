@@ -1,0 +1,12 @@
+{
+    "AppID": "00000000-0000-0000-0000-000000000001",
+    "M365Environment": "commercial",
+    "MissingPermissions": [
+        {
+            "Permission": "Policy.Read.All",
+            "ResourceAPIAppId": "00000003-0000-0000-c000-000000000000"
+        }
+    ],
+    "ExtraPermissions": "Acronym.Read.All",
+    "MissingRoles": "Global Reader"
+}

@@ -44,7 +44,6 @@ The minimum permissions and roles that must be assigned to the service principal
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
 
-
 > [!NOTE]
 > Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.<sup>1</sup>
 
@@ -72,7 +71,8 @@ Add-PowerAppsAccount `
 ```
 
 > [!NOTE]
-> When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.
+> When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.<br>
+> When testing [GCC High tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgovhigh`.
 
 ```powershell
 # Register the service principal, giving it the
@@ -95,12 +95,18 @@ It's helpful to note the following details:
 
 This section contains additional, non-interactive authentication details that are required to successfully run ScubaGear against a GCC High tenant.
 
-
 ### Defender in GCC High
 
 When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
-
 ### SharePoint in GCC High
 
 When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
+
+## Service Principal Setup Automation
+We’ve developed PowerShell functions to streamline the setup of service principals for non-interactive ScubaGear runs. These functions simplify creating the service principal, assigning the necessary permissions and roles, and linking a certificate.
+
+Additionally, you can audit the assigned permissions and roles to confirm they meet ScubaGear’s minimum requirements. For more details, refer to the documentation below.
+
+[Service Principal Workflows](serviceprincipal-workflows.md)<br>
+[Service Principal Troubleshooting](serviceprincipal-troubleshooting.md)

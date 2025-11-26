@@ -1,0 +1,12 @@
+{
+    "id": "resource-sp-exo",
+    "appId": "00000002-0000-0ff1-ce00-000000000000",
+    "displayName": "Office 365 Exchange Online",
+    "appRoles": [
+        {
+            "id": "dc50a0fb-09a3-484d-be87-e023b12c6440",
+            "value": "Exchange.ManageAsApp"
+        }
+    ],
+    "oauth2PermissionScopes": []
+}

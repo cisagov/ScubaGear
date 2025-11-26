@@ -1,0 +1,43 @@
+{
+    "description": "Service principal with Power Platform needed but not registered",
+    "servicePrincipal": {
+        "id": "sp-ppneeded-1",
+        "appId": "00000000-0000-0000-0000-000000000006",
+        "displayName": "ScubaGear Test SP - PP Needed"
+    },
+    "application": {
+        "id": "app-ppneeded-1",
+        "appId": "00000000-0000-0000-0000-000000000006",
+        "requiredResourceAccess": []
+    },
+    "appRoleAssignments": [
+        {
+            "id": "assignment-1",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+        },
+        {
+            "id": "assignment-2",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "df021288-bdef-4463-88db-98f22de89214"
+        }
+    ],
+    "oauth2Grants": [],
+    "permissionComparison": {
+        "missingPermissions": [],
+        "extraPermissions": [],
+        "hasMissingPermissions": false,
+        "hasExtraPermissions": false
+    },
+    "roleComparison": {
+        "roleName": "Global Reader",
+        "roleID": "role-123",
+        "missing": false
+    },
+    "powerPlatformRegistered": false,
+    "productNames": ["aad", "exo", "defender", "sharepoint", "teams", "powerplatform"],
+    "expectedResult": {
+        "hasFixPermissionIssues": true,
+        "statusPattern": "Action needed.*Power Platform not registered"
+    }
+}

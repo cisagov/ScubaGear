@@ -1,0 +1,11 @@
+{
+    "AppID": "00000000-0000-0000-0000-000000000001",
+    "M365Environment": "commercial",
+    "DelegatedPermissions": [
+        {
+            "Scope": "User.Read Directory.Read.All",
+            "GrantId": "delegated-grant-id-123",
+            "ConsentType": "AllPrincipals"
+        }
+    ]
+}
