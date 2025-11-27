@@ -40,7 +40,7 @@ InModuleScope ScubaConfig {
                         M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $true) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
                 function global:ConvertFrom-Yaml {
@@ -49,7 +49,7 @@ InModuleScope ScubaConfig {
                         M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $true) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
