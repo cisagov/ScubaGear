@@ -418,7 +418,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 ## 5. App Management
 
-**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following commands in the Teams Powershell module.
+**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following commands in the Teams Powershell module. THE FOLLOWING COMMAND SHOULD NOT BE RUN IN NEW TENANTS AND SHOULD ONLY BE USED FOR ORGANIZATIONS THAT HAVE PREVIOULY IMPLEMENTED THE APP MANAGEMENT POLICIES WITHIN THE PERMISSION POLICIES SECTION OF THE ADMIN PORTAL.
 
 Set-CsTeamsAppPermissionPolicy -Identity Global `
     -DefaultCatalogAppsType AllowedAppList `
