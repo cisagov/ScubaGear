@@ -52,9 +52,11 @@ interpreted as described in
 
 **BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
 
-**API Support**: This indicator means that policy is can be checked via Microsoft API
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
 
-**Manual**: This indicator means that policy requires manual verification of configuration checking
+**Configurable**: This indicator means that the policy can be customized via config file.
+
+**Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
 # Baseline Policies
 
@@ -69,7 +71,8 @@ forwarding rules to exfiltrate data to external recipients.
 Automatic forwarding to external domains SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
@@ -136,7 +139,7 @@ points.
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -208,7 +211,7 @@ Exchange Online Protection (EOP) features include DKIM signing capabilities.
 #### MS.EXO.3.1v1
 DKIM SHOULD be enabled for all domains.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -264,7 +267,7 @@ sent from your domain that fail SPF and DKIM checks.
 A DMARC policy SHALL be published for every second-level domain.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
@@ -282,7 +285,7 @@ second-level domain protects the second-level domains and all subdomains.
 The DMARC message rejection option SHALL be p=reject.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (i.e., none, quarantine, and reject),
@@ -299,7 +302,7 @@ required by BOD 18-01 for FCEB departments and agencies.
 The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -315,7 +318,7 @@ Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports 
 #### MS.EXO.4.4v1
 An agency point of contact SHOULD be included for aggregate and failure reports.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.4.4v1; Criticality: SHOULD -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
@@ -406,7 +409,7 @@ SMTP Auth needs to be enabled for any use case.
 SMTP AUTH SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.5.1v1; Criticality: SHALL -->
 - _Rationale:_ SMTP AUTH is not used or needed by modern email clients.
@@ -449,7 +452,7 @@ Exchange Online allows creation of sharing polices that soften default restricti
 Contact folders SHALL NOT be shared with all domains.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
@@ -466,7 +469,7 @@ for specific legitimate use as needed.
 Calendar details SHALL NOT be shared with all domains.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
@@ -525,7 +528,7 @@ Mail flow rules allow incoming email modification, such that email from external
 External sender warnings SHALL be implemented.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
@@ -1066,7 +1069,7 @@ IP safe lists are dynamic lists of "known, good senders," which Microsoft source
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.12.1v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
@@ -1079,7 +1082,7 @@ security mechanisms, including spam filtering and sender authentication checks. 
 #### MS.EXO.12.2v1
 Safe lists SHOULD NOT be enabled.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.12.2v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from allowed safe list addresses bypass important
@@ -1168,7 +1171,7 @@ this policy helps avoid inadvertent disabling.
 Mailbox auditing SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.EXO.13.1v1; Criticality: SHALL -->
 - _Rationale:_ Exchange Online user accounts can be compromised or misused. Enabling mailbox auditing provides a valuable source of information to detect and respond to mailbox misuse.

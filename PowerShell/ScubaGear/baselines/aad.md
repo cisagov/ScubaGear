@@ -34,11 +34,11 @@ Microsoft Entra ID tenant.
 
 **BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
 
-**API Support**: This indicator means that policy is can be checked via Microsoft API
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
 
-**Configurable**: This indicator means that policy is can be customized via config file
+**Configurable**: This indicator means that the policy can be customized via config file.
 
-**Manual**: This indicator means that policy requires manual verification of configuration checking
+**Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
 ## Highly Privileged Roles
 
@@ -72,7 +72,7 @@ This section provides policies that reduce security risks related to legacy auth
 Legacy authentication SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
@@ -128,7 +128,7 @@ This section provides policies that reduce security risks related to potentially
 Users detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
@@ -156,7 +156,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 Sign-ins detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
@@ -233,7 +233,7 @@ The phishing-resistant methods **Microsoft Entra ID certificate-based authentica
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
@@ -249,7 +249,7 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
@@ -267,7 +267,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.3.3v2; Criticality: SHALL -->
@@ -285,7 +285,7 @@ If Microsoft Authenticator is enabled, it SHALL be configured to show login cont
 The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.3.4v1; Criticality: SHALL -->
@@ -314,7 +314,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
@@ -332,7 +332,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 #### MS.AAD.3.7v1
 Managed devices SHOULD be required for authentication.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
@@ -346,7 +346,7 @@ Managed devices SHOULD be required for authentication.
 #### MS.AAD.3.8v1
 Managed Devices SHOULD be required to register MFA.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
@@ -362,7 +362,7 @@ Managed Devices SHOULD be required to register MFA.
 #### MS.AAD.3.9v1
 Device code authentication SHOULD be blocked.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
 - _Rationale:_ The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
@@ -541,7 +541,7 @@ This section provides policies that help reduce security risk of malicious appli
 Only administrators SHALL be allowed to register applications.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.5.1v1; Criticality: SHALL -->
@@ -557,7 +557,7 @@ Only administrators SHALL be allowed to register applications.
 Only administrators SHALL be allowed to consent to applications.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
@@ -573,7 +573,7 @@ Only administrators SHALL be allowed to consent to applications.
 An admin consent workflow SHALL be configured for applications.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.5.3v1; Criticality: SHALL -->
 - _Rationale:_ Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
@@ -641,7 +641,7 @@ This section provides policies that reduce security risks associated with legacy
 User passwords SHALL NOT expire.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.6.1v1; Criticality: SHALL -->
@@ -680,7 +680,7 @@ Some of the policy implementations in this section reference specific features o
 A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.1v1; Criticality: SHALL -->
@@ -695,7 +695,7 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.2v1; Criticality: SHALL -->
@@ -713,7 +713,7 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.3v1; Criticality: SHALL -->
@@ -728,7 +728,7 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#privileged-user-policy-exclusions)
 
 
@@ -747,7 +747,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.5v1; Criticality: SHALL -->
@@ -761,7 +761,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 Activation of the Global Administrator role SHALL require approval.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
@@ -776,7 +776,7 @@ Activation of the Global Administrator role SHALL require approval.
 Eligible and Active highly privileged role assignments SHALL trigger an alert.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.7v1; Criticality: SHALL -->
@@ -791,7 +791,7 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 User activation of the Global Administrator role SHALL trigger an alert.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 
 <!--Policy: MS.AAD.7.8v1; Criticality: SHALL -->
@@ -806,7 +806,7 @@ User activation of the Global Administrator role SHALL trigger an alert.
 #### MS.AAD.7.9v1
 User activation of other highly privileged roles SHOULD trigger an alert.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.7.9v1; Criticality: SHOULD -->
 - _Rationale:_ Closely monitor activation of high-risk roles for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts. In some environments, activating privileged roles can generate a significant number of alerts.
@@ -967,7 +967,7 @@ This section provides policies that help reduce security risks related to integr
 #### MS.AAD.8.1v1
 Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
@@ -982,7 +982,7 @@ Guest users SHOULD have limited or restricted access to Microsoft Entra ID direc
 #### MS.AAD.8.2v1
 Only users with the Guest Inviter role SHOULD be able to invite guest users.
 
-![API Support](https://img.shields.io/badge/API_Support-blue)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ By only allowing an authorized group of individuals to invite external users to create accounts in the tenant, an agency can enforce a guest user account approval process, reducing the risk of unauthorized account creation.

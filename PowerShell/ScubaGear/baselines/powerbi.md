@@ -41,7 +41,7 @@ the types of users are defined as follows:
   are added to the agency's Microsoft Entra ID as guest users. These users authenticate with their home organization/tenant and are granted access to Power BI
   content by virtue of being listed as guest users in the tenant's Microsoft Entra ID.
 
-**Manual**: This indicator means that policy requires manual verification of configuration checking
+**Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
 > Note:
 > These terms vary in use across Microsoft documentation.
