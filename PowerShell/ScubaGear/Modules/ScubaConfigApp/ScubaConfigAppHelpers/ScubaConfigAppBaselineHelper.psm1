@@ -1,4 +1,33 @@
-﻿function Get-ScubaConfigRegoExclusionMappings {
+﻿<#
+.SYNOPSIS
+Helper functions to update ScubaConfigApp baseline configuration using Rego files.
+
+.DESCRIPTION
+This module provides functions to parse Rego files for exclusion type mappings
+and update the ScubaConfigApp baseline configuration accordingly.
+
+.EXAMPLE
+
+#import module
+[string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigAppBaselineHelper.psm1')
+
+# Get the REGO mappings
+$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
+
+# Update configuration using Rego mappings
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines"  -RegoDirectory "..\..\Rego"
+
+# Filter specific products
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
+
+# Update configuration with additional fields
+Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
+#>
+
+function Get-ScubaConfigRegoExclusionMappings {
     <#
     .SYNOPSIS
     Parses Rego configuration files to extract the actual exclusion type mappings for each policy.
@@ -400,7 +429,10 @@ function Get-ScubaBaselinePolicy {
 
     $files = @()
 
-    if ($GitHubDirectoryUrl) {
+    # Determine if we're using GitHub URL or local directory
+    $isGitHubUrl = $GitHubDirectoryUrl -and $GitHubDirectoryUrl -match '^https?://'
+
+    if ($isGitHubUrl) {
         # Convert GitHub URL to API URL
         if ($GitHubDirectoryUrl -match '^https://github.com/([^/]+)/([^/]+)/tree/([^/]+)(?:/(.*))?$') {
             $owner = $matches[1]
@@ -413,25 +445,38 @@ function Get-ScubaBaselinePolicy {
                 $apiUrl = "https://api.github.com/repos/$owner/$repo/contents`?ref=$branch"
             }
         } else {
-            throw "Invalid GitHub directory URL."
+            throw "Invalid GitHub directory URL format."
         }
 
         # Get list of markdown files in the directory
         $response = Invoke-RestMethod -Uri $apiUrl
         $files = $response | Where-Object { $_.name -like "*.md" }
     } elseif ($BaselineDirectory) {
+        # Use local directory
+        if (-not (Test-Path $BaselineDirectory)) {
+            throw "Baseline directory not found: $BaselineDirectory"
+        }
         $files = Get-ChildItem -Path $BaselineDirectory -Filter *.md
+    } elseif ($GitHubDirectoryUrl) {
+        # GitHubDirectoryUrl is provided but it's a local path (not HTTP/HTTPS)
+        # Treat it as a local directory path
+        if (-not (Test-Path $GitHubDirectoryUrl)) {
+            throw "Baseline directory not found: $GitHubDirectoryUrl"
+        }
+        $files = Get-ChildItem -Path $GitHubDirectoryUrl -Filter *.md
+        $BaselineDirectory = $GitHubDirectoryUrl  # Set this for consistent processing below
     } else {
         throw "You must provide either -BaselineDirectory or -GitHubDirectoryUrl."
     }
 
     foreach ($file in $files) {
-        if ($GitHubDirectoryUrl) {
+        if ($isGitHubUrl) {
             $rawUrl = $file.download_url
             $content = Invoke-WebRequest -Uri $rawUrl -UseBasicParsing | Select-Object -ExpandProperty Content
             $product = [System.IO.Path]::GetFileNameWithoutExtension($file.name)
             $lines = $content -split "`n"
         } else {
+            # Local file
             $product = $file.BaseName
             $lines = Get-Content $file.FullName
         }
@@ -611,22 +656,6 @@ function Get-ScubaPolicyContent {
     }
     return $result
 }
-<#
-#import module
-[string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigHelper.psm1')
 
-# Get the REGO mappings
-$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
-
-# Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US copy.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
-
-# Filter specific products
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
-
-# Update configuration with additional fields
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
-#>
 # export
 #Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigRegoExclusionMappings, Update-ScubaConfigBaselineWithRego
