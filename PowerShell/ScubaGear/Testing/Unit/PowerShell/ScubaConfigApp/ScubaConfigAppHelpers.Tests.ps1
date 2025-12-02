@@ -345,8 +345,11 @@
                 $content = Get-Content $helperFile.FullName -Raw
                 $currentModuleName = [System.IO.Path]::GetFileNameWithoutExtension($helperFile.Name)
 
-                # Check if this module tries to import itself
-                $content | Should -Not -Match "Import-Module.*$currentModuleName" -Because "Helper module '$($helperFile.Name)' should not import itself"
+                # Remove comment blocks to avoid false positives from example code
+                $contentWithoutComments = $content -replace '(?s)<#.*?#>', ''
+
+                # Check if this module tries to import itself (excluding comments)
+                $contentWithoutComments | Should -Not -Match "Import-Module.*$currentModuleName" -Because "Helper module '$($helperFile.Name)' should not import itself"
 
                 # Check for potential circular references
                 foreach ($otherHelper in $helperFiles) {

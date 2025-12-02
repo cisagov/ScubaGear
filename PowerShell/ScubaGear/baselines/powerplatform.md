@@ -329,7 +329,7 @@ to detect and mitigate certain types of attacks, including Cross-Site
 Scripting (XSS), clickjacking, and data injection attacks. When enabled, this setting can apply to all
 current canvas apps and model-driven apps at the Power Platform environment level.
 
-###  Policies
+### Policies
 
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.
@@ -373,7 +373,7 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins can restrict the creation of new Power Pages to only admins.
 
-###  Policies
+### Policies
 
 #### MS.POWERPLATFORM.5.1v1
 The ability to create Power Pages sites SHOULD be restricted to admins.
