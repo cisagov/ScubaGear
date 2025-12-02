@@ -7,7 +7,7 @@
     WindowStartupLocation="CenterScreen"
     Background="#F6FBFE"
     Foreground="#333333"
-    ShowInTaskbar="False"
+    ShowInTaskbar="true"
     >
 
     <Window.Resources>
