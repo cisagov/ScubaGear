@@ -418,13 +418,81 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 ## 5. App Management
 
-**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following commands in the Teams Powershell module.
+**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following command in the Teams Powershell module.
 
 ```Set-CsTeamsAppPermissionPolicy -Identity Global -DefaultCatalogAppsType AllowedAppList -GlobalCatalogAppsType AllowedAppList -PrivateCatalogAppsType AllowedAppList```
 
 **The legacy command above should only be used in tenants that have previously been configured for application policies within the Permission Policies section of the Teams admin portal. New implementations should follow the policy guide below. Organizations should look to migrate to the new policy settings below, when those get migrated to your organzation. If your tenant still has the policy settings in the Permission Policies section, then use the command above.** 
 
-ScubaGear will continue to look for the legacy policies when running in noninteractive mode because of a limitation in the API when gathering the data for the report. Users can utilize interactive mode, and ScubaGear will gather the data for the newer portal based settings.
+**Legacy settings** can also be manipulated in the Teams admin portal in the following manner. If your portal does not have these settings available, then your portal has been migrated to the new settings.
+
+#### Legacy MS.TEAMS.5.1v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Permission policies**.
+
+3.  Select **Global (Org-wide default)**.
+
+4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
+
+5.  Click **Allow apps**.
+
+6.  Search and Click **Add** to all appropriate Microsoft Apps.
+
+7.  Click **Allow**.
+
+8.  Click **Save**.
+
+9.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 3.
+
+#### Legacy MS.TEAMS.5.2v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Third-party apps** turn off **Third-party apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Third-party apps** to **Block all apps**, unless specific apps
+    have been approved by the agency, in which case select **Allow
+    specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.   If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
+
+#### Legacy MS.TEAMS.5.3v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Custom apps** turn off **Interaction with custom apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Custom apps** to **Block all apps**, unless specific apps have
+    been approved by the agency, in which case select **Allow specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.  If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
+
+**ScubaGear will continue to look for the legacy policies when running in noninteractive mode because of a limitation in the API when gathering the data for the report. Users can utilize interactive mode and the -UseNewTeamsAppSetting parameter to allow ScubaGear to gather the data for the newer portal based settings.**
 
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
