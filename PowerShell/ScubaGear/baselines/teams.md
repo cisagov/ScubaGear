@@ -424,7 +424,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 **The legacy command above should only be used in tenants that have previously been configured for application policies within the Permission Policies section of the Teams admin portal. New implementations should follow the policy guide below. Organizations should look to migrate to the new policy settings below, when those get migrated to your organzation. If your tenant still has the policy settings in the Permission Policies section, then use the command above.** 
 
-**Legacy settings** can also be manipulated in the Teams admin portal in the following manner. If your portal does not have these settings available, then your portal has been migrated to the new settings.
+**Legacy settings** can also be manipulated in the Teams admin portal in the following manner. If your portal does not have these settings available, then your portal has been migrated to the new settings. Instructions for those are the v2 settings listed after the v1 settings.
 
 #### Legacy MS.TEAMS.5.1v1 Instructions
 
