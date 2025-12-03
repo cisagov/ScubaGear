@@ -301,7 +301,6 @@ function Invoke-SCuBA {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [ValidateNotNullOrEmpty()]
         [switch]
         $UseNewTeamsAppSettings
     )
