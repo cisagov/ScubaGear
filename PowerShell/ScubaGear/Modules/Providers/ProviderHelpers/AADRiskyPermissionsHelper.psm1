@@ -328,8 +328,11 @@ function Get-ApplicationsWithRiskyPermissions {
                     $FederatedCredentialsResults = $null
                 }
 
+                $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+                $AdminConsentedPermissions = @($MappedPermissions | Where-Object { $_.IsAdminConsented -eq $true })
+
                 # Exclude applications without risky permissions
-                if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
+                if ($RiskyPermissions.Count -gt 0 -and $AdminConsentedPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -472,8 +475,11 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                             Write-Warning "Error for service principal $($Result.id): $($Result.status)"
                         }
 
+                        $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+                        $AdminConsentedPermissions = @($MappedPermissions | Where-Object { $_.IsAdminConsented -eq $true })
+
                         # Exclude service principals without risky permissions
-                        if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
+                        if ($RiskyPermissions.Count -gt 0 -and $AdminConsentedPermissions.Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
                                 ObjectId                = $ServicePrincipal.Id
                                 AppId                   = $ServicePrincipal.AppId
