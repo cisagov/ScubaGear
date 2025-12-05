@@ -314,11 +314,11 @@ class ScubaConfigValidator {
         if ($Schema.properties) {
             # Get config properties
             $ConfigProperties = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
-            
+
             foreach ($PropertyName in $ConfigProperties) {
                 $PropertyValue = $ConfigObject.$PropertyName
                 $PropertySchema = $Schema.properties.$PropertyName
-                
+
                 # Skip validation for OmitPolicy and AnnotatePolicy if disabled
                 if ($PropertyName -eq "OmitPolicy" -and $ValidationSettings.validateOmitPolicy -eq $false) {
                     continue
@@ -326,7 +326,7 @@ class ScubaConfigValidator {
                 if ($PropertyName -eq "AnnotatePolicy" -and $ValidationSettings.validateAnnotatePolicy -eq $false) {
                     continue
                 }
-                
+
                 if ($PropertySchema -and $PropertyValue) {
                     # Validate this property against its schema
                     [ScubaConfigValidator]::ValidatePropertyAgainstSchema($PropertyValue, $PropertySchema, $Validation, "Property '$PropertyName'")
@@ -510,14 +510,14 @@ class ScubaConfigValidator {
         # Handle object validation
         elseif ($PropertySchema.type -eq "object") {
             [ScubaConfigValidator]::ValidateObjectAgainstSchema($Value, $PropertySchema, $Validation, $Context)
-            
+
             # Handle patternProperties validation (for OmitPolicy, AnnotatePolicy, etc.)
             if ($PropertySchema.patternProperties) {
                 $ObjectKeys = [ScubaConfigValidator]::GetObjectKeys($Value)
                 foreach ($Key in $ObjectKeys) {
                     $KeyValue = $Value.$Key
                     $PatternMatched = $false
-                    
+
                     # Check each pattern in patternProperties
                     foreach ($Pattern in $PropertySchema.patternProperties.PSObject.Properties.Name) {
                         if ($Key -match $Pattern) {
@@ -527,7 +527,7 @@ class ScubaConfigValidator {
                             break  # Stop after first matching pattern
                         }
                     }
-                    
+
                     # If no pattern matched, report error
                     if (-not $PatternMatched) {
                         $Validation.Errors += "$Context key '$Key' does not match any allowed pattern"
@@ -547,10 +547,10 @@ class ScubaConfigValidator {
         if ($ItemSchema.oneOf) {
             $OneOfValid = $false
             $OneOfErrors = @()
-            
+
             foreach ($Option in $ItemSchema.oneOf) {
                 $TempValidation = [PSCustomObject]@{ Errors = @() }
-                
+
                 # Handle different types in oneOf options
                 if ($Option.type -eq "object") {
                     # For object validation, check type first, then properties
@@ -564,13 +564,13 @@ class ScubaConfigValidator {
                                 } else {
                                     $null -ne $Item.$RequiredProp
                                 }
-                                
+
                                 if (-not $HasProperty) {
                                     $TempValidation.Errors += "$Context is missing required property '$RequiredProp'"
                                 }
                             }
                         }
-                        
+
                         # Validate properties
                         if ($Option.properties) {
                             foreach ($PropName in $Option.properties.PSObject.Properties.Name) {
@@ -579,14 +579,14 @@ class ScubaConfigValidator {
                                 } else {
                                     $Item.$PropName
                                 }
-                                
+
                                 if ($PropertyValue -ne $null) {
                                     $PropSchema = $Option.properties.$PropName
                                     [ScubaConfigValidator]::ValidateItemAgainstSchema($PropertyValue, $PropSchema, $TempValidation, "$Context.$PropName")
                                 }
                             }
                         }
-                        
+
                         # Check for additionalProperties: false
                         if ($Option.additionalProperties -eq $false) {
                             $AllowedProps = if ($Option.properties) { $Option.properties.PSObject.Properties.Name } else { @() }
@@ -604,7 +604,7 @@ class ScubaConfigValidator {
                     # For non-object types, use standard validation
                     [ScubaConfigValidator]::ValidateItemAgainstSchema($Item, $Option, $TempValidation, $Context)
                 }
-                
+
                 if ($TempValidation.Errors.Count -eq 0) {
                     $OneOfValid = $true
                     break
@@ -612,7 +612,7 @@ class ScubaConfigValidator {
                     $OneOfErrors += $TempValidation.Errors
                 }
             }
-            
+
             if (-not $OneOfValid) {
                 $Validation.Errors += "$Context does not match any of the allowed formats"
             }
