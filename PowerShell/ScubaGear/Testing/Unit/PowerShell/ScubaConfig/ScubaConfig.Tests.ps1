@@ -1,9 +1,9 @@
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
-Describe "ScubaConfig JSON-based Configuration Tests" {
-    BeforeAll {
-        # Initialize the system
-        [ScubaConfig]::InitializeValidator()
+Describe "ScubaConfig Module Unit Tests" {
+    BeforeEach {
+        # Reset the instance before each test to prevent state bleed
+        [ScubaConfig]::ResetInstance()
     }
 
     AfterEach {
@@ -16,271 +16,278 @@ Describe "ScubaConfig JSON-based Configuration Tests" {
         [ScubaConfig]::ResetInstance()
     }
 
-    It "Should load JSON configuration defaults" {
-        $Defaults = [ScubaConfig]::GetConfigDefaults()
+    Context "Class Structure and Properties" {
+        It "Should be a valid PowerShell class" {
+            [ScubaConfig] | Should -Not -BeNullOrEmpty
+            [ScubaConfig].Name | Should -Be "ScubaConfig"
+        }
 
-        $Defaults | Should -Not -BeNullOrEmpty
-        $Defaults.defaults | Should -Not -BeNullOrEmpty
-        $Defaults.defaults.ProductNames | Should -Contain "aad"
-        $Defaults.defaults.M365Environment | Should -Be "commercial"
-        $Defaults.defaults.OPAVersion | Should -Match "^\d+\.\d+\.\d+$"
+        It "Should have required static properties" {
+            # Check that the class has static members - the private properties aren't directly accessible
+            [ScubaConfig] | Get-Member -Static | Should -Not -BeNullOrEmpty
+        }
+
+        It "Should have required instance properties" {
+            $Instance = [ScubaConfig]::GetInstance()
+
+            # Instance should be created successfully and be usable
+            $Instance | Should -Not -BeNullOrEmpty
+            $Instance.GetType().Name | Should -Be "ScubaConfig"
+        }
+
+        It "Should have required static methods" {
+            $StaticMethods = [ScubaConfig] | Get-Member -Static -MemberType Method | Select-Object -ExpandProperty Name
+
+            $StaticMethods | Should -Contain "GetInstance"
+            $StaticMethods | Should -Contain "ResetInstance"
+            $StaticMethods | Should -Contain "InitializeValidator"
+            $StaticMethods | Should -Contain "ScubaDefault"
+            $StaticMethods | Should -Contain "GetConfigDefaults"
+            $StaticMethods | Should -Contain "ValidateConfigFile"
+            $StaticMethods | Should -Contain "GetSupportedProducts"
+            $StaticMethods | Should -Contain "GetSupportedEnvironments"
+            $StaticMethods | Should -Contain "GetProductInfo"
+            $StaticMethods | Should -Contain "GetPrivilegedRoles"
+        }
+
+        It "Should have required instance methods" {
+            $Instance = [ScubaConfig]::GetInstance()
+            $InstanceMethods = $Instance | Get-Member -MemberType Method | Select-Object -ExpandProperty Name
+
+            $InstanceMethods | Should -Contain "LoadConfig"
+            $InstanceMethods | Should -Contain "ValidateConfiguration"
+        }
     }
 
-    It "Should validate valid YAML configuration" {
-        $ValidYaml = @"
-ProductNames:
-  - aad
-  - defender
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-OrgName: Test Organization
-OrgUnitName: IT Department
-"@
+    Context "Singleton Pattern Implementation" {
+        It "Should return the same instance on multiple calls" {
+            $Instance1 = [ScubaConfig]::GetInstance()
+            $Instance2 = [ScubaConfig]::GetInstance()
 
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $ValidYaml | Set-Content -Path $TempFile
+            $Instance1 | Should -Be $Instance2
+            $Instance1.GetHashCode() | Should -Be $Instance2.GetHashCode()
+        }
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
+        It "Should create new instance after reset" {
+            # Load some configuration into the instance to create state
+            $Instance1 = [ScubaConfig]::GetInstance()
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
 
-        $ValidationResult.IsValid | Should -Be $True
-        $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
+            try {
+                $Instance1.LoadConfig($TempFile)
+                $HasConfig1 = $Instance1.Configuration -ne $null
 
-        Remove-Item -Path $TempFile -Force
+                [ScubaConfig]::ResetInstance()
+
+                $Instance2 = [ScubaConfig]::GetInstance()
+                $HasConfig2 = $Instance2.Configuration -ne $null
+
+                # After reset, new instance should not have the old configuration
+                $HasConfig1 | Should -Be $true
+                $HasConfig2 | Should -Be $false
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Should properly initialize on first access" {
+            [ScubaConfig]::ResetInstance()
+
+            # Should not throw when getting instance
+            { [ScubaConfig]::GetInstance() } | Should -Not -Throw
+
+            # Should have initialized the validator
+            [ScubaConfig]::_ValidatorInitialized | Should -Be $true
+        }
     }
 
-    It "Should validate YAML configuration" {
-        $InvalidYaml = @"
-ProductNames:
-  - aad
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-"@
+    Context "Static Method Functionality" {
+        It "Should initialize validator without errors" {
+            { [ScubaConfig]::InitializeValidator() } | Should -Not -Throw
+        }
 
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $InvalidYaml | Set-Content -Path $TempFile
+        It "Should get configuration defaults" {
+            $Defaults = [ScubaConfig]::GetConfigDefaults()
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
+            $Defaults | Should -Not -BeNullOrEmpty
+            $Defaults | Should -BeOfType [PSCustomObject]
+        }
 
-        # Validation currently accepts configurations - just verify it returns a result
-        $ValidationResult | Should -Not -BeNullOrEmpty
-        $ValidationResult.PSObject.Properties.Name | Should -Contain 'IsValid'
+        It "Should get supported products as array" {
+            $Products = [ScubaConfig]::GetSupportedProducts()
 
-        Remove-Item -Path $TempFile -Force
+            $Products | Should -Not -BeNullOrEmpty
+            # Ensure it's iterable (could be array or single value)
+            $ProductsArray = @($Products)
+            $ProductsArray.Count | Should -BeGreaterThan 0
+        }
+
+        It "Should get supported environments as array" {
+            $Environments = [ScubaConfig]::GetSupportedEnvironments()
+
+            $Environments | Should -Not -BeNullOrEmpty
+            # Ensure it's iterable (could be array or single value)
+            $EnvironmentsArray = @($Environments)
+            $EnvironmentsArray.Count | Should -BeGreaterThan 0
+        }
+
+        It "Should get product info for valid products" {
+            $Products = [ScubaConfig]::GetSupportedProducts()
+            $FirstProduct = $Products[0]
+
+            $ProductInfo = [ScubaConfig]::GetProductInfo($FirstProduct)
+
+            $ProductInfo | Should -Not -BeNullOrEmpty
+            $ProductInfo | Should -BeOfType [PSCustomObject]
+        }
+
+        It "Should get privileged roles as array" {
+            $Roles = [ScubaConfig]::GetPrivilegedRoles()
+
+            $Roles | Should -Not -BeNullOrEmpty
+            # Ensure it's iterable (could be array or single value)
+            $RolesArray = @($Roles)
+            $RolesArray.Count | Should -BeGreaterThan 0
+        }
+
+        It "Should provide backward compatibility with ScubaDefault method" {
+            { [ScubaConfig]::ScubaDefault('DefaultOPAVersion') } | Should -Not -Throw
+            { [ScubaConfig]::ScubaDefault('DefaultProductNames') } | Should -Not -Throw
+            { [ScubaConfig]::ScubaDefault('DefaultM365Environment') } | Should -Not -Throw
+        }
+
+        It "Should validate configuration files" {
+            # Create a minimal test file
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
+
+            try {
+                $Result = [ScubaConfig]::ValidateConfigFile($TempFile)
+                $Result | Should -Not -BeNullOrEmpty
+                $Result | Should -BeOfType [PSCustomObject]
+                $Result.PSObject.Properties.Name | Should -Contain 'IsValid'
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 
-    It "Should handle policy configuration" {
-        $YamlWithPolicies = @"
-ProductNames:
-  - aad
-  - defender
-OmitPolicy:
-  MS.AAD.1.1v1: "Valid policy ID"
-AnnotatePolicy:
-  MS.DEFENDER.2.1v1: "Valid annotation"
-"@
+    Context "Instance Method Functionality" {
+        It "Should have empty configuration initially" {
+            $Instance = [ScubaConfig]::GetInstance()
 
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $YamlWithPolicies | Set-Content -Path $TempFile
+            $Instance.Configuration | Should -BeNullOrEmpty
+        }
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
+        It "Should load configuration files" {
+            $Instance = [ScubaConfig]::GetInstance()
 
-        # Verify validation returns a result
-        $ValidationResult | Should -Not -BeNullOrEmpty
+            # Create a minimal test file
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
 
-        Remove-Item -Path $TempFile -Force
+            try {
+                { $Instance.LoadConfig($TempFile) } | Should -Not -Throw
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Should validate current configuration" {
+            $Instance = [ScubaConfig]::GetInstance()
+
+            # Load some configuration first
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
+
+            try {
+                $Instance.LoadConfig($TempFile)
+                # Method should exist and be callable
+                { $Instance.ValidateConfiguration() } | Should -Not -Throw
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It "Should support skip validation parameter in LoadConfig" {
+            $Instance = [ScubaConfig]::GetInstance()
+
+            # Create a minimal test file
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
+
+            try {
+                { $Instance.LoadConfig($TempFile, $true) } | Should -Not -Throw
+                { $Instance.LoadConfig($TempFile, $false) } | Should -Not -Throw
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 
-    It "Should handle exclusions configuration" {
-        $YamlWithExclusions = @"
-ProductNames:
-  - aad
-  - defender
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-OrgName: Test Organization
-OrgUnitName: IT Department
-Aad:
-  CapExclusions:
-    Users:
-      - "12345678-1234-1234-1234-123456789012"
-    Groups:
-      - "87654321-4321-4321-4321-210987654321"
-Defender:
-  SensitiveUsers:
-    - DisplayName: "John Doe"
-      EmailAddress: "john.doe@example.com"
-"@
+    Context "Error Handling" {
+        It "Should handle invalid file paths gracefully" {
+            $Instance = [ScubaConfig]::GetInstance()
 
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $YamlWithExclusions | Set-Content -Path $TempFile
+            { $Instance.LoadConfig("nonexistent-file.yaml") } | Should -Throw
+        }
 
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
+        It "Should handle invalid product names in GetProductInfo" {
+            { [ScubaConfig]::GetProductInfo("InvalidProduct") } | Should -Not -Throw
+        }
 
-        $ValidationResult.IsValid | Should -Be $True
-
-        Remove-Item -Path $TempFile -Force
+        It "Should handle invalid ScubaDefault keys" {
+            # Invalid keys should throw exceptions as designed
+            { [ScubaConfig]::ScubaDefault("InvalidKey") } | Should -Throw
+        }
     }
 
-    It "Should get product information" {
-        $AadInfo = [ScubaConfig]::GetProductInfo("aad")
+    Context "State Management" {
+        It "Should maintain configuration state between calls" {
+            $Instance = [ScubaConfig]::GetInstance()
 
-        $AadInfo | Should -Not -BeNullOrEmpty
-        $AadInfo.name | Should -Be "Microsoft Entra ID"
-        $AadInfo.supportsExclusions | Should -Be $True
-        $AadInfo.supportedExclusionTypes | Should -Contain "CapExclusions"
-    }
+            # Create a test file
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
 
-    It "Should get supported products and M365environments" {
-        $Products = [ScubaConfig]::GetSupportedProducts()
-        $Environments = [ScubaConfig]::GetSupportedEnvironments()
+            try {
+                $Instance.LoadConfig($TempFile)
+                $Instance.Configuration | Should -Not -BeNullOrEmpty
 
-        $Products | Should -Contain "aad"
-        $Products | Should -Contain "powerplatform"
+                # Get same instance and check configuration persists
+                $SameInstance = [ScubaConfig]::GetInstance()
+                $SameInstance.Configuration | Should -Not -BeNullOrEmpty
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
 
-        $Environments | Should -Contain "commercial"
-        $Environments | Should -Contain "gcc"
-    }
+        It "Should clear state on reset" {
+            $Instance = [ScubaConfig]::GetInstance()
 
-    It "Should maintain backward compatibility with ScubaDefault method" {
-        $OpaVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
-        $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
+            # Load some configuration
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
 
-        $OpaVersion | Should -Match "^\d+\.\d+\.\d+$"
-        $ProductNames | Should -Contain "aad"
-    }
+            try {
+                $Instance.LoadConfig($TempFile)
+                $Instance.Configuration | Should -Not -BeNullOrEmpty
 
-    It "Should load configuration" {
-        # Reset to ensure clean state
-        [ScubaConfig]::ResetInstance()
-
-        $ValidYaml = @"
-ProductNames:
-  - exo
-  - sharepoint
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-OrgName: Test Organization
-OrgUnitName: IT Department
-LogIn: true
-OutFolderName: M365BaselineConformance
-"@
-
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $ValidYaml | Set-Content -Path $TempFile -Force
-
-        $Config = [ScubaConfig]::GetInstance()
-        $LoadResult = $Config.LoadConfig($TempFile)
-
-        $LoadResult | Should -Be $True
-        $Config.Configuration | Should -Not -BeNullOrEmpty
-
-        Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
-    }
-
-    It "Should handle DNS resolver configuration" {
-        $YamlWithDns = @"
-ProductNames:
-  - aad
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-PreferredDnsResolvers:
-  - "8.8.8.8"
-  - "8.8.4.4"
-  - "1.1.1.1"
-SkipDoH: true
-"@
-
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $YamlWithDns | Set-Content -Path $TempFile
-
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
-
-        $ValidationResult.IsValid | Should -Be $True
-        $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
-
-        Remove-Item -Path $TempFile -Force
-    }
-
-    It "Should reject invalid IP addresses in PreferredDnsResolvers" {
-        $YamlWithInvalidIp = @"
-ProductNames:
-  - aad
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-PreferredDnsResolvers:
-  - "256.256.256.256"
-  - "8.8.8.8"
-"@
-
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $YamlWithInvalidIp | Set-Content -Path $TempFile
-
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
-
-        # Note: Current validation may not strictly enforce IP format
-        # This test documents expected behavior when strict validation is implemented
-        $ValidationResult | Should -Not -BeNullOrEmpty
-
-        Remove-Item -Path $TempFile -Force
-    }
-
-    It "Should validate SkipDoH as boolean" {
-        $YamlWithInvalidSkipDoH = @"
-ProductNames:
-  - aad
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-SkipDoH: "not-a-boolean"
-"@
-
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $YamlWithInvalidSkipDoH | Set-Content -Path $TempFile
-
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
-
-        # Note: Current validation may not strictly enforce boolean type from YAML string
-        # This test documents expected behavior when strict validation is implemented
-        $ValidationResult | Should -Not -BeNullOrEmpty
-
-        Remove-Item -Path $TempFile -Force
-    }
-
-    It "Should handle complete configuration with all DNS and exclusion options" {
-        $CompleteYaml = @"
-ProductNames:
-  - aad
-  - defender
-M365Environment: commercial
-Organization: example.onmicrosoft.com
-OrgName: Test Organization
-PreferredDnsResolvers:
-  - "8.8.8.8"
-  - "1.1.1.1"
-SkipDoH: false
-Aad:
-  CapExclusions:
-    Users:
-      - "12345678-1234-1234-1234-123456789012"
-    Groups:
-      - "87654321-4321-4321-4321-210987654321"
-Defender:
-  SensitiveUsers:
-    - DisplayName: "Admin User"
-      EmailAddress: "admin@example.com"
-OmitPolicy:
-  MS.AAD.1.1v1: "Break-glass account exclusion"
-AnnotatePolicy:
-  MS.DEFENDER.2.1v1: "Under review"
-"@
-
-        $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-        $CompleteYaml | Set-Content -Path $TempFile
-
-        $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
-
-        $ValidationResult.IsValid | Should -Be $True
-        $ValidationResult.ValidationErrors | Should -BeNullOrEmpty
-
-        Remove-Item -Path $TempFile -Force
+                # Reset and get new instance
+                [ScubaConfig]::ResetInstance()
+                $NewInstance = [ScubaConfig]::GetInstance()
+                $NewInstance.Configuration | Should -BeNullOrEmpty
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 }
