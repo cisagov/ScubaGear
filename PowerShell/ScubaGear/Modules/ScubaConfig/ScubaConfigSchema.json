@@ -155,8 +155,23 @@
       "description": "Policies to omit from assessment",
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
-          "type": "string",
-          "description": "Justification for omitting the policy"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Justification for omitting the policy"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "Rationale": {
+                  "type": "string",
+                  "description": "Justification for omitting the policy"
+                }
+              },
+              "required": ["Rationale"],
+              "additionalProperties": false
+            }
+          ]
         }
       },
       "additionalProperties": true
@@ -166,8 +181,23 @@
       "description": "Policy annotations",
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
-          "type": "string",
-          "description": "Annotation text for the policy"
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Annotation text for the policy"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "Comment": {
+                  "type": "string",
+                  "description": "Annotation text for the policy"
+                }
+              },
+              "required": ["Comment"],
+              "additionalProperties": false
+            }
+          ]
         }
       },
       "additionalProperties": true
@@ -175,6 +205,44 @@
   },
   "additionalProperties": true,
   "definitions": {
+    "patterns": {
+      "guid": {
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        "friendlyName": "GUID format"
+      },
+      "fqdn": {
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "displayname@fqdn format"
+      },
+      "appGuid": {
+        "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
+        "friendlyName": "application GUID format"
+      },
+      "thumbprint": {
+        "pattern": "^[A-Fa-f0-9]{40}$",
+        "friendlyName": "certificate thumbprint (40 hex chars)"
+      },
+      "ipv4": {
+        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+        "friendlyName": "IPv4 address format"
+      },
+      "filename": {
+        "pattern": "^[a-zA-Z0-9_-]+$",
+        "friendlyName": "alphanumeric/underscore/hyphen only"
+      },
+      "filePath": {
+        "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$",
+        "friendlyName": "file path format"
+      },
+      "sensitiveUser": {
+        "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "DisplayName;EmailAddress format"
+      },
+      "orgDomain": {
+        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "domain name (FQDN)"
+      }
+    },
     "AadExclusions": {
       "type": "object",
       "properties": {
@@ -236,6 +304,14 @@
               },
               "description": "User Principal Names (UPNs) to include in sensitive accounts"
             },
+            "IncludedGroups": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              },
+              "description": "Group Principal Names (fully qualified domain names) to include in sensitive accounts"
+            },
             "IncludedDomains": {
               "type": "array",
               "items": {"type": "string"},
@@ -249,6 +325,14 @@
               },
               "description": "User Principal Names (UPNs) to exclude from sensitive accounts"
             },
+            "ExcludedGroups": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+              },
+              "description": "Group Principal Names (fully qualified domain names) to exclude from sensitive accounts"
+            },
             "ExcludedDomains": {
               "type": "array",
               "items": {"type": "string"},
@@ -259,16 +343,11 @@
         "SensitiveUsers": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "DisplayName": {"type": "string"},
-              "EmailAddress": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              }
-            },
-            "required": ["DisplayName", "EmailAddress"]
-          }
+            "type": "string",
+            "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "description": "Sensitive user in format 'DisplayName;EmailAddress'"
+          },
+          "description": "List of sensitive users with display name and email separated by semicolon"
         }
       }
     },

@@ -173,8 +173,10 @@ class ScubaConfig {
             Write-Warning $Warning
         }
 
-        # Legacy validation for policy IDs
-        if ($this.Configuration.ContainsKey("OmitPolicy")) {
+        # Legacy validation for policy IDs (respect validation flags)
+        $Defaults = [ScubaConfig]::_ConfigDefaults
+        
+        if ($this.Configuration.ContainsKey("OmitPolicy") -and $Defaults.validation.validateOmitPolicy -ne $false) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
             }
@@ -183,7 +185,7 @@ class ScubaConfig {
             }
         }
 
-        if ($this.Configuration.ContainsKey("AnnotatePolicy")) {
+        if ($this.Configuration.ContainsKey("AnnotatePolicy") -and $Defaults.validation.validateAnnotatePolicy -ne $false) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
             }
@@ -237,8 +239,15 @@ class ScubaConfig {
 
         foreach ($Policy in $PolicyConfig.Keys) {
             if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
+                # Try to extract product from malformed policy ID to give better error message
+                $PolicyParts = $Policy -split "\."
+                $ProductInPolicy = if ($PolicyParts.Length -ge 2 -and $PolicyParts[1]) { $PolicyParts[1] } else { $null }
+
+                # Generate format example from pattern using the validator's method
+                $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($Defaults.validation.policyIdPattern, $ProductInPolicy)
+
                 $ErrorMessage = "Config file indicates $ActionType $Policy, but $Policy is not a valid control ID. "
-                $ErrorMessage += "Expected format is '$($Defaults.validation.policyIdExample)'. "
+                $ErrorMessage += "Expected format: $ExampleFormat. "
                 $ErrorMessage += "Policy ID does not match expected format."
                 throw $ErrorMessage
             }
