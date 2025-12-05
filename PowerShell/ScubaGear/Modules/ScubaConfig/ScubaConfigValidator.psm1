@@ -448,8 +448,11 @@ class ScubaConfigValidator {
             $ProductData = $null
             if ($ConfigObject.$ProductName) {
                 $ProductData = $ConfigObject.$ProductName
-            } elseif ($ConfigObject.($ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1))) {
-                $ProductData = $ConfigObject.($ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1))
+            } else {
+                $CapitalizedProductName = $ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1)
+                if ($ConfigObject.$CapitalizedProductName) {
+                    $ProductData = $ConfigObject.$CapitalizedProductName
+                }
             }
 
             if ($ProductData) {
@@ -492,15 +495,6 @@ class ScubaConfigValidator {
     static [void] ValidateObjectAgainstSchema([object]$Object, [object]$Schema, [PSCustomObject]$Validation, [string]$Context) {
         if (-not $Schema -or -not $Schema.properties) {
             return
-        }
-
-        # Get object properties
-        $ObjectProperties = if ($Object -is [hashtable]) {
-            $Object.Keys
-        } elseif ($Object.PSObject -and $Object.PSObject.Properties) {
-            $Object.PSObject.Properties.Name
-        } else {
-            @()
         }
 
         # Validate each property in the schema
@@ -602,7 +596,7 @@ class ScubaConfigValidator {
                                     $Item.$PropName
                                 }
 
-                                if ($PropertyValue -ne $null) {
+                                if ($null -ne $PropertyValue) {
                                     $PropSchema = $Option.properties.$PropName
                                     [ScubaConfigValidator]::ValidateItemAgainstSchema($PropertyValue, $PropSchema, $TempValidation, "$Context.$PropName")
                                 }
@@ -683,6 +677,7 @@ class ScubaConfigValidator {
             }
         } catch {
             # Silently fall back to regex if schema lookup fails
+            Write-Debug "Failed to lookup friendly name for pattern: $Pattern"
         }
         return $null
     }
