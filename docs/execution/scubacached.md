@@ -207,6 +207,8 @@ Testing if the tenant had the migration complete configured. Newer tenants do no
     "PolicyVersion":  "1.5",
     "PolicyMigrationState":  "migrationComplete",
     "DisplayName":  null,
+    ...
+}
 ```
 
 to :
@@ -217,12 +219,13 @@ to :
     "PolicyVersion":  "1.5",
     "PolicyMigrationState":  null,
     "DisplayName":  "Authentication Methods Policy",
+    ...
+}
  ```
 
 ```powershell
 Invoke-SCuBACached -ProductNames aad -ExportProvider $false -OutPath "C:\ScubaResults\AAD_Policy_Test"
 ```
-
 
 ## Error Scenarios
 
