@@ -1,12 +1,24 @@
 class ScubaConfigValidator {
     <#
     .SYNOPSIS
-    Validates ScubaGear YAML configuration files against JSON schema
+    ScubaConfigValidator provides validation of ScubaGear configuration files using JSON Schema
+
     .DESCRIPTION
-    This class provides validation functionality for ScubaGear configuration files,
-    ensuring they conform to the defined schema and contain valid values.
+    ScubaConfigValidator implements a validation system that combines multiple validation checks to ensure configuration correctness and provide user-friendly feedback.
+
+    .EXAMPLE
+    # Initialize validator and perform basic file validation
+    [ScubaConfigValidator]::Initialize("C:\ScubaGear\Modules\ScubaConfig")
+    $Result = [ScubaConfigValidator]::ValidateYamlFile("C:\Config\my-config.yaml")
+
+    .EXAMPLE
+    # Validate with debug mode enabled for troubleshooting
+    [ScubaConfigValidator]::Initialize($ModulePath)
+    $Result = [ScubaConfigValidator]::ValidateYamlFile("config.yaml", $true)  # Enable debug
+    $Result.Warnings
     #>
 
+    # Static cache for loaded resources
     hidden static [hashtable]$_Cache = @{}
 
     static [void] Initialize([string]$ModulePath) {
@@ -15,6 +27,7 @@ class ScubaConfigValidator {
         [ScubaConfigValidator]::LoadDefaults()
     }
 
+    # Loads and caches JSON schema file for configuration validation.
     hidden static [void] LoadSchema() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
         $SchemaPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigSchema.json"
@@ -31,6 +44,7 @@ class ScubaConfigValidator {
         }
     }
 
+    # Loads and caches default configuration values from JSON file.
     hidden static [void] LoadDefaults() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
         $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigDefaults.json"
@@ -47,6 +61,7 @@ class ScubaConfigValidator {
         }
     }
 
+    # Returns cached configuration defaults object. Throws if validator not initialized.
     static [object] GetDefaults() {
         if (-not [ScubaConfigValidator]::_Cache.ContainsKey('Defaults')) {
             throw "Validator not initialized. Call Initialize() first."
@@ -54,6 +69,7 @@ class ScubaConfigValidator {
         return [ScubaConfigValidator]::_Cache['Defaults']
     }
 
+    # Returns cached JSON schema object. Throws if validator not initialized.
     static [object] GetSchema() {
         if (-not [ScubaConfigValidator]::_Cache.ContainsKey('Schema')) {
             throw "Validator not initialized. Call Initialize() first."
@@ -61,14 +77,17 @@ class ScubaConfigValidator {
         return [ScubaConfigValidator]::_Cache['Schema']
     }
 
+    # Validates YAML configuration file with default settings (no debug, full validation).
     static [ValidationResult] ValidateYamlFile([string]$FilePath) {
         return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $false, $false)
     }
 
+    # Validates YAML configuration file with debug mode option (full validation enabled).
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode) {
         return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $DebugMode, $false)
     }
 
+    # Main YAML validation method with full control over debug mode and default configurations validation.
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipBusinessRules) {
         # Add debug information to the result
         $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath (SkipBusinessRules: $SkipBusinessRules)")
@@ -115,7 +134,7 @@ class ScubaConfigValidator {
             return $Result
         }
 
-        # If skipping business rules, only return parsed content without validation
+        # If skipping default configurations, only return parsed content without validation
         if ($SkipBusinessRules) {
             $Result.IsValid = $true
             return $Result
@@ -142,6 +161,7 @@ class ScubaConfigValidator {
         return $Result
     }
 
+    # Performs JSON Schema Draft-7 validation against configuration objects.
     hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject, [bool]$DebugMode) {
         $Validation = [PSCustomObject]@{
             Errors = @()
@@ -192,7 +212,7 @@ class ScubaConfigValidator {
             }
         }
 
-        # Validate ProductNames - comprehensive schema-driven validation
+        # Validate ProductNames - schema-driven validation
         if ($Schema.properties -and $Schema.properties.ProductNames) {
             $ProductNamesSchema = $Schema.properties.ProductNames
 
@@ -337,6 +357,7 @@ class ScubaConfigValidator {
         return $Validation
     }
 
+    # Performs business logic validation beyond basic schema compliance.
     hidden static [PSCustomObject] ValidateBusinessRules([object]$ConfigObject, [bool]$DebugMode) {
         $Validation = [PSCustomObject]@{
             Errors = @()
@@ -362,6 +383,7 @@ class ScubaConfigValidator {
         return $Validation
     }
 
+    # Validates individual policy ID format and product alignment.
     hidden static [PSCustomObject] ValidatePolicyId([string]$PolicyId, [array]$ProductNames) {
         $Result = [PSCustomObject]@{
             IsValid = $false
@@ -404,7 +426,7 @@ class ScubaConfigValidator {
         return $Result
     }
 
-    # Helper method to convert regex pattern to human-readable format example
+    # Converts regex patterns to user-friendly format examples.
     static [string] ConvertPatternToExample([string]$Pattern, [string]$Product) {
         # For the pattern: ^[Mm][Ss]\.[a-zA-Z]+\.[0-9]+\.[0-9]+[Vv][0-9]+$
         # Generate: MS.PRODUCT.#.#v# or MS.AAD.#.#v# (if product specified)
@@ -416,7 +438,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Validate product exclusions (like aad:, teams:, etc.) against schema definitions
+    # Validates product-specific exclusion configurations against schema definitions.
     static [void] ValidateProductExclusions([object]$ConfigObject, [object]$Schema, [PSCustomObject]$Validation) {
         $Defaults = [ScubaConfigValidator]::GetDefaults()
         $ProductNames = $Defaults.defaults.AllProductNames
@@ -437,7 +459,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Validate individual product exclusion structure against JSON schema
+    # Validates individual product exclusion structure against its schema definition.
     static [void] ValidateProductExclusionStructure([string]$ProductName, [object]$ProductExclusions, [object]$Schema, [PSCustomObject]$Validation) {
         # Get the schema definition for this product's exclusions
         $ProductSchemaName = $ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1).ToLower() + "Exclusions"
@@ -466,7 +488,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Generic recursive schema validation method
+    # Performs recursive schema validation for complex objects.
     static [void] ValidateObjectAgainstSchema([object]$Object, [object]$Schema, [PSCustomObject]$Validation, [string]$Context) {
         if (-not $Schema -or -not $Schema.properties) {
             return
@@ -492,7 +514,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Validate individual property against its schema
+    # Validates individual properties against their schema definitions.
     static [void] ValidatePropertyAgainstSchema([object]$Value, [object]$PropertySchema, [PSCustomObject]$Validation, [string]$Context) {
         # Handle array validation
         if ($PropertySchema.type -eq "array" -and $PropertySchema.items) {
@@ -541,7 +563,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Validate individual item against schema (handles patterns, types, etc.)
+    # Validates individual items against schema with support for oneOf and complex patterns.
     static [void] ValidateItemAgainstSchema([object]$Item, [object]$ItemSchema, [PSCustomObject]$Validation, [string]$Context) {
         # Handle oneOf validation (for OmitPolicy/AnnotatePolicy flexible formats)
         if ($ItemSchema.oneOf) {
@@ -648,7 +670,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Get friendly name for a pattern from the schema definitions (no hardcoding)
+    # Retrieves human-readable descriptions for regex patterns from schema definitions.
     hidden static [string] GetPatternFriendlyName([string]$Pattern) {
         try {
             $Schema = [ScubaConfigValidator]::GetSchema()
@@ -665,7 +687,7 @@ class ScubaConfigValidator {
         return $null
     }
 
-    # Generate user-friendly error messages based on pattern and context
+    # Generates user-friendly error messages for pattern validation failures.
     static [string] GeneratePatternErrorMessage([string]$Value, [string]$Pattern, [string]$Context) {
         $FriendlyName = [ScubaConfigValidator]::GetPatternFriendlyName($Pattern)
         if ($FriendlyName) {
@@ -674,7 +696,7 @@ class ScubaConfigValidator {
         return "$Context value '$Value' does not match required pattern: $Pattern"
     }
 
-    # Helper to get PowerShell type name that matches JSON schema types
+    # Determines PowerShell object types in JSON Schema compatible format.
     static [string] GetValueType([object]$Value) {
         if ($null -eq $Value) { return "null" }
         elseif ($Value -is [string]) { return "string" }
@@ -687,7 +709,7 @@ class ScubaConfigValidator {
         else { return "unknown ($($Value.GetType().Name))" }
     }
 
-    # Helper method to safely get keys/properties from objects, filtering out system properties
+    # Safely extracts property names from objects while filtering system properties.
     static [array] GetObjectKeys([object]$Object) {
         if ($null -eq $Object) {
             return @()
@@ -712,7 +734,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Enhanced validation for organizational fields (Organization, OrgName, OrgUnitName)
+    # Validates organizational field content quality and default configurations.
     hidden static [void] ValidateOrganizationalFields([object]$ConfigObject, [PSCustomObject]$Validation) {
         $Schema = [ScubaConfigValidator]::GetSchema()
 
@@ -743,7 +765,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Enhanced validation for ProductNames (warnings only, validation done in schema check)
+    # Validates ProductNames array for duplicates and wildcard logic.
     hidden static [void] ValidateProductNames([object]$ConfigObject, [PSCustomObject]$Validation) {
         # Only add warnings if ProductNames is present
         if (-not $ConfigObject.ProductNames) {
@@ -772,7 +794,7 @@ class ScubaConfigValidator {
         }
     }
 
-    # Enhanced validation for M365Environment (warnings only, validation done in schema check)
+    # Provides environment-specific validation warnings and guidance.
     hidden static [void] ValidateM365Environment([object]$ConfigObject, [PSCustomObject]$Validation) {
         # Only add warnings if M365Environment is present and valid
         if (-not $ConfigObject.M365Environment) {

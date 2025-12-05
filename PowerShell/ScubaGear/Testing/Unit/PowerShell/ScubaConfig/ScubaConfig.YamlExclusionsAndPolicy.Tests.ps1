@@ -24,7 +24,7 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
     Context "When validation flags are enabled" {
         BeforeAll {
             # Store original defaults
-            $Script:OriginalDefaults = Get-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw
+            $Script:OriginalDefaults = Get-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw
 
             # Set validation flags to enabled for these tests
             $Defaults = $Script:OriginalDefaults | ConvertFrom-Json
@@ -33,7 +33,7 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
             $Defaults.validation.validateAnnotatePolicy = $true
 
             $ModifiedDefaults = $Defaults | ConvertTo-Json -Depth 10
-            $ModifiedDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
+            $ModifiedDefaults | Set-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
 
             # Reload validator with new defaults
             [ScubaConfig]::ResetInstance()
@@ -42,7 +42,7 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
 
         AfterAll {
             # Restore original defaults
-            $Script:OriginalDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
+            $Script:OriginalDefaults | Set-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
             [ScubaConfig]::ResetInstance()
             [ScubaConfig]::InitializeValidator()
         }
@@ -166,7 +166,7 @@ aad:
     Context "When validation flags are disabled" {
         BeforeAll {
             # Store original defaults
-            $Script:OriginalDefaults = Get-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw
+            $Script:OriginalDefaults = Get-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw
 
             # Set validation flags to disabled for these tests
             $Defaults = $Script:OriginalDefaults | ConvertFrom-Json
@@ -175,7 +175,7 @@ aad:
             $Defaults.validation.validateAnnotatePolicy = $false
 
             $ModifiedDefaults = $Defaults | ConvertTo-Json -Depth 10
-            $ModifiedDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
+            $ModifiedDefaults | Set-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
 
             # Reload validator with new defaults
             [ScubaConfig]::ResetInstance()
@@ -184,12 +184,12 @@ aad:
 
         AfterAll {
             # Restore original defaults
-            $Script:OriginalDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
+            $Script:OriginalDefaults | Set-Content -Path "Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
             [ScubaConfig]::ResetInstance()
             [ScubaConfig]::InitializeValidator()
         }
 
-        It "Should not validate exclusion ranges when disabled" {
+        It "Should skip OmitPolicy validation when disabled" {
             $YamlWithInvalidPolicyId = @"
 ProductNames:
   - aad

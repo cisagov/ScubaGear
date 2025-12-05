@@ -3,26 +3,34 @@ using module '.\ScubaConfigValidator.psm1'
 class ScubaConfig {
     <#
     .SYNOPSIS
-    This singleton class stores Scuba config data loaded from a file.
+    ScubaConfig is a class that provides validation to ScubaGear YAML/JSON configuration files
+
     .DESCRIPTION
-    This class is designed to function as a singleton. The singleton instance
-    is cached on the ScubaConfig type itself. In the context of tests, it may be
-    important to call `.ResetInstance` before and after tests as needed to
-    ensure any preexisting configs are not inadvertantly used for the test,
-    or left in place after the test is finished. The singleton will persist
-    for the life of the powershell session unless the ScubaConfig module is
-    removed. Note that `.LoadConfig` internally calls `.ResetInstance` to avoid
-    issues.
+    ScubaConfig implements a singleton configuration management class that manages configuration state throughout the PowerShell session. It integrates tightly with
+    ScubaConfigValidator to provide validation using JSON Schema and default rules.
+
     .EXAMPLE
+    # Basic usage - Get singleton instance and load configuration
+    using module '.\ScubaConfig.psm1'
     $Config = [ScubaConfig]::GetInstance()
-    [ScubaConfig]::LoadConfig($SomePath)
+    $Success = $Config.LoadConfig("C:\MyConfig\scuba-config.yaml")
+
+    .EXAMPLE
+    # Access default values and configuration schema
+    $DefaultOPAPath = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
+    $AllProducts = [ScubaConfig]::ScubaDefault('AllProductNames')
+    $SupportedEnvironments = [ScubaConfig]::GetSupportedEnvironments()
     #>
+
+    # Static properties for singleton instance and cached resources
     hidden static [ScubaConfig]$_Instance = [ScubaConfig]::new()
     hidden static [Boolean]$_IsLoaded = $false
     hidden static [Boolean]$_ValidatorInitialized = $false
     hidden static [object]$_ConfigDefaults = $null
     hidden static [object]$_ConfigSchema = $null
 
+    # Initializes validator subsystem once per session - loads schema/defaults from JSON files,
+    # caches resources in static properties for performance.
     static [void] InitializeValidator() {
         if (-not [ScubaConfig]::_ValidatorInitialized) {
             $ModulePath = Split-Path -Parent $PSCommandPath
@@ -33,6 +41,8 @@ class ScubaConfig {
         }
     }
 
+    # Resolves configuration defaults using naming conventions. "Default" prefix maps to defaults section.
+    # Special processing: DefaultOPAPath expands ~, DefaultOutPath resolves ., wildcard handling for products.
     static [object]ScubaDefault ([string]$Name){
         [ScubaConfig]::InitializeValidator()
 
@@ -82,14 +92,18 @@ class ScubaConfig {
         }
     }
 
+    # Returns default OPA version from configuration. Wrapper around ScubaDefault('DefaultOPAVersion').
     static [string]GetOpaVersion() {
         return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     }
 
+    # Loads configuration file with full validation enabled (delegates to main LoadConfig with SkipValidation=false).
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
         return $this.LoadConfig($Path, $false)
     }
 
+    # Primary config loading method. Resets singleton, validates file format, parses content, applies defaults.
+    # SkipValidation=true allows deferred validation after command-line overrides are applied.
     [Boolean]LoadConfig([System.IO.FileInfo]$Path, [Boolean]$SkipValidation){
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
@@ -137,17 +151,9 @@ class ScubaConfig {
         return [ScubaConfig]::_IsLoaded
     }
 
+    # Validates current configuration state after overrides. Performs schema + default checks + policy validation.
+    # Used for deferred validation pattern where config is loaded with SkipValidation=true then validated after overrides.
     [void]ValidateConfiguration(){
-        <#
-        .SYNOPSIS
-        Validates the current configuration after all overrides have been applied.
-        .DESCRIPTION
-        This method performs business rule validation on the current configuration state.
-        It should be called after command-line parameters have been applied to override
-        config file values, ensuring the final configuration is validated rather than
-        just the file contents.
-        #>
-        [ScubaConfig]::InitializeValidator()
 
         Write-Debug "Validating final configuration state"
 
@@ -176,6 +182,7 @@ class ScubaConfig {
         # Legacy validation for policy IDs (respect validation flags)
         $Defaults = [ScubaConfig]::_ConfigDefaults
 
+        # Validate OmitPolicy entries if present and validation not disabled
         if ($this.Configuration.ContainsKey("OmitPolicy") -and $Defaults.validation.validateOmitPolicy -ne $false) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
@@ -185,6 +192,7 @@ class ScubaConfig {
             }
         }
 
+        # Validate AnnotatePolicy entries if present and validation not disabled
         if ($this.Configuration.ContainsKey("AnnotatePolicy") -and $Defaults.validation.validateAnnotatePolicy -ne $false) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
@@ -204,10 +212,13 @@ class ScubaConfig {
         }
     }
 
+    # Clears configuration data from singleton instance. Used by ResetInstance() for clean state.
     hidden [void]ClearConfiguration(){
         $this.Configuration = $null
     }
 
+    # Recursively converts PSCustomObject to hashtable for internal storage compatibility.
+    # YAML parsing creates PSCustomObjects, but internal config uses hashtables for performance.
     hidden static [hashtable] ConvertPSObjectToHashtable([PSCustomObject]$Object) {
         $Hashtable = @{}
         foreach ($Property in $Object.PSObject.Properties) {
@@ -233,6 +244,7 @@ class ScubaConfig {
         return $Hashtable
     }
 
+    # Validates policy configuration entries for format compliance and product alignment.
     hidden static [void] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
         [ScubaConfig]::InitializeValidator()
         $Defaults = [ScubaConfig]::_ConfigDefaults
@@ -268,9 +280,10 @@ class ScubaConfig {
         }
     }
 
-    hidden [Guid]$Uuid = [Guid]::NewGuid()
+    # Internal configuration storage as hashtable
     hidden [hashtable]$Configuration
 
+    # Applies default values and processes special configuration properties (wildcards, path expansion).
     hidden [void]SetParameterDefaults(){
         Write-Debug "Setting ScubaConfig default values from configuration."
 
@@ -313,9 +326,11 @@ class ScubaConfig {
         return
     }
 
+    # enforces singleton pattern by preventing direct instantiation.
     hidden ScubaConfig(){
     }
 
+    # Resets singleton to clean state. Primarily used in testing scenarios for isolation.
     static [void]ResetInstance(){
         [ScubaConfig]::_Instance.ClearConfiguration()
         [ScubaConfig]::_IsLoaded = $false
@@ -328,42 +343,49 @@ class ScubaConfig {
         return
     }
 
+    # Returns the singleton instance. Initializes validator subsystem on first access.
     static [ScubaConfig]GetInstance(){
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_Instance
     }
 
-    # Additional utility methods for JSON-based configuration
+    # Returns configuration defaults object loaded from ScubaConfigDefaults.json.
     static [object] GetConfigDefaults() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults
     }
 
+    # Returns JSON Schema object loaded from ScubaConfigSchema.json for configuration validation.
     static [object] GetConfigSchema() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigSchema
     }
 
+    # Validates configuration file without loading it. Returns detailed validation results.
     static [ValidationResult] ValidateConfigFile([string]$Path) {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfigValidator]::ValidateYamlFile($Path)
     }
 
+    # Returns array of all supported product names from defaults configuration.
     static [array] GetSupportedProducts() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames
     }
 
+    # Returns array of supported M365 environment names (commercial, gcc, gcchigh, dod).
     static [array] GetSupportedEnvironments() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults.M365Environment.PSObject.Properties.Name
     }
 
+    # Returns configuration information for specified product (baseline file, capabilities, etc.).
     static [object] GetProductInfo([string]$ProductName) {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults.products.$ProductName
     }
 
+    # Returns array of privileged administrative roles for security validation.
     static [array] GetPrivilegedRoles() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults.privilegedRoles
