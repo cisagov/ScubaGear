@@ -263,7 +263,7 @@ class ScubaConfigValidator {
         if ($ConfigObject.M365Environment) {
             $ValidEnvironments = $Schema.properties.M365Environment.enum
             if ($ConfigObject.M365Environment -notin $ValidEnvironments) {
-                $Validation.Errors += "Invalid M365Environment '$($ConfigObject.M365Environment)'. Valid environments: $($ValidEnvironments -join ', ')"
+                $Validation.Errors += "Property 'M365Environment' value '$($ConfigObject.M365Environment)' is not valid. Valid environments: $($ValidEnvironments -join ', ')"
             }
         }
 
@@ -274,7 +274,7 @@ class ScubaConfigValidator {
                 $Validation.Errors += "Property 'Organization' value '$($ConfigObject.Organization)' is not a valid fully qualified domain name (FQDN)"
             }
         }
-
+        <#
         # Validate AppId format
         if ($ConfigObject.AppId) {
             $GuidPattern = $Schema.properties.AppId.pattern
@@ -290,6 +290,7 @@ class ScubaConfigValidator {
                 $Validation.Errors += "CertificateThumbprint '$($ConfigObject.CertificateThumbprint)' must be 40 hexadecimal characters"
             }
         }
+        #>
 
         # Validate additionalProperties constraint (enforce "additionalProperties": false)
         if ($Schema.additionalProperties -eq $false) {
@@ -401,7 +402,7 @@ class ScubaConfigValidator {
             # Generate format example from pattern
             $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($PolicyPattern, $ProductInPolicy)
 
-            $Result.Error = "Policy ID '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
+            $Result.Error = "Policy ID: '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
             return $Result
         }
 
@@ -417,7 +418,7 @@ class ScubaConfigValidator {
             }
 
             if ($Defaults.validation.requireProductInPolicy -and $ProductInPolicy -notin $EffectiveProducts) {
-                $Result.Error = "Policy '$PolicyId' references product '$ProductInPolicy' which is not in the selected ProductNames: $($EffectiveProducts -join ', ')"
+                $Result.Error = "Policy ID: '$PolicyId' references product '$ProductInPolicy' which is not in the selected ProductNames: $($EffectiveProducts -join ', ')"
                 return $Result
             }
         }
@@ -486,7 +487,7 @@ class ScubaConfigValidator {
 
             if ($PolicyExclusions) {
                 # Validate against the schema recursively
-                [ScubaConfigValidator]::ValidateObjectAgainstSchema($PolicyExclusions, $ProductSchema, $Validation, "Policy '$PolicyId'")
+                [ScubaConfigValidator]::ValidateObjectAgainstSchema($PolicyExclusions, $ProductSchema, $Validation, "Policy ID: '$PolicyId'")
             }
         }
     }
@@ -540,6 +541,16 @@ class ScubaConfigValidator {
                             $PatternSchema = $PropertySchema.patternProperties.$Pattern
                             [ScubaConfigValidator]::ValidateItemAgainstSchema($KeyValue, $PatternSchema, $Validation, "$Context key '$Key'")
                             $PatternMatched = $true
+
+                            # Additional validation for policy IDs (OmitPolicy/AnnotatePolicy)
+                            if ($Context -match "OmitPolicy|AnnotatePolicy") {
+                                $Defaults = [ScubaConfigValidator]::GetDefaults()
+                                $ProductNames = $Defaults.defaults.AllProductNames
+                                $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($Key, $ProductNames)
+                                if (-not $PolicyValidation.IsValid) {
+                                    $Validation.Errors += $PolicyValidation.Error
+                                }
+                            }
                             break  # Stop after first matching pattern
                         }
                     }
@@ -745,8 +756,6 @@ class ScubaConfigValidator {
         if ($ConfigObject.OrgName) {
             if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgName)) {
                 $Validation.Errors += "OrgName cannot be empty or contain only whitespace"
-            } elseif ($ConfigObject.OrgName.Length -gt 100) {
-                $Validation.Errors += "OrgName cannot exceed 100 characters"
             }
         }
 
@@ -754,8 +763,6 @@ class ScubaConfigValidator {
         if ($ConfigObject.OrgUnitName) {
             if ([string]::IsNullOrWhiteSpace($ConfigObject.OrgUnitName)) {
                 $Validation.Errors += "OrgUnitName cannot be empty or contain only whitespace"
-            } elseif ($ConfigObject.OrgUnitName.Length -gt 100) {
-                $Validation.Errors += "OrgUnitName cannot exceed 100 characters"
             }
         }
     }
