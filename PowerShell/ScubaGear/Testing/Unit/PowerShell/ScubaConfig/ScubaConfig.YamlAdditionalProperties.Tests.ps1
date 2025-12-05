@@ -44,8 +44,16 @@ Describe "ScubaConfig Additional Properties Validation" {
                             $result[$key] = @{}
                         }
                         else {
-                            # Simple value
-                            $result[$key] = $value
+                            # Simple value - parse boolean types correctly
+                            if ($value -eq 'true' -or $value -eq 'True') {
+                                $result[$key] = $true
+                            }
+                            elseif ($value -eq 'false' -or $value -eq 'False') {
+                                $result[$key] = $false
+                            }
+                            else {
+                                $result[$key] = $value
+                            }
                             $arrayMode = $false
                         }
                     }
