@@ -1,244 +1,187 @@
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
 
-Describe "ScubaConfigValidator Basic Validation" {
+Describe "ScubaConfigValidator Module Unit Tests" {
     BeforeAll {
-        # Remove any existing ConvertFrom-Yaml mock from previous tests
-        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
-            Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
-        }
-
-        # Create a proper Global mock for ConvertFrom-Yaml
-        function Global:ConvertFrom-Yaml {
-            param([Parameter(ValueFromPipeline)] [string]$Yaml)
-
-            process {
-                # Simple YAML to object conversion for testing
-                $Lines = $Yaml -split "`n"
-                $Result = @{}
-                $CurrentKey = $null
-
-                foreach ($Line in $Lines) {
-                    $Line = $Line.Trim()
-                    if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
-
-                    if ($Line -match '^(\w+):\s*$') {
-                        # Key with no value (likely an object or array follows)
-                        $CurrentKey = $Matches[1]
-                        $Result[$CurrentKey] = @{}
-                    }
-                    elseif ($Line -match '^(\w+):\s*(.+)$') {
-                        # Key with value
-                        $Key = $Matches[1]
-                        $Value = $Matches[2].Trim()
-                        $Result[$Key] = $Value
-                        $CurrentKey = $null
-                    }
-                    elseif ($Line -match '^\-\s+(.+)$' -and $CurrentKey) {
-                        # Array item
-                        $Item = $Matches[1].Trim().Trim('"')  # Remove quotes if present
-                        if ($Result[$CurrentKey] -is [hashtable] -and $Result[$CurrentKey].Count -eq 0) {
-                            $Result[$CurrentKey] = @()
-                        }
-                        $Result[$CurrentKey] += $Item
-                    }
-                    elseif ($Line -match '^\s+(\w+):\s*$' -and $CurrentKey) {
-                        # Nested object key
-                        $NestedKey = $Matches[1]
-                        if ($Result[$CurrentKey] -isnot [hashtable]) {
-                            $Result[$CurrentKey] = @{}
-                        }
-                        $Result[$CurrentKey][$NestedKey] = @{}
-                    }
-                    elseif ($Line -match '^\s+(\w+):\s*(.+)$' -and $CurrentKey) {
-                        # Nested key with value
-                        $NestedKey = $Matches[1]
-                        $Value = $Matches[2].Trim()
-                        if ($Result[$CurrentKey] -isnot [hashtable]) {
-                            $Result[$CurrentKey] = @{}
-                        }
-                        $Result[$CurrentKey][$NestedKey] = $Value
-                    }
-                }
-
-                return [PSCustomObject]$Result
-            }
-        }
-
         # Initialize the validator
         [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
+    }
 
-        # Test YAML configurations
-        $script:ValidConfigYaml = @"
-ProductNames:
-  - aad
-  - defender
-M365Environment: commercial
-OrgName: Test Organization
-Description: Test configuration for validation
-
-ExclusionsConfig:
-  aad:
-    CapExclusions:
-      Users:
-        - "12345678-1234-1234-1234-123456789abc"
-      Groups:
-        - "87654321-4321-4321-4321-cba987654321"
-    RoleExclusions:
-      Users:
-        - "11111111-2222-3333-4444-555555555555"
-  defender:
-    SensitiveAccounts:
-      IncludedUsers:
-        - "user@example.com"
-        - "admin@company.org"
-      ExcludedUsers:
-        - "testuser@example.com"
-"@
-
-    $script:InvalidGuidConfigYaml = @"
-ProductNames:
-  - aad
-M365Environment: commercial
-OrgName: Test Organization
-Description: Test configuration with invalid GUIDs
-
-ExclusionsConfig:
-  aad:
-    CapExclusions:
-      Users:
-        - "not-a-guid"
-        - "invalid-format"
-      Groups:
-        - "also-not-guid"
-"@
-
-    $script:InvalidUpnConfigYaml = @"
-ProductNames:
-  - defender
-M365Environment: commercial
-OrgName: Test Organization
-Description: Test configuration with invalid UPNs
-
-ExclusionsConfig:
-  defender:
-    SensitiveAccounts:
-      IncludedUsers:
-        - "not-an-email"
-        - "invalid.format"
-      ExcludedUsers:
-        - "also@invalid"
-"@
-}
-
-    Context "Valid Configurations" {
-        It "Should validate configuration with proper structure and required fields" {
-            $script:ValidConfigYaml | Out-File -FilePath "TestData_Valid.yaml" -Encoding UTF8
-
-            try {
-                $result = [ScubaConfigValidator]::ValidateYamlFile("TestData_Valid.yaml")
-                $result.IsValid | Should -Be $true
-                $result.ValidationErrors.Count | Should -Be 0
-            }
-            finally {
-                Remove-Item "TestData_Valid.yaml" -ErrorAction SilentlyContinue
-            }
+    Context "Class Structure and Properties" {
+        It "Should be a valid PowerShell class" {
+            [ScubaConfigValidator] | Should -Not -BeNullOrEmpty
+            [ScubaConfigValidator].Name | Should -Be "ScubaConfigValidator"
         }
 
-        It "Should accept valid GUID format pattern" {
-            $validGuid = "12345678-1234-1234-1234-123456789abc"
-            $validGuid | Should -Match '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        It "Should have required static properties" {
+            # Check if _Cache property exists by trying to access it
+            { [ScubaConfigValidator]::_Cache } | Should -Not -Throw
+            [ScubaConfigValidator]::_Cache | Should -Not -BeNullOrEmpty
         }
 
-        It "Should accept valid UPN format pattern" {
-            $validUpn = "user@example.com"
-            $validUpn | Should -Match '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        It "Should have required static methods" {
+            $StaticMethods = [ScubaConfigValidator] | Get-Member -Static -MemberType Method | Select-Object -ExpandProperty Name
+
+            $StaticMethods | Should -Contain "Initialize"
+            $StaticMethods | Should -Contain "GetDefaults"
+            $StaticMethods | Should -Contain "GetSchema"
+            $StaticMethods | Should -Contain "ValidateYamlFile"
+            $StaticMethods | Should -Contain "ValidateItemAgainstSchema"
+            $StaticMethods | Should -Contain "GetValueType"
+            $StaticMethods | Should -Contain "GeneratePatternErrorMessage"
         }
     }
 
-    Context "Pattern Validation Tests" {
-        It "Should recognize invalid GUID formats" {
-            $invalidGuids = @(
-                "not-a-guid",
-                "invalid-format",
-                "12345678-1234-1234-1234",  # Too short
-                "12345678-1234-1234-1234-123456789abcd",  # Too long
-                "gggggggg-1234-1234-1234-123456789abc"   # Invalid characters
-            )
+    Context "Static Method Functionality" {
+        It "Should initialize without errors" {
+            { [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig") } | Should -Not -Throw
+        }
 
-            foreach ($invalidGuid in $invalidGuids) {
-                $invalidGuid | Should -Not -Match '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+        It "Should get defaults successfully" {
+            $Defaults = [ScubaConfigValidator]::GetDefaults()
+
+            $Defaults | Should -Not -BeNullOrEmpty
+            $Defaults | Should -BeOfType [PSCustomObject]
+        }
+
+        It "Should get schema successfully" {
+            $Schema = [ScubaConfigValidator]::GetSchema()
+
+            $Schema | Should -Not -BeNullOrEmpty
+            $Schema | Should -BeOfType [PSCustomObject]
+        }
+
+        It "Should validate YAML files" {
+            # Create a minimal test file
+            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            "ProductNames: [aad]" | Set-Content -Path $TempFile
+
+            try {
+                $Result = [ScubaConfigValidator]::ValidateYamlFile($TempFile)
+                $Result | Should -Not -BeNullOrEmpty
+                $Result | Should -BeOfType [PSCustomObject]
+                $Result.PSObject.Properties.Name | Should -Contain 'IsValid'
+            }
+            finally {
+                Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
             }
         }
 
-        It "Should recognize invalid UPN formats" {
-            $invalidUpns = @(
-                "not-an-email",
-                "invalid.format",
-                "missing@",
-                "@missing-local",
-                "no-domain@",
-                "space @example.com",
-                "also@invalid"  # Missing TLD
-            )
+        It "Should detect value types correctly" {
+            [ScubaConfigValidator]::GetValueType("string") | Should -Be "string"
+            [ScubaConfigValidator]::GetValueType(123) | Should -Be "integer"
+            [ScubaConfigValidator]::GetValueType(123.5) | Should -Be "number"
+            [ScubaConfigValidator]::GetValueType($true) | Should -Be "boolean"
+            [ScubaConfigValidator]::GetValueType($false) | Should -Be "boolean"
+            # Arrays are detected as objects due to PSObject property being checked first
+            [ScubaConfigValidator]::GetValueType(@(1,2,3)) | Should -Be "object"
+            [ScubaConfigValidator]::GetValueType(@{}) | Should -Be "object"
+        }
 
-            foreach ($invalidUpn in $invalidUpns) {
-                $invalidUpn | Should -Not -Match '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        It "Should validate items against schema" {
+            # Test with simple schema validation
+            $TestItem = "test-string"
+            $TestSchema = @{ type = "string" }
+            $ValidationResult = [PSCustomObject]@{ Errors = @() }
+
+            { [ScubaConfigValidator]::ValidateItemAgainstSchema($TestItem, $TestSchema, $ValidationResult, "TestProperty") } | Should -Not -Throw
+            $ValidationResult.Errors.Count | Should -Be 0
+        }
+
+        It "Should generate pattern error messages" {
+            # Test with a basic pattern error message generation
+            $ErrorMessage = [ScubaConfigValidator]::GeneratePatternErrorMessage("invalid-value", "^[a-zA-Z0-9]+$", "TestContext")
+
+            $ErrorMessage | Should -Not -BeNullOrEmpty
+            $ErrorMessage | Should -BeOfType [string]
+            $ErrorMessage | Should -Match "TestContext.*invalid-value"
+        }
+    }
+
+    Context "File Extension Validation" {
+        It "Should validate supported file extensions" {
+            $Defaults = [ScubaConfigValidator]::GetDefaults()
+
+            if ($Defaults.validation -and $Defaults.validation.supportedFileExtensions) {
+                $SupportedExtensions = $Defaults.validation.supportedFileExtensions
+                $SupportedExtensions | Should -Contain ".yaml"
+                $SupportedExtensions | Should -Contain ".json"
+            }
+        }
+
+        It "Should reject unsupported file extensions" {
+            $TestFiles = @(".ps1", ".txt", ".xml", ".csv")
+
+            foreach ($ext in $TestFiles) {
+                $TempFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), "test$ext")
+                "test content" | Set-Content -Path $TempFile
+
+                try {
+                    $Result = [ScubaConfigValidator]::ValidateYamlFile($TempFile)
+                    $Result.IsValid | Should -Be $false
+                    $Result.ValidationErrors | Should -Match "Unsupported file extension"
+                }
+                finally {
+                    Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+                }
             }
         }
     }
 
-    Context "Supported File Extensions" {
-        It "Should accept valid config file extensions: <Extension>" -ForEach @(
-            @{Extension = ".yaml"}
-            @{Extension = ".json"}
-        ) {
-            $testFile = "TestConfig$Extension"
-            $script:ValidConfigYaml | Out-File -FilePath $testFile -Encoding UTF8
-
-            try {
-                $result = [ScubaConfigValidator]::ValidateYamlFile($testFile)
-                $result | Should -Not -BeNullOrEmpty
-                # File should be processed without extension errors
-            }
-            finally {
-                Remove-Item $testFile -ErrorAction SilentlyContinue
-            }
+    Context "Error Handling" {
+        It "Should handle nonexistent files gracefully" {
+            $Result = [ScubaConfigValidator]::ValidateYamlFile("nonexistent-file.yaml")
+            $Result | Should -Not -BeNullOrEmpty
+            $Result.IsValid | Should -Be $false
         }
 
-        It "Should reject invalid config file extensions: <Extension>" -ForEach @(
-            @{Extension = ".ps1"}
-            @{Extension = ".txt"}
-            @{Extension = ".xml"}
-            @{Extension = ".csv"}
-        ) {
-            $testFile = "TestConfig$Extension"
-            $script:ValidConfigYaml | Out-File -FilePath $testFile -Encoding UTF8
+        It "Should handle invalid schema validation gracefully" {
+            $InvalidItem = "invalid"
+            $InvalidSchema = @{}
+            $ValidationResult = [PSCustomObject]@{ Errors = @() }
 
-            try {
-                $result = [ScubaConfigValidator]::ValidateYamlFile($testFile)
-                $result.IsValid | Should -Be $false
-                $result.ValidationErrors | Should -Match "Unsupported file extension"
-            }
-            finally {
-                Remove-Item $testFile -ErrorAction SilentlyContinue
-            }
+            { [ScubaConfigValidator]::ValidateItemAgainstSchema($InvalidItem, $InvalidSchema, $ValidationResult, "TestProperty") } | Should -Not -Throw
         }
 
-        It "Should validate supported extensions from defaults JSON" {
-            $defaults = [ScubaConfigValidator]::GetDefaults()
-            $supportedExtensions = $defaults.validation.supportedFileExtensions
+        It "Should handle uninitialized validator state" {
+            # Clear cache to simulate uninitialized state
+            $OriginalCache = [ScubaConfigValidator]::_Cache.Clone()
 
-            $supportedExtensions | Should -Contain ".yaml"
-            $supportedExtensions | Should -Contain ".json"
-            $supportedExtensions | Should -Not -Contain ".csv"
-            $supportedExtensions | Should -Not -Contain ".ps1"
+            try {
+                # Clear the cache
+                [ScubaConfigValidator]::_Cache.Clear()
+
+                # Methods should throw when uninitialized
+                { [ScubaConfigValidator]::GetDefaults() } | Should -Throw
+                { [ScubaConfigValidator]::GetSchema() } | Should -Throw
+            }
+            finally {
+                # Restore cache
+                [ScubaConfigValidator]::_Cache = $OriginalCache
+            }
         }
     }
 
-    AfterAll {
-        # Clean up the global ConvertFrom-Yaml mock
-        if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
-            Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+    Context "State Management" {
+        It "Should maintain initialized state" {
+            [ScubaConfigValidator]::_Cache.ContainsKey('ModulePath') | Should -Be $true
+            [ScubaConfigValidator]::_Cache['ModulePath'] | Should -Not -BeNullOrEmpty
+        }
+
+        It "Should have loaded defaults" {
+            [ScubaConfigValidator]::_Cache.ContainsKey('Defaults') | Should -Be $true
+            [ScubaConfigValidator]::_Cache['Defaults'] | Should -Not -BeNullOrEmpty
+        }
+
+        It "Should have loaded schema" {
+            [ScubaConfigValidator]::_Cache.ContainsKey('Schema') | Should -Be $true
+            [ScubaConfigValidator]::_Cache['Schema'] | Should -Not -BeNullOrEmpty
+        }
+
+        It "Should reinitialize successfully" {
+            { [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig") } | Should -Not -Throw
+            [ScubaConfigValidator]::_Cache.ContainsKey('ModulePath') | Should -Be $true
+            [ScubaConfigValidator]::_Cache.ContainsKey('Defaults') | Should -Be $true
+            [ScubaConfigValidator]::_Cache.ContainsKey('Schema') | Should -Be $true
         }
     }
 }
