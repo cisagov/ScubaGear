@@ -175,7 +175,7 @@ class ScubaConfig {
 
         # Legacy validation for policy IDs (respect validation flags)
         $Defaults = [ScubaConfig]::_ConfigDefaults
-        
+
         if ($this.Configuration.ContainsKey("OmitPolicy") -and $Defaults.validation.validateOmitPolicy -ne $false) {
             try {
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
