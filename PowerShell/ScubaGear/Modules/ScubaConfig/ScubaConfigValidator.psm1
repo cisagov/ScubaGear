@@ -267,30 +267,8 @@ class ScubaConfigValidator {
             }
         }
 
-        # Validate Organization format
-        if ($ConfigObject.Organization -and $Schema.properties -and $Schema.properties.Organization) {
-            $OrgPattern = $Schema.properties.Organization.pattern
-            if ($OrgPattern -and $ConfigObject.Organization -notmatch $OrgPattern) {
-                $Validation.Errors += "Property 'Organization' value '$($ConfigObject.Organization)' is not a valid fully qualified domain name (FQDN)"
-            }
-        }
-        <#
-        # Validate AppId format
-        if ($ConfigObject.AppId) {
-            $GuidPattern = $Schema.properties.AppId.pattern
-            if ($ConfigObject.AppId -notmatch $GuidPattern) {
-                $Validation.Errors += "AppId '$($ConfigObject.AppId)' is not a valid GUID format"
-            }
-        }
-
-        # Validate CertificateThumbprint format
-        if ($ConfigObject.CertificateThumbprint) {
-            $ThumbprintPattern = $Schema.properties.CertificateThumbprint.pattern
-            if ($ConfigObject.CertificateThumbprint -notmatch $ThumbprintPattern) {
-                $Validation.Errors += "CertificateThumbprint '$($ConfigObject.CertificateThumbprint)' must be 40 hexadecimal characters"
-            }
-        }
-        #>
+        # Validate properties that use $ref patterns by resolving the reference
+        [ScubaConfigValidator]::ValidateRefProperties($ConfigObject, $Schema, $Validation)
 
         # Validate additionalProperties constraint (enforce "additionalProperties": false)
         if ($Schema.additionalProperties -eq $false) {
@@ -356,6 +334,89 @@ class ScubaConfigValidator {
         }
 
         return $Validation
+    }
+
+    # Validates properties that use $ref by resolving the pattern from definitions
+    static [void] ValidateRefProperties([object]$ConfigObject, [object]$Schema, [PSCustomObject]$Validation) {
+        # Get all config properties
+        $ConfigProperties = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
+
+        foreach ($PropertyName in $ConfigProperties) {
+            $PropertyValue = $ConfigObject.$PropertyName
+            $PropertySchema = $Schema.properties.$PropertyName
+
+            # Skip if no property value or schema
+            if (-not $PropertyValue -or -not $PropertySchema) {
+                continue
+            }
+
+            # Check if this property uses $ref
+            if ($PropertySchema.'$ref') {
+                $RefPath = $PropertySchema.'$ref'
+
+                # Handle pattern references like "#/definitions/patterns/thumbprint"
+                if ($RefPath -match '^#/definitions/patterns/(.+)$') {
+                    $PatternName = $Matches[1]
+                    $PatternDef = $Schema.definitions.patterns.$PatternName
+
+                    if ($PatternDef -and $PatternDef.pattern) {
+                        # Validate the property value against the pattern
+                        if ($PropertyValue -notmatch $PatternDef.pattern) {
+                            $FriendlyName = if ($PatternDef.friendlyName) { $PatternDef.friendlyName } else { "required pattern" }
+                            $Validation.Errors += "Property '$PropertyName' value '$PropertyValue' does not match: $FriendlyName"
+                        }
+
+                        # Additional path existence validation if testPath is true
+                        if ($PatternDef.testPath -eq $true -and $PropertyValue -ne ".") {
+                            if (-not (Test-Path -Path $PropertyValue -PathType Container)) {
+                                $Validation.Errors += "Property '$PropertyName' path '$PropertyValue' does not exist or is not a directory"
+                            }
+                        }
+                    }
+                }
+
+                # Handle type references like "#/definitions/types/booleanWithTrueDefault"
+                if ($RefPath -match '^#/definitions/types/(.+)$') {
+                    $TypeName = $Matches[1]
+                    $TypeDef = $Schema.definitions.types.$TypeName
+
+                    if ($TypeDef -and $TypeDef.type) {
+                        # Validate the property value against the expected type
+                        $ExpectedType = $TypeDef.type
+                        $ActualType = [ScubaConfigValidator]::GetValueType($PropertyValue)
+
+                        if ($ActualType -ne $ExpectedType) {
+                            $Validation.Errors += "Property '$PropertyName' expected type '$ExpectedType' but got '$ActualType'"
+                        }
+                    }
+                }
+            }
+
+            # Check for testPath property directly on the property schema (for non-$ref properties)
+            if ($PropertySchema.testPath -eq $true -and $PropertyValue -and $PropertyValue -ne ".") {
+                if (-not (Test-Path -Path $PropertyValue -PathType Container)) {
+                    $Validation.Errors += "Property '$PropertyName' path '$PropertyValue' does not exist or is not a directory"
+                }
+            }
+
+            # Handle array items that use $ref (like PreferredDnsResolvers)
+            if ($PropertySchema.type -eq "array" -and $PropertySchema.items -and $PropertySchema.items.'$ref') {
+                $RefPath = $PropertySchema.items.'$ref'
+                if ($RefPath -match '^#/definitions/patterns/(.+)$') {
+                    $PatternName = $Matches[1]
+                    $PatternDef = $Schema.definitions.patterns.$PatternName
+
+                    if ($PatternDef -and $PatternDef.pattern -and $PropertyValue -is [array]) {
+                        foreach ($Item in $PropertyValue) {
+                            if ($Item -notmatch $PatternDef.pattern) {
+                                $FriendlyName = if ($PatternDef.friendlyName) { $PatternDef.friendlyName } else { "required pattern" }
+                                $Validation.Errors += "Property '$PropertyName' contains invalid item '$Item'. Expected: $FriendlyName"
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     # Performs business logic validation beyond basic schema compliance.
