@@ -21,9 +21,9 @@ The **License Requirements** sections of this document assume the organization i
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 # Baseline Policies
 
@@ -67,6 +67,7 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
@@ -215,6 +216,7 @@ Sharing files with external users via the usage of **Anyone links** or **Verific
 #### MS.SHAREPOINT.3.1v1
 Expiration days for Anyone links SHALL be set to 30 days or less.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
@@ -231,6 +233,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
@@ -246,6 +249,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->

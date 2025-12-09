@@ -43,9 +43,9 @@ the types of users are defined as follows:
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 

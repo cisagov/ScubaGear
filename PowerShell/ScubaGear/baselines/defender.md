@@ -33,9 +33,9 @@ The following are key terms and descriptions used in this document.
 
 **Sensitive Accounts**: This term denotes a set of user accounts that have access to sensitive and high-value information. Certain accounts—like those belonging to CEOs, CFOs, CISOs, and IT administrators—have access to highly sensitive data and critical systems, making them prime targets for cyberattacks. These accounts, referred to as priority accounts, require enhanced security measures to minimize the risk of compromise.
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Requires Configuration**: This indicator means that ScubaGear requires configuration via config file in order to check the policy.
 
@@ -289,7 +289,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
-[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](../../../docs/configuration/configuration.md#defender-configurations)
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-orange)](../../../docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
@@ -543,7 +543,7 @@ A list of apps that are restricted from accessing files protected by DLP policy 
 The custom policy SHOULD include an action to block access to sensitive
 information by restricted apps and unwanted Bluetooth applications.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](/defender.md#msdefender46v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./defender.md#msdefender46v1-instructions)
 
 <!--Policy: MS.DEFENDER.4.6v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files
@@ -770,7 +770,7 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
-[![Manual](https://img.shields.io/badge/Manual-green)](/defender.md#msdefender52sv1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./defender.md#msdefender52sv1-instructions)
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
@@ -883,7 +883,7 @@ Unified Audit logging SHALL be enabled.
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](/defender.md#msdefender63v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./defender.md#msdefender63v1-instructions)
 
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.

@@ -50,9 +50,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 interpreted as described in
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Configurable**: This indicator means that the policy can be customized via config file.
 
@@ -140,6 +140,7 @@ An SPF policy SHALL be published for each domain that fails all non-approved sen
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -212,6 +213,7 @@ Exchange Online Protection (EOP) features include DKIM signing capabilities.
 DKIM SHOULD be enabled for all domains.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ An adversary may modify the `FROM` field
@@ -268,6 +270,7 @@ A DMARC policy SHALL be published for every second-level domain.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
@@ -286,6 +289,7 @@ The DMARC message rejection option SHALL be p=reject.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (i.e., none, quarantine, and reject),
@@ -303,6 +307,7 @@ The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cy
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain

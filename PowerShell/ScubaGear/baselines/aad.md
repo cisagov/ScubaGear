@@ -32,9 +32,9 @@ Microsoft Entra ID tenant.
 
 **Resource Tenant & Home Tenant**: In scenarios where guest users are involved the **resource tenant** hosts the M365 target resources that the guest user is accessing. The **home tenant** is the one that hosts the guest user's identity.
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Configurable**: This indicator means that the policy can be customized via config file.
 
@@ -250,6 +250,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
@@ -298,7 +299,8 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 #### MS.AAD.3.5v1
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](./aad.md#msaad35v1-instructions)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 
 <!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
@@ -363,6 +365,7 @@ Managed Devices SHOULD be required to register MFA.
 Device code authentication SHOULD be blocked.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+[![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
 - _Rationale:_ The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.

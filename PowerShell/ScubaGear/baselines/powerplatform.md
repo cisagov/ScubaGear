@@ -62,9 +62,9 @@ often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
 
-**BOD 25-01 Requirement**: This indicator means that policy is required under CISA BOD 25-01
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
@@ -361,7 +361,7 @@ current canvas apps and model-driven apps at the Power Platform environment leve
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.
 
-[![Manual](https://img.shields.io/badge/Manual-green)](./powerplatform.md#mspowerplatform32v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./powerplatform.md#mspowerplatform41v1-instructions)
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
