@@ -4,6 +4,8 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
 Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     BeforeAll {
+    function Set-Utf8NoBom {}
+    Mock -ModuleName Orchestrator Set-Utf8NoBom {}
         function Export-AADProvider {}
         Mock -ModuleName Orchestrator Export-AADProvider {}
         function Export-EXOProvider {}
@@ -28,63 +30,57 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     }
     Context 'When running the providers on commercial tenants' {
         BeforeAll {
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProviderParameters')]
-            $ProviderParameters = @{
-                    OutFolderPath         = "./output";
-                    OutProviderFileName   = "ProviderSettingsExport";
-                    M365Environment       = "commercial";
-                    TenantDetails         = '{"DisplayName": "displayName"}';
-                    ModuleVersion         = '1.0';
-                    BoundParameters       = @{};
-                    Guid                  = "00000000-0000-0000-0000-000000000000";
-                    PreferredDnsResolvers = @();
-                    SkipDoH               = $false;
-            }
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
+              $ScubaConfig = [PSCustomObject]@{
+                 ProductNames = @('aad')
+                 OutProviderFileName = "ProviderSettingsExport"
+                 M365Environment = "commercial"
+                 OutRegoFileName = "TestResults"
+                 OutReportName = "BaselineReports"
+                 OPAPath = "."
+                 LogIn = $false
+                 PreferredDnsResolvers = @()
+                 SkipDoH = $false
+              }
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'TenantDetails')]
+              $TenantDetails = '{"DisplayName": "displayName"}'
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleVersion')]
+              $ModuleVersion = '1.0'
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
+              $OutFolderPath = "./output"
+              [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
+              $Guid = "00000000-0000-0000-0000-000000000000"
         }
         It 'With -ProductNames "aad", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("aad")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("aad")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "defender", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("defender")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("defender")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "exo", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("exo")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("exo")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "powerplatform", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("powerplatform")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("powerplatform")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "sharepoint", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("sharepoint")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("sharepoint")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With -ProductNames "teams", should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("teams")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("teams")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
         It 'With all products, should not throw' {
-            $ProviderParameters += @{
-                ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-            }
-            {Invoke-ProviderList @ProviderParameters} | Should -Not -Throw
+              $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
         }
     }
-    }
+}
 }
 
 AfterAll {
