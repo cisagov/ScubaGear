@@ -447,6 +447,8 @@ Power Apps supports discovery of apps by allowing makers to share canvas apps wi
 #### MS.POWERPLATFORM.6.1v1
 The Share with Everyone feature SHOULD be disabled.
 
+![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
+
 <!--Policy: MS.POWERPLATFORM.6.1v1; Criticality: SHOULD -->
 - _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, complicating auditing and access governance. The configuration setting is disabled by default; however, this is a defense-in-depth policy to protect against misconfigurations or malicious actors.
 - _Last Modified:_ October 2025
