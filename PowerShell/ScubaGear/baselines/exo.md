@@ -135,14 +135,14 @@ points.
 
 ### Policies
 
-#### MS.EXO.2.2v2
+#### MS.EXO.2.2v3
 An SPF policy SHALL be published for each domain that fails all non-approved senders.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-blue)
 [![Configurable](https://img.shields.io/badge/Configurable-purple)](../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains)
 
-<!--Policy: MS.EXO.2.2v1; Criticality: SHALL -->
+<!--Policy: MS.EXO.2.2v3; Criticality: SHALL -->
 - _Rationale:_ An adversary may modify the `FROM` field
 of an email such that it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
@@ -175,7 +175,7 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 
 ### Implementation
 
-#### MS.EXO.2.2v2 Instructions
+#### MS.EXO.2.2v3 Instructions
 First, identify any approved senders specific to your agency, e.g., any on-premises mail servers. SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.
 
 SPF is not configured through the Exchange admin center, but rather via
