@@ -290,7 +290,8 @@ function New-Report {
                         "OriginalResult"=$Result.DisplayString
                         "OriginalDetails"=$OriginalDetails
                         "Comments"=$Comments
-                        "ResolutionDate"= if ([string]::IsNullOrEmpty($OmitExpiration)) {"N/A"} else {$OmitExpiration}
+                        # Use null to clearly indicate absence of a date rather than the string "N/A"
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($OmitExpiration)) {$null} else {$OmitExpiration}
                     }
                     continue
                 }
@@ -320,7 +321,8 @@ function New-Report {
                         "OriginalResult"=$Result.DisplayString
                         "OriginalDetails"=$OriginalDetails
                         "Comments"=$Comments
-                        "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
+                        # Use null to clearly indicate absence of a date rather than the string "N/A"
+                        "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {$null} else {$RemediationDate}
                     }
                     continue
                 }
@@ -340,7 +342,8 @@ function New-Report {
                     "OriginalResult"=$Result.DisplayString
                     "OriginalDetails"=$OriginalDetails
                     "Comments"=$Comments
-                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {"N/A"} else {$RemediationDate}
+                    # Use null to clearly indicate absence of a date rather than the string "N/A"
+                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {$null} else {$RemediationDate}
                 }
             }
             else {
