@@ -770,7 +770,7 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
-[![Manual](https://img.shields.io/badge/Manual-green)](./defender.md#msdefender52sv1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-green)](./defender.md#msdefender52v1-instructions)
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
