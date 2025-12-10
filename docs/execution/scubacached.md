@@ -206,8 +206,7 @@ Testing if the tenant had the migration complete configured. Newer tenants do no
     "AuthenticationMethodConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22",
     "PolicyVersion":  "1.5",
     "PolicyMigrationState":  "migrationComplete",
-    "DisplayName":  null,
-    ...
+    "DisplayName":  null
 }
 ```
 
@@ -218,8 +217,7 @@ to :
     "AuthenticationMethodConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations%22",
     "PolicyVersion":  "1.5",
     "PolicyMigrationState":  null,
-    "DisplayName":  "Authentication Methods Policy",
-    ...
+    "DisplayName":  "Authentication Methods Policy"
 }
  ```
 
