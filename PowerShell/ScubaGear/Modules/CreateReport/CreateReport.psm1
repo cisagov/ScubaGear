@@ -364,8 +364,7 @@ function New-Report {
                     "OriginalResult"=$ControlResult
                     "OriginalDetails"=$ControlDetails
                     "Comments"=$Comments
-                    "AnnotationRemediationDate"="N/A"
-                    "OmissionExpirationDate"="N/A"
+                    "ResolutionDate"= if ([string]::IsNullOrEmpty($RemediationDate)) {$null} else {$RemediationDate}
                 }
                 Write-Warning -Message "WARNING: No test results found for Control Id $($Control.Id)"
             }
