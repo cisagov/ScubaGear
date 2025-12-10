@@ -73,7 +73,7 @@ Legacy authentication SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
@@ -129,7 +129,7 @@ Users detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
@@ -157,7 +157,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
@@ -234,7 +234,7 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
@@ -250,7 +250,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
@@ -317,7 +317,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
@@ -335,7 +335,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 Managed devices SHOULD be required for authentication.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
 - _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
@@ -349,7 +349,7 @@ Managed devices SHOULD be required for authentication.
 Managed Devices SHOULD be required to register MFA.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
@@ -365,7 +365,7 @@ Managed Devices SHOULD be required to register MFA.
 Device code authentication SHOULD be blocked.
 
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
 - _Rationale:_ The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
@@ -732,7 +732,7 @@ Permanent active role assignments SHALL NOT be allowed for highly privileged rol
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
-[![Configurable](https://img.shields.io/badge/Configurable-002868)](../../../docs/configuration/configuration.md#privileged-user-policy-exclusions)
+[![Configurable](https://img.shields.io/badge/Configurable-002D60)](../../../docs/configuration/configuration.md#privileged-user-policy-exclusions)
 
 
 <!--Policy: MS.AAD.7.4v1; Criticality: SHALL -->
