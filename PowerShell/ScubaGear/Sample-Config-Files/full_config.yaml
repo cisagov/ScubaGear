@@ -156,9 +156,9 @@ Defender:
       ExcludedUsers:
         - janedoe-ga@example.com
       ExcludedGroups:
-        - SG-MDE-SenseitiveAdmins@example.com
+        - SG-MDE-SensitiveAdmins@example.com
       ExcludedDomains:
-        - example.com
+        - contoso.com
 
   # Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
   MS.DEFENDER.1.5v1:
