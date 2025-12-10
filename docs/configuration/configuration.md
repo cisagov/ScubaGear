@@ -255,8 +255,8 @@ Defender:
       - "user1@contoso.com"
       - "user2@contoso.com"
     IncludedGroups:
-      - "C-Suite Executives"
-      - "IT Administrators"
+      - "C-Suite Executives@contoso.com"
+      - "IT Administrators@contoso.com"
     IncludedDomains:
       - "contoso.com"
     ExcludedUsers: []
