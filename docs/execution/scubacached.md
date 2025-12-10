@@ -250,7 +250,7 @@ If the cached data doesn't contain information for the requested products:
 > You may see this message repeated for each product not found:
 
 ```
-WARNING: WARNING: No test results found for Control Id: [Control Id]
+WARNING: WARNING: No test results found for Control Id [Control Id]
 ```
 
 **Solution**: Either:
