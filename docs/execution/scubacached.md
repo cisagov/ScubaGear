@@ -160,7 +160,7 @@ When testing Rego policies against specific configuration scenarios that can't b
 
 #### EXAMPLE 1
 
-For example, when testing AAD authentication policy migration settings
+For example, when testing Entra ID conditional access policy settings:
 
 1. Export provider data in full mode:
 
@@ -199,7 +199,7 @@ This approach allows you to test edge cases, policy combinations, or specific co
 
 #### EXAMPLE 2
 
-Testing if the tenant had the migration complete configured. Newer tenants do not have this option. To test this, you can change the results json to simulate an alternate pass. For exmample change:
+Testing if the tenant has the migration complete setting configured. Newer tenants do not have this option. To test this, you can change the results JSON to simulate an alternate pass. For exmample change:
 
 ```json
 "authentication_method_policy":  {
@@ -270,10 +270,10 @@ ConvertFrom-Json: Invalid JSON format
 
 ### Invalid or incorrect results
 
-If the results are looking incorrect when it generates a html report, this may be due to opa executable missing. Download opa from https://github.com/open-policy-agent/opa/releases
+If the results are looking incorrect when it generates a html report, this may be due to the OPA executable missing. Download OPA from https://github.com/open-policy-agent/opa/releases
 
 > [!IMPORTANT]
-> Make sure the file is named to: `opa_windows_amd64.exe`
+> Make sure the file is named: `opa_windows_amd64.exe`
 
 **Solution**: Rerun the Invoke-SCuBACached in cache mode with a new OPA path:
 
