@@ -53,6 +53,15 @@ Numerous policies in this baseline rely on Microsoft Entra ID Conditional Access
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to help prevent unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
 
+Assigning conditions within Conditional Access policies—such as device platform, location, or application filters—can unintentionally introduce gaps in policy coverage. While these conditions are designed to refine access controls, overly granular or misaligned configurations may exclude certain scenarios from enforcement. For example:
+
+- **Overlapping or conflicting conditions** can result in users or devices falling outside intended protections.
+- **Unaccounted exceptions** (e.g., new cloud apps or unmanaged devices) may bypass critical controls.
+- **Dynamic environments** (such as hybrid identities or evolving IP ranges) can render static conditions ineffective over time.
+
+These gaps undermine the security posture by creating blind spots where authentication and compliance requirements are not consistently applied. To mitigate this risk, organizations should regularly review CA policy logic, validate coverage against all user and device contexts, and implement monitoring to detect unintended exclusions.
+
+
 # Baseline Policies
 
 ## 1. Legacy Authentication
