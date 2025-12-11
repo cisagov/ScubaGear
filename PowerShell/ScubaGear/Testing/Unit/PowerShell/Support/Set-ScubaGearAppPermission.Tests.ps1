@@ -34,11 +34,6 @@ InModuleScope ServicePrincipal {
                     return $null
                 }
 
-                # Mock Invoke-MgGraphRequest for DELETE operations
-                Mock -CommandName Invoke-MgGraphRequest -MockWith {
-                    return $null
-                }
-
                 # Mock Invoke-GraphDirectly for role definition lookup (if MissingRoles exists)
                 Mock -CommandName Invoke-GraphDirectly -MockWith {
                     param($Commandlet, $queryParams)
@@ -59,7 +54,7 @@ InModuleScope ServicePrincipal {
                 }
             }
 
-            It "Verify changes when no current permissions are present" {
+            It "Verify needed permissions would be added, unneeded delegated permissions removed, Global Reader role added, and power platform registered" {
                 $NoCurrentPermissionsObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockNoCurrentPermissions.json") | ConvertFrom-Json
                 $Result = $NoCurrentPermissionsObject | Set-ScubaGearAppPermission -WhatIf
 
@@ -98,7 +93,7 @@ InModuleScope ServicePrincipal {
                                     })
                                     Version = "1"
                                     Id = "f2ef992c-3afb-46b9-b7cf-a126ee74c451"
-                                    Description = "Can read everything that a Global Administrator can, but not update anything."
+                                    Description = ""
                                     IsEnabled = $true
                                     InheritsPermissionsFrom = @(@{Id = "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"})
                                     ResourceScopes = @("/")
@@ -119,38 +114,9 @@ InModuleScope ServicePrincipal {
         }
 
         Context "Extra Permissions Tests" {
-            BeforeAll {
-                $ExtraPermissionObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockExtraPermissions.json") | ConvertFrom-Json
 
-                # Mock Get-ScubaGearPermissions for API URI generation
-                Mock -CommandName Get-ScubaGearPermissions -MockWith {
-                    param($outAs, $id)
-                    if ($outAs -eq 'api') {
-                        return "https://graph.microsoft.com/v1.0/servicePrincipals/$id/appRoleAssignments"
-                    }
-                    return $null
-                }
-
-                # Mock Invoke-MgGraphRequest for DELETE operations
-                Mock -CommandName Invoke-MgGraphRequest -MockWith {
-                    return $null
-                }
-
-                # Mock Invoke-GraphDirectly for app registration retrieval and update
-                Mock -CommandName Invoke-GraphDirectly -MockWith {
-                    param($Commandlet)
-
-                    if ($Commandlet -eq 'Get-MgBetaApplication') {
-                        # Return mock app registration with required resource access
-                        return $ExtraPermissionObject.ExtraPermissionsDetails
-                    }
-                    elseif ($Commandlet -eq 'Update-MgBetaApplication') {
-                        return $null
-                    }
-                    return $null
-                }
-            }
             It "Verify changes would be made if extra permissions are detected" {
+                $ExtraPermissionObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockExtraPermissions.json") | ConvertFrom-Json
                 $ExtraPermissionInputObject = $ExtraPermissionObject
                 $Result = $ExtraPermissionInputObject | Set-ScubaGearAppPermission -WhatIf
                 $Result[0] | Should -Be "WhatIf: Would remove extra permissions: Acronym.Read.All"
@@ -158,29 +124,6 @@ InModuleScope ServicePrincipal {
         }
 
         Context "Power Platform Registration Tests" {
-            BeforeAll {
-                # Mock for Power Platform operations
-                Mock -CommandName Invoke-GraphDirectly -MockWith {
-                    param($Commandlet)
-
-                    if ($Commandlet -eq 'Get-MgServicePrincipal') {
-                        # Mock Power Platform service principal lookup
-                        return @{
-                            Value = @{
-                                Id = "powerplatform-sp-id-12345"
-                                AppId = "powerplatform-app-id"
-                            }
-                        }
-                    }
-                    elseif ($Commandlet -eq 'Remove-MgServicePrincipalAppRoleAssignment') {
-                        return $null
-                    }
-                    elseif ($Commandlet -eq 'New-MgServicePrincipalAppRoleAssignment') {
-                        return $null
-                    }
-                    return $null
-                }
-            }
 
             It "Verify Power Platform would be removed when registered but not needed" {
                 $PowerPlatformUnneededObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockPowerPlatformUnneeded.json") | ConvertFrom-Json
@@ -205,10 +148,6 @@ InModuleScope ServicePrincipal {
                     if ($outAs -eq 'api') {
                         return "https://graph.microsoft.com/v1.0/servicePrincipals/$id/appRoleAssignments"
                     }
-                    return $null
-                }
-
-                Mock -CommandName Invoke-MgGraphRequest -MockWith {
                     return $null
                 }
 
@@ -243,6 +182,28 @@ InModuleScope ServicePrincipal {
                 $Result[0] | Should -Be "WhatIf: Would remove extra permissions: Acronym.Read.All"
                 $Result[1] | Should -Be "WhatIf: Would add missing permissions: Policy.Read.All"
                 $Result[2] | Should -Be "WhatIf: Would assign directory role 'Global Reader' to 00000000-0000-0000-0000-000000000001"
+            }
+        }
+
+        Context "Handle permissions in App Registration Manifest that are not granted admin consent" {
+
+            It "Verify permissions in manifest that only need to be granted admin consent" {
+                $MissingAdminConsentPermissionsObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockManifestMissingAdminConsent.json") | ConvertFrom-Json
+                $Result = $MissingAdminConsentPermissionsObject | Set-ScubaGearAppPermission -WhatIf
+
+                # Verify expected message is present
+                $Result[0] | Should -Be "WhatIf: Would add missing permissions: User.Read.All, Exchange.ManageAsApp"
+            }
+        }
+
+        Context "Verify both exchange permissions are present in GCC High environments" {
+
+            It "Verify Microsoft Exchange Online Protection Exchange.ManageAsApp permission is handled correctly in GCC High" {
+                $MissingAdminConsentPermissionsObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockMissingGCCHighExoPermission.json") | ConvertFrom-Json
+                $Result = $MissingAdminConsentPermissionsObject | Set-ScubaGearAppPermission -WhatIf
+
+                # Verify expected message is present
+                $Result[0] | Should -Be "WhatIf: Would add missing permissions: Exchange.ManageAsApp"
             }
         }
     }

@@ -6,11 +6,12 @@
         "exo",
         "sharepoint",
         "teams",
-        "powerPlatform",
+        "powerplatform",
         "defender"
     ],
     "ServicePrincipalID":  "00000000-0000-0000-0000-000000000002",
     "MissingPermissions":  false,
+    "PermissionsNotInManifest":  false,
     "ExtraPermissions":  false,
     "ExtraPermissionsDetails":  false,
     "DelegatedPermissions":  false,
@@ -178,14 +179,7 @@
             "AppRoleId":  "dc50a0fb-09a3-484d-be87-e023b12c6440"
         }
     ],
-    "CurrentDelegatedPerms":  {
-        "Consented":  [
-
-                    ],
-        "NotConsented":  {
-
-                        }
-    },
+    "CurrentDelegatedGrants":  [],
     "AppRoleIDs":  [
         {
             "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",

@@ -109,10 +109,12 @@ function Compare-ScubaGearRole {
 function Compare-ScubaGearPermission {
     <#
     .SYNOPSIS
-        Compares the service principal permissions against the required permissions.
+        Compares the service principal's actual granted permissions against the required permissions.
 
     .DESCRIPTION
-        This function will compare the service principal permissions against the required permissions. If the service principal is missing any permissions, the function will return the missing permissions.
+        This function checks the service principal's actual granted permissions (via admin consent) against the required permissions for ScubaGear.
+        It does NOT check the app registration manifest (requiredResourceAccess) - only what has been actually granted.
+        If the service principal is missing any required permissions or has extra permissions, the function will return them.
 
     .PARAMETER ServicePrincipalID
         Used to define the AppID of the service principal that will be checked for permissions.
@@ -130,7 +132,7 @@ function Compare-ScubaGearPermission {
         Used to pass in the service principal permissions if already obtained. This can be used to skip the call to Microsoft Graph to get the service principal permissions.
 
     .PARAMETER ProductNames
-        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerPlatform", "defender", and "*". The default is to check for all permissions.
+        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "defender", and "*". The default is to check for all permissions.
 
     .EXAMPLE
         Compare-ScubaGearPermission -ServicePrincipalID "AppID" -AppRoleIDs $AppRoleIDs -M365Environment commercial
@@ -177,7 +179,7 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerPlatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -189,7 +191,7 @@ function Compare-ScubaGearPermission {
             $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes @("Application.Read.All")
             Write-Verbose "Connected to Microsoft Graph in Compare-ScubaGearPermission"
 
-            # Check to see if the service principal is already assigned to the API permissions
+            # Check actual granted permissions via app role assignments (admin consent status)
             $SPPerms = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipalAppRoleAssignment -M365Environment $M365Environment -id $ServicePrincipalID).Value
         } catch {
             Write-Warning "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
@@ -284,7 +286,7 @@ function Compare-ScubaGearPermission {
 
     # Handle case where service principal has NO permissions at all
     if ($null -eq $SPPerms -or $SPPerms.Count -eq 0) {
-        Write-Output "No service principal permissions found, all required permissions are missing."
+        Write-Output "No service principal permissions found, all granted permissions are missing."
 
         # All filtered permissions are missing
         foreach ($appRole in $FilteredAppRoleIDs) {
@@ -327,9 +329,9 @@ function Compare-ScubaGearPermission {
 
         $missingPermsCount = $SPMissingPerms.leastPermissions.Count
         if($missingPermsCount -eq 0){
-            Write-Output "Service Principal permissions comparison completed, no API permissions missing."
+            Write-Output "Service Principal has all granted permissions (admin consent verified)."
         }else{
-            Write-Output "Service Principal permissions comparison completed, $missingPermsCount API permissions missing."
+            Write-Output "Service Principal is missing $missingPermsCount granted permissions (admin consent required)."
         }
 
         # Determine if the service principal has any extra permissions
@@ -857,7 +859,7 @@ function Get-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be assessing and only compare against those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerPlatform', 'defender', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*' (which includes all products)
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames 'aad'
@@ -902,7 +904,7 @@ function Get-ScubaGearAppPermission {
         [string]$M365Environment,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerPlatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -919,7 +921,7 @@ function Get-ScubaGearAppPermission {
 
     if($ProductNames -contains '*'){
         # If wildcard is specified, include all products
-        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerPlatform', 'defender')
+        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
     }
 
     # Check Power Platform registration - always check to report current status
@@ -970,17 +972,39 @@ function Get-ScubaGearAppPermission {
     }
     Write-Verbose "Found $($uniqueResourceIdsHash.Count) unique resource IDs"
 
-    # Collect resource App IDs from app registration (for delegated permissions)
-    $requiredAccess = if ($appReg.requiredResourceAccess) { $appReg.requiredResourceAccess } else { $appReg.RequiredResourceAccess }
-    if ($requiredAccess) {
-        Write-Verbose "Collecting unique App IDs from required resource access"
-        foreach ($resource in $requiredAccess) {
+    # Collect resource IDs from actual OAuth2 permission grants (delegated permissions)
+    if ($SPPermsDelegatedConsented) {
+        Write-Verbose "Collecting unique resource IDs from OAuth2 permission grants"
+        foreach ($grant in $SPPermsDelegatedConsented) {
+            $resId = if ($grant.resourceId) { $grant.resourceId } else { $grant.ResourceId }
+            if ($resId -and -not $uniqueResourceIdsHash.ContainsKey($resId)) {
+                $uniqueResourceIdsHash[$resId] = $true
+            }
+        }
+        Write-Verbose "Found $($uniqueResourceIdsHash.Count) total unique resource IDs (including OAuth2 grants)"
+    }
+
+    # Also collect App IDs from manifest for delegated permission resolution
+    $requiredResourceAccess = if ($appReg.requiredResourceAccess) { $appReg.requiredResourceAccess } else { $appReg.RequiredResourceAccess }
+    if ($requiredResourceAccess) {
+        Write-Verbose "Collecting unique App IDs from manifest for delegated permissions"
+        Write-Verbose "Found $($requiredResourceAccess.Count) resource(s) in manifest"
+        foreach ($resource in $requiredResourceAccess) {
             $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+
+            # Count permission types for debugging
+            $roleCount = @($resourceAccess | Where-Object { ($_.type -eq 'Role') -or ($_.Type -eq 'Role') }).Count
+            $scopeCount = @($resourceAccess | Where-Object { ($_.type -eq 'Scope') -or ($_.Type -eq 'Scope') }).Count
+            Write-Verbose "  Resource $resAppId has $roleCount Role permission(s) and $scopeCount Scope permission(s)"
+
             if ($resAppId -and -not $uniqueAppIdsHash.ContainsKey($resAppId)) {
                 $uniqueAppIdsHash[$resAppId] = $true
             }
         }
-        Write-Verbose "Found $($uniqueAppIdsHash.Count) unique App IDs"
+        Write-Verbose "Found $($uniqueAppIdsHash.Count) unique App IDs from manifest"
+    } else {
+        Write-Verbose "No requiredResourceAccess found in app registration manifest"
     }
 
     # Build batch request - OPTIMIZATION: Use ArrayList for better performance
@@ -1043,25 +1067,24 @@ function Get-ScubaGearAppPermission {
         }
     }
 
-    # Process delegated permissions - handle both property name cases
-    $requiredResourceAccess = if ($appReg.requiredResourceAccess) { $appReg.requiredResourceAccess } else { $appReg.RequiredResourceAccess }
-
-    $SPPermsDelegatedNotConsented = if ($requiredResourceAccess) {
-        $requiredResourceAccess | ForEach-Object {
-            $resourceAccess = if ($_.resourceAccess) { $_.resourceAccess } else { $_.ResourceAccess }
-            $resourceAccess | Where-Object {
+    # Build list of application permissions from manifest (requiredResourceAccess already retrieved earlier)
+    $ManifestAppPermissions = @()
+    if ($requiredResourceAccess) {
+        foreach ($resource in $requiredResourceAccess) {
+            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+            $appPermissions = $resourceAccess | Where-Object {
                 $type = if ($_.type) { $_.type } else { $_.Type }
-                $type -eq 'Scope'
+                $type -eq 'Role'
+            }
+            foreach ($perm in $appPermissions) {
+                $permId = if ($perm.id) { $perm.id } else { $perm.Id }
+                $ManifestAppPermissions += $permId
             }
         }
-    } else {
-        @()
     }
 
-    $SPPermsDelegated = @{
-        Consented    = $SPPermsDelegatedConsented
-        NotConsented = $SPPermsDelegatedNotConsented
-    }
+    # Process delegated permissions - only use actual consented grants
+    $SPPermsDelegated = $SPPermsDelegatedConsented
 
     # Create permissions object with SkipConnect to avoid redundant connections
     Write-Verbose "Getting ScubaGear app role IDs"
@@ -1071,59 +1094,150 @@ function Get-ScubaGearAppPermission {
     Write-Verbose "Comparing service principal permissions"
     $SPComparePerms = Compare-ScubaGearPermission -AppRoleIDs $AppRoleIDs -M365Environment $M365Environment -SPPerms $SPPermsApplication -ProductNames $ProductNames -SkipConnect
 
-    $SPMissingPerms = if ($SPComparePerms.HasMissingPermissions) { $SPComparePerms.MissingPermissions } else { $false }
-    $SPExtraPerms   = if ($SPComparePerms.HasExtraPermissions)   { $SPComparePerms.ExtraPermissions   } else { $false }
+    # All permissions missing from actual grants go in MissingPermissions
+    # Add InManifest property to help Set-ScubaGearAppPermission know what to do
+    $SPMissingPerms = @()
 
-    # Process delegated permissions using cached data
-    $DelegatedPerms = $false
-    if (($SPPermsDelegated.Consented.Id.Count -gt 0) -or ($SPPermsDelegated.NotConsented.Id.Count -gt 0)) {
-    #if ($SPPermsDelegated.Consented.Id.Count -gt 0) {
+    if ($SPComparePerms.HasMissingPermissions) {
+        foreach ($missingPerm in $SPComparePerms.MissingPermissions) {
+            $inManifest = $ManifestAppPermissions -contains $missingPerm.AppRoleID
 
-        $scopeList = @()
-
-        # Add scopes from consented grants - handle both property cases
-        if ($SPPermsDelegated.Consented) {
-            foreach ($grant in $SPPermsDelegated.Consented) {
-                $scope = if ($grant.scope) { $grant.scope } else { $grant.Scope }
-                if ($scope) {
-                    $scopeList += $scope -split ' '
-                }
-            }
+            # Add InManifest property to the permission object
+            $missingPerm | Add-Member -MemberType NoteProperty -Name 'InManifest' -Value $inManifest -Force
+            $SPMissingPerms += $missingPerm
         }
+    }
 
-        # Use cached resource SPs for delegated permissions
-        if ($SPPermsDelegated.NotConsented.Id.Count -gt 0) {
-            $requiredResourceAccess = if ($appReg.requiredResourceAccess) { $appReg.requiredResourceAccess } else { $appReg.RequiredResourceAccess }
-            foreach ($resource in $requiredResourceAccess) {
-                $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
-                $scopePermissions = $resourceAccess | Where-Object {
-                    $type = if ($_.type) { $_.type } else { $_.Type }
-                    $type -eq 'Scope'
-                }
+    if ($SPMissingPerms.Count -eq 0) { $SPMissingPerms = $false }
 
-                if ($scopePermissions) {
-                    # Use cached resource SP
-                    $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+    # Check for required permissions that are granted but NOT in manifest
+    # These need to be added to the manifest (they're in "Other permissions granted")
+    $PermissionsNotInManifest = @()
+    $requiredAppRoleIds = @($AppRoleIDs | ForEach-Object { $_.AppRoleID })
+    $grantedAppRoleIds = @($SPPermsApplication | ForEach-Object {
+        if ($_.appRoleId) { $_.appRoleId } else { $_.AppRoleId }
+    })
+
+    foreach ($requiredRole in $AppRoleIDs) {
+        $roleId = $requiredRole.AppRoleID
+        # If this permission is required AND granted but NOT in manifest
+        if (($grantedAppRoleIds -contains $roleId) -and ($ManifestAppPermissions -notcontains $roleId)) {
+            Write-Verbose "Found required permission granted but not in manifest: $($requiredRole.APIName)"
+            $PermissionsNotInManifest += $requiredRole.APIName
+        }
+    }
+
+    if ($PermissionsNotInManifest.Count -eq 0) { $PermissionsNotInManifest = $false }
+
+    # Get extra permissions from actual grants
+    $SPExtraPerms = if ($SPComparePerms.HasExtraPermissions) { $SPComparePerms.ExtraPermissions } else { @() }
+
+    # Also check manifest for application permissions that aren't consented and aren't needed
+    if ($requiredResourceAccess) {
+        Write-Verbose "Checking manifest for unconsented application permissions"
+        $grantedAppRoleIds = @($SPPermsApplication | ForEach-Object {
+            if ($_.appRoleId) { $_.appRoleId } else { $_.AppRoleId }
+        })
+        $requiredAppRoleIds = @($AppRoleIDs | ForEach-Object { $_.AppRoleID })
+
+        foreach ($resource in $requiredResourceAccess) {
+            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+            $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+
+            $appPermissions = @($resourceAccess | Where-Object {
+                ($_.type -eq 'Role') -or ($_.Type -eq 'Role')
+            })
+
+            foreach ($appPerm in $appPermissions) {
+                $permId = if ($appPerm.id) { $appPerm.id } else { $appPerm.Id }
+
+                # If this permission is in manifest but NOT granted AND NOT required
+                if (($grantedAppRoleIds -notcontains $permId) -and ($requiredAppRoleIds -notcontains $permId)) {
+                    Write-Verbose "Found unconsented application permission in manifest: $permId"
+
+                    # Look up the permission name
                     $resourceSP = $resourceSPByAppIdCache[$resAppId]
-
                     if ($resourceSP) {
-                        foreach ($scopePerm in $scopePermissions) {
-                            $scopePermId = if ($scopePerm.id) { $scopePerm.id } else { $scopePerm.Id }
-                            $oauth2Scopes = if ($resourceSP.oauth2PermissionScopes) { $resourceSP.oauth2PermissionScopes } else { $resourceSP.Oauth2PermissionScopes }
-                            $permissionDetail = $oauth2Scopes | Where-Object {
-                                $permId = if ($_.id) { $_.id } else { $_.Id }
-                                $permId -eq $scopePermId
-                            }
-                            if ($permissionDetail) {
-                                $value = if ($permissionDetail.value) { $permissionDetail.value } else { $permissionDetail.Value }
-                                $scopeList += $value
+                        $appRoles = if ($resourceSP.appRoles) { $resourceSP.appRoles } else { $resourceSP.AppRoles }
+                        $appRole = $appRoles | Where-Object {
+                            $roleId = if ($_.id) { $_.id } else { $_.Id }
+                            $roleId -eq $permId
+                        }
+                        if ($appRole) {
+                            $permName = if ($appRole.value) { $appRole.value } else { $appRole.Value }
+                            if ($SPExtraPerms -isnot [array]) { $SPExtraPerms = @() }
+                            if ($SPExtraPerms -notcontains $permName) {
+                                Write-Verbose "Adding unconsented permission to extra list: $permName"
+                                $SPExtraPerms += $permName
                             }
                         }
                     }
                 }
             }
         }
+    }
 
+    if ($SPExtraPerms.Count -eq 0) { $SPExtraPerms = $false }
+
+    # Process delegated permissions - check both consented grants AND manifest
+    $DelegatedPerms = $false
+    $scopeList = @()
+
+    # First, get scopes from consented grants
+    if ($SPPermsDelegated -and $SPPermsDelegated.Count -gt 0) {
+        foreach ($grant in $SPPermsDelegated) {
+            $scope = if ($grant.scope) { $grant.scope } else { $grant.Scope }
+            if ($scope) {
+                $scopeList += $scope -split ' '
+            }
+        }
+    }
+
+    # Also check manifest for delegated (Scope type) permissions even if not consented
+    if ($requiredResourceAccess) {
+        Write-Verbose "Checking manifest for delegated (Scope type) permissions"
+        foreach ($resource in $requiredResourceAccess) {
+            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+            $delegatedPermissions = @($resourceAccess | Where-Object {
+                ($_.type -eq 'Scope') -or ($_.Type -eq 'Scope')
+            })
+
+            # If there are any Scope-type permissions, we need to flag them
+            if ($delegatedPermissions -and $delegatedPermissions.Count -gt 0) {
+                Write-Verbose "Found $($delegatedPermissions.Count) delegated permission(s) in manifest"
+
+                # For each delegated permission, get its name from the resource SP
+                $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+                Write-Verbose "Looking up resource SP for AppId: $resAppId"
+
+                $resourceSP = $resourceSPByAppIdCache[$resAppId]
+
+                if ($resourceSP) {
+                    Write-Verbose "Found resource SP in cache for $resAppId"
+                    foreach ($delegatedPerm in $delegatedPermissions) {
+                        $permId = if ($delegatedPerm.id) { $delegatedPerm.id } else { $delegatedPerm.Id }
+                        $oauth2Scopes = if ($resourceSP.oauth2PermissionScopes) { $resourceSP.oauth2PermissionScopes } else { $resourceSP.Oauth2PermissionScopes }
+                        $scopeDetail = $oauth2Scopes | Where-Object {
+                            $scopeId = if ($_.id) { $_.id } else { $_.Id }
+                            $scopeId -eq $permId
+                        }
+                        if ($scopeDetail) {
+                            $scopeValue = if ($scopeDetail.value) { $scopeDetail.value } else { $scopeDetail.Value }
+                            Write-Verbose "Adding delegated permission: $scopeValue"
+                            $scopeList += $scopeValue
+                        } else {
+                            Write-Verbose "Could not find scope detail for permission ID: $permId"
+                        }
+                    }
+                } else {
+                    Write-Warning "Resource SP not found in cache for AppId: $resAppId. Delegated permissions cannot be resolved. Run with -Verbose for details."
+                    Write-Verbose "Available cache keys: $($resourceSPByAppIdCache.Keys -join ', ')"
+                }
+            }
+        }
+    }
+
+    if ($scopeList.Count -gt 0) {
         $DelegatedPerms = ($scopeList | Select-Object -Unique)
     }
 
@@ -1170,24 +1284,41 @@ function Get-ScubaGearAppPermission {
 
     # Check if Power Platform is registered (only if it's in the product list)
     $powerPlatformOK = $true
-    if ($ProductNames -contains 'powerPlatform' -and $PowerPlatformCheck -eq $false) {
+    if ($ProductNames -contains 'powerplatform' -and $PowerPlatformCheck -eq $false) {
         $powerPlatformOK = $false
     }
     # Also check if Power Platform is registered but not needed
-    if ($PowerPlatformCheck -eq $true -and $ProductNames -notcontains 'powerPlatform') {
+    if ($PowerPlatformCheck -eq $true -and $ProductNames -notcontains 'powerplatform') {
         $powerPlatformOK = $false
     }
 
     # Create Status based on all conditions with detailed information
-    if (($SPMissingPerms -eq $false) -and ($SPExtraPerms -eq $false) -and ($DelegatedPerms -eq $false) -and (-not $SPRoleAssignment.Missing) -and ($powerPlatformOK -eq $true)) {
+    if (($SPMissingPerms -eq $false) -and ($PermissionsNotInManifest -eq $false) -and ($SPExtraPerms -eq $false) -and ($DelegatedPerms -eq $false) -and (-not $SPRoleAssignment.Missing) -and ($powerPlatformOK -eq $true)) {
         $Status = "No action needed, service principal is setup correctly."
     } else {
         $statusParts = @()
 
-        # Add missing permissions details
+        # Add missing permissions details - separate by InManifest property
         if ($SPMissingPerms -ne $false -and @($SPMissingPerms).Count -gt 0) {
-            $missingPermsList = ($SPMissingPerms | ForEach-Object { $_.Permission }) -join ', '
-            $statusParts += "missing permissions [$missingPermsList]"
+            # Separate into not in manifest vs in manifest
+            $notInManifest = @($SPMissingPerms | Where-Object { -not $_.InManifest })
+            $inManifest = @($SPMissingPerms | Where-Object { $_.InManifest })
+
+            if ($notInManifest.Count -gt 0) {
+                $notInManifestList = ($notInManifest | ForEach-Object { $_.Permission }) -join ', '
+                $statusParts += "missing permissions [$notInManifestList] (need to be added to manifest)"
+            }
+
+            if ($inManifest.Count -gt 0) {
+                $inManifestList = ($inManifest | ForEach-Object { $_.Permission }) -join ', '
+                $statusParts += "permissions [$inManifestList] (in manifest, just need admin consent)"
+            }
+        }
+
+        # Add permissions that are granted but not in manifest
+        if ($PermissionsNotInManifest -ne $false -and @($PermissionsNotInManifest).Count -gt 0) {
+            $permNotInManifestList = $PermissionsNotInManifest -join ', '
+            $statusParts += "permissions [$permNotInManifestList] (granted but need to be added to manifest)"
         }
 
         # Add extra permissions details
@@ -1207,10 +1338,10 @@ function Get-ScubaGearAppPermission {
         }
 
         # Add Power Platform registration status if it's registered but not in the product list
-        if ($PowerPlatformCheck -eq $true -and $ProductNames -notcontains 'powerPlatform') {
+        if ($PowerPlatformCheck -eq $true -and $ProductNames -notcontains 'powerplatform') {
             $statusParts += "Power Platform registered but not required for selected products"
         }
-        elseif ($PowerPlatformCheck -eq $false -and $ProductNames -contains 'powerPlatform') {
+        elseif ($PowerPlatformCheck -eq $false -and $ProductNames -contains 'powerplatform') {
             $statusParts += "Power Platform not registered"
         }
 
@@ -1230,6 +1361,7 @@ function Get-ScubaGearAppPermission {
         ProductNames             = $ProductNames
         ServicePrincipalID       = $SP.Id
         MissingPermissions       = $SPMissingPerms
+        PermissionsNotInManifest = $PermissionsNotInManifest
         ExtraPermissions         = $SPExtraPerms
         ExtraPermissionsDetails  = if ($ExtraPermsWithDetails.Count -gt 0) { $ExtraPermsWithDetails } else { $false }
         DelegatedPermissions     = $DelegatedPerms
@@ -1237,19 +1369,19 @@ function Get-ScubaGearAppPermission {
         PowerPlatformRegistered  = $PowerPlatformCheck
         ScubaGearSPPermissions   = $ScubaGearSPPermissions
         CurrentPermissions       = $SPPermsApplication
-        CurrentDelegatedPerms    = $SPPermsDelegated
+        CurrentDelegatedGrants   = $SPPermsDelegated
         AppRoleIDs               = $AppRoleIDs
         Status                   = $Status
     }
 
     # Output the object for pipeline use
-    if($InputObject.MissingPermissions -or $InputObject.ExtraPermissions -or $InputObject.MissingRoles -or $InputObject.DelegatedPermissions -or ($InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerPlatform') -or ($InputObject.PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerPlatform')) {
+    if($InputObject.MissingPermissions -or $InputObject.PermissionsNotInManifest -or $InputObject.ExtraPermissions -or $InputObject.MissingRoles -or $InputObject.DelegatedPermissions -or ($InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerplatform') -or ($InputObject.PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform')) {
         # Add new property to $InputObject for FixPermissionIssues
         $ProductNamesString = ($ProductNames | ForEach-Object { "'$_'" }) -join ', '
         $InputObject | Add-Member -MemberType NoteProperty -Name FixPermissionIssues -Value "Get-ScubaGearAppPermission -AppID $AppID -M365Environment $M365Environment -ProductNames $ProductNamesString | Set-ScubaGearAppPermission" -Force
-        Update-TypeData -TypeName 'SCuBA.Permissions' -DefaultDisplayPropertySet 'AppID', 'M365Environment', 'MissingPermissions', 'ExtraPermissions', 'MissingRoles', 'DelegatedPermissions', 'PowerPlatformRegistered', 'FixPermissionIssues', 'Status' -Force
+        Update-TypeData -TypeName 'SCuBA.Permissions' -DefaultDisplayPropertySet 'AppID', 'M365Environment', 'MissingPermissions', 'PermissionsNotInManifest', 'ExtraPermissions', 'MissingRoles', 'DelegatedPermissions', 'PowerPlatformRegistered', 'FixPermissionIssues', 'Status' -Force
     } else {
-        Update-TypeData -TypeName 'SCuBA.Permissions' -DefaultDisplayPropertySet 'AppID', 'M365Environment', 'MissingPermissions', 'ExtraPermissions', 'MissingRoles', 'DelegatedPermissions', 'PowerPlatformRegistered', 'Status' -Force
+        Update-TypeData -TypeName 'SCuBA.Permissions' -DefaultDisplayPropertySet 'AppID', 'M365Environment', 'MissingPermissions', 'PermissionsNotInManifest', 'ExtraPermissions', 'MissingRoles', 'DelegatedPermissions', 'PowerPlatformRegistered', 'Status' -Force
     }
 
     return $InputObject
@@ -1258,26 +1390,39 @@ function Get-ScubaGearAppPermission {
 function Set-ScubaGearAppPermission {
     <#
     .SYNOPSIS
-        Applies missing permissions and roles to a service principal, based on piped input from Get-ScubaGearAppPermission.
+        Applies missing permissions and roles to a service principal, based on piped input from Get-ScubaGearAppPermission or direct parameters.
 
     .DESCRIPTION
-        This function takes the output object from Get-ScubaGearAppPermission (via pipeline or parameter) and applies any missing API permissions and directory roles to the specified service principal.
+        This function can work in two ways:
+        1. Accept piped input from Get-ScubaGearAppPermission (automatic mode)
+        2. Accept direct parameters for standalone operation (manual mode)
 
     .PARAMETER InputObject
         The object output from Get-ScubaGearAppPermission, containing AppID, M365Environment, MissingPermissions, and MissingRoles.
+        Used when piping from Get-ScubaGearAppPermission.
+
+    .PARAMETER AppID
+        The Application (client) ID of the service principal. Required when not using pipeline.
+
+    .PARAMETER M365Environment
+        The Microsoft 365 environment. Required when not using pipeline.
+        Valid values are: commercial, gcc, gcchigh, dod
+
+    .PARAMETER ProductNames
+        Products to configure permissions for. Required when not using pipeline.
+        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*'
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames "aad" | Set-ScubaGearAppPermission
+        Pipeline mode - uses InputObject from Get-ScubaGearAppPermission
 
     .EXAMPLE
-        Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames "aad", "exo" | Set-ScubaGearAppPermission
-
-        Fixes missing permissions and roles for AAD and Exchange Online.
+        Set-ScubaGearAppPermission -AppID "00000000-0000-0000-0000-000000000000" -M365Environment commercial -ProductNames 'aad', 'exo'
+        Standalone mode - directly fix permissions for specified products
 
     .EXAMPLE
-        Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames '*' | Set-ScubaGearAppPermission -WhatIf
-
-        Shows what changes would be made without actually applying them.
+        Set-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames '*' -WhatIf
+        Standalone mode with WhatIf - shows what changes would be made
 
     .OUTPUTS
         None. Outputs status messages to the console.
@@ -1285,12 +1430,47 @@ function Set-ScubaGearAppPermission {
     .NOTES
         Author       : ScubaGear Team
         Prerequisite : PowerShell 5.1 or later
-
     #>
-   [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+   [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'High',
+        DefaultParameterSetName = 'Pipeline'
+    )]
     param(
-        [Parameter(ValueFromPipeline = $true, Mandatory = $true)]
-        [PSCustomObject]$InputObject
+        # Pipeline parameter set
+        [Parameter(
+            ValueFromPipeline = $true,
+            Mandatory = $true,
+            ParameterSetName = 'Pipeline'
+        )]
+        [PSCustomObject]$InputObject,
+
+        # Standalone parameter set
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Standalone'
+        )]
+        [ValidateScript({
+            if ([guid]::TryParse($_, [ref][guid]::Empty)) {
+                return $true
+            }
+            throw "AppID must be a valid GUID format: $($_)"
+        })]
+        [string]$AppID,
+
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Standalone'
+        )]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [string]$M365Environment,
+
+        [Parameter(
+            Mandatory = $true,
+            ParameterSetName = 'Standalone'
+        )]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
+        [string[]]$ProductNames
     )
 
     Begin {
@@ -1300,18 +1480,47 @@ function Set-ScubaGearAppPermission {
     }
 
     process {
+        # Determine which parameter set is being used
+        if ($PSCmdlet.ParameterSetName -eq 'Standalone') {
+            Write-Verbose "Running in standalone mode - fetching current permissions"
+
+            # Handle wildcard for ProductNames
+            #if ($ProductNames -contains '*') {
+            #    $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
+            #}
+
+            # Call Get-ScubaGearAppPermission to build the InputObject
+            try {
+                $InputObject = Get-ScubaGearAppPermission -AppID $AppID -M365Environment $M365Environment -ProductNames $ProductNames
+
+                if (-not $InputObject) {
+                    Write-Warning "Failed to retrieve current permissions for AppID $AppID"
+                    return
+                }
+            }
+            catch {
+                Write-Error "Failed to retrieve permissions: $($_.Exception.Message)"
+                return
+            }
+        }
+        else {
+            Write-Verbose "Running in pipeline mode - using provided InputObject"
+        }
+
         # Lets set some variables
         $AppID = $InputObject.AppID
         $M365Environment = $InputObject.M365Environment
         $MissingPermissions = $InputObject.MissingPermissions
+        $PermissionsNotInManifest = $InputObject.PermissionsNotInManifest
         $ExtraPermissions = $InputObject.ExtraPermissions
-        $ExtraPermissionsDetails = $InputObject.ExtraPermissionsDetails  # NEW
+        $ExtraPermissionsDetails = $InputObject.ExtraPermissionsDetails
         $delegatedPermissions = $InputObject.DelegatedPermissions
-        $CurrentDelegatedPerms = $InputObject.CurrentDelegatedPerms
+        $CurrentDelegatedGrants = $InputObject.CurrentDelegatedGrants
         $MissingRoles = $InputObject.MissingRoles
         $ServicePrincipalID = $InputObject.ServicePrincipalID
         $ScubaGearSPPermissions = $InputObject.ScubaGearSPPermissions
         $CurrentPermissions = $InputObject.CurrentPermissions
+        $AppRoleIDs = $InputObject.AppRoleIDs
         $PowerPlatformRegistered = $InputObject.PowerPlatformRegistered
 
         if (-not $AppID -or -not $M365Environment) {
@@ -1320,15 +1529,17 @@ function Set-ScubaGearAppPermission {
         }
 
         # Check if there's anything to fix - use @() to ensure Count works with single items
-        $hasDelegatedPerms = ($CurrentDelegatedPerms.Consented.Id.Count -gt 0) -or ($CurrentDelegatedPerms.NotConsented.Id.Count -gt 0)
-        $hasExtraPerms = ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0)
+        $hasDelegatedPerms = ($delegatedPermissions -ne $false -and @($delegatedPermissions).Count -gt 0)
+        # Check both ExtraPermissions (includes manifest-only) and ExtraPermissionsDetails (consented only)
+        $hasExtraPerms = (($ExtraPermissions -ne $false -and @($ExtraPermissions).Count -gt 0) -or ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0))
         $hasMissingPerms = ($MissingPermissions -ne $false -and @($MissingPermissions).Count -gt 0)
+        $hasPermsNotInManifest = ($PermissionsNotInManifest -ne $false -and @($PermissionsNotInManifest).Count -gt 0)
         $hasMissingRoles = ($MissingRoles -ne $false -and @($MissingRoles).Count -gt 0)
         $needsPowerPlatform = ($PowerPlatformRegistered -eq $false)
-        $hasUnwantedPowerPlatform = ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerPlatform')
+        $hasUnwantedPowerPlatform = ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform')
 
         # Check if anything needs to be done
-        $needsChanges = $hasDelegatedPerms -or $hasExtraPerms -or $hasMissingPerms -or $hasMissingRoles -or $needsPowerPlatform -or $hasUnwantedPowerPlatform
+        $needsChanges = $hasDelegatedPerms -or $hasExtraPerms -or $hasMissingPerms -or $hasPermsNotInManifest -or $hasMissingRoles -or $needsPowerPlatform -or $hasUnwantedPowerPlatform
 
         if (-not $needsChanges) {
             Write-Output "No changes needed - service principal is already configured correctly."
@@ -1339,31 +1550,31 @@ function Set-ScubaGearAppPermission {
         $script:changesMade = $true
         $script:lastAppID = $AppID
 
-        try {
-            $allScopes = @("Application.ReadWrite.All", "AppRoleAssignment.ReadWrite.All", "RoleManagement.ReadWrite.Directory")
-            $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes $allScopes
-            Write-Verbose "Successfully connected to Microsoft Graph"
-        } catch {
-            Write-Warning "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
-            return
+        # Only connect if we're actually making changes (not in WhatIf mode)
+        if (-not $WhatIfPreference) {
+            try {
+                $allScopes = @("Application.ReadWrite.All", "AppRoleAssignment.ReadWrite.All", "RoleManagement.ReadWrite.Directory")
+                $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes $allScopes
+                Write-Verbose "Successfully connected to Microsoft Graph"
+            } catch {
+                Write-Warning "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
+                return
+            }
         }
 
         $target = "Service Principal [$AppID] in $M365Environment"
 
-        # STEP 1: Remove delegated permissions (both consented and not-consented)
-        # Check if CurrentDelegatedPerms has either Consented or NotConsented items
-        $hasDelegatedPerms = ($CurrentDelegatedPerms.Consented.Id.Count -gt 0) -or ($CurrentDelegatedPerms.NotConsented.Id.Count -gt 0)
-
+        # STEP 1: Remove delegated permissions
         if ($delegatedPermissions -ne $false -and $hasDelegatedPerms) {
             if ($PSCmdlet.ShouldProcess($target, "Remove delegated permissions: $($delegatedPermissions -join ', ')")) {
                 try {
-                    Write-Verbose "Removing delegated permissions from service principal and app registration"
+                    Write-Verbose "Removing delegated permissions from service principal"
 
-                    # PART A: Remove OAuth2 permission grants (CONSENTED delegated permissions)
-                    if ($CurrentDelegatedPerms.Consented.Id.Count -gt 0) {
-                        Write-Verbose "Removing $($CurrentDelegatedPerms.Consented.Id.Count) consented delegated permission grant(s)"
+                    # Part 1: Remove OAuth2 permission grants (consented delegated permissions)
+                    if ($CurrentDelegatedGrants -and $CurrentDelegatedGrants.Count -gt 0) {
+                        Write-Verbose "Removing $($CurrentDelegatedGrants.Count) delegated permission grant(s)"
 
-                        foreach ($grant in $CurrentDelegatedPerms.Consented) {
+                        foreach ($grant in $CurrentDelegatedGrants) {
                             try {
                                 $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgOauth2PermissionGrant -Environment $M365Environment -outAs api -id $grant.Id)
                                 Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
@@ -1375,70 +1586,8 @@ function Set-ScubaGearAppPermission {
                         Write-Output "Removed consented delegated permissions"
                     }
 
-                    # PART B: Remove Scope-type permissions from app registration manifest (NOT-CONSENTED)
-                    if ($CurrentDelegatedPerms.NotConsented.Id.Count -gt 0) {
-                        Write-Verbose "Removing $($CurrentDelegatedPerms.NotConsented.Id.Count) not-consented delegated permission(s) from manifest"
-
-                        $appResponse = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
-                            '$filter' = "appId eq '$AppID'"
-                        }).Value
-
-                        if ($appResponse -and $appResponse.requiredResourceAccess) {
-                            $updatedResourceAccess = @()
-
-                            foreach ($resource in $appResponse.requiredResourceAccess) {
-                                # Keep only Role-type permissions, filter out ALL Scope-type
-                                $filteredAccess = @($resource.resourceAccess | Where-Object { $_.type -eq 'Role' })
-
-                                # Only include this resource if it still has Role permissions
-                                if ($filteredAccess.Count -gt 0) {
-                                    # Convert to simple array of hashtables
-                                    $resourceAccessArray = @()
-                                    foreach ($access in $filteredAccess) {
-                                        $resourceAccessArray += @{
-                                            id = $access.id
-                                            type = $access.type
-                                        }
-                                    }
-
-                                    $updatedResourceAccess += @{
-                                        resourceAppId = $resource.resourceAppId
-                                        resourceAccess = $resourceAccessArray
-                                    }
-                                }
-                            }
-
-                            $Body = @{
-                                requiredResourceAccess = $updatedResourceAccess
-                            }
-
-                            Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
-                            Write-Output "Removed not-consented delegated permissions from app registration manifest"
-                        }
-                    }
-                } catch {
-                    Write-Warning "Failed to remove delegated permissions: $($_.Exception.Message)"
-                }
-            } else {
-                Write-Output "WhatIf: Would remove delegated permissions: $($delegatedPermissions -join ', ')"
-            }
-        }
-
-        # STEP 2a: Remove ONLY extra permissions if they exist - using data we already have
-        if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
-            if ($PSCmdlet.ShouldProcess($target, "Remove extra permissions: $($ExtraPermissions -join ', ')")) {
-                try {
-                    Write-Verbose "Removing only extra permissions from service principal"
-
-                    # Part 1: Remove the app role assignments (admin consent)
-                    foreach ($extraPerm in $ExtraPermissionsDetails) {
-                        $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
-                        Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
-                        Write-Output "Removed extra permission: $($extraPerm.PermissionName)"
-                    }
-
-                    # Part 2: Remove extra permissions from app registration manifest
-                    Write-Verbose "Removing extra permissions from app registration manifest"
+                    # Part 2: Remove delegated (Scope) permissions from app registration manifest
+                    Write-Verbose "Removing delegated (Scope type) permissions from app registration manifest"
                     $appResponse = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
                         '$filter' = "appId eq '$AppID'"
                     }).Value
@@ -1446,16 +1595,13 @@ function Set-ScubaGearAppPermission {
                     if ($appResponse -and $appResponse.requiredResourceAccess) {
                         $updatedResourceAccess = @()
 
-                        # Collect the AppRoleIDs of extra permissions to remove
-                        $extraAppRoleIds = $ExtraPermissionsDetails | ForEach-Object { $_.AppRoleId }
-
                         foreach ($resource in $appResponse.requiredResourceAccess) {
-                            # Filter out the extra permissions (keep only Role-type that are NOT extra)
+                            # Keep only Role-type permissions, filter out ALL Scope-type
                             $filteredAccess = @($resource.resourceAccess | Where-Object {
-                                $_.type -eq 'Role' -and $extraAppRoleIds -notcontains $_.id
+                                ($_.type -eq 'Role') -or ($_.Type -eq 'Role')
                             })
 
-                            # Only include this resource if it still has permissions
+                            # Only include this resource if it still has Role permissions
                             if ($filteredAccess.Count -gt 0) {
                                 $resourceAccessArray = @()
                                 foreach ($access in $filteredAccess) {
@@ -1477,23 +1623,155 @@ function Set-ScubaGearAppPermission {
                         }
 
                         Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
-                        Write-Output "Removed extra permissions from app registration manifest"
+                        Write-Output "Removed delegated permissions from app registration manifest"
+                    }
+                } catch {
+                    Write-Warning "Failed to remove delegated permissions: $($_.Exception.Message)"
+                }
+            } else {
+                if ($delegatedPermissions -and @($delegatedPermissions).Count -gt 0) {
+                    Write-Output "WhatIf: Would remove delegated permissions: $($delegatedPermissions -join ', ')"
+                }
+            }
+        }
+
+        # STEP 2a: Remove extra permissions (both consented and manifest-only)
+        if ($hasExtraPerms) {
+            if ($PSCmdlet.ShouldProcess($target, "Remove extra permissions: $($ExtraPermissions -join ', ')")) {
+                try {
+                    Write-Verbose "Removing extra permissions from service principal"
+
+                    # Part 1: Remove app role assignments (admin consent) - only for consented extra permissions
+                    if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
+                        foreach ($extraPerm in $ExtraPermissionsDetails) {
+                            $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
+                            Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                            Write-Output "Removed consented extra permission: $($extraPerm.PermissionName)"
+                        }
+                    }
+
+                    # Part 2: Remove ALL extra permissions from app registration manifest
+                    Write-Verbose "Removing extra permissions from app registration manifest"
+                    $appResponse = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
+                        '$filter' = "appId eq '$AppID'"
+                    }).Value
+
+                    if ($appResponse -and $appResponse.requiredResourceAccess) {
+                        # Build list of AppRoleIds to remove
+                        $extraAppRoleIds = @()
+
+                        # First, add AppRoleIds from ExtraPermissionsDetails (consented extras)
+                        if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
+                            foreach ($extraPerm in $ExtraPermissionsDetails) {
+                                $extraAppRoleIds += $extraPerm.AppRoleId
+                                Write-Verbose "Adding consented extra AppRoleId: $($extraPerm.AppRoleId) ($($extraPerm.PermissionName))"
+                            }
+                        }
+
+                        # Second, find unconsented extras in manifest by resolving permission names
+                        # We need to query Microsoft Graph API for each resource to get permission names
+                        $extraPermNames = if ($ExtraPermissions -is [array]) { $ExtraPermissions } else { @($ExtraPermissions) }
+
+                        # Look through manifest to find App Role IDs for permission names
+                        foreach ($resource in $appResponse.requiredResourceAccess) {
+                            $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+                            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+
+                            # Skip if no resource app ID
+                            if (-not $resAppId) {
+                                Write-Verbose "Skipping resource with null AppId"
+                                continue
+                            }
+
+                            # Get the resource service principal to resolve permission names
+                            Write-Verbose "Querying resource SP for AppId: $resAppId"
+                            $resourceSPResult = Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{ '$filter' = "appId eq '$resAppId'" }
+                            $resourceSP = if ($resourceSPResult.Value) { $resourceSPResult.Value[0] } else { $resourceSPResult }
+
+                            if ($resourceSP -and $resourceSP.appRoles) {
+                                foreach ($access in $resourceAccess) {
+                                    $accessId = if ($access.id) { $access.id } else { $access.Id }
+                                    $accessType = if ($access.type) { $access.type } else { $access.Type }
+
+                                    # Only process Role-type permissions
+                                    if ($accessType -eq 'Role') {
+                                        # Find the permission name for this AppRoleId
+                                        $appRole = $resourceSP.appRoles | Where-Object { $_.id -eq $accessId }
+                                        if ($appRole -and $extraPermNames -contains $appRole.value) {
+                                            if ($extraAppRoleIds -notcontains $accessId) {
+                                                $extraAppRoleIds += $accessId
+                                                Write-Verbose "Adding unconsented extra AppRoleId from manifest: $accessId ($($appRole.value))"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Write-Verbose "Total extra AppRoleIds to remove: $($extraAppRoleIds.Count)"
+
+                        $updatedResourceAccess = @()
+
+                        foreach ($resource in $appResponse.requiredResourceAccess) {
+                            $resourceAccess = if ($resource.resourceAccess) { $resource.resourceAccess } else { $resource.ResourceAccess }
+
+                            # Filter out ONLY the extra Role-type permissions, keep everything else
+                            $filteredAccess = @($resourceAccess | Where-Object {
+                                $accessId = if ($_.id) { $_.id } else { $_.Id }
+                                $accessType = if ($_.type) { $_.type } else { $_.Type }
+
+                                # Keep if: it's NOT a Role type, OR it's a Role type that's NOT in extraAppRoleIds
+                                ($accessType -ne 'Role') -or (($extraAppRoleIds -notcontains $accessId))
+                            })
+
+                            # Only include this resource if it still has permissions after filtering
+                            if ($filteredAccess.Count -gt 0) {
+                                $resourceAccessArray = @()
+                                foreach ($access in $filteredAccess) {
+                                    $accessId = if ($access.id) { $access.id } else { $access.Id }
+                                    $accessType = if ($access.type) { $access.type } else { $access.Type }
+                                    $resourceAccessArray += @{
+                                        id = $accessId
+                                        type = $accessType
+                                    }
+                                }
+
+                                $resAppId = if ($resource.resourceAppId) { $resource.resourceAppId } else { $resource.ResourceAppId }
+                                $updatedResourceAccess += @{
+                                    resourceAppId = $resAppId
+                                    resourceAccess = $resourceAccessArray
+                                }
+                            }
+                        }
+
+                        $Body = @{
+                            requiredResourceAccess = $updatedResourceAccess
+                        }
+
+                        Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+
+                        foreach ($permName in $extraPermNames) {
+                            Write-Output "Removed extra permission from manifest: $permName"
+                        }
                     }
                 } catch {
                     Write-Warning "Failed to remove extra permissions: $($_.Exception.Message)"
                 }
             } else {
-                Write-Output "WhatIf: Would remove extra permissions: $($ExtraPermissions -join ', ')"
+                if ($ExtraPermissions -and @($ExtraPermissions).Count -gt 0) {
+                    Write-Output "WhatIf: Would remove extra permissions: $($ExtraPermissions -join ', ')"
+                }
             }
         }
 
-        # STEP 2b: Add ONLY missing permissions
-        if ($MissingPermissions -ne $false -and @($MissingPermissions).Count -gt 0) {
-            if ($PSCmdlet.ShouldProcess($target, "Add missing permissions: $($MissingPermissions.Permission -join ', ')")) {
+        # STEP 2b: Add permissions to manifest that are granted but not declared
+        if ($PermissionsNotInManifest -ne $false -and @($PermissionsNotInManifest).Count -gt 0) {
+            $permList = $PermissionsNotInManifest -join ', '
+            if ($PSCmdlet.ShouldProcess($target, "Add granted permissions to manifest: $permList")) {
                 try {
-                    Write-Verbose "Adding only missing permissions to service principal"
+                    Write-Verbose "Adding granted permissions to manifest"
 
-                    # STEP 1: Update the app registration manifest first
+                    # Get the app registration
                     $appResponse = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
                         '$filter' = "appId eq '$AppID'"
                     }).Value
@@ -1503,7 +1781,7 @@ function Set-ScubaGearAppPermission {
                         $existingResourceAccess = $appResponse.requiredResourceAccess
                         $resourceAccessMap = @{}
 
-                        # Build a map of existing permissions - using simple arrays
+                        # Build a map of existing permissions
                         foreach ($resource in $existingResourceAccess) {
                             if (-not $resourceAccessMap.ContainsKey($resource.resourceAppId)) {
                                 $resourceAccessMap[$resource.resourceAppId] = @{
@@ -1519,26 +1797,36 @@ function Set-ScubaGearAppPermission {
                             }
                         }
 
-                        # Add missing permissions to the map
-                        foreach ($missingPerm in $MissingPermissions) {
-                            $resourceAPIAppId = $missingPerm.ResourceAPI
+                        # Look up each permission by name in AppRoleIDs to get its resourceAPIAppId and AppRoleID
+                        foreach ($permName in $PermissionsNotInManifest) {
+                            $appRoleInfo = $AppRoleIDs | Where-Object { $_.APIName -eq $permName }
 
-                            if (-not $resourceAccessMap.ContainsKey($resourceAPIAppId)) {
-                                $resourceAccessMap[$resourceAPIAppId] = @{
-                                    resourceAppId = $resourceAPIAppId
-                                    resourceAccess = @()
-                                }
-                            }
+                            if ($appRoleInfo) {
+                                $resourceAPIAppId = $appRoleInfo.resourceAPIAppId
 
-                            # Check if it doesn't already exist in the manifest
-                            $exists = $resourceAccessMap[$resourceAPIAppId].resourceAccess | Where-Object { $_.id -eq $missingPerm.AppRoleID }
-                            if (-not $exists) {
-                                # Add the missing permission using array addition
-                                $resourceAccessMap[$resourceAPIAppId].resourceAccess += @{
-                                    id = $missingPerm.AppRoleID
-                                    type = "Role"
+                                if (-not $resourceAccessMap.ContainsKey($resourceAPIAppId)) {
+                                    $resourceAccessMap[$resourceAPIAppId] = @{
+                                        resourceAppId = $resourceAPIAppId
+                                        resourceAccess = @()
+                                    }
                                 }
-                                Write-Verbose "Added $($missingPerm.Permission) to app registration manifest"
+
+                                # Add the permission if not already there
+                                $alreadyExists = $false
+                                foreach ($access in $resourceAccessMap[$resourceAPIAppId].resourceAccess) {
+                                    if ($access.id -eq $appRoleInfo.AppRoleID) {
+                                        $alreadyExists = $true
+                                        break
+                                    }
+                                }
+
+                                if (-not $alreadyExists) {
+                                    $resourceAccessMap[$resourceAPIAppId].resourceAccess += @{
+                                        id = $appRoleInfo.AppRoleID
+                                        type = "Role"
+                                    }
+                                    Write-Verbose "Added $permName to app registration manifest"
+                                }
                             }
                         }
 
@@ -1557,10 +1845,99 @@ function Set-ScubaGearAppPermission {
                         }
 
                         Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
-                        Write-Verbose "Updated app registration manifest with missing permissions"
+
+                        foreach ($permName in $PermissionsNotInManifest) {
+                            Write-Output "Added granted permission to manifest: $permName"
+                        }
+                    }
+                } catch {
+                    Write-Warning "Failed to add granted permissions to manifest: $($_.Exception.Message)"
+                }
+            } else {
+                Write-Output "WhatIf: Would add granted permissions to manifest: $permList"
+            }
+        }
+
+        # STEP 2c: Handle missing permissions (add to manifest if needed, then grant consent)
+        if ($MissingPermissions -ne $false -and @($MissingPermissions).Count -gt 0) {
+            # Separate into those already in manifest vs those that need to be added
+            $permsToAdd = @($MissingPermissions | Where-Object { -not $_.InManifest })
+            $permsToConsent = @($MissingPermissions | Where-Object { $_.InManifest })
+
+            $actionDesc = @()
+            if ($permsToAdd.Count -gt 0) { $actionDesc += "Add to manifest: $($permsToAdd.Permission -join ', ')" }
+            if ($permsToConsent.Count -gt 0) { $actionDesc += "Grant consent: $($permsToConsent.Permission -join ', ')" }
+
+            if ($PSCmdlet.ShouldProcess($target, $actionDesc -join ' | ')) {
+                try {
+                    Write-Verbose "Processing missing permissions"
+
+                    # STEP 1: Update the app registration manifest for permissions not already in it
+                    if ($permsToAdd.Count -gt 0) {
+                        $appResponse = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
+                            '$filter' = "appId eq '$AppID'"
+                        }).Value
+
+                        if ($appResponse) {
+                            # Get existing requiredResourceAccess
+                            $existingResourceAccess = $appResponse.requiredResourceAccess
+                            $resourceAccessMap = @{}
+
+                            # Build a map of existing permissions - using simple arrays
+                            foreach ($resource in $existingResourceAccess) {
+                                if (-not $resourceAccessMap.ContainsKey($resource.resourceAppId)) {
+                                    $resourceAccessMap[$resource.resourceAppId] = @{
+                                        resourceAppId = $resource.resourceAppId
+                                        resourceAccess = @()
+                                    }
+                                }
+                                foreach ($access in $resource.resourceAccess) {
+                                    $resourceAccessMap[$resource.resourceAppId].resourceAccess += @{
+                                        id = $access.id
+                                        type = $access.type
+                                    }
+                                }
+                            }
+
+                            # Add only permissions that aren't in manifest
+                            foreach ($missingPerm in $permsToAdd) {
+                                $resourceAPIAppId = $missingPerm.ResourceAPI
+
+                                if (-not $resourceAccessMap.ContainsKey($resourceAPIAppId)) {
+                                    $resourceAccessMap[$resourceAPIAppId] = @{
+                                        resourceAppId = $resourceAPIAppId
+                                        resourceAccess = @()
+                                    }
+                                }
+
+                                # Add the missing permission
+                                $resourceAccessMap[$resourceAPIAppId].resourceAccess += @{
+                                    id = $missingPerm.AppRoleID
+                                    type = "Role"
+                                }
+                                Write-Verbose "Added $($missingPerm.Permission) to app registration manifest"
+                            }
+
+                            # Convert map back to array
+                            $updatedResourceAccess = @()
+                            foreach ($key in $resourceAccessMap.Keys) {
+                                $updatedResourceAccess += @{
+                                    resourceAppId = $resourceAccessMap[$key].resourceAppId
+                                    resourceAccess = $resourceAccessMap[$key].resourceAccess
+                                }
+                            }
+
+                            # Update the app registration manifest
+                            $Body = @{
+                                requiredResourceAccess = $updatedResourceAccess
+                            }
+
+                            Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+                            Write-Verbose "Updated app registration manifest with missing permissions"
+                        }
                     }
 
-                    # STEP 2: Now grant admin consent by creating the assignments
+                    # STEP 2: Grant admin consent for ALL missing permissions (both newly added and already in manifest)
                     $groupedByResource = $MissingPermissions | Group-Object -Property ResourceAPI
 
                     foreach ($resourceGroup in $groupedByResource) {
@@ -1604,7 +1981,7 @@ function Set-ScubaGearAppPermission {
             }
         }
 
-        # STEP 2c: Handle case where NO permissions exist at all (add all required)
+        # STEP 2d: Handle case where NO permissions exist at all (add all required)
         if ($CurrentPermissions.Count -eq 0 -and $MissingPermissions -eq $false) {
             if ($PSCmdlet.ShouldProcess($target, "Initialize permissions (no current permissions found)")) {
                 Set-AppRegistrationPermission -AppID $AppID -ScubaGearSPPermissions $ScubaGearSPPermissions -M365Environment $M365Environment
@@ -1616,22 +1993,22 @@ function Set-ScubaGearAppPermission {
         # STEP 3: Fix directory roles if missing
         if ($MissingRoles -ne $false -and @($MissingRoles).Count -gt 0) {
             foreach ($role in $MissingRoles) {
-                $roleDef = (Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition -M365Environment $M365Environment -queryParams @{ '$filter' = "displayName eq '$role'" }).Value
-                if ($roleDef) {
-                    if ($PSCmdlet.ShouldProcess($target, "Assign directory role '$role'")) {
+                if ($PSCmdlet.ShouldProcess($target, "Assign directory role '$role'")) {
+                    $roleDef = (Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition -M365Environment $M365Environment -queryParams @{ '$filter' = "displayName eq '$role'" }).Value
+                    if ($roleDef) {
                         Set-ScubaGearRole -ServicePrincipalID $ServicePrincipalID -roleDefinitionID $roleDef.Id -M365Environment $M365Environment
                         Write-Output "Assigned service principal to role: $role"
                     } else {
-                        Write-Output "WhatIf: Would assign directory role '$role' to $AppID"
+                        Write-Warning "Role definition not found for: $role"
                     }
                 } else {
-                    Write-Warning "Role definition not found for: $role"
+                    Write-Output "WhatIf: Would assign directory role '$role' to $AppID"
                 }
             }
         }
 
         # STEP 4a: Remove Power Platform registration if it's registered but not in ProductNames
-        if ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerPlatform') {
+        if ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform') {
             if ($PSCmdlet.ShouldProcess($target, "Remove Power Platform registration (not required for selected products)")) {
                 try {
                     Write-Verbose "Attempting to remove Power Platform registration"
@@ -1655,7 +2032,7 @@ function Set-ScubaGearAppPermission {
         }
 
         # STEP 4b: Fix Power Platform registration if needed
-        if ($InputObject.PSObject.Properties['PowerPlatformRegistered'] -and $InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerPlatform') {
+        if ($InputObject.PSObject.Properties['PowerPlatformRegistered'] -and $InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerplatform') {
 
             if ($PSCmdlet.ShouldProcess($target, "Register with Power Platform")) {
                 try {
@@ -1869,7 +2246,7 @@ function New-ScubaGearServicePrincipal {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be configured for and only apply those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerPlatform', 'defender', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*' (which includes all products)
 
     .PARAMETER ServicePrincipalName
         Used to define the name of the Service Principal that will be created. The default is "ScubaGear Application"
@@ -1888,7 +2265,7 @@ function New-ScubaGearServicePrincipal {
         Creates a service principal with permissions for all products.
 
     .EXAMPLE
-        New-ScubaGearServicePrincipal -M365Environment gcchigh -ProductNames 'aad', 'exo', 'powerPlatform' -ServicePrincipalName "MyScubaGear"
+        New-ScubaGearServicePrincipal -M365Environment gcchigh -ProductNames 'aad', 'exo', 'powerplatform' -ServicePrincipalName "MyScubaGear"
 
         Creates a service principal named "MyScubaGear" with permissions for AAD, Exchange Online, and Power Platform in GCC High.
 
@@ -1928,7 +2305,7 @@ function New-ScubaGearServicePrincipal {
         [string]$M365Environment,
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerPlatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames,
 
         [Parameter(Mandatory=$false)]
@@ -1944,7 +2321,7 @@ function New-ScubaGearServicePrincipal {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
             # If wildcard is specified, include all products
-            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerPlatform', 'defender')
+            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
         }
 
         # Get permissions using the same approach as Get-ScubaGearAppPermission
@@ -1980,7 +2357,7 @@ Creating new ScubaGear Service Principal with the following configuration:
   - Directory Roles: $($PermissionFileRole -join ', ')
 "@
 
-        if ($ProductNames -contains 'powerPlatform') {
+        if ($ProductNames -contains 'powerplatform') {
             $whatIfMessage += "`n  - Power Platform Registration: Yes"
         }
 
@@ -2017,6 +2394,27 @@ Creating new ScubaGear Service Principal with the following configuration:
                 appId = $app.AppId
             }
             $sp = Invoke-GraphDirectly -Commandlet New-MgServicePrincipal -Body $Body -M365Environment $M365Environment
+
+            # Adding a delay to ensure the service principal is fully propagated before proceeding
+            Write-Verbose "Waiting for service principal to propagate across Azure AD infrastructure..."
+            $spExists = $false
+            $maxRetries = 10
+            $retryCount = 0
+            while (!$spExists -and $retryCount -lt $maxRetries) {
+                Start-Sleep -Seconds 3
+                $retryCount++
+                try {
+                    $spCheck = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                        '$filter' = "id eq '$($sp.Id)'"
+                    }).Value
+                    if ($spCheck) {
+                        $spExists = $true
+                        Write-Verbose "Service principal confirmed after $retryCount attempts"
+                    }
+                } catch {
+                    Write-Verbose "Service principal not yet available, attempt $retryCount of $maxRetries"
+                }
+            }
 
             # Only set API permissions if there are any
             if ($filteredPermissions.Count -gt 0) {
@@ -2108,7 +2506,7 @@ Creating new ScubaGear Service Principal with the following configuration:
         }
 
         # Set up Power Platform if it's in the ProductNames
-        if($ProductNames -contains 'powerPlatform'){
+        if($ProductNames -contains 'powerplatform'){
             try {
                 # https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md#power-platform
                 $appId = ($SP).AppID

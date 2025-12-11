@@ -1,9 +1,21 @@
 {
     "AppID":  "00000000-0000-0000-0000-000000000001",
     "M365Environment":  "commercial",
+    "ProductNames":  [
+        "aad",
+        "exo",
+        "sharepoint",
+        "teams",
+        "powerplatform",
+        "defender"
+    ],
     "MissingPermissions":  false,
+    "PermissionsNotInManifest":  false,
+    "ExtraPermissions":  false,
     "ExtraPermissionsDetails":  false,
+    "DelegatedPermissions":  false,
     "MissingRoles":  "Global Reader",
+    "PowerPlatformRegistered":  true,
     "CurrentPermissions":  [
         {
             "DeletedDateTime":  null,
@@ -104,5 +116,7 @@
             "PrincipalDisplayName":  "ScubaGear Application",
             "AppRoleId":  "dc50a0fb-09a3-484d-be87-e023b12c6440"
         }
-    ]
+    ],
+    "Status":  "Action needed: you have missing role [Global Reader]. See FixPermissionIssues for resolution.",
+    "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 00000000-0000-0000-0000-000000000001 -M365Environment commercial -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerplatform\u0027, \u0027defender\u0027 | Set-ScubaGearAppPermission"
 }

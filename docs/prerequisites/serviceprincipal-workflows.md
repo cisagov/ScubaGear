@@ -172,7 +172,11 @@ This shows you the exact command to remediate all issues.
 See what changes will be made:
 
 ```powershell
+# Pipeline mode (recommended)
 $Audit | Set-ScubaGearAppPermission -WhatIf
+
+# Standalone mode
+Set-ScubaGearAppPermission -AppID $Audit.AppID -M365Environment $Audit.M365Environment -ProductNames $Audit.ProductNames -WhatIf
 ```
 
 **Review the output:**

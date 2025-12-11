@@ -11,6 +11,7 @@
     ],
     "ServicePrincipalID": "00000000-0000-0000-0000-000000000002",
     "MissingPermissions": false,
+    "PermissionsNotInManifest": false,
     "ExtraPermissions": false,
     "ExtraPermissionsDetails": false,
     "DelegatedPermissions": false,
