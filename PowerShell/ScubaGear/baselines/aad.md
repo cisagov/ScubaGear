@@ -131,8 +131,8 @@ Users detected as high risk SHALL be blocked.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
-<!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
-<!--ExclusionType: CapExclusions-->
+<!--ExclusionType: CapExclusions--><!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
+
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _Note:_ Users identified as high risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
@@ -162,6 +162,7 @@ Sign-ins detected as high risk SHALL be blocked.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
@@ -324,6 +325,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
@@ -342,6 +344,7 @@ Managed devices SHOULD be required for authentication.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-20b, IA-3
@@ -356,6 +359,7 @@ Managed Devices SHOULD be required to register MFA.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-20b, IA-3
@@ -372,6 +376,7 @@ Device code authentication SHOULD be blocked.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
 - _Last modified:_ February 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
@@ -691,7 +696,6 @@ A minimum of two users and a maximum of eight users SHALL be provisioned with th
 
 
 <!--Policy: MS.AAD.7.1v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_  The Global Administrator role provides unfettered access to the tenant. Limiting the number of users with this level of access makes tenant compromise more challenging. Microsoft recommends fewer than five users in the Global Administrator role. However, additional user accounts, up to eight, may be necessary to support emergency access and some operational scenarios.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(5)
@@ -707,7 +711,6 @@ Privileged users SHALL be provisioned with finer-grained roles instead of Global
 
 
 <!--Policy: MS.AAD.7.2v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Many privileged administrative users do not need unfettered access to the tenant to perform their duties. By assigning them to roles based on least privilege, the risks associated with having their accounts compromised are reduced.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-5
@@ -726,7 +729,6 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 
 
 <!--Policy: MS.AAD.7.3v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ By provisioning cloud-only Microsoft Entra ID user accounts to privileged users, the risks associated with a compromise of on-premises federation infrastructure are reduced. It is more challenging for the adversary to pivot from the compromised environment to the cloud with privileged access.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(5)
@@ -762,7 +764,6 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 
 
 <!--Policy: MS.AAD.7.5v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 admin center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2
@@ -777,7 +778,6 @@ Activation of the Global Administrator role SHALL require approval.
 
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(1)
@@ -793,7 +793,6 @@ Eligible and Active highly privileged role assignments SHALL trigger an alert.
 
 
 <!--Policy: MS.AAD.7.7v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Closely monitor assignment of the highest privileged roles for signs of compromise. Send assignment alerts to enable the security monitoring team to detect compromise attempts.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(1)
@@ -809,7 +808,6 @@ User activation of the Global Administrator role SHALL trigger an alert.
 
 
 <!--Policy: MS.AAD.7.8v1; Criticality: SHALL -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Closely monitor activation of the Global Administrator role for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts.
 - _Last modified:_ June 2023
 - _Note:_ It is recommended to prioritize user activation of Global Administrator as one of the most important events to monitor and respond to.
@@ -824,7 +822,6 @@ User activation of other highly privileged roles SHOULD trigger an alert.
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.AAD.7.9v1; Criticality: SHOULD -->
-<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Closely monitor activation of high-risk roles for signs of compromise. Send activation alerts to enable the security monitoring team to detect compromise attempts. In some environments, activating privileged roles can generate a significant number of alerts.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(9)
