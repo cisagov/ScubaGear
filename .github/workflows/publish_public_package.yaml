@@ -20,11 +20,6 @@ on:
         description: "If pre-release, enter prerelease tag in [0-9A-Za-z]+ format (e.g., alpha1, rc2, test04):"
         required: false
         type: string
-  # for testing
-  # push:
-  #   paths:
-  #     - ".github/workflows/publish_public_package.yaml"
-  #     - "utils/workflow/Publish-ScubaGear.ps1"
 
 permissions: read-all
 
@@ -61,56 +56,48 @@ jobs:
         env:
           KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
         run: |
-          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+          . repo/utils/workflow/Publish-PublicPackage.ps1
+          $KeyVaultData = Get-KeyVaultInfo -KeyVaultInfo ${env:KEY_VAULT_INFO}
+          echo "KeyVaultUrl=$($KeyVaultData.KeyVaultUrl)" >> $env:GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultData.KeyVaultCertificateName)" >> $env:GITHUB_OUTPUT
       - name: Sign and Publish Module
         run: |
           . repo/utils/workflow/Publish-ScubaGear.ps1
-          # TODO Update and test with new function in utils/workflow
+          . repo/utils/workflow/Publish-PublicPackage.ps1
+
           # Remove non-release files
-          Remove-Item -Recurse -Force repo -Include .git*
+          Remove-GitFiles -RootFolderPath "repo"
+
           # Extract the API key used to publish to PSGallery
-          $ApiKey = az keyvault secret show --id '${{ steps.key-vault-info.outputs.KeyVaultUrl }}/secrets/ScubaGear-PSGAllery-API-Key' --query value -o tsv
-          if (-Not $ApiKey)
-          {
-            Write-Error "Failed to retrieve API key"
-          }
-          # Setup the parameters
-          $Parameters = @{
-            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
-            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
-            ModuleSourcePath = 'repo/PowerShell/ScubaGear'
-            GalleryName = 'PSGallery'
-            NuGetApiKey = $ApiKey
-          }
-          if ('true' -eq '${{ inputs.IsPrerelease }}')
-          {
-            Write-Output "Adding IsPrerelease"
-            Write-Output ${{ inputs.IsPrerelease }}
-            $Parameters.Add('PrereleaseTag', '${{ inputs.PrereleaseTag }}')
-          }
-          if (-Not [string]::IsNullOrEmpty('${{ inputs.OverrideModuleVersion }}'))
-          {
-            Write-Output "Adding OverrideModuleVersion"
-            Write-Output ${{ inputs.OverrideModuleVersion }}
-            $Parameters.Add('OverrideModuleVersion', '${{ inputs.OverrideModuleVersion }}')
-          }
+          $ApiKey = Get-PSGalleryApiKey -KeyVaultUrl '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+
+          # Setup the parameters using the new function
+          $Parameters = Set-PublishParameters `
+            -AzureKeyVaultUrl '${{ steps.key-vault-info.outputs.KeyVaultUrl }}' `
+            -CertificateName '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}' `
+            -ModuleSourcePath 'repo/PowerShell/ScubaGear' `
+            -ApiKey $ApiKey `
+            -IsPrerelease ('true' -eq '${{ inputs.IsPrerelease }}') `
+            -PrereleaseTag '${{ inputs.PrereleaseTag }}' `
+            -OverrideModuleVersion '${{ inputs.OverrideModuleVersion }}'
+
           # This publishes to PSGallery.
           Publish-ScubaGearModule @Parameters
       # This is a manual test that simply writes the version to the console
       - name: Test Scuba Version
         run: |
-          # Give PSGallery a chance to publish the pre-release to its API
-          Start-Sleep -Seconds 30
-          if ('true' -eq '${{ inputs.IsPrerelease }}')
-          {
-            $Version = '${{ inputs.OverrideModuleVersion }}' + '-' + '${{ inputs.PrereleaseTag }}'
-            Write-Output "Checking for prerelease with required version: $Version"
-            Find-Module -Name ScubaGear -RequiredVersion $Version -AllowPrerelease
+          . repo/utils/workflow/Publish-PublicPackage.ps1
+
+          # Test that the module was published successfully
+          $TestResult = Test-PublishedModule `
+            -IsPrerelease ('true' -eq '${{ inputs.IsPrerelease }}') `
+            -ModuleVersion '${{ inputs.OverrideModuleVersion }}' `
+            -PrereleaseTag '${{ inputs.PrereleaseTag }}' `
+            -WaitSeconds 30
+
+          if (-not $TestResult) {
+            Write-Error "Module test failed - module not found in PSGallery"
+            exit 1
           }
-          else
-          {
-            Write-Output "Installing latest version"
-            Find-Module -Name ScubaGear
-          }
+
+          Write-Output "Module test completed successfully"
