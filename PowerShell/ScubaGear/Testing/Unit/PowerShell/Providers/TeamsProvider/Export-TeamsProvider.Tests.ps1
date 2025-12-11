@@ -102,7 +102,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 $ValidJson
             }
         }
-        It "returns valid JSON" {
+        It "returns valid JSON with interactive auth and unified settings available" {
                 $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -112,12 +112,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
-        It "returns valid JSON with UseNewSettings" {
-                $Json = Export-TeamsProvider -UseNewSettings
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
-        It "returns valid JSON with UseNewSettings when unified settings unavailable" {
+        It "returns valid JSON with interactive auth when unified settings unavailable" {
                 # Mock scenario where Get-M365UnifiedTenantSettings returns nothing (older tenant)
                 Mock -ModuleName ExportTeamsProvider Get-CommandTracker {
                     $Tracker = [MockCommandTracker]::New()
@@ -141,7 +136,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                     } -Force
                     return $Tracker
                 }
-                $Json = Export-TeamsProvider -UseNewSettings
+                $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
