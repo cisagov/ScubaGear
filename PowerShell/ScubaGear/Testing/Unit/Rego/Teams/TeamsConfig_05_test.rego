@@ -31,7 +31,8 @@ test_DefaultCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of Microsoft Apps by default: Global. Org-wide tenant setting (Microsoft apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
@@ -47,7 +48,8 @@ test_DefaultCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of Microsoft Apps by default: Tag:TestPolicy. Org-wide tenant setting (Microsoft apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.1v2", Output, ReportDetailStr, false) == true
@@ -97,7 +99,8 @@ test_GlobalCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of third-party apps by default: Global. Org-wide tenant setting (third-party apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
@@ -113,7 +116,8 @@ test_GlobalCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of third-party apps by default: Tag:TestPolicy. Org-wide tenant setting (third-party apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.2v2", Output, ReportDetailStr, false) == true
@@ -162,7 +166,8 @@ test_PrivateCatalogAppsType_Incorrect_V1 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of custom apps by default: Global. Org-wide tenant setting (custom apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
@@ -178,7 +183,8 @@ test_PrivateCatalogAppsType_Incorrect_V2 if {
     ReportDetailStr := concat("", [
         "Legacy app permission policy check: 1 app permission policy(ies) found that does not restrict ",
         "installation of custom apps by default: Tag:TestPolicy. Org-wide tenant setting (custom apps): ",
-        "Not Checked - Legacy app permission policies were validated"
+        "Not Checked - If the Global settings were implemented use the ",
+        "-UseNewTeamsAppSettings parameter when running Scubagear."
     ])
 
     TestResult("MS.TEAMS.5.3v2", Output, ReportDetailStr, false) == true
