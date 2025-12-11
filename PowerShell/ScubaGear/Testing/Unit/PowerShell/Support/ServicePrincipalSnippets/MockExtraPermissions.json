@@ -1,0 +1,48 @@
+{
+    "description": "Service principal with extra permissions",
+    "servicePrincipal": {
+        "id": "sp-extra-1",
+        "appId": "00000000-0000-0000-0000-000000000003",
+        "displayName": "ScubaGear Test SP - Extra Perms"
+    },
+    "application": {
+        "id": "app-extra-1",
+        "appId": "00000000-0000-0000-0000-000000000003",
+        "requiredResourceAccess": []
+    },
+    "appRoleAssignments": [
+        {
+            "id": "assignment-1",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+        },
+        {
+            "id": "assignment-2",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "df021288-bdef-4463-88db-98f22de89214"
+        },
+        {
+            "id": "assignment-3",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "extra-perm-guid"
+        }
+    ],
+    "oauth2Grants": [],
+    "permissionComparison": {
+        "missingPermissions": [],
+        "extraPermissions": ["Reports.Read.All"],
+        "hasMissingPermissions": false,
+        "hasExtraPermissions": true
+    },
+    "roleComparison": {
+        "roleName": "Global Reader",
+        "roleID": "role-123",
+        "missing": false
+    },
+    "powerPlatformRegistered": false,
+    "productNames": ["aad", "exo", "defender", "sharepoint", "teams", "powerplatform"],
+    "expectedResult": {
+        "hasFixPermissionIssues": true,
+        "statusPattern": "Action needed.*extra permissions"
+    }
+}
