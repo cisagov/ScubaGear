@@ -61,7 +61,6 @@ Assigning conditions within Conditional Access policies—such as device platfor
 
 These gaps undermine the security posture by creating blind spots where authentication and compliance requirements are not consistently applied. To mitigate this risk, organizations should regularly review CA policy logic, validate coverage against all user and device contexts, and implement monitoring to detect unintended exclusions.
 
-
 # Baseline Policies
 
 ## 1. Legacy Authentication
