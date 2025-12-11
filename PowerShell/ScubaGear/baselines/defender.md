@@ -108,6 +108,7 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 
 
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
+<!--ExclusionType: SensitiveAccounts-->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
@@ -125,6 +126,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 
 
 <!--Policy: MS.DEFENDER.1.5v1; Criticality: SHALL -->
+<!--ExclusionType: SensitiveAccounts-->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
@@ -238,6 +240,7 @@ impersonation attempt, the email is quarantined.
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
+<!--ExclusionType: SensitiveUsers-->
 - _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
@@ -253,6 +256,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
+<!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
@@ -268,6 +272,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
+<!--ExclusionType: PartnerDomains-->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to

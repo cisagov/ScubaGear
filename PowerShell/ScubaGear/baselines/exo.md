@@ -65,6 +65,7 @@ Automatic forwarding to external domains SHALL be disabled.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 
 <!--Policy: MS.EXO.1.1v2; Criticality: SHALL -->
+<!--ExclusionType: AllowedForwardingDomains-->
 - _Rationale:_ Adversaries can use automatic forwarding to gain
 persistent access to a victim's email. Disabling forwarding to
 external domains prevents this technique when the adversary is
