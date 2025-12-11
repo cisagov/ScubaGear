@@ -612,8 +612,8 @@ GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
 }
 
 GetDefaultAppTenantDetails := concat("", [
-    " - If the Global settings were implemented use the ",
-    "-UseNewTeamsAppSettings parameter when running Scubagear."
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
 ]) if {
     DefaultAppSettingValue == "Not Checked"
 }
@@ -738,8 +738,8 @@ GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
 }
 
 GetGlobalAppTenantDetails := concat("", [
-    " - If the Global settings were implemented use the ",
-    "-UseNewTeamsAppSettings parameter when running Scubagear."
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
 ]) if {
     GlobalAppSettingValue == "Not Checked"
 }
@@ -864,8 +864,8 @@ GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
 }
 
 GetPrivateAppTenantDetails := concat("", [
-    " - If the Global settings were implemented use the ",
-    "-UseNewTeamsAppSettings parameter when running Scubagear."
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
 ]) if {
     PrivateAppSettingValue == "Not Checked"
 }
