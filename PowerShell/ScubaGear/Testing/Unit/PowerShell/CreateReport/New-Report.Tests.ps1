@@ -44,7 +44,7 @@ InModuleScope CreateReport {
             @{Product = 'aad'; WarningCount = 0},
             @{Product = 'defender'; WarningCount = 9},
             @{Product = 'exo'; WarningCount = 0},
-            @{Product = 'powerplatform'; WarningCount = 2},
+            @{Product = 'powerplatform'; WarningCount = 3},
             @{Product = 'sharepoint'; WarningCount = 0},
             @{Product = 'teams'; WarningCount = 14} 
         ){
