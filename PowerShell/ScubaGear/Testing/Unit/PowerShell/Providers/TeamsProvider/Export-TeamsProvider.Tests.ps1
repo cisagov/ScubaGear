@@ -105,17 +105,45 @@ InModuleScope -ModuleName ExportTeamsProvider {
         It "returns valid JSON" {
                 $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
             }
         It "returns valid JSON with CertificateBasedAuth" {
                 $Json = Export-TeamsProvider -CertificateBasedAuth
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
             }
         It "returns valid JSON with UseNewSettings" {
                 $Json = Export-TeamsProvider -UseNewSettings
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
+            }
+        It "returns valid JSON with UseNewSettings when unified settings unavailable" {
+                # Mock scenario where Get-M365UnifiedTenantSettings returns nothing (older tenant)
+                Mock -ModuleName ExportTeamsProvider Get-CommandTracker {
+                    $Tracker = [MockCommandTracker]::New()
+                    # Override the Get-M365UnifiedTenantSettings to return empty array
+                    $Tracker | Add-Member -MemberType ScriptMethod -Name TryCommand -Value {
+                        param([string]$Command, [hashtable]$CommandArgs = @{})
+                        if ($Command -eq "Get-M365UnifiedTenantSettings") {
+                            $this.UnSuccessfulCommands += $Command
+                            return @()  # Simulate cmdlet failure/no data
+                        }
+                        # Call original mock for other commands
+                        switch ($Command) {
+                            "Get-CsTenant" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsMeetingPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTenantFederationConfiguration" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsClientConfiguration" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsAppPermissionPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsMeetingBroadcastPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            default { throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)" }
+                        }
+                    } -Force
+                    return $Tracker
+                }
+                $Json = Export-TeamsProvider -UseNewSettings
+                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+                $ValidJson | Should Be $true
             }
         AfterAll {
             Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
