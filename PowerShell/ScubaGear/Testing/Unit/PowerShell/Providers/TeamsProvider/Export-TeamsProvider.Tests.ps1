@@ -122,8 +122,8 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 Mock -ModuleName ExportTeamsProvider Get-CommandTracker {
                     $Tracker = [MockCommandTracker]::New()
                     # Override the Get-M365UnifiedTenantSettings to return empty array
-                    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CommandArgs')]
                     $Tracker | Add-Member -MemberType ScriptMethod -Name TryCommand -Value {
+                        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'CommandArgs')]
                         param([string]$Command, [hashtable]$CommandArgs = @{})
                         if ($Command -eq "Get-M365UnifiedTenantSettings") {
                             $this.UnSuccessfulCommands += $Command
