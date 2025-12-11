@@ -211,6 +211,7 @@ Reset-ScubaGearDependencies
   - [Power Platform](docs/troubleshooting/power.md)
   - [Microsoft Graph](docs/troubleshooting/graph.md)
 - [Network & Proxy](docs/troubleshooting/proxy.md)
+- [ScubaCached](docs/execution/scubacached.md)
 
 ### Automation
 
