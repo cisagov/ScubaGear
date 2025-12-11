@@ -152,7 +152,7 @@ tests contains {
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
@@ -244,7 +244,7 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-SPOTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
@@ -305,7 +305,7 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
@@ -366,7 +366,7 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
