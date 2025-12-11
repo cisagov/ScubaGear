@@ -48,15 +48,32 @@ Certificate-based authentication detected.
     }
     elseif ($UseNewSettings) {
         # Scenario 2: Interactive auth with explicit new settings preference
-        Write-Warning @"
+        # Interactive/user authentication - attempt to get org-wide app settings
+        $UnifiedSettings = @($Tracker.TryCommand("Get-M365UnifiedTenantSettings"))
+        
+        if ($UnifiedSettings.Count -eq 0 -or $null -eq $UnifiedSettings[0]) {
+            # Cmdlet failed or returned no data - warn user and fall back to legacy
+            Write-Warning @"
+-UseNewTeamsAppSettings parameter was specified, but org-wide app settings could not be retrieved.
+Possible reasons:
+  - Tenant does not have the newer Teams Admin Center org-wide app settings configured
+  - Get-M365UnifiedTenantSettings cmdlet is not available in this environment
+
+FALLBACK: Legacy Teams app permission policies will be validated instead (MS.TEAMS.5.1v1, 5.2v1, 5.3v1).
+NOTE: The v2 policies (MS.TEAMS.5.1v2, 5.2v2, 5.3v2) will show as "Not Checked" in the report.
+"@
+            $TenantAppSettings = ConvertTo-Json @()
+        }
+        else {
+            # Successfully retrieved org-wide settings
+            Write-Warning @"
 Interactive authentication with -UseNewTeamsAppSettings parameter detected.
 - Org-wide app settings (newer v2 policies) will be validated for MS.TEAMS.5.1v2, 5.2v2, and 5.3v2.
-- Legacy Teams app permission policies (MS.TEAMS.5.1v1, 5.2v1, 5.3v1) will NOT be validated.
-- To validate legacy Teams app permission policies instead, 
-  re-run ScubaGear without the -UseNewTeamsAppSettings parameter.
+- Legacy Teams app permission policies are still collected and available in the report.
+- The Rego policies will prioritize org-wide settings when available.
 "@
-        # Interactive/user authentication - attempt to get org-wide app settings
-        $TenantAppSettings = ConvertTo-Json @($Tracker.TryCommand("Get-M365UnifiedTenantSettings"))
+            $TenantAppSettings = ConvertTo-Json $UnifiedSettings
+        }
     }
     else {
         # Scenario 3: Interactive auth, default behavior - use legacy settings
