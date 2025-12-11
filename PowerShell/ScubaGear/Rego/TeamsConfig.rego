@@ -611,10 +611,7 @@ GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
     DefaultAppSettingValue != "Not Checked"
 }
 
-GetDefaultAppTenantDetails := concat("", [
-    " - Org-wide app settings not available in this tenant; ",
-    "legacy app permission policies were validated instead"
-]) if {
+GetDefaultAppTenantDetails := " - Legacy app permission policies were validated" if {
     DefaultAppSettingValue == "Not Checked"
 }
 #--
@@ -737,10 +734,7 @@ GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
     GlobalAppSettingValue != "Not Checked"
 }
 
-GetGlobalAppTenantDetails := concat("", [
-    " - Org-wide app settings not available in this tenant; ",
-    "legacy app permission policies were validated instead"
-]) if {
+GetGlobalAppTenantDetails := " - Legacy app permission policies were validated" if {
     GlobalAppSettingValue == "Not Checked"
 }
 #--
@@ -863,10 +857,7 @@ GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
     PrivateAppSettingValue != "Not Checked"
 }
 
-GetPrivateAppTenantDetails := concat("", [
-    " - Org-wide app settings not available in this tenant; ",
-    "legacy app permission policies were validated instead"
-]) if {
+GetPrivateAppTenantDetails := " - Legacy app permission policies were validated" if {
     PrivateAppSettingValue == "Not Checked"
 }
 #--
