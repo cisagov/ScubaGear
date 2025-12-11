@@ -166,6 +166,10 @@
                 "Rationale": {
                   "type": "string",
                   "description": "Justification for omitting the policy"
+                },
+                "Expiration": {
+                  "$ref": "#/definitions/patterns/date",
+                  "description": "Expiration date for the omission in yyyy-mm-dd format"
                 }
               },
               "required": ["Rationale"],
@@ -192,6 +196,14 @@
                 "Comment": {
                   "type": "string",
                   "description": "Annotation text for the policy"
+                },
+                "RemediationDate": {
+                  "$ref": "#/definitions/patterns/date",
+                  "description": "Planned remediation date in yyyy-mm-dd format"
+                },
+                "IncorrectResult": {
+                  "type": "boolean",
+                  "description": "Flag indicating if the test result is incorrect"
                 }
               },
               "required": ["Comment"],
@@ -241,6 +253,11 @@
       "orgDomain": {
         "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$",
         "friendlyName": "domain name (FQDN)"
+      },
+      "date": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+        "friendlyName": "date in yyyy-mm-dd format"
       }
     },
     "AadExclusions": {
