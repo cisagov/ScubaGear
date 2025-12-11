@@ -62,6 +62,12 @@ often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
 
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
+
+**Manual**: This indicator means that the policy requires manual verification of configuration settings.
+
 # Baseline Policies
 
 Baseline Policies in this document are targeted towards administrative controls that apply to
@@ -79,7 +85,8 @@ By default, any user in the Microsoft Entra ID Tenant can create additional envi
 #### MS.POWERPLATFORM.1.1v1
 The ability to create production and sandbox environments SHALL be restricted to admins.
 
-[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 
 <!--Policy: MS.POWERPLATFORM.1.1v1; Criticality: SHALL -->
@@ -94,7 +101,8 @@ The ability to create production and sandbox environments SHALL be restricted to
 #### MS.POWERPLATFORM.1.2v1
 The ability to create trial environments SHALL be restricted to admins.
 
-[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.POWERPLATFORM.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
@@ -172,12 +180,13 @@ creating apps in all other created environments.
 #### MS.POWERPLATFORM.2.1v1
 A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.
 
-[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.POWERPLATFORM.2.1v1; Criticality: SHALL -->
 - _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while also maintaining the agency's security posture.
 - _Last Modified:_ June 2023
-- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft DataverseMicrosoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
+- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -185,6 +194,8 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 
 #### MS.POWERPLATFORM.2.2v1
 Non-default environments SHOULD have at least one DLP policy affecting them.
+
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.POWERPLATFORM.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
@@ -279,7 +290,8 @@ source.
 #### MS.POWERPLATFORM.3.1v1
 Power Platform tenant isolation SHALL be enabled.
 
-[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-red)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.POWERPLATFORM.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
@@ -292,6 +304,10 @@ Power Platform tenant isolation SHALL be enabled.
 
 #### MS.POWERPLATFORM.3.2v1
 An inbound/outbound connection allowlist SHOULD be configured.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](./powerplatform.md#mspowerplatform32v1-instructions)
+
+
 
 <!--Policy: MS.POWERPLATFORM.3.2v1; Criticality: SHOULD -->
 - _Rationale:_ Depending on agency needs an allowlist can be configured to allow cross tenant collaboration via connectors.
@@ -340,10 +356,12 @@ to detect and mitigate certain types of attacks, including Cross-Site
 Scripting (XSS), clickjacking, and data injection attacks. When enabled, this setting can apply to all
 current canvas apps and model-driven apps at the Power Platform environment level.
 
-###  Policies
+### Policies
 
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](./powerplatform.md#mspowerplatform41v1-instructions)
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
@@ -384,10 +402,12 @@ center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-gove
 
 Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins can restrict the creation of new Power Pages to only admins.
 
-###  Policies
+### Policies
 
 #### MS.POWERPLATFORM.5.1v1
 The ability to create Power Pages sites SHOULD be restricted to admins.
+
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.POWERPLATFORM.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may unintentionally misconfigure their Power Pages to expose sensitive information or leave the website in a vulnerable state.
@@ -409,13 +429,58 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 #### MS.POWERPLATFORM.5.1v1 Instructions
 1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
-2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenants Power Platform.
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
 Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
 
     ```
     Set-TenantSettings -RequestBody @{ “disablePortalsCreationByNonAdminUsers” = $true }
+    ```
+
+## 6. Power Apps Sharing Controls
+
+Power Apps supports discovery of apps by allowing makers to share canvas apps with individuals and security groups. Sharing with **Everyone**, or all users present in the directory, is disabled by default. When the **Share with Everyone** feature is disabled, only Dynamics 365 administrators, Power Platform administrators, and global administrators have the ability to share an application with everyone in the environment.
+
+### Policies
+
+#### MS.POWERPLATFORM.6.1v1
+The Share with Everyone feature SHOULD be disabled.
+
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
+
+<!--Policy: MS.POWERPLATFORM.6.1v1; Criticality: SHOULD -->
+- _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, complicating auditing and access governance. The configuration setting is disabled by default; however, this is a defense-in-depth policy to protect against misconfigurations or malicious actors.
+- _Last Modified:_ October 2025
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(5), AC-6(10)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T1098.007: Additional Local or Domain Groups](https://attack.mitre.org/techniques/T1098/007/)
+
+### Resources
+- [Limit Sharing with Everyone \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/power-platform/guidance/adoption/secure-default-environment#limit-sharing-with-everyone)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+#### MS.POWERPLATFORM.6.1v1 Instructions
+1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+
+3. Then run the following PowerShell commands to get the settings object and set the variable `disableShareWithEveryone` to `$true`.
+
+    ```
+    $tenantSettings = Get-TenantSettings
+    $tenantSettings.powerPlatform.powerApps.disableShareWithEveryone = $true
+    Set-TenantSettings $tenantSettings
     ```
 
 **`TLP:CLEAR`**

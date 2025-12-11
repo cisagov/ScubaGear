@@ -7,7 +7,7 @@ InModuleScope Orchestrator {
             function Invoke-Rego {}
             Mock -ModuleName Orchestrator Invoke-Rego
             function Get-FileEncoding {}
-            Mock -ModuleName Orchestrator Get-FileEncoding
+            Mock -ModuleName Orchestrator Get-FileEncoding { 'utf8' }
 
             Mock -CommandName Write-Progress {}
             Mock -CommandName Join-Path { "." }
@@ -18,55 +18,46 @@ InModuleScope Orchestrator {
         Context 'When running the rego on a provider json' {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RunRegoParameters')]
-                $RunRegoParameters = @{
-                    OPAPath             = "./"
-                    ParentPath          = "./"
-                    OutFolderPath       = "./"
+                $ScubaConfig = [PSCustomObject]@{
+                    ProductNames = @('aad')
+                    OPAPath = "./"
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName     = "TestResults"
+                    OutRegoFileName = "TestResults"
+                    OutReportName = "BaselineReports"
+                    LogIn = $false
                 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ParentPath')]
+                $ParentPath = "./"
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
+                $OutFolderPath = "./"
             }
             It 'With -ProductNames "aad", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("aad")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "defender", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("defender")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("defender")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "exo", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("exo")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("exo")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "powerplatform", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("powerplatform")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("powerplatform")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "sharepoint", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("sharepoint")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("sharepoint")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "teams", should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("teams")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("teams")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With all products, should not throw' {
-                $RunRegoParameters += @{
-                    ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
-                }
-                { Invoke-RunRego @RunRegoParameters } | Should -Not -Throw
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
         }
     }
