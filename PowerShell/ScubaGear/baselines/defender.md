@@ -529,7 +529,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./defender.md#msdefender45v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender45v1-instructions)
 
 <!--Policy: MS.DEFENDER.4.5v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files or not
@@ -548,7 +548,7 @@ A list of apps that are restricted from accessing files protected by DLP policy 
 The custom policy SHOULD include an action to block access to sensitive
 information by restricted apps and unwanted Bluetooth applications.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./defender.md#msdefender46v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender46v1-instructions)
 
 <!--Policy: MS.DEFENDER.4.6v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files
@@ -775,7 +775,7 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 #### MS.DEFENDER.5.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./defender.md#msdefender52v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender52v1-instructions)
 
 <!--Policy: MS.DEFENDER.5.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
@@ -888,7 +888,7 @@ Unified Audit logging SHALL be enabled.
 #### MS.DEFENDER.6.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./defender.md#msdefender63v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender63v1-instructions)
 
 <!--Policy: MS.DEFENDER.6.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.

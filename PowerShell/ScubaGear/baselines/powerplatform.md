@@ -305,7 +305,7 @@ Power Platform tenant isolation SHALL be enabled.
 #### MS.POWERPLATFORM.3.2v1
 An inbound/outbound connection allowlist SHOULD be configured.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./powerplatform.md#mspowerplatform32v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerplatform32v1-instructions)
 
 
 
@@ -361,7 +361,7 @@ current canvas apps and model-driven apps at the Power Platform environment leve
 #### MS.POWERPLATFORM.4.1v1
 Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./powerplatform.md#mspowerplatform41v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerplatform41v1-instructions)
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.

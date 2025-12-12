@@ -611,7 +611,7 @@ required, guidance for configuring Microsoft's DLP solution can be found in foll
 #### MS.TEAMS.6.1v1
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams61v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams61v1-instructions)
 
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
@@ -626,7 +626,7 @@ The DLP solution SHALL protect personally identifiable information (PII)
 and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs),
 and Social Security numbers (SSNs) via email SHALL be restricted.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams62v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
 
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
@@ -673,7 +673,7 @@ Malware scanning protects M365 Teams assets from malicious software. Several com
 #### MS.TEAMS.7.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams71v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams71v1-instructions)
 
 <!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
@@ -686,7 +686,7 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams72v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams72v1-instructions)
 
 <!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
@@ -753,7 +753,7 @@ If the agency uses Microsoft Defender to meet this baseline policy group, see th
 #### MS.TEAMS.8.1v1
 URL comparison with a blocklist SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams81v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams81v1-instructions)
 
 <!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
@@ -770,7 +770,7 @@ URL comparison with a blocklist SHOULD be enabled.
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./teams.md#msteams82v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams82v1-instructions)
 
 <!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.

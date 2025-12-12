@@ -145,7 +145,7 @@ Users detected as high risk SHALL be blocked.
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./aad.md#msaad22v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad22v1-instructions)
 
 <!--Policy: MS.AAD.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ Notification enables the admin to monitor the event and remediate the risk. This helps the organization proactively respond to cyber intrusions as they occur.
@@ -515,7 +515,7 @@ This section provides policies to reduce security risks related to the lack of s
 #### MS.AAD.4.1v1
 Security logs SHALL be sent to the agency's security operations center for monitoring.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./aad.md#msaad41v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad41v1-instructions)
 
 <!--Policy: MS.AAD.4.1v1; Criticality: SHALL -->
 - _Rationale:_ The security risk of not having visibility into cyber attacks is reduced by collecting logs in the agency’s centralized security detection infrastructure. This makes security events available for auditing, query, and incident response.
@@ -1010,7 +1010,7 @@ Only users with the Guest Inviter role SHOULD be able to invite guest users.
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./aad.md#msaad83v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad83v1-instructions)
 
 <!--Policy: MS.AAD.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations getting access.

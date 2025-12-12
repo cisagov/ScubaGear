@@ -621,7 +621,7 @@ required, guidance for configuring Microsoft's DLP solution can be found in the 
 #### MS.EXO.8.1v2
 A DLP solution SHALL be used.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo81v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo81v2-instructions)
 
 <!--Policy: MS.EXO.8.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently disclose sensitive information to unauthorized individuals. A DLP solution may detect the presence of sensitive information in Exchange Online and block access to unauthorized entities.
@@ -636,7 +636,7 @@ A DLP solution SHALL be used.
 #### MS.EXO.8.2v2
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo82v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo82v2-instructions)
 
 
 <!--Policy: MS.EXO.8.2v2; Criticality: SHALL -->
@@ -654,7 +654,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 #### MS.EXO.8.3v1
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo83v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo83v1-instructions)
 
 <!--Policy: MS.EXO.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Any alternative DLP solution should be able to detect sensitive information in Exchange Online and block access to unauthorized entities.
@@ -669,7 +669,7 @@ The selected DLP solution SHOULD offer services comparable to the native DLP sol
 #### MS.EXO.8.4v1
 At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo84v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo84v1-instructions)
 
 <!--Policy: MS.EXO.8.4v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
@@ -728,7 +728,7 @@ Microsoft Defender can be found in the follow section of the CISA M365 Secure Co
 #### MS.EXO.9.1v2
 Emails SHALL be filtered by attachment file types.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo91v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo91v2-instructions)
 
 <!--Policy: MS.EXO.9.1v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -745,7 +745,7 @@ prevent spread of malware distributed via click-to-run email attachments.
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo92v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo92v1-instructions)
 
 <!--Policy: MS.EXO.9.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users can change a file extension at the end of a file name (e.g., notepad.exe to notepad.txt) to obscure the actual file type. Verifying the file type and checking that this matches the designated file extension can help detect instances where the file extension was changed.
@@ -760,7 +760,7 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 #### MS.EXO.9.3v2
 Disallowed file types SHALL be determined and enforced.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo93v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo93v2-instructions)
 
 <!--Policy: MS.EXO.9.3v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files,
@@ -777,7 +777,7 @@ organization, to be made in accordance with their risk tolerance.
 #### MS.EXO.9.4v1
 Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo94v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo94v1-instructions)
 
 <!--Policy: MS.EXO.9.4v1; Criticality: SHOULD -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -795,7 +795,7 @@ prevent spread of malware distributed via click-to-run email attachments.
 #### MS.EXO.9.5v1
 At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo95v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo95v1-instructions)
 
 <!--Policy: MS.EXO.9.5v1; Criticality: SHOULD -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -877,7 +877,7 @@ implement malware scanning, see the following policies of the CISA M365 Secure C
 #### MS.EXO.10.1v1
 Emails SHALL be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo101v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo101v1-instructions)
 
 <!--Policy: MS.EXO.10.1v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
@@ -892,7 +892,7 @@ the risk for end users.
 #### MS.EXO.10.2v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo102v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo102v1-instructions)
 
 <!--Policy: MS.EXO.10.2v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
@@ -909,7 +909,7 @@ users cannot interact with those emails.
 #### MS.EXO.10.3v1
 Email scanning SHALL be capable of reviewing emails after delivery.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo103v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo103v1-instructions)
 
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
@@ -984,7 +984,7 @@ Defender for Office 365. If using Defender for Office 365 for impersonation prot
 #### MS.EXO.11.1v1
 Impersonation protection checks SHOULD be used.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo111v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo111v1-instructions)
 
 <!--Policy: MS.EXO.11.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users might not be able to reliably identify phishing emails, especially
@@ -1000,7 +1000,7 @@ senders, the risk of a successful phishing attempt can be reduced.
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo112v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo112v1-instructions)
 
 <!--Policy: MS.EXO.11.2v1; Criticality: SHOULD -->
 - _Rationale:_ Many tasks are better suited for automated processes, such as identifying
@@ -1016,7 +1016,7 @@ successful phishing attempts.
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo113v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo113v1-instructions)
 
 <!--Policy: MS.EXO.11.3v1; Criticality: SHOULD -->
 - _Rationale:_ Phishing attacks can result in unauthorized data disclosure and unauthorized access. Using AI-based phishing detection tools to improve the detection rate of phishing attempts helps reduce the risk of successful phishing attacks.
@@ -1257,7 +1257,7 @@ Baseline for Defender for Office 365.
 #### MS.EXO.14.1v2
 A spam filter SHALL be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo141v2-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo141v2-instructions)
 
 <!--Policy: MS.EXO.14.1v2; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
@@ -1270,7 +1270,7 @@ A spam filter SHALL be enabled.
 #### MS.EXO.14.2v1
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo142v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo142v1-instructions)
 
 <!--Policy: MS.EXO.14.2v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
@@ -1283,7 +1283,7 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 #### MS.EXO.14.3v1
 Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo143v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo143v1-instructions)
 
 <!--Policy: MS.EXO.14.3v1; Criticality: SHALL -->
 - _Rationale:_ Legitimate emails may be incorrectly filtered
@@ -1300,7 +1300,7 @@ potentially unknown users to bypass spam protections.
 #### MS.EXO.14.4v1
 If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo144v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo144v1-instructions)
 
 <!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
@@ -1386,7 +1386,7 @@ If the agency uses Microsoft Defender for Office 365 to meet this baseline polic
 #### MS.EXO.15.1v1
 URL comparison with a block-list SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo151v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo151v1-instructions)
 
 <!--Policy: MS.EXO.15.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
@@ -1399,7 +1399,7 @@ URL comparison with a block-list SHOULD be enabled.
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo152v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo152v1-instructions)
 
 <!--Policy: MS.EXO.15.2v1; Criticality: SHOULD -->
 - _Rationale:_ URLs in emails may direct users to download and run malware.
@@ -1414,7 +1414,7 @@ users from infecting their devices.
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo153v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo153v1-instructions)
 
 <!--Policy: MS.EXO.15.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
@@ -1496,7 +1496,7 @@ At a minimum, the following alerts SHALL be enabled:
 
   g. **A potentially malicious URL click was detected.**
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo161v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo161v1-instructions)
 
 <!--Policy: MS.EXO.16.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service impacting events may go
@@ -1517,7 +1517,7 @@ At a minimum, the following alerts SHALL be enabled:
 #### MS.EXO.16.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo162v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo162v1-instructions)
 
 <!--Policy: MS.EXO.16.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may
@@ -1588,7 +1588,7 @@ Office 365.
 #### MS.EXO.17.1v1
 Unified Audit logging SHALL be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo171v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo171v1-instructions)
 
 <!--Policy: MS.EXO.17.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
@@ -1601,7 +1601,7 @@ Unified Audit logging SHALL be enabled.
 #### MS.EXO.17.3v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](./exo.md#msexo173v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo173v1-instructions)
 
 <!--Policy: MS.EXO.17.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they
