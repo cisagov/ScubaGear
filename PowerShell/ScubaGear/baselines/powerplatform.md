@@ -64,7 +64,7 @@ update, and delete (CRUD) operations.
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 

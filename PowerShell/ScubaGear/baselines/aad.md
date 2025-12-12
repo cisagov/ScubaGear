@@ -34,7 +34,7 @@ Microsoft Entra ID tenant.
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
 
 **Configurable**: This indicator means that the policy can be customized via config file.
 
@@ -130,6 +130,7 @@ Users detected as high risk SHALL be blocked.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 ![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
