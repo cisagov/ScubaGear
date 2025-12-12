@@ -35,7 +35,7 @@ The following are key terms and descriptions used in this document.
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Requires Configuration**: This indicator means that ScubaGear requires configuration via config file in order to check the policy.
 
