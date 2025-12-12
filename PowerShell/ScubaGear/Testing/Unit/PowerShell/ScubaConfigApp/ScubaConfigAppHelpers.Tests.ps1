@@ -163,8 +163,8 @@
                     'Clear-AutoSaveData'
                 )
                 'ScubaConfigAppBaselineHelper.psm1' = @(
-                    'Get-ScubaConfigRegoExclusionMappings',
-                    'Update-ScubaConfigBaselineWithRego',
+                    'Get-ScubaConfigExclusionMappingsFromMarkdown',
+                    'Update-ScubaConfigBaselineWithMarkdown',
                     'Get-ScubaBaselinePolicy',
                     'Get-ScubaPolicyContent'
                 )

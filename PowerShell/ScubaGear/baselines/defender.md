@@ -35,7 +35,7 @@ The following are key terms and descriptions used in this document.
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
-**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear.
 
 **Requires Configuration**: This indicator means that ScubaGear requires configuration via config file in order to check the policy.
 
@@ -56,7 +56,7 @@ Within the standard and strict preset policies, users can be enrolled in [Exchan
 The standard and strict preset security policies SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 
 <!--Policy: MS.DEFENDER.1.1v1; Criticality: SHALL -->
@@ -74,7 +74,7 @@ The standard and strict preset security policies SHALL be enabled.
 All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 
 <!--Policy: MS.DEFENDER.1.2v1; Criticality: SHALL -->
@@ -95,7 +95,7 @@ All users SHALL be added to Exchange Online Protection (EOP) in either the stand
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 
 <!--Policy: MS.DEFENDER.1.3v1; Criticality: SHALL -->
@@ -116,11 +116,12 @@ All users SHALL be added to Defender for Office 365 protection in either the sta
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 
 <!--Policy: MS.DEFENDER.1.4v1; Criticality: SHALL -->
+<!--ExclusionType: SensitiveAccounts-->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk to email threats.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
@@ -135,11 +136,12 @@ Sensitive accounts SHALL be added to Exchange Online Protection in the strict pr
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 
 <!--Policy: MS.DEFENDER.1.5v1; Criticality: SHALL -->
+<!--ExclusionType: SensitiveAccounts-->
 - _Rationale:_ Unauthorized access to a sensitive account may result in greater harm than to a standard user account. Adding sensitive accounts to the strict preset security policy, with its increased protections, better mitigates their elevated risk.
 - _Last modified:_ June 2023
 - _Note:_ The strict preset security policy must be enabled to protect
@@ -252,10 +254,11 @@ impersonation attempt, the email is quarantined.
 #### MS.DEFENDER.2.1v1
 User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.1v1; Criticality: SHOULD -->
+<!--ExclusionType: SensitiveUsers-->
 - _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
@@ -270,10 +273,11 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 #### MS.DEFENDER.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.2v1; Criticality: SHOULD -->
+<!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ June 2023
 - _Note:_ The standard and strict preset security policies must be enabled to
@@ -288,10 +292,11 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 #### MS.DEFENDER.2.3v1
 Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.DEFENDER.2.3v1; Criticality: SHOULD -->
+<!--ExclusionType: PartnerDomains-->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ November 2025
 - _Note:_ The standard and strict preset security policies must be enabled to
@@ -386,7 +391,7 @@ action is needed to enable it for other products.
 #### MS.DEFENDER.3.1v1
 Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Clicking malicious links makes users vulnerable to attacks, and this danger is not limited to links in emails. Other Microsoft products, such as Microsoft Teams, can be used to present users with malicious links. As such, it is important to protect users on these other Microsoft products as well.
@@ -453,7 +458,7 @@ their environment and needs.
 A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.4.1v2; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
@@ -470,7 +475,7 @@ A custom policy SHALL be configured to protect PII and sensitive information, as
 #### MS.DEFENDER.4.2v1
 The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
@@ -489,7 +494,7 @@ The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams cha
 #### MS.DEFENDER.4.3v1
 The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.4.3v1; Criticality: SHOULD -->
 - _Rationale:_ Access to sensitive information should be prohibited unless
@@ -507,7 +512,7 @@ The action for the custom policy SHOULD be set to block sharing sensitive inform
 #### MS.DEFENDER.4.4v1
 Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.4.4v1; Criticality: SHOULD -->
 - _Rationale:_ Some users may not be aware of agency policies on
@@ -757,7 +762,7 @@ real-time insight into possible security incidents. Guidance on specific alerts 
 At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
@@ -870,7 +875,7 @@ types to the Unified Audit Log.
 Unified Audit logging SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)
 
 <!--Policy: MS.DEFENDER.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
