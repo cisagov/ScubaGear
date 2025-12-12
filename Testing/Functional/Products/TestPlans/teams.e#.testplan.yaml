@@ -1,5 +1,57 @@
 ProductName: teams
 TestPlan:
+  - PolicyId: MS.TEAMS.2.2v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.2v2 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true
+              AllowTeamsConsumerInbound: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true
+              AllowTeamsConsumerInbound: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false
+              AllowTeamsConsumerInbound: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false
+              AllowTeamsConsumerInbound: false
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.TEAMS.2.3v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.3v2 Non-compliant - AllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.2.3v2 Compliant - DoNotAllowTeamsConsumer
+        Preconditions:
+          - Command: Set-CsTenantFederationConfiguration
+            Splat:
+              AllowTeamsConsumer: false
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.TEAMS.4.1v1
     TestDriver: RunScuba
     Tests:
