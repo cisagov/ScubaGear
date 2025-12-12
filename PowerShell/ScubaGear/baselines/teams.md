@@ -522,7 +522,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 8.  If custom policies have been created, repeat steps 4 to 7 for each
     policy, selecting the appropriate policy in step 5.
 
-**ScubaGear will continue to look for the legacy policies when running in noninteractive mode because of a limitation in the API when gathering the data for the report. Users can utilize interactive mode and the -UseNewTeamsAppSetting parameter to allow ScubaGear to gather the data for the newer portal based settings.**
+**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
 
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
