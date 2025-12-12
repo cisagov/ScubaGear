@@ -402,7 +402,7 @@ Invoke-SCuBA -ProductNames teams `
 **PreferredDnsResolvers** is a list of IP addresses of DNS resolvers that should
 be used to retrieve any DNS records required by specific SCuBA policies. Currently,
 the only applicable SCuBA polices are the following:
-- MS.EXO.2.2v2
+- MS.EXO.2.2v3
 - MS.EXO.3.1v1
 - MS.EXO.4.1v1
 - MS.EXO.4.2v1

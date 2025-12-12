@@ -43,6 +43,12 @@ the types of users are defined as follows:
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
 
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
+
+**Manual**: This indicator means that the policy requires manual verification of configuration settings.
+
 # Baseline Policies
 
 ## 1. Meeting Policies
@@ -56,6 +62,8 @@ This section helps reduce security risks related to the user permissions for rec
 #### MS.TEAMS.1.1v1
 External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.
 
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ An external participant with control of a shared screen could potentially perform unauthorized actions on the shared screen. This policy reduces that risk by removing an external participant's ability to request control. However, if an agency has a legitimate use case to grant this control, it may be done on a case-by-case basis.
 - _Last modified:_ July 2023
@@ -66,6 +74,9 @@ External meeting participants SHOULD NOT be enabled to request control of shared
 
 #### MS.TEAMS.1.2v2
 Anonymous users SHALL NOT be enabled to start meetings.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
 - _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
@@ -90,6 +101,8 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
 #### MS.TEAMS.1.4v1
 Internal users SHOULD be admitted automatically.
 
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.1.4v1; Criticality: SHOULD -->
 - _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.  
 - _Last modified:_ July 2023
@@ -100,6 +113,8 @@ Internal users SHOULD be admitted automatically.
 
 #### MS.TEAMS.1.5v1
 Dial-in users SHOULD NOT be enabled to bypass the lobby.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.5v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.
@@ -112,6 +127,8 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 #### MS.TEAMS.1.6v1
 Meeting recording SHOULD be disabled.
 
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
 - _Rationale:_ Allowing any user to record a Teams meeting or group call may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, an agency limits information exposure.
 - _Last modified:_ March 2025
@@ -122,6 +139,8 @@ Meeting recording SHOULD be disabled.
 
 #### MS.TEAMS.1.7v2
 Record an event SHOULD NOT be set to Always record.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.7v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing to always record Live Events can pose data and video recording leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
@@ -274,6 +293,9 @@ Similar to external users, blocking contact with unmanaged Teams users prevents 
 #### MS.TEAMS.2.1v2
 External access for users SHALL only be enabled on a per-domain basis.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ August 2025
@@ -286,6 +308,9 @@ External access for users SHALL only be enabled on a per-domain basis.
 #### MS.TEAMS.2.2v2
 Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ August 2025
@@ -297,6 +322,8 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
 #### MS.TEAMS.2.3v2
 Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
@@ -385,6 +412,9 @@ This section helps reduce security risks related to Teams email integration. Tea
 #### MS.TEAMS.4.1v1
 Teams email integration SHALL be disabled.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
@@ -432,6 +462,8 @@ development, that users sideload into Teams.
 #### MS.TEAMS.5.1v2
 Agencies SHOULD only allow installation of Microsoft apps approved by the agency.
 
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.TEAMS.5.1v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
 - _Last modified:_ August 2025
@@ -442,6 +474,8 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 
 #### MS.TEAMS.5.2v2
 Agencies SHOULD only allow installation of third-party apps approved by the agency.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.2v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.
@@ -454,6 +488,8 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 
 #### MS.TEAMS.5.3v2
 Agencies SHOULD only allow installation of custom apps approved by the agency.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.3v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
@@ -575,6 +611,8 @@ required, guidance for configuring Microsoft's DLP solution can be found in foll
 #### MS.TEAMS.6.1v1
 A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams61v1-instructions)
+
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
@@ -587,6 +625,8 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 The DLP solution SHALL protect personally identifiable information (PII)
 and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs),
 and Social Security numbers (SSNs) via email SHALL be restricted.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
 
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
@@ -633,6 +673,8 @@ Malware scanning protects M365 Teams assets from malicious software. Several com
 #### MS.TEAMS.7.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams71v1-instructions)
+
 <!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
@@ -643,6 +685,8 @@ Attachments included with Teams messages SHOULD be scanned for malware.
 
 #### MS.TEAMS.7.2v1
 Users SHOULD be prevented from opening or downloading files detected as malware.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams72v1-instructions)
 
 <!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
 - _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
@@ -709,6 +753,8 @@ If the agency uses Microsoft Defender to meet this baseline policy group, see th
 #### MS.TEAMS.8.1v1
 URL comparison with a blocklist SHOULD be enabled.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams81v1-instructions)
+
 <!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
 - _Last modified:_ July 2023
@@ -723,6 +769,8 @@ URL comparison with a blocklist SHOULD be enabled.
 
 #### MS.TEAMS.8.2v1
 User click tracking SHOULD be enabled.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams82v1-instructions)
 
 <!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.

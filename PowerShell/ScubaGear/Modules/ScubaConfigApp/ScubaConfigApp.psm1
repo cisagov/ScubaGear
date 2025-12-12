@@ -327,17 +327,15 @@ Function Start-SCuBAConfigApp {
         # Cascading baseline loading strategy
         $syncHash.Baselines = $null
         $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
-        $RegoTestPath = Join-Path $ModuleBasePath $syncHash.UIConfigs.OfflineRegoFolderPath
 
-        # Strategy 1: Local Rego parsing from markdown baselines (primary strategy when PullOnlineBaselines is false)
-        if (-not $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
+        # Strategy 1: Local markdown baselines parsing (primary strategy when PullOnlineBaselines is false)
+        if (-not $syncHash.UIConfigs.PullOnlineBaselines) {
             try {
-                Write-DebugOutput -Message "Attempting to dynamically parse baselines from local Rego markdown files" -Source $source -Level "Verbose"
+                Write-DebugOutput -Message "Attempting to dynamically parse baselines from local markdown files" -Source $source -Level "Verbose"
 
-                $RegoResolvedPath = (Resolve-Path $RegoTestPath).Path
                 $BaselineDestPath = "$env:Temp\ScubaBaselines_Dynamic.json"
 
-                # Create empty baseline structure for Rego to populate
+                # Create empty baseline structure to populate
                 $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
                 $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
 
@@ -346,48 +344,44 @@ Function Start-SCuBAConfigApp {
                 $LocalBaselineMarkdownResolved = (Resolve-Path $LocalBaselineMarkdownPath).Path
 
                 Write-DebugOutput -Message "Local baseline markdown path: $LocalBaselineMarkdownResolved" -Source $source -Level "Verbose"
-                Write-DebugOutput -Message "Local Rego path: $RegoResolvedPath" -Source $source -Level "Verbose"
 
-                Update-ScubaConfigBaselineWithRego `
+                Update-ScubaConfigBaselineWithMarkdown `
                     -ConfigFilePath $BaselineDestPath `
-                    -GitHubDirectoryUrl $LocalBaselineMarkdownResolved `
-                    -RegoDirectory $RegoResolvedPath `
+                    -BaselineDirectory $LocalBaselineMarkdownResolved `
                     -AdditionalFields @('criticality')
 
                 $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
                 $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Local Rego Dynamic Parsing" -Source $source -Level "Info"
+                Write-DebugOutput -Message "Successfully loaded baselines using: Local Markdown Parsing" -Source $source -Level "Info"
             }
             catch {
-                Write-DebugOutput -Message "Failed to load baselines using Local Rego parsing: $($_.Exception.Message)" -Source $source -Level "Warning"
+                Write-DebugOutput -Message "Failed to load baselines using Local Markdown parsing: $($_.Exception.Message)" -Source $source -Level "Warning"
                 $syncHash.Baselines = $null
             }
         }
 
-        # Strategy 2: Online Markdown with Rego processing (if online and enabled)
-        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines -and (Test-Path $RegoTestPath)) {
+        # Strategy 2: Online Markdown processing (if online and enabled)
+        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines) {
             try {
                 Write-DebugOutput -Message "Attempting to load baselines from online markdown files in this directory: $($syncHash.UIConfigs.OnlineBaselineMarkdownURL)" -Source $source -Level "Verbose"
 
-                $RegoResolvedPath = (Resolve-Path $RegoTestPath).Path
                 $BaselineDestPath = "$env:Temp\ScubaBaselines.json"
 
-                # Create empty baseline structure for Rego to populate
+                # Create empty baseline structure to populate
                 $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
                 $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
 
-                Update-ScubaConfigBaselineWithRego `
+                Update-ScubaConfigBaselineWithMarkdown `
                     -ConfigFilePath $BaselineDestPath `
                     -GitHubDirectoryUrl $syncHash.UIConfigs.OnlineBaselineMarkdownURL `
-                    -RegoDirectory $RegoResolvedPath `
                     -AdditionalFields @('criticality')
 
                 $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
                 $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Online Markdown with Rego Baseline" -Source $source -Level "Info"
+                Write-DebugOutput -Message "Successfully loaded baselines using: Online Markdown Baseline" -Source $source -Level "Info"
             }
             catch {
-                Write-DebugOutput -Message "Failed to load baselines using Online Markdown with Rego Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
+                Write-DebugOutput -Message "Failed to load baselines using Online Markdown Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
                 $syncHash.Baselines = $null
             }
         }

@@ -1,186 +1,97 @@
-﻿<#
-.SYNOPSIS
-Helper functions to update ScubaConfigApp baseline configuration using Rego files.
-
-.DESCRIPTION
-This module provides functions to parse Rego files for exclusion type mappings
-and update the ScubaConfigApp baseline configuration accordingly.
-
-.EXAMPLE
-
-#import module
+<#
+# Example usage:
 [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-Import-Module (Join-Path -Path $ResourceRoot -ChildPath './ScubaConfigAppBaselineHelper.psm1')
 
-# Get the REGO mappings
-$regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "..\..\Rego"
+# Get the markdown mappings
+$markdownMappings = Get-ScubaConfigExclusionMappingsFromMarkdown -BaselineDirectory "..\..\..\baselines"
 
-# Update configuration using Rego mappings
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego"
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines"  -RegoDirectory "..\..\Rego"
+# Update configuration using markdown mappings
+Update-ScubaConfigBaselineWithMarkdown -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
 
 # Filter specific products
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -BaselineDirectory "..\..\baselines" -ProductFilter @("aad", "defender", "exo")
+Update-ScubaConfigBaselineWithMarkdown -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 
 # Update configuration with additional fields
-Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory "..\..\Rego" -AdditionalFields @('criticality')
+Update-ScubaConfigBaselineWithMarkdown -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -AdditionalFields @('criticality')
 #>
 
-function Get-ScubaConfigRegoExclusionMappings {
+function Get-ScubaConfigExclusionMappingsFromMarkdown {
     <#
     .SYNOPSIS
-    Parses Rego configuration files to extract the actual exclusion type mappings for each policy.
+    Extracts exclusion type mappings from hidden markers in baseline markdown files.
 
     .DESCRIPTION
-    This function analyzes the Rego files in the ScubaGear project to determine which exclusion types
-    are actually used by each policy ID. This provides the most accurate mapping compared to text-based
-    pattern matching.
+    This function parses baseline markdown files to extract exclusion type mappings using
+    hidden markers in the format <!--ExclusionType: TypeName-->. This approach is simpler
+    and more maintainable than parsing Rego files.
 
-    .PARAMETER RegoDirectory
-    The directory containing the Rego files. Defaults to the standard ScubaGear Rego directory.
+    .PARAMETER BaselineDirectory
+    The directory containing baseline markdown files. Defaults to the standard ScubaGear baselines directory.
+
+    .PARAMETER GitHubDirectoryUrl
+    The URL of the GitHub directory containing baseline policy files.
 
     .EXAMPLE
-    $mappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory "C:\Path\To\ScubaGear\Rego"
+    $mappings = Get-ScubaConfigExclusionMappingsFromMarkdown -BaselineDirectory "C:\Path\To\ScubaGear\baselines"
     #>
     param(
         [Parameter(Mandatory=$false)]
-        [string]$RegoDirectory = "$PSScriptRoot\..\..\Rego"
+        [string]$BaselineDirectory,
+
+        [Parameter(Mandatory=$false)]
+        [string]$GitHubDirectoryUrl
     )
 
     $exclusionMappings = @{}
+    $files = @()
 
-    # Define the mapping patterns to look for in Rego files
-    $patterns = @{
-        'UserExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'CapExclusions'
-        'GroupExclusionsFullyExempt.*["'']([^"'']+)["'']' = 'CapExclusions'
-        'PrivilegedRoleExclusions.*["'']([^"'']+)["'']' = 'RoleExclusions'
-
-        'SensitiveAccountsConfig.*["'']([^"'']+)["'']' = 'SensitiveAccounts'
-        'SensitiveAccountsSetting.*["'']([^"'']+)["'']' = 'SensitiveAccounts'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']AgencyDomains["'']' = 'AgencyDomains'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']PartnerDomains["'']' = 'PartnerDomains'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["''].*["'']SensitiveUsers["'']' = 'SensitiveUsers'
-        'ImpersonationProtectionConfig.*["'']([^"'']+)["'']' = 'SensitiveUsers'
-
-        'input\.scuba_config\.Exo\[\''([^'']+)\''\]\.AllowedForwardingDomains' = 'AllowedForwardingDomains'
-
-        'input\.scuba_config\.Aad\[\''([^'']+)\''\]\.RoleExclusions' = 'RoleExclusions'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveAccounts' = 'SensitiveAccounts'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.SensitiveUsers' = 'SensitiveUsers'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.PartnerDomains' = 'PartnerDomains'
-        'input\.scuba_config\.Defender\[\''([^'']+)\''\]\.AgencyDomains' = 'AgencyDomains'
-    }
-
-
-    # Get all Rego files with error handling for permission denied issues
-    try {
-        $regoFiles = Get-ChildItem -Path $RegoDirectory -Filter "*.rego" -Recurse -ErrorAction Stop
-    }
-    catch [System.UnauthorizedAccessException] {
-        # Handle permission denied errors by trying without -Recurse or with limited scope
-        Write-Warning "Permission denied accessing some directories. Searching only in immediate subdirectories."
-        $regoFiles = @()
-
-        # Get files from the root directory
-        $regoFiles += Get-ChildItem -Path $RegoDirectory -Filter "*.rego" -ErrorAction SilentlyContinue
-
-        # Get files from immediate subdirectories only
-        $subdirs = Get-ChildItem -Path $RegoDirectory -Directory -ErrorAction SilentlyContinue
-        foreach ($subdir in $subdirs) {
-            try {
-                $regoFiles += Get-ChildItem -Path $subdir.FullName -Filter "*.rego" -Recurse -ErrorAction Stop
-            }
-            catch {
-                # Skip directories we can't access
-                Write-Verbose "Skipping directory due to access restrictions: $($subdir.FullName)"
-                $regoFiles += Get-ChildItem -Path $subdir.FullName -Filter "*.rego" -ErrorAction SilentlyContinue
-            }
+    # Get markdown files from GitHub or local directory
+    if ($GitHubDirectoryUrl) {
+        # Convert GitHub URL to API URL
+        if ($GitHubDirectoryUrl -match '^https://github.com/([^/]+)/([^/]+)/tree/([^/]+)(?:/(.*))?$') {
+            $owner = $matches[1]
+            $repo = $matches[2]
+            $branch = $matches[3]
+            $path = if ($matches[4]) { $matches[4] } else { "" }
+            $apiUrl = "https://api.github.com/repos/$owner/$repo/contents/$path`?ref=$branch"
+        } else {
+            throw "Invalid GitHub URL format. Expected format: https://github.com/owner/repo/tree/branch/path"
         }
+
+        # Get list of markdown files in the directory
+        $response = Invoke-RestMethod -Uri $apiUrl
+        $files = $response | Where-Object { $_.name -like "*.md" }
+    } elseif ($BaselineDirectory) {
+        $files = Get-ChildItem -Path $BaselineDirectory -Filter *.md
+    } else {
+        throw "You must provide either -BaselineDirectory or -GitHubDirectoryUrl."
     }
-    catch {
-        throw "Failed to access Rego directory '$RegoDirectory': $($_.Exception.Message)"
-    }
 
-    foreach ($file in $regoFiles) {
-        $content = Get-Content -Path $file.FullName -Raw
-
-        foreach ($pattern in $patterns.Keys) {
-            $exclusionData = $patterns[$pattern]
-
-            # Use regex to find matches
-            $RegoFileContentMatches = [regex]::Matches($content, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-
-            foreach ($regoMatch in $RegoFileContentMatches) {
-                if ($regoMatch.Groups.Count -gt 1) {
-                    $policyId = $regoMatch.Groups[1].Value
-
-                    # Only add if it looks like a valid policy ID
-                    if ($policyId -match '^MS\.[A-Z]+\.[0-9]+\.[0-9]+v[0-9]+$') {
-                        $exclusionMappings[$policyId] = $exclusionData
-                        Write-Verbose "Found mapping: $policyId -> $exclusionData (from $($file.Name))"
-                    }
-                }
-            }
+    # Process each markdown file
+    foreach ($file in $files) {
+        if ($GitHubDirectoryUrl) {
+            $content = (Invoke-WebRequest -Uri $file.download_url).Content
+            $lines = $content -split "`n"
+        } else {
+            $lines = Get-Content -Path $file.FullName
         }
-    }
-
-    # Add some additional patterns by analyzing comments and function names
-    foreach ($file in $regoFiles) {
-        $content = Get-Content -Path $file.FullName
 
         $currentPolicyId = $null
-        $inPolicySection = $false
 
-        for ($i = 0; $i -lt $content.Count; $i++) {
-            $line = $content[$i]
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            $line = $lines[$i]
 
-            # Look for policy ID comments
-            if ($line -match '#\s*(MS\.[A-Z]+\.[0-9]+\.[0-9]+v[0-9]+)') {
+            # Look for policy ID headers (#### MS.XXX.#.#v#)
+            if ($line -match '^####\s+(MS\.[A-Z]+\.[0-9]+\.[0-9]+v[0-9]+)\s*$') {
                 $currentPolicyId = $matches[1]
-                $inPolicySection = $true
-                continue
             }
 
-            # Look for end of policy section
-            if ($inPolicySection -and $line -match '^#\s*MS\.[A-Z]+\.[0-9]+' -and $line -notmatch $currentPolicyId) {
-                $inPolicySection = $false
-                $currentPolicyId = $null
-                continue
-            }
-
-            # If we're in a policy section, look for specific patterns
-            if ($inPolicySection -and $currentPolicyId) {
-                # Look for specific exclusion patterns within the policy section
-                switch -Regex ($line) {
-                    'UserExclusionsFullyExempt|GroupExclusionsFullyExempt' {
-                        $exclusionMappings[$currentPolicyId] = 'CapExclusions'
-                        Write-Verbose "Found CAP mapping: $currentPolicyId -> CapExclusions (from context)"
-                    }
-                    'PrivilegedRoleExclusions' {
-                        $exclusionMappings[$currentPolicyId] = 'RoleExclusions'
-                        Write-Verbose "Found RoleExclusions mapping: $currentPolicyId -> RoleExclusions (from context)"
-                    }
-                    'SensitiveAccountsConfig|SensitiveAccountsSetting' {
-                        $exclusionMappings[$currentPolicyId] = 'SensitiveAccounts'
-                        Write-Verbose "Found sensitive accounts mapping: $currentPolicyId -> SensitiveAccounts (from context)"
-                    }
-                    'ImpersonationProtectionConfig.*SensitiveUsers' {
-                        $exclusionMappings[$currentPolicyId] = 'SensitiveUsers'
-                        Write-Verbose "Found sensitive users mapping: $currentPolicyId -> SensitiveUsers (from context)"
-                    }
-                    'ImpersonationProtectionConfig.*PartnerDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'PartnerDomains'
-                        Write-Verbose "Found partner domains mapping: $currentPolicyId -> PartnerDomains (from context)"
-                    }
-                    'ImpersonationProtectionConfig.*AgencyDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'AgencyDomains'
-                        Write-Verbose "Found agency domains mapping: $currentPolicyId -> AgencyDomains (from context)"
-                    }
-                    'AllowedForwardingDomains' {
-                        $exclusionMappings[$currentPolicyId] = 'AllowedForwardingDomains'
-                        Write-Verbose "Found forwarding domains mapping: $currentPolicyId -> AllowedForwardingDomains (from context)"
-                    }
+            # Look for hidden exclusion type marker
+            if ($currentPolicyId -and $line -match '<!--\s*ExclusionType:\s*(\w+)\s*-->') {
+                $exclusionType = $matches[1]
+                if (-not $exclusionMappings.ContainsKey($currentPolicyId)) {
+                    $exclusionMappings[$currentPolicyId] = $exclusionType
+                    Write-Verbose "Found mapping: $currentPolicyId -> $exclusionType (from $($file.Name))"
                 }
             }
         }
@@ -188,15 +99,16 @@ function Get-ScubaConfigRegoExclusionMappings {
 
     return $exclusionMappings
 }
-function Update-ScubaConfigBaselineWithRego {
+
+function Update-ScubaConfigBaselineWithMarkdown {
     <#
     .SYNOPSIS
-    Updates the baseline configuration using exclusion mappings extracted from Rego files.
+    Updates the baseline configuration using exclusion mappings extracted from markdown file markers.
 
     .DESCRIPTION
-    This function uses the Rego files to determine the actual exclusion types used by each policy,
-    providing more accurate mappings than text-based pattern matching. Also handles version increment,
-    debug mode reset, and adds required fields to all baselines.
+    This function uses hidden markers in the baseline markdown files to determine the exclusion types
+    used by each policy, providing a simpler approach than parsing Rego files. Also handles version
+    increment, debug mode reset, and adds required fields to all baselines.
 
     .PARAMETER ConfigFilePath
     The path to the configuration file that will be updated.
@@ -207,9 +119,6 @@ function Update-ScubaConfigBaselineWithRego {
     .PARAMETER GitHubDirectoryUrl
     The URL of the GitHub directory containing baseline policy files.
 
-    .PARAMETER RegoDirectory
-    The directory containing the Rego files. Defaults to the standard ScubaGear Rego directory.
-
     .PARAMETER ProductFilter
     An array of product names to filter the policies.
 
@@ -217,7 +126,7 @@ function Update-ScubaConfigBaselineWithRego {
     An array of additional fields to include in the policy objects. Available fields: criticality, lastModified, implementation, mitreMapping, resources, link.
 
     .EXAMPLE
-    Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -RegoDirectory ".\Rego"
+    Update-ScubaConfigBaselineWithMarkdown -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
     #>
     param(
         [Parameter(Mandatory=$true)]
@@ -230,27 +139,36 @@ function Update-ScubaConfigBaselineWithRego {
         [string]$GitHubDirectoryUrl,
 
         [Parameter(Mandatory=$false)]
-        [string]$RegoDirectory = "$PSScriptRoot\..\..\Rego",
-
-        [Parameter(Mandatory=$false)]
         [string[]]$ProductFilter = @(),
 
         [Parameter(Mandatory=$false)]
         [string[]]$AdditionalFields = @("criticality", "lastModified", "implementation", "mitreMapping", "resources", "link")
     )
 
-    # Get the exclusion mappings from Rego files
-    Write-Output "Analyzing Rego files for exclusion mappings..."
-    $regoMappings = Get-ScubaConfigRegoExclusionMappings -RegoDirectory $RegoDirectory
-
-    Write-Output "Found $($regoMappings.Keys.Count) policy exclusion mappings from Rego files"
-
-    # Load existing configuration
-    if (-not (Test-Path $ConfigFilePath)) {
-        throw "Configuration file not found at: $ConfigFilePath"
+    # Get the exclusion mappings from markdown file markers
+    Write-Output "Analyzing markdown files for exclusion mappings..."
+    #if Paramter is BaselineDirectory use that, else use GitHubDirectoryUrl
+    if ($BaselineDirectory) {
+        $markdownMappings = Get-ScubaConfigExclusionMappingsFromMarkdown -BaselineDirectory $BaselineDirectory
+    } else {
+        $markdownMappings = Get-ScubaConfigExclusionMappingsFromMarkdown -GitHubDirectoryUrl $GitHubDirectoryUrl
     }
 
-    $configContent = Get-Content $ConfigFilePath -Raw | ConvertFrom-Json
+    Write-Output "Found $($markdownMappings.Keys.Count) policy exclusion mappings from markdown files"
+
+    # Load existing configuration or create new one if it doesn't exist
+    if (Test-Path $ConfigFilePath) {
+        $configContent = Get-Content $ConfigFilePath -Raw | ConvertFrom-Json
+        Write-Output "Loaded existing configuration from: $ConfigFilePath"
+    } else {
+        # Create new configuration structure
+        $configContent = [PSCustomObject]@{
+            Version = "1.0.0"
+            DebugMode = "None"
+            baselines = @{}
+        }
+        Write-Output "Creating new configuration file: $ConfigFilePath"
+    }
 
     # 1. Update version using current date (year offset from 2025, month, day)
     if ($configContent.Version) {
@@ -304,9 +222,9 @@ function Update-ScubaConfigBaselineWithRego {
         $productBaseline = @()
 
         foreach ($policy in $policies) {
-            # Use Rego mapping if available, otherwise default to "none"
-            $exclusionField = if ($regoMappings.ContainsKey($policy.PolicyId)) {
-                $regoMappings[$policy.PolicyId]
+            # Use markdown mapping if available, otherwise default to "none"
+            $exclusionField = if ($markdownMappings.ContainsKey($policy.PolicyId)) {
+                $markdownMappings[$policy.PolicyId]
             } else {
                 "none"
             }
@@ -321,12 +239,14 @@ function Update-ScubaConfigBaselineWithRego {
             $policyObj = [ordered]@{
                 id = $policy.PolicyId
                 name = $policy.Title
-                rationale = $policy.Rationale
-                criticality = $null
                 exclusionField = $exclusionField
                 omissionField = "Omissions"
                 annotationField = "Annotations"
-                link = "$GitHubDirectoryUrl/$($product.ToLower()).md#$($policy.PolicyId.replace('.', '').ToLower())"
+            }
+
+            # Add rationale if available (always try to include this)
+            if ($policy.Rationale) {
+                $policyObj['rationale'] = $policy.Rationale
             }
 
             # Add additional fields if specified and they exist
@@ -334,32 +254,33 @@ function Update-ScubaConfigBaselineWithRego {
                 switch ($field) {
                     "criticality" {
                         if ($policy.Criticality) {
-                            $policyObj.criticality = $policy.Criticality
+                            $policyObj['criticality'] = $policy.Criticality
                         }
                     }
                     "lastModified" {
                         if ($policy.LastModified) {
-                            $policyObj.lastModified = $policy.LastModified
+                            $policyObj['lastModified'] = $policy.LastModified
                         }
                     }
                     "implementation" {
                         if ($policy.Implementation) {
-                            $policyObj.implementation = $policy.Implementation
+                            $policyObj['implementation'] = $policy.Implementation
                         }
                     }
                     "mitreMapping" {
                         if ($policy.MITRE_Mapping -and $policy.MITRE_Mapping.Count -gt 0) {
-                            $policyObj.mitreMapping = $policy.MITRE_Mapping
+                            $policyObj['mitreMapping'] = $policy.MITRE_Mapping
                         }
                     }
                     "resources" {
                         if ($policy.Resources -and $policy.Resources.Count -gt 0) {
-                            $policyObj.resources = $policy.Resources
+                            $policyObj['resources'] = $policy.Resources
                         }
                     }
                     "link" {
-                        # Link is always generated, so it's already added above
-                        # This case exists for documentation/consistency
+                        if ($policy.Link) {
+                            $policyObj['link'] = $policy.Link
+                        }
                     }
                 }
             }
@@ -429,56 +350,33 @@ function Get-ScubaBaselinePolicy {
 
     $files = @()
 
-    # Determine if we're using GitHub URL or local directory
-    $isGitHubUrl = $GitHubDirectoryUrl -and $GitHubDirectoryUrl -match '^https?://'
-
-    if ($isGitHubUrl) {
+    if ($GitHubDirectoryUrl) {
         # Convert GitHub URL to API URL
         if ($GitHubDirectoryUrl -match '^https://github.com/([^/]+)/([^/]+)/tree/([^/]+)(?:/(.*))?$') {
             $owner = $matches[1]
             $repo = $matches[2]
             $branch = $matches[3]
-            $path = $matches[4]
-            if ($null -ne $path -and $path -ne "") {
-                $apiUrl = "https://api.github.com/repos/$owner/$repo/contents/$path`?ref=$branch"
-            } else {
-                $apiUrl = "https://api.github.com/repos/$owner/$repo/contents`?ref=$branch"
-            }
+            $path = if ($matches[4]) { $matches[4] } else { "" }
+            $apiUrl = "https://api.github.com/repos/$owner/$repo/contents/$path`?ref=$branch"
         } else {
-            throw "Invalid GitHub directory URL format."
+            throw "Invalid GitHub URL format. Expected format: https://github.com/owner/repo/tree/branch/path"
         }
 
         # Get list of markdown files in the directory
         $response = Invoke-RestMethod -Uri $apiUrl
         $files = $response | Where-Object { $_.name -like "*.md" }
     } elseif ($BaselineDirectory) {
-        # Use local directory
-        if (-not (Test-Path $BaselineDirectory)) {
-            throw "Baseline directory not found: $BaselineDirectory"
-        }
         $files = Get-ChildItem -Path $BaselineDirectory -Filter *.md
-    } elseif ($GitHubDirectoryUrl) {
-        # GitHubDirectoryUrl is provided but it's a local path (not HTTP/HTTPS)
-        # Treat it as a local directory path
-        if (-not (Test-Path $GitHubDirectoryUrl)) {
-            throw "Baseline directory not found: $GitHubDirectoryUrl"
-        }
-        $files = Get-ChildItem -Path $GitHubDirectoryUrl -Filter *.md
-        $BaselineDirectory = $GitHubDirectoryUrl  # Set this for consistent processing below
     } else {
         throw "You must provide either -BaselineDirectory or -GitHubDirectoryUrl."
     }
 
     foreach ($file in $files) {
-        if ($isGitHubUrl) {
-            $rawUrl = $file.download_url
-            $content = Invoke-WebRequest -Uri $rawUrl -UseBasicParsing | Select-Object -ExpandProperty Content
-            $product = [System.IO.Path]::GetFileNameWithoutExtension($file.name)
+        if ($GitHubDirectoryUrl) {
+            $content = (Invoke-WebRequest -Uri $file.download_url).Content
             $lines = $content -split "`n"
         } else {
-            # Local file
-            $product = $file.BaseName
-            $lines = Get-Content $file.FullName
+            $lines = Get-Content -Path $file.FullName
         }
 
         $inPoliciesSection = $false
@@ -496,34 +394,29 @@ function Get-ScubaBaselinePolicy {
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
 
-            # Check if we're in Implementation section
-            if ($line -match '^### Implementation\s*$') {
+            # Detect the start of an implementation instruction section
+            if ($line -match '^####\s+(MS\.[A-Z]+\.[0-9]+\.[0-9]+v[0-9]+)\s+Instructions\s*$') {
+                if ($inImplementationSection -and $currentImplementationPolicy) {
+                    $implementationInstructions[$currentImplementationPolicy] = ($currentImplementationContent -join "`n").Trim()
+                }
+                $currentImplementationPolicy = $matches[1]
                 $inImplementationSection = $true
+                $currentImplementationContent = @()
                 continue
             }
 
-            # Stop looking when we hit the next main section
-            if ($inImplementationSection -and $line -match '^## ') {
-                $inImplementationSection = $false
-                if ($currentImplementationPolicy) {
-                    $implementationInstructions[$currentImplementationPolicy] = ($currentImplementationContent -join "`n").Trim()
+            # Collect content for implementation instructions
+            if ($inImplementationSection) {
+                # Check for the end of implementation section (next policy or major section)
+                if ($line -match '^####\s+MS\.[A-Z]+\.[0-9]+\.[0-9]+v[0-9]+' -or $line -match '^##\s+\d+\.' -or $line -match '^###\s+') {
+                    if ($currentImplementationPolicy) {
+                        $implementationInstructions[$currentImplementationPolicy] = ($currentImplementationContent -join "`n").Trim()
+                    }
+                    $inImplementationSection = $false
                     $currentImplementationPolicy = $null
                     $currentImplementationContent = @()
                 }
-                continue
-            }
-
-            # If we're in Implementation section, look for policy instruction headers
-            if ($inImplementationSection) {
-                if ($line -match '####\s+([A-Z0-9\.]+v\d+)\s+Instructions') {
-                    if ($currentImplementationPolicy) {
-                        $implementationInstructions[$currentImplementationPolicy] = ($currentImplementationContent -join "`n").Trim()
-                        $currentImplementationContent = @()
-                    }
-                    $currentImplementationPolicy = $matches[1]
-                    continue
-                }
-                if ($currentImplementationPolicy) {
+                else {
                     $currentImplementationContent += $line
                 }
             }
@@ -537,60 +430,74 @@ function Get-ScubaBaselinePolicy {
         $inPoliciesSection = $false
         for ($i = 0; $i -lt $lines.Count; $i++) {
             $line = $lines[$i]
-            if ($line.Trim() -match '^### Policies') {
+
+            if ($line -match '^###\s+Policies\s*$') {
                 $inPoliciesSection = $true
                 continue
             }
-            if ($inPoliciesSection -and ($line.Trim() -match '^## ' -or $line.Trim() -match '^# ')) {
-                if ($currentPolicy) {
-                    $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
-                    foreach ($key in $policyContent.Keys) {
-                        $currentPolicy[$key] = $policyContent[$key]
-                    }
-                    $policies += [PSCustomObject]$currentPolicy
-                    $currentPolicy = $null
-                    $currentContent = @()
-                }
-                $inPoliciesSection = $false
-                $expectTitle = $false
-                continue
-            }
+
             if ($inPoliciesSection) {
+                if ($line -match '^###\s+(?!Policies)' -or $line -match '^##\s+\d+\.') {
+                    # End of Policies section - save current policy if exists
+                    if ($currentPolicy) {
+                        $currentPolicy.Content = ($currentContent -join "`n").Trim()
+                        $fullContent = $currentPolicy.Content
+                        $policyDetails = Get-ScubaPolicyContent -Content $fullContent
+                        $currentPolicy.Criticality = $policyDetails.Criticality
+                        $currentPolicy.LastModified = $policyDetails.LastModified
+                        $currentPolicy.Rationale = $policyDetails.Rationale
+                        $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
+                        $currentPolicy.Resources = $policyDetails.Resources
+                        $policies += $currentPolicy
+                        # Reset for next policy
+                        $currentPolicy = $null
+                        $currentContent = @()
+                    }
+                    $inPoliciesSection = $false
+                    # Continue processing to find next "### Policies" section
+                    continue
+                }
+
                 if ($line -match $policyHeaderPattern) {
                     if ($currentPolicy) {
-                        $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
-                        foreach ($key in $policyContent.Keys) {
-                            $currentPolicy[$key] = $policyContent[$key]
-                        }
-                        $policies += [PSCustomObject]$currentPolicy
-                        $currentContent = @()
+                        $currentPolicy.Content = ($currentContent -join "`n").Trim()
+                        $fullContent = $currentPolicy.Content
+                        $policyDetails = Get-ScubaPolicyContent -Content $fullContent
+                        $currentPolicy.Criticality = $policyDetails.Criticality
+                        $currentPolicy.LastModified = $policyDetails.LastModified
+                        $currentPolicy.Rationale = $policyDetails.Rationale
+                        $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
+                        $currentPolicy.Resources = $policyDetails.Resources
+                        $policies += $currentPolicy
                     }
                     $currentPolicy = @{
                         PolicyId = $matches[1]
-                        Title    = ""
-                        Implementation = ""
+                        Title = $null
+                        Content = $null
                     }
+                    $currentContent = @()
                     $expectTitle = $true
-                    continue
                 }
-                elseif ($expectTitle -and $currentPolicy) {
-                    if ($line.Trim() -ne "") {
-                        $currentPolicy.Title = $line.Trim()
-                        $expectTitle = $false
-                    }
+                elseif ($expectTitle -and $line.Trim() -ne '') {
+                    $currentPolicy.Title = $line.Trim()
+                    $expectTitle = $false
                 }
-                elseif ($currentPolicy) {
+                else {
                     $currentContent += $line
                 }
             }
         }
 
         if ($currentPolicy) {
-            $policyContent = Get-ScubaPolicyContent -Content ($currentContent -join "`n")
-            foreach ($key in $policyContent.Keys) {
-                $currentPolicy[$key] = $policyContent[$key]
-            }
-            $policies += [PSCustomObject]$currentPolicy
+            $currentPolicy.Content = ($currentContent -join "`n").Trim()
+            $fullContent = $currentPolicy.Content
+            $policyDetails = Get-ScubaPolicyContent -Content $fullContent
+            $currentPolicy.Criticality = $policyDetails.Criticality
+            $currentPolicy.LastModified = $policyDetails.LastModified
+            $currentPolicy.Rationale = $policyDetails.Rationale
+            $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
+            $currentPolicy.Resources = $policyDetails.Resources
+            $policies += $currentPolicy
         }
 
         # Attach implementation instructions to the policies
@@ -601,7 +508,8 @@ function Get-ScubaBaselinePolicy {
         }
 
         if ($policies.Count -gt 0) {
-            $policiesByProduct[$product] = $policies
+            $productName = ($file.Name -replace '\.md$', '').ToLower()
+            $policiesByProduct[$productName] = $policies
         }
     }
 
@@ -639,7 +547,7 @@ function Get-ScubaPolicyContent {
         $mitreList = @()
         foreach ($line in $mitreBlock -split "`n") {
             if ($line -match '\[([^\]]+)\]\(([^)]+)\)') {
-                $mitreList += $line.Trim()
+                $mitreList += @{ Name = $matches[1]; Url = $matches[2] }
             }
         }
         $result.MITRE_Mapping = $mitreList
@@ -648,8 +556,8 @@ function Get-ScubaPolicyContent {
         $resourcesBlock = $matches[1]
         $resources = @()
         foreach ($line in $resourcesBlock -split "`n") {
-            if ($line -match '^\s*-\s*\[([^\]]+)\]\(([^)]+)\)') {
-                $resources += $line.Trim()
+            if ($line -match '\[([^\]]+)\]\(([^)]+)\)') {
+                $resources += @{ Name = $matches[1]; Url = $matches[2] }
             }
         }
         $result.Resources = $resources
@@ -657,5 +565,7 @@ function Get-ScubaPolicyContent {
     return $result
 }
 
-# export
-#Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigRegoExclusionMappings, Update-ScubaConfigBaselineWithRego
+
+
+# Export module members
+Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigExclusionMappingsFromMarkdown, Update-ScubaConfigBaselineWithMarkdown
