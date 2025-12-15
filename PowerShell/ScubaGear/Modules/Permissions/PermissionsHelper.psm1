@@ -134,7 +134,7 @@ Function Get-ScubaGearPermissions {
 
         # If ProductName is * then set Product to all possible values
         if ($Product -contains '*') {
-            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerPlatform')
+            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform')
         }
 
         if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){

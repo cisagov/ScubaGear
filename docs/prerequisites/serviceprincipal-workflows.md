@@ -43,9 +43,9 @@ Before using the Service Principal module, ensure you have:
 
    <sup>*Application Developer can only manage applications they own</sup>
 
-   > [!NOTE]
-   > - **Entra ID roles**: You need only ONE of the listed roles. The **bold** role is the least privileged option.
-   > - **Graph API scopes**: Functions automatically request these permissions when you run them. You must consent when prompted.
+> [!NOTE]
+> - **Entra ID roles**: You need only ONE of the listed roles. The **bold** role is the least privileged option.
+> - **Graph API scopes**: Functions automatically request these permissions when you run them. You must consent when prompted.
 
 ## Initial Setup Workflow
 

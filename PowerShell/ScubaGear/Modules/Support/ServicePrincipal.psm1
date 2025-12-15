@@ -903,9 +903,9 @@ function Get-ScubaGearAppPermission {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
-        [string[]]$ProductNames
+        [string[]]$ProductNames = '*'
     )
 
     $M365Environment = $M365Environment.ToLower()
@@ -1434,7 +1434,7 @@ function Set-ScubaGearAppPermission {
    [CmdletBinding(
         SupportsShouldProcess = $true,
         ConfirmImpact = 'High',
-        DefaultParameterSetName = 'Pipeline'
+        DefaultParameterSetName = 'Standalone'
     )]
     param(
         # Pipeline parameter set
@@ -1466,11 +1466,11 @@ function Set-ScubaGearAppPermission {
         [string]$M365Environment,
 
         [Parameter(
-            Mandatory = $true,
+            Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
         [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
-        [string[]]$ProductNames
+        [string[]]$ProductNames = '*'
     )
 
     Begin {
@@ -1483,11 +1483,6 @@ function Set-ScubaGearAppPermission {
         # Determine which parameter set is being used
         if ($PSCmdlet.ParameterSetName -eq 'Standalone') {
             Write-Verbose "Running in standalone mode - fetching current permissions"
-
-            # Handle wildcard for ProductNames
-            #if ($ProductNames -contains '*') {
-            #    $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
-            #}
 
             # Call Get-ScubaGearAppPermission to build the InputObject
             try {
@@ -2304,9 +2299,9 @@ function New-ScubaGearServicePrincipal {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$false)]
         [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
-        [string[]]$ProductNames,
+        [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
         [ValidateLength(0, 120)]
