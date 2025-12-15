@@ -99,9 +99,9 @@
     "supportedFileExtensions": [".yaml", ".yml", ".json"],
     "maxFileSizeBytes": 1048576,
     "requireProductInPolicy": true,
-    "validateExclusions": false,
-    "validateOmitPolicy": false,
-    "validateAnnotatePolicy": false
+    "validateExclusions": true,
+    "validateOmitPolicy": true,
+    "validateAnnotatePolicy": true
   },
   "outputSettings": {
     "fileNameMaxLength": 100,
@@ -109,5 +109,9 @@
     "defaultEncoding": "UTF-8"
   }
 }
+
+
+
+
 
 
