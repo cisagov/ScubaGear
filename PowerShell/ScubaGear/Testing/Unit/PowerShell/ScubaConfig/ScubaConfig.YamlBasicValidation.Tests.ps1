@@ -4,6 +4,9 @@ Describe "ScubaConfig Basic Root Configuration Tests" {
     BeforeAll {
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
+
+        # Mock ConvertFrom-Yaml for GitHub workflow compatibility
+        Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
     }
 
     BeforeEach {
@@ -53,6 +56,18 @@ DisconnectOnExit: false
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $ValidYaml | Set-Content -Path $TempFile
 
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad', 'defender')
+                M365Environment='commercial'
+                Organization='example.onmicrosoft.com'
+                OrgName='Test Organization'
+                OrgUnitName='IT Department'
+                LogIn=$true
+                DisconnectOnExit=$false
+            }
+        }
+
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
         $ValidationResult.IsValid | Should -Be $True
@@ -73,6 +88,16 @@ DisconnectOnExit: "false"
 
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $InvalidYaml | Set-Content -Path $TempFile
+
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad')
+                M365Environment='commercial'
+                OrgName='Test Organization'
+                LogIn='true'
+                DisconnectOnExit='false'
+            }
+        }
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
@@ -99,6 +124,14 @@ OrgName: Test Organization
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $ValidYaml | Set-Content -Path $TempFile
 
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad', 'defender', 'exo', 'sharepoint', 'teams', 'powerplatform')
+                M365Environment='commercial'
+                OrgName='Test Organization'
+            }
+        }
+
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
         $ValidationResult.IsValid | Should -Be $True
 
@@ -117,6 +150,14 @@ OrgName: Test Organization
 
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $InvalidYaml | Set-Content -Path $TempFile
+
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad', 'defender', 'invalid_product')
+                M365Environment='commercial'
+                OrgName='Test Organization'
+            }
+        }
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
         $ValidationResult.IsValid | Should -Be $False
@@ -137,6 +178,14 @@ OrgName: Test Organization
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
 
+            function global:ConvertFrom-Yaml {
+                @{
+                    ProductNames=@('aad')
+                    M365Environment=$Environment
+                    OrgName='Test Organization'
+                }
+            }
+
             $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
             $ValidationResult.IsValid | Should -Be $True
 
@@ -154,6 +203,14 @@ OrgName: Test Organization
 
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $InvalidYaml | Set-Content -Path $TempFile
+
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad')
+                M365Environment='invalid_environment'
+                OrgName='Test Organization'
+            }
+        }
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
         $ValidationResult.IsValid | Should -Be $False
@@ -175,6 +232,15 @@ PreferredDnsResolvers:
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $ValidYaml | Set-Content -Path $TempFile
 
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad')
+                M365Environment='commercial'
+                OrgName='Test Organization'
+                PreferredDnsResolvers=@('8.8.8.8', '1.1.1.1')
+            }
+        }
+
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
         $ValidationResult.IsValid | Should -Be $True
 
@@ -194,6 +260,15 @@ PreferredDnsResolvers:
 
         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
         $InvalidYaml | Set-Content -Path $TempFile
+
+        function global:ConvertFrom-Yaml {
+            @{
+                ProductNames=@('aad')
+                M365Environment='commercial'
+                OrgName='Test Organization'
+                PreferredDnsResolvers=@('8.8.8.8', '1.1.1.256')
+            }
+        }
 
         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
         $ValidationResult.IsValid | Should -Be $False

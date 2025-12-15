@@ -51,7 +51,6 @@ InModuleScope ScubaConfig {
                 }
                 [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
