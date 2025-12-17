@@ -655,6 +655,13 @@ class ScubaConfigValidator {
             }
         }
 
+        # Validate enum if specified
+        if ($ItemSchema.enum -and $null -ne $Item) {
+            if ($Item -notin $ItemSchema.enum) {
+                $Validation.Errors += "$Context value '$Item' is not valid. Valid values: $($ItemSchema.enum -join ', ')"
+            }
+        }
+
         # Validate type
         if ($ItemSchema.type) {
             $ExpectedType = $ItemSchema.type

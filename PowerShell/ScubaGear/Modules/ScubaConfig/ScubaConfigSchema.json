@@ -77,8 +77,7 @@
     "NumberOfUUIDCharactersToTruncate": {
       "type": "integer",
       "description": "Number of UUID characters to truncate in output",
-      "minimum": 0,
-      "maximum": 36,
+      "enum": [0, 13, 18, 36],
       "default": 18
     },
     "Organization": {
