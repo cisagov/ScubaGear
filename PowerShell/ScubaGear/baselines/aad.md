@@ -49,11 +49,11 @@ Throughout this document, this list of highly privileged roles is referenced in 
 
 ## Conditional Access Policies
 
-Numerous policies in this baseline rely on Microsoft Entra ID Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using conditions such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Microsoft Entra ID Conditional Access.
+Numerous policies in this baseline rely on Microsoft Entra ID Conditional Access. Conditional Access is a feature that allows administrators to limit access to resources using characteristics such as user or group membership, device, IP location, and real-time risk detection. This section provides guidance and tools when implementing baseline policies which rely on Microsoft Entra ID Conditional Access.
 
 As described in Microsoft’s literature related to conditional access policies, CISA recommends initially setting a policy to **Report-only** when it is created and then performing thorough hands-on testing to help prevent unintended consequences before toggling the policy from **Report-only** to **On**. The policy will only be enforced when it is set to **On**. One tool that can assist with running test simulations is the [What If tool](https://learn.microsoft.com/en-us/entra/identity/conditional-access/what-if-tool). Microsoft also describes [Conditional Access insights and reporting](https://learn.microsoft.com/en-us/entra/identity/conditional-access/howto-conditional-access-insights-reporting) that can assist with testing.
 
-Assigning conditions within Conditional Access policies—such as device platform, location, or application filters—can unintentionally introduce gaps in policy coverage. While these conditions are designed to refine access controls, overly granular or misaligned configurations may exclude certain scenarios from enforcement. For example:
+ScubaGear currently does not assess conditions within conditional access policies aside from the conditions specified in the implementation sections. Assigning conditions within Conditional Access policies—such as device platform, location, or application filters—can unintentionally introduce gaps in policy coverage. While these conditions are designed to refine access controls, overly granular or misaligned configurations may exclude certain scenarios from enforcement. For example:
 
 - **Overlapping or conflicting conditions** can result in users or devices falling outside intended protections.
 - **Unaccounted exceptions** (e.g., new cloud apps or unmanaged devices) may bypass critical controls.
