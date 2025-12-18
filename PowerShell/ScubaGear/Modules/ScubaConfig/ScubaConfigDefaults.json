@@ -102,13 +102,79 @@
     "validateExclusions": true,
     "validateOmitPolicy": true,
     "validateAnnotatePolicy": true
+    
   },
   "outputSettings": {
+    "debugMode": true,
     "fileNameMaxLength": 100,
     "supportedFormats": ["html", "json", "csv"],
-    "defaultEncoding": "UTF-8"
+    "defaultEncoding": "UTF-8",
+    "errorCategories": [
+      {
+        "name": "Property errors",
+        "pattern": "Property"
+      },
+      {
+        "name": "Exclusion Policy errors",
+        "pattern": "exclusion.*Policy ID|exclusion.*control ID|^Policy ID:"
+      },
+      {
+        "name": "Annotate Policy errors",
+        "pattern": "^Annotated Policy ID:|AnnotatePolicy"
+      },
+      {
+        "name": "Omit Policy errors",
+        "pattern": "^Omitted Policy ID:|OmitPolicy"
+      }
+    ],
+    "recommendedActionMessage": [
+      "    It is recommended to use the new ScubaGear Configuration Editor to build a configuration file via a graphical user interface.",
+      "    Run: 'Start-ScubaConfigApp' to launch the configuration application and get started.",
+      "    Refer to the documentation [docs\\configuration\\scubaconfigapp.md] for guidance on using this application."
+    ]
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

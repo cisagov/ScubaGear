@@ -121,7 +121,7 @@ M365Environment: invalid-env
                 }
             }
 
-            It 'LoadConfig with SkipValidation=$true should skip business rule validation'{
+            It 'LoadConfig with SkipValidation=$true should skip Organization rule validation'{
                 # Create config with invalid values
                 $testFile = [System.IO.Path]::GetTempFileName()
                 $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')

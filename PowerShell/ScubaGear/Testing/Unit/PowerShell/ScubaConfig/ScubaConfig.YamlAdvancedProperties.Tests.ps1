@@ -76,23 +76,24 @@ M365Environment: commercial
 OrgName: Test Organization
 Description: Test configuration for validation
 
-ExclusionsConfig:
-  aad:
+Aad:
+  MS.AAD.1.1v1:
     CapExclusions:
       Users:
-        - "12345678-1234-1234-1234-123456789abc"
+        - 12345678-1234-1234-1234-123456789abc
       Groups:
-        - "87654321-4321-4321-4321-cba987654321"
+        - 87654321-4321-4321-4321-cba987654321
     RoleExclusions:
       Users:
-        - "11111111-2222-3333-4444-555555555555"
-  defender:
+        - 11111111-2222-3333-4444-555555555555
+Defender:
+  MS.DEFENDER.1.1v1:
     SensitiveAccounts:
       IncludedUsers:
-        - "user@example.com"
-        - "admin@company.org"
+        - user@example.com
+        - admin@company.org
       ExcludedUsers:
-        - "testuser@example.com"
+        - testuser@example.com
 "@
 
     $script:InvalidGuidConfigYaml = @"
@@ -102,14 +103,14 @@ M365Environment: commercial
 OrgName: Test Organization
 Description: Test configuration with invalid GUIDs
 
-ExclusionsConfig:
-  aad:
+Aad:
+  MS.AAD.1.1v1:
     CapExclusions:
       Users:
-        - "not-a-guid"
-        - "invalid-format"
+        - not-a-guid
+        - invalid-format
       Groups:
-        - "also-not-guid"
+        - also-not-guid
 "@
 
     $script:InvalidUpnConfigYaml = @"
@@ -119,14 +120,14 @@ M365Environment: commercial
 OrgName: Test Organization
 Description: Test configuration with invalid UPNs
 
-ExclusionsConfig:
-  defender:
+Defender:
+  MS.DEFENDER.1.1v1:
     SensitiveAccounts:
       IncludedUsers:
-        - "not-an-email"
-        - "invalid.format"
+        - not-an-email
+        - invalid.format
       ExcludedUsers:
-        - "also@invalid"
+        - also@invalid
 "@
 }
 

@@ -21,9 +21,8 @@
       "default": "commercial"
     },
     "OPAPath": {
-      "type": "string",
-      "description": "Path to OPA executable directory",
-      "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$"
+      "$ref": "#/definitions/patterns/filePath",
+      "description": "Path to OPA executable directory"
     },
     "LogIn": {
       "type": "boolean",
@@ -40,39 +39,32 @@
       "description": "Output directory path"
     },
     "OutFolderName": {
-      "type": "string",
-      "description": "Output folder name",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "Output folder name"
     },
     "OutProviderFileName": {
-      "type": "string",
-      "description": "Provider settings export filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "Provider settings export filename"
     },
     "OutRegoFileName": {
-      "type": "string",
-      "description": "Rego test results filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "Rego test results filename"
     },
     "OutReportName": {
-      "type": "string",
-      "description": "HTML report filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "HTML report filename"
     },
     "OutJsonFileName": {
-      "type": "string",
-      "description": "JSON results filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "JSON results filename"
     },
     "OutCsvFileName": {
-      "type": "string",
-      "description": "CSV results filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "CSV results filename"
     },
     "OutActionPlanFileName": {
-      "type": "string",
-      "description": "Action plan filename",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "$ref": "#/definitions/patterns/filename",
+      "description": "Action plan filename"
     },
     "NumberOfUUIDCharactersToTruncate": {
       "type": "integer",
@@ -81,9 +73,8 @@
       "default": 18
     },
     "Organization": {
-      "type": "string",
-      "description": "Organization domain name (Fully Qualified Domain Name)",
-      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$"
+      "$ref": "#/definitions/patterns/fqdn",
+      "description": "Organization domain name (Fully Qualified Domain Name)"
     },
     "OrgName": {
       "type": "string",
@@ -103,21 +94,18 @@
       "maxLength": 500
     },
     "AppId": {
-      "type": "string",
-      "description": "Entra ID Application ID for service principal authentication",
-      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$"
+      "$ref": "#/definitions/patterns/appGuid",
+      "description": "Entra ID Application ID for service principal authentication"
     },
     "CertificateThumbprint": {
-      "type": "string",
-      "description": "Certificate thumbprint for service principal authentication",
-      "pattern": "^[A-Fa-f0-9]{40}$"
+      "$ref": "#/definitions/patterns/thumbprint",
+      "description": "Certificate thumbprint for service principal authentication"
     },
     "PreferredDnsResolvers": {
       "type": "array",
       "description": "Preferred DNS resolver IP addresses",
       "items": {
-        "type": "string",
-        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+        "$ref": "#/definitions/patterns/ipv4"
       }
     },
     "SkipDoH": {
@@ -249,6 +237,11 @@
         "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
         "friendlyName": "DisplayName;EmailAddress format"
       },
+      "fqdn": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,4}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,4}$",
+        "friendlyName": "Fully Qualified Domain Name (FQDN)"
+      },
       "orgDomain": {
         "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,}$",
         "friendlyName": "domain name (FQDN)"
@@ -261,111 +254,123 @@
     },
     "AadExclusions": {
       "type": "object",
-      "properties": {
-        "CapExclusions": {
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
           "type": "object",
           "properties": {
-            "Users": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-              },
-              "description": "User object IDs (GUIDs) to exclude from CAP evaluation"
+            "CapExclusions": {
+              "type": "object",
+              "properties": {
+                "Users": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "description": "User object IDs (GUIDs) to exclude from CAP evaluation"
+                },
+                "Groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "description": "Group object IDs (GUIDs) to exclude from CAP evaluation"
+                }
+              }
             },
-            "Groups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-              },
-              "description": "Group object IDs (GUIDs) to exclude from CAP evaluation"
-            }
-          }
-        },
-        "RoleExclusions": {
-          "type": "object",
-          "properties": {
-            "Users": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-              },
-              "description": "User object IDs (GUIDs) to exclude from role requirements"
-            },
-            "Groups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-              },
-              "description": "Group object IDs (GUIDs) to exclude from role requirements"
+            "RoleExclusions": {
+              "type": "object",
+              "properties": {
+                "Users": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "description": "User object IDs (GUIDs) to exclude from role requirements"
+                },
+                "Groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                  },
+                  "description": "Group object IDs (GUIDs) to exclude from role requirements"
+                }
+              }
             }
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "DefenderExclusions": {
       "type": "object",
-      "properties": {
-        "SensitiveAccounts": {
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
           "type": "object",
           "properties": {
-            "IncludedUsers": {
+            "SensitiveAccounts": {
+              "type": "object",
+              "properties": {
+                "IncludedUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                  },
+                  "description": "User Principal Names (UPNs) to include in sensitive accounts"
+                },
+                "IncludedGroups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                  },
+                  "description": "Group Principal Names (fully qualified domain names) to include in sensitive accounts"
+                },
+                "IncludedDomains": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "Domains to include in sensitive accounts"
+                },
+                "ExcludedUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                  },
+                  "description": "User Principal Names (UPNs) to exclude from sensitive accounts"
+                },
+                "ExcludedGroups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                  },
+                  "description": "Group Principal Names (fully qualified domain names) to exclude from sensitive accounts"
+                },
+                "ExcludedDomains": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "Domains to exclude from sensitive accounts"
+                }
+              }
+            },
+            "SensitiveUsers": {
               "type": "array",
               "items": {
                 "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+                "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+                "description": "Sensitive user in format 'DisplayName;EmailAddress'"
               },
-              "description": "User Principal Names (UPNs) to include in sensitive accounts"
-            },
-            "IncludedGroups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              },
-              "description": "Group Principal Names (fully qualified domain names) to include in sensitive accounts"
-            },
-            "IncludedDomains": {
-              "type": "array",
-              "items": {"type": "string"},
-              "description": "Domains to include in sensitive accounts"
-            },
-            "ExcludedUsers": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              },
-              "description": "User Principal Names (UPNs) to exclude from sensitive accounts"
-            },
-            "ExcludedGroups": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-              },
-              "description": "Group Principal Names (fully qualified domain names) to exclude from sensitive accounts"
-            },
-            "ExcludedDomains": {
-              "type": "array",
-              "items": {"type": "string"},
-              "description": "Domains to exclude from sensitive accounts"
+              "description": "List of sensitive users with display name and email separated by semicolon"
             }
           }
-        },
-        "SensitiveUsers": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            "description": "Sensitive user in format 'DisplayName;EmailAddress'"
-          },
-          "description": "List of sensitive users with display name and email separated by semicolon"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "ExoExclusions": {
       "type": "object",
