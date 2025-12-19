@@ -40,12 +40,12 @@ class ScubaConfigValidator {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
         # Construct the full path to the schema file
         $SchemaPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigSchema.json"
-        
+
         # Verify the schema file exists before attempting to load it
         if (-not (Test-Path -Path $SchemaPath)) {
             throw "Schema file not found: $SchemaPath"
         }
-        
+
         try {
             # Read the entire schema file as a single string
             $SchemaContent = Get-Content -Path $SchemaPath -Raw
@@ -95,10 +95,10 @@ class ScubaConfigValidator {
     static [ValidationResult] ValidateYamlFile([string]$FilePath) {
         # Get the default debug mode from configuration
         $Defaults = [ScubaConfigValidator]::GetDefaults()
-        $DefaultDebugMode = if ($Defaults.outputSettings -and $Defaults.outputSettings.debugMode) { 
-            $Defaults.outputSettings.debugMode 
-        } else { 
-            $false 
+        $DefaultDebugMode = if ($Defaults.outputSettings -and $Defaults.outputSettings.debugMode) {
+            $Defaults.outputSettings.debugMode
+        } else {
+            $false
         }
         return [ScubaConfigValidator]::ValidateYamlFile($FilePath, $DefaultDebugMode, $false)
     }
@@ -112,7 +112,7 @@ class ScubaConfigValidator {
     static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipDetailedValidation) {
         # Write debug info immediately instead of collecting it
         Write-Debug "ValidateYamlFile called with: $FilePath (DebugMode: $DebugMode, SkipDetailedValidation: $SkipDetailedValidation)"
-        
+
         $Result = [ValidationResult]::new()
         $Result.IsValid = $false
         $Result.ValidationErrors = @()
@@ -255,7 +255,7 @@ class ScubaConfigValidator {
         $RequiredProperties = if ($Defaults.minRequired) { $Defaults.minRequired } else { @() }
         if ($RequiredProperties.Count -gt 0) {
             $ConfigProperties = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
-            
+
             if ($DebugMode) {
                 Write-Debug "Required properties check: $($RequiredProperties -join ', ')"
                 Write-Debug "Found properties: $($ConfigProperties -join ', ')"
@@ -474,7 +474,7 @@ class ScubaConfigValidator {
                         break
                     }
                 }
-                
+
                 if (-not $PatternMatched) {
                     $CapitalizedProduct = $ProductName.Substring(0,1).ToUpper() + $ProductName.Substring(1).ToLower()
                     $Validation.Errors += "Policy ID: '$PolicyId' under '$CapitalizedProduct' does not match any allowed pattern"
@@ -526,7 +526,7 @@ class ScubaConfigValidator {
             $Schema = [ScubaConfigValidator]::GetSchema()
             $PropertySchema = [ScubaConfigValidator]::ResolveSchemaReference($Schema, $PropertySchema)
         }
-        
+
         # Validate type constraint
         if ($PropertySchema.type) {
             $ExpectedType = $PropertySchema.type
@@ -580,7 +580,7 @@ class ScubaConfigValidator {
         if ($PropertySchema.type -eq "array") {
             [ScubaConfigValidator]::ValidateArrayProperty($Value, $PropertySchema, $Validation, $Context)
         }
-        # Handle object validation  
+        # Handle object validation
         elseif ($PropertySchema.type -eq "object") {
             [ScubaConfigValidator]::ValidateObjectProperty($Value, $PropertySchema, $Validation, $Context)
         }
@@ -589,7 +589,7 @@ class ScubaConfigValidator {
     # Dynamic array validation based on schema constraints
     static [void] ValidateArrayProperty([object]$Value, [object]$ArraySchema, [PSCustomObject]$Validation, [string]$Context) {
         $IsArray = $Value -is [array] -or ($Value -is [System.Collections.IEnumerable] -and $Value -isnot [string])
-        
+
         if (-not $IsArray) {
             $ActualType = [ScubaConfigValidator]::GetValueType($Value)
             $Validation.Errors += "$Context must be an array but got $ActualType"
@@ -959,7 +959,7 @@ class ScubaConfigValidator {
         }
 
         $ConfigKeys = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
-        
+
         foreach ($Key in $ConfigKeys) {
             # Check if the key (in lowercase) exists in our correct casing map
             $LowerKey = $Key.ToLower()

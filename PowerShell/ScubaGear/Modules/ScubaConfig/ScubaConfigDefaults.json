@@ -102,7 +102,7 @@
     "validateExclusions": true,
     "validateOmitPolicy": true,
     "validateAnnotatePolicy": true
-    
+
   },
   "outputSettings": {
     "debugMode": true,

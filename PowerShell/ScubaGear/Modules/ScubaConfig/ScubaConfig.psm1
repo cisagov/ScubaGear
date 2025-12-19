@@ -137,16 +137,16 @@ class ScubaConfig {
         # Phase 1: Always validate basic file format (extension, size, YAML syntax)
         # This catches fundamental issues early before processing
         Write-Debug "Loading configuration file: $Path"
-        
+
         # Use the default debug mode from configuration instead of hardcoding false
         $Defaults = [ScubaConfig]::_ConfigDefaults
-        $DefaultDebugMode = if ($Defaults.outputSettings -and $Defaults.outputSettings.debugMode) { 
-            $Defaults.outputSettings.debugMode 
-        } else { 
-            $false 
+        $DefaultDebugMode = if ($Defaults.outputSettings -and $Defaults.outputSettings.debugMode) {
+            $Defaults.outputSettings.debugMode
+        } else {
+            $false
         }
         Write-Debug "Using debug mode: $DefaultDebugMode (from configuration default)"
-        
+
         $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName, $DefaultDebugMode, $true)
 
         # Check for file format errors (extension, size, YAML parsing)
@@ -243,11 +243,11 @@ class ScubaConfig {
             $OutputSettings = $Defaults.outputSettings
             $recommendedActionMessage = $OutputSettings.recommendedActionMessage
             $ErrorCategories = $OutputSettings.errorCategories
-            
+
             # Dynamically categorize errors based on configuration
             $CategorizedErrors = @{}
             $UncategorizedErrors = @()
-            
+
             # Create a prioritized matching order (most specific patterns first)
             # This ensures more specific patterns match before generic ones
             $MatchingOrder = @()
@@ -262,12 +262,12 @@ class ScubaConfig {
 
             foreach ($ValidationError in $AllErrors) {
                 $Categorized = $false
-                
+
                 # Try to match against each category's pattern in priority order
                 foreach ($Category in $MatchingOrder) {
                     $CategoryName = $Category.name
                     $Pattern = $Category.pattern
-                    
+
                     if ($ValidationError -match $Pattern) {
                         # Special handling for "^Policy ID:" pattern to avoid double-categorization
                         if ($Pattern -match "\^Policy ID:") {
@@ -293,7 +293,7 @@ class ScubaConfig {
                         }
                     }
                 }
-                
+
                 if (-not $Categorized) {
                     $UncategorizedErrors += $ValidationError
                 }
@@ -301,7 +301,7 @@ class ScubaConfig {
 
             # Build categorized error message using configured order
             $ErrorMessage = "Configuration validation failed:`n"
-            
+
             # Display errors in the order defined in configuration
             foreach ($Category in $ErrorCategories) {
                 $CategoryName = $Category.name

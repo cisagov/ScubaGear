@@ -4,7 +4,7 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
     BeforeAll {
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
-        
+
         # Mock ConvertFrom-Yaml for GitHub workflow compatibility
         Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
     }
