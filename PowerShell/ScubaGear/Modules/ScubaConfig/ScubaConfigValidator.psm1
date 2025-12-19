@@ -349,13 +349,11 @@ class ScubaConfigValidator {
             }
         }
 
-        # Product name warnings (business logic)
-        if ($ConfigObject.ProductNames -and ($ConfigObject.ProductNames -contains "*") -and $ConfigObject.ProductNames.Count -gt 1) {
-            $Validation.Warnings += "ProductNames contains wildcard '*' with other products. Wildcard takes precedence."
-        }
-
         # Validate product exclusion property casing (business requirement)
         [ScubaConfigValidator]::ValidateProductExclusionCasing($ConfigObject, $Validation)
+
+        # Check for exclusion configurations on products that don't support them
+        [ScubaConfigValidator]::ValidateUnsupportedExclusions($ConfigObject, $Validation)
 
         return $Validation
     }
@@ -949,13 +947,20 @@ class ScubaConfigValidator {
 
     # Validates product exclusion property names for correct capitalization.
     hidden static [void] ValidateProductExclusionCasing([object]$ConfigObject, [PSCustomObject]$Validation) {
-        $CorrectCasing = @{
-            "aad" = "Aad"
-            "defender" = "Defender"
-            "exo" = "Exo"
-            "powerplatform" = "PowerPlatform"
-            "sharepoint" = "SharePoint"
-            "teams" = "Teams"
+        $Defaults = [ScubaConfigValidator]::GetDefaults()
+        
+        # Get products that support exclusions from configuration
+        if (-not ($Defaults.products)) {
+            return
+        }
+
+        # Build correct casing map for products that support exclusions
+        $CorrectCasing = @{}
+        foreach ($ProductKey in $Defaults.products.PSObject.Properties.Name) {
+            $Product = $Defaults.products.$ProductKey
+            if ($Product.supportsExclusions -eq $true) {
+                $CorrectCasing[$ProductKey.ToLower()] = $ProductKey.Substring(0,1).ToUpper() + $ProductKey.Substring(1).ToLower()
+            }
         }
 
         $ConfigKeys = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
@@ -968,6 +973,37 @@ class ScubaConfigValidator {
                 if ($Key -cne $CorrectCasing[$LowerKey]) {
                     $Validation.Errors += "Property '$Key' should use correct capitalization: '$($CorrectCasing[$LowerKey])'. Product exclusion properties are case-sensitive."
                 }
+            }
+        }
+    }
+
+    # Validates that exclusion configurations are not set for products that don't support them.
+    hidden static [void] ValidateUnsupportedExclusions([object]$ConfigObject, [PSCustomObject]$Validation) {
+        $Defaults = [ScubaConfigValidator]::GetDefaults()
+        
+        # Get products that do NOT support exclusions from configuration
+        if (-not ($Defaults.products)) {
+            return
+        }
+
+        $UnsupportedProducts = @()
+        foreach ($ProductKey in $Defaults.products.PSObject.Properties.Name) {
+            $Product = $Defaults.products.$ProductKey
+            if ($Product.supportsExclusions -eq $false) {
+                $UnsupportedProducts += $ProductKey
+            }
+        }
+
+        $ConfigKeys = [ScubaConfigValidator]::GetObjectKeys($ConfigObject)
+
+        foreach ($Key in $ConfigKeys) {
+            # Check if the key matches any product that doesn't support exclusions
+            if ($Key -in $UnsupportedProducts) {
+                $Validation.Warnings += "Configuration contains exclusions for '$Key' which does not support exclusions. This configuration will be ignored."
+            }
+            # Also check for case-insensitive matches
+            elseif ($UnsupportedProducts -contains ($Key -replace '^(.)(.*)$', { $_.Groups[1].Value.ToUpper() + $_.Groups[2].Value.ToLower() })) {
+                $Validation.Warnings += "Configuration contains exclusions for '$Key' which does not support exclusions. This configuration will be ignored."
             }
         }
     }

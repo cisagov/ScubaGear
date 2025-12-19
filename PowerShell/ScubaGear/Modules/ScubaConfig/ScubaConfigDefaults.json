@@ -47,37 +47,37 @@
     }
   },
   "products": {
-    "aad": {
+    "Aad": {
       "name": "Microsoft Entra ID",
       "displayName": "Microsoft Entra ID (aad)",
       "supportsExclusions": true,
       "supportedExclusionTypes": ["CapExclusions", "RoleExclusions"]
     },
-    "defender": {
+    "Defender": {
       "name": "Defender",
       "displayName": "Defender (defender)",
       "supportsExclusions": true,
       "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers"]
     },
-    "exo": {
+    "Exo": {
       "name": "Exchange Online",
       "displayName": "Exchange Online (exo)",
       "supportsExclusions": true,
       "supportedExclusionTypes": ["AllowedForwardingDomains", "PartnerDomains", "AgencyDomains"]
     },
-    "powerplatform": {
+    "Powerplatform": {
       "name": "Power Platform",
       "displayName": "Power Platform (powerplatform)",
       "supportsExclusions": false,
       "supportedExclusionTypes": []
     },
-    "sharepoint": {
+    "Sharepoint": {
       "name": "SharePoint & OneDrive",
       "displayName": "SharePoint & OneDrive (sharepoint)",
       "supportsExclusions": false,
       "supportedExclusionTypes": []
     },
-    "teams": {
+    "Teams": {
       "name": "Microsoft Teams",
       "displayName": "Microsoft Teams (teams)",
       "supportsExclusions": false,
@@ -102,7 +102,6 @@
     "validateExclusions": true,
     "validateOmitPolicy": true,
     "validateAnnotatePolicy": true
-
   },
   "outputSettings": {
     "debugMode": true,

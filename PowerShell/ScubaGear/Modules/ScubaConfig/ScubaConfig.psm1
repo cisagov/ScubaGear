@@ -428,6 +428,11 @@ class ScubaConfig {
         # Special handling for ProductNames (wildcard expansion and uniqueness)
         # ProductNames determines which Microsoft 365 products will be scanned
         if ($this.Configuration.ProductNames) {
+            # Check for wildcard with other products before expansion and warn user
+            if ($this.Configuration.ProductNames.Contains('*') -and $this.Configuration.ProductNames.Count -gt 1) {
+                Write-Warning "ProductNames contains wildcard '*' with other products. Wildcard takes precedence."
+            }
+
             # Handle wildcard '*' by expanding to all supported products
             if ($this.Configuration.ProductNames.Contains('*')) {
                 $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames')
