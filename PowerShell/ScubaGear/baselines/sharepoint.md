@@ -21,6 +21,10 @@ The **License Requirements** sections of this document assume the organization i
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
+**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+
+**Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
+
 # Baseline Policies
 
 ## 1. External Sharing
@@ -31,6 +35,9 @@ This section helps reduce security risks related to sharing files with users ext
 ### Policies
 #### MS.SHAREPOINT.1.1v1
 External sharing for SharePoint SHALL be limited to Existing guests or Only people in your organization.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Sharing information outside the organization via SharePoint increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of access to information.
@@ -44,6 +51,9 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only peop
 #### MS.SHAREPOINT.1.2v1
 External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.SHAREPOINT.1.2v1; Criticality: SHALL -->
 - _Rationale:_ Sharing files outside the organization via OneDrive increases the risk of unauthorized access. By limiting external sharing, administrators decrease the risk of unauthorized access to information.
 - _Last modified:_ June 2023
@@ -56,6 +66,9 @@ External sharing for OneDrive SHALL be limited to Existing guests or Only people
 
 #### MS.SHAREPOINT.1.3v1
 External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.
@@ -133,6 +146,9 @@ This section provides policies to set the scope and permissions for sharing link
 #### MS.SHAREPOINT.2.1v1
 File and folder default sharing scope SHALL be set to Specific people (only the people the user specifies).
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.SHAREPOINT.2.1v1; Criticality: SHALL -->
 - _Rationale:_ By making the default sharing the most restrictive, administrators prevent accidentally sharing information too broadly.
 - _Last modified:_ June 2023
@@ -146,6 +162,9 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
 
 #### MS.SHAREPOINT.2.2v1
 File and folder default sharing permissions SHALL be set to View.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
 - _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
@@ -197,6 +216,9 @@ Sharing files with external users via the usage of **Anyone links** or **Verific
 #### MS.SHAREPOINT.3.1v1
 Expiration days for Anyone links SHALL be set to 30 days or less.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators can prevent unintended sustained access to the link.
 - _Last modified:_ March 2025
@@ -211,6 +233,9 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 #### MS.SHAREPOINT.3.2v1
 The allowable file and folder permissions for links SHALL be set to View only.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
 <!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ March 2025
@@ -223,6 +248,9 @@ The allowable file and folder permissions for links SHALL be set to View only.
 
 #### MS.SHAREPOINT.3.3v1
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
