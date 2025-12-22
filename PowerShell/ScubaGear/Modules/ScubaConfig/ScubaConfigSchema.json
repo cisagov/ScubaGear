@@ -17,8 +17,7 @@
     "M365Environment": {
       "type": "string",
       "description": "Microsoft 365 environment type",
-      "enum": ["commercial", "gcc", "gcchigh", "dod"],
-      "default": "commercial"
+      "enum": ["commercial", "gcc", "gcchigh", "dod"]
     },
     "OPAPath": {
       "type": "string",
@@ -27,13 +26,11 @@
     },
     "LogIn": {
       "type": "boolean",
-      "description": "Whether to perform login during execution",
-      "default": true
+      "description": "Whether to perform login during execution"
     },
     "DisconnectOnExit": {
       "type": "boolean",
-      "description": "Whether to disconnect from services on exit",
-      "default": false
+      "description": "Whether to disconnect from services on exit"
     },
     "OutPath": {
       "type": "string",
@@ -78,8 +75,7 @@
     "NumberOfUUIDCharactersToTruncate": {
       "type": "integer",
       "description": "Number of UUID characters to truncate in output",
-      "enum": [0, 13, 18, 36],
-      "default": 18
+      "enum": [0, 13, 18, 36]
     },
     "Organization": {
       "$ref": "#/definitions/patterns/orgDomain",
@@ -98,10 +94,12 @@
       "maxLength": 100
     },
     "AppId": {
+      "type": "string",
       "$ref": "#/definitions/patterns/appGuid",
       "description": "Entra ID Application ID for service principal authentication"
     },
     "CertificateThumbprint": {
+      "type": "string",
       "$ref": "#/definitions/patterns/thumbprint",
       "description": "Certificate thumbprint for service principal authentication"
     },
@@ -115,30 +113,35 @@
     },
     "SkipDoH": {
       "type": "boolean",
-      "description": "Skip DNS over HTTPS for DNS queries",
-      "default": false
+      "description": "Skip DNS over HTTPS for DNS queries"
     },
     "Aad": {
+      "type": "object",
       "$ref": "#/definitions/AadExclusions",
       "description": "Azure Active Directory (Entra ID) exclusions configuration"
     },
     "Defender": {
+      "type": "object",
       "$ref": "#/definitions/DefenderExclusions",
       "description": "Microsoft Defender exclusions configuration"
     },
     "Exo": {
+      "type": "object",
       "$ref": "#/definitions/ExoExclusions",
       "description": "Exchange Online exclusions configuration"
     },
     "PowerPlatform": {
+      "type": "object",
       "$ref": "#/definitions/PowerPlatformExclusions",
       "description": "Power Platform exclusions configuration"
     },
     "SharePoint": {
+      "type": "object",
       "$ref": "#/definitions/SharePointExclusions",
       "description": "SharePoint exclusions configuration"
     },
     "Teams": {
+      "type": "object",
       "$ref": "#/definitions/TeamsExclusions",
       "description": "Teams exclusions configuration"
     },

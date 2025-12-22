@@ -245,9 +245,9 @@ class ScubaConfig {
         # This maintains backward compatibility while allowing selective disabling of policy validation
         $Defaults = [ScubaConfig]::_ConfigDefaults
 
-        # Validate OmitPolicy entries if present and validation not disabled
+        # Validate OmitPolicy entries if present
         # OmitPolicy allows users to exclude specific policies from assessment
-        if ($this.Configuration.OmitPolicy -and $Defaults.validation.validateOmitPolicy -ne $false) {
+        if ($this.Configuration.OmitPolicy) {
             try {
                 # Validate that omitted policy IDs are properly formatted and reference valid products
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
@@ -258,9 +258,9 @@ class ScubaConfig {
             }
         }
 
-        # Validate AnnotatePolicy entries if present and validation not disabled
+        # Validate AnnotatePolicy entries if present
         # AnnotatePolicy allows users to add metadata and comments to specific policy results
-        if ($this.Configuration.AnnotatePolicy -and $Defaults.validation.validateAnnotatePolicy -ne $false) {
+        if ($this.Configuration.AnnotatePolicy) {
             try {
                 # Validate that annotated policy IDs are properly formatted and reference valid products
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)

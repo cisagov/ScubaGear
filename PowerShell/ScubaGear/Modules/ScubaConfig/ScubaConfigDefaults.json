@@ -96,12 +96,11 @@
   ],
   "validation": {
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
+    "policyIdPatternExample": "MS.<PRODUCT>.#.#v#",
+    "policyIdPatternExampleWithProduct": "MS.{PRODUCT}.#.#v#",
     "supportedFileExtensions": [".yaml", ".yml", ".json"],
     "maxFileSizeBytes": 1048576,
-    "requireProductInPolicy": true,
-    "validateExclusions": true,
-    "validateOmitPolicy": true,
-    "validateAnnotatePolicy": true
+    "requireProductInPolicy": true
   },
   "outputSettings": {
     "debugMode": true,
