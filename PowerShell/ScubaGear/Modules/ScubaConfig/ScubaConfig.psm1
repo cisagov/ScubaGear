@@ -122,14 +122,18 @@ class ScubaConfig {
 
     # Primary config loading method. Resets singleton, validates file format, parses content, applies defaults.
     # SkipValidation=true allows deferred validation after command-line overrides are applied.
-    # This method implements a two-phase validation approach for flexibility
+    # This method implements a two-phase validation approach for flexibility:
+    # Phase 1: Always validate file format (extension, size, YAML syntax)
+    # Phase 2: Optionally validate content (schema, business rules) based on SkipValidation parameter
     [Boolean]LoadConfig([System.IO.FileInfo]$Path, [Boolean]$SkipValidation){
         # First, verify the file exists before attempting to load it
+        # This provides a clear error message rather than letting file operations fail later
         if (-Not (Test-Path -PathType Leaf $Path)){
             throw [System.IO.FileNotFoundException]"Failed to load: $Path"
         }
 
         # Reset the singleton to ensure clean state before loading new configuration
+        # This prevents contamination from previously loaded configurations in the same session
         [ScubaConfig]::ResetInstance()
         # Ensure the validator subsystem is ready
         [ScubaConfig]::InitializeValidator()
@@ -139,6 +143,7 @@ class ScubaConfig {
         Write-Debug "Loading configuration file: $Path"
 
         # Use the default debug mode from configuration instead of hardcoding false
+        # This allows the debug behavior to be controlled via configuration files
         $Defaults = [ScubaConfig]::_ConfigDefaults
         $DefaultDebugMode = if ($Defaults.outputSettings -and $Defaults.outputSettings.debugMode) {
             $Defaults.outputSettings.debugMode
@@ -147,188 +152,150 @@ class ScubaConfig {
         }
         Write-Debug "Using debug mode: $DefaultDebugMode (from configuration default)"
 
+        # Perform initial validation with business rules skipped (SkipBusinessRules=true)
+        # This validates file format, extension, size, and YAML parsing but defers content validation
+        # The third parameter (SkipBusinessRules) is always true here for format-only validation
         $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName, $DefaultDebugMode, $true)
 
         # Check for file format errors (extension, size, YAML parsing)
+        # These are fundamental issues that prevent any further processing
         if (-not $ValidationResult.IsValid) {
+            # Build a comprehensive error message from all validation failures
             $ErrorMessage = "Configuration file format validation failed:`n"
             foreach ($ValidationError in $ValidationResult.ValidationErrors) {
                 $ErrorMessage += "  - $ValidationError`n"
             }
+            # Throw with formatted error message, removing trailing newline
             throw $ErrorMessage.TrimEnd()
         }
 
-        # Display warnings if any
+        # Display warnings if any (file size approaching limits, deprecated formats, etc.)
+        # Warnings don't prevent loading but provide important user guidance
         if ($ValidationResult.Warnings.Count -gt 0) {
             foreach ($Warning in $ValidationResult.Warnings) {
                 Write-Warning $Warning
             }
         }
 
-        # Use the already parsed content from validation
+        # Use the already parsed content from validation to avoid re-parsing
+        # The validator has already converted YAML to PowerShell objects safely
         $this.Configuration = $ValidationResult.ParsedContent
 
-        # Convert to hashtable for compatibility
+        # Convert to hashtable for compatibility with internal configuration management
+        # PSCustomObjects from YAML parsing need to be converted to hashtables for consistent access patterns
         if ($this.Configuration -is [PSCustomObject]) {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
 
+        # Apply default values and process special configuration properties
+        # This ensures all required properties have values and handles wildcards, path expansion, etc.
         $this.SetParameterDefaults()
+        # Mark configuration as successfully loaded
         [ScubaConfig]::_IsLoaded = $true
 
-        # Perform full validation if not skipped
+        # Perform full content validation if not skipped
+        # This allows for deferred validation after command-line parameter overrides
         if (-not $SkipValidation) {
+            # Validate the complete configuration including schema, business rules, and policy references
             $this.ValidateConfiguration()
         }
 
         return [ScubaConfig]::_IsLoaded
     }
 
-    # Validates current configuration state after overrides. Performs schema + Configuration rules + policy validation.
+# Validates current configuration state after overrides. Performs schema + business rules + policy validation.
     # Used for deferred validation pattern where config is loaded with SkipValidation=true then validated after overrides.
-    # This allows command-line parameters to override config file values before final validation
+    # This allows command-line parameters to override config file values before final validation.
+    # The method implements a comprehensive validation strategy with multiple phases and detailed error reporting.
     [void]ValidateConfiguration(){
 
         Write-Debug "Validating final configuration state"
 
         # Convert internal hashtable representation back to PSCustomObject for validator compatibility
-        # The validator expects PSCustomObject format for consistent property access
+        # The validator expects PSCustomObject format for consistent property access across different PowerShell object types
+        # This conversion is necessary because the internal configuration uses hashtables for performance
         $ConfigObject = [PSCustomObject]$this.Configuration
 
         # Phase 1: Perform JSON Schema validation (structure, types, constraints)
+        # This validates against the formal schema definition including data types, patterns, and structural requirements
+        # Schema validation catches fundamental issues like wrong data types, missing required fields, invalid formats
         $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false)
 
-        # Phase 2: Perform Configuration rule validation (paths, content quality, cross-field validation)
-        $ConfigurationValidation = [ScubaConfigValidator]::ValidateConfigurationRules($ConfigObject, $false)
+        # Phase 2: Perform business rule validation (paths, content quality, cross-field validation)
+        # This layer adds domain-specific validation beyond what JSON Schema can express
+        # Business rules include file path existence, cross-field dependencies, and ScubaGear-specific requirements
+        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($ConfigObject, $false)
 
-        # Collect all errors
+        # Collect all errors from both validation phases
+        # This provides a comprehensive view of all configuration issues in a single validation run
         $AllErrors = @()
         $AllErrors += $SchemaValidation.Errors
-        $AllErrors += $ConfigurationValidation.Errors
+        $AllErrors += $BusinessValidation.Errors
 
-        # Display warnings
+        # Display all warnings to the user immediately
+        # Warnings don't prevent execution but provide important guidance and notices
         foreach ($Warning in $SchemaValidation.Warnings) {
             Write-Warning $Warning
         }
-        foreach ($Warning in $ConfigurationValidation.Warnings) {
+        foreach ($Warning in $BusinessValidation.Warnings) {
             Write-Warning $Warning
         }
 
-        # Legacy validation for policy IDs (respect validation flags)
+        # Phase 3: Legacy validation for policy IDs (respect validation flags)
+        # This maintains backward compatibility while allowing selective disabling of policy validation
         $Defaults = [ScubaConfig]::_ConfigDefaults
 
         # Validate OmitPolicy entries if present and validation not disabled
-        if ($this.Configuration.ContainsKey("OmitPolicy") -and $Defaults.validation.validateOmitPolicy -ne $false) {
+        # OmitPolicy allows users to exclude specific policies from assessment
+        if ($this.Configuration.OmitPolicy -and $Defaults.validation.validateOmitPolicy -ne $false) {
             try {
+                # Validate that omitted policy IDs are properly formatted and reference valid products
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "omitting", $this.Configuration.ProductNames)
             }
             catch {
+                # Capture policy validation errors and add to the overall error collection
                 $AllErrors += $_.Exception.Message
             }
         }
 
         # Validate AnnotatePolicy entries if present and validation not disabled
-        if ($this.Configuration.ContainsKey("AnnotatePolicy") -and $Defaults.validation.validateAnnotatePolicy -ne $false) {
+        # AnnotatePolicy allows users to add metadata and comments to specific policy results
+        if ($this.Configuration.AnnotatePolicy -and $Defaults.validation.validateAnnotatePolicy -ne $false) {
             try {
+                # Validate that annotated policy IDs are properly formatted and reference valid products
                 [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "annotation", $this.Configuration.ProductNames)
             }
             catch {
+                # Capture policy validation errors and add to the overall error collection
                 $AllErrors += $_.Exception.Message
             }
         }
 
-        # Throw if any validation errors
+        # If any validation errors were found, throw a comprehensive error message
+        # This prevents execution with invalid configuration and provides clear guidance for remediation
         if ($AllErrors.Count -gt 0) {
-            # Get output settings from defaults
-            $OutputSettings = $Defaults.outputSettings
-            $recommendedActionMessage = $OutputSettings.recommendedActionMessage
-            $ErrorCategories = $OutputSettings.errorCategories
+            # Categorize all errors using the validator's categorization logic for better user experience
+            # This groups related errors together and presents them in a logical order
+            $CategorizedErrors = [ScubaConfigValidator]::CategorizeErrors($AllErrors)
 
-            # Dynamically categorize errors based on configuration
-            $CategorizedErrors = @{}
-            $UncategorizedErrors = @()
+            # Build error message from categorized results with error count
+            # Include both total count and proper pluralization for professional error reporting
+            $Plural = if ($AllErrors.Count -ne 1) { 's' } else { '' }
+            $ErrorMessage = "Configuration validation failed ($($AllErrors.Count) error$Plural):"
+            if ($CategorizedErrors -is [array] -and $CategorizedErrors.Count -gt 0) {
+                $ErrorMessage += "`n" + ($CategorizedErrors -join "`n")
+            }
 
-            # Create a prioritized matching order (most specific patterns first)
-            # This ensures more specific patterns match before generic ones
-            $MatchingOrder = @()
-            foreach ($Category in $ErrorCategories) {
-                if ($Category.name -like "*Annotate*" -or $Category.name -like "*Omit*") {
-                    $MatchingOrder = @($Category) + $MatchingOrder  # Add to front
-                }
-                else {
-                    $MatchingOrder += $Category  # Add to end
+            # Add recommended action message if configured
+            # This provides users with concrete next steps for resolving configuration issues
+            if ($Defaults.outputSettings -and $Defaults.outputSettings.recommendedActionMessage) {
+                $ErrorMessage += "`n`nRECOMMENDED ACTION:"
+                foreach ($ActionLine in $Defaults.outputSettings.recommendedActionMessage) {
+                    $ErrorMessage += "`n$ActionLine"
                 }
             }
 
-            foreach ($ValidationError in $AllErrors) {
-                $Categorized = $false
-
-                # Try to match against each category's pattern in priority order
-                foreach ($Category in $MatchingOrder) {
-                    $CategoryName = $Category.name
-                    $Pattern = $Category.pattern
-
-                    if ($ValidationError -match $Pattern) {
-                        # Special handling for "^Policy ID:" pattern to avoid double-categorization
-                        if ($Pattern -match "\^Policy ID:") {
-                            # Only categorize as Exclusion if not already matched by annotation/omitting
-                            $IsAnnotated = $ValidationError -match "^Annotated Policy ID:"
-                            $IsOmitted = $ValidationError -match "^Omitted Policy ID:"
-                            if (-not $IsAnnotated -and -not $IsOmitted) {
-                                if (-not $CategorizedErrors.ContainsKey($CategoryName)) {
-                                    $CategorizedErrors[$CategoryName] = @()
-                                }
-                                $CategorizedErrors[$CategoryName] += $ValidationError
-                                $Categorized = $true
-                                break
-                            }
-                        }
-                        else {
-                            if (-not $CategorizedErrors.ContainsKey($CategoryName)) {
-                                $CategorizedErrors[$CategoryName] = @()
-                            }
-                            $CategorizedErrors[$CategoryName] += $ValidationError
-                            $Categorized = $true
-                            break
-                        }
-                    }
-                }
-
-                if (-not $Categorized) {
-                    $UncategorizedErrors += $ValidationError
-                }
-            }
-
-            # Build categorized error message using configured order
-            $ErrorMessage = "Configuration validation failed:`n"
-
-            # Display errors in the order defined in configuration
-            foreach ($Category in $ErrorCategories) {
-                $CategoryName = $Category.name
-                if ($CategorizedErrors.ContainsKey($CategoryName) -and $CategorizedErrors[$CategoryName].Count -gt 0) {
-                    $ErrorMessage += "`n$CategoryName`:`n"
-                    foreach ($ErrorMsg in $CategorizedErrors[$CategoryName]) {
-                        $ErrorMessage += "  - $ErrorMsg`n"
-                    }
-                }
-            }
-
-            # Add any uncategorized errors
-            if ($UncategorizedErrors.Count -gt 0) {
-                $ErrorMessage += "`nOther errors:`n"
-                foreach ($ErrorMsg in $UncategorizedErrors) {
-                    $ErrorMessage += "  - $ErrorMsg`n"
-                }
-            }
-
-            # Add RECOMMENDED ACTION message if available
-            if ($recommendedActionMessage -and $recommendedActionMessage.Count -gt 0) {
-                $ErrorMessage += "`nRECOMMENDED ACTION:`n"
-                foreach ($Message in $recommendedActionMessage) {
-                    $ErrorMessage += "$Message`n"
-                }
-            }
-
+            # Throw the comprehensive error message to halt execution with invalid configuration
             throw $ErrorMessage.TrimEnd()
         }
     }
@@ -340,25 +307,39 @@ class ScubaConfig {
 
     # Recursively converts PSCustomObject to hashtable for internal storage compatibility.
     # YAML parsing creates PSCustomObjects, but internal config uses hashtables for performance.
+    # This conversion is necessary because:
+    # 1. Hashtables provide faster property access than PSCustomObjects
+    # 2. Hashtables have more predictable behavior with dynamic property names
+    # 3. Legacy ScubaGear code expects hashtable interface for configuration access
+    # 4. Hashtables work better with PowerShell's automatic variable expansion
     hidden static [hashtable] ConvertPSObjectToHashtable([PSCustomObject]$Object) {
         $Hashtable = @{}
+        # Process each property from the PSCustomObject
         foreach ($Property in $Object.PSObject.Properties) {
+            # Recursively convert nested PSCustomObjects to nested hashtables
+            # This handles complex configuration structures like exclusion policies
             if ($Property.Value -is [PSCustomObject]) {
                 $Hashtable[$Property.Name] = [ScubaConfig]::ConvertPSObjectToHashtable($Property.Value)
             }
+            # Handle arrays that might contain PSCustomObjects (like ProductNames with complex structures)
+            # Arrays in YAML can contain both simple values and complex objects
             elseif ($Property.Value -is [Array] -or $Property.Value -is [System.Collections.IList]) {
                 $Array = @()
                 foreach ($Item in $Property.Value) {
+                    # Convert any PSCustomObjects within the array to hashtables
                     if ($Item -is [PSCustomObject]) {
                         $Array += [ScubaConfig]::ConvertPSObjectToHashtable($Item)
                     }
                     else {
+                        # Keep primitive types (strings, numbers, booleans) as-is
                         $Array += $Item
                     }
                 }
                 $Hashtable[$Property.Name] = $Array
             }
             else {
+                # For primitive types (string, int, bool), copy directly
+                # No conversion needed for these basic data types
                 $Hashtable[$Property.Name] = $Property.Value
             }
         }
@@ -366,20 +347,30 @@ class ScubaConfig {
     }
 
     # Validates policy configuration entries for format compliance and product alignment.
+    # This method ensures that OmitPolicy and AnnotatePolicy sections contain valid policy IDs
+    # and that referenced products are actually selected for scanning in ProductNames.
+    # Policy IDs must follow the format: MS.{PRODUCT}.{GROUP}.{NUMBER}v{VERSION}
     hidden static [void] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
         [ScubaConfig]::InitializeValidator()
         $Defaults = [ScubaConfig]::_ConfigDefaults
 
+        # Process each policy ID in the configuration section (OmitPolicy or AnnotatePolicy)
         foreach ($Policy in $PolicyConfig.Keys) {
+            # Validate policy ID format against the regex pattern from configuration
+            # Pattern ensures proper format: MS.{PRODUCT}.{GROUP}.{NUMBER}v{VERSION}
+            # Example valid IDs: MS.AAD.1.1v1, MS.DEFENDER.2.3v2, MS.EXO.1.4v1
             if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
-                # Try to extract product from malformed policy ID to give better error message
+                # Try to extract product from malformed policy ID to provide helpful error message
+                # Split on periods to get potential product name for better error guidance
                 $PolicyParts = $Policy -split "\."
                 $ProductInPolicy = if ($PolicyParts.Length -ge 2 -and $PolicyParts[1]) { $PolicyParts[1] } else { $null }
 
-                # Generate format example from pattern using the validator's method
+                # Generate user-friendly format example using the validator's helper method
+                # This provides context-specific guidance (e.g., "MS.AAD.#.#v#" if product detected)
                 $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($Defaults.validation.policyIdPattern, $ProductInPolicy)
 
-                # Convert action type to past tense for error message prefix
+                # Build contextual error message based on the action type (omitting vs annotation)
+                # Use proper grammar and terminology for each action type
                 $ActionPrefix = if ($ActionType -eq "omitting") { "Omitted" } elseif ($ActionType -eq "annotation") { "Annotated" } else { (Get-Culture).TextInfo.ToTitleCase($ActionType) }
                 $ErrorMessage = "${ActionPrefix} Policy ID: '$Policy' is not a valid control ID. "
                 $ErrorMessage += "Expected format: $ExampleFormat. "
@@ -387,16 +378,23 @@ class ScubaConfig {
                 throw $ErrorMessage
             }
 
+            # Extract the product name from the policy ID (second component after splitting on periods)
+            # Policy ID format: MS.{PRODUCT}.{GROUP}.{NUMBER}v{VERSION}
+            # Convert to lowercase for case-insensitive comparison with ProductNames
             $Product = ($Policy -Split "\.")[1].ToLower()
 
-            # Handle wildcard in ProductNames
+            # Determine which products are effectively selected for scanning
+            # Handle wildcard case where all products are selected
             $EffectiveProducts = $ProductNames
             if ($ProductNames -contains '*') {
+                # Expand wildcard to all available products from configuration
                 $EffectiveProducts = $Defaults.defaults.AllProductNames
             }
 
+            # Verify that the referenced product is actually going to be scanned
+            # Prevents configuration errors where policies are specified for products not being tested
             if (-not ($EffectiveProducts -Contains $Product)) {
-                # Convert action type to past tense for error message prefix
+                # Build error message with proper action prefix and clear explanation
                 $ActionPrefix = if ($ActionType -eq "omitting") { "Omitted" } elseif ($ActionType -eq "annotation") { "Annotated" } else { (Get-Culture).TextInfo.ToTitleCase($ActionType) }
                 $ErrorMessage = "${ActionPrefix} Policy ID: '$Policy' references product '$Product' which is not in the selected ProductNames: $($EffectiveProducts -join ', ')."
                 throw $ErrorMessage
@@ -408,57 +406,72 @@ class ScubaConfig {
     hidden [hashtable]$Configuration
 
     # Applies default values and processes special configuration properties (wildcards, path expansion).
-    # This method ensures all required properties have values and handles special cases like path resolution
+    # This method ensures all required properties have values and handles special cases like path resolution.
+    # It implements a two-phase approach: 1) Apply defaults for missing properties, 2) Process special cases.
     hidden [void]SetParameterDefaults(){
         Write-Debug "Setting ScubaConfig default values from configuration."
 
         # Get the defaults section from cached configuration
+        # This contains fallback values for all configurable properties
         $Defaults = [ScubaConfig]::_ConfigDefaults.defaults
 
+        # Phase 1: Apply default values for any properties not explicitly set in the configuration file
+        # This ensures the configuration is complete even if the YAML file is minimal or missing properties
         # Iterate through all default properties and set any missing values
-        # This ensures the configuration is complete even if the YAML file is minimal
         foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
             # Only set default if the property wasn't explicitly provided in the configuration file
-            if (-not $this.Configuration.ContainsKey($PropertyName)) {
+            # This respects user's explicit choices while filling in gaps with sensible defaults
+            if (-not $this.Configuration.$PropertyName) {
                 Write-Debug "Setting default value for '$PropertyName'"
+                # Copy the default value from the defaults configuration
                 $this.Configuration[$PropertyName] = $Defaults.$PropertyName
             }
         }
+
+        # Phase 2: Special processing for properties that require additional logic beyond simple defaults
+        # These properties need custom handling for wildcards, path resolution, or data transformation
 
         # Special handling for ProductNames (wildcard expansion and uniqueness)
         # ProductNames determines which Microsoft 365 products will be scanned
         if ($this.Configuration.ProductNames) {
             # Check for wildcard with other products before expansion and warn user
+            # This is a common user mistake that can lead to confusion about which products are scanned
             if ($this.Configuration.ProductNames.Contains('*') -and $this.Configuration.ProductNames.Count -gt 1) {
                 Write-Warning "ProductNames contains wildcard '*' with other products. Wildcard takes precedence."
             }
 
             # Handle wildcard '*' by expanding to all supported products
+            # This provides a convenient way to scan all available Microsoft 365 products
             if ($this.Configuration.ProductNames.Contains('*')) {
                 $this.Configuration.ProductNames = [ScubaConfig]::ScubaDefault('AllProductNames')
                 Write-Debug "Setting ProductNames to all products because of wildcard"
             } else {
                 # Remove duplicates and sort for consistency
+                # This handles cases where users accidentally specify the same product multiple times
                 Write-Debug "ProductNames provided - ensuring uniqueness."
                 $this.Configuration.ProductNames = @($this.Configuration.ProductNames | Sort-Object -Unique)
             }
         }
 
         # Special handling for OPAPath (expand Unix-style home directory reference)
-        # Convert tilde (~) to actual Windows user profile path
+        # Convert tilde (~) to actual Windows user profile path for cross-platform compatibility
         if ($this.Configuration.OPAPath -eq "~/.scubagear/Tools") {
             try {
                 # Build the full path using Windows conventions
+                # This allows Unix-style path notation to work on Windows systems
                 $this.Configuration.OPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
             } catch {
                 # Fallback to current directory if profile path resolution fails
+                # This ensures the configuration is still usable even if home directory access fails
                 $this.Configuration.OPAPath = "."
             }
         }
 
         # Special handling for OutPath (resolve relative current directory reference)
-        # Convert '.' to the actual current working directory path
+        # Convert '.' to the actual current working directory path for absolute path consistency
         if ($this.Configuration.OutPath -eq ".") {
+            # Get the current working directory as an absolute path
+            # This ensures output files are written to a predictable location
             $this.Configuration.OutPath = Get-Location | Select-Object -ExpandProperty ProviderPath
         }
 

@@ -110,21 +110,28 @@
     "defaultEncoding": "UTF-8",
     "errorCategories": [
       {
-        "name": "Property errors",
-        "pattern": "Property"
-      },
-      {
-        "name": "Exclusion Policy errors",
-        "pattern": "exclusion.*Policy ID|exclusion.*control ID|^Policy ID:"
-      },
-      {
         "name": "Annotate Policy errors",
-        "pattern": "^Annotated Policy ID:|AnnotatePolicy"
+        "pattern": "^Annotated\\s+Policy\\s+ID:|^Property\\s+'AnnotatePolicy'"
       },
       {
         "name": "Omit Policy errors",
-        "pattern": "^Omitted Policy ID:|OmitPolicy"
+        "pattern": "^Omitted\\s+Policy\\s+ID:|^Property\\s+'OmitPolicy'"
+      },
+      {
+        "name": "Exclusion Policy errors",
+        "pattern": "^Policy\\s+ID:\\s+.*(?:CapExclusions|RoleExclusions|SensitiveUsers|SensitiveAccounts)"
+      },
+      {
+        "name": "Property errors",
+        "pattern": "^Property\\s+'"
       }
+    ],
+    "errorCategoryDisplayOrder": [
+      "Property errors",
+      "Exclusion Policy errors",
+      "Annotate Policy errors",
+      "Omit Policy errors",
+      "Other errors"
     ],
     "recommendedActionMessage": [
       "    It is recommended to use the new ScubaGear Configuration Editor to build a configuration file via a graphical user interface.",
@@ -133,37 +140,6 @@
     ]
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -103,7 +103,7 @@ DisconnectOnExit: "false"
 
         $ValidationResult.IsValid | Should -Be $False
         # Should detect that string boolean values are invalid
-        $ValidationResult.ValidationErrors | Should -Match ".*expected type 'boolean' but got 'string'"
+        ($ValidationResult.ValidationErrors -join ' ') | Should -Match ".*expected type 'boolean' but got 'string'"
 
         Remove-Item -Path $TempFile -Force
     }
