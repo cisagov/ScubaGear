@@ -88,9 +88,9 @@ class ScubaConfigValidator {
     }
 
     # Main YAML validation method with full control over debug mode and default configurations validation.
-    static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipBusinessRules) {
+    static [ValidationResult] ValidateYamlFile([string]$FilePath, [bool]$DebugMode, [bool]$SkipScubaConfigRules) {
         # Add debug information to the result
-        $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath (SkipBusinessRules: $SkipBusinessRules)")
+        $DebugInfo = @("DEBUG: ValidateYamlFile called with: $FilePath (SkipScubaConfigRules: $SkipScubaConfigRules)")
         $Result = [ValidationResult]::new()
         $Result.IsValid = $false
         $Result.ValidationErrors = @()
@@ -135,7 +135,7 @@ class ScubaConfigValidator {
         }
 
         # If skipping default configurations, only return parsed content without validation
-        if ($SkipBusinessRules) {
+        if ($SkipScubaConfigRules) {
             $Result.IsValid = $true
             return $Result
         }
@@ -152,10 +152,10 @@ class ScubaConfigValidator {
             $Result.Warnings += $DebugInfo
         }
 
-        # Additional business logic validation
-        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($YamlObject, $DebugMode)
-        $Result.ValidationErrors += $BusinessValidation.Errors
-        $Result.Warnings += $BusinessValidation.Warnings
+        # Additional Scuba configuration rule validation
+        $ScubaConfigValidation = [ScubaConfigValidator]::ValidateScubaConfigRules($YamlObject, $DebugMode)
+        $Result.ValidationErrors += $ScubaConfigValidation.Errors
+        $Result.Warnings += $ScubaConfigValidation.Warnings
 
         # Categorize and organize errors into sections
         $Result.ValidationErrors = [ScubaConfigValidator]::CategorizeErrors($Result.ValidationErrors)
@@ -380,8 +380,8 @@ class ScubaConfigValidator {
         return $Validation
     }
 
-    # Performs business logic validation beyond basic schema compliance.
-    hidden static [PSCustomObject] ValidateBusinessRules([object]$ConfigObject, [bool]$DebugMode) {
+    # Performs Scuba configuration rule validation beyond basic schema compliance.
+    hidden static [PSCustomObject] ValidateScubaConfigRules([object]$ConfigObject, [bool]$DebugMode) {
         $Validation = [PSCustomObject]@{
             Errors = @()
             Warnings = @()
@@ -403,7 +403,7 @@ class ScubaConfigValidator {
         # Enhanced validation for M365Environment (content quality only)
         [ScubaConfigValidator]::ValidateM365Environment($ConfigObject, $Validation)
 
-        # Validate product exclusion property casing (business requirement)
+        # Validate product exclusion property casing (Scuba configuration requirement)
         [ScubaConfigValidator]::ValidateProductExclusionCasing($ConfigObject, $Validation)
 
         # Check for exclusion configurations on products that don't support them
@@ -1193,7 +1193,7 @@ class ScubaConfigValidator {
                     # Enhanced validation for string properties that have minLength constraints in the schema
                     # The JSON schema minLength constraint catches empty strings, but PowerShell's [string]::IsNullOrWhiteSpace
                     # provides more comprehensive validation for whitespace-only values (spaces, tabs, newlines, etc.)
-                    # This business logic layer adds value beyond what JSON schema alone can provide
+                    # This Scuba configuration rules layer adds value beyond what JSON schema alone can provide
                     if ($PropertySchema.minLength -and $PropertySchema.minLength -gt 0) {
                         # Check for whitespace-only values that would pass JSON schema minLength but are effectively empty
                         # null check prevents PowerShell errors, IsNullOrWhiteSpace handles edge cases like "   " or "\t\n"

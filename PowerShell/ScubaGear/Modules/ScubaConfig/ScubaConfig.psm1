@@ -124,7 +124,7 @@ class ScubaConfig {
     # SkipValidation=true allows deferred validation after command-line overrides are applied.
     # This method implements a two-phase validation approach for flexibility:
     # Phase 1: Always validate file format (extension, size, YAML syntax)
-    # Phase 2: Optionally validate content (schema, business rules) based on SkipValidation parameter
+    # Phase 2: Optionally validate content (schema, Scuba configuration rules) based on SkipValidation parameter
     [Boolean]LoadConfig([System.IO.FileInfo]$Path, [Boolean]$SkipValidation){
         # First, verify the file exists before attempting to load it
         # This provides a clear error message rather than letting file operations fail later
@@ -152,9 +152,9 @@ class ScubaConfig {
         }
         Write-Debug "Using debug mode: $DefaultDebugMode (from configuration default)"
 
-        # Perform initial validation with business rules skipped (SkipBusinessRules=true)
+        # Perform initial validation with Scuba configuration rules skipped (SkipScubaConfigRules=true)
         # This validates file format, extension, size, and YAML parsing but defers content validation
-        # The third parameter (SkipBusinessRules) is always true here for format-only validation
+        # The third parameter (SkipScubaConfigRules) is always true here for format-only validation
         $ValidationResult = [ScubaConfigValidator]::ValidateYamlFile($Path.FullName, $DefaultDebugMode, $true)
 
         # Check for file format errors (extension, size, YAML parsing)
@@ -196,14 +196,14 @@ class ScubaConfig {
         # Perform full content validation if not skipped
         # This allows for deferred validation after command-line parameter overrides
         if (-not $SkipValidation) {
-            # Validate the complete configuration including schema, business rules, and policy references
+            # Validate the complete configuration including schema, Scuba configuration rules, and policy references
             $this.ValidateConfiguration()
         }
 
         return [ScubaConfig]::_IsLoaded
     }
 
-# Validates current configuration state after overrides. Performs schema + business rules + policy validation.
+# Validates current configuration state after overrides. Performs schema + Scuba configuration rules + policy validation.
     # Used for deferred validation pattern where config is loaded with SkipValidation=true then validated after overrides.
     # This allows command-line parameters to override config file values before final validation.
     # The method implements a comprehensive validation strategy with multiple phases and detailed error reporting.
@@ -221,23 +221,23 @@ class ScubaConfig {
         # Schema validation catches fundamental issues like wrong data types, missing required fields, invalid formats
         $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false)
 
-        # Phase 2: Perform business rule validation (paths, content quality, cross-field validation)
+        # Phase 2: Perform Scuba configuration rule validation (paths, content quality, cross-field validation)
         # This layer adds domain-specific validation beyond what JSON Schema can express
-        # Business rules include file path existence, cross-field dependencies, and ScubaGear-specific requirements
-        $BusinessValidation = [ScubaConfigValidator]::ValidateBusinessRules($ConfigObject, $false)
+        # Scuba configuration rules include file path existence, cross-field dependencies, and ScubaGear-specific requirements
+        $ScubaConfigValidation = [ScubaConfigValidator]::ValidateScubaConfigRules($ConfigObject, $false)
 
         # Collect all errors from both validation phases
         # This provides a comprehensive view of all configuration issues in a single validation run
         $AllErrors = @()
         $AllErrors += $SchemaValidation.Errors
-        $AllErrors += $BusinessValidation.Errors
+        $AllErrors += $ScubaConfigValidation.Errors
 
         # Display all warnings to the user immediately
         # Warnings don't prevent execution but provide important guidance and notices
         foreach ($Warning in $SchemaValidation.Warnings) {
             Write-Warning $Warning
         }
-        foreach ($Warning in $BusinessValidation.Warnings) {
+        foreach ($Warning in $ScubaConfigValidation.Warnings) {
             Write-Warning $Warning
         }
 
