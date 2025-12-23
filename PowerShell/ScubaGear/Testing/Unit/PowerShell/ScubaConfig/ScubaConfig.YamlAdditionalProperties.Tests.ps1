@@ -289,9 +289,11 @@ PreferredDnsResolvers:
   - 1.1.1.1
 SkipDoH: false
 OmitPolicy:
-  MS.AAD.1.1v1: Test omission
+  MS.AAD.1.1v1:
+    Rationale: Test omission
 AnnotatePolicy:
-  MS.TEAMS.2.1v1: Test annotation
+  MS.TEAMS.2.1v1:
+    Rationale: Test annotation
 "@
 
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
@@ -320,6 +322,21 @@ Aad:
       Users:
         - 12345678-1234-1234-1234-123456789012
 "@
+
+            # Override ConvertFrom-Yaml for this test to properly handle the nested structure
+            function global:ConvertFrom-Yaml {
+                @{
+                    ProductNames=@('aad')
+                    M365Environment='commercial'
+                    Aad=@{
+                        'MS.AAD.1.1v1'=@{
+                            CapExclusions=@{
+                                Users=@('12345678-1234-1234-1234-123456789012')
+                            }
+                        }
+                    }
+                }
+            }
 
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile

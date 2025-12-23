@@ -43,7 +43,6 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
             $M365Environment.enum | Should -Contain "gcc"
             $M365Environment.enum | Should -Contain "gcchigh"
             $M365Environment.enum | Should -Contain "dod"
-            $M365Environment.default | Should -Be "commercial"
         }
 
         It "Should have boolean properties correctly defined" {

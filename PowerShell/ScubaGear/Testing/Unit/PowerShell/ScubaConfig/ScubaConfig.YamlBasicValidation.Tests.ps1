@@ -35,9 +35,8 @@ Describe "ScubaConfig Basic Root Configuration Tests" {
 
         # Check validation flags exist
         $Defaults.validation | Should -Not -BeNullOrEmpty
-        $Defaults.validation.PSObject.Properties.Name | Should -Contain "validateExclusions"
-        $Defaults.validation.PSObject.Properties.Name | Should -Contain "validateOmitPolicy"
-        $Defaults.validation.PSObject.Properties.Name | Should -Contain "validateAnnotatePolicy"
+        $Defaults.validation.PSObject.Properties.Name | Should -Contain "policyIdPattern"
+        $Defaults.validation.PSObject.Properties.Name | Should -Contain "supportedFileExtensions"
     }
 
     It "Should validate basic YAML configuration with proper boolean types" {
