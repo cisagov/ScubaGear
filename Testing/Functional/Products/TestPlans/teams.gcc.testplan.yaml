@@ -1,21 +1,26 @@
 ProductName: teams
 TestPlan:
+  - PolicyId: MS.TEAMS.2.2v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.2v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.TEAMS.2.3v2
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.2.3v2 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
   - PolicyId: MS.TEAMS.4.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.4.1v1 Compliant - AllowEmailIntoChannel (gcc, dod)
-        Preconditions:
-          - Command: Set-CsTeamsClientConfiguration
-            Splat:
-              Identity: Global
-              AllowEmailIntoChannel: true
+      - TestDescription: MS.TEAMS.4.1v1 Not-applicable case - policy does not apply to GCC, GCC High, or DoD tenants
+        Preconditions: []
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel (gcc, dod)
-        Preconditions:
-          - Command: Set-CsTeamsClientConfiguration
-            Splat:
-              Identity: Global
-              AllowEmailIntoChannel: false
-        Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
