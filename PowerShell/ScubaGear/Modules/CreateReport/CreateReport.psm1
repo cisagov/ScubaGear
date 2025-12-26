@@ -241,6 +241,10 @@ function New-Report {
 
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
+            # Generate indicator HTML for this control
+            $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version
+            $RequirementWithIndicators = $Control.Value + $IndicatorHtml
+
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
                 $Result = Get-RegoResult $Test $MissingCommands $Control
@@ -279,7 +283,7 @@ function New-Report {
                     }
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
-                        "Requirement"=$Control.Value
+                        "Requirement"=$RequirementWithIndicators
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= $Details
@@ -310,7 +314,7 @@ function New-Report {
                     $ReportSummary.IncorrectResults += 1
                     $Fragment += [pscustomobject]@{
                         "Control ID"=$Control.Id
-                        "Requirement"=$Control.Value
+                        "Requirement"=$RequirementWithIndicators
                         "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
@@ -331,7 +335,7 @@ function New-Report {
                 $ReportSummary[$Result.SummaryKey] += 1
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
-                    "Requirement"=$Control.Value
+                    "Requirement"=$RequirementWithIndicators
                     "Result"= $Result.DisplayString
                     "Criticality"=if ($Control.Deleted -or $Control.MalformedDescription) {"-"} else {$Test.Criticality}
                     "Details"= $Result.Details
@@ -353,7 +357,7 @@ function New-Report {
                 $ControlDetails = "Report issue on <a href=`"$ScubaGitHubUrl/issues`" target=`"_blank`">GitHub</a>"
                 $Fragment += [pscustomobject]@{
                     "Control ID"=$Control.Id
-                    "Requirement"=$Control.Value
+                    "Requirement"=$RequirementWithIndicators
                     "Result"= $ControlResult
                     "Criticality"= "-"
                     "Details"= $ControlDetails
@@ -428,6 +432,35 @@ function New-Report {
     $ReportHTML = $ReportHTML.Replace("{TITLE}", $Title)
     $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
     $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
+
+    # Generate the indicator legend
+    # BOD 25-01 is listed first, then the rest are in alphabetical order
+    $IndicatorLegend = @"
+<div class="indicator-legend">
+    <span class="indicator-legend-title">Policy Indicators:</span>
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-bod">BOD 25-01 Requirement</span>
+        <span>Required by CISA BOD 25-01</span>
+    </div>
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-automated">Automated Check</span>
+        <span>Automatically verified by ScubaGear</span>
+    </div>
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-configurable">Configurable</span>
+        <span>Customizable via config file</span>
+    </div>
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-manual">Manual</span>
+        <span>Requires manual verification</span>
+    </div>
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-requires-config">Requires Configuration</span>
+        <span>Config file required for check</span>
+    </div>
+</div>
+"@
+    $ReportHTML = $ReportHTML.Replace("{INDICATOR_LEGEND}", $IndicatorLegend)
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
@@ -793,7 +826,54 @@ function Import-SecureBaseline{
                         # Description bold substitution
                         $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "bold"
 
-                        $Group.Controls += @{"Id"=$Id; "Value"=$Value; "Deleted"=$Deleted; MalformedDescription=$IsMalformedDescription}
+                        # Parse indicator badges from the lines following the description
+                        $Indicators = @()
+                        $BadgeLineAdvance = $LineAdvance + 1
+                        $MaxBadgeSearch = 10
+
+                        # Look for badge lines after the description
+                        for ($i = 0; $i -lt $MaxBadgeSearch; $i++) {
+                            $BadgeLine = ([string]$MdLines[$LineNumber + $BadgeLineAdvance + $i]).Trim()
+                            
+                            # Stop if we hit a comment line (criticality marker) or empty line followed by non-badge content
+                            if ($BadgeLine -match "^<!--") {
+                                break
+                            }
+                            
+                            # Match badge pattern: [![Badge Name](image_url)](link_url)
+                            if ($BadgeLine -match '\[!\[([^\]]+)\]\([^\)]+\)\]\(([^\)]+)\)') {
+                                $BadgeName = $Matches[1]
+                                $BadgeLink = $Matches[2]
+                                
+                                # Determine badge type based on name
+                                $BadgeType = switch -Regex ($BadgeName) {
+                                    "BOD.25-01" { "bod" }
+                                    "Automated.Check" { "automated" }
+                                    "Manual" { "manual" }
+                                    "Configurable" { "configurable" }
+                                    "Requires.Configuration" { "requires-config" }
+                                    default { "other" }
+                                }
+                                
+                                $Indicators += @{
+                                    "Name" = $BadgeName
+                                    "Link" = $BadgeLink
+                                    "Type" = $BadgeType
+                                }
+                            }
+                            # If line doesn't contain a badge and isn't empty, stop looking
+                            elseif (-not [string]::IsNullOrWhiteSpace($BadgeLine) -and $BadgeLine -notmatch '^\[!\[') {
+                                break
+                            }
+                        }
+
+                        $Group.Controls += @{
+                            "Id"=$Id
+                            "Value"=$Value
+                            "Deleted"=$Deleted
+                            "MalformedDescription"=$IsMalformedDescription
+                            "Indicators"=$Indicators
+                        }
                     }
                     catch {
                         Write-Error "Error parsing for policies in Group $($Group.GroupNumber). $($Group.GroupName)"
@@ -860,6 +940,64 @@ function Resolve-HTMLMarkdown{
         throw $InvalidHTMLReplace
         return $OriginalString
     }
+}
+
+function Get-IndicatorHtml {
+    <#
+    .Description
+    Generates HTML for policy indicator badges.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$false)]
+        [array]
+        $Indicators,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $BaselineName,
+
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ModuleVersion
+    )
+
+    if ($null -eq $Indicators -or $Indicators.Count -eq 0) {
+        return ""
+    }
+
+    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $IndicatorHtml = "<div class='policy-indicators'>"
+
+    foreach ($Indicator in $Indicators) {
+        $BadgeName = $Indicator.Name
+        $BadgeLink = $Indicator.Link
+        $BadgeType = $Indicator.Type
+
+        # Resolve relative links to absolute GitHub URLs
+        if ($BadgeLink.StartsWith("#")) {
+            # Link to section within the same document
+            $BadgeLink = "$ScubaGitHubUrl/blob/v$ModuleVersion/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md$BadgeLink"
+        }
+        elseif ($BadgeLink.StartsWith("../../../")) {
+            # Relative path from baselines folder
+            $RelativePath = $BadgeLink -replace '^\.\./\.\./\.\./', ''
+            $BadgeLink = "$ScubaGitHubUrl/blob/v$ModuleVersion/$RelativePath"
+        }
+        elseif ($BadgeLink.StartsWith("./") -or (-not $BadgeLink.StartsWith("http"))) {
+            # Other relative paths
+            $BadgeLink = "$ScubaGitHubUrl/blob/v$ModuleVersion/PowerShell/ScubaGear/baselines/$BadgeLink"
+        }
+
+        $IndicatorHtml += "<a href='$BadgeLink' target='_blank' class='indicator indicator-$BadgeType' title='$BadgeName'>$BadgeName</a>"
+    }
+
+    $IndicatorHtml += "</div>"
+    return $IndicatorHtml
 }
 
 Export-ModuleMember -Function @(
