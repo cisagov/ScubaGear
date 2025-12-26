@@ -277,7 +277,7 @@ If Microsoft Authenticator is enabled, it SHALL be configured to show login cont
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 
-<!--Policy: MS.AAD.3.3v2; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.3v2; Criticality: SHALL/Conditional -->
 - _Rationale:_ This policy helps protect the tenant when Microsoft Authenticator is used by showing user context information, which helps reduce MFA phishing compromises.
 - _Last modified:_ March 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2(1), IA-2(2), IA-5c, IA-5g, IA-2(8), IA-2(13)
@@ -308,7 +308,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.5v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
 - _Last modified:_ June 2023
 - _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
