@@ -164,15 +164,20 @@ class ScubaConfigValidator {
 
             # Determine format and parse
             if ($FileExtension -in @('.yaml', '.yml')) {
-                # Parse YAML using PowerShell-Yaml module
-                if (-not (Get-Module -ListAvailable -Name 'powershell-yaml')) {
-                    $Result.IsValid = $false
-                    $Result.ValidationErrors += "PowerShell-Yaml module not found. Install with: Install-Module powershell-yaml"
-                    return $Result
+                # Parse YAML - uses powershell-yaml module in production, mocked function in tests
+                # Tests define global:ConvertFrom-Yaml to avoid module dependency in CI/CD
+                try {
+                    $ParsedContent = $FileContent | ConvertFrom-Yaml -ErrorAction Stop
                 }
-
-                Import-Module powershell-yaml -ErrorAction Stop
-                $ParsedContent = $FileContent | ConvertFrom-Yaml -ErrorAction Stop
+                catch {
+                    # If ConvertFrom-Yaml doesn't exist, provide helpful error
+                    if ($_.Exception.Message -match "ConvertFrom-Yaml.*not recognized") {
+                        $Result.IsValid = $false
+                        $Result.ValidationErrors += "PowerShell-Yaml module not found. Install with: Install-Module powershell-yaml"
+                        return $Result
+                    }
+                    throw
+                }
             }
             else {
                 # Parse JSON
