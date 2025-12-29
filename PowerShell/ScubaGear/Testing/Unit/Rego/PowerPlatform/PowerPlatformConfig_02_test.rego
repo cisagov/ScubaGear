@@ -142,7 +142,7 @@ test_environmentType_ExceptEnvironments_environmentList_Incorrect if {
     Output := powerplatform.tests with input.dlp_policies as [Policies]
                                   with input.environment_list as Env
 
-    ReportDetailString := "1 subsequent environments without DLP policies: NotIncludedEnvironment1"
+    ReportDetailString := "2 subsequent environments without DLP policies: Test1, Test2"
     TestResult("MS.POWERPLATFORM.2.2v1", Output, ReportDetailString, false) == true
 }
 
