@@ -128,15 +128,20 @@ M365Environment: invalid-env
             }
 
             It 'LoadConfig with SkipValidation=$true should skip Organization rule validation'{
-                # Create config with invalid values
+                # Create config with invalid values but valid paths
                 $testFile = [System.IO.Path]::GetTempFileName()
                 $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
                 "ProductNames: ['invalid']" | Set-Content -Path $testFile
+
+                # Create temp directory for OPAPath
+                $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
+                New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
 
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('invalid-product')
                         M365Environment='invalid-env'
+                        OPAPath=$tempOpaPath
                     }
                 }
 
@@ -149,12 +154,14 @@ M365Environment: invalid-env
                     $cfg.Configuration.ProductNames | Should -Not -BeNullOrEmpty
                     # Since validation was skipped, we can override values
                     $cfg.Configuration.ProductNames = @('aad', 'defender')
+                    $cfg.Configuration.M365Environment = 'commercial'
                     # Now validation should pass after override
                     { $cfg.ValidateConfiguration() } | Should -Not -Throw
                 }
                 finally {
                     [ScubaConfig]::ResetInstance()
                     if (Test-Path $testFile) { Remove-Item $testFile -Force }
+                    if (Test-Path $tempOpaPath) { Remove-Item $tempOpaPath -Recurse -Force }
                 }
             }
 
@@ -190,10 +197,15 @@ M365Environment: invalid-env
                 $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
                 "M365Environment: gcch" | Set-Content -Path $testFile
 
+                # Create temp directory for OPAPath
+                $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
+                New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
+
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('aad')
                         M365Environment='gcch'  # Invalid value
+                        OPAPath=$tempOpaPath
                     }
                 }
 
@@ -217,6 +229,7 @@ M365Environment: invalid-env
                 finally {
                     [ScubaConfig]::ResetInstance()
                     if (Test-Path $testFile) { Remove-Item $testFile -Force }
+                    if (Test-Path $tempOpaPath) { Remove-Item $tempOpaPath -Recurse -Force }
                 }
             }
 
