@@ -134,6 +134,11 @@
       "$ref": "#/definitions/patterns/thumbprint"
     },
 
+    "KeepIndividualJson": {
+      "_comment": "Whether to keep individual JSON result files for each product",
+      "type": "boolean"
+    },
+
     "OPAPath": {
       "_comment": "Path to OPA executable directory",
       "$ref": "#/definitions/patterns/folderPath"
