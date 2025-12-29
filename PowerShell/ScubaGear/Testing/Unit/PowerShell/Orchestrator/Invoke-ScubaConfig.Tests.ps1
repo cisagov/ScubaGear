@@ -12,47 +12,35 @@ InModuleScope Orchestrator {
                 Mock -ModuleName Orchestrator Remove-Resources {}
                 Mock -ModuleName Orchestrator Import-Resources {}
                 Mock -ModuleName Orchestrator Invoke-Connection {
-                    # Refactored: Invoke-Connection now receives consolidated -ScubaConfig parameter
-                    # Capture LogIn from ScubaConfig instead of (now missing) positional parameter
-                    if ($ScubaConfig) { $script:TestSplat['LogIn'] = $ScubaConfig.LogIn }
+                    $script:TestSplat.Add('LogIn', $LogIn)
                 }
                 Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
                 Mock -ModuleName Orchestrator Invoke-ProviderList {
-                    # Provider list invocation now supplied with -ScubaConfig and -BoundParameters
-                    if ($ScubaConfig) {
-                        $script:TestSplat['AppID'] = $ScubaConfig.AppID
-                        $script:TestSplat['Organization'] = $ScubaConfig.Organization
-                        $script:TestSplat['CertificateThumbprint'] = $ScubaConfig.CertificateThumbprint
-                    }
+                    $script:TestSplat.Add('AppID', $ScubaConfig.AppID)
+                    $script:TestSplat.Add('Organization', $ScubaConfig.Organization)
+                    $script:TestSplat.Add('CertificateThumbprint', $ScubaConfig.CertificateThumbprint)
                 }
                 Mock -ModuleName Orchestrator Invoke-RunRego {
-                    # Rego invocation now pulls all needed values from ScubaConfig
-                    if ($ScubaConfig) {
-                        $script:TestSplat['OPAPath'] = $ScubaConfig.OPAPath
-                        $script:TestSplat['OutProviderFileName'] = $ScubaConfig.OutProviderFileName
-                        $script:TestSplat['OutRegoFileName'] = $ScubaConfig.OutRegoFileName
-                    }
+                    $script:TestSplat.Add('OPAPath', $OPAPath)
+                    $script:TestSplat.Add('OutProviderFileName', $OutProviderFileName)
+                    $script:TestSplat.Add('OutRegoFileName', $OutRegoFileName)
                 }
                 Mock -ModuleName Orchestrator Invoke-ReportCreation {
-                    # Report creation now only receives -ScubaConfig for these values
-                    if ($ScubaConfig) {
-                        $script:TestSplat['ProductNames'] = $ScubaConfig.ProductNames
-                        $script:TestSplat['M365Environment'] = $ScubaConfig.M365Environment
-                        $script:TestSplat['OutPath'] = $ScubaConfig.OutPath
-                        $script:TestSplat['OutFolderName'] = $ScubaConfig.OutFolderName
-                        $script:TestSplat['OutReportName'] = $ScubaConfig.OutReportName
-                    }
+                    $script:TestSplat.Add('ProductNames', $ScubaConfig.ProductNames)
+                    $script:TestSplat.Add('M365Environment', $ScubaConfig.M365Environment)
+                    $script:TestSplat.Add('OutPath', $ScubaConfig.OutPath)
+                    $script:TestSplat.Add('OutFolderName', $ScubaConfig.OutFolderName)
+                    $script:TestSplat.Add('OutReportName', $ScubaConfig.OutReportName)
                 }
                 Mock -ModuleName Orchestrator Merge-JsonOutput {
-                    if ($ScubaConfig) { $script:TestSplat['OutJsonFileName'] = $ScubaConfig.OutJsonFileName }
+                    $script:TestSplat.Add('OutJsonFileName', $ScubaConfig.OutJsonFileName)
                 }
                 function ConvertTo-ResultsCsv {throw 'this will be mocked'}
                 Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
                 function Disconnect-SCuBATenant {
-                    if ($ScubaConfig) { $script:TestSplat['DisconnectOnExit'] = $ScubaConfig.DisconnectOnExit }
+                    $script:TestSplat.Add('DisconnectOnExit', $DisconnectOnExit)
                 }
-                function Get-ScubaDefault {throw 'this will be mocked'}
-                Mock -ModuleName Orchestrator Get-ScubaDefault {"."}
+                # Get-ScubaDefault function removed - now uses [ScubaConfig]::ScubaDefault() static method
                 Mock -CommandName New-Item {}
                 Mock -CommandName Copy-Item {}
             }
@@ -63,38 +51,37 @@ InModuleScope Orchestrator {
                 SetupMocks
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=,"teams"
+                        ProductNames=@("teams")
                         M365Environment='commercial'
                         OPAPath=$PSScriptRoot
-                        Login=$true
+                        LogIn=$true
+                        DisconnectOnExit=$false
                         OutPath=$PSScriptRoot
                         OutFolderName='ScubaReports'
-                        OutProviderFileName='TenantSettingsExport'
-                        OutRegoFileName='ScubaTestResults'
-                        OutReportName='ScubaReports'
+                        OutProviderFileName='ProviderSettingsExport'
+                        OutRegoFileName='TestResults'
+                        OutReportName='BaselineReports'
+                        OutJsonFileName='ScubaResults'
                         Organization='sub.domain.com'
-                        AppID='7892dfe467aef9023be'
-                        CertificateThumbprint='8A673F1087453ABC894'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
-                [ScubaConfig]::ResetInstance()
                 Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
                 @{ Parameter = "M365Environment";       Value = "commercial"           },
                 @{ Parameter = "ProductNames";          Value = @("teams")             },
-                @{ Parameter = "OPAPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "LogIn";                 Value = $true                  },
-                @{ Parameter = "OutPath";               Value = $PSScriptRoot          },
                 @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
-                @{ Parameter = "OutProviderFileName";   Value = "TenantSettingsExport" },
-                @{ Parameter = "OutRegoFileName";       Value = "ScubaTestResults"     },
-                @{ Parameter = "OutReportName";         Value = "ScubaReports"         },
+                @{ Parameter = "OutProviderFileName";   Value = "ProviderSettingsExport" },
+                @{ Parameter = "OutRegoFileName";       Value = "TestResults"          },
+                @{ Parameter = "OutReportName";         Value = "BaselineReports"      },
                 @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
-                @{ Parameter = "AppID";                 Value = "7892dfe467aef9023be"  },
-                @{ Parameter = "CertificateThumbprint"; Value = "8A673F1087453ABC894"  }
+                @{ Parameter = "AppID";                 Value = "12345678-1234-1234-1234-123456789012"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "1234567890ABCDEF1234567890ABCDEF12345678"  }
                 ){
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
@@ -102,7 +89,6 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
             BeforeAll {
                 SetupMocks
-                [ScubaConfig]::ResetInstance()
                 Invoke-SCuBA `
                   -M365Environment "gcc" `
                   -ProductNames "aad" `
@@ -115,8 +101,8 @@ InModuleScope Orchestrator {
                   -OutReportName "MyReport" `
                   -OutJsonFileName "JsonResults" `
                   -Organization "good.four.us" `
-                  -AppID "1212121212121212121" `
-                  -CertificateThumbprint "AB123456789ABCDEF01" `
+                  -AppID "87654321-4321-4321-4321-210987654321" `
+                  -CertificateThumbprint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
                   -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
             }
 
@@ -132,8 +118,8 @@ InModuleScope Orchestrator {
                 @{ Parameter = "OutReportName";         Value = "MyReport"             },
                 @{ Parameter = "OutJsonFileName";       Value = "JsonResults"          },
                 @{ Parameter = "Organization";          Value = "good.four.us"         },
-                @{ Parameter = "AppID";                 Value = "1212121212121212121"  },
-                @{ Parameter = "CertificateThumbprint"; Value = "AB123456789ABCDEF01"  }
+                @{ Parameter = "AppID";                 Value = "87654321-4321-4321-4321-210987654321"  },
+                @{ Parameter = "CertificateThumbprint"; Value = "ABCDEF1234567890ABCDEF1234567890ABCDEF12"  }
                 ){
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
@@ -167,8 +153,8 @@ InModuleScope Orchestrator {
                         OutRegoFileName='ScubaTestResults'
                         OutReportName='ScubaReports'
                         Organization='sub.domain.com'
-                        AppID='7892dfe467aef9023be'
-                        CertificateThumbprint='8A673F1087453ABC894'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
                 Invoke-SCuBA `
