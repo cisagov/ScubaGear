@@ -124,7 +124,7 @@
       "$ref": "#/definitions/patterns/orgDomain"
     },
 
-    "AppId": {
+    "AppID": {
       "_comment": "Entra ID Application (client) ID for service principal authentication",
       "$ref": "#/definitions/patterns/appGuid"
     },

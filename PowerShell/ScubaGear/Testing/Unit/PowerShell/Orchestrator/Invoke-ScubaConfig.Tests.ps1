@@ -89,6 +89,24 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
             BeforeAll {
                 SetupMocks
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@("teams")
+                        M365Environment='commercial'
+                        OPAPath=$PSScriptRoot
+                        LogIn=$true
+                        DisconnectOnExit=$false
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='ProviderSettingsExport'
+                        OutRegoFileName='TestResults'
+                        OutReportName='BaselineReports'
+                        OutJsonFileName='ScubaResults'
+                        Organization='sub.domain.com'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
+                    }
+                }
                 Invoke-SCuBA `
                   -M365Environment "gcc" `
                   -ProductNames "aad" `
@@ -128,6 +146,24 @@ InModuleScope Orchestrator {
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with command line ProductNames wild card override' {
             BeforeAll {
                 SetupMocks
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@("teams")
+                        M365Environment='commercial'
+                        OPAPath=$PSScriptRoot
+                        LogIn=$true
+                        DisconnectOnExit=$false
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='ProviderSettingsExport'
+                        OutRegoFileName='TestResults'
+                        OutReportName='BaselineReports'
+                        OutJsonFileName='ScubaResults'
+                        Organization='sub.domain.com'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
+                    }
+                }
                 Invoke-SCuBA `
                   -ProductNames "*" `
                   -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")

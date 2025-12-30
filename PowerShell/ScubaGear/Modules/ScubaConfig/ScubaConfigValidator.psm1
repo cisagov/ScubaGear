@@ -285,8 +285,17 @@ class ScubaConfigValidator {
                     if ($PropertyValue -match $ResolvedProperty.pattern) {
                         # Expand tilde to home directory for validation
                         $ExpandedPath = $PropertyValue -replace '~', $env:USERPROFILE
+                        
+                        # Resolve short path (8.3 format) to full path if the path exists
+                        # This handles cases like C:\Users\RUNNER~1\... from $env:TEMP
+                        try {
+                            $ResolvedPath = (Get-Item -LiteralPath $ExpandedPath -ErrorAction Stop).FullName
+                            $PathExists = $true
+                        } catch {
+                            $PathExists = $false
+                        }
 
-                        if (-not (Test-Path $ExpandedPath)) {
+                        if (-not $PathExists) {
                             $ErrorType = if ($PropertyName -eq 'OPAPath') {
                                 "Directory does not exist: $PropertyValue. ScubaGear cannot run without a valid OPA directory."
                             } else {
