@@ -26,23 +26,14 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
 
     Context "When validation flags are enabled" {
         BeforeAll {
-            # Store original defaults
-            $Script:OriginalDefaults = Get-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw
-
-            # Set validation flags to enabled for these tests
-            $Defaults = $Script:OriginalDefaults | ConvertFrom-Json
-
-            $ModifiedDefaults = $Defaults | ConvertTo-Json -Depth 10
-            $ModifiedDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
-
-            # Reload validator with new defaults
+            # Instead of modifying the actual file, reload the validator
+            # which will use the existing defaults from the file
             [ScubaConfig]::ResetInstance()
             [ScubaConfig]::InitializeValidator()
         }
 
         AfterAll {
-            # Restore original defaults
-            $Script:OriginalDefaults | Set-Content -Path "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Force
+            # Clean up after tests
             [ScubaConfig]::ResetInstance()
             [ScubaConfig]::InitializeValidator()
         }
