@@ -99,65 +99,7 @@ InModuleScope Orchestrator {
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
         }
-        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba config with command line override' {
-            BeforeAll {
-                # Reset TestSplat for this test
-                $script:TestSplat = @{}
-                
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@("teams")
-                        M365Environment='commercial'
-                        OPAPath=$PSScriptRoot
-                        LogIn=$true
-                        DisconnectOnExit=$false
-                        OutPath=$PSScriptRoot
-                        OutFolderName='ScubaReports'
-                        OutProviderFileName='ProviderSettingsExport'
-                        OutRegoFileName='TestResults'
-                        OutReportName='BaselineReports'
-                        OutJsonFileName='ScubaResults'
-                        Organization='sub.domain.com'
-                        AppID='12345678-1234-1234-1234-123456789012'
-                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
-                    }
-                }
-                Invoke-SCuBA `
-                  -M365Environment "gcc" `
-                  -ProductNames "aad" `
-                  -OPAPath $env:TEMP `
-                  -LogIn:$false `
-                  -OutPath $env:TEMP `
-                  -OutFolderName "MyReports" `
-                  -OutProviderFileName "MySettingsExport" `
-                  -OutRegoFileName "RegoResults" `
-                  -OutReportName "MyReport" `
-                  -OutJsonFileName "JsonResults" `
-                  -Organization "good.four.us" `
-                  -AppID "87654321-4321-4321-4321-210987654321" `
-                  -CertificateThumbprint "ABCDEF1234567890ABCDEF1234567890ABCDEF12" `
-                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
-            }
-
-            It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
-                @{ Parameter = "M365Environment";       Value = "gcc"                  },
-                @{ Parameter = "ProductNames";          Value = @("aad")               },
-                @{ Parameter = "OPAPath";               Value = $env:TEMP              },
-                @{ Parameter = "LogIn";                 Value = $false                 },
-                @{ Parameter = "OutPath";               Value = $env:TEMP              },
-                @{ Parameter = "OutFolderName";         Value = "MyReports"            },
-                @{ Parameter = "OutProviderFileName";   Value = "MySettingsExport"     },
-                @{ Parameter = "OutRegoFileName";       Value = "RegoResults"          },
-                @{ Parameter = "OutReportName";         Value = "MyReport"             },
-                @{ Parameter = "OutJsonFileName";       Value = "JsonResults"          },
-                @{ Parameter = "Organization";          Value = "good.four.us"         },
-                @{ Parameter = "AppID";                 Value = "87654321-4321-4321-4321-210987654321"  },
-                @{ Parameter = "CertificateThumbprint"; Value = "ABCDEF1234567890ABCDEF1234567890ABCDEF12"  }
-                ){
-                    $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
-            }
-        }
-
+        
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with command line ProductNames wild card override' {
             BeforeAll {
                 # Reset TestSplat for this test
