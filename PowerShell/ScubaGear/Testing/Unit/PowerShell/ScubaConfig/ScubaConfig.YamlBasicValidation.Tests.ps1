@@ -177,6 +177,14 @@ OrgName: Test Organization
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
 
+            function global:ConvertFrom-Yaml {
+                @{
+                    ProductNames=@('aad')
+                    M365Environment=$Environment
+                    OrgName='Test Organization'
+                }
+            }
+
             $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
             $ValidationResult.IsValid | Should -Be $True
 

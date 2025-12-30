@@ -134,7 +134,7 @@
       "$ref": "#/definitions/patterns/thumbprint"
     },
 
-    "KeepIndividualJson": {
+    "KeepIndividualJSON": {
       "_comment": "Whether to keep individual JSON result files for each product",
       "type": "boolean"
     },
