@@ -242,6 +242,14 @@ MyCustomProperty: test-value
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
 
+            function global:ConvertFrom-Yaml {
+                @{
+                    ProductNames=@('aad')
+                    M365Environment='commercial'
+                    MyCustomProperty='test-value'
+                }
+            }
+
             [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
             $Config.LoadConfig($TempFile)
@@ -262,6 +270,16 @@ CustomProp3: value3
 
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             $ValidYaml | Set-Content -Path $TempFile
+
+            function global:ConvertFrom-Yaml {
+                @{
+                    ProductNames=@('aad')
+                    M365Environment='commercial'
+                    CustomProp1='value1'
+                    CustomProp2='value2'
+                    CustomProp3='value3'
+                }
+            }
 
             [ScubaConfig]::ResetInstance()
             $Config = [ScubaConfig]::GetInstance()
