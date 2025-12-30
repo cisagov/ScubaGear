@@ -11,6 +11,10 @@ InModuleScope Orchestrator {
         # Set up all mocks ONCE for all tests
         $script:TestSplat = @{}
         
+        # Define stub functions that will be mocked
+        function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+        function Disconnect-SCuBATenant {throw 'this will be mocked'}
+        
         Mock -ModuleName Orchestrator Remove-Resources {}
         Mock -ModuleName Orchestrator Import-Resources {}
         Mock -ModuleName Orchestrator Invoke-Connection {

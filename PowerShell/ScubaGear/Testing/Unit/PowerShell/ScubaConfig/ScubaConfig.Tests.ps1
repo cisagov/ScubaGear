@@ -1,6 +1,43 @@
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "ScubaConfig Module Unit Tests" {
+    BeforeAll {
+        # Create a global mock for ConvertFrom-Yaml to avoid needing powershell-yaml module in CI/CD
+        function global:ConvertFrom-Yaml {
+            param($Yaml)
+            
+            # Simple mock that returns a hashtable (not PSCustomObject)
+            # Handle both array and string inputs
+            $Content = if ($Yaml -is [array]) { $Yaml -join "`n" } else { $Yaml }
+            
+            # Parse basic YAML syntax like "ProductNames: [aad]" or "ProductNames: [aad, exo]"
+            if ($Content -match 'ProductNames:\s*\[([^\]]+)\]') {
+                $ProductsString = $matches[1]
+                $Products = $ProductsString -split ',' | ForEach-Object { $_.Trim() }
+                return @{
+                    ProductNames = $Products
+                }
+            }
+            
+            # Return hashtable with ProductNames if found on separate line
+            if ($Content -match 'ProductNames:') {
+                return @{
+                    ProductNames = @('aad')
+                }
+            }
+            
+            # Return hashtable with at least ProductNames to satisfy validation
+            return @{
+                ProductNames = @('aad')
+            }
+        }
+    }
+    
+    AfterAll {
+        # Clean up the global mock
+        Remove-Item -Path Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+    }
+    
     BeforeEach {
         # Reset the instance before each test to prevent state bleed
         [ScubaConfig]::ResetInstance()
