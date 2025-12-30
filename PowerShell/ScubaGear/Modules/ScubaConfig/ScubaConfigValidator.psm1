@@ -285,11 +285,11 @@ class ScubaConfigValidator {
                     if ($PropertyValue -match $ResolvedProperty.pattern) {
                         # Expand tilde to home directory for validation
                         $ExpandedPath = $PropertyValue -replace '~', $env:USERPROFILE
-                        
-                        # Resolve short path (8.3 format) to full path if the path exists
+
+                        # Check if path exists - Get-Item resolves short paths (8.3 format) automatically
                         # This handles cases like C:\Users\RUNNER~1\... from $env:TEMP
                         try {
-                            $ResolvedPath = (Get-Item -LiteralPath $ExpandedPath -ErrorAction Stop).FullName
+                            [void](Get-Item -LiteralPath $ExpandedPath -ErrorAction Stop)
                             $PathExists = $true
                         } catch {
                             $PathExists = $false
