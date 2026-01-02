@@ -70,7 +70,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only people in your organization**.
@@ -219,7 +219,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.1v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Links may be used to provide access to information for a short period of time. Without expiration, however, access is indefinite. By setting expiration timers for links, administrators can prevent unintended sustained access to the link.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
@@ -236,7 +236,7 @@ The allowable file and folder permissions for links SHALL be set to View only.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Unauthorized changes to files can be made if permissions allow editing by anyone.  By restricting permissions on links to **View** only, administrators prevent anonymous file changes.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
@@ -252,7 +252,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.

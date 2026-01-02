@@ -52,10 +52,27 @@ function Get-RegoResult {
         $Result.SummaryKey = "Warnings"
         $Result.Details = $Test.ReportDetails
     }
+        elseif ($Test.Criticality -eq "Should/Conditional") {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Conditional"
+        $Result.Details = $Test.ReportDetails
+    }
     elseif ($Test.Criticality.EndsWith('3rd Party') -or $Test.Criticality.EndsWith('Not-Implemented')) {
         $Result.DisplayString = "N/A"
         $Result.SummaryKey = "Manual"
         $Result.Details = $Test.ReportDetails
+    }
+    elseif ($Test.Criticality -eq "Shall/Conditional") {
+        if($Test.RequirementMet) {
+        $Result.DisplayString = "Pass"
+        $Result.SummaryKey = "Passes"
+        $Result.Details = $Test.ReportDetails
+    }
+    else {
+        $Result.DisplayString = "N/A"
+        $Result.SummaryKey = "Conditional"
+        $Result.Details = $Test.ReportDetails
+    }
     }
     else {
         $Result.DisplayString = "Fail"
@@ -228,6 +245,7 @@ function New-Report {
         "Passes" = 0;
         "Omits" = 0;
         "IncorrectResults" = 0;
+        "Conditional" = 0;
         "Manual" = 0;
         "Errors" = 0;
         "Date" = $SettingsExport.date;
@@ -253,7 +271,7 @@ function New-Report {
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
-                # Declare annotation fields at the top level. If they exist, these fields need to be included 
+                # Declare annotation fields at the top level. If they exist, these fields need to be included
                 # in the control object regardless if the control is omitted, incorrect, or normal
                 $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                 $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
@@ -562,7 +580,7 @@ function New-Report {
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
-    # Load JS files 
+    # Load JS files
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
     $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
     $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw

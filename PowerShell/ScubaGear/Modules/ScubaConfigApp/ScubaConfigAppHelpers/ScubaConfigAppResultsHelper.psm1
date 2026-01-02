@@ -877,7 +877,6 @@ Function New-ResultsContent {
             $statusItems = @()
             $passes = [string]$productData.Passes
             $warnings = [string]$productData.Warnings
-            $failures = [string]$productData.Failures
             $manual = [string]$productData.Manual
             $errors = [string]$productData.Errors
 

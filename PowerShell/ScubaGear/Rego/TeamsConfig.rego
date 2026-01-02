@@ -314,7 +314,7 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
@@ -371,7 +371,7 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
-    "Criticality": "Should/Not-Implemented",
+    "Criticality": "Should/Conditional",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
@@ -439,7 +439,7 @@ IsUSGovTenantRegion := true if {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall/Conditional",
     "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,

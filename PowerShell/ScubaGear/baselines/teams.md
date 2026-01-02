@@ -311,7 +311,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
+<!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL/Conditional -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
 - _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
@@ -325,7 +325,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
+<!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD/Conditional -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ August 2025
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
@@ -415,7 +415,7 @@ Teams email integration SHALL be disabled.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
+<!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL/Conditional -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
