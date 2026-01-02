@@ -56,8 +56,11 @@ Invoke-SCuBACached [-ExportProvider <Boolean>] [-ProductNames <String[]>] [-M365
 
 The most important parameter that distinguishes `Invoke-SCuBACached` from `Invoke-SCuBA`:
 
-- **`$true` (default)**: Functions exactly like `Invoke-SCuBA` - authenticates, exports provider data, runs Rego analysis, and generates reports
+- **`$true` (default)**: Functions exactly like `Invoke-SCuBA` - authenticates when parameter `-LogIn $true` is used, exports provider data, runs Rego analysis, and generates reports
 - **`$false`**: Skips authentication and data export, runs analysis only on existing provider JSON files in the specified output path
+
+> [!NOTE]
+> Authentication is **skipped by default** for cached execution workflows. Run `Incoke-ScbuaCached -LogIn $true` explicitly if you need to authenticate in the current PowerShell session.
 
 ### Other Parameters
 
