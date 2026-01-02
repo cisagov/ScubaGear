@@ -239,6 +239,15 @@ Describe "ScubaConfig Module Unit Tests" {
 
             # Load some configuration first
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            
+            # Create the default OPAPath directory so validation passes
+            $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+            $OPAPathCreated = $false
+            if (-not (Test-Path -Path $DefaultOPAPath)) {
+                New-Item -Path $DefaultOPAPath -ItemType Directory -Force | Out-Null
+                $OPAPathCreated = $true
+            }
+            
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
@@ -248,6 +257,10 @@ Describe "ScubaConfig Module Unit Tests" {
             }
             finally {
                 Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+                # Clean up the OPAPath directory if we created it
+                if ($OPAPathCreated -and (Test-Path -Path $DefaultOPAPath)) {
+                    Remove-Item -Path $DefaultOPAPath -Recurse -Force -ErrorAction SilentlyContinue
+                }
             }
         }
 
