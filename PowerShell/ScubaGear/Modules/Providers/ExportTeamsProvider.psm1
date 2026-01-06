@@ -33,10 +33,10 @@ function Export-TeamsProvider {
         # Scenario 1: Certificate-based authentication - legacy only
         Write-Warning @"
 Certificate-based authentication detected. 
-- Legacy Teams app permission policies will be validated for MS.TEAMS.5.1v1, 5.2v1, and 5.3v1 policies.
+- MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against legacy Teams app permission policies.
 - Org-wide app settings cannot be retrieved with certificate authentication (Get-M365UnifiedTenantSettings requires user login).
 - If your organization uses the newer Teams Admin Center org-wide app settings, 
-  please re-run ScubaGear using interactive user authentication to validate policies MS.TEAMS.5.1v2, 5.2v2, and 5.3v2.
+  please re-run ScubaGear using interactive user authentication to validate against org-wide settings instead of legacy policies.
 "@
         $TenantAppSettings = ConvertTo-Json @()
     }
@@ -52,15 +52,14 @@ Possible reasons:
   - Tenant does not have the newer Teams Admin Center org-wide app settings configured
   - Get-M365UnifiedTenantSettings cmdlet is not available in this environment
 
-FALLBACK: Legacy Teams app permission policies will be validated instead (MS.TEAMS.5.1v1, 5.2v1, 5.3v1).
-NOTE: The v2 policies (MS.TEAMS.5.1v2, 5.2v2, 5.3v2) will show as "Not Checked" in the report.
+FALLBACK: MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against legacy Teams app permission policies instead of org-wide settings.
 "@
             $TenantAppSettings = ConvertTo-Json @()
         }
         else {
             # Successfully retrieved org-wide settings
-            Write-Warning @"
-Org-wide app settings (newer v2 policies) retrieved successfully.
+            Write-Information @"
+Org-wide app settings retrieved successfully.
 - MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against org-wide app settings.
 "@
             $TenantAppSettings = ConvertTo-Json $UnifiedSettings
