@@ -518,15 +518,6 @@ DefaultAppTenantSettingCompliant := true if {
     DefaultAppTenantSetting.SettingValue == "None"
 }
 
-DefaultAppTenantSettingCompliant := false if {
-    not DefaultAppTenantSetting
-}
-
-DefaultAppTenantSettingCompliant := false if {
-    DefaultAppTenantSetting
-    DefaultAppTenantSetting.SettingValue != "None"
-}
-
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
 DefaultAppSettingValue := DefaultAppTenantSetting.SettingValue if {
     DefaultAppTenantSetting
@@ -666,15 +657,6 @@ GlobalAppTenantSettingCompliant := true if {
     GlobalAppTenantSetting.SettingValue == "None"
 }
 
-GlobalAppTenantSettingCompliant := false if {
-    not GlobalAppTenantSetting
-}
-
-GlobalAppTenantSettingCompliant := false if {
-    GlobalAppTenantSetting
-    GlobalAppTenantSetting.SettingValue != "None"
-}
-
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
 GlobalAppSettingValue := GlobalAppTenantSetting.SettingValue if {
     GlobalAppTenantSetting
@@ -812,15 +794,6 @@ default PrivateAppTenantSettingCompliant := false
 PrivateAppTenantSettingCompliant := true if {
     PrivateAppTenantSetting
     PrivateAppTenantSetting.SettingValue == "None"
-}
-
-PrivateAppTenantSettingCompliant := false if {
-    not PrivateAppTenantSetting
-}
-
-PrivateAppTenantSettingCompliant := false if {
-    PrivateAppTenantSetting
-    PrivateAppTenantSetting.SettingValue != "None"
 }
 
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
