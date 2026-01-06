@@ -527,8 +527,7 @@ DefaultAppTenantSettingCompliant := false if {
 
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
 DefaultAppSettingValue := DefaultAppTenantSetting.SettingValue if {
-    input.tenant_app_settings
-    count([S | some S in input.tenant_app_settings; S.SettingName == "DefaultApp"]) > 0
+    DefaultAppTenantSetting
 }
 
 DefaultAppSettingValue := "Not Checked" if {
@@ -667,8 +666,7 @@ GlobalAppTenantSettingCompliant := false if {
 
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
 GlobalAppSettingValue := GlobalAppTenantSetting.SettingValue if {
-    input.tenant_app_settings
-    count([S | some S in input.tenant_app_settings; S.SettingName == "GlobalApp"]) > 0
+    GlobalAppTenantSetting
 }
 
 GlobalAppSettingValue := "Not Checked" if {
@@ -807,8 +805,7 @@ PrivateAppTenantSettingCompliant := false if {
 
 # Get tenant setting value - returns value if exists, otherwise "Not Checked"
 PrivateAppSettingValue := PrivateAppTenantSetting.SettingValue if {
-    input.tenant_app_settings
-    count([S | some S in input.tenant_app_settings; S.SettingName == "PrivateApp"]) > 0
+    PrivateAppTenantSetting
 }
 
 PrivateAppSettingValue := "Not Checked" if {
