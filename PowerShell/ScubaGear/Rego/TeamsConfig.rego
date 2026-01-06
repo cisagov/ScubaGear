@@ -544,11 +544,9 @@ tests contains {
     DefaultAppSettingValue != "Not Checked"
     Policies := PoliciesBlockingDefaultApps
     LegacyCompliant := count(Policies) == 0
-    TenantCompliant := DefaultAppTenantSettingCompliant
     
-    # Overall status: pass if legacy is compliant OR tenant setting is compliant
-    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
-    Status := CompliantCount > 0
+    # In v2 mode (tenant settings available), only check tenant setting compliance
+    Status := DefaultAppTenantSettingCompliant
     
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
@@ -683,11 +681,9 @@ tests contains {
     GlobalAppSettingValue != "Not Checked"
     Policies := PoliciesAllowingGlobalApps
     LegacyCompliant := count(Policies) == 0
-    TenantCompliant := GlobalAppTenantSettingCompliant
     
-    # Overall status: pass if legacy is compliant OR tenant setting is compliant
-    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
-    Status := CompliantCount > 0
+    # In v2 mode (tenant settings available), only check tenant setting compliance
+    Status := GlobalAppTenantSettingCompliant
     
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
@@ -822,11 +818,9 @@ tests contains {
     PrivateAppSettingValue != "Not Checked"
     Policies := PoliciesAllowingCustomApps
     LegacyCompliant := count(Policies) == 0
-    TenantCompliant := PrivateAppTenantSettingCompliant
     
-    # Overall status: pass if legacy is compliant OR tenant setting is compliant
-    CompliantCount := count([x | x := LegacyCompliant; x == true]) + count([x | x := TenantCompliant; x == true])
-    Status := CompliantCount > 0
+    # In v2 mode (tenant settings available), only check tenant setting compliance
+    Status := PrivateAppTenantSettingCompliant
     
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
