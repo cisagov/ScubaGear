@@ -283,21 +283,21 @@
     "PowerPlatform": {
       "_comment": "Power Platform - does not support exclusions",
       "type": "object",
-      "properties": {},
+      "patternProperties": {},
       "additionalProperties": false
     },
 
     "SharePoint": {
       "_comment": "SharePoint & OneDrive - does not support exclusions",
       "type": "object",
-      "properties": {},
+      "patternProperties": {},
       "additionalProperties": false
     },
 
     "Teams": {
       "_comment": "Microsoft Teams - does not support exclusions",
       "type": "object",
-      "properties": {},
+      "patternProperties": {},
       "additionalProperties": false
     },
 

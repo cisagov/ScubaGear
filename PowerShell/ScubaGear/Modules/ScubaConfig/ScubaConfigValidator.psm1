@@ -424,35 +424,57 @@ class ScubaConfigValidator {
                 }
             }
 
-            # Check if property exists in defaults (case-insensitive match for default properties)
+            # Check ALL schema properties with case-insensitive match (PowerShell parameters are case-insensitive)
             if (-not $PropertyExists) {
-                $Defaults = [ScubaConfigValidator]::GetDefaults()
-                if ($Defaults.defaults) {
-                    foreach ($DefaultProp in $Defaults.defaults.PSObject.Properties.Name) {
-                        if ($DefaultProp.ToLower() -eq $PropertyName.ToLower()) {
-                            # Found a case-insensitive match - validate using the canonical property name
-                            if ($Schema.properties.PSObject.Properties.Name -contains $DefaultProp) {
-                                $PropertySchema = $Schema.properties.$DefaultProp
-                                [ScubaConfigValidator]::ValidatePropertyBySchema(
-                                    $PropertyValue,
-                                    $PropertySchema,
-                                    $Validation,
-                                    $PropertyName,
-                                    $PropertyName,
-                                    $null,
-                                    $Schema
-                                )
-                                $PropertyExists = $true
+                foreach ($SchemaPropertyName in $Schema.properties.PSObject.Properties.Name) {
+                    if ($SchemaPropertyName.ToLower() -eq $PropertyName.ToLower()) {
+                        # Found a case-insensitive match - validate using the canonical property name
+                        $PropertySchema = $Schema.properties.$SchemaPropertyName
+                        [ScubaConfigValidator]::ValidatePropertyBySchema(
+                            $PropertyValue,
+                            $PropertySchema,
+                            $Validation,
+                            $PropertyName,
+                            $PropertyName,
+                            $null,
+                            $Schema
+                        )
+                        $PropertyExists = $true
+                        
+                        # Warn about case mismatch (informational - PowerShell will still use it)
+                        # Skip warning for products that don't support exclusions - they'll get an error later
+                        if ($SchemaPropertyName -cne $PropertyName) {
+                            # Check if this product supports exclusions (has non-empty patternProperties)
+                            $SupportsExclusions = $false
+                            if ($PropertySchema.PSObject.Properties.Name -contains "patternProperties") {
+                                $PatternProps = $PropertySchema.patternProperties
+                                # Non-empty patternProperties means exclusions are supported
+                                if ($PatternProps -and 
+                                    (($PatternProps.PSObject.Properties.Count -gt 0) -or 
+                                     (($PatternProps -is [hashtable]) -and $PatternProps.Count -gt 0))) {
+                                    $SupportsExclusions = $true
+                                }
                             }
-                            break
+                            else {
+                                # No patternProperties at all (regular properties like AppId, OrgName) - show warning
+                                $SupportsExclusions = $true
+                            }
+                            
+                            if ($SupportsExclusions) {
+                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'."
+)
+                            }
                         }
+                        break
                     }
                 }
             }
 
             if (-not $PropertyExists) {
                 # Property not in schema - treat as warning (ScubaGear can still run with extra properties)
-                [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. This will be ignored."
+                # Note: Root-level properties are case-insensitive in PowerShell, so typos may still work
+                # This warning means the property truly doesn't match any known configuration option
+                [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. It will be ignored by ScubaGear."
 )
             }
         }
@@ -645,7 +667,7 @@ class ScubaConfigValidator {
 
                 # If property not found and additionalProperties is false, report error
                 if (-not $PropertyExists -and $Schema.additionalProperties -eq $false) {
-                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Valid properties: $($AllowedProperties -join ', ')."
+                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProperties -join ', ')."
 )
                 }
             }
@@ -1033,7 +1055,7 @@ class ScubaConfigValidator {
                             if ($Option.additionalProperties -eq $false) {
                                 foreach ($ItemProp in $ItemKeys) {
                                     if ($ItemProp -notin $AllowedProps) {
-                                        [void]$TempValidation.Errors.Add("${Context}: Invalid property '$ItemProp'. Valid properties: $($AllowedProps -join ', ')")
+                                        [void]$TempValidation.Errors.Add("${Context}: Invalid property '$ItemProp'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProps -join ', ')")
                                     }
                                 }
                             }
