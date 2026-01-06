@@ -586,13 +586,20 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-# When org-wide setting is available (not "Not Checked"), show it first
+# When org-wide setting is compliant, just show "Requirement met"
+BuildDefaultAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    DefaultAppTenantSettingCompliant
+}
+
+# When org-wide setting is available but non-compliant, show details
 BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (Microsoft apps): ",
     SettingValue,
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    not DefaultAppTenantSettingCompliant
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
@@ -725,13 +732,20 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-# When org-wide setting is available (not "Not Checked"), show it first
+# When org-wide setting is compliant, just show "Requirement met"
+BuildGlobalAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    GlobalAppTenantSettingCompliant
+}
+
+# When org-wide setting is available but non-compliant, show details
 BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (third-party apps): ",
     SettingValue,
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    not GlobalAppTenantSettingCompliant
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
@@ -864,13 +878,20 @@ tests contains {
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
-# When org-wide setting is available (not "Not Checked"), show it first
+# When org-wide setting is compliant, just show "Requirement met"
+BuildPrivateAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    PrivateAppTenantSettingCompliant
+}
+
+# When org-wide setting is available but non-compliant, show details
 BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     "Org-wide tenant setting (custom apps): ",
     SettingValue,
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    not PrivateAppTenantSettingCompliant
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
