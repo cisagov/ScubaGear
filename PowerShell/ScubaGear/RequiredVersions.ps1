@@ -3,7 +3,7 @@ $ModuleList = @(
     @{
         ModuleName = 'MicrosoftTeams'
         ModuleVersion = [version] '4.9.3'
-        MaximumVersion = [version] '7.4.0'
+        MaximumVersion = [version] '7.5.0'
         Purpose = 'Microsoft Teams configuration management'
         IsPinned = "False"
     },
