@@ -1,0 +1,133 @@
+{
+    "description": "Service principal with optimal permissions for all ScubaGear products - no missing, no extra",
+    "servicePrincipal": {
+        "id": "sp-optimal-1",
+        "appId": "00000000-0000-0000-0000-000000000001",
+        "displayName": "ScubaGear Test SP - Optimal"
+    },
+    "application": {
+        "id": "app-optimal-1",
+        "appId": "00000000-0000-0000-0000-000000000001",
+        "displayName": "ScubaGear Application",
+        "publisherDomain": "testdomain.onmicrosoft.com",
+        "signInAudience": "AzureADMyOrg",
+        "requiredResourceAccess": [
+            {
+                "resourceAppId": "00000003-0000-0000-c000-000000000000",
+                "resourceAccess": [
+                    {
+                        "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "246dd0d5-5bd0-4def-940b-0421030a5b68",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "01e37dc9-c035-40bd-b438-b2879c4870a6",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "edb419d6-7edc-42a3-9345-509bfdf5d87c",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "69e67828-780e-47fd-b28c-7b27d14864e6",
+                        "type": "Role"
+                    },
+                    {
+                        "id": "df021288-bdef-4463-88db-98f22de89214",
+                        "type": "Role"
+                    }
+                ]
+            },
+            {
+                "resourceAppId": "00000003-0000-0ff1-ce00-000000000000",
+                "resourceAccess": [
+                    {
+                        "id": "678536fe-1083-478a-9c59-b99265e6b0d3",
+                        "type": "Role"
+                    }
+                ]
+            },
+            {
+                "resourceAppId": "00000002-0000-0ff1-ce00-000000000000",
+                "resourceAccess": [
+                    {
+                        "id": "dc50a0fb-09a3-484d-be87-e023b12c6440",
+                        "type": "Role"
+                    }
+                ]
+            }
+        ]
+    },
+    "appRoleAssignments": [
+        {
+            "id": "assignment-1",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "01e37dc9-c035-40bd-b438-b2879c4870a6"
+        },
+        {
+            "id": "assignment-2",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "246dd0d5-5bd0-4def-940b-0421030a5b68"
+        },
+        {
+            "id": "assignment-3",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "edb419d6-7edc-42a3-9345-509bfdf5d87c"
+        },
+        {
+            "id": "assignment-4",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "69e67828-780e-47fd-b28c-7b27d14864e6"
+        },
+        {
+            "id": "assignment-5",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+        },
+        {
+            "id": "assignment-6",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "483bed4a-2ad3-4361-a73b-c83ccdbdc53c"
+        },
+        {
+            "id": "assignment-7",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "df021288-bdef-4463-88db-98f22de89214"
+        },
+        {
+            "id": "assignment-8",
+            "resourceId": "resource-sp-exo",
+            "appRoleId": "dc50a0fb-09a3-484d-be87-e023b12c6440"
+        },
+        {
+            "id": "assignment-9",
+            "resourceId": "resource-sp-sharepoint",
+            "appRoleId": "678536fe-1083-478a-9c59-b99265e6b0d3"
+        }
+    ],
+    "oauth2Grants": [],
+    "permissionComparison": {
+        "missingPermissions": [],
+        "extraPermissions": [],
+        "hasMissingPermissions": false,
+        "hasExtraPermissions": false
+    },
+    "roleComparison": {
+        "roleName": "Global Reader",
+        "roleID": "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+        "missing": false
+    },
+    "powerPlatformRegistered": true,
+    "productNames": ["aad", "exo", "defender", "sharepoint", "teams", "powerplatform"],
+    "expectedResult": {
+        "hasFixPermissionIssues": false,
+        "statusPattern": "No action needed"
+    }
+}

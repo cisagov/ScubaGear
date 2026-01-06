@@ -221,6 +221,7 @@ Reset-ScubaGearDependencies
 
 - [Assumptions](docs/misc/assumptions.md)
 - [Mappings](docs/misc/mappings.md)
+- [Service Principal Assistance](docs/prerequisites/serviceprincipal-workflows.md)
 
 ## Project License
 
