@@ -14,16 +14,6 @@ These are the following steps that must be completed:
 * Associate the certificate with the service principal
 * Determining the thumbprint of the certificate
 
-## Service Principal
-
-Configuring a service principal is beyond the scope of these instructions, but Microsoft has documentation that may help:
-
-* [Create a service principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) in the Azure console.
-* Associate a [certificate with a service principal](https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-3)
-
-> [!NOTE]
-> Take note of the AppId and the name of your tenant, as these values will be required to execute ScubaGear in non-interactive mode.
-
 The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
 
 > [!IMPORTANT]
@@ -43,7 +33,6 @@ The minimum permissions and roles that must be assigned to the service principal
 | Power Platform          | (see below)                                     |               |                                       |                                       |
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
-
 
 > [!NOTE]
 > Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details) below.<sup>1</sup>
@@ -72,7 +61,8 @@ Add-PowerAppsAccount `
 ```
 
 > [!NOTE]
-> When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.
+> When testing [GCC tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgov`.<br>
+> When testing [GCC High tenants](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/gcc), use `-Endpoint usgovhigh`.
 
 ```powershell
 # Register the service principal, giving it the
@@ -95,12 +85,34 @@ It's helpful to note the following details:
 
 This section contains additional, non-interactive authentication details that are required to successfully run ScubaGear against a GCC High tenant.
 
-
 ### Defender in GCC High
 
 When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
-
 ### SharePoint in GCC High
 
 When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
+
+## Service Principal Setup
+
+There are two ways to set up a service principal for ScubaGear: using our automated PowerShell functions or manual setup through the Entra admin center.
+
+### Automated Setup
+
+ScubaGear provides PowerShell functions to automate service principal creation, permission assignment, role configuration, and certificate management. This approach is faster, less error-prone, and includes built-in validation.
+
+**Get started:**
+- [Service Principal Workflows](serviceprincipal-workflows.md) - Step-by-step guides for common tasks
+- [Service Principal Troubleshooting](serviceprincipal-troubleshooting.md) - Solutions to common issues
+
+### Manual Setup
+
+If you prefer to set up the service principal manually through the Entra admin center, Microsoft provides documentation for the required steps:
+
+* [Create a service principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) in the Azure console
+* [Associate a certificate with a service principal](https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-3)
+
+When setting up manually, ensure you assign the permissions and roles listed in the [table above](#overview) based on which M365 products you plan to assess.
+
+> [!NOTE]
+> Regardless of setup method, save the AppId and tenant name - these are required to run ScubaGear in non-interactive mode.
