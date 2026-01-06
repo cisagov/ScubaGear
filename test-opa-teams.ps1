@@ -14,7 +14,7 @@ $opaExe = $null
 foreach ($path in $opaPaths) {
     if (Test-Path $path) {
         $opaExe = $path
-        Write-Host "Found OPA at: $opaExe" -ForegroundColor Green
+        Write-Information "Found OPA at: $opaExe" -InformationAction Continue
         break
     }
 }
@@ -24,14 +24,14 @@ if (-not $opaExe) {
     $opaCmd = Get-Command opa -ErrorAction SilentlyContinue
     if ($opaCmd) {
         $opaExe = $opaCmd.Source
-        Write-Host "Found OPA at: $opaExe" -ForegroundColor Green
+        Write-Information "Found OPA at: $opaExe" -InformationAction Continue
     }
 }
 
 if (-not $opaExe) {
-    Write-Host "ERROR: OPA executable not found!" -ForegroundColor Red
-    Write-Host "Please ensure OPA is installed and in your PATH" -ForegroundColor Yellow
-    Write-Host "You can download OPA from: https://www.openpolicyagent.org/docs/latest/#running-opa" -ForegroundColor Yellow
+    Write-Error "ERROR: OPA executable not found!"
+    Write-Warning "Please ensure OPA is installed and in your PATH"
+    Write-Warning "You can download OPA from: https://www.openpolicyagent.org/docs/latest/#running-opa"
     exit 1
 }
 
@@ -39,7 +39,7 @@ if (-not $opaExe) {
 $scubaGearPath = "C:\Users\skirkpatrick\OneDrive - Microsoft\Documents\GitHub\ScubaGear1664\PowerShell\ScubaGear"
 Push-Location $scubaGearPath
 
-Write-Host "`nRunning OPA tests for Teams..." -ForegroundColor Cyan
+Write-Information "`nRunning OPA tests for Teams..." -InformationAction Continue
 
 # Run the tests
 & $opaExe test Testing/Unit/Rego/Teams --verbose
@@ -49,9 +49,9 @@ $exitCode = $LASTEXITCODE
 Pop-Location
 
 if ($exitCode -eq 0) {
-    Write-Host "`nAll tests PASSED!" -ForegroundColor Green
+    Write-Information "`nAll tests PASSED!" -InformationAction Continue
 } else {
-    Write-Host "`nSome tests FAILED!" -ForegroundColor Red
+    Write-Error "`nSome tests FAILED!"
 }
 
 exit $exitCode
