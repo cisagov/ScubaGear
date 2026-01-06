@@ -105,12 +105,12 @@ InModuleScope -ModuleName ExportTeamsProvider {
         It "returns valid JSON with interactive auth and unified settings available" {
                 $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
             }
         It "returns valid JSON with CertificateBasedAuth" {
                 $Json = Export-TeamsProvider -CertificateBasedAuth
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
             }
         It "returns valid JSON with interactive auth when unified settings unavailable" {
                 # Mock scenario where Get-M365UnifiedTenantSettings returns nothing (older tenant)
@@ -138,7 +138,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 }
                 $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
+                $ValidJson | Should Be $true
             }
         AfterAll {
             Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
