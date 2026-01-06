@@ -444,23 +444,10 @@ class ScubaConfigValidator {
                         # Warn about case mismatch (informational - PowerShell will still use it)
                         # Skip warning for products that don't support exclusions - they'll get an error later
                         if ($SchemaPropertyName -cne $PropertyName) {
-                            # Check if this product supports exclusions (has non-empty patternProperties)
-                            $SupportsExclusions = $false
-                            if ($PropertySchema.PSObject.Properties.Name -contains "patternProperties") {
-                                $PatternProps = $PropertySchema.patternProperties
-                                # Non-empty patternProperties means exclusions are supported
-                                if ($PatternProps -and 
-                                    (($PatternProps.PSObject.Properties.Count -gt 0) -or 
-                                     (($PatternProps -is [hashtable]) -and $PatternProps.Count -gt 0))) {
-                                    $SupportsExclusions = $true
-                                }
-                            }
-                            else {
-                                # No patternProperties at all (regular properties like AppId, OrgName) - show warning
-                                $SupportsExclusions = $true
-                            }
+                            # Products without exclusion support: SharePoint, Teams, PowerPlatform
+                            $ProductsWithoutExclusions = @('SharePoint', 'Teams', 'PowerPlatform')
                             
-                            if ($SupportsExclusions) {
+                            if ($SchemaPropertyName -notin $ProductsWithoutExclusions) {
                                 [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'."
 )
                             }
@@ -801,14 +788,8 @@ class ScubaConfigValidator {
                     }
 
                     # Check if policy supports any exclusion types first
-                    if ($AllowedTypes.Count -eq 0 -and $ExclusionTypes.Count -gt 0) {
-                        # Generate error once per policy, not per exclusion type
-                        [void]$Validation.Errors.Add("$ProductName exclusion error: Policy ID '$PolicyId' does not have any mapped exclusion types in schema metadata.")
-                    }
-                    else {
-                        # Validate each exclusion type configured
+                    if ($AllowedTypes.Count -gt 0 -and $ExclusionTypes.Count -gt 0) {
                         foreach ($ExclusionType in $ExclusionTypes) {
-                            # Check if this exclusion type is allowed for this policy
                             if ($ExclusionType -notin $AllowedTypes) {
                                 [void]$Validation.Errors.Add("$ProductName exclusion error: '$ExclusionType' is not valid for this policy. Policy ID '$PolicyId' supports exclusion types: $($AllowedTypes -join ', ').")
                             }
