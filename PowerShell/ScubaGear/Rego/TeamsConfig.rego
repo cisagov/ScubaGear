@@ -582,7 +582,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildDefaultAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
-    DefaultAppTenantSettingCompliant
+    DefaultAppTenantSettingCompliant == true
 }
 
 # When org-wide setting is available but non-compliant, show details
@@ -592,7 +592,7 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
-    not DefaultAppTenantSettingCompliant
+    DefaultAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
@@ -721,7 +721,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildGlobalAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
-    GlobalAppTenantSettingCompliant
+    GlobalAppTenantSettingCompliant == true
 }
 
 # When org-wide setting is available but non-compliant, show details
@@ -731,7 +731,7 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
-    not GlobalAppTenantSettingCompliant
+    GlobalAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
@@ -860,7 +860,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildPrivateAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
-    PrivateAppTenantSettingCompliant
+    PrivateAppTenantSettingCompliant == true
 }
 
 # When org-wide setting is available but non-compliant, show details
@@ -870,7 +870,7 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
-    not PrivateAppTenantSettingCompliant
+    PrivateAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
