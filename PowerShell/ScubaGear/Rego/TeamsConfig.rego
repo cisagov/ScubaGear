@@ -865,9 +865,6 @@ tests contains {
     Status := count(Policies) == 0
     String := "app permission policy(ies) found that does not restrict installation of custom apps by default:"
 }
-    # Use helper function to build details with proper prioritization
-    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
-}
 
 # Helper function to build details message - prioritizes org-wide settings when available
 # When org-wide setting is available (not "Not Checked"), show it first
