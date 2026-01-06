@@ -1,0 +1,43 @@
+{
+    "description": "Service principal with missing permissions",
+    "servicePrincipal": {
+        "id": "sp-missing-1",
+        "appId": "00000000-0000-0000-0000-000000000002",
+        "displayName": "ScubaGear Test SP - Missing Perms"
+    },
+    "application": {
+        "id": "app-missing-1",
+        "appId": "00000000-0000-0000-0000-000000000002",
+        "requiredResourceAccess": []
+    },
+    "appRoleAssignments": [
+        {
+            "id": "assignment-1",
+            "resourceId": "resource-sp-graph",
+            "appRoleId": "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+        }
+    ],
+    "oauth2Grants": [],
+    "permissionComparison": {
+        "missingPermissions": [
+            {
+                "permission": "User.Read.All",
+                "resourceAPIAppId": "00000003-0000-0000-c000-000000000000"
+            }
+        ],
+        "extraPermissions": [],
+        "hasMissingPermissions": true,
+        "hasExtraPermissions": false
+    },
+    "roleComparison": {
+        "roleName": "Global Reader",
+        "roleID": "role-123",
+        "missing": false
+    },
+    "powerPlatformRegistered": false,
+    "productNames": ["aad", "exo", "defender", "sharepoint", "teams", "powerplatform"],
+    "expectedResult": {
+        "hasFixPermissionIssues": true,
+        "statusPattern": "Action needed.*missing permissions"
+    }
+}

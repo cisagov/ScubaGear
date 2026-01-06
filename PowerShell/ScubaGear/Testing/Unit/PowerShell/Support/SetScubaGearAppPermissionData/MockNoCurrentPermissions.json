@@ -1,0 +1,215 @@
+{
+    "AppID":  "00000000-0000-0000-0000-000000000001",
+    "M365Environment":  "commercial",
+    "ProductNames":  [
+        "aad",
+        "exo",
+        "sharepoint",
+        "teams",
+        "powerplatform",
+        "defender"
+    ],
+    "ServicePrincipalID":  "00000000-0000-0000-0000-000000000002",
+    "MissingPermissions":  [
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "PrivilegedAccess.Read.AzureADGroup",
+            "AppRoleID":  "01e37dc9-c035-40bd-b438-b2879c4870a6",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "Policy.Read.All",
+            "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+            "AppRoleID":  "edb419d6-7edc-42a3-9345-509bfdf5d87c",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "RoleManagementPolicy.Read.AzureADGroup",
+            "AppRoleID":  "69e67828-780e-47fd-b28c-7b27d14864e6",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "Directory.Read.All",
+            "AppRoleID":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "RoleManagement.Read.Directory",
+            "AppRoleID":  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
+            "Permission":  "User.Read.All",
+            "AppRoleID":  "df021288-bdef-4463-88db-98f22de89214",
+            "Product":  "aad",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000002-0000-0ff1-ce00-000000000000",
+            "Permission":  "Exchange.ManageAsApp",
+            "AppRoleID":  "dc50a0fb-09a3-484d-be87-e023b12c6440",
+            "Product":  "exo",
+            "InManifest":  false
+        },
+        {
+            "ResourceAPI":  "00000003-0000-0ff1-ce00-000000000000",
+            "Permission":  "Sites.FullControl.All",
+            "AppRoleID":  "678536fe-1083-478a-9c59-b99265e6b0d3",
+            "Product":  "sharepoint",
+            "InManifest":  false
+        }
+    ],
+    "PermissionsNotInManifest":  false,
+    "ExtraPermissions":  false,
+    "ExtraPermissionsDetails":  false,
+    "DelegatedPermissions":  "User.Read",
+    "MissingRoles":  "Global Reader",
+    "PowerPlatformRegistered":  false,
+    "ScubaGearSPPermissions":  [
+                                   {
+                                       "leastPermissions":  [
+                                                                "PrivilegedAccess.Read.AzureADGroup"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "Policy.Read.All"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "Exchange.ManageAsApp"
+                                                            ],
+                                       "resourceAPIAppId":  "00000002-0000-0ff1-ce00-000000000000",
+                                       "scubaGearProduct":  "exo"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "Sites.FullControl.All"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0ff1-ce00-000000000000",
+                                       "scubaGearProduct":  "sharepoint"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "PrivilegedEligibilitySchedule.Read.AzureADGroup"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "RoleManagementPolicy.Read.AzureADGroup"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  [
+                                                                "Directory.Read.All"
+                                                            ],
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "RoleManagement.Read.Directory",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "User.Read.All",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   }
+                               ],
+    "CurrentPermissions":  [
+
+                           ],
+    "CurrentDelegatedPerms":  {
+                                  "Consented":  [
+
+                                                ],
+                                  "NotConsented":  {
+                                                       "Type":  "Scope",
+                                                       "Id":  "e1fe6dd8-ba31-4d61-89e7-88639da4683d"
+                                                   }
+                              },
+    "AppRoleIDs":  [
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "PrivilegedAccess.Read.AzureADGroup",
+                           "AppRoleID":  "01e37dc9-c035-40bd-b438-b2879c4870a6",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "Policy.Read.All",
+                           "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+                           "AppRoleID":  "edb419d6-7edc-42a3-9345-509bfdf5d87c",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "RoleManagementPolicy.Read.AzureADGroup",
+                           "AppRoleID":  "69e67828-780e-47fd-b28c-7b27d14864e6",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "Directory.Read.All",
+                           "AppRoleID":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "RoleManagement.Read.Directory",
+                           "AppRoleID":  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "User.Read.All",
+                           "AppRoleID":  "df021288-bdef-4463-88db-98f22de89214",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000002-0000-0ff1-ce00-000000000000",
+                           "APIName":  "Exchange.ManageAsApp",
+                           "AppRoleID":  "dc50a0fb-09a3-484d-be87-e023b12c6440",
+                           "Product":  "exo"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0ff1-ce00-000000000000",
+                           "APIName":  "Sites.FullControl.All",
+                           "AppRoleID":  "678536fe-1083-478a-9c59-b99265e6b0d3",
+                           "Product":  "sharepoint"
+                       }
+                   ],
+    "Status":  "Action needed: you have missing permissions [PrivilegedAccess.Read.AzureADGroup, Policy.Read.All, PrivilegedEligibilitySchedule.Read.AzureADGroup, RoleManagementPolicy.Read.AzureADGroup, Directory.Read.All, RoleManagement.Read.Directory, User.Read.All, Exchange.ManageAsApp, Sites.FullControl.All] and delegated permissions [User.Read] and missing role [Global Reader] and Power Platform not registered. See FixPermissionIssues for resolution.",
+    "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 52420846-b406-49f2-96fe-5232048659f5 -M365Environment commercial -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerPlatform\u0027, \u0027defender\u0027 | Set-ScubaGearAppPermission"
+}

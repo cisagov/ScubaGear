@@ -1,0 +1,87 @@
+{
+    "AppID": "00000000-0000-0000-0000-000000000001",
+    "M365Environment": "commercial",
+    "ProductNames": [
+        "aad",
+        "exo",
+        "sharepoint",
+        "teams",
+        "powerPlatform",
+        "defender"
+    ],
+    "ServicePrincipalID": "00000000-0000-0000-0000-000000000002",
+    "MissingPermissions": false,
+    "PermissionsNotInManifest": false,
+    "ExtraPermissions": false,
+    "ExtraPermissionsDetails": false,
+    "DelegatedPermissions": false,
+    "MissingRoles": false,
+    "PowerPlatformRegistered": false,
+    "ScubaGearSPPermissions":  [
+        {
+            "leastPermissions":  [
+                                    "PrivilegedAccess.Read.AzureADGroup"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  [
+                                    "Policy.Read.All"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  [
+                                    "Exchange.ManageAsApp"
+                                ],
+            "resourceAPIAppId":  "00000002-0000-0ff1-ce00-000000000000",
+            "scubaGearProduct":  "exo"
+        },
+        {
+            "leastPermissions":  [
+                                    "Sites.FullControl.All"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0ff1-ce00-000000000000",
+            "scubaGearProduct":  "sharepoint"
+        },
+        {
+            "leastPermissions":  [
+                                    "PrivilegedEligibilitySchedule.Read.AzureADGroup"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  [
+                                    "RoleManagementPolicy.Read.AzureADGroup"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  [
+                                    "Directory.Read.All"
+                                ],
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  "RoleManagement.Read.Directory",
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        },
+        {
+            "leastPermissions":  "User.Read.All",
+            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+            "scubaGearProduct":  "aad"
+        }
+    ],
+    "CurrentPermissions": [
+        {
+            "AppRoleId": "69e67828-780e-47fd-b28c-7b27d14864e6"
+        }
+    ],
+    "CurrentRoles": []
+}
