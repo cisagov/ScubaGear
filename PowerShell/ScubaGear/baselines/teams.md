@@ -456,72 +456,6 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 **Legacy settings** can also be manipulated in the Teams admin portal in the following manner. If your portal does not have these settings available, then your portal has been migrated to the new settings. Instructions for those are the v2 settings listed after the v1 settings.
 
-#### Legacy MS.TEAMS.5.1v1 Instructions
-
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Teams apps** > **Permission policies**.
-
-3.  Select **Global (Org-wide default)**.
-
-4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
-
-5.  Click **Allow apps**.
-
-6.  Search and Click **Add** to all appropriate Microsoft Apps.
-
-7.  Click **Allow**.
-
-8.  Click **Save**.
-
-9.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
-
-#### Legacy MS.TEAMS.5.2v1 Instructions
-
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Teams apps** > **Manage apps**.
-
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Third-party apps** turn off **Third-party apps**.
-    - Click **Save**.
-
-4.  Select **Teams apps** > **Permission policies**.
-
-5.  Select **Global (Org-wide default)**.
-
-6.  Set **Third-party apps** to **Block all apps**, unless specific apps
-    have been approved by the agency, in which case select **Allow
-    specific apps and block all others**.
-
-7.  Click **Save**.
-
-8.   If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
-
-#### Legacy MS.TEAMS.5.3v1 Instructions
-
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Teams apps** > **Manage apps**.
-
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Custom apps** turn off **Interaction with custom apps**.
-    - Click **Save**.
-
-4.  Select **Teams apps** > **Permission policies**.
-
-5.  Select **Global (Org-wide default)**.
-
-6.  Set **Custom apps** to **Block all apps**, unless specific apps have
-    been approved by the agency, in which case select **Allow specific apps and block all others**.
-
-7.  Click **Save**.
-
-8.  If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
-
 **ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
 
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
@@ -666,6 +600,75 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
 
 11.  Repeat steps 7 to 10 for each application
+
+
+### Legacy Policy Implementation 
+
+#### Legacy MS.TEAMS.5.1v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Permission policies**.
+
+3.  Select **Global (Org-wide default)**.
+
+4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
+
+5.  Click **Allow apps**.
+
+6.  Search and Click **Add** to all appropriate Microsoft Apps.
+
+7.  Click **Allow**.
+
+8.  Click **Save**.
+
+9.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 3.
+
+#### Legacy MS.TEAMS.5.2v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Third-party apps** turn off **Third-party apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Third-party apps** to **Block all apps**, unless specific apps
+    have been approved by the agency, in which case select **Allow
+    specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.   If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
+
+#### Legacy MS.TEAMS.5.3v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Custom apps** turn off **Interaction with custom apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Custom apps** to **Block all apps**, unless specific apps have
+    been approved by the agency, in which case select **Allow specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.  If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
 
 ## 6. Data Loss Prevention
 
