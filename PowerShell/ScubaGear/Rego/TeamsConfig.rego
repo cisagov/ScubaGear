@@ -511,6 +511,8 @@ DefaultAppTenantSetting := Setting if {
 
 # Determine if the tenant setting requirement is met (set to None)
 # Default to false if the setting doesn't exist
+default DefaultAppTenantSettingCompliant := false
+
 DefaultAppTenantSettingCompliant := true if {
     DefaultAppTenantSetting
     DefaultAppTenantSetting.SettingValue == "None"
@@ -657,6 +659,8 @@ GlobalAppTenantSetting := Setting if {
 
 # Determine if the tenant setting requirement is met (set to None)
 # Default to false if the setting doesn't exist
+default GlobalAppTenantSettingCompliant := false
+
 GlobalAppTenantSettingCompliant := true if {
     GlobalAppTenantSetting
     GlobalAppTenantSetting.SettingValue == "None"
@@ -803,6 +807,8 @@ PrivateAppTenantSetting := Setting if {
 
 # Determine if the tenant setting requirement is met (set to None)
 # Default to false if the setting doesn't exist
+default PrivateAppTenantSettingCompliant := false
+
 PrivateAppTenantSettingCompliant := true if {
     PrivateAppTenantSetting
     PrivateAppTenantSetting.SettingValue == "None"
