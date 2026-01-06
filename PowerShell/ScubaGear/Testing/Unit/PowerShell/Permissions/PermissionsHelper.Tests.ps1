@@ -5,17 +5,6 @@ BeforeDiscovery {
 
 InModuleScope PermissionsHelper {
     Describe -Tag 'PermissionsHelper' -Name "Get-ScubaGearPermissions" {
-        BeforeAll {
-
-            Mock -ModuleName PermissionsHelper Get-ScubaGearPermissions -MockWith {
-                param ($Product)
-                    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-                    $permissionSet = Get-Content -Path "$($ResourceRoot)/../../../../Modules/Permissions/ScubaGearPermissions.json" | ConvertFrom-Json
-                    $collection = $permissionSet | Where-Object { $_.scubaGearProduct -contains $product -and $_.supportedEnv -contains "commercial" }
-                    $results = $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique | sort-object
-                    return $results
-            }
-        }
 
         Context "Check Graph permissions for aad" {
             It "should return the expected value from Get-ScubaGearPermissions for aad" {

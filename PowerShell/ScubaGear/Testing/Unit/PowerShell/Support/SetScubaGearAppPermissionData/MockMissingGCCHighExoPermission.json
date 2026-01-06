@@ -1,0 +1,248 @@
+{
+    "AppID":  "00000000-0000-0000-0000-000000000001",
+    "M365Environment":  "gcchigh",
+    "ProductNames":  [
+                         "aad",
+                         "exo",
+                         "sharepoint",
+                         "teams",
+                         "powerplatform",
+                         "defender"
+                     ],
+    "ServicePrincipalID":  "00000000-0000-0000-0000-000000000002",
+    "MissingPermissions":  [
+                               {
+                                   "ResourceAPI":  "00000007-0000-0ff1-ce00-000000000000",
+                                   "Permission":  "Exchange.ManageAsApp",
+                                   "AppRoleID":  "455e5cd2-84e8-4751-8344-5672145dfa17",
+                                   "Product":  "exo",
+                                   "InManifest":  false
+                               }
+                           ],
+    "PermissionsNotInManifest":  false,
+    "ExtraPermissions":  false,
+    "ExtraPermissionsDetails":  false,
+    "DelegatedPermissions":  false,
+    "MissingRoles":  false,
+    "PowerPlatformRegistered":  true,
+    "ScubaGearSPPermissions":  [
+                                   {
+                                       "leastPermissions":  "PrivilegedAccess.Read.AzureADGroup",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "Policy.Read.All",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "Exchange.ManageAsApp",
+                                       "resourceAPIAppId":  "00000007-0000-0ff1-ce00-000000000000",
+                                       "scubaGearProduct":  "exo"
+                                   },
+                                   {
+                                       "leastPermissions":  "Sites.FullControl.All",
+                                       "resourceAPIAppId":  "00000003-0000-0ff1-ce00-000000000000",
+                                       "scubaGearProduct":  "sharepoint"
+                                   },
+                                   {
+                                       "leastPermissions":  "Exchange.ManageAsApp",
+                                       "resourceAPIAppId":  "00000002-0000-0ff1-ce00-000000000000",
+                                       "scubaGearProduct":  "exo"
+                                   },
+                                   {
+                                       "leastPermissions":  "RoleManagementPolicy.Read.AzureADGroup",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "Directory.Read.All",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "RoleManagement.Read.Directory",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   },
+                                   {
+                                       "leastPermissions":  "User.Read.All",
+                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                                       "scubaGearProduct":  "aad"
+                                   }
+                               ],
+    "CurrentPermissions":  [
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474217217)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifPWVLvM7Z49MlQrZJKvKxYE",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474215814)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifAkt4RQy2VJKg9LQ6uZR_DM",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474217800)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifMImalVHc-hMrIj7_O-T6o0",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "df021288-bdef-4463-88db-98f22de89214"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474216518)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifGnjtGMKfHJEomIpNeF0Vxs",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "d262afb5-9357-4d63-bb01-4fadf38554a0"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474214198)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifL_TejiL1G1EmHTtRNizqiA",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "01e37dc9-c035-40bd-b438-b2879c4870a6"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474214601)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifCgDG0d7WXFJrHbQsTCUGWE",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "246dd0d5-5bd0-4def-940b-0421030a5b68"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "7b3ab873-5db6-49f2-b8c0-7ca86e20db35",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474215276)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifD5CucFuLZBKqgYbZ1-JFos",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Microsoft Graph",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "b466f5da-f72b-471c-8e36-1099eb13e31d"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "78b1a558-52d1-40ad-9c4c-3a463abec695",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474220021)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifISpP2KFbCtMqEPU6tOsldI",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Office 365 Exchange Online",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "dc50a0fb-09a3-484d-be87-e023b12c6440"
+                               },
+                               {
+                                   "DeletedDateTime":  null,
+                                   "ResourceId":  "4b43e5cd-1137-4566-a2b1-28e69e534134",
+                                   "PrincipalType":  "ServicePrincipal",
+                                   "CreatedDateTime":  "\/Date(1765474219253)\/",
+                                   "Id":  "J3DPXQcFBUienk1C7lFifL8Gjt-HzERPtdzZsHSGLhY",
+                                   "PrincipalId":  "00000000-0000-0000-0000-000000000002",
+                                   "ResourceDisplayName":  "Office 365 SharePoint Online",
+                                   "PrincipalDisplayName":  "ScubaGear Application",
+                                   "AppRoleId":  "678536fe-1083-478a-9c59-b99265e6b0d3"
+                               }
+                           ],
+    "CurrentDelegatedGrants":  [
+
+                               ],
+    "AppRoleIDs":  [
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "PrivilegedAccess.Read.AzureADGroup",
+                           "AppRoleID":  "01e37dc9-c035-40bd-b438-b2879c4870a6",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "Policy.Read.All",
+                           "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "RoleManagementPolicy.Read.AzureADGroup",
+                           "AppRoleID":  "b466f5da-f72b-471c-8e36-1099eb13e31d",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "Directory.Read.All",
+                           "AppRoleID":  "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+                           "AppRoleID":  "d262afb5-9357-4d63-bb01-4fadf38554a0",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "RoleManagement.Read.Directory",
+                           "AppRoleID":  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
+                           "APIName":  "User.Read.All",
+                           "AppRoleID":  "df021288-bdef-4463-88db-98f22de89214",
+                           "Product":  "aad"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000007-0000-0ff1-ce00-000000000000",
+                           "APIName":  "Exchange.ManageAsApp",
+                           "AppRoleID":  "455e5cd2-84e8-4751-8344-5672145dfa17",
+                           "Product":  "exo"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000003-0000-0ff1-ce00-000000000000",
+                           "APIName":  "Sites.FullControl.All",
+                           "AppRoleID":  "678536fe-1083-478a-9c59-b99265e6b0d3",
+                           "Product":  "sharepoint"
+                       },
+                       {
+                           "resourceAPIAppId":  "00000002-0000-0ff1-ce00-000000000000",
+                           "APIName":  "Exchange.ManageAsApp",
+                           "AppRoleID":  "dc50a0fb-09a3-484d-be87-e023b12c6440",
+                           "Product":  "exo"
+                       }
+                   ],
+    "Status":  "Action needed: you have missing permissions [Exchange.ManageAsApp] (need to be added to manifest). See FixPermissionIssues for resolution.",
+    "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 00000000-0000-0000-0000-000000000001 -M365Environment gcchigh -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerplatform\u0027, \u0027defender\u0027 | Set-ScubaGearAppPermission"
+}
