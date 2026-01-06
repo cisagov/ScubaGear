@@ -533,7 +533,7 @@ DefaultAppSettingValue := "Not Checked" if {
 }
 
 # Helper to determine compliance status for DefaultApp (v2)
-GetDefaultAppComplianceStatus(LegacyCompliant) := DefaultAppTenantSettingCompliant if {
+GetDefaultAppComplianceStatus(_) := DefaultAppTenantSettingCompliant if {
     DefaultAppSettingValue != "Not Checked"
 }
 
@@ -663,7 +663,7 @@ GlobalAppSettingValue := "Not Checked" if {
 }
 
 # Helper to determine compliance status for GlobalApp (v2)
-GetGlobalAppComplianceStatus(LegacyCompliant) := GlobalAppTenantSettingCompliant if {
+GetGlobalAppComplianceStatus(_) := GlobalAppTenantSettingCompliant if {
     GlobalAppSettingValue != "Not Checked"
 }
 
@@ -793,7 +793,7 @@ PrivateAppSettingValue := "Not Checked" if {
 }
 
 # Helper to determine compliance status for PrivateApp (v2)
-GetPrivateAppComplianceStatus(LegacyCompliant) := PrivateAppTenantSettingCompliant if {
+GetPrivateAppComplianceStatus(_) := PrivateAppTenantSettingCompliant if {
     PrivateAppSettingValue != "Not Checked"
 }
 
