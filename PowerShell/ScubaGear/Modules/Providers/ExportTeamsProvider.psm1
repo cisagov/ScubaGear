@@ -38,7 +38,10 @@ Certificate-based authentication detected.
 - If your organization uses the newer Teams Admin Center org-wide app settings, 
   please re-run ScubaGear using interactive user authentication to validate against org-wide settings instead of legacy policies.
 "@
-        $TenantAppSettings = ConvertTo-Json @()
+        # Use a marker to indicate certificate auth was used
+        $TenantAppSettings = ConvertTo-Json @([PSCustomObject]@{
+            CertificateBasedAuth = $true
+        })
     }
     else {
         # Scenario 2: Interactive auth - try unified settings first with automatic fallback

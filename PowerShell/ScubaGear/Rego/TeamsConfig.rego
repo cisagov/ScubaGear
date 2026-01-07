@@ -518,9 +518,14 @@ DefaultAppTenantSettingCompliant := true if {
     DefaultAppTenantSetting.SettingValue == "None"
 }
 
-# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
 DefaultAppSettingValue := DefaultAppTenantSetting.SettingValue if {
     DefaultAppTenantSetting
+}
+
+DefaultAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
 }
 
 DefaultAppSettingValue := "Not Checked" if {
@@ -530,15 +535,21 @@ DefaultAppSettingValue := "Not Checked" if {
 DefaultAppSettingValue := "Not Checked" if {
     input.tenant_app_settings
     count([S | some S in input.tenant_app_settings; S.SettingName == "DefaultApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
 }
 
 # Helper to determine compliance status for DefaultApp (v2)
 GetDefaultAppComplianceStatus(_) := DefaultAppTenantSettingCompliant if {
     DefaultAppSettingValue != "Not Checked"
+    DefaultAppSettingValue != "Certificate Auth"
 }
 
 GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
     DefaultAppSettingValue == "Not Checked"
+}
+
+GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    DefaultAppSettingValue == "Certificate Auth"
 }
 
 # Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
@@ -573,6 +584,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildDefaultAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     DefaultAppTenantSettingCompliant == true
 }
 
@@ -583,12 +595,18 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     DefaultAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
 BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
     LegacyCompliant == true
 }
 
@@ -604,6 +622,17 @@ BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyComplia
     LegacyCompliant == false
 }
 
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
 # Helper rule to determine DefaultApp tenant setting details
 GetDefaultAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
     DefaultAppTenantSettingCompliant
@@ -612,6 +641,15 @@ GetDefaultAppTenantDetails := " - Compliant (set to None); legacy app permission
 GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
     not DefaultAppTenantSettingCompliant
     DefaultAppSettingValue != "Not Checked"
+    DefaultAppSettingValue != "Certificate Auth"
+}
+
+GetDefaultAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    DefaultAppSettingValue == "Certificate Auth"
 }
 
 GetDefaultAppTenantDetails := concat("", [
@@ -648,9 +686,14 @@ GlobalAppTenantSettingCompliant := true if {
     GlobalAppTenantSetting.SettingValue == "None"
 }
 
-# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
 GlobalAppSettingValue := GlobalAppTenantSetting.SettingValue if {
     GlobalAppTenantSetting
+}
+
+GlobalAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
 }
 
 GlobalAppSettingValue := "Not Checked" if {
@@ -660,15 +703,21 @@ GlobalAppSettingValue := "Not Checked" if {
 GlobalAppSettingValue := "Not Checked" if {
     input.tenant_app_settings
     count([S | some S in input.tenant_app_settings; S.SettingName == "GlobalApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
 }
 
 # Helper to determine compliance status for GlobalApp (v2)
 GetGlobalAppComplianceStatus(_) := GlobalAppTenantSettingCompliant if {
     GlobalAppSettingValue != "Not Checked"
+    GlobalAppSettingValue != "Certificate Auth"
 }
 
 GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
     GlobalAppSettingValue == "Not Checked"
+}
+
+GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    GlobalAppSettingValue == "Certificate Auth"
 }
 
 # Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
@@ -703,6 +752,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildGlobalAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     GlobalAppTenantSettingCompliant == true
 }
 
@@ -713,12 +763,18 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     GlobalAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
 BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
     LegacyCompliant == true
 }
 
@@ -734,6 +790,17 @@ BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyComplian
     LegacyCompliant == false
 }
 
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
 # Helper rule to determine GlobalApp tenant setting details
 GetGlobalAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
     GlobalAppTenantSettingCompliant
@@ -742,6 +809,15 @@ GetGlobalAppTenantDetails := " - Compliant (set to None); legacy app permission 
 GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
     not GlobalAppTenantSettingCompliant
     GlobalAppSettingValue != "Not Checked"
+    GlobalAppSettingValue != "Certificate Auth"
+}
+
+GetGlobalAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    GlobalAppSettingValue == "Certificate Auth"
 }
 
 GetGlobalAppTenantDetails := concat("", [
@@ -778,9 +854,14 @@ PrivateAppTenantSettingCompliant := true if {
     PrivateAppTenantSetting.SettingValue == "None"
 }
 
-# Get tenant setting value - returns value if exists, otherwise "Not Checked"
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
 PrivateAppSettingValue := PrivateAppTenantSetting.SettingValue if {
     PrivateAppTenantSetting
+}
+
+PrivateAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
 }
 
 PrivateAppSettingValue := "Not Checked" if {
@@ -790,15 +871,21 @@ PrivateAppSettingValue := "Not Checked" if {
 PrivateAppSettingValue := "Not Checked" if {
     input.tenant_app_settings
     count([S | some S in input.tenant_app_settings; S.SettingName == "PrivateApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
 }
 
 # Helper to determine compliance status for PrivateApp (v2)
 GetPrivateAppComplianceStatus(_) := PrivateAppTenantSettingCompliant if {
     PrivateAppSettingValue != "Not Checked"
+    PrivateAppSettingValue != "Certificate Auth"
 }
 
 GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
     PrivateAppSettingValue == "Not Checked"
+}
+
+GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    PrivateAppSettingValue == "Certificate Auth"
 }
 
 # Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
@@ -833,6 +920,7 @@ tests contains {
 # When org-wide setting is compliant, just show "Requirement met"
 BuildPrivateAppDetails(SettingValue, _, _, _) := PASS if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     PrivateAppTenantSettingCompliant == true
 }
 
@@ -843,12 +931,18 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
     TenantDetails
 ]) if {
     SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
     PrivateAppTenantSettingCompliant == false
 }
 
 # When legacy is compliant and tenant setting is not checked, just show "Requirement met"
 BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
     SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
     LegacyCompliant == true
 }
 
@@ -864,6 +958,17 @@ BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyComplia
     LegacyCompliant == false
 }
 
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
 # Helper rule to determine PrivateApp tenant setting details
 GetPrivateAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
     PrivateAppTenantSettingCompliant
@@ -872,6 +977,15 @@ GetPrivateAppTenantDetails := " - Compliant (set to None); legacy app permission
 GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
     not PrivateAppTenantSettingCompliant
     PrivateAppSettingValue != "Not Checked"
+    PrivateAppSettingValue != "Certificate Auth"
+}
+
+GetPrivateAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    PrivateAppSettingValue == "Certificate Auth"
 }
 
 GetPrivateAppTenantDetails := concat("", [
