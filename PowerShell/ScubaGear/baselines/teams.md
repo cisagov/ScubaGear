@@ -523,7 +523,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 ### Implementation
 
-***NOTE:*** Legacy implementation instructions are below the Version 2 intructions. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions.
+**NOTE:** Legacy implementation instructions are below the Version 2 intructions. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions.
 
 #### MS.TEAMS.5.1v2 Instructions
 
@@ -605,6 +605,8 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 
 ### Legacy Policy Implementation 
+
+**NOTE:** Only Implement these settings if the v2 settings above are not available in your tenant.
 
 #### Legacy MS.TEAMS.5.1v1 Instructions
 
