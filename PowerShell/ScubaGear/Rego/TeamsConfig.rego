@@ -545,7 +545,7 @@ GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy", "Get-M365UnifiedTenantSettings"],
+    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
     "ActualValue": {"Policies": Policies, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -675,7 +675,7 @@ GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy", "Get-M365UnifiedTenantSettings"],
+    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
     "ActualValue": {"Policies": Policies, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -805,7 +805,7 @@ GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy", "Get-M365UnifiedTenantSettings"],
+    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
     "ActualValue": {"Policies": Policies, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
