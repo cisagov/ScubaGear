@@ -41,7 +41,7 @@ class ScubaConfig {
             "Hybrid Identity Administrator",
             "Application Administrator",
             "Cloud Application Administrator")
-        DefaultOPAVersion = '1.12.1'
+        DefaultOPAVersion = '1.12.2'
         DefaultSkipDoH = $false
         DefaultPreferredDnsResolvers = @()
     }
