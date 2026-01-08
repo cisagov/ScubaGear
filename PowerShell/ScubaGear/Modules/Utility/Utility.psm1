@@ -139,6 +139,43 @@ function Invoke-ReadAllText {
 }
 
 function Invoke-GraphDirectly {
+    <#
+    .SYNOPSIS
+    Invoke Microsoft Graph API requests directly, replacing specific cmdlets.
+
+    .Description
+    This function is used to invoke Microsoft Graph API requests directly, replacing the need for specific cmdlets.
+
+    .Parameter commandlet
+    The name of the commandlet to replace, e.g., "Get-MgBetaServicePrincipal".
+
+    .Parameter M365Environment
+    The Microsoft 365 environment to target, e.g., "Commercial", "Government", etc.
+
+    .Parameter queryParams
+    A hashtable of query parameters to append to the request URI.
+
+    .Parameter apiHeader
+    A switch to indicate whether to include API headers in the request.
+
+    .Parameter ID
+    The ID of the resource to target, if applicable.
+
+    .Parameter Body
+    The body of the request, typically used for POST or PATCH requests.
+
+    .Example
+    Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment "Commercial" -queryParams @{ filter = "displayName eq 'Test'" } -apiHeader -ID "12345"
+
+    This example invokes the Microsoft Graph API to get a service principal with the specified filter, using the commercial environment and including API headers.
+
+    .Example
+    Invoke-GraphDirectly -commandlet "New-MgBetaServicePrincipal" -M365Environment "Commercial" -Body @{ displayName = "New SP"; appId = "12345678-1234-1234-1234-123456789012" } -Method "POST"
+
+    This example invokes the Microsoft Graph API to create a new service principal with the specified body, using the commercial environment.
+
+    #>
+    [cmdletbinding()]
     param (
         [ValidateNotNullOrEmpty()]
         [string]
@@ -151,20 +188,30 @@ function Invoke-GraphDirectly {
         [System.Collections.Hashtable]
         $queryParams,
 
-        [string]$ID
+        [string]$ID,
+
+        [object]$Body
     )
 
     Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
 
-    # Use Get-ScubaGearPermissions to convert cmdlets to API calls
-    if($ID){
+    # Determine HTTP method based on commandlet name
+    if ($commandlet) {
+    $verb = $commandlet.Split('-')[0]
+    $Method = switch ($verb) {
+        "Get"    { "GET" }
+        "New"    { "POST" }
+        "Update" { "PATCH" }
+        "Remove" { "DELETE" }
+        default  { "GET" }
+        }
+    }
+
+    # Determine endpoint
+    if ($ID) {
         $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment -id $ID
     } else {
         $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment
-    }
-
-    If($null -eq $endpoint){
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     if ($queryParams) {
@@ -180,24 +227,67 @@ function Invoke-GraphDirectly {
     }
     Write-Debug "Graph Api direct: $endpoint"
 
+    If($null -eq $endpoint){
+        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+    }
+
     $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
+
     if($Null -ne $apiHeader.PSObject.Properties.Name) {
         # If the API header is passed in, we add it to the request.
         $headers = @{}
-
         foreach ($property in $apiHeader.PSObject.Properties) {
             $headers[$property.Name] = $property.Value
         }
-        $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers
+
+        if ($Body) {
+            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers -Method $Method -Body ($Body | ConvertTo-Json -Depth 10) -ContentType "application/json"
+        } else {
+            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers -Method $Method
+        }
     } else {
-        $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint
+        if ($Body) {
+            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Method $Method -Body ($Body | ConvertTo-Json -Depth 10) -ContentType "application/json"
+        } else {
+            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Method $Method
+        }
     }
 
-    return $resp | ConvertFrom-GraphHashtable
+    if($Method -notmatch "DELETE|PATCH"){
+        return $resp | ConvertFrom-GraphHashtable
+    }
 
 }
 
 Function ConvertFrom-GraphHashtable {
+    <#
+    .SYNOPSIS
+    Converts a collection of hashtables from Microsoft Graph API responses into PowerShell objects.
+
+    .DESCRIPTION
+    This function processes a collection of hashtables, typically returned from Microsoft Graph API responses,
+    and converts them into PowerShell objects. It handles nested hashtables and arrays, converting them into
+    appropriate PowerShell object properties. The function is designed to work with the output of the
+    Invoke-GraphDirectly function, allowing for easy manipulation and access to the data.
+
+    .PARAMETER GraphData
+    The input data, which is expected to be a collection of hashtables or objects returned from Microsoft Graph API requests.
+
+    .EXAMPLE
+    $graphData = @(
+        @{ id = "1"; displayName = "Example 1"; properties = @{ nestedProp = "value1" } },
+        @{ id = "2"; displayName = "Example 2"; properties = @{ nestedProp = "value2" } }
+    )
+    $convertedData = ConvertFrom-GraphHashtable -GraphData $graphData
+
+    This example takes a collection of hashtables representing Microsoft Graph API data and converts them into PowerShell objects,
+    allowing for easier access to properties and nested data.
+
+    .NOTES
+    This function is part of the ScubaGear PowerShell module and is intended for internal use to facilitate
+    the conversion of Microsoft Graph API responses into a more manageable format in order to limit REGO changes.
+
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
@@ -210,15 +300,12 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            # Check if the item is a hashtable, if so convert it to a PSObject.
-            # This function reduces code changes to the AADConditionalAccessHelper module and REGO.
             if ($Item -is [hashtable]) {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
                 # Process each property in the hashtable
                 foreach ($property in $Item.GetEnumerator()) {
-                    # Capitalize the first letter of the property key
                     $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
                     if ($property.Value -is [hashtable]) {
                         # Recursive call to process nested hashtables
@@ -247,7 +334,7 @@ Function ConvertFrom-GraphHashtable {
                 [void]$GraphObject.Add($Object)
             }
             else {
-                # Handle normal objects, no conversion needed just return the results
+                # Handle normal objects
                 [void]$GraphObject.Add($Item)
             }
         }
@@ -258,9 +345,97 @@ Function ConvertFrom-GraphHashtable {
     }
 }
 
+function Invoke-GraphBatchRequest {
+    <#
+    .SYNOPSIS
+        Executes multiple Graph API requests in a single batch call.
+
+    .DESCRIPTION
+        Uses Microsoft Graph $batch endpoint to execute up to 20 requests in a single HTTP call.
+        Automatically handles batching if more than 20 requests are provided.
+
+    .PARAMETER Requests
+        Array of request objects. Each object should have: id, method, url
+
+    .PARAMETER M365Environment
+        The M365 environment to use for the batch request.
+
+    .PARAMETER ApiVersion
+        The Microsoft Graph API version to use (default: v1.0).
+        Valid values are "v1.0" and "beta".
+
+    .EXAMPLE
+        $requests = @(
+            @{ id = "1"; method = "GET"; url = "/servicePrincipals/12345" }
+            @{ id = "2"; method = "GET"; url = "/servicePrincipals/67890" }
+        )
+        $results = Invoke-GraphBatchRequest -Requests $requests -M365Environment "commercial"
+
+        This example executes two GET requests in a single batch call to retrieve service principals.
+
+    .EXAMPLE
+        $requests = @(
+            @{ id = "1"; method = "GET"; url = "/users" }
+            @{ id = "2"; method = "GET"; url = "/groups" }
+        )
+        $results = Invoke-GraphBatchRequest -Requests $requests -M365Environment "commercial" -ApiVersion "beta"
+
+        This example executes two GET requests in a single batch call to retrieve users and groups using the beta API version.
+
+    .NOTES
+        This function is part of the ScubaGear PowerShell module and is intended for internal use to facilitate
+        efficient Graph API interactions by minimizing the number of HTTP requests.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [array]$Requests,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("v1.0", "beta", IgnoreCase = $True)]
+        [string]$ApiVersion = "v1.0"
+    )
+
+    $allResults = @{}
+    $batchSize = 20  # Microsoft Graph batch limit
+
+    # Split requests into batches of 20
+    for ($i = 0; $i -lt $Requests.Count; $i += $batchSize) {
+        $batchRequests = $Requests[$i..[Math]::Min($i + $batchSize - 1, $Requests.Count - 1)]
+
+        # Build batch request body
+        $batchBody = @{
+            requests = @($batchRequests)
+        }
+
+        try {
+            # Execute batch request using Invoke-MgGraphRequest
+            Write-Verbose "Executing batch request with $($batchRequests.Count) requests"
+            $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
+            $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+
+            # Parse responses
+            foreach ($response in $batchResponse.responses) {
+                $allResults[$response.id] = $response
+            }
+        }
+        catch {
+            Write-Warning "Batch request failed: $($_.Exception.Message)"
+            throw
+        }
+    }
+
+    return $allResults
+}
+
 Export-ModuleMember -Function @(
     'Get-Utf8NoBom',
     'Set-Utf8NoBom',
     'Invoke-GraphDirectly',
-    'ConvertFrom-GraphHashtable'
+    'ConvertFrom-GraphHashtable',
+    'Invoke-GraphBatchRequest'
 )

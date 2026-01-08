@@ -1,0 +1,36 @@
+{
+    "id": "resource-sp-graph",
+    "appId": "00000003-0000-0000-c000-000000000000",
+    "displayName": "Microsoft Graph",
+    "appRoles": [
+        {
+            "id": "01e37dc9-c035-40bd-b438-b2879c4870a6",
+            "value": "PrivilegedAccess.Read.AzureADGroup"
+        },
+        {
+            "id": "246dd0d5-5bd0-4def-940b-0421030a5b68",
+            "value": "Policy.Read.All"
+        },
+        {
+            "id": "edb419d6-7edc-42a3-9345-509bfdf5d87c",
+            "value": "PrivilegedEligibilitySchedule.Read.AzureADGroup"
+        },
+        {
+            "id": "69e67828-780e-47fd-b28c-7b27d14864e6",
+            "value": "RoleManagementPolicy.Read.AzureADGroup"
+        },
+        {
+            "id": "7ab1d382-f21e-4acd-a863-ba3e13f7da61",
+            "value": "Directory.Read.All"
+        },
+        {
+            "id": "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",
+            "value": "RoleManagement.Read.Directory"
+        },
+        {
+            "id": "df021288-bdef-4463-88db-98f22de89214",
+            "value": "User.Read.All"
+        }
+    ],
+    "oauth2PermissionScopes": []
+}
