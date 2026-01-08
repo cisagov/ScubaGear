@@ -646,7 +646,7 @@ function Invoke-ProviderList {
                 $TimeZone = ($GetTimeZone).StandardName
             }
 
-        $ConfigDetails = @(ConvertTo-Json -Depth 100 $ScubaConfig)
+        $ConfigDetails = @(ConvertTo-Json -Depth 20 $ScubaConfig)
         if(! $ConfigDetails) {
             $ConfigDetails = "{}"
         }
@@ -1917,7 +1917,7 @@ function Invoke-SCuBACached {
                 # FIX for Issue #1543: ScubaCached out of memory / exponential file growth
                 # The Raw property is a PSCustomObject after ConvertFrom-Json, not a raw JSON string.
                 # It needs to be converted back to JSON to write to file.
-                # Using -Depth 100 prevents truncation of deeply nested Defender objects.
+                # Using -Depth 20 prevents truncation of deeply nested Defender objects.
                 $RawJsonString = $SettingsExport | ConvertTo-Json -Depth 20 -Compress
                 $ActualSavedLocation = Set-Utf8NoBom -Content $RawJsonString -Location $OutPath -FileName "$OutProviderFileName.json"
                 Write-Debug $ActualSavedLocation
@@ -1937,7 +1937,7 @@ function Invoke-SCuBACached {
             # FIX for Issue #1543: Ensure provider JSON is always written with sufficient depth
             # This write operation ensures the UUID is persisted back to the provider file.
             # Truncation causes data corruption that compounds on subsequent cached runs.
-            # Using -Depth 100 -Compress prevents truncation and reduces file size.
+            # Using -Depth 20 -Compress prevents truncation and reduces file size.
             $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
             $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
             -Location $OutPath -FileName "$OutProviderFileName.json"
