@@ -193,7 +193,7 @@ Reset-ScubaGearDependencies
 
 ## Configuration & Usage
 
-- [Configuration UI](docs/scubaconfigapp.md) - **Graphical interface**
+- [Configuration UI](docs/configuration/scubaconfigapp.md) - **Graphical interface**
 - [Configuration File](docs/configuration/configuration.md) - **YAML-based configuration**
 - [Parameters Reference](docs/configuration/parameters.md) - **Command-line options**
 
