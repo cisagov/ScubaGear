@@ -207,17 +207,33 @@ function Initialize-SCuBA {
                     else {
                         # No problematic versions - use the original message
                         Write-Debug "${ModuleName}: ${BestInstalledVersion} already has latest acceptable version installed."
+
+                        if ($Force) {
+                            Write-Information -MessageData "Force reinstalling ${ModuleName}."
+                            Install-Module -Name $ModuleName `
+                                -MinimumVersion $Module.ModuleVersion `
+                                -MaximumVersion $Module.MaximumVersion `
+                                -Force `
+                                -Scope $Scope
+                            $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                            Write-Information -MessageData "Re-installed ${ModuleName} to version ${MaxInstalledVersion}."
+                        }
                     }
                 }
                 else {
-                    Write-Information -MessageData "Updating ${ModuleName} from ${BestInstalledVersion} to ${LatestAcceptableVersion}."
-                    Install-Module -Name $ModuleName `
-                        -MinimumVersion $Module.ModuleVersion `
-                        -MaximumVersion $Module.MaximumVersion `
-                        -Force `
-                        -Scope $Scope
-                    $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-                    Write-Information -MessageData "Updated ${ModuleName} to ${MaxInstalledVersion}."
+                    if ($SkipUpdate) {
+                        Write-Debug "Skipping update for ${ModuleName}: ${BestInstalledVersion} to newer version ${LatestAcceptableVersion}."
+                    }
+                    else {
+                        Write-Information -MessageData "Updating ${ModuleName} from ${BestInstalledVersion} to ${LatestAcceptableVersion}."
+                        Install-Module -Name $ModuleName `
+                            -MinimumVersion $Module.ModuleVersion `
+                            -MaximumVersion $Module.MaximumVersion `
+                            -Force `
+                            -Scope $Scope
+                        $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                        Write-Information -MessageData "Updated ${ModuleName} to ${MaxInstalledVersion}."
+                    }
                 }
             }
             else {
