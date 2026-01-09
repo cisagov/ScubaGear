@@ -1,66 +1,86 @@
-#Requires -Version 5.1
 <#
-    .SYNOPSIS
-        This script verifies the required Powershell modules used by the
-        assessment tool are installed.
-    .PARAMETER Force
-    This will cause all required dependencies to be installed and updated to latest.
-    .DESCRIPTION
-        Verifies a supported version of the modules required to support SCuBAGear are installed.
+.SYNOPSIS
+    Checks ScubaGear and dependency versions for issues that would prevent execution.
+
+.DESCRIPTION
+    Runs Test-ScubaGearVersion to identify version issues with ScubaGear or its dependencies.
+    If critical version issues are found, recommendations are displayed.
+
+.EXAMPLE
+    .\Get-VersionIssues.ps1
+
+.NOTES
+    Uses Host.UI.WriteErrorLine instead of Write-Warning to avoid duplicate warning
+    messages when dependencies.ps1 also issue warnings.
+
 #>
 
-$RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "RequiredVersions.ps1"
-if (Test-Path -Path $RequiredModulesPath){
-    . $RequiredModulesPath
-}
-else {
-    Write-Error "Unable to find required modules path at $RequiredModulesPath"
-}
+[CmdletBinding()]
+param()
 
-if (!$ModuleList){
-   throw "Required modules list is required."
-}
+try {
+    $SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
+    Import-Module -Name $SupportModulesPath
 
-$SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
-Import-Module -Name $SupportModulesPath
+    # Run version check
+    $VersionIssues = Test-ScubaGearVersion
 
-$MissingModules = @()
+    # Extract components
+    $DependencyStatus = $VersionIssues | Where-Object { $_.Component -eq "Dependencies" }
 
-foreach ($Module in $ModuleList) {
-    Write-Debug "Evaluating module: $($Module.ModuleName)"
-    $InstalledModuleVersions = Get-Module -ListAvailable -Name $($Module.ModuleName)
-    $FoundAcceptableVersion = $false
+    # Check for version issues
+    if ($DependencyStatus.Status -eq "Version Issues") {
+        $issueMessage = ($DependencyStatus.Recommendations -split '\.?\s*Run')[0].Trim()
 
-    foreach ($ModuleVersion in $InstalledModuleVersions){
+        $errorMessage = @"
 
-        if (($ModuleVersion.Version -ge $Module.ModuleVersion) -and ($ModuleVersion.Version -le $Module.MaximumVersion)){
-            $FoundAcceptableVersion = $true
-            break;
-        }
+CRITICAL: Version issues detected that may prevent ScubaGear from running!
+
+Issues Found:
+  $issueMessage
+
+Action Required:
+  Run 'Reset-ScubaGearDependencies' to fix these version issues.
+
+"@
+        $Host.UI.WriteErrorLine($errorMessage)
     }
 
-    if (-not $FoundAcceptableVersion) {
-        $MissingModules += $Module
-    }
-}
+    # Check for missing modules
+    if ($DependencyStatus.Status -eq "Missing Modules") {
+        $missingList = $DependencyStatus.MissingModules | ForEach-Object { "  - $_" }
+        $missingListString = $missingList -join "`n"
 
-if ($MissingModules.Count -gt 0){
-    # Set preferences for writing messages
-    $PreferenceStack = New-Object -TypeName System.Collections.Stack
-    $PreferenceStack.Push($WarningPreference)
-    $WarningPreference = "Continue"
+        $errorMessage = @"
 
-    Write-Warning "
-    The required supporting PowerShell modules are not installed with a supported version.
-    ScubaGear may not function properly until the supporting modules are installed.
-    Run Initialize-SCuBA to install all required dependencies.
-    See Get-Help Initialize-SCuBA for more help."
+CRITICAL: Missing required dependencies!
 
-    Write-Debug "The following modules are not installed:"
-    foreach ($Module in $MissingModules){
-        Write-Debug "`t$($Module.ModuleName)"
+Missing Modules:
+$missingListString
+
+Action Required:
+  $($DependencyStatus.Recommendations)
+
+"@
+        $Host.UI.WriteErrorLine($errorMessage)
     }
 
-    $WarningPreference = $PreferenceStack.Pop()
-}
+    # Check for non-critical issues that the user should consider addressing
+    if ($DependencyStatus.Status -eq "Needs Cleanup") {
+        $warningMessage = @"
+Multiple module versions detected.
+  This may cause issues with ScubaGear, cleanup is recommended.
+  $($DependencyStatus.Recommendations)
+"@
+        $Host.UI.WriteErrorLine($warningMessage)
+    }
 
+    # All clear
+    if ($DependencyStatus.Status -eq "Optimal") {
+        Write-Information "All module checks passed. ScubaGear is ready to run." -InformationAction Continue
+    }
+}
+catch {
+    Write-Error "An error occurred checking version status: $($_.Exception.Message)"
+    throw
+}

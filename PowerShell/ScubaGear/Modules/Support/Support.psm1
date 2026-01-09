@@ -175,31 +175,83 @@ function Initialize-SCuBA {
     foreach ($Module in $ModuleList) {
         $ModuleName = $Module.ModuleName
         if (Get-Module -ListAvailable -Name $ModuleName) {
-            $HighestInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-            $LatestVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
-            if ($HighestInstalledVersion -ge $LatestVersion) {
-                Write-Debug "${ModuleName}: ${HighestInstalledVersion} already has latest installed."
-                if ($Force -eq $true) {
+            $InstalledModules = Get-Module -ListAvailable -Name $ModuleName
+            $HighestInstalledVersion = ($InstalledModules | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+            $LatestAcceptableVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
+
+            # Check if ANY installed version is in the acceptable range
+            $AcceptableVersionInstalled = $InstalledModules | Where-Object {
+                $_.Version -ge $Module.ModuleVersion -and $_.Version -le $Module.MaximumVersion
+            }
+
+            if ($AcceptableVersionInstalled) {
+                # Check if we already have the latest acceptable version
+                $BestInstalledVersion = ($AcceptableVersionInstalled | Sort-Object Version -Descending | Select-Object -First 1).Version
+
+                if ($BestInstalledVersion -ge $LatestAcceptableVersion) {
+                    # Check for versions above maximum FIRST, then adjust the debug message
+                    $VersionsAboveMax = $InstalledModules | Where-Object { $_.Version -gt $Module.MaximumVersion }
+
+                    if ($VersionsAboveMax) {
+                        $HighestVersion = ($VersionsAboveMax | Sort-Object Version -Descending | Select-Object -First 1).Version
+                        $MaxVersion = $Module.MaximumVersion
+
+                        # Modified debug message that acknowledges both versions if present
+                        Write-Debug "${ModuleName}: ${BestInstalledVersion} (acceptable) is installed, but ${HighestVersion} (above maximum) will be loaded by default."
+
+                        if (-not $ModuleWarnings) {
+                            $ModuleWarnings = @()
+                        }
+                        $ModuleWarnings += "${ModuleName}: Version ${HighestVersion} is installed but exceeds maximum (${MaxVersion}). PowerShell will load ${HighestVersion} by default, which may cause compatibility issues. Run 'Reset-ScubaGearDependencies' to clean up."
+                    }
+                    else {
+                        # No problematic versions - use the original message
+                        Write-Debug "${ModuleName}: ${BestInstalledVersion} already has latest acceptable version installed."
+                    }
+                }
+                else {
+                    Write-Information -MessageData "Updating ${ModuleName} from ${BestInstalledVersion} to ${LatestAcceptableVersion}."
                     Install-Module -Name $ModuleName `
+                        -MinimumVersion $Module.ModuleVersion `
+                        -MaximumVersion $Module.MaximumVersion `
                         -Force `
-                        -AllowClobber `
-                        -Scope "$($Scope)" `
-                        -MaximumVersion $Module.MaximumVersion
-                    Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}."
+                        -Scope $Scope
+                    $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                    Write-Information -MessageData "Updated ${ModuleName} to ${MaxInstalledVersion}."
                 }
             }
             else {
-                if ($SkipUpdate -eq $true) {
-                    Write-Debug "Skipping update for ${ModuleName}: ${HighestInstalledVersion} to newer version ${LatestVersion}."
-                }
-                else {
-                    Install-Module -Name $ModuleName `
-                        -Force `
-                        -AllowClobber `
-                        -Scope "$($Scope)" `
-                        -MaximumVersion $Module.MaximumVersion
-                    $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-                    Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
+                # No acceptable version installed - need to install
+                $MinVersion = $Module.ModuleVersion
+                $MaxVersion = $Module.MaximumVersion
+                Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} is outside acceptable range (${MinVersion} - ${MaxVersion}). Installing acceptable version."
+                Install-Module -Name $ModuleName `
+                    -MinimumVersion $Module.ModuleVersion `
+                    -MaximumVersion $Module.MaximumVersion `
+                    -Force `
+                    -Scope $Scope
+
+                # After installing, check for the new installed version
+                $NewInstalledModules = Get-Module -ListAvailable -Name $ModuleName
+                $InstalledVersion = ($NewInstalledModules | Where-Object {
+                    $_.Version -ge $Module.ModuleVersion -and $_.Version -le $Module.MaximumVersion
+                } | Sort-Object Version -Descending | Select-Object -First 1).Version
+                Write-Information -MessageData "Installed ${ModuleName} ${InstalledVersion}."
+
+                # Check if versions above maximum still exist
+                $VersionsAboveMax = $NewInstalledModules | Where-Object { $_.Version -gt $Module.MaximumVersion }
+
+                if ($VersionsAboveMax) {
+                    $HighestVersion = ($VersionsAboveMax | Sort-Object Version -Descending | Select-Object -First 1).Version
+                    $MaxVersion = $Module.MaximumVersion
+
+                    # Debug message acknowledging both versions
+                    Write-Debug "${ModuleName}: ${InstalledVersion} (acceptable) is installed, but ${HighestVersion} (above maximum) will be loaded by default."
+
+                    if (-not $ModuleWarnings) {
+                        $ModuleWarnings = @()
+                    }
+                    $ModuleWarnings += "${ModuleName}: Version ${HighestVersion} is installed but exceeds maximum (${MaxVersion}). PowerShell will load ${HighestVersion} by default, which may cause compatibility issues. Run 'Reset-ScubaGearDependencies' to clean up."
                 }
             }
         }
@@ -228,6 +280,45 @@ function Initialize-SCuBA {
     # Stop the clock and report total elapsed time
     $Stopwatch.stop()
     Write-Output "ScubaGear setup time elapsed (in seconds): $([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
+
+    # Display all warnings at the end
+    if ($ModuleWarnings -and $ModuleWarnings.Count -gt 0) {
+        Write-Information "" -InformationAction Continue
+
+        # Build the entire error message as an array
+        $ErrorOutput = @()
+        $ErrorOutput += ""
+        $ErrorOutput += "ERROR:"
+
+        # Collect all error messages
+        foreach ($Warning in $ModuleWarnings) {
+            # Split on " Run " to separate the error message from the recommended action
+            $splitIndex = $Warning.LastIndexOf(" Run ")
+
+            if ($splitIndex -gt 0) {
+                $ErrorMessage = $Warning.Substring(0, $splitIndex)
+                $ErrorOutput += $ErrorMessage
+            }
+            else {
+                # Fallback if " Run " not found
+                $ErrorOutput += $Warning
+            }
+        }
+
+        # Add single RECOMMENDED ACTION section
+        $ErrorOutput += ""
+        $ErrorOutput += "--- RECOMMENDED ACTION ---"
+        $ErrorOutput += "Run 'Reset-ScubaGearDependencies' to clean up."
+        $ErrorOutput += ""
+        $ErrorOutput += "Additional Information:"
+        $ErrorOutput += "  - This issue occurs when a module version exceeds the maximum tested version."
+        $ErrorOutput += "  - PowerShell loads the highest version by default, which may cause compatibility issues."
+        $ErrorOutput += "  - Follow the recommended action to remove problematic versions."
+        $ErrorOutput += ""
+
+        # Output the entire message at once
+        $Host.UI.WriteErrorLine($($ErrorOutput -join "`n"))
+    }
 
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
@@ -1644,12 +1735,17 @@ function Reset-ScubaGearDependencies {
 
                 foreach ($version in $module.VersionsToRemove) {
                     try {
-                        Uninstall-Module -Name $module.Name -RequiredVersion $version -Force
+                        Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
+                        # Only add to cleanedVersions if we get here (uninstall succeeded)
                         $cleanedVersions += "v$version"
                     }
                     catch {
+                        # Uninstall failed - add to failed list and capture actual error message
                         $failedVersions += "v$version"
-                        $result.Warnings += "Could not remove $($module.Name) v$version (may require admin or module in use)"
+
+                        # Extract the actual warning/error message from the exception
+                        $actualError = $_.Exception.Message
+                        $result.Warnings += "Could not remove $($module.Name) v$version`: $actualError"
                     }
                 }
 
