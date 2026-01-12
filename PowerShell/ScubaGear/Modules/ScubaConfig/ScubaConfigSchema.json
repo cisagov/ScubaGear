@@ -5,8 +5,8 @@
   "type": "object",
 
   "schemaMetadata": {
-    "version": "1.0.0",
-    "lastUpdated": "2024-12-23",
+    "version": "1.0.1",
+    "lastUpdated": "2026-01-12",
 
     "ignoreProperties": [
       "_comment: Properties to ignore during validation (PowerShell metadata and internal properties)",
