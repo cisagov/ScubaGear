@@ -104,18 +104,23 @@ function Update-OpaVersion {
 
     Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
 
-    # Replace default version in Config module
-    $ScubaConfigPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1'
-    $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-    $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
-    $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
-    if ($ScubaConfigModule -match $DefaultVersionPattern) {
-        $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOPAVersion'"
-        Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
+    $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json'
+
+    if (-not (Test-Path -PathType Leaf -Path $ScubaConfigDefaultsPath)) {
+        throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
     }
-    else {
-        throw "Fatal Error: Couldn't find the default OPA version in the ScubaConfig."
+
+    $ConfigDefaults = Get-Content -Path $ScubaConfigDefaultsPath -Raw | ConvertFrom-Json
+
+    if ($null -eq $ConfigDefaults.defaults.OPAVersion) {
+        throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
     }
+
+    $ConfigDefaults.defaults.OPAVersion = $LatestOpaVersion
+    # If updating this in the future, make sure to keep UTF8 encoding. 
+    # Set-Content will write a trailing newline at the end of the file by default;
+    # ScubaConfigDefaults.json already has this so skip adding a new line.
+    $ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
 
     Write-Warning "Updating the version of OPA in Support.psm1..."
 
