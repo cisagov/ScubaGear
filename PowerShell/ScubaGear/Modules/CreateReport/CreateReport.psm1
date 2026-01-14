@@ -155,7 +155,7 @@ function New-Report {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Entra ID", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -696,7 +696,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', "entraid", IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
@@ -708,6 +708,9 @@ function Import-SecureBaseline{
 
     foreach ($Product in $ProductNames) {
         try {
+            if ($Product -eq 'entraid') {
+                $Product = "aad"
+            }
             Write-Debug "Processing secure baseline markdown for $Product"
             $Output[$Product] = @()
             $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"

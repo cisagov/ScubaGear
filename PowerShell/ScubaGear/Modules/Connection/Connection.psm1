@@ -55,7 +55,7 @@ function Connect-Tenant {
        Write-Progress @ProgressParams
        try {
            switch ($Product) {
-               "aad" {
+               {($_ -eq "aad") -or ($_ -eq "entraid")}  {
                    $GraphScopes = Get-ScubaGearEntraMinimumPermissions
 
                    $GraphParams = @{

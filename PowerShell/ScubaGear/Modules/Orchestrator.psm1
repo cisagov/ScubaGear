@@ -136,7 +136,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entraid", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -307,6 +307,28 @@ function Invoke-SCuBA {
         if ($ProductNames.Contains('*')){
             $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
+        }
+
+       # Transform ProductNames into list of all products if it contains wildcard
+        if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entraid')){
+            $ProductNames = $ProductNames | Where-Object { $_ -ne 'entraid'}
+            Write-Debug "Removing duplicate productnames parameter"
+        }
+
+               # Transform ProductNames into list of all products if it contains wildcard
+        if ($ProductNames.Contains('entraid')){
+            $ProductNames = $ProductNames | ForEach-Object {
+                if ($_ -eq 'entraid') {
+                    'aad'
+                }
+                else {
+                    $_
+                }
+            }
+            foreach ($i in $ProductNames) {
+                Write-Host $i
+            }
+            Write-Host "Removing Entra ID productnames parameter"
         }
 
         # Default execution ParameterSet
@@ -513,6 +535,7 @@ $ArgToProd = @{
     exo = "EXO";
     defender = "Defender";
     aad = "AAD";
+    entraid = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
 }
@@ -521,7 +544,7 @@ $ProdToFullName = @{
     Teams = "Microsoft Teams";
     EXO = "Exchange Online";
     Defender = "Microsoft 365 Defender";
-    AAD = "Azure Active Directory";
+    AAD = "Microsoft Entra ID";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
 }
@@ -609,7 +632,8 @@ function Invoke-ProviderList {
                 $BaselineName = $ArgToProd[$Product]
                 $N += 1
                 $Percent = $N * 100 / $Len
-                $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
+                $BaselineProgessBarName = if ($BaselineName -eq "AAD") {"Entra ID"} else {$BaselineName}
+                $Status = "Running the $($BaselineProgessBarName) Provider; $($N) of $($Len) Product settings extracted"
                 $ProgressParams = @{
                     'Activity' = "Running the provider for each baseline";
                     'Status' = $Status;
@@ -739,7 +763,9 @@ function Invoke-RunRego {
                 $N += 1
                 $Percent = $N * 100 / $Len
 
-                $Status = "Running the $($BaselineName) Rego Verification; $($N) of $($Len) Rego verifications completed"
+                $BaselineProgessBarName = if ($BaselineName -eq "AAD") {"Entra ID"} else {$BaselineName}
+
+                $Status = "Running the $($BaselineProgessBarName) Rego Verification; $($N) of $($Len) Rego verifications completed"
                 $ProgressParams = @{
                     'Activity' = "Running the rego for each baseline";
                     'Status' = $Status;
@@ -921,7 +947,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("entraid", "teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1245,14 +1271,14 @@ function Invoke-ReportCreation {
             $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
             Copy-Item -Path $Images -Destination $IndividualReportPath -Force -Recurse -ErrorAction 'Stop'
-
             $SecureBaselines =  Import-SecureBaseline -ProductNames $ScubaConfig.ProductNames
 
             foreach ($Product in $ScubaConfig.ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
+                $BaselineProgessBarName = if ($BaselineName -eq "AAD") {"Entra ID"} else {$BaselineName}
                 $N += 1
                 $Percent = $N*100/$Len
-                $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
+                $Status = "Running the $($BaselineProgessBarName) Report creation; $($N) of $($Len) Baselines Reports created";
                 $ProgressParams = @{
                     'Activity' = "Creating the reports for each baseline";
                     'Status' = $Status;
@@ -1398,7 +1424,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entraid", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1411,7 +1437,7 @@ function Get-TenantDetail {
     )
 
     # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
+    if ($ProductNames.Contains("aad") -or $ProductNames.Contains("entraid")) {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("sharepoint")) {
@@ -1734,7 +1760,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', "entraid", IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -1851,6 +1877,12 @@ function Invoke-SCuBACached {
 
             if ($ProductNames -eq '*'){
                 $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+            }
+
+            # Transform ProductNames into list of all products if it contains wildcard
+            if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entraid')) {
+                $ProductNames = $ProductNames.Remove('aad')
+                Write-Debug "Removing duplicate AAD productnames parameter"
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {
