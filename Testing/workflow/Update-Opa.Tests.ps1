@@ -33,7 +33,7 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1' -Resolve
+        $ConfigDefaultsPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json' -Resolve
         $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
         # Setup mock values
         $MockCurrentVersion = "1.1.1"  # The version inserted into Support
@@ -45,7 +45,7 @@ Describe "Update OPA" {
             -CurrentOpaVersion $MockCurrentVersion `
             -LatestOpaVersion $MockLatestVersion
         # Check the results at the file level
-        $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
+        $ConfigDefaultsPath | Should -FileContentMatchExactly $MockLatestVersion
         $SupportPath | Should -FileContentMatchExactly $MockCurrentVersion
         # For support, check specifically.
         # Find all specific lines with this comment.
