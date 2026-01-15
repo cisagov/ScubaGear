@@ -179,7 +179,7 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "commoncontrols", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -904,7 +904,7 @@ function Get-ScubaGearAppPermission {
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "commoncontrols", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
@@ -921,7 +921,7 @@ function Get-ScubaGearAppPermission {
 
     if($ProductNames -contains '*'){
         # If wildcard is specified, include all products
-        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
+        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'commoncontrols')
     }
 
     # Check Power Platform registration - always check to report current status
@@ -1469,7 +1469,7 @@ function Set-ScubaGearAppPermission {
             Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "commoncontrols", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
@@ -2300,7 +2300,7 @@ function New-ScubaGearServicePrincipal {
         [string]$M365Environment,
 
         [Parameter(Mandatory=$false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "commoncontrols", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
@@ -2316,7 +2316,7 @@ function New-ScubaGearServicePrincipal {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
             # If wildcard is specified, include all products
-            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
+            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'commoncontrols')
         }
 
         # Get permissions using the same approach as Get-ScubaGearAppPermission

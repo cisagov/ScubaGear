@@ -12,8 +12,8 @@
       "MacOS": "opa_darwin_amd64",
       "Linux": "opa_linux_amd64_static"
     },
-    "ProductNames": ["aad", "defender", "exo", "sharepoint", "teams"],
-    "AllProductNames": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams"],
+    "ProductNames": ["aad", "commoncontrols", "exo", "sharepoint", "teams"],
+    "AllProductNames": ["aad", "commoncontrols", "exo", "powerplatform", "sharepoint", "teams"],
     "M365Environment": "commercial",
     "LogIn": true,
     "DisconnectOnExit": false,

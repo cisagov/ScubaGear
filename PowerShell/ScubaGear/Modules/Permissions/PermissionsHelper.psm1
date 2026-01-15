@@ -107,7 +107,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
+        [ValidateSet('aad', 'exo', 'commoncontrols', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -134,7 +134,7 @@ Function Get-ScubaGearPermissions {
 
         # If ProductName is * then set Product to all possible values
         if ($Product -contains '*') {
-            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform')
+            $Product = @('aad', 'exo', 'commoncontrols', 'teams', 'sharepoint', 'powerplatform')
         }
 
         if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){

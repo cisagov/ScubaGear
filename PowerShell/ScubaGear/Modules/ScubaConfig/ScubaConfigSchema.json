@@ -97,7 +97,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams", "*"]
+        "enum": ["aad", "commoncontrols", "exo", "powerplatform", "sharepoint", "teams", "*"]
       },
       "minItems": 1,
       "uniqueItems": true

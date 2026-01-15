@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+   [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -68,7 +68,7 @@ function Connect-Tenant {
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
-               {($_ -eq "exo") -or ($_ -eq "defender")} {
+               {($_ -eq "exo") -or ($_ -eq "commoncontrols")} {
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
                            M365Environment = $M365Environment;
@@ -235,10 +235,10 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-       [ValidateSet("aad", "defender", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+       [ValidateSet("aad", "commoncontrols", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-       $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+       $ProductNames = @("aad", "commoncontrols", "exo", "powerplatform", "sharepoint", "teams")
    )
    $ErrorActionPreference = "SilentlyContinue"
 
@@ -265,8 +265,8 @@ function Disconnect-SCuBATenant {
            elseif ($Product -eq "powerplatform") {
                Remove-PowerAppsAccount -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
            }
-           elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
-               if($Product -eq "defender") {
+           elseif (($Product -eq "exo") -or ($Product -eq "commoncontrols")) {
+               if($Product -eq "commoncontrols") {
                    Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                }
                Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue -InformationAction SilentlyContinue | Out-Null

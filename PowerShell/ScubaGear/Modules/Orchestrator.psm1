@@ -136,7 +136,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -305,7 +305,7 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "commoncontrols", "exo", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
@@ -511,7 +511,7 @@ function Invoke-SCuBA {
 $ArgToProd = @{
     teams = "Teams";
     exo = "EXO";
-    defender = "Defender";
+    commoncontrols = "CommonControls";
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
@@ -520,7 +520,7 @@ $ArgToProd = @{
 $ProdToFullName = @{
     Teams = "Microsoft Teams";
     EXO = "Exchange Online";
-    Defender = "Microsoft 365 Defender";
+    CommonControls = "Common Controls";
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
@@ -627,7 +627,7 @@ function Invoke-ProviderList {
                         "exo" {
                             $RetVal = Export-EXOProvider -PreferredDnsResolvers $ScubaConfig.PreferredDnsResolvers -SkipDoH $ScubaConfig.SkipDoH | Select-Object -Last 1
                         }
-                        "defender" {
+                        "commoncontrols" {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
                         }
                         "powerplatform" {
@@ -921,7 +921,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1023,7 +1023,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1398,7 +1398,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1426,7 +1426,7 @@ function Get-TenantDetail {
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
     }
-    elseif ($ProductNames.Contains("defender")) {
+    elseif ($ProductNames.Contains("commoncontrols")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
     }
     else {
@@ -1487,13 +1487,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1734,7 +1734,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -1850,7 +1850,7 @@ function Invoke-SCuBACached {
             }
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+                $ProductNames = "teams", "exo", "commoncontrols", "aad", "sharepoint", "powerplatform"
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {

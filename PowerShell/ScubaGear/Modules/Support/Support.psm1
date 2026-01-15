@@ -30,7 +30,7 @@ function Copy-SCuBABaselineDocument {
         New-Item -ItemType Directory -Path $Destination | Out-Null
     }
 
-    @("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
+    @("teams", "exo", "commoncontrols", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
         $SourceFileName = Join-Path -Path $PSScriptRoot -ChildPath "..\..\baselines\$_.md"
         $TargetFileName = Join-Path -Path $Destination -ChildPath "$_.md"
         Copy-Item -Path $SourceFileName -Destination $Destination -Force:$Force -ErrorAction Stop  2> $null
@@ -764,9 +764,9 @@ function New-SCuBAConfig {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "commoncontrols", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
+        $ProductNames = @("aad", "commoncontrols", "exo", "sharepoint", "teams"),
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
