@@ -339,8 +339,7 @@ impersonation attempt, the email is quarantined.
 
 ### Policies
 #### MS.SECURITY.2.1v1
-User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
-<!-- TODO or a custom policy? all policies that users are added to? the default policy? -->
+User impersonation protection SHOULD be enabled for sensitive accounts.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -358,8 +357,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.SECURITY.2.2v1
-Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
-<!-- TODO or a custom policy? all policies that users are added to? the default policy? -->
+Domain impersonation protection SHOULD be enabled for domains owned by the agency.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -377,8 +375,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
 #### MS.SECURITY.2.3v1
-Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies.
-<!-- TODO or a custom policy? all policies that users are added to? the default policy? -->
+Domain impersonation protection SHOULD be added for key suppliers and partners.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -414,7 +411,11 @@ Domain impersonation protection SHOULD be added for key suppliers and partners i
 ### Implementation
 
 #### MS.SECURITY.2.1v1 Instructions
+<!-- todo update steps
+this is no longer about just the standard and strict policies
+basically all policies that have users need this
 
+maybe just adding to the default policy will work? That applies to all users -->
 1. Sign in to **Microsoft 365 Defender**.
 2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
 3. Select **Threat Policies**.
