@@ -116,53 +116,30 @@ function Update-OpaVersion {
         throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
     }
 
+    $PreviousDefault = $CurrentOpaVersion
     $ConfigDefaults.defaults.OPAVersion = $LatestOpaVersion
+
+    if ($null -eq $ConfigDefaults.metadata) {
+        throw "Fatal Error: Couldn't find metadata in ScubaConfigDefaults.json"
+    }
+
+    if ($null -eq $ConfigDefaults.metadata.compatibleOpaVersions) {
+        $ConfigDefaults.metadata.compatibleOpaVersions = @()
+    }
+
+    # Move the previous default to the end of compatibleOpaVersions
+    $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | ForEach-Object { $_ }
+    $Versions += $PreviousDefault
+    $ConfigDefaults.metadata.compatibleOpaVersions = $Versions
+
     # If updating this in the future, make sure to keep UTF8 encoding. 
     # Set-Content will write a trailing newline at the end of the file by default;
     # ScubaConfigDefaults.json already has this so skip adding a new line.
     $ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
 
-    Write-Warning "Updating the version of OPA in Support.psm1..."
-
-    # Update Acceptable Versions in Support Module
-    # The update is roll the default to the latest version, then put the
-    # previous default right before the var in the ACCEPTABLEVERSIONS string
-    $SupportModulePath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/Support/Support.psm1'
-    $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
-    $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
-    $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
-    $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
-
-    (Get-Content -Path $SupportModulePath) | ForEach-Object {
-        $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
-        if ($EndAcceptableVarMatch) {
-            $VersionsLength = ($_ -split ",").length
-            # Split the line if we reach our version limit per line
-            # in the the file. This is to prevent long lines.
-            if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
-                # Splitting lines; current and latest OPA Version will start on the next line
-                $VersionsArr = $_ -split ","
-                # Create a new line, then add the new version on the next line
-                ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",") + ","
-                "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
-            }
-            elseif ($VersionsLength -eq 1) {
-                # if the default version is the only acceptable version
-                # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
-                $VersionsArr = $_ -split "="
-                VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-            }
-            else {
-                # No splitting lines; appending new current OPA version to acceptable version
-                $VersionsArr = $_ -split ","
-                $NewVersions = ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",")
-                $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-            }
-        }
-        else {
-            $_
-        }
-    } | Set-Content $SupportModulePath
+    Write-Warning "Updated ScubaConfigDefaults.json:"
+    Write-Warning "defaults.OPAVersion set to $LatestOpaVersion"
+    Write-Warning "Previous default ($PreviousDefault) appended to metadata.compatibleOpaVersions"
 }
 
 function Invoke-UnitTestsWithNewOPAVersion {
