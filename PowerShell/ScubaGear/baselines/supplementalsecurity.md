@@ -203,7 +203,7 @@ SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malwar
 
 ### Resources
 
-- [Anti-malware protection for cloud mailboxes \| Microsoft Learn](hhttps://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about)
+- [Anti-malware protection for cloud mailboxes \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about)
 - [Set up Safe Attachments policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-policies-configure?view=o365-worldwide)
 
 ### License Requirements
