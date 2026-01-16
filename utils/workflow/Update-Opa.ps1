@@ -102,7 +102,7 @@ function Update-OpaVersion {
         $LatestOpaVersion
     )
 
-    Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
+    Write-Warning "Updating OPA versions and compatible OPA versions in ScubaConfigDefaults.json..."
 
     $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json'
 
@@ -128,7 +128,7 @@ function Update-OpaVersion {
     $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | ForEach-Object { $_ }
     $Versions = $Versions | Where-Object { $_ -ne $PreviousDefault }
     $Versions += $PreviousDefault
-    
+
     # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
     $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
 
@@ -137,24 +137,23 @@ function Update-OpaVersion {
     # ScubaConfigDefaults.json already has this so skip adding a new line.
     #$ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
 
-    $Raw = [regex]::Replace(
-        $Raw,
+    $RawScubaConfigDefaultsJson = [regex]::Replace(
+        $RawScubaConfigDefaultsJson,
         '(?s)"compatibleOpaVersions"\s*:\s*\[.*?\]',
-        { param($m) '"compatibleOpaVersions": ' + $CompatibleOpaVersions }
+        '"compatibleOpaVersions": ' + $CompatibleOpaVersions
     )
 
-    $Raw = [regex]::Replace(
-        $Raw,
+    $RawScubaConfigDefaultsJson = [regex]::Replace(
+        $RawScubaConfigDefaultsJson,
         '"OPAVersion"\s*:\s*"[^"]*"',
-        { param($m) '"OPAVersion": "' + $NewDefault + '"' }
+        '"OPAVersion": "' + $NewDefault + '"'
     )
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $Raw, $utf8NoBom)
+    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $RawScubaConfigDefaultsJson, $utf8NoBom)
 
-    Write-Warning "Updated ScubaConfigDefaults.json:"
-    Write-Warning "defaults.OPAVersion set to $NewDefault"
-    Write-Warning "Previous default ($PreviousDefault) appended to metadata.compatibleOpaVersions"
+    Write-Warning "Set defaults.OPAVersion to $NewDefault."
+    Write-Warning "Added previous default ($PreviousDefault) to metadata.compatibleOpaVersions."
 }
 
 function Invoke-UnitTestsWithNewOPAVersion {
