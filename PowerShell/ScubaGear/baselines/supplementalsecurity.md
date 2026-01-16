@@ -139,7 +139,8 @@ action is needed to enable it for other products.
 Emails with click-to-run file attachments SHALL be blocked, including at a minimum .exe, .cmd, and .vbe files.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-<!-- todo this is also configurable -->
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
+<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITY.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -157,7 +158,8 @@ prevent spread of malware distributed via click-to-run email attachments.
 Email scanning SHALL be capable of reviewing emails after delivery.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-<!-- todo this is also configurable -->
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
+<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITY.1.2v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
@@ -171,7 +173,8 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 Emails identified as containing malware SHALL be quarantined or dropped.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-<!-- todo this is also configurable -->
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
+<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITY.1.3v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
