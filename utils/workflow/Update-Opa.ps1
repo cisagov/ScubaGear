@@ -110,8 +110,8 @@ function Update-OpaVersion {
         throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
     }
 
-    $RawScubaConfigDefaultsJson = Get-Content -Path $ScubaConfigDefaultsPath -Raw
-    $ConfigDefaults = $RawScubaConfigDefaultsJson | ConvertFrom-Json
+    $Raw = Get-Content -Path $ScubaConfigDefaultsPath -Raw
+    $ConfigDefaults = $Raw | ConvertFrom-Json
 
     if ($null -eq $ConfigDefaults.defaults.OPAVersion) {
         throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
@@ -132,26 +132,11 @@ function Update-OpaVersion {
     # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
     $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
 
-    # If updating this in the future, make sure to keep UTF8 encoding. 
-    # Set-Content will write a trailing newline at the end of the file by default;
-    # ScubaConfigDefaults.json already has this so skip adding a new line.
-    #$ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
-
-    $RawScubaConfigDefaultsJson = [regex]::Replace(
-        $RawScubaConfigDefaultsJson,
-        '(?s)"compatibleOpaVersions"\s*:\s*\[.*?\]',
-        '"compatibleOpaVersions": ' + $CompatibleOpaVersions
-    )
-
-    $RawScubaConfigDefaultsJson = [regex]::Replace(
-        $RawScubaConfigDefaultsJson,
-        '"OPAVersion"\s*:\s*"[^"]*"',
-        '"OPAVersion": "' + $NewDefault + '"'
-    )
+    $Raw = $Raw -replace '"compatibleOpaVersions"\s*:\s*\[[^\]]*\]', ('"compatibleOpaVersions": ' + $CompatibleOpaVersions)
+    $Raw = $Raw -replace '"OPAVersion"\s*:\s*"[^"]*"', ('"OPAVersion": "' + $NewDefault + '"')
 
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $RawScubaConfigDefaultsJson, $utf8NoBom)
-
+    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $Raw, $utf8NoBom)
     Write-Warning "Set defaults.OPAVersion to $NewDefault."
     Write-Warning "Added previous default ($PreviousDefault) to metadata.compatibleOpaVersions."
 }
