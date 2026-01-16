@@ -110,35 +110,50 @@ function Update-OpaVersion {
         throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
     }
 
-    $ConfigDefaults = Get-Content -Path $ScubaConfigDefaultsPath -Raw | ConvertFrom-Json
+    $ConfigDefaults = Get-Content -Path $ScubaConfigDefaultsPath -Raw
 
     if ($null -eq $ConfigDefaults.defaults.OPAVersion) {
         throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
     }
 
-    $PreviousDefault = $CurrentOpaVersion
-    $ConfigDefaults.defaults.OPAVersion = $LatestOpaVersion
-
-    if ($null -eq $ConfigDefaults.metadata) {
-        throw "Fatal Error: Couldn't find metadata in ScubaConfigDefaults.json"
-    }
-
     if ($null -eq $ConfigDefaults.metadata.compatibleOpaVersions) {
-        $ConfigDefaults.metadata.compatibleOpaVersions = @()
+        throw "Fatal Error: Couldn't find metadata.compatibleOpaVersions in ScubaConfigDefaults.json"
     }
+
+    $PreviousDefault = $CurrentOpaVersion
+    $NewDefault = $LatestOpaVersion
+    #$ConfigDefaults.defaults.OPAVersion = $LatestOpaVersion
 
     # Move the previous default to the end of compatibleOpaVersions
     $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | ForEach-Object { $_ }
+    $Versions = $Versions | Where-Object { $_ -ne $PreviousDefault }
     $Versions += $PreviousDefault
-    $ConfigDefaults.metadata.compatibleOpaVersions = $Versions
+    # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
+    $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
+    #$ConfigDefaults.metadata.compatibleOpaVersions = $Versions
 
     # If updating this in the future, make sure to keep UTF8 encoding. 
     # Set-Content will write a trailing newline at the end of the file by default;
     # ScubaConfigDefaults.json already has this so skip adding a new line.
-    $ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
+    #$ConfigDefaults | ConvertTo-Json -Depth 10 | Set-Content -Path $ScubaConfigDefaultsPath -Encoding UTF8 -NoNewline
+
+    $Raw = [regex]::Replace(
+        $Raw,
+        '(?s)"compatibleOpaVersions"\s*:\s*\[.*?\]',
+        { param($m) '"compatibleOpaVersions": ' + $CompatibleOpaVersions }
+    )
+
+    $Raw = [regex]::Replace(
+        $Raw,
+        '"OPAVersion"\s*:\s*"[^"]*"',
+        { param($m) '"OPAVersion": "' + $NewDefault + '"' }
+    )
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $Raw, $utf8NoBom)
 
     Write-Warning "Updated ScubaConfigDefaults.json:"
-    Write-Warning "defaults.OPAVersion set to $LatestOpaVersion"
+    Write-Warning "defaults.OPAVersion set to $NewDefault"
     Write-Warning "Previous default ($PreviousDefault) appended to metadata.compatibleOpaVersions"
 }
 
