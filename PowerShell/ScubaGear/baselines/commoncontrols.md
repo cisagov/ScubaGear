@@ -147,7 +147,7 @@ Sharing high risk file types, when necessary, is better left to a means other
 than email; the dangers of allowing them to be sent over email outweigh
 any potential benefits. Filtering email attachments based on file types can
 prevent spread of malware distributed via click-to-run email attachments.
-- _Last modified:_ May 2024
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -161,7 +161,7 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 
 <!--Policy: MS.COMMONCONTROLS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -177,7 +177,7 @@ Emails identified as containing malware SHALL be quarantined or dropped.
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
 Preventing emails with known malware from reaching user mailboxes helps ensure
 users cannot interact with those emails.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -192,7 +192,7 @@ SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malwar
 
 <!--Policy: MS.COMMONCONTROLS.1.4v1; Criticality: SHOULD -->
 - _Rationale:_ Files shared through Teams or hosted on SharePoint/OneDrive can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
-- _Last modified:_ July 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -344,7 +344,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts in both t
 <!--Policy: MS.COMMONCONTROLS.2.1v1; Criticality: SHOULD -->
 <!--ExclusionType: SensitiveUsers-->
 - _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect accounts.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
@@ -363,7 +363,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 <!--Policy: MS.COMMONCONTROLS.2.2v1; Criticality: SHOULD -->
 <!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect agency domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
@@ -382,7 +382,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners i
 <!--Policy: MS.COMMONCONTROLS.2.3v1; Criticality: SHOULD -->
 <!--ExclusionType: PartnerDomains-->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
-- _Last modified:_ November 2025
+- _Last modified:_ February 2026
 - _Note:_ The standard and strict preset security policies must be enabled to
           protect partner domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
@@ -487,7 +487,7 @@ A DLP policy SHALL be configured to protect PII and sensitive information, as de
                others who should not have access to it. DLP policies
                provide a way for agencies to detect and prevent
                unauthorized disclosures.
-- _Last modified:_ November 2024
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -503,7 +503,7 @@ The DLP policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, 
 - _Rationale:_ Unauthorized disclosures may happen through M365 services
                or endpoint devices. DLP policies should cover all
                affected locations to be effective.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ The DLP policy referenced here is the same policy
           configured in [MS.COMMONCONTROLS.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
@@ -522,7 +522,7 @@ The action for the DLP policy SHOULD be set to block sharing sensitive informati
 - _Rationale:_ Access to sensitive information should be prohibited unless
                explicitly allowed. Specific exemptions can be made based
                on agency policies and valid business justifications.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.COMMONCONTROLS.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)
@@ -541,7 +541,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
                proper use of sensitive information. Enabling
                notifications provides positive feedback to users when
                accessing sensitive information.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ The custom policy referenced here is the same policy
           configured in [MS.COMMONCONTROLS.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AT-2b
@@ -559,7 +559,7 @@ A list of apps that are restricted from accessing files protected by DLP policy 
                information. Defining a list of those apps makes it
                possible to use DLP policies to restrict those apps' access
                to sensitive information on endpoints using Defender.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
@@ -579,7 +579,7 @@ information by restricted apps and unwanted Bluetooth applications.
                access from restricted apps and unwanted Bluetooth
                applications prevents unauthorized disclosure by those
                programs.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_
   - The custom policy referenced here is the same policy
     configured in [MS.COMMONCONTROLS.4.1v2](#msdefender41v2).
@@ -806,7 +806,7 @@ At a minimum, the following alerts SHALL be enabled:
 
 <!--Policy: MS.COMMONCONTROLS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
@@ -819,7 +819,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 
 <!--Policy: MS.COMMONCONTROLS.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
@@ -918,7 +918,7 @@ Unified Audit logging SHALL be enabled.
 
 <!--Policy: MS.COMMONCONTROLS.5.1v1; Criticality: SHALL -->
 - _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
-- _Last modified:_ March 2025
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
   - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
@@ -931,7 +931,7 @@ Audit logs SHALL be maintained for at least the minimum duration dictated by OMB
 
 <!--Policy: MS.COMMONCONTROLS.5.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note_: Purview Audit (Premium) provides a default audit log retention policy,
           retaining Exchange Online, SharePoint Online, OneDrive for
           Business, and Microsoft Entra ID audit records for one year.
@@ -1021,7 +1021,7 @@ Spam and high confidence spam SHALL be moved to either the junk email folder or 
 <!--Policy: MS.COMMONCONTROLS.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
 Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -1037,7 +1037,7 @@ by spam protections. Adding allowed senders is an acceptable method of
 combating these false positives. Allowing an entire domain, especially
 a common domain like office.com, however, provides for a large number of
 potentially unknown users to bypass spam protections.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ Allowed senders MAY be added.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -1106,7 +1106,7 @@ URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams mes
 
 <!--Policy: MS.COMMONCONTROLS.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -1121,7 +1121,7 @@ Direct download links SHOULD be scanned for malware.
 - _Rationale:_ URLs in emails may direct users to download and run malware.
 Scanning direct download links in real-time for known malware and blocking access can prevent
 users from infecting their devices.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -1134,7 +1134,7 @@ User click tracking SHOULD be enabled.
 
 <!--Policy: MS.COMMONCONTROLS.7.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, AU-12c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -1198,7 +1198,7 @@ IP allow lists SHOULD NOT be created.
 <!--Policy: MS.COMMONCONTROLS.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
 security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -1215,7 +1215,7 @@ Avoiding use of safe lists prevents potential threats from circumventing
 security mechanisms. While blocking all malicious senders is not feasible,
 blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 - _Note:_ A connection filter MAY be implemented to create an IP block list.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
