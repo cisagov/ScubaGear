@@ -138,7 +138,8 @@ action is needed to enable it for other products.
 #### MS.COMMONCONTROLS.1.1v1
 Emails with click-to-run file attachments SHALL be blocked, including at a minimum .exe, .cmd, and .vbe files.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo91v2-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+<!-- todo this is also configurable -->
 
 <!--Policy: MS.COMMONCONTROLS.1.1v2; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -155,7 +156,8 @@ prevent spread of malware distributed via click-to-run email attachments.
 #### MS.COMMONCONTROLS.1.2v1
 Email scanning SHALL be capable of reviewing emails after delivery.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo103v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+<!-- todo this is also configurable -->
 
 <!--Policy: MS.COMMONCONTROLS.1.2v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
@@ -168,7 +170,8 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 #### MS.COMMONCONTROLS.1.3v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo102v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+<!-- todo this is also configurable -->
 
 <!--Policy: MS.COMMONCONTROLS.1.3v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
@@ -185,10 +188,10 @@ users cannot interact with those emails.
 #### MS.COMMONCONTROLS.1.4v1
 SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams71v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
-- _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users. TODO update rationale
+<!--Policy: MS.COMMONCONTROLS.1.4v1; Criticality: SHOULD -->
+- _Rationale:_ Files shared through Teams or hosted on SharePoint/OneDrive can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
 - _MITRE ATT&CK TTP Mapping:_
@@ -197,7 +200,8 @@ SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malwar
 
 ### Resources
 
-- [Common attachments filter in anti-malware policies \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about#common-attachments-filter-in-anti-malware-policies)
+- [Anti-malware protection for cloud mailboxes \| Microsoft Learn](hhttps://learn.microsoft.com/en-us/defender-office-365/anti-malware-protection-about)
+ [Set up Safe Attachments policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-policies-configure?view=o365-worldwide)
 
 ### License Requirements
 
