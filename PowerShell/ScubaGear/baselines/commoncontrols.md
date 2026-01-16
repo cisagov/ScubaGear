@@ -153,11 +153,24 @@ prevent spread of malware distributed via click-to-run email attachments.
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
 #### MS.COMMONCONTROLS.1.2v1
+Email scanning SHALL be capable of reviewing emails after delivery.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo103v1-instructions)
+
+<!--Policy: MS.COMMONCONTROLS.1.2v1; Criticality: SHALL -->
+- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
+- _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+
+#### MS.COMMONCONTROLS.1.3v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo102v1-instructions)
 
-<!--Policy: MS.COMMONCONTROLS.1.2v1; Criticality: SHALL -->
+<!--Policy: MS.COMMONCONTROLS.1.3v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
 Preventing emails with known malware from reaching user mailboxes helps ensure
 users cannot interact with those emails.
@@ -166,19 +179,6 @@ users cannot interact with those emails.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-
-#### MS.COMMONCONTROLS.1.3v1
-Email scanning SHALL be capable of reviewing emails after delivery.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo103v1-instructions)
-
-<!--Policy: MS.COMMONCONTROLS.1.3v1; Criticality: SHALL -->
-- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
-- _Last modified:_ June 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
-- _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
 
@@ -208,20 +208,16 @@ Safe attachments require Defender for Office 365 Plan 1 or 2. These are included
 
 #### MS.COMMONCONTROLS.1.1v1 Instructions
 
-Both the standard and strict preset policies meet this baseline requirement, so
-no further actions are needed for users added to those policies. See
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-
 2.  Under **Email & collaboration**, select **Policies & rules**.
-
 3.  Select **Threat policies**.
-
 4.  Under **Policies**, select **Anti-malware**.
-
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
     2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
@@ -245,49 +241,66 @@ For users not added to the standard or strict preset policies:
     6. Click **Next** then **Submit**.
 
 #### MS.COMMONCONTROLS.1.2v1 Instructions
-<!-- TODO check that current ui matches this -->
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
 1.  Sign in to **Microsoft 365 Defender**.
-
 2.  Under **Email & collaboration**, select **Policies & rules**.
-
 3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-malware**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary.
+    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
+        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit protection settings**
+    4. Check **Enable zero-hour auto purge for malware (Recommended)**.
+    5. Click **Save**.
+6.  If creating a new policy:
+    1. Click **Create**.
+    2. After naming the policy, click **Next**.
+    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+       to be exempted from this policy.
+    5. Click **Next**.
+    4. Check **Enable zero-hour auto purge for malware (Recommended)**.
+    5. Click **Next** then **Submit**.
 
-4.  Under **Policies**, select **Safe Attachments**.
-<!-- todo is telling them to create a new policy the right thing here? -->
-5.  Click **Create** to start a new policy.
-
-6.  Give the new policy an appropriate name and description.
-
-<!-- todo should we discuss exclusions here? -->
-7.  Under domains, enter all agency tenant domains. All users under
-    these domains will be added to the policy.
-
-<!-- what does this step do? it feels weird to dictate this since it doesn't
-seem related to the control itself -->
-8.  Under **Safe Attachments unknown malware response**, select
-    **Block**.
-
-9.  Set the **Quarantine policy** to **AdminOnlyAccessPolicy**.
-
-10. Click **Next**, then **Submit**.
 
 #### MS.COMMONCONTROLS.1.3v1 Instructions
-<!-- todo double check that current UI matches this -->
+
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
 1.  Sign in to **Microsoft 365 Defender**.
-
 2.  Under **Email & collaboration**, select **Policies & rules**.
-
 3.  Select **Threat policies**.
-
-4.  Under **Policies**, select **Anti-malware**.
-
-5.  Select the **Default (Default)** policy.
-<!-- todo rework this, which policy should they select? -->
-6.  Click **Edit protection settings**.
-
-7.  Check **Enable zero-hour auto purge for malware (Recommended)**.
-
-8.  Click **Save**.
+4.  Under **Policies**, select **Safe Attachments**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary.
+    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
+        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit settings**
+    4. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic Delivery**.
+    5. Click **Save**.
+6.  If creating a new policy:
+    1. Click **Create**.
+    2. After naming the policy, click **Next**.
+    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+       to be exempted from this policy.
+    5. Click **Next**.
+    4. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic Delivery**.
+    5. Click **Next** then **Submit**.
 
 #### MS.COMMONCONTROLS.1.4v1 Instructions
 
