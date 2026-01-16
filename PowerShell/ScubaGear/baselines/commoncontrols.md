@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Secure Configuration Baseline for Common Controls
+# CISA M365 Secure Configuration Baseline Supplemental Security Controls
 
 Several essential security functions for M365 services require a dedicated security
 tool, e.g., for spam and phishing protections. M365 provides these security functions
@@ -9,12 +9,12 @@ require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
 and are available as add-ons for E3 and G3. However, third-party solutions that
 offer comparable security functions can be used in lieu of Defender.
 
-The Common Controls baseline enumerates a set of required security functions agencies
-should configure, be it through Defender or a third-party tool of their choice.
-Should an agency elect to use Defender as their tool of choice, agencies should
-follow the implementation guidance included with this baseline. However, regardless
-of whether or Defender is used, the policies in this baseline are applicable to
-all M365 users.
+The Supplemental Security Controls baseline enumerates a set of required security
+functions agencies should configure, be it through Defender or a third-party tool
+of their choice. Should an agency elect to use Defender as their tool of choice,
+agencies should follow the implementation guidance included with this baseline.
+However, regardless of whether or not Defender is used, the policies in this baseline
+are applicable to all M365 users.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
@@ -39,7 +39,33 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
-**Sensitive Accounts**: This term denotes a set of user accounts that have access to sensitive and high-value information. Certain accounts—like those belonging to CEOs, CFOs, CISOs, and IT administrators—have access to highly sensitive data and critical systems, making them prime targets for cyberattacks. These accounts, referred to as priority accounts, require enhanced security measures to minimize the risk of compromise.
+**Sensitive Accounts**: This term denotes a set of user accounts that have either
+access to sensitive and high-value information or are likely to be seen as trusted
+authority figures by other users. Certain accounts—like those belonging to CEOs,
+CFOs, CISOs, and IT administrators—have access to highly sensitive data and critical
+systems, making them prime targets for cyberattacks. These accounts, referred to
+as priority accounts, require enhanced security measures to minimize the risk of
+compromise.
+
+**Threat Policies**: Much of Microsoft Defender for Office 365's configuration
+is managed through threat policies. Users, groups, and domains can be added to
+or excluded from threat security polices. Users added to a policy receive the
+protections configured for that policy.
+
+While users can create custom threat polices, Microsoft Defender defines three
+[preset security policies](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
+built-in protection, standard, and strict. These preset policies are informed by
+Microsoft's observations, and are designed to strike the balance between usability
+and security. They allow administrators to enable the full feature set of Defender
+by adding users to the policies rather than manually configuring each setting.
+One simple method of meeting most requirements of this baseline is to add users
+to the standard or strict preset policies, though some organizations may require
+the flexibility afforded by custom policies.
+
+Note that a user can be added to multiple policies. In that case, the policies
+are applied in order of precedence, as desribed by
+[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
+
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
@@ -49,24 +75,54 @@ The following are key terms and descriptions used in this document.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
+## Adding Users to the Preset Security Policies
+As many controls in this baseline can be satisfied by adding users to the standard
+or strict security policies, we describe this process once here, rather than
+duplicating it in each applicable control.
+
+To add users to the standard policy:
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Under **Standard protection**, ensure the toggle is enabled such that it reads "Standard protection is on."
+6. Under **Standard protection is on**, select **Manage protection settings**.
+7. On the **Apply Exchange Online Protection** page, select **All recipients**.
+8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
+10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+11. Select **Next** on each page until the **Review and confirm your changes** page.
+12. On the **Review and confirm your changes** page, select **Confirm**.
+
+To add users to the strict policy:
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Under **Strict protection**, ensure the toggle is enabled such that it reads "Strict protection is on."
+6. Under **Strict protection is on**, select **Manage protection settings**.
+7. On the **Apply Exchange Online Protection** page, select **All recipients**.
+8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
+10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+11. Select **Next** on each page until the **Review and confirm your changes** page.
+12. On the **Review and confirm your changes** page, select **Confirm**.
+
+See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) to understand the
+differences between the two preset policies.
+
 # Baseline Policies
-
-
-<!-- TODO incorporate the explanation of the preset policies somewhere, it's still helpful
-
-Microsoft Defender defines three [preset security
-profiles](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
-built-in protection, standard, and strict. These preset policies are informed by Microsoft's observations, and are designed to strike the balance between usability and security. They allow administrators to enable the full feature set of Defender by simply adding users to the policies rather than manually configuring each setting.
-
-Within the standard and strict preset policies, users can be enrolled in [Exchange Online Protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/eop-about?view=o365-worldwide) (EOP) and [Defender for Office 365 protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/microsoft-defender-for-office-365-product-overview?view=o365-worldwide). Additionally, preset policies support configuration of [impersonation protection](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365).
- -->
 
 ## 1. Malware Protection
 
 Emails and Teams messages may include attachments that contain malware. Therefore,
 messages should be scanned for malware to prevent infections. Once malware has
 been identified, the scanner should drop or quarantine the associated messages.
-Because malware detections may be updated, it is also important that emails
+Because malware detections may be updated, it is also important that messages
 that were already delivered to users are also scanned and removed.
 
 The Safe Attachments feature included with Defender will scan messages for
@@ -152,7 +208,12 @@ Safe attachments require Defender for Office 365 Plan 1 or 2. These are included
 
 #### MS.COMMONCONTROLS.1.1v1 Instructions
 
-<!-- TODO check that current ui matches this -->
+Both the standard and strict preset policies meet this baseline requirement, so
+no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
 
 2.  Under **Email & collaboration**, select **Policies & rules**.
@@ -161,16 +222,27 @@ Safe attachments require Defender for Office 365 Plan 1 or 2. These are included
 
 4.  Under **Policies**, select **Anti-malware**.
 
-<!-- todo which policy should they select? -->
-5.  Select the **Default (Default)** policy.
-
-6.  Click **Edit protection settings**.
-
-7.  Check **Enable the common attachments filter**.
-
-8.  Click **Customize file types** as needed.
-
-9.  Click **Save**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary.
+    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
+        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit protection settings**
+    4. Check **Enable the common attachments filter**.
+    5. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vba are selected.
+    5. Click **Save**.
+6.  If creating a new policy:
+    1. Click **Create**.
+    2. After naming the policy, click **Next**.
+    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+       to be exempted from this policy.
+    5. Click **Next**.
+    4. Check **Enable the common attachments filter**.
+    5. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vba are selected, then click **Done**.
+    6. Click **Next** then **Submit**.
 
 #### MS.COMMONCONTROLS.1.2v1 Instructions
 <!-- TODO check that current ui matches this -->
