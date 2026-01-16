@@ -110,7 +110,8 @@ function Update-OpaVersion {
         throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
     }
 
-    $ConfigDefaults = Get-Content -Path $ScubaConfigDefaultsPath -Raw
+    $RawScubaConfigDefaultsJson = Get-Content -Path $ScubaConfigDefaultsPath -Raw
+    $ConfigDefaults = $RawScubaConfigDefaultsJson | ConvertFrom-Json
 
     if ($null -eq $ConfigDefaults.defaults.OPAVersion) {
         throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
@@ -122,15 +123,14 @@ function Update-OpaVersion {
 
     $PreviousDefault = $CurrentOpaVersion
     $NewDefault = $LatestOpaVersion
-    #$ConfigDefaults.defaults.OPAVersion = $LatestOpaVersion
 
     # Move the previous default to the end of compatibleOpaVersions
     $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | ForEach-Object { $_ }
     $Versions = $Versions | Where-Object { $_ -ne $PreviousDefault }
     $Versions += $PreviousDefault
+    
     # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
     $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
-    #$ConfigDefaults.metadata.compatibleOpaVersions = $Versions
 
     # If updating this in the future, make sure to keep UTF8 encoding. 
     # Set-Content will write a trailing newline at the end of the file by default;
