@@ -246,6 +246,7 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
+For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
 2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
@@ -278,6 +279,7 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
+For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
 2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
@@ -304,7 +306,9 @@ for instructions on adding users to these policies.
 
 #### MS.COMMONCONTROLS.1.4v1 Instructions
 
-<!-- todo double check that this matches the current UI -->
+This baseline policy is _not_ covered by the preset policies, so these steps
+need to be taken even if the standard or strict policies are used.
+
 1.  Sign in to **Microsoft 365 Defender**.
 
 2.  Under **Email & collaboration**, select **Policies & rules**.
@@ -315,9 +319,10 @@ for instructions on adding users to these policies.
 
 5.  Select **Global settings**.
 
-6.  Toggle the **Turn on Defender for Office 365 for SharePoint, OneDrive, and
-    Microsoft Teams** slider to **On**.
+6.  Toggle the **Turn on Defender for Office 365 for SharePoint, OneDrive, and Microsoft Teams**
+    slider to **On**.
 
+7. Click **Save**.
 
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
