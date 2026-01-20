@@ -246,6 +246,7 @@ function Copy-ModuleToTempLocation {
   }
   else {
     $ErrorMessage = "Failed to find the module destination path."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -281,6 +282,7 @@ function Edit-ManifestFile {
   }
   else {
     $ErrorMessage = "Failed to find the manifest file."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -326,6 +328,7 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot edit the module because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to edit the module manifest."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   try {
@@ -338,6 +341,7 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot test the manifest file because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to test the manifest file."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   $ModuleVersion
@@ -370,6 +374,7 @@ function New-ArrayOfFilePaths {
   }
   else {
     $ErrorMessage = "Failed to find any .ps1, .psm1, or .psd1 files."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -398,6 +403,7 @@ function New-FileList {
   }
   else {
     $ErrorMessage = "Failed to find the list file."
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
