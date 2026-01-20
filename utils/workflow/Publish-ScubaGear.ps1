@@ -443,7 +443,7 @@ function Use-AzureSignTool {
     '-tr', $TimeStampServer,
     '-kvu', $AzureKeyVaultUrl,
     '-kvc', $CertificateName,
-    '-kvm'
+    '-kvm',
     '-ifl', $FileList
   )
 
@@ -459,16 +459,25 @@ function Use-AzureSignTool {
   $ToolPath = (Get-Command AzureSignTool).Path
   Write-Warning "The path to AzureSignTool is $ToolPath"
   # & is the call operator that executes a command, script, or function.
-  $Results = & $ToolPath $SignArguments
-  Write-Warning $Results
-  Write-Warning $Results | Format-List
+  try {
+    $Results = & $ToolPath $SignArguments 2>&1
+  }
+  catch {
+    $ErrorMessage = "An error occurred while signing the files: $($_.Exception)"
+    Write-Error $ErrorMessage
+    throw $ErrorMessage
+  }
+
+  Write-Warning "AzureSignTool output:"
+  $Results | ForEach-Object { Write-Warning $_ }
+
   # Test the results for failures.
   # If there are no failures, the $SuccessPattern string will be the last
   # line in the results.
   # Warning: This is a brittle test, because it depends upon a specific string.
   $SuccessPattern = 'Failed operations: 0'
   $FoundNoFailures = $Results | Select-String -Pattern $SuccessPattern -Quiet
-  Write-Warning $FoundNoFailures
+
   if ($FoundNoFailures -eq $true) {
     Write-Warning "Signed the filelist without errors."
   }
