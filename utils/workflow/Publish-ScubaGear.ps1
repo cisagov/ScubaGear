@@ -468,8 +468,9 @@ function Use-AzureSignTool {
     throw $ErrorMessage
   }
 
-  Write-Warning "AzureSignTool output:"
-  $Results | ForEach-Object { Write-Warning $_ }
+  # Keep this for debugging purposes to check the AzureSignTool output
+  #Write-Warning "AzureSignTool output:"
+  #$Results | ForEach-Object { Write-Warning $_ }
 
   # Test the results for failures.
   # If there are no failures, the $SuccessPattern string will be the last
