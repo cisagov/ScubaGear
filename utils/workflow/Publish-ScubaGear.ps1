@@ -202,6 +202,7 @@ function Publish-ScubaGearModule {
   }
   catch {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
+    Write-Error "Error details: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
     exit 1
   }
   $ModuleVersion
@@ -245,7 +246,6 @@ function Copy-ModuleToTempLocation {
   }
   else {
     $ErrorMessage = "Failed to find the module destination path."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -281,7 +281,6 @@ function Edit-ManifestFile {
   }
   else {
     $ErrorMessage = "Failed to find the manifest file."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -327,7 +326,6 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot edit the module because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to edit the module manifest."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
   try {
@@ -340,7 +338,6 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot test the manifest file because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to test the manifest file."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
   $ModuleVersion
@@ -373,7 +370,6 @@ function New-ArrayOfFilePaths {
   }
   else {
     $ErrorMessage = "Failed to find any .ps1, .psm1, or .psd1 files."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -402,7 +398,6 @@ function New-FileList {
   }
   else {
     $ErrorMessage = "Failed to find the list file."
-    Write-Error = $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -452,7 +447,7 @@ function Use-AzureSignTool {
   $NumberOfCommands = (Get-Command AzureSignTool) # Should return 1
   if ($NumberOfCommands -eq 0) {
     $ErrorMessage = "Failed to find the AzureSignTool on this system."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   $ToolPath = (Get-Command AzureSignTool).Path
@@ -473,7 +468,7 @@ function Use-AzureSignTool {
   }
   else {
     $ErrorMessage = "Failed to sign the filelist without errors."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 }
@@ -532,7 +527,7 @@ function Test-ScubaCatalogFile {
   }
   else {
     $ErrorMessage = "Signing the module was NOT successful."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 }
