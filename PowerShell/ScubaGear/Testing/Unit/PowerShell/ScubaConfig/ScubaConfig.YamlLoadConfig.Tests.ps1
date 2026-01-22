@@ -42,7 +42,7 @@ InModuleScope ScubaConfig {
                         M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $true) | Should -BeTrue
                 $cfg = [ScubaConfig]::GetInstance()
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
@@ -53,10 +53,11 @@ InModuleScope ScubaConfig {
                         M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $true) | Should -BeTrue
                 # After second load, configuration should be replaced
                 $cfg = [ScubaConfig]::GetInstance()
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
+                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
@@ -127,7 +128,7 @@ M365Environment: invalid-env
             }
 
             It 'LoadConfig with SkipValidation=$true should skip Organization rule validation'{
-                # Create config with invalid values
+                # Create config with invalid values but valid paths
                 $testFile = [System.IO.Path]::GetTempFileName()
                 $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
                 "ProductNames: ['invalid']" | Set-Content -Path $testFile
@@ -154,8 +155,6 @@ M365Environment: invalid-env
                     # Since validation was skipped, we can override values
                     $cfg.Configuration.ProductNames = @('aad', 'defender')
                     $cfg.Configuration.M365Environment = 'commercial'
-                    # Ensure OPAPath is still pointing to our temp directory
-                    $cfg.Configuration.OPAPath = $tempOpaPath
                     # Now validation should pass after override
                     { $cfg.ValidateConfiguration() } | Should -Not -Throw
                 }
@@ -220,8 +219,6 @@ M365Environment: invalid-env
 
                     # Override with valid value (simulating command-line parameter)
                     $cfg.Configuration.M365Environment = 'gcchigh'
-                    # Ensure OPAPath is still pointing to our temp directory
-                    $cfg.Configuration.OPAPath = $tempOpaPath
 
                     # Validation should now succeed
                     {$cfg.ValidateConfiguration()} | Should -Not -Throw

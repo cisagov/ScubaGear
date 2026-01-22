@@ -74,7 +74,7 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 
 - **Organization Settings**: Tenant information, display names, descriptions
 - **Product Selection**: Choose which M365 services to assess
-- **Exclusions**: Configure policy exclusions for product-specific configurations outline in the [Configuration File](docs/configuration/configuration.md)
+- **Exclusions**: Configure policy exclusions for product-specific configurations outline in the [Configuration File](configuration.md)
 - **Annotations**: Add contextual information to policies
 - **Omissions**: Skip specific policies with rationale and expiration dates
 - **Advanced Settings**: Output paths, authentication, and technical parameters

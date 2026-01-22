@@ -344,11 +344,18 @@ function Invoke-SCuBA {
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             [ScubaConfig]::ResetInstance()
-            if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath))){
-                Write-Error -Message "The config file failed to load: $ConfigFilePath"
-            }
-            else {
+            try {
+                # Load config without validation to allow command-line parameter overrides
+                if (-Not ([ScubaConfig]::GetInstance().LoadConfig($ConfigFilePath, $true))){
+                    Write-Error -Message "The config file failed to load: $ConfigFilePath"
+                    return
+                }
                 $ScubaConfig = [ScubaConfig]::GetInstance().Configuration
+            }
+            catch {
+                # Display clean validation error without PowerShell stack trace
+                Write-Warning $_.Exception.Message
+                return
             }
 
             # Authentications parameters use below
@@ -383,6 +390,17 @@ function Invoke-SCuBA {
                 {
                     $ScubaConfig[$value] = $PSBoundParameters[$value]
                 }
+            }
+
+            # Validate the final configuration after all overrides have been applied
+            try {
+                [ScubaConfig]::GetInstance().ValidateConfiguration()
+            }
+            catch {
+                # Display clean validation error without PowerShell stack trace
+                #Write-Warning $_.Exception.Message
+                $Host.UI.WriteErrorLine("`nERROR: " + $_.Exception.Message)
+                return
             }
         }
 
@@ -651,7 +669,7 @@ function Invoke-ProviderList {
                 $TimeZone = ($GetTimeZone).StandardName
             }
 
-        $ConfigDetails = @(ConvertTo-Json -Depth 100 $ScubaConfig)
+        $ConfigDetails = @(ConvertTo-Json -Depth 20 $ScubaConfig)
         if(! $ConfigDetails) {
             $ConfigDetails = "{}"
         }
@@ -938,7 +956,7 @@ function ConvertTo-ResultsCsv {
 
             if (Test-Path $ScubaResultsPath -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                $ScubaResults = Get-Content (Get-ChildItem $ScubaResultsPath).FullName | ConvertFrom-Json
+                $ScubaResults = Get-Content -Encoding UTF8 (Get-ChildItem $ScubaResultsPath).FullName | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -948,7 +966,7 @@ function ConvertTo-ResultsCsv {
                 foreach ($Product in $ProductNames) {
                     $BaselineName = $ArgToProd[$Product]
                     $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
-                    $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+                    $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
                     $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
                         -NotePropertyValue $IndividualResults.Results
                 }
@@ -1056,7 +1074,7 @@ function Merge-JsonOutput {
             # Load the raw provider output
             $SettingsExportPath = Join-Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
             $DeletionList += $SettingsExportPath
-            $SettingsExport =  Get-Content $SettingsExportPath -Raw
+            $SettingsExport =  Get-Content -Encoding UTF8 $SettingsExportPath -Raw
             $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
             $TimestampZulu = $SettingsExportObject.timestamp_zulu
 
@@ -1094,7 +1112,7 @@ function Merge-JsonOutput {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                 $DeletionList += $FileName
-                $IndividualResults = Get-Content $FileName | ConvertFrom-Json
+                $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
 
                 $Results | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.Results
@@ -1917,15 +1935,17 @@ function Invoke-SCuBACached {
                 # By default ScubaGear will output the files into their own folder.
                 # The only case this will happen is when someone personally moves multiple files into the
                 # same folder.
-                $SettingsExport = $(Get-Content (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json).Raw
+                $SettingsExport = $(Get-Content -Encoding UTF8 (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json).Raw
 
-                # Uses the custom UTF8 NoBOM function to reoutput the Provider JSON file
-                $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
-                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
-                -Location $OutPath -FileName "$OutProviderFileName.json"
+                # FIX for Issue #1543: ScubaCached out of memory / exponential file growth
+                # The Raw property is a PSCustomObject after ConvertFrom-Json, not a raw JSON string.
+                # It needs to be converted back to JSON to write to file.
+                # Using -Depth 20 prevents truncation of deeply nested Defender objects.
+                $RawJsonString = $SettingsExport | ConvertTo-Json -Depth 20 -Compress
+                $ActualSavedLocation = Set-Utf8NoBom -Content $RawJsonString -Location $OutPath -FileName "$OutProviderFileName.json"
                 Write-Debug $ActualSavedLocation
             }
-            $SettingsExport = Get-Content $ProviderJSONFilePath | ConvertFrom-Json
+            $SettingsExport = Get-Content $ProviderJSONFilePath -Encoding UTF8 | ConvertFrom-Json
 
             # Generate a new UUID if the original data doesn't have one
             if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
@@ -1937,6 +1957,10 @@ function Invoke-SCuBACached {
                 $Guid = $SettingsExport.report_uuid
             }
 
+            # FIX for Issue #1543: Ensure provider JSON is always written with sufficient depth
+            # This write operation ensures the UUID is persisted back to the provider file.
+            # Truncation causes data corruption that compounds on subsequent cached runs.
+            # Using -Depth 20 -Compress prevents truncation and reduces file size.
             $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
             $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
             -Location $OutPath -FileName "$OutProviderFileName.json"
