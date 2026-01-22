@@ -125,6 +125,9 @@ InModuleScope -ModuleName ExportTeamsProvider {
                     # Override the Get-M365UnifiedTenantSettings to return empty array
                     $Tracker | Add-Member -MemberType ScriptMethod -Name TryCommand -Value {
                         param([string]$Command, [hashtable]$CommandArgs = @{}, [bool]$SuppressWarning = $false)
+                        # Parameters CommandArgs and SuppressWarning are required for signature compatibility
+                        $null = $CommandArgs  # Satisfy PSScriptAnalyzer
+                        $null = $SuppressWarning  # Satisfy PSScriptAnalyzer
                         if ($Command -eq "Get-M365UnifiedTenantSettings") {
                             $this.UnSuccessfulCommands += $Command
                             return @()  # Simulate cmdlet failure/no data
