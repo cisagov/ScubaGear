@@ -49,7 +49,7 @@ Certificate-based authentication detected.
         
         if ($UnifiedSettings.Count -eq 0 -or $null -eq $UnifiedSettings[0]) {
             # Cmdlet failed or returned no data - fall back to legacy
-            Write-Warning @"
+            Write-Information @"
 Org-wide app settings could not be retrieved.
 Possible reasons:
   - Tenant does not have the newer Teams Admin Center org-wide app settings configured
