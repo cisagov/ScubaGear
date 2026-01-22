@@ -45,7 +45,7 @@ Certificate-based authentication detected.
     }
     else {
         # Scenario 2: Interactive auth - try unified settings first with automatic fallback
-        $UnifiedSettings = @($Tracker.TryCommand("Get-M365UnifiedTenantSettings"))
+        $UnifiedSettings = @($Tracker.TryCommand("Get-M365UnifiedTenantSettings", @{}, $true))
         
         if ($UnifiedSettings.Count -eq 0 -or $null -eq $UnifiedSettings[0]) {
             # Cmdlet failed or returned no data - fall back to legacy

@@ -7,7 +7,7 @@ class CommandTracker {
     [string[]]$SuccessfulCommands = @()
     [string[]]$UnSuccessfulCommands = @()
 
-    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs, [bool]$SuppressWarning = $false) {
         <#
         .Description
         Wraps the given Command inside a try/catch, run with the provided
@@ -56,7 +56,9 @@ class CommandTracker {
             $this.SuccessfulCommands += $Command
         }
         catch {
-            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            if (-not $SuppressWarning) {
+                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            }
 
             $this.UnSuccessfulCommands += $Command
             $Result = @()
