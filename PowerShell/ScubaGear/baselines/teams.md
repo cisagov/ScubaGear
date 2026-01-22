@@ -448,16 +448,6 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 ## 5. App Management
 
-**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. However, the legacy manner for implementation can be accomplished using the following command in the Teams Powershell module.
-
-```Set-CsTeamsAppPermissionPolicy -Identity Global -DefaultCatalogAppsType AllowedAppList -GlobalCatalogAppsType AllowedAppList -PrivateCatalogAppsType AllowedAppList```
-
-**The legacy command above should only be used in tenants that have previously been configured for application policies within the Permission Policies section of the Teams admin portal. New implementations should follow the policy guide below. Organizations should look to migrate to the new policy settings below, when those get migrated to your organzation. If your tenant still has the policy settings in the Permission Policies section, then use the command above.** 
-
-**Legacy settings** can also be manipulated in the Teams admin portal in the following manner. If your portal does not have these settings available, then your portal has been migrated to the new settings. Instructions for those are the v2 settings listed after the v1 settings.
-
-**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
-
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
 - *Microsoft apps*: apps published by Microsoft.
@@ -522,6 +512,10 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - N/A
 
 ### Implementation
+
+**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. Newer Tenants, created within 2024 and newer will follow the newer version 2 policy implementation steps while older tenants will follow the legacy implementation steps. 
+
+**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
 
 **NOTE:** Legacy implementation instructions are below the Version 2 intructions. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions.
 
