@@ -712,22 +712,23 @@ html[data-theme='dark'] .indicator-requires-config {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin: 1rem 3.125em;
-    padding: 0.75rem 1rem;
+    margin: 0.5em 3.125em 1em 3.125em;
+    padding: 0;
     background-color: var(--background-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.8125em;
     align-items: flex-start;
-    width: fit-content;
+    width: 1000px;
+    box-sizing: border-box;
 }
 
 .indicator-legend-title {
-    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.23em;
+    font-weight: bold;
     color: var(--header-color);
     margin-bottom: 0.25rem;
-    align-self: center;
+    text-align: left;
 }
 
 .indicator-legend-item {
