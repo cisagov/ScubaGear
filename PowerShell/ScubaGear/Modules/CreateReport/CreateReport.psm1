@@ -206,6 +206,9 @@ function New-Report {
 
     $Fragments = @()
 
+    # Track which indicator types are used in this report for dynamic legend generation
+    $UsedIndicatorTypes = @{}
+
     $MetaData += [pscustomobject]@{
         "Tenant Display Name" = $SettingsExport.tenant_details.DisplayName;
         "Report Date" = $SettingsExport.date;
@@ -241,9 +244,16 @@ function New-Report {
 
             $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
-            # Generate indicator HTML for this control
+            # Generate indicator HTML for this control and track which types are used
             $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version
             $RequirementWithIndicators = $Control.Value + $IndicatorHtml
+
+            # Track indicator types for legend generation
+            foreach ($Indicator in $Control.Indicators) {
+                if (-not [string]::IsNullOrEmpty($Indicator.Type)) {
+                    $UsedIndicatorTypes[$Indicator.Type] = $true
+                }
+            }
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
@@ -433,33 +443,69 @@ function New-Report {
     $BaselineURL = "<a href=`"$($ScubaGitHubUrl)/blob/v$($SettingsExport.module_version)/PowerShell/ScubaGear/baselines/$($BaselineName.ToLower()).md`" target=`"_blank`"><h3 style=`"width: 100px;`">Baseline Documents</h3></a>"
     $ReportHTML = $ReportHTML.Replace("{BASELINE_URL}", $BaselineURL)
 
-    # Generate the indicator legend
+    # Generate the indicator legend dynamically based on indicators used in this report
     # BOD 25-01 is listed first, then the rest are in alphabetical order
-    $IndicatorLegend = @"
+    $IndicatorDefinitions = @{
+        "bod" = @{
+            Name = "BOD 25-01 Requirement"
+            Description = "Required by CISA BOD 25-01"
+            Order = 0  # BOD always first
+        }
+        "automated" = @{
+            Name = "Automated Check"
+            Description = "Automatically verified by ScubaGear"
+            Order = 1
+        }
+        "configurable" = @{
+            Name = "Configurable"
+            Description = "Customizable via config file"
+            Order = 2
+        }
+        "manual" = @{
+            Name = "Manual"
+            Description = "Requires manual verification"
+            Order = 3
+        }
+        "requires-config" = @{
+            Name = "Requires Configuration"
+            Description = "Config file required for check"
+            Order = 4
+        }
+    }
+
+    # Build the legend HTML only with indicators that are used in this report
+    $IndicatorLegendItems = ""
+    if ($UsedIndicatorTypes.Count -gt 0) {
+        # Sort: BOD first (order 0), then rest alphabetically by name
+        $SortedTypes = $UsedIndicatorTypes.Keys | Sort-Object { 
+            $def = $IndicatorDefinitions[$_]
+            if ($def.Order -eq 0) { "0" } else { $def.Name }
+        }
+
+        foreach ($Type in $SortedTypes) {
+            $Def = $IndicatorDefinitions[$Type]
+            if ($null -ne $Def) {
+                $IndicatorLegendItems += @"
+
+    <div class="indicator-legend-item">
+        <span class="indicator indicator-$Type">$($Def.Name)</span>
+        <span>$($Def.Description)</span>
+    </div>
+"@
+            }
+        }
+    }
+
+    # Only show legend if there are indicators to display
+    if ($IndicatorLegendItems -ne "") {
+        $IndicatorLegend = @"
 <div class="indicator-legend">
-    <span class="indicator-legend-title">Policy Indicators:</span>
-    <div class="indicator-legend-item">
-        <span class="indicator indicator-bod">BOD 25-01 Requirement</span>
-        <span>Required by CISA BOD 25-01</span>
-    </div>
-    <div class="indicator-legend-item">
-        <span class="indicator indicator-automated">Automated Check</span>
-        <span>Automatically verified by ScubaGear</span>
-    </div>
-    <div class="indicator-legend-item">
-        <span class="indicator indicator-configurable">Configurable</span>
-        <span>Customizable via config file</span>
-    </div>
-    <div class="indicator-legend-item">
-        <span class="indicator indicator-manual">Manual</span>
-        <span>Requires manual verification</span>
-    </div>
-    <div class="indicator-legend-item">
-        <span class="indicator indicator-requires-config">Requires Configuration</span>
-        <span>Config file required for check</span>
-    </div>
+    <span class="indicator-legend-title">Policy Indicators:</span>$IndicatorLegendItems
 </div>
 "@
+    } else {
+        $IndicatorLegend = ""
+    }
     $ReportHTML = $ReportHTML.Replace("{INDICATOR_LEGEND}", $IndicatorLegend)
 
     # Handle AAD-specific reporting
