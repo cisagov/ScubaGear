@@ -13,7 +13,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
 
-                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs, [bool]$SuppressWarning) {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
@@ -54,15 +54,21 @@ InModuleScope -ModuleName ExportTeamsProvider {
                         return $Result
                     }
                     catch {
-                        Write-Warning "Error running $($Command). $($_)"
+                        if (-not $SuppressWarning) {
+                            Write-Warning "Error running $($Command). $($_)"
+                        }
                         $this.UnSuccessfulCommands += $Command
                         $Result = @()
                         return $Result
                     }
                 }
 
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+                    return $this.TryCommand($Command, $CommandArgs, $false)
+                }
+
                 [System.Object[]] TryCommand([string]$Command) {
-                    return $this.TryCommand($Command, @{})
+                    return $this.TryCommand($Command, @{}, $false)
                 }
 
                 [void] AddSuccessfulCommand([string]$Command) {
@@ -118,7 +124,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                     $Tracker = [MockCommandTracker]::New()
                     # Override the Get-M365UnifiedTenantSettings to return empty array
                     $Tracker | Add-Member -MemberType ScriptMethod -Name TryCommand -Value {
-                        param([string]$Command)
+                        param([string]$Command, [hashtable]$CommandArgs = @{}, [bool]$SuppressWarning = $false)
                         if ($Command -eq "Get-M365UnifiedTenantSettings") {
                             $this.UnSuccessfulCommands += $Command
                             return @()  # Simulate cmdlet failure/no data
