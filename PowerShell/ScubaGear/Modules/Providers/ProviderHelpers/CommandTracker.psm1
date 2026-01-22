@@ -76,7 +76,7 @@ class CommandTracker {
         Internal
         #>
 
-        return $this.TryCommand($Command, @{})
+        return $this.TryCommand($Command, @{}, $false)
     }
 
     [void] AddSuccessfulCommand([string]$Command) {
