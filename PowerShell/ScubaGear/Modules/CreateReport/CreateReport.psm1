@@ -223,7 +223,8 @@ function New-Report {
     };
 
     $MetaDataTable = $MetaData | ConvertTo-HTML -Fragment
-    $MetaDataTable = $MetaDataTable -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
+    # Join into single string to ensure it stays as one element in $Fragments
+    $MetaDataTable = ($MetaDataTable -join "`n") -replace '^(.*?)<table>','<table id="tenant-data" style = "text-align:center;">'
     $Fragments += $MetaDataTable
     $ReportSummary = @{
         "Warnings" = 0;
@@ -497,16 +498,16 @@ function New-Report {
     }
 
     # Only show legend if there are indicators to display
+    # Insert the legend into $Fragments right after the metadata table (index 0)
     if ($IndicatorLegendItems -ne "") {
         $IndicatorLegend = @"
 <div class="indicator-legend">
     <span class="indicator-legend-title">Policy Indicators:</span>$IndicatorLegendItems
 </div>
 "@
-    } else {
-        $IndicatorLegend = ""
+        # Insert legend after the first element (metadata table)
+        $Fragments = @($Fragments[0]) + @($IndicatorLegend) + @($Fragments[1..($Fragments.Length-1)])
     }
-    $ReportHTML = $ReportHTML.Replace("{INDICATOR_LEGEND}", $IndicatorLegend)
 
     # Handle AAD-specific reporting
     if ($BaselineName -eq "aad") {
