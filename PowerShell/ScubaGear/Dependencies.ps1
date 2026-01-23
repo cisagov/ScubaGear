@@ -36,7 +36,6 @@ try {
     $hasMultipleVersions = $false
 
     # Parse ModuleFileLocations to categorize issues
-        # Parse ModuleFileLocations to categorize issues
     if ($DependencyStatus.ModuleFileLocations) {
         foreach ($moduleInfo in $DependencyStatus.ModuleFileLocations) {
             $hasCritical = $false
