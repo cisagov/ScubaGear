@@ -483,10 +483,8 @@ Function Start-SCuBAConfigApp {
         }
         Write-DebugOutput -Message "M365Environment_ComboBox set: $($syncHash.M365Environment_ComboBox.SelectedItem.Content)" -Source $source -Level "Info"
 
-        # Populate Products Checkbox dynamically within the ProductsGrid
-        #only list three rows then use next column
-        # Assume 3 rows, then wrap to next column
-        $maxRows = 3
+        # Populate Products Checkbox dynamically within the ProductsGrid (WrapPanel)
+        # WrapPanel automatically wraps items to fit available space
         for ($i = 0; $i -lt $syncHash.UIConfigs.products.Count; $i++) {
             $product = $syncHash.UIConfigs.products[$i]
 
@@ -494,13 +492,7 @@ Function Start-SCuBAConfigApp {
             $checkBox.Content = $product.displayName
             $checkBox.Name = ($product.id + "ProductCheckBox")
             $checkBox.Tag = $product.id
-            $checkBox.Margin = "0,5"
-
-            $row = $i % $maxRows
-            $column = [math]::Floor($i / $maxRows)
-
-            [System.Windows.Controls.Grid]::SetRow($checkBox, $row)
-            [System.Windows.Controls.Grid]::SetColumn($checkBox, $column)
+            $checkBox.Margin = "0,5,15,5" # Add right margin for spacing between columns
 
             [void]$syncHash.ProductsGrid.Children.Add($checkBox)
 
