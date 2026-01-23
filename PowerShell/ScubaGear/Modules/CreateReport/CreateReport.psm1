@@ -873,16 +873,16 @@ function Import-SecureBaseline{
                         # Description bold substitution
                         $Value = Resolve-HTMLMarkdown -OriginalString $Value -HTMLReplace "bold"
 
-                        # Parse indicator badges from the lines following the description
+                        # Parse indicator badges from the lines following the policy ID
+                        # Search thoroughly from policy ID until we hit the <!--Policy: comment
                         $Indicators = @()
-                        $BadgeLineAdvance = $LineAdvance + 1
-                        $MaxBadgeSearch = 10
+                        $MaxBadgeSearch = 50  # Increased to handle policies with long descriptions
 
-                        # Look for badge lines after the description
-                        for ($i = 0; $i -lt $MaxBadgeSearch; $i++) {
-                            $BadgeLine = ([string]$MdLines[$LineNumber + $BadgeLineAdvance + $i]).Trim()
+                        # Look for badge lines between policy ID and criticality comment
+                        for ($i = 1; $i -lt $MaxBadgeSearch; $i++) {
+                            $BadgeLine = ([string]$MdLines[$LineNumber + $i]).Trim()
                             
-                            # Stop if we hit a comment line (criticality marker) or empty line followed by non-badge content
+                            # Stop if we hit a comment line (criticality marker)
                             if ($BadgeLine -match "^<!--") {
                                 break
                             }
@@ -908,10 +908,7 @@ function Import-SecureBaseline{
                                     "Type" = $BadgeType
                                 }
                             }
-                            # If line doesn't contain a badge and isn't empty, stop looking
-                            elseif (-not [string]::IsNullOrWhiteSpace($BadgeLine) -and $BadgeLine -notmatch '^\[!\[') {
-                                break
-                            }
+                            # Continue searching - don't break on non-badge content
                         }
 
                         $Group.Controls += @{
