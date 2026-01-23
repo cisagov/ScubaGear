@@ -1098,6 +1098,9 @@ function Test-ScubaGearVersion {
     .PARAMETER CheckGitHub
         Also check GitHub releases for the latest version.
 
+    .PARAMETER Quiet
+        Suppress detailed Write-Information output. Only return objects.
+
     .OUTPUTS
         PSCustomObject
 
@@ -1111,7 +1114,10 @@ function Test-ScubaGearVersion {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [switch]$CheckGitHub
+        [switch]$CheckGitHub,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Quiet
     )
 
     try {
@@ -1213,21 +1219,105 @@ function Test-ScubaGearVersion {
         $results += $dependencyComponent
         Write-Output $results
 
-        # Display formatted information for modules with multiple versions
-        if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
-            Write-Information "`nModules with Multiple Versions:" -InformationAction Continue
-            Write-Information "================================" -InformationAction Continue
+        if (-not $Quiet){
+            # Display formatted information for modules with multiple versions
+            if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
+                # Separate modules into critical (version outside range) vs cleanup (all versions OK)
+                $criticalModules = @()
+                $cleanupModules = @()
 
-            foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
-                Write-Information "`nModule: $($moduleInfo.ModuleName)" -InformationAction Continue
-                Write-Information "Version Count: $($moduleInfo.VersionCount)" -InformationAction Continue
-                Write-Information "File Locations:" -InformationAction Continue
+                foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
+                    # Parse versions from location strings
+                    $versions = @()
+                    $hasCriticalIssue = $false
 
-                foreach ($location in $moduleInfo.Locations) {
-                    Write-Information "  $location" -InformationAction Continue
+                    foreach ($location in $moduleInfo.Locations) {
+                        # Extract version and status from format: "2.34.0 [STATUS] (Scope): Path"
+                        if ($location -match '^([\d\.]+)\s+\[([^\]]+)\]') {
+                            $version = $matches[1]
+                            $status = $matches[2]
+
+                            $versions += [PSCustomObject]@{
+                                Version = $version
+                                Status = $status
+                            }
+
+                            if ($status -like "ABOVE MAX*" -or $status -like "BELOW MIN*") {
+                                $hasCriticalIssue = $true
+                            }
+                        }
+                    }
+
+                    # Sort versions descending (highest first)
+                    $versions = $versions | Sort-Object { [version]$_.Version } -Descending
+
+                    $moduleEntry = [PSCustomObject]@{
+                        ModuleName = $moduleInfo.ModuleName
+                        Versions = $versions
+                        HighestVersion = $versions[0]
+                    }
+
+                    if ($hasCriticalIssue) {
+                        $criticalModules += $moduleEntry
+                    } else {
+                        $cleanupModules += $moduleEntry
+                    }
                 }
+
+                $totalModules = $dependencyStatus.ModuleFileLocations.Count
+                $criticalCount = $criticalModules.Count
+                $cleanupCount = $cleanupModules.Count
+
+                # Summary-first approach
+                <#
+                Write-Information "`n $totalModules modules have multiple versions installed:" -InformationAction Continue
+                if ($criticalCount -gt 0) {
+                    Write-Information "  - $criticalCount CRITICAL (incompatible version will be loaded)" -InformationAction Continue
+                }
+                if ($cleanupCount -gt 0) {
+                    Write-Information "  - $cleanupCount needs cleanup (multiple acceptable versions)" -InformationAction Continue
+                }
+                Write-Information "" -InformationAction Continue
+                #>
+
+                # Details section
+                Write-Information "Details:" -InformationAction Continue
+
+                # Display critical issues first
+                foreach ($module in $criticalModules) {
+                    $highestVersion = $module.HighestVersion
+                    $statusTag = ""
+
+                    if ($highestVersion.Status -like "ABOVE MAX*") {
+                        # Extract max version from status like "ABOVE MAX: 2.25.0"
+                        if ($highestVersion.Status -match 'ABOVE MAX:\s*([\d\.]+)') {
+                            $maxVer = $matches[1]
+                            $statusTag = "[ABOVE MAX: $maxVer]"
+                        } else {
+                            $statusTag = "[ABOVE MAX]"
+                        }
+                    } elseif ($highestVersion.Status -like "BELOW MIN*") {
+                        if ($highestVersion.Status -match 'BELOW MIN:\s*([\d\.]+)') {
+                            $minVer = $matches[1]
+                            $statusTag = "[BELOW MIN: $minVer]"
+                        } else {
+                            $statusTag = "[BELOW MIN]"
+                        }
+                    }
+
+                    Write-Information "  CRITICAL: $($module.ModuleName) - will load $($highestVersion.Version) $statusTag" -InformationAction Continue
+                }
+
+                # Display cleanup recommendations
+                foreach ($module in $cleanupModules) {
+                    $versionCount = $module.Versions.Count
+                    Write-Information "  CLEANUP: $($module.ModuleName) - will load $($module.HighestVersion.Version) ($versionCount versions installed)" -InformationAction Continue
+                }
+
+                Write-Information "" -InformationAction Continue
+                Write-Information "Run 'Reset-ScubaGearDependencies' to fix." -InformationAction Continue
+                Write-Information "" -InformationAction Continue
             }
-            Write-Information "" -InformationAction Continue
         }
 
     }
@@ -1528,6 +1618,7 @@ function Update-ScubaGear {
     }
 }
 
+
 function Reset-ScubaGearDependencies {
     <#
     .SYNOPSIS
@@ -1719,10 +1810,22 @@ function Reset-ScubaGearDependencies {
                     if ($null -ne $module.VersionsToRemove) {
                         foreach ($version in $module.VersionsToRemove) {
                             try {
-                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction SilentlyContinue
+                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
                             }
-                            catch {
-                                $result.Warnings += "Could not remove $($module.Name) v$version (may require admin)"
+                            catch{
+                                # Remove the module from file path if uninstall fails
+                                try {
+                                    $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
+                                    if ($modulePath) {
+                                        Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
+                                    }
+                                    else {
+                                        $result.Warnings += "Could not locate module path for $($module.Name) v$version"
+                                    }
+                                }
+                                catch {
+                                    $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
+                                }
                             }
                         }
                     }
@@ -1755,13 +1858,23 @@ function Reset-ScubaGearDependencies {
                         # Only add to cleanedVersions if we get here (uninstall succeeded)
                         $cleanedVersions += "v$version"
                     }
-                    catch {
-                        # Uninstall failed - add to failed list and capture actual error message
-                        $failedVersions += "v$version"
-
-                        # Extract the actual warning/error message from the exception
-                        $actualError = $_.Exception.Message
-                        $result.Warnings += "Could not remove $($module.Name) v$version`: $actualError"
+                    catch{
+                        # Remove the module from file path if uninstall fails
+                        try {
+                            $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
+                            if (Test-Path $modulePath) {
+                                Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
+                                $cleanedVersions += "v$version"
+                            }
+                            else {
+                                $result.Warnings += "Could not locate module path for $($module.Name) v$version"
+                                $failedVersions += "v$version"
+                            }
+                        }
+                        catch {
+                            $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
+                            $failedVersions += "v$version"
+                        }
                     }
                 }
 
@@ -1778,6 +1891,7 @@ function Reset-ScubaGearDependencies {
                     $result.Errors += "[FAIL] Failed to clean $($module.Name): could not remove any versions"
                     $result.ActionsFailed++
                 }
+                
             }
         }
 
