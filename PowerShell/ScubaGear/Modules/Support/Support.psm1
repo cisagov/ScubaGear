@@ -1264,22 +1264,6 @@ function Test-ScubaGearVersion {
                     }
                 }
 
-                $totalModules = $dependencyStatus.ModuleFileLocations.Count
-                $criticalCount = $criticalModules.Count
-                $cleanupCount = $cleanupModules.Count
-
-                # Summary-first approach
-                <#
-                Write-Information "`n $totalModules modules have multiple versions installed:" -InformationAction Continue
-                if ($criticalCount -gt 0) {
-                    Write-Information "  - $criticalCount CRITICAL (incompatible version will be loaded)" -InformationAction Continue
-                }
-                if ($cleanupCount -gt 0) {
-                    Write-Information "  - $cleanupCount needs cleanup (multiple acceptable versions)" -InformationAction Continue
-                }
-                Write-Information "" -InformationAction Continue
-                #>
-
                 # Details section
                 Write-Information "Details:" -InformationAction Continue
 
@@ -1891,7 +1875,6 @@ function Reset-ScubaGearDependencies {
                     $result.Errors += "[FAIL] Failed to clean $($module.Name): could not remove any versions"
                     $result.ActionsFailed++
                 }
-                
             }
         }
 
