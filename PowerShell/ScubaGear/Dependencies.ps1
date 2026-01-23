@@ -50,11 +50,11 @@ try {
                     if ($location -match '([\d\.]+)?\s*\[ABOVE MAX:\s*([\d\.]+)\]') {
                         $installedVer = if ($matches[1]) { $matches[1] } else { "unknown" }
                         $maxVer = $matches[2]
-                        $criticalIssues += "  • $($moduleInfo.ModuleName) - version $installedVer exceeds maximum ($maxVer)"
+                        $criticalIssues += "  - $($moduleInfo.ModuleName) - version $installedVer exceeds maximum ($maxVer)"
                     }
                     else {
                         # Fallback if regex doesn't match
-                        $criticalIssues += "  • $($moduleInfo.ModuleName) - version exceeds maximum"
+                        $criticalIssues += "  - $($moduleInfo.ModuleName) - version exceeds maximum"
                     }
                     break
                 }
@@ -65,11 +65,11 @@ try {
                     if ($location -match '([\d\.]+)?\s*\[BELOW MIN:\s*([\d\.]+)\]') {
                         $installedVer = if ($matches[1]) { $matches[1] } else { "unknown" }
                         $minVer = $matches[2]
-                        $criticalIssues += "  • $($moduleInfo.ModuleName) - version $installedVer below minimum ($minVer)"
+                        $criticalIssues += "  - $($moduleInfo.ModuleName) - version $installedVer below minimum ($minVer)"
                     }
                     else {
                         # Fallback if regex doesn't match
-                        $criticalIssues += "  • $($moduleInfo.ModuleName) - version below minimum"
+                        $criticalIssues += "  - $($moduleInfo.ModuleName) - version below minimum"
                     }
                     break
                 }
@@ -79,7 +79,7 @@ try {
             if (-not $hasCritical) {
                 $hasMultipleVersions = $true
                 $versionCount = $moduleInfo.VersionCount
-                $warnings += "  • $($moduleInfo.ModuleName) - $versionCount versions installed (cleanup recommended)"
+                $warnings += "  - $($moduleInfo.ModuleName) - $versionCount versions installed (cleanup recommended)"
             }
         }
     }
@@ -88,7 +88,7 @@ try {
     if ($DependencyStatus.MissingModules -and $DependencyStatus.MissingModules.Count -gt 0) {
         $hasMissingModules = $true
         foreach ($module in $DependencyStatus.MissingModules) {
-            $criticalIssues += "  • $module - not installed"
+            $criticalIssues += "  - $module - not installed"
         }
     }
 
