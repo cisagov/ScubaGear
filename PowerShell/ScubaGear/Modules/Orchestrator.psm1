@@ -637,7 +637,12 @@ function Invoke-ProviderList {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "teams" {
-                            $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                            if ($PnPFlag) {
+                                $RetVal = Export-TeamsProvider -CertificateBasedAuth | Select-Object -Last 1
+                            }
+                            else {
+                                $RetVal = Export-TeamsProvider | Select-Object -Last 1
+                            }
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"
