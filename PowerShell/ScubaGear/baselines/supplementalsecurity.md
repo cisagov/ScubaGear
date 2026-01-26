@@ -356,7 +356,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 - Impersonation protection and advanced phishing thresholds require
   Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
-  and are available as add-ons for E3 and G3. As of January 2025,
+  and are available as add-ons for E3 and G3. As of January 2026,
   anti-phishing for user and domain impersonation and spoof intelligence
   are not yet available in M365 Government Community Cloud (GCC High) and Department of Defense (DoD) environments. See [Platform features \|
   Microsoft
