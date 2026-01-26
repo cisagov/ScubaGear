@@ -294,6 +294,7 @@ impersonation attempt, the email is quarantined.
 ### Policies
 #### MS.SECURITY.2.1v1
 User impersonation protection SHOULD be enabled for sensitive accounts.
+
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -301,8 +302,6 @@ User impersonation protection SHOULD be enabled for sensitive accounts.
 <!--ExclusionType: SensitiveUsers-->
 - _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ February 2026
-- _Note:_ The standard and strict preset security policies must be enabled to
-          protect accounts.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -312,6 +311,7 @@ User impersonation protection SHOULD be enabled for sensitive accounts.
 
 #### MS.SECURITY.2.2v1
 Domain impersonation protection SHOULD be enabled for domains owned by the agency.
+
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -319,8 +319,6 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 <!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ February 2026
-- _Note:_ The standard and strict preset security policies must be enabled to
-          protect agency domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -330,6 +328,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 
 #### MS.SECURITY.2.3v1
 Domain impersonation protection SHOULD be added for key suppliers and partners.
+
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
@@ -337,8 +336,6 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 <!--ExclusionType: PartnerDomains-->
 - _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
 - _Last modified:_ February 2026
-- _Note:_ The standard and strict preset security policies must be enabled to
-          protect partner domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -350,6 +347,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 - [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365)
 - [Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users)
+- [User impersonation protection \| Microsoft Learn](https://learn.microsoft.com/en-us/defender-office-365/anti-phishing-policies-about#user-impersonation-protection)
 
 ### License Requirements
 
@@ -364,60 +362,54 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 ### Implementation
 
-#### MS.SECURITY.2.1v1 Instructions
-<!-- todo update steps
-this is no longer about just the standard and strict policies
-basically all policies that have users need this
+The list of addresses/domains to flag when impersonated by attackers is managed
+on a per-policy basis. This means that in order for all users to be protected,
+this list must be added to each relevant threat policy. For example, consider
+a tenant with 3 users: Alice, Bob, and Charlie. If Alice has been assigned to
+the standard policy, Bob to the strict, and Charlie to a custom policy, in order
+to protect all 3 users, the tenant has 2 options:
+1. Simply define the list of addresses to flag for impersonation once in the
+default anti-phish policy, as that always applies to all recipients.
+2. Define the list of of addresses to flag for impersonation in all 3 policies
+(standard, strict, and the custom policy).
 
-maybe just adding to the default policy will work? That applies to all users -->
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under either **Standard protection** or **Strict protection**, select **Manage
-   protection settings**.
-6. Select **Next** until you reach the **Impersonation Protection** page, then
-   select **Next** once more.
-7. On the **Protected custom users** page, add a name and valid email address for each
-   sensitive account and click **Add** after each.
-8. Select **Next** until you reach the **Trusted senders and domains** page.
-9. (Optional) Add specific email addresses here to not flag as impersonation
-   when sending messages and prevent false positives. Click **Add** after each.
-10. Select **Next** on each page until the **Review and confirm your changes** page.
-11. On the **Review and confirm your changes** page, select **Confirm**.
+For simplicity, the implementation steps that follow just instruct users to
+configure impersonation protection in the default anti-phish policy. However,
+agencies are welcome to instead configure it in the other policies if desired,
+as long as ultimately all recipients recieve the impersonation protection checks.
+
+#### MS.SECURITY.2.1v1 Instructions
+
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-phishing**.
+5.  Under **Impersonation**, check **Enable users to protect**.
+6.  Click **Manage [x] sender(s)**.
+7.  On the **Manage senders for impersonation protection** page, click **Add user**
+then add a name and valid email address for each sensitive account and click **Add** after each.
+8.  Click **Done** then **Save**.
 
 #### MS.SECURITY.2.2v1 Instructions
 
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under either **Standard protection** or **Strict protection**, select **Manage
-   protection settings**.
-6. Select **Next** until you reach the **Impersonation Protection** page, then
-   select **Next** once more.
-7. On the **Protected custom domains** page, add each agency domain
-   and click **Add** after each.
-8. Select **Next** until you reach the **Trusted senders and domains** page.
-9. (Optional) Add specific domains here to not flag as impersonation when
-   sending messages and prevent false positives. Click **Add** after each.
-10. Select **Next** on each page until the **Review and confirm your changes** page.
-11. On the **Review and confirm your changes** page, select **Confirm**.
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-phishing**.
+5.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
+6.  Click then **Save**.
 
 #### MS.SECURITY.2.3v1 Instructions
 
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under either **Standard protection** or **Strict protection**, select **Manage
-   protection settings**.
-6. Select **Next** until you reach the **Impersonation Protection** page, then
-   select **Next** once more.
-7. On the **Protected custom domains** page, add each partner domain
-   and click **Add** after each.
-8. Select **Next** on each page until the **Review and confirm your changes** page.
-9. On the **Review and confirm your changes** page, select **Confirm**.
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-phishing**.
+5.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
+6.  Click **Manage [x] custom domain(s)**.
+7.  On the **Manage custom domains for impersonation protection** page, click **Add domain**
+then add each partner domain.
+8.  Click **Add domains**, **Done**, then **Save**.
 
 ## 3. Data Loss Prevention
 
