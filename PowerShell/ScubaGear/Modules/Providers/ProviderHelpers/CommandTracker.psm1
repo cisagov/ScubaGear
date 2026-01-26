@@ -67,6 +67,18 @@ class CommandTracker {
         return $Result
     }
 
+    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+        <#
+        .Description
+        Wraps the given Command inside a try/catch, run with the provided
+        arguments, and tracks successes/failures. SuppressWarning defaults to false.
+        .Functionality
+        Internal
+        #>
+
+        return $this.TryCommand($Command, $CommandArgs, $false)
+    }
+
     [System.Object[]] TryCommand([string]$Command) {
         <#
         .Description
