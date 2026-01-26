@@ -300,7 +300,9 @@ User impersonation protection SHOULD be enabled for sensitive accounts.
 
 <!--Policy: MS.SECURITY.2.1v1; Criticality: SHOULD -->
 <!--ExclusionType: SensitiveUsers-->
-- _Rationale:_ User impersonation, especially of users with access to sensitive or high-value information and resources, has the potential to result in serious harm. Impersonation protection mitigates this risk. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ User impersonation, especially of users seen as authority figures,
+has the potential to result in serious harm. Impersonation protection mitigates
+this risk.
 - _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -317,7 +319,8 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 
 <!--Policy: MS.SECURITY.2.2v1; Criticality: SHOULD -->
 <!--ExclusionType: AgencyDomains-->
-- _Rationale:_ Configuring domain impersonation protection for all agency domains reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for agency-owned domains
+reduces the risk of a user being deceived by a look-alike domain.
 - _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -334,7 +337,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 <!--Policy: MS.SECURITY.2.3v1; Criticality: SHOULD -->
 <!--ExclusionType: PartnerDomains-->
-- _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain. By configuring impersonation protection in both preset policies, administrators can help protect email recipients from impersonated emails, regardless of whether they are added to the standard or strict policy.
+- _Rationale:_ Configuring domain impersonation protection for domains owned by important partners reduces the risk of a user being deceived by a look-alike domain.
 - _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -353,7 +356,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 - Impersonation protection and advanced phishing thresholds require
   Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
-  and are available as add-ons for E3 and G3. As of April 25, 2023,
+  and are available as add-ons for E3 and G3. As of January 2025,
   anti-phishing for user and domain impersonation and spoof intelligence
   are not yet available in M365 Government Community Cloud (GCC High) and Department of Defense (DoD) environments. See [Platform features \|
   Microsoft
