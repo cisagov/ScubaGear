@@ -51,21 +51,15 @@ compromise.
 is managed through threat policies. Users, groups, and domains can be added to
 or excluded from threat security polices. Users added to a policy receive the
 protections configured for that policy.
-
 While users can create custom threat polices, Microsoft Defender defines three
 [preset security policies](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
 built-in protection, standard, and strict. These preset policies are informed by
 Microsoft's observations, and are designed to strike the balance between usability
 and security. They allow administrators to enable the full feature set of Defender
 by adding users to the policies rather than manually configuring each setting.
-One simple method of meeting most requirements of this baseline is to add users
+One simple method of meeting many requirements of this baseline is to add users
 to the standard or strict preset policies, though some organizations may require
 the flexibility afforded by custom policies.
-
-Note that a user can be added to multiple policies. In that case, the policies
-are applied in order of precedence, as desribed by
-[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
-
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
@@ -114,6 +108,10 @@ To add users to the strict policy:
 
 See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) to understand the
 differences between the two preset policies.
+
+Note that a user can be added to multiple policies. In that case, the policies
+are applied in order of precedence, as desribed by
+[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
 
 # Baseline Policies
 
