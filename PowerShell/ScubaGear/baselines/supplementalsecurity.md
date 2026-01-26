@@ -69,50 +69,6 @@ the flexibility afforded by custom policies.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
-## Adding Users to the Preset Security Policies
-As many controls in this baseline can be satisfied by adding users to the standard
-or strict security policies, we describe this process once here, rather than
-duplicating it in each applicable control.
-
-To add users to the standard policy:
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under **Standard protection**, ensure the toggle is enabled such that it reads "Standard protection is on."
-6. Under **Standard protection is on**, select **Manage protection settings**.
-7. On the **Apply Exchange Online Protection** page, select **All recipients**.
-8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
-   to be exempted from the preset policies.
-9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
-10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
-   to be exempted from the preset policies.
-11. Select **Next** on each page until the **Review and confirm your changes** page.
-12. On the **Review and confirm your changes** page, select **Confirm**.
-
-To add users to the strict policy:
-1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under **Strict protection**, ensure the toggle is enabled such that it reads "Strict protection is on."
-6. Under **Strict protection is on**, select **Manage protection settings**.
-7. On the **Apply Exchange Online Protection** page, select **All recipients**.
-8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
-   to be exempted from the preset policies.
-9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
-10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
-   to be exempted from the preset policies.
-11. Select **Next** on each page until the **Review and confirm your changes** page.
-12. On the **Review and confirm your changes** page, select **Confirm**.
-
-See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) to understand the
-differences between the two preset policies.
-
-Note that a user can be added to multiple policies. In that case, the policies
-are applied in order of precedence, as desribed by
-[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
-
 # Baseline Policies
 
 ## 1. Malware Protection
@@ -215,7 +171,7 @@ Safe attachments require Defender for Office 365 Plan 1 or 2. These are included
 
 Both the standard and strict preset policies meet this baseline policy requirement,
 so no further actions are needed for users added to those policies. See
-[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
@@ -248,7 +204,7 @@ For users not added to the standard or strict preset policies:
 #### MS.SECURITY.1.2v1 Instructions
 Both the standard and strict preset policies meet this baseline policy requirement,
 so no further actions are needed for users added to those policies. See
-[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
@@ -281,7 +237,7 @@ For users not added to the standard or strict preset policies:
 
 Both the standard and strict preset policies meet this baseline policy requirement,
 so no further actions are needed for users added to those policies. See
-[Adding Users to the Preset Security Policies](#adding-users-to-the-preset-security-policies)
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
@@ -1282,5 +1238,50 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
    IP addresses or address range** as needed.
 
 8. Ensure **Turn on safe list** is not selected.
+
+# Appendix A: Adding Users to the Preset Security Policies
+As many controls in this baseline can be satisfied by adding users to the standard
+or strict security policies, we describe this process once here, rather than
+duplicating it in each applicable control.
+
+To add users to the standard policy:
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Under **Standard protection**, ensure the toggle is enabled such that it reads "Standard protection is on."
+6. Under **Standard protection is on**, select **Manage protection settings**.
+7. On the **Apply Exchange Online Protection** page, select **All recipients**.
+8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
+10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+11. Select **Next** on each page until the **Review and confirm your changes** page.
+12. On the **Review and confirm your changes** page, select **Confirm**.
+
+To add users to the strict policy:
+1. Sign in to **Microsoft 365 Defender**.
+2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
+3. Select **Threat Policies**.
+4. From the **Templated policies** section, select **Preset Security Policies**.
+5. Under **Strict protection**, ensure the toggle is enabled such that it reads "Strict protection is on."
+6. Under **Strict protection is on**, select **Manage protection settings**.
+7. On the **Apply Exchange Online Protection** page, select **All recipients**.
+8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
+10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
+   to be exempted from the preset policies.
+11. Select **Next** on each page until the **Review and confirm your changes** page.
+12. On the **Review and confirm your changes** page, select **Confirm**.
+
+See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) to understand the
+differences between the two preset policies.
+
+Note that a user can be added to multiple policies. In that case, the policies
+are applied in order of precedence, as desribed by
+[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
+
 
 **`TLP:CLEAR`**
