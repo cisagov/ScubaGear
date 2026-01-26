@@ -5,12 +5,13 @@
 Microsoft 365 (M365) Exchange Online is a cloud-based messaging platform that gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
 
 Many admin controls for Exchange Online are found in the **Exchange admin center**.
-However, several of the security features for Exchange Online are shared between Microsoft
-products and are configured in either the **Microsoft 365 Defender portal**
-or **Microsoft Purview compliance portal**. However, the use of Microsoft Defender
-is not strictly required. When noted, alternative products may be used in lieu
-of Defender, on the condition that they fulfill these required baseline
-settings. Refer to the [CISA M365 Secure Configuration Baseline for Common Controls](commoncontrols.md)
+However, several essential security functions for Exchange Online require a dedicated security
+tool, e.g., for data loss prevention. M365 provides these security functions
+natively via Defender for Office 365. Notably, Defender for Office 365 capabilities
+require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
+and are available as add-ons for E3 and G3. However, third-party solutions that
+offer comparable security functions can be used in lieu of Defender.
+Refer to the [CISA M365 Secure Configuration Supplemental Security Baseline](supplementalsecurity.md)
 for additional guidance.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.

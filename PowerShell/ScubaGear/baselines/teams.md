@@ -4,12 +4,13 @@
 Microsoft 365 (M365) Teams is a cloud-based text and live chat workspace that supports video calls, chat messaging, screen sharing, and file sharing. This secure configuration baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
 
 Many admin controls for Teams are found in the **Teams admin center**.
-However, several of the security features for Teams are shared between Microsoft
-products and are configured in either the **Microsoft 365 Defender portal**
-or **Microsoft Purview compliance portal**. However, the use of Microsoft Defender
-is not strictly required. When noted, alternative products may be used in lieu
-of Defender, on the condition that they fulfill these required baseline
-settings. Refer to the [CISA M365 Secure Configuration Baseline for Common Controls](commoncontrols.md)
+However, several essential security functions for Teams require a dedicated security
+tool, e.g., for data loss prevention. M365 provides these security functions
+natively via Defender for Office 365. Notably, Defender for Office 365 capabilities
+require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
+and are available as add-ons for E3 and G3. However, third-party solutions that
+offer comparable security functions can be used in lieu of Defender.
+Refer to the [CISA M365 Secure Configuration Supplemental Security Baseline](supplementalsecurity.md)
 for additional guidance.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
