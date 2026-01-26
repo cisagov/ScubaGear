@@ -239,9 +239,6 @@ tests contains {
 # MS.AAD.3.2v1
 #--
 
-# Save all policy names if PhishingResistantMFAPolicies exist
-AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
-
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
 NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
@@ -269,12 +266,12 @@ tests contains {
     "PolicyId": "MS.AAD.3.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AllMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
+    "ActualValue": NonSpecificMFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := Count(AllMFA) > 0
+    Status := Count(NonSpecificMFAPolicies) > 0
 }
 #--
 
@@ -400,8 +397,8 @@ LowSecurityAuthMethodsDisabled := true if {
     every Config in LowSecurityAuthMethods { Config.State == "disabled" }
 }
 
-# First test is for N/A case
-tests contains {
+ # First test is for N/A case
+ tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
