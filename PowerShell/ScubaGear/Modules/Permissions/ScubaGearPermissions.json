@@ -13,10 +13,9 @@
             "RoleManagement.Read.Directory"
         ],
         "higherPermissions": [
+            "Directory.Read.All",
             "RoleManagement.ReadWrite.Directory",
-            "RoleManagement.Read.All",
-            "Directory.ReadWrite.All",
-            "Directory.Read.All"
+            "Directory.ReadWrite.All"
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
@@ -32,7 +31,7 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/unifiedroledefinition-get?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "Used by the Service Principal module for role assignment details"
     },
 
     {
@@ -69,7 +68,7 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "Used by the Service Principal module to retrieve service principal details"
     },
 
     {
@@ -109,6 +108,205 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgServicePrincipalOAuth2PermissionGrant",
+        "apiResource": "/v1.0/servicePrincipals/{id}/oauth2PermissionGrants",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Directory.Read.All"
+        ],
+        "higherPermissions": [
+            "DelegatedPermissionGrant.ReadWrite.All",
+            "Directory.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-oauth2permissiongrants?view=graph-rest-1.0"
+        ],
+        "notes": "Used by Service Principal module to retrieve delegated permissions assignment"
+    },
+
+    {
+        "moduleCmdlet": "New-MgServicePrincipal",
+        "apiResource": "/v1.0/servicePrincipals",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0&tabs=http"
+        ],
+        "notes": "Used by the Service Principal module to create new service principals"
+    },
+
+    {
+        "moduleCmdlet": "Get-MgServicePrincipalAppRoleAssignment",
+        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All",
+            "Directory.Read.All",
+            "Application.ReadWrite.OwnedBy",
+            "Application.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "scubatank"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0"
+        ],
+        "notes": "Used by the Service Principal module to retrieve assigned permissions"
+    },
+
+    {
+        "moduleCmdlet": "Remove-MgServicePrincipalAppRoleAssignment",
+        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "AppRoleAssignment.ReadWrite.All"
+        ],
+        "higherPermissions": [
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete-approleassignments?view=graph-rest-1.0&tabs=http"
+        ],
+        "notes": "Used by the Service Principal to remove assigned permissions"
+    },
+
+    {
+        "moduleCmdlet": "Remove-MgOauth2PermissionGrant",
+        "apiResource": "/v1.0/oauth2PermissionGrants/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "DelegatedPermissionGrant.ReadWrite.All"
+        ],
+        "higherPermissions": [
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http"
+        ],
+        "notes": "Used by the Service Principal module to remove delegated permissions assignment"
+    },
+
+    {
+        "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignedTo",
+        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignedTo",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Directory.Read.All"
+        ],
+        "higherPermissions": [
+            "AppRoleAssignment.ReadWrite.All",
+            "Application.Read.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
+        ],
+        "notes": "Used by the Service Principal module to assign missing permissions"
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaApplication",
         "apiResource": "/beta/applications",
         "apiFilter": "",
@@ -142,7 +340,7 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ""
+        "notes": "Used by the Service Principal and RiskyPermissions modules to retrieve application details"
     },
 
     {
@@ -210,6 +408,37 @@
             "https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-1.0"
         ],
         "notes": ""
+    },
+
+    {
+        "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest",
+        "apiResource": "/v1.0/roleManagement/directory/roleAssignmentScheduleRequests",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Identity.Governance"
+        ],
+        "leastPermissions": [
+            "RoleAssignmentSchedule.ReadWrite.Directory"
+        ],
+        "higherPermissions": [
+            "RoleManagement.ReadWrite.Directory"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/rbacapplication-post-roleassignmentschedulerequests?view=graph-rest-1.0"
+        ],
+        "notes": "This is used by the service principal module for assigning roles."
     },
 
     {
@@ -685,7 +914,8 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "aad"
+            "aad",
+            "sharepoint"
         ],
         "supportedEnv": [
             "commercial",
@@ -922,6 +1152,40 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleAssignment",
+        "apiResource": "/v1.0/rolemanagement/directory/roleAssignments",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
+        "leastPermissions": [
+            "RoleManagement.Read.Directory"
+        ],
+        "higherPermissions": [
+            "RoleManagement.Read.All",
+            "Directory.Read.All",
+            "RoleManagement.ReadWrite.Directory",
+            "Directory.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/unifiedroleassignment-get?view=graph-rest-1.0"
+        ],
+        "notes": "Used by the Service Principal module to assign the role assignment"
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaSubscribedSku",
         "apiResource": "/beta/subscribedSkus",
         "apiFilter": "",
@@ -976,7 +1240,6 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "defender",
             "aad"
         ],
         "supportedEnv": [
@@ -1163,15 +1426,12 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [
-            "Exchange.ManageAsApp"
-        ],
+        "leastPermissions": [],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "exo",
             "defender"
         ],
         "supportedEnv": [
@@ -1195,15 +1455,12 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [
-            "Exchange.ManageAsApp"
-        ],
+        "leastPermissions": [],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "exo",
             "defender"
         ],
         "supportedEnv": [
@@ -1226,15 +1483,12 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [
-            "Exchange.ManageAsApp"
-        ],
+        "leastPermissions": [],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "exo",
             "defender"
         ],
         "supportedEnv": [
@@ -1466,8 +1720,7 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "aad",
-            "defender"
+            "aad"
         ],
         "supportedEnv": [
             "commercial",
@@ -1498,8 +1751,7 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "aad",
-            "defender"
+            "aad"
         ],
         "supportedEnv": [
             "gcchigh"
@@ -1529,8 +1781,7 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "aad",
-            "defender"
+            "aad"
         ],
         "supportedEnv": [
             "dod"
@@ -1540,5 +1791,69 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
         ],
         "notes": ""
+    },
+
+    {
+        "moduleCmdlet": "New-MgApplication",
+        "apiResource": "/v1.0/applications",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/application-post-applications?view=graph-rest-1.0&tabs=http"
+        ],
+        "notes": "Used by the Service Principal module to create a new Application registration"
+    },
+
+    {
+        "moduleCmdlet": "Update-MgApplication",
+        "apiResource": "/v1.0/applications/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "ServicePrincipal"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http"
+        ],
+        "notes": "Used by the Service Principal module to add permissions."
     }
 ]

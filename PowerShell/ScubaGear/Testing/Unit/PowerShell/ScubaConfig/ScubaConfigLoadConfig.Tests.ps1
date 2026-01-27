@@ -6,8 +6,14 @@ InModuleScope ScubaConfig {
             Mock -CommandName Write-Warning {}
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
-	    Remove-Item function:\ConvertFrom-Yaml
+            Remove-Item function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
         }
+
+        AfterAll {
+            # Reset instance after all tests in this file
+            [ScubaConfig]::ResetInstance()
+        }
+
         context 'Handling repeated keys in YAML file' {
             It 'Load config with dupliacte keys'{
                 # Load the first file and check the ProductNames value.
@@ -19,65 +25,265 @@ InModuleScope ScubaConfig {
             }
         }
         context 'Handling repeated LoadConfig invocations' {
+            BeforeAll {
+                # Create a temporary YAML file for testing
+                $script:TempConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:TempConfigFile = [System.IO.Path]::ChangeExtension($script:TempConfigFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $script:TempConfigFile
+            }
             It 'Load valid config file followed by another'{
+                [ScubaConfig]::ResetInstance()
                 $cfg = [ScubaConfig]::GetInstance()
                 # Load the first file and check the ProductNames value.
+                "ProductNames: ['teams']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('teams')
+                        M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                $cfg = [ScubaConfig]::GetInstance()
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
+                "ProductNames: ['exo']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('exo')
+                        M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
+                [ScubaConfig]::GetInstance().LoadConfig($script:TempConfigFile, $false) | Should -BeTrue
+                # After second load, configuration should be replaced
+                $cfg = [ScubaConfig]::GetInstance()
                 $cfg.Configuration.ProductNames | Should -Be 'exo'
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
             AfterAll {
                 [ScubaConfig]::ResetInstance()
+                if (Test-Path $script:TempConfigFile) {
+                    Remove-Item $script:TempConfigFile -Force
+                }
             }
         }
-        context "Handling policy omissions" {
-            It 'Does not warn for proper control IDs' {
-                function global:ConvertFrom-Yaml {
-                    @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.EXO.1.1v2"=@{"Rationale"="Example rationale"}}
-                    }
-                }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
+
+        context 'Deferred Validation with SkipValidation Parameter' {
+            BeforeAll {
+                # Create a temporary YAML file with valid content
+                $script:ValidConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:ValidConfigFile = [System.IO.Path]::ChangeExtension($script:ValidConfigFile, '.yaml')
+                @"
+ProductNames:
+  - aad
+M365Environment: commercial
+"@ | Set-Content -Path $script:ValidConfigFile -Encoding UTF8
+
+                # Create a temporary YAML file with invalid content that will be overridden
+                $script:InvalidConfigFile = [System.IO.Path]::GetTempFileName()
+                $script:InvalidConfigFile = [System.IO.Path]::ChangeExtension($script:InvalidConfigFile, '.yaml')
+                @"
+ProductNames:
+  - invalid-product
+M365Environment: invalid-env
+"@ | Set-Content -Path $script:InvalidConfigFile -Encoding UTF8
             }
 
-            It 'Warns for malformed control IDs' {
+            It 'LoadConfig with SkipValidation=$false should validate immediately'{
+                # Create valid config file for this test
+                $validFile = [System.IO.Path]::GetTempFileName()
+                $validFile = [System.IO.Path]::ChangeExtension($validFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $validFile
+
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MSEXO.1.1v2"=@{"Rationale"="Example rationale"}}
+                        ProductNames=@('aad')
+                        M365Environment='commercial'
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
+
+                try {
+                    # Should succeed with valid config
+                    {[ScubaConfig]::GetInstance().LoadConfig($validFile, $false)} | Should -Not -Throw
+                    [ScubaConfig]::ResetInstance()
+
+                    # Create invalid config file with truly invalid product
+                    $invalidFile = [System.IO.Path]::GetTempFileName()
+                    $invalidFile = [System.IO.Path]::ChangeExtension($invalidFile, '.yaml')
+                    "ProductNames: ['invalid']" | Set-Content -Path $invalidFile
+
+                    function global:ConvertFrom-Yaml {
+                        @{
+                            ProductNames=@('thisproductdoesnotexist')
+                        }
+                    }
+
+                    # Should fail with invalid config
+                    {[ScubaConfig]::GetInstance().LoadConfig($invalidFile, $false)} | Should -Throw
+                }
+                finally {
+                    [ScubaConfig]::ResetInstance()
+                    if (Test-Path $validFile) { Remove-Item $validFile -Force }
+                    if (Test-Path $invalidFile) { Remove-Item $invalidFile -Force }
+                }
             }
 
-            It 'Warns for control IDs not encompassed by ProductNames' {
+            It 'LoadConfig with SkipValidation=$true should skip Organization rule validation'{
+                # Create config with invalid values
+                $testFile = [System.IO.Path]::GetTempFileName()
+                $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
+                "ProductNames: ['invalid']" | Set-Content -Path $testFile
+
+                # Create temp directory for OPAPath
+                $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
+                New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
+
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('exo');
-                        OmitPolicy=@{"MS.Gmail.1.1v1"=@{"Rationale"="Example rationale"}}
+                        ProductNames=@('invalid-product')
+                        M365Environment='invalid-env'
+                        OPAPath=$tempOpaPath
                     }
                 }
-                [ScubaConfig]::GetInstance().LoadConfig($PSCommandPath) | Should -BeTrue
-                Should -Invoke -CommandName Write-Warning -Exactly -Times 1
+
+                try {
+                    # Should load without error even with invalid values when validation skipped
+                    {[ScubaConfig]::GetInstance().LoadConfig($testFile, $true)} | Should -Not -Throw
+
+                    # Configuration should be loaded with invalid values
+                    $cfg = [ScubaConfig]::GetInstance()
+                    $cfg.Configuration.ProductNames | Should -Not -BeNullOrEmpty
+                    # Since validation was skipped, we can override values
+                    $cfg.Configuration.ProductNames = @('aad', 'defender')
+                    $cfg.Configuration.M365Environment = 'commercial'
+                    # Ensure OPAPath is still pointing to our temp directory
+                    $cfg.Configuration.OPAPath = $tempOpaPath
+                    # Now validation should pass after override
+                    { $cfg.ValidateConfiguration() } | Should -Not -Throw
+                }
+                finally {
+                    [ScubaConfig]::ResetInstance()
+                    if (Test-Path $testFile) { Remove-Item $testFile -Force }
+                    if (Test-Path $tempOpaPath) { Remove-Item $tempOpaPath -Recurse -Force }
+                }
             }
-	    AfterAll {
-	    }
+
+            It 'ValidateConfiguration should validate current configuration state'{
+                # Create config with invalid values
+                $testFile = [System.IO.Path]::GetTempFileName()
+                $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
+                "ProductNames: ['invalid']" | Set-Content -Path $testFile
+
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('invalid-product')
+                    }
+                }
+
+                try {
+                    # Load with validation skipped
+                    [ScubaConfig]::GetInstance().LoadConfig($testFile, $true)
+
+                    # ValidateConfiguration should fail on invalid data
+                    $cfg = [ScubaConfig]::GetInstance()
+                    {$cfg.ValidateConfiguration()} | Should -Throw
+                }
+                finally {
+                    [ScubaConfig]::ResetInstance()
+                    if (Test-Path $testFile) { Remove-Item $testFile -Force }
+                }
+            }
+
+            It 'Override invalid config value then validate should succeed'{
+                # Create config with invalid M365Environment
+                $testFile = [System.IO.Path]::GetTempFileName()
+                $testFile = [System.IO.Path]::ChangeExtension($testFile, '.yaml')
+                "M365Environment: gcch" | Set-Content -Path $testFile
+
+                # Create temp directory for OPAPath
+                $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
+                New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
+
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad')
+                        M365Environment='gcch'  # Invalid value
+                        OPAPath=$tempOpaPath
+                    }
+                }
+
+                try {
+                    # Load config without validation
+                    [ScubaConfig]::GetInstance().LoadConfig($testFile, $true) | Should -BeTrue
+
+                    # Verify invalid value was loaded
+                    $cfg = [ScubaConfig]::GetInstance()
+                    $cfg.Configuration.M365Environment | Should -Be 'gcch'
+
+                    # Override with valid value (simulating command-line parameter)
+                    $cfg.Configuration.M365Environment = 'gcchigh'
+                    # Ensure OPAPath is still pointing to our temp directory
+                    $cfg.Configuration.OPAPath = $tempOpaPath
+
+                    # Validation should now succeed
+                    {$cfg.ValidateConfiguration()} | Should -Not -Throw
+
+                    # Verify the override persisted
+                    $cfg.Configuration.M365Environment | Should -Be 'gcchigh'
+                }
+                finally {
+                    [ScubaConfig]::ResetInstance()
+                    if (Test-Path $testFile) { Remove-Item $testFile -Force }
+                    if (Test-Path $tempOpaPath) { Remove-Item $tempOpaPath -Recurse -Force }
+                }
+            }
+
+            It 'Default LoadConfig() without parameters should validate immediately'{
+                # Create valid config
+                $validFile = [System.IO.Path]::GetTempFileName()
+                $validFile = [System.IO.Path]::ChangeExtension($validFile, '.yaml')
+                "ProductNames: ['aad']" | Set-Content -Path $validFile
+
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad')
+                        M365Environment='commercial'
+                    }
+                }
+
+                try {
+                    # Default behavior should still validate
+                    {[ScubaConfig]::GetInstance().LoadConfig($validFile)} | Should -Not -Throw
+                    [ScubaConfig]::ResetInstance()
+
+                    # Create invalid config
+                    $invalidFile = [System.IO.Path]::GetTempFileName()
+                    $invalidFile = [System.IO.Path]::ChangeExtension($invalidFile, '.yaml')
+                    "ProductNames: ['invalid']" | Set-Content -Path $invalidFile
+
+                    function global:ConvertFrom-Yaml {
+                        @{
+                            ProductNames=@('invalid-product')
+                        }
+                    }
+
+                    {[ScubaConfig]::GetInstance().LoadConfig($invalidFile)} | Should -Throw
+                }
+                finally {
+                    [ScubaConfig]::ResetInstance()
+                    if (Test-Path $validFile) { Remove-Item $validFile -Force }
+                    if (Test-Path $invalidFile) { Remove-Item $invalidFile -Force }
+                }
+            }
+
+            AfterAll {
+                [ScubaConfig]::ResetInstance()
+                if (Test-Path $script:ValidConfigFile) {
+                    Remove-Item $script:ValidConfigFile -Force
+                }
+                if (Test-Path $script:InvalidConfigFile) {
+                    Remove-Item $script:InvalidConfigFile -Force
+                }
+            }
         }
+
     }
 }

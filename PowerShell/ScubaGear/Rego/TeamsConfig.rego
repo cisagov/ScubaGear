@@ -496,25 +496,167 @@ tests contains {
 # MS.TEAMS.5.1v2
 #--
 
-# Iterate through all meeting policies. For each, check if DefaultCatalogAppsType
+# Iterate through all app permission policies. For each, check if DefaultCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
 PoliciesBlockingDefaultApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesBlockingDefaultApps does not have any policies saved.
+# Check if the DefaultApp tenant setting exists and is set to "None"
+DefaultAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "DefaultApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+default DefaultAppTenantSettingCompliant := false
+
+DefaultAppTenantSettingCompliant := true if {
+    DefaultAppTenantSetting
+    DefaultAppTenantSetting.SettingValue == "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
+DefaultAppSettingValue := DefaultAppTenantSetting.SettingValue if {
+    DefaultAppTenantSetting
+}
+
+DefaultAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
+}
+
+DefaultAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+DefaultAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "DefaultApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
+}
+
+# Helper to determine compliance status for DefaultApp (v2)
+GetDefaultAppComplianceStatus(_) := DefaultAppTenantSettingCompliant if {
+    DefaultAppSettingValue != "Not Checked"
+    DefaultAppSettingValue != "Certificate Auth"
+}
+
+GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    DefaultAppSettingValue == "Not Checked"
+}
+
+GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    DefaultAppSettingValue == "Certificate Auth"
+}
+
+# Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": DefaultAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesBlockingDefaultApps
-    String := "app permission policy(ies) found that does not restrict installation of Microsoft Apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    
+    # Determine compliance based on what's available
+    Status := GetDefaultAppComplianceStatus(LegacyCompliant)
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "Microsoft Apps by default:"
+    ]))
+    
+    # Determine tenant details based on setting state
+    TenantDetails := GetDefaultAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+# When org-wide setting is compliant, just show "Requirement met"
+BuildDefaultAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    DefaultAppTenantSettingCompliant == true
+}
+
+# When org-wide setting is available but non-compliant, show details
+BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
+    "Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    DefaultAppTenantSettingCompliant == false
+}
+
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == true
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == false
+}
+
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (Microsoft apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
+# Helper rule to determine DefaultApp tenant setting details
+GetDefaultAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    DefaultAppTenantSettingCompliant
+}
+
+GetDefaultAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not DefaultAppTenantSettingCompliant
+    DefaultAppSettingValue != "Not Checked"
+    DefaultAppSettingValue != "Certificate Auth"
+}
+
+GetDefaultAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    DefaultAppSettingValue == "Certificate Auth"
+}
+
+GetDefaultAppTenantDetails := concat("", [
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
+]) if {
+    DefaultAppSettingValue == "Not Checked"
 }
 #--
 
@@ -522,52 +664,335 @@ tests contains {
 # MS.TEAMS.5.2v2
 #--
 
-# Iterate through all meeting policies. For each, check if GlobalCatalogAppsType
+# Iterate through all app permission policies. For each, check if GlobalCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
 PoliciesAllowingGlobalApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesAllowingGlobalApps does not have any policies saved.
+# Check if the GlobalApp tenant setting exists and is set to "None"
+GlobalAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "GlobalApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+default GlobalAppTenantSettingCompliant := false
+
+GlobalAppTenantSettingCompliant := true if {
+    GlobalAppTenantSetting
+    GlobalAppTenantSetting.SettingValue == "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
+GlobalAppSettingValue := GlobalAppTenantSetting.SettingValue if {
+    GlobalAppTenantSetting
+}
+
+GlobalAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
+}
+
+GlobalAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+GlobalAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "GlobalApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
+}
+
+# Helper to determine compliance status for GlobalApp (v2)
+GetGlobalAppComplianceStatus(_) := GlobalAppTenantSettingCompliant if {
+    GlobalAppSettingValue != "Not Checked"
+    GlobalAppSettingValue != "Certificate Auth"
+}
+
+GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    GlobalAppSettingValue == "Not Checked"
+}
+
+GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    GlobalAppSettingValue == "Certificate Auth"
+}
+
+# Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": GlobalAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingGlobalApps
-    String := "app permission policy(ies) found that does not restrict installation of third-party apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    
+    # Determine compliance based on what's available
+    Status := GetGlobalAppComplianceStatus(LegacyCompliant)
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "third-party apps by default:"
+    ]))
+    
+    # Determine tenant details based on setting state
+    TenantDetails := GetGlobalAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+# When org-wide setting is compliant, just show "Requirement met"
+BuildGlobalAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    GlobalAppTenantSettingCompliant == true
+}
+
+# When org-wide setting is available but non-compliant, show details
+BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
+    "Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    GlobalAppTenantSettingCompliant == false
+}
+
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == true
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == false
+}
+
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (third-party apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
+# Helper rule to determine GlobalApp tenant setting details
+GetGlobalAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    GlobalAppTenantSettingCompliant
+}
+
+GetGlobalAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not GlobalAppTenantSettingCompliant
+    GlobalAppSettingValue != "Not Checked"
+    GlobalAppSettingValue != "Certificate Auth"
+}
+
+GetGlobalAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    GlobalAppSettingValue == "Certificate Auth"
+}
+
+GetGlobalAppTenantDetails := concat("", [
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
+]) if {
+    GlobalAppSettingValue == "Not Checked"
 }
 #--
 
 #
 # MS.TEAMS.5.3v2
 #--
-#
 
-# Iterate through all meeting policies. For each, check if PrivateCatalogAppsType
+# Iterate through all app permission policies. For each, check if PrivateCatalogAppsType
 # is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
 PoliciesAllowingCustomApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
 
-# Pass if PoliciesAllowingCustomApps does not have any policies saved.
+# Check if the PrivateApp tenant setting exists and is set to "None"
+PrivateAppTenantSetting := Setting if {
+    some Setting in input.tenant_app_settings
+    Setting.SettingName == "PrivateApp"
+}
+
+# Determine if the tenant setting requirement is met (set to None)
+# Default to false if the setting doesn't exist
+default PrivateAppTenantSettingCompliant := false
+
+PrivateAppTenantSettingCompliant := true if {
+    PrivateAppTenantSetting
+    PrivateAppTenantSetting.SettingValue == "None"
+}
+
+# Get tenant setting value - returns value if exists, otherwise "Not Checked" or "Certificate Auth"
+PrivateAppSettingValue := PrivateAppTenantSetting.SettingValue if {
+    PrivateAppTenantSetting
+}
+
+PrivateAppSettingValue := "Certificate Auth" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) > 0
+}
+
+PrivateAppSettingValue := "Not Checked" if {
+    not input.tenant_app_settings
+}
+
+PrivateAppSettingValue := "Not Checked" if {
+    input.tenant_app_settings
+    count([S | some S in input.tenant_app_settings; S.SettingName == "PrivateApp"]) == 0
+    count([S | some S in input.tenant_app_settings; S.CertificateBasedAuth == true]) == 0
+}
+
+# Helper to determine compliance status for PrivateApp (v2)
+GetPrivateAppComplianceStatus(_) := PrivateAppTenantSettingCompliant if {
+    PrivateAppSettingValue != "Not Checked"
+    PrivateAppSettingValue != "Certificate Auth"
+}
+
+GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    PrivateAppSettingValue == "Not Checked"
+}
+
+GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
+    PrivateAppSettingValue == "Certificate Auth"
+}
+
+# Check passes when org-wide tenant setting is compliant, or legacy policies are compliant
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": {"Policies": Policies, "TenantSetting": PrivateAppSettingValue},
+    "ReportDetails": Details,
     "RequirementMet": Status
 } if {
     Policies := PoliciesAllowingCustomApps
-    String := "app permission policy(ies) found that does not restrict installation of custom apps by default:"
-    Status := count(Policies) == 0
+    LegacyCompliant := count(Policies) == 0
+    
+    # Determine compliance based on what's available
+    Status := GetPrivateAppComplianceStatus(LegacyCompliant)
+    
+    # Build detailed report
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+        "app permission policy(ies) found that does not restrict installation of ",
+        "custom apps by default:"
+    ]))
+    
+    # Determine tenant details based on setting state
+    TenantDetails := GetPrivateAppTenantDetails
+    
+    # Use helper function to build details with proper prioritization
+    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+}
+
+# Helper function to build details message - prioritizes org-wide settings when available
+# When org-wide setting is compliant, just show "Requirement met"
+BuildPrivateAppDetails(SettingValue, _, _, _) := PASS if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    PrivateAppTenantSettingCompliant == true
+}
+
+# When org-wide setting is available but non-compliant, show details
+BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
+    "Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue != "Not Checked"
+    SettingValue != "Certificate Auth"
+    PrivateAppTenantSettingCompliant == false
+}
+
+# When legacy is compliant and tenant setting is not checked, just show "Requirement met"
+BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == true
+}
+
+BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := LegacyDetails if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == true
+}
+
+# When legacy is NOT compliant and tenant setting is not checked, show full message
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Not Checked"
+    LegacyCompliant == false
+}
+
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
+    "Legacy app permission policy check: ",
+    LegacyDetails,
+    ". Org-wide tenant setting (custom apps): ",
+    SettingValue,
+    TenantDetails
+]) if {
+    SettingValue == "Certificate Auth"
+    LegacyCompliant == false
+}
+
+# Helper rule to determine PrivateApp tenant setting details
+GetPrivateAppTenantDetails := " - Compliant (set to None); legacy app permission policies not required" if {
+    PrivateAppTenantSettingCompliant
+}
+
+GetPrivateAppTenantDetails := " - Non-compliant (should be set to None)" if {
+    not PrivateAppTenantSettingCompliant
+    PrivateAppSettingValue != "Not Checked"
+    PrivateAppSettingValue != "Certificate Auth"
+}
+
+GetPrivateAppTenantDetails := concat("", [
+    " - Certificate-based authentication used; ",
+    "org-wide app settings cannot be retrieved with certificate authentication. ",
+    "Legacy app permission policies were validated instead"
+]) if {
+    PrivateAppSettingValue == "Certificate Auth"
+}
+
+GetPrivateAppTenantDetails := concat("", [
+    " - Org-wide app settings not available in this tenant; ",
+    "legacy app permission policies were validated instead"
+]) if {
+    PrivateAppSettingValue == "Not Checked"
 }
 #--
 
