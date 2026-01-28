@@ -30,6 +30,9 @@
                 "19dbc75e-c2e2-444c-a770-ec69d8559fc7": "Directory.ReadWrite.All",
                 "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8": "RoleManagement.ReadWrite.Directory",
                 "025d3225-3f02-4882-b4c0-cd5b541a4e80": "RoleManagement.ReadWrite.Exchange",
+                "274d0592-d1b6-44bd-af1d-26d259bcb43a": "RoleManagement.ReadWrite.CloudPC",
+                "8b7e8c0a-7e9d-4049-97ec-04b5e1bcaf05": "RoleManagement.ReadWrite.Defender",
+                "c7fbd983-d9aa-4fa7-84b8-17382c103bc4": "RoleManagement.Read.All",
                 "18a4783c-866b-4cc7-a460-3d5e5662c884": "Application.ReadWrite.OwnedBy",
                 "741f803b-c850-494e-b5df-cde7c675a1ca": "User.ReadWrite.All",
                 "df021288-bdef-4463-88db-98f22de89214": "User.Read.All",
@@ -113,6 +116,9 @@
                 "bac3b9c2-b516-4ef4-bd3b-c2ef73d8d804": "Device.Command",
                 "11d4cd79-5ba5-460f-803f-e22c8ab85ccd": "Device.Read",
                 "ff91d191-45a0-43fd-b837-bd682c4a0b0f": "EAS.AccessAsUser.All",
+                "9769c687-087d-48ac-9cb3-c37dde652038": "EWS.AccessAsUser.All",
+                "652390e4-393a-48de-9484-05f9b1212954": "IMAP.AccessAsUser.All",
+                "d7b7f2d9-0f45-4ea1-9d42-e50810c06991": "POP.AccessAsUser.All",
                 "3a1e4806-a744-4c70-80fc-223bf8582c46": "Family.Read",
                 "10465720-29dd-4523-a11a-6a75c743c9d9": "Files.Read",
                 "df85f4d6-205c-4ac5-a5ea-6bf408dba283": "Files.Read.All",
@@ -122,7 +128,12 @@
                 "52dc2051-4958-4636-8f2a-281d39c6981c": "MailboxFolder.Read",
                 "077fde41-7e0b-4c5b-bcd1-e9d743a30c80": "MailboxFolder.ReadWrite",
                 "818c620a-27a9-40bd-a6a5-d96f7d610b4b": "MailboxSettings.ReadWrite",
-                "258f6531-6087-4cc4-bb90-092c5fb3ed3f": "SMTP.Send"
+                "258f6531-6087-4cc4-bb90-092c5fb3ed3f": "SMTP.Send",
+                "d01b97e9-cbc0-49fe-810a-750afd5527a3": "RoleManagement.ReadWrite.Directory",
+                "c1499fe0-52b1-4b22-bed2-7a244e0e879f": "RoleManagement.ReadWrite.Exchange",
+                "501d06f8-07b8-4f18-b5c6-c191a4af7a82": "RoleManagement.ReadWrite.CloudPC",
+                "d8914f8f-9f64-4bd1-b4d3-f5a701ed8457": "RoleManagement.ReadWrite.Defender",
+                "48fec646-b2ba-4019-8681-8eb31435aded": "RoleManagement.Read.All"
             }
         },
         "Office 365 Management APIs": {
@@ -158,7 +169,9 @@
                 "87f447af-9fa4-4c32-9dfa-4a57a73d18ce": "MailboxSettings.Read",
                 "818c620a-27a9-40bd-a6a5-d96f7d610b4b": "MailboxSettings.ReadWrite",
                 "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All",
-                "b340eb25-3456-403f-be2f-af7a0d370277": "User.ReadBasic.All"
+                "b340eb25-3456-403f-be2f-af7a0d370277": "User.ReadBasic.All",
+                "266d2589-20b5-4f91-9a03-89247d1be8da": "EAS.AccessAsUser.All",
+                "3b5f3d61-589b-4a3c-a359-5dd4b5ee5bd5": "EWS.AccessAsUser.All"
             }
         },
         "Office 365 SharePoint Online": {
