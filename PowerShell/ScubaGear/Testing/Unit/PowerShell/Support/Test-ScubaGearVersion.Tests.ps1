@@ -238,6 +238,18 @@ InModuleScope 'Support' {
                 $firstModule = $script:ScubaGearModuleList[0]
                 $secondModule = $script:ScubaGearModuleList[1]
 
+                # Add Get-Module mock to return ScubaGear module
+                Mock Get-Module {
+                    param($Name, $ListAvailable)
+                    if ($Name -eq 'ScubaGear' -and $ListAvailable) {
+                        return @{
+                            Version = $script:CurrentScubaGearVersion
+                            ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\ScubaGear\$($script:CurrentScubaGearVersion)"
+                        }
+                    }
+                    return $null
+                }
+
                 Mock Get-DependencyStatus {
                     return [PSCustomObject]@{
                         TotalRequired = $script:ScubaGearModuleList.Count
@@ -247,27 +259,34 @@ InModuleScope 'Support' {
                         ModuleFileLocations = @(
                             [PSCustomObject]@{
                                 ModuleName = $firstModule.ModuleName
-                                Versions = @(
-                                    [PSCustomObject]@{ Version = $firstModule.ModuleVersion.ToString(); Path = "$env:USERPROFILE\Documents\PowerShell\Modules\$($firstModule.ModuleName)\$($firstModule.ModuleVersion)"; Scope = 'CurrentUser' },
-                                    [PSCustomObject]@{ Version = ([version]"$($firstModule.ModuleVersion.Major).$($firstModule.ModuleVersion.Minor + 1).0").ToString(); Path = "$env:USERPROFILE\Documents\PowerShell\Modules\$($firstModule.ModuleName)\$($firstModule.ModuleVersion.Major).$($firstModule.ModuleVersion.Minor + 1).0"; Scope = 'CurrentUser' }
+                                VersionCount = 2
+                                MinVersion = $firstModule.ModuleVersion.ToString()
+                                MaxVersion = $firstModule.MaximumVersion.ToString()
+                                Locations = @(
+                                    "$($firstModule.ModuleVersion) [OK] (CurrentUser): $env:USERPROFILE\Documents\PowerShell\Modules\$($firstModule.ModuleName)\$($firstModule.ModuleVersion)",
+                                    "$($firstModule.ModuleVersion.Major).$($firstModule.ModuleVersion.Minor + 1).0 [OK] (CurrentUser): $env:USERPROFILE\Documents\PowerShell\Modules\$($firstModule.ModuleName)\$($firstModule.ModuleVersion.Major).$($firstModule.ModuleVersion.Minor + 1).0"
                                 )
                             },
                             [PSCustomObject]@{
                                 ModuleName = $secondModule.ModuleName
-                                Versions = @(
-                                    [PSCustomObject]@{ Version = $secondModule.ModuleVersion.ToString(); Path = "$env:ProgramFiles\PowerShell\Modules\$($secondModule.ModuleName)\$($secondModule.ModuleVersion)"; Scope = 'AllUsers' },
-                                    [PSCustomObject]@{ Version = ([version]"$($secondModule.ModuleVersion.Major).$($secondModule.ModuleVersion.Minor + 1).0").ToString(); Path = "$env:USERPROFILE\Documents\PowerShell\Modules\$($secondModule.ModuleName)\$($secondModule.ModuleVersion.Major).$($secondModule.ModuleVersion.Minor + 1).0"; Scope = 'CurrentUser' }
+                                VersionCount = 2
+                                MinVersion = $secondModule.ModuleVersion.ToString()
+                                MaxVersion = $secondModule.MaximumVersion.ToString()
+                                Locations = @(
+                                    "$($secondModule.ModuleVersion) [OK] (AllUsers): $env:ProgramFiles\PowerShell\Modules\$($secondModule.ModuleName)\$($secondModule.ModuleVersion)",
+                                    "$($secondModule.ModuleVersion.Major).$($secondModule.ModuleVersion.Minor + 1).0 [OK] (CurrentUser): $env:USERPROFILE\Documents\PowerShell\Modules\$($secondModule.ModuleName)\$($secondModule.ModuleVersion.Major).$($secondModule.ModuleVersion.Minor + 1).0"
                                 )
                             }
                         )
                         AdminRequired = $true
-                        Status = "Multiple Versions"
+                        Status = "Needs Cleanup"
                         Recommendations = @("2 modules have multiple versions installed. Run 'Reset-ScubaGearDependencies' to clean up.")
                     }
                 }
 
                 $result = Test-ScubaGearVersion
 
+                # Test against the dependency component (second element in array)
                 $result[1].MultipleVersionsInstalled | Should -Be $true
                 $result[1].MultipleVersionModules | Should -Contain $firstModule.ModuleName
                 $result[1].MultipleVersionModules | Should -Contain $secondModule.ModuleName
