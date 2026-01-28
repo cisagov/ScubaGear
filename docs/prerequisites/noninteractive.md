@@ -42,7 +42,7 @@ The minimum permissions and roles that must be assigned to the service principal
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
 
 > [!NOTE]
-> Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-configuration).<sup>1</sup>
+> Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-configuration).<sup>1</sup><br>
 > Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup>
 
 ## Service Principal Setup
@@ -102,7 +102,7 @@ Save these values for running ScubaGear:
 ## Power Platform Registration
 
 > [!NOTE]
-> This section applies to **both automated and manual setup methods**. Power Platform requires an additional one-time registration step regardless of how you created your service principal.<br>
+> This section applies to **manual setup methods**. Power Platform requires an additional one-time registration step regardless of how you created your service principal.<br>
 > If you used the automated setup, you can skip to the verification step at the end of this section [Verify Registration](#step-3-verify-registration).
 
 Power Platform requires the service principal to be manually registered via interactive authentication before ScubaGear can assess it. This is a [limitation of Power Platform service principals](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals).
@@ -141,68 +141,14 @@ After registration, verify Power Platform permissions:
 Get-ScubaGearAppPermission -AppID "your-app-id" -M365Environment "commercial" -ProductNames 'powerplatform'
 ```
 
-## Additional GCC High Configuration
+## Additional GCC High details
 
-> [!NOTE]
-> This section applies to **both automated and manual setup methods** when assessing GCC High tenants.
+This section contains additional, non-interactive authentication details that are required to successfully run ScubaGear against a GCC High tenant.
 
-GCC High tenants require additional API permissions beyond the standard configuration due to differences in the GCC High environment.
+### Defender in GCC High
 
-### Defender for Office 365 in GCC High
+When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
-When assessing Defender for Office 365 in GCC High:
+### SharePoint in GCC High
 
-**Required Permission:** `Exchange.ManageAsApp` must be added as an application permission from **both**:
-1. `Microsoft Exchange Online Protection` API
-2. `Office 365 Exchange Online` API
-
-**Reference:** [Exchange Online App-Only Auth Documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions) (see GCC High note)
-
-**For automated setup:**
-```powershell
-# Use -M365Environment gcchigh when creating service principal
-New-ScubaGearServicePrincipal `
-    -M365Environment gcchigh `
-    -ProductNames 'defender' `
-    -ServicePrincipalName "ScubaGear-GCCHigh"
-```
-
-**For manual setup:**
-1. In Entra Admin Center, go to your app registration
-2. Select **API Permissions**
-3. Add `Exchange.ManageAsApp` from both APIs listed above
-4. Grant admin consent
-
-### SharePoint Online in GCC High
-
-When assessing SharePoint Online in GCC High:
-
-**Required Permission:** `Sites.FullControl.All` must be added from the **GCC High-specific** API:
-- Use: `Office 365 SharePoint Online` API (GCC High)
-- NOT: `SharePoint` API (used in commercial tenants)
-
-**For automated setup:**
-```powershell
-# Use -M365Environment gcchigh
-New-ScubaGearServicePrincipal `
-    -M365Environment gcchigh `
-    -ProductNames 'sharepoint' `
-    -ServicePrincipalName "ScubaGear-GCCHigh"
-```
-
-**For manual setup:**
-1. In Entra Admin Center, go to your app registration
-2. Select **API Permissions**
-3. Add **Office 365 SharePoint Online** (NOT "SharePoint")
-4. Add `Sites.FullControl.All` permission
-5. Grant admin consent
-
-### Verifying GCC High Configuration
-
-```powershell
-# Verify all permissions are correct for GCC High
-Get-ScubaGearAppPermission `
-    -AppID "your-app-id" `
-    -M365Environment gcchigh `
-    -ProductNames 'defender', 'sharepoint'
-```
+When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
