@@ -202,6 +202,7 @@ function Publish-ScubaGearModule {
   }
   catch {
     Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
+    Write-Error "Error details: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
     exit 1
   }
   $ModuleVersion
@@ -245,7 +246,7 @@ function Copy-ModuleToTempLocation {
   }
   else {
     $ErrorMessage = "Failed to find the module destination path."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -281,7 +282,7 @@ function Edit-ManifestFile {
   }
   else {
     $ErrorMessage = "Failed to find the manifest file."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -327,7 +328,7 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot edit the module because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to edit the module manifest."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   try {
@@ -340,7 +341,7 @@ function Edit-ManifestFile {
     Write-Warning "Error: Cannot test the manifest file because:"
     Write-Warning $_.Exception
     $ErrorMessage = "Failed to test the manifest file."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   $ModuleVersion
@@ -373,7 +374,7 @@ function New-ArrayOfFilePaths {
   }
   else {
     $ErrorMessage = "Failed to find any .ps1, .psm1, or .psd1 files."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -402,7 +403,7 @@ function New-FileList {
   }
   else {
     $ErrorMessage = "Failed to find the list file."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 
@@ -442,7 +443,7 @@ function Use-AzureSignTool {
     '-tr', $TimeStampServer,
     '-kvu', $AzureKeyVaultUrl,
     '-kvc', $CertificateName,
-    '-kvm'
+    '-kvm',
     '-ifl', $FileList
   )
 
@@ -452,25 +453,38 @@ function Use-AzureSignTool {
   $NumberOfCommands = (Get-Command AzureSignTool) # Should return 1
   if ($NumberOfCommands -eq 0) {
     $ErrorMessage = "Failed to find the AzureSignTool on this system."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
   $ToolPath = (Get-Command AzureSignTool).Path
   Write-Warning "The path to AzureSignTool is $ToolPath"
   # & is the call operator that executes a command, script, or function.
-  $Results = & $ToolPath $SignArguments
+  try {
+    $Results = & $ToolPath $SignArguments 2>&1
+  }
+  catch {
+    $ErrorMessage = "An error occurred while signing the files: $($_.Exception)"
+    Write-Error $ErrorMessage
+    throw $ErrorMessage
+  }
+
+  # Keep this for debugging purposes to check the AzureSignTool output
+  #Write-Warning "AzureSignTool output:"
+  #$Results | ForEach-Object { Write-Warning $_ }
+
   # Test the results for failures.
   # If there are no failures, the $SuccessPattern string will be the last
   # line in the results.
   # Warning: This is a brittle test, because it depends upon a specific string.
   $SuccessPattern = 'Failed operations: 0'
   $FoundNoFailures = $Results | Select-String -Pattern $SuccessPattern -Quiet
+
   if ($FoundNoFailures -eq $true) {
     Write-Warning "Signed the filelist without errors."
   }
   else {
     $ErrorMessage = "Failed to sign the filelist without errors."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 }
@@ -529,7 +543,7 @@ function Test-ScubaCatalogFile {
   }
   else {
     $ErrorMessage = "Signing the module was NOT successful."
-    Write-Error = $ErrorMessage
+    Write-Error $ErrorMessage
     throw $ErrorMessage
   }
 }

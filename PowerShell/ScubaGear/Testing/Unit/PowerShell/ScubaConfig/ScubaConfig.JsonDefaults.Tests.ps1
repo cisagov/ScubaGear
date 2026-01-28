@@ -36,8 +36,13 @@ Describe "JSON-based Configuration System" {
         }
 
         It "Should read OPAVersion default from JSON" {
+            # Read the expected value directly from the JSON file
+            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw | ConvertFrom-Json
+            $expectedVersion = $jsonDefaults.defaults.OPAVersion
+
+            # Verify ScubaConfig returns the same value
             $opaVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
-            $opaVersion | Should -Be "1.12.1"
+            $opaVersion | Should -Be $expectedVersion
         }
 
         It "Should read M365Environment default as commercial from JSON" {
