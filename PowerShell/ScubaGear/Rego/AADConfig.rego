@@ -400,22 +400,7 @@ LowSecurityAuthMethodsDisabled := true if {
     every Config in LowSecurityAuthMethods { Config.State == "disabled" }
 }
 
-# First test is for N/A case
-tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails("MS.AAD.3.4v1", Reason),
-    "RequirementMet": false
-} if {
-    PolicyId := "MS.AAD.3.5v1"
-    # regal ignore:line-length
-    Reason := "This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete. See %v for more info"
-    AuthenticationPolicyMigrationIsComplete != true
-}
-
-# If policy is not N/A then we check that the configuration matches the baseline
+# We check that the configuration matches the baseline
 tests contains {
     "PolicyId": "MS.AAD.3.5v1",
     "Criticality": "Shall",
@@ -425,7 +410,6 @@ tests contains {
     "RequirementMet": Status
 } if {
     ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
-    AuthenticationPolicyMigrationIsComplete == true
     Status := LowSecurityAuthMethodsDisabled
 }
 #--
