@@ -4,16 +4,6 @@ Running ScubaGear in a non-interactive (automated) fashion requires an applicati
 
 > [!NOTE]
 > While there are many ways to authenticate with a service principal, ScubaGear only authenticates via a certificate identified by its certificate thumbprint.<br>
-> **GCC High users:** See [Additional GCC High Configuration](#additional-gcc-high-configuration) for environment-specific requirements before beginning setup.
-
-### Table of Contents
-
-- [Overview](#overview)
-- [Service Principal Setup](#service-principal-setup)
-  - [Automated Setup (Recommended)](#1-automated-setup-recommended)
-  - [Manual Setup (Alternative)](#2-manual-setup-alternative)
-  - [Power Platform Registration](#power-platform-registration)
-- [Additional GCC High Configuration](#additional-gcc-high-configuration)
 
 ## Overview
 
