@@ -5,6 +5,7 @@ This guide provides step-by-step workflows for common Service Principal manageme
 ## Table of Contents
 
 - [Overview](#overview)
+- [Scope and Intended Use](#scope-and-intended-use)
 - [Prerequisites](#prerequisites)
 - [Initial Setup Workflow](#initial-setup-workflow)
 - [Audit Existing Service Principal](#audit-existing-service-principal)
@@ -14,7 +15,10 @@ This guide provides step-by-step workflows for common Service Principal manageme
 
 ## Overview
 
-The Service Principal module provides six core functions:
+The benefits of using the ScubaGear Service Principal module include:
+- Automated configuration of all required ScubaGear permissions
+- Built-in validation and auditing
+- Reduced risk of misconfiguration
 
 **Service Principal Setup:**
 - [`New-ScubaGearServicePrincipal`](#new-scubagearserviceprincipal) - Creates a new service principal with all required permissions based on products being assessed
@@ -25,6 +29,17 @@ The Service Principal module provides six core functions:
 - [`Get-ScubaGearAppCert`](#get-scubagearcert) - Lists certificates for a service principal
 - [`New-ScubaGearAppCert`](#new-scubagearcert) - Adds a new certificate to a service principal
 - [`Remove-ScubaGearAppCert`](#remove-scubagearcert) - Removes a certificate from a service principal
+
+## Scope and Intended Use
+
+> [!IMPORTANT]
+> **This module is designed exclusively for ScubaGear.**
+ - ✅ Creates a service principal for ScubaGear assessments
+ - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, Defender, Power Platform)
+ - ✅ Handles certificate management
+ - ✅ Audits and fixes ScubaGear Service Principal permission issues
+ - ❌ NOT for general service principal management
+ - ❌ NOT for other applications or custom permission sets
 
 ## Prerequisites
 
