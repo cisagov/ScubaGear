@@ -78,7 +78,7 @@ tests contains {
 
 # This variable is used for both "MS.POWERPLATFORM.2.1v1" and "MS.POWERPLATFORM.2.2v1"
 #
-# The environmentType field can be set to the following values: 
+# The environmentType field can be set to the following values:
 # "AllEnvironments", "ExceptEnvironments", or "OnlyEnvironments"
 PoliciesSetToAllEnvironments contains {
     PolicyValue.name,
@@ -95,7 +95,7 @@ PoliciesSetToAllEnvironments contains {
 
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
-DefaultEnvPolicies contains { 
+DefaultEnvPolicies contains {
     "DisplayName": PolicyValue.displayName,
     "EnvironmentType": PolicyValue.environmentType
 } if {
@@ -103,6 +103,23 @@ DefaultEnvPolicies contains {
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
     Env.name == concat("-", ["Default", input.tenant_id])
+}
+
+# Check if a policy with ExceptEnvironments applies to default (default is not in the exception list)
+PoliciesApplyingToDefaultViaExcept contains {
+    "DisplayName": PolicyValue.displayName,
+    "EnvironmentType": PolicyValue.environmentType
+} if {
+    some Policy in input.dlp_policies
+    some PolicyValue in Policy.value
+    PolicyValue.environmentType == "ExceptEnvironments"
+
+    # Get all environment names in the exceptions list
+    ExceptedEnvNames := { Env.name | some Env in PolicyValue.environments }
+
+    # Check if default is NOT in the exceptions list (meaning policy applies to default)
+    DefaultEnvName := concat("-", ["Default", input.tenant_id])
+    not DefaultEnvName in ExceptedEnvNames
 }
 
 # Pass if at least one policy is set to all environments
@@ -131,6 +148,7 @@ tests contains {
     "Commandlet": ["Get-DlpPolicy"],
     "ActualValue": {
         "DefaultEnvPolicies": DefaultEnvPolicies,
+        "PoliciesApplyingToDefaultViaExcept": PoliciesApplyingToDefaultViaExcept
     },
     "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
@@ -138,8 +156,12 @@ tests contains {
     ErrorMessage := "No policy found that applies to default environment"
     Count(PoliciesSetToAllEnvironments) == 0
 
+    # Check if default environment has policies applied either directly or via ExceptEnvironments
     # If a default policy is excluded, it will still show up under the "environments" key.
-    Status := Count({e | some e in DefaultEnvPolicies; e.EnvironmentType != "ExceptEnvironments"}) > 0
+    DirectPolicies := Count({e | some e in DefaultEnvPolicies; e.EnvironmentType != "ExceptEnvironments"})
+    ExceptPolicies := Count(PoliciesApplyingToDefaultViaExcept)
+
+    Status := (DirectPolicies + ExceptPolicies) > 0
 }
 #--
 
@@ -155,14 +177,47 @@ AllEnvironments contains {
     some EnvironmentList in input.environment_list
 }
 
-# gets the list of all environments with policies applied to them
-NonDefaultEnvWithPolicies contains {
+# Gets environments explicitly included in policies (OnlyEnvironments/AllEnvironments)
+ExplicitlyIncludedEnvs contains {
     "name": Env.name,
     "environmentType": PolicyValue.environmentType
 } if {
     some Policy in input.dlp_policies
     some PolicyValue in Policy.value
+    PolicyValue.environmentType != "ExceptEnvironments"
     some Env in PolicyValue.environments
+}
+
+# Gets non-default environments covered by ExceptEnvironments policies
+EnvsCoveredViaExcept contains EnvName if {
+    some Policy in input.dlp_policies
+    some PolicyValue in Policy.value
+    PolicyValue.environmentType == "ExceptEnvironments"
+
+    # Get all environment names in the exceptions list
+    ExceptedEnvNames := { Env.name | some Env in PolicyValue.environments }
+
+    # Get all non-default environment names from environment_list
+    AllNonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+
+    # Environments covered are those NOT in the exceptions list
+    CoveredEnvs := AllNonDefaultEnvNames - ExceptedEnvNames
+    some EnvName in CoveredEnvs
+}
+
+# Combined set of all non-default environments with policies
+NonDefaultEnvWithPolicies contains {
+    "name": Env.name,
+    "environmentType": Env.environmentType
+} if {
+    some Env in ExplicitlyIncludedEnvs
+}
+
+NonDefaultEnvWithPolicies contains {
+    "name": EnvName,
+    "environmentType": "ExceptEnvironments"
+} if {
+    some EnvName in EnvsCoveredViaExcept
 }
 
 # Pass if at least one policy is set to all environments
