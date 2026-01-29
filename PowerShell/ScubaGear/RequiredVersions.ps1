@@ -1,6 +1,13 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleList')]
 $ModuleList = @(
     @{
+        ModuleName = 'Microsoft.Graph.Authentication'
+        ModuleVersion = [version] '2.0.0'
+        MaximumVersion = [version] '2.25.0'
+        Purpose = 'Microsoft Graph API authentication'
+        IsPinned = "True"
+    },
+    @{
         ModuleName = 'MicrosoftTeams'
         ModuleVersion = [version] '4.9.3'
         MaximumVersion = [version] '7.5.0'
@@ -41,13 +48,6 @@ $ModuleList = @(
         MaximumVersion = [version] '1.0.45'
         Purpose = 'Power Apps development and management'
         IsPinned = "False"
-    },
-    @{
-        ModuleName = 'Microsoft.Graph.Authentication'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.25.0'
-        Purpose = 'Microsoft Graph API authentication'
-        IsPinned = "True"
     },
     @{
         ModuleName = 'powershell-yaml'
