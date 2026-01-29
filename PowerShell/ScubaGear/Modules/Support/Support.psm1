@@ -214,7 +214,8 @@ function Initialize-SCuBA {
                                 -MinimumVersion $Module.ModuleVersion `
                                 -MaximumVersion $Module.MaximumVersion `
                                 -Force `
-                                -Scope $Scope
+                                -Scope $Scope `
+                                -SkipPublisherCheck
                             $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
                             Write-Information -MessageData "Re-installed ${ModuleName} to version ${MaxInstalledVersion}."
                         }
@@ -230,7 +231,8 @@ function Initialize-SCuBA {
                             -MinimumVersion $Module.ModuleVersion `
                             -MaximumVersion $Module.MaximumVersion `
                             -Force `
-                            -Scope $Scope
+                            -Scope $Scope `
+                            -SkipPublisherCheck
                         $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
                         Write-Information -MessageData "Updated ${ModuleName} to ${MaxInstalledVersion}."
                     }
@@ -245,7 +247,8 @@ function Initialize-SCuBA {
                     -MinimumVersion $Module.ModuleVersion `
                     -MaximumVersion $Module.MaximumVersion `
                     -Force `
-                    -Scope $Scope
+                    -Scope $Scope `
+                    -SkipPublisherCheck
 
                 # After installing, check for the new installed version
                 $NewInstalledModules = Get-Module -ListAvailable -Name $ModuleName
@@ -276,6 +279,7 @@ function Initialize-SCuBA {
                 -AllowClobber `
                 -Scope "$($Scope)" `
                 -MaximumVersion $Module.MaximumVersion
+                -SkipPublisherCheck
                 $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
             Write-Information -MessageData "Installed the latest acceptable version of ${ModuleName}: ${MaxInstalledVersion}."
         }
