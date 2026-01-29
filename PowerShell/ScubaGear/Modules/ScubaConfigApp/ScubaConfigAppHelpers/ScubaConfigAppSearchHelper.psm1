@@ -81,8 +81,8 @@ Function Add-SearchAndFilterCapability {
                     } catch {
                         # Fallback: manually clear the search and apply filter
                         $searchBox = $syncHash."$($currentTabType)Search_TextBox"
-                        $criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
-                        $configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
+                        #$criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
+                        #$configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
 
                         if ($searchBox) {
                             $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
@@ -162,8 +162,8 @@ Function Add-SearchAndFilterCapability {
 
         $clearButton.Add_Click({
             $searchBox = $syncHash."$($tabType)Search_TextBox"
-            $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
-            $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+            #$criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+            #$configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
 
             if ($searchBox) {
                 $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search

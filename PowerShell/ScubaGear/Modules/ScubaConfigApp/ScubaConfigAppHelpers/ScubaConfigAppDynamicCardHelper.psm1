@@ -1050,7 +1050,22 @@ Function New-FieldListCard {
     $removeButton.Cursor = [System.Windows.Input.Cursors]::Hand
     $removeButton.Visibility = "Collapsed"
 
+    # Baseline Policy Viewer button
+    $baselinePolicyButton = New-Object System.Windows.Controls.Button
+    $baselinePolicyButton.Content = "View Baseline Policies"
+    $baselinePolicyButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_BaselinePolicyButton")
+    $baselinePolicyButton.Style = $syncHash.Window.FindResource("PrimaryButton")
+    $baselinePolicyButton.Width = 140
+    $baselinePolicyButton.Height = 28
+    $baselinePolicyButton.Margin = "0,0,10,0"
+    $baselinePolicyButton.Background = [System.Windows.Media.Brushes]::DarkBlue
+    $baselinePolicyButton.Foreground = [System.Windows.Media.Brushes]::White
+    $baselinePolicyButton.BorderThickness = "0"
+    $baselinePolicyButton.FontWeight = "SemiBold"
+    $baselinePolicyButton.Cursor = [System.Windows.Input.Cursors]::Hand
+
     [void]$buttonPanel.Children.Add($saveButton)
+    [void]$buttonPanel.Children.Add($baselinePolicyButton)
     [void]$buttonPanel.Children.Add($removeButton)
     [void]$detailsPanel.Children.Add($buttonPanel)
 
@@ -1249,6 +1264,19 @@ Function New-FieldListCard {
 
     Add-UIControlEventHandler -Control $saveButton
     Add-UIControlEventHandler -Control $removeButton
+    <##>
+    Add-UIControlEventHandler -Control $baselinePolicyButton
+
+    # Create click event for baseline policy viewer button
+    $baselinePolicyButton.Add_Click({
+        try {
+            # Use the main baseline viewer function with navigation parameter via syncHash
+            & $syncHash.ShowBaselinePolicyViewer -NavigateToPolicyId $PolicyId
+        } catch {
+            Write-DebugOutput -Message "Error opening baseline policy viewer: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+            $syncHash.ShowMessageBox.Invoke("Error opening baseline policies: $($_.Exception.Message)", "Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+        }
+    }.GetNewClosure())
 
     # Create click event for save button
     $saveButton.Add_Click({
