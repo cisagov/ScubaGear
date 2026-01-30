@@ -11,7 +11,7 @@ ScubaGear supports two setup approaches:
 - **Automated**: Functions handle all configuration automatically
 - **Manual**: You configure permissions, certificates, and roles yourself
 
-The minimum permissions and roles that must be assigned to the service principal are listed in the table below.
+The table below lists the minimum permissions and roles required for ScubaGear to read configuration data for each supported product.
 
 > [!IMPORTANT]
 > Permissions that have "write" privileges are included in the [Power Platform](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals) and [SharePoint](https://learn.microsoft.com/en-us/graph/permissions-selected-overview?tabs=http#what-permissions-do-i-need-to-manage-permissions) permissions list below. Those permissions are the minimum required by ScubaGear to be able to read admin center configurations for those two services and is a limitation of the underlying APIs of these services.<br> ScubaGear itself **never uses these write privileges** for its assessments.
@@ -36,9 +36,7 @@ The minimum permissions and roles that must be assigned to the service principal
 > Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup>
 
 ## Service Principal Setup
-
-> [!IMPORTANT]
-> ScubaGear offers both automated and manual service principal setup. We strongly recommend the automated approach for most users.
+ScubaGear offers both automated and manual service principal setup.
 
 ### 1. Automated Setup (Recommended)
 > [!NOTE]
@@ -86,8 +84,7 @@ Save these values for running ScubaGear:
 - **Application (client) ID**
 - **Certificate thumbprint**
 
-> [!NOTE]
-> Continue to the [Power Platform Registration](#power-platform-registration) section below if you're assessing Power Platform.
+Continue to the [Power Platform Registration](#power-platform-registration) section below if you're assessing Power Platform.
 
 ## Power Platform Registration
 
@@ -95,7 +92,7 @@ Save these values for running ScubaGear:
 > This section applies to **manual setup methods**. Power Platform requires an additional one-time registration step regardless of how you created your service principal.<br>
 > If you used the automated setup, you can skip to the verification step at the end of this section [Verify Registration](#step-3-verify-registration).
 
-Power Platform requires the service principal to be manually registered via interactive authentication before ScubaGear can assess it. This is a [limitation of Power Platform service principals](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals).
+The Service Principal must be registered with Power Platform using interactive authentication **before** running ScubaGear. This is a [limitation of Power Platform service principals](https://learn.microsoft.com/en-us/power-platform/admin/powershell-create-service-principal#limitations-of-service-principals).
 
 ### Registration Steps
 
@@ -127,8 +124,8 @@ New-PowerAppManagementApp -ApplicationId "your-app-id"
 After registration, verify Power Platform permissions:
 
 ```powershell
-# If using automated setup:
-Get-ScubaGearAppPermission -AppID "your-app-id" -M365Environment "commercial" -ProductNames 'powerplatform'
+# Should return your AppID under 'applicationId'
+Get-PowerAppManagementApp -ApplicationId "your-app-id"
 ```
 
 ## Additional GCC High details

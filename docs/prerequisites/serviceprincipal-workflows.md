@@ -2,17 +2,6 @@
 
 This guide provides step-by-step workflows for common Service Principal management tasks in ScubaGear.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Scope and Intended Use](#scope-and-intended-use)
-- [Prerequisites](#prerequisites)
-- [Initial Setup Workflow](#initial-setup-workflow)
-- [Audit Existing Service Principal](#audit-existing-service-principal)
-- [Fix Permission Issues](#fix-permission-issues)
-- [Certificate Rotation Workflow](#certificate-rotation-workflow)
-- [Adjust Product Permissions](#adjust-product-permissions)
-
 ## Overview
 
 The benefits of using the ScubaGear Service Principal module include:
@@ -20,15 +9,17 @@ The benefits of using the ScubaGear Service Principal module include:
 - Built-in validation and auditing
 - Reduced risk of misconfiguration
 
-**Service Principal Setup:**
-- [`New-ScubaGearServicePrincipal`](#new-scubagearserviceprincipal) - Creates a new service principal with all required permissions based on products being assessed
-- [`Get-ScubaGearAppPermission`](#get-scubagearapppermission) - Audits an existing service principal's permissions
-- [`Set-ScubaGearAppPermission`](#set-scubagearapppermission) - Fixes missing or incorrect permissions
+### Setup
+- `New-ScubaGearServicePrincipal` - Creates a new service principal with all required permissions based on products being assessed
 
-**Certificate Management:**
-- [`Get-ScubaGearAppCert`](#get-scubagearcert) - Lists certificates for a service principal
-- [`New-ScubaGearAppCert`](#new-scubagearcert) - Adds a new certificate to a service principal
-- [`Remove-ScubaGearAppCert`](#remove-scubagearcert) - Removes a certificate from a service principal
+### Permission Management
+- `Get-ScubaGearAppPermission` - Audits an existing service principal's permissions
+- `Set-ScubaGearAppPermission` - Fixes missing or incorrect permissions
+
+### Certificate Management
+- `Get-ScubaGearAppCert` - Lists certificates for a service principal
+- `New-ScubaGearAppCert` - Adds a new certificate to a service principal
+- `Remove-ScubaGearAppCert` - Removes a certificate from a service principal
 
 ## Scope and Intended Use
 
