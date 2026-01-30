@@ -301,10 +301,10 @@ function Initialize-SCuBA {
     if ($ModuleWarnings -and $ModuleWarnings.Count -gt 0) {
         Write-Information "" -InformationAction Continue
 
-        # Build the entire error message as an array
+        # Build the entire warning message as an array
         $ErrorOutput = @()
         $ErrorOutput += ""
-        $ErrorOutput += "ERROR:"
+        $ErrorOutput += "Warning:"
 
         # Collect all error messages
         foreach ($Warning in $ModuleWarnings) {
