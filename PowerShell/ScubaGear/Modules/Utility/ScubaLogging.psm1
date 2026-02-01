@@ -125,7 +125,7 @@ function Initialize-ScubaLogging {
 
     }
     catch {
-        Write-Error "Failed to initialize ScubaGear logging: $_"
+        Write-Warning "Failed to initialize ScubaGear logging: $_"
         $Script:ScubaLogEnabled = $false
     }
 }
