@@ -418,7 +418,16 @@ InModuleScope ScubaLogging {
             
             BeforeEach {
                 # Make sure we start clean for integration tests
-                Stop-ScubaLogging
+                if ($Script:ScubaLogEnabled) {
+                    Stop-ScubaLogging
+                }
+                
+                # Clean up any existing log files in the test directory
+                if (Test-Path $script:TestLogPath) {
+                    Get-ChildItem $script:TestLogPath -Filter "*.log" | Remove-Item -Force -ErrorAction SilentlyContinue
+                }
+                
+                # Reset all module variables to ensure clean state
                 $Script:ScubaLogPath = $null
                 $Script:ScubaLogEnabled = $false
                 $Script:ScubaDeepTracing = $false
@@ -434,6 +443,10 @@ InModuleScope ScubaLogging {
                 $Script:ScubaLogLevel | Should -Be "Debug"
                 $Script:ScubaDeepTracing | Should -Be $true
                 
+                # Store the current log file path for verification
+                $currentLogFile = $Script:ScubaLogPath
+                $currentLogFile | Should -Not -BeNullOrEmpty
+                
                 # Perform various logging operations
                 Write-ScubaLog -Message "Test workflow starting" -Level "Warning"
                 
@@ -448,10 +461,9 @@ InModuleScope ScubaLogging {
                 Stop-ScubaLogging
                 
                 # Verify log file exists and contains expected content
-                $logFiles = Get-ChildItem $script:TestLogPath -Filter "*.log"
-                $logFiles.Count | Should -BeGreaterThan 0
+                Test-Path $currentLogFile | Should -Be $true
                 
-                $logContent = Get-Content $logFiles[0].FullName -Raw
+                $logContent = Get-Content $currentLogFile -Raw
                 $logContent | Should -Match "Test workflow starting"
                 $logContent | Should -Match "ENTER: TestWorkflow"
                 $logContent | Should -Match "Inside function"
