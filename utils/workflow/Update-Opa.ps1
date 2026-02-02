@@ -125,8 +125,7 @@ function Update-OpaVersion {
     $NewDefault = $LatestOpaVersion
 
     # Move the previous default to the end of compatibleOpaVersions
-    $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | ForEach-Object { $_ }
-    $Versions = $Versions | Where-Object { $_ -ne $PreviousDefault }
+    $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | Where-Object { $_ -ne $PreviousDefault }
     $Versions += $PreviousDefault
 
     # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
