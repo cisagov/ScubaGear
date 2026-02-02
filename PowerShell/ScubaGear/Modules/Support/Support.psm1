@@ -92,7 +92,7 @@ function Initialize-SCuBA {
         [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
-        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
+        $ExpectedVersion = [ScubaConfig]::GetOpaVersion(),
         [Parameter(Mandatory = $false)]
         [ValidateSet('Windows','MacOS','Linux')]
         [Alias('os')]
@@ -256,7 +256,7 @@ function Install-OPAforSCuBA {
         [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
-        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
+        $ExpectedVersion = [ScubaConfig]::GetOpaVersion(),
         [Parameter(Mandatory = $false)]
         [Alias('name')]
         [string]
@@ -273,11 +273,13 @@ function Install-OPAforSCuBA {
     )
 
     # Constants
-    $ACCEPTABLEVERSIONS = '0.69.0', '0.70.0', '1.0.1', '1.1.0', '1.2.0',
-    '1.3.0', '1.4.2', '1.5.0', '1.6.0',
-    '1.7.1', '1.8.0', '1.9.0', '1.10.1',
-    '1.11.0', '1.11.1', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
-    $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
+    $ACCEPTABLEVERSIONS = @([ScubaConfig]::GetCompatibleOpaVersions()) + @([ScubaConfig]::GetOpaVersion())
+    $ACCEPTABLEVERSIONS = $ACCEPTABLEVERSIONS | Sort-Object -Unique
+    $FILENAME = @{
+        Windows = [ScubaConfig]::GetOpaExecutable("Windows");
+        MacOS   = [ScubaConfig]::GetOpaExecutable("MacOS");
+        Linux   = [ScubaConfig]::GetOpaExecutable("Linux")
+    }
 
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
@@ -294,8 +296,8 @@ function Install-OPAforSCuBA {
         Write-Information "" | Out-Host
     }
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
-        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
-        throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
+        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n"
+        throw "Version parameter entered, $ExpectedVersion, is not in the list of acceptable versions. Acceptable versions are:`r`n$AcceptableVersionsString"
     }
     $Filename = $FILENAME.$OperatingSystem
     if($OPAExe -eq "") {
