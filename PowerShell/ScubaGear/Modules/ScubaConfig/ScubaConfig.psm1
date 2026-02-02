@@ -115,6 +115,36 @@ class ScubaConfig {
         return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
     }
 
+    static [array]GetCompatibleOpaVersions() {
+        [ScubaConfig]::InitializeValidator()
+        
+        return [ScubaConfig]::_ConfigDefaults.metadata.compatibleOpaVersions
+    }
+
+    static [string] GetOpaExecutable([string]$OperatingSystem) {
+        [ScubaConfig]::InitializeValidator()
+
+        if ([string]::IsNullOrWhiteSpace($OperatingSystem)) {
+            throw "OperatingSystem parameter cannot be null or whitespace."
+        }
+
+        $OPAExecutables = [ScubaConfig]::_ConfigDefaults.defaults.OPAExecutable
+
+        if ($null -eq $OPAExecutables) {
+            throw "OPAExecutable default configuration does not exist."
+        }
+
+        $validKeys = @($OPAExecutables.PSObject.Properties.Name)
+        $requestedKey = $OperatingSystem.Trim().ToLower()
+        $matchedKey = $validKeys | Where-Object { $_.ToLower() -eq $requestedKey } | Select-Object -First 1
+
+        if (-not $matchedKey) {
+            throw "No OPA executable found for operating system: $OperatingSystem"
+        }
+
+        return $OPAExecutables.$matchedKey
+    }
+
     # Loads configuration file with full validation enabled (delegates to main LoadConfig with SkipValidation=false).
     [Boolean]LoadConfig([System.IO.FileInfo]$Path){
         return $this.LoadConfig($Path, $false)

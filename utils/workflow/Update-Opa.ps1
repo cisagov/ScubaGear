@@ -102,62 +102,42 @@ function Update-OpaVersion {
         $LatestOpaVersion
     )
 
-    Write-Warning "Updating the version of OPA in ScubaConfig.psm1..."
+    Write-Warning "Updating OPA versions and compatible OPA versions in ScubaConfigDefaults.json..."
 
-    # Replace default version in Config module
-    $ScubaConfigPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1'
-    $OPAVerRegex = "\'\d+\.\d+\.\d+\'"
-    $DefaultVersionPattern = "DefaultOPAVersion = $OPAVerRegex"
-    $ScubaConfigModule = Get-Content $ScubaConfigPath -Raw
-    if ($ScubaConfigModule -match $DefaultVersionPattern) {
-        $Content = $ScubaConfigModule -replace $DefaultVersionPattern, "DefaultOPAVersion = '$LatestOPAVersion'"
-        Set-Content -Path $ScubaConfigPath -Value $Content -NoNewline
-    }
-    else {
-        throw "Fatal Error: Couldn't find the default OPA version in the ScubaConfig."
+    $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json'
+
+    if (-not (Test-Path -PathType Leaf -Path $ScubaConfigDefaultsPath)) {
+        throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
     }
 
-    Write-Warning "Updating the version of OPA in Support.psm1..."
+    $Raw = Get-Content -Path $ScubaConfigDefaultsPath -Raw
+    $ConfigDefaults = $Raw | ConvertFrom-Json
 
-    # Update Acceptable Versions in Support Module
-    # The update is roll the default to the latest version, then put the
-    # previous default right before the var in the ACCEPTABLEVERSIONS string
-    $SupportModulePath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/Support/Support.psm1'
-    $MAXIMUM_VER_PER_LINE = 4 # Handle long lines of acceptable versions
-    $END_VERSIONS_COMMENT = "# End Versions" # EOL comment in the PowerShell file
-    $EndAcceptableVerRegex = ".*$END_VERSIONS_COMMENT"
-    $DefaultOPAVersionVar = "[ScubaConfig]::ScubaDefault('DefaultOPAVersion')"
+    if ($null -eq $ConfigDefaults.defaults.OPAVersion) {
+        throw "Fatal Error: Couldn't find defaults.OPAVersion in ScubaConfigDefaults.json"
+    }
 
-    (Get-Content -Path $SupportModulePath) | ForEach-Object {
-        $EndAcceptableVarMatch = $_ -match $EndAcceptableVerRegex
-        if ($EndAcceptableVarMatch) {
-            $VersionsLength = ($_ -split ",").length
-            # Split the line if we reach our version limit per line
-            # in the the file. This is to prevent long lines.
-            if ($VersionsLength -gt $MAXIMUM_VER_PER_LINE) {
-                # Splitting lines; current and latest OPA Version will start on the next line
-                $VersionsArr = $_ -split ","
-                # Create a new line, then add the new version on the next line
-                ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",") + ","
-                "    '$CurrentOpaVersion', $DefaultOPAVersionVar $END_VERSIONS_COMMENT" # 4 space indentation
-            }
-            elseif ($VersionsLength -eq 1) {
-                # if the default version is the only acceptable version
-                # Make `VariableName = CurrentVersion, DefaultOPAVer #EndVersionComment `
-                $VersionsArr = $_ -split "="
-                VersionsArr[0] + "= '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-            }
-            else {
-                # No splitting lines; appending new current OPA version to acceptable version
-                $VersionsArr = $_ -split ","
-                $NewVersions = ($VersionsArr[0..($VersionsArr.Length - 2)] -join ",")
-                $NewVersions + ", '$CurrentOpaVersion'" + ", $DefaultOPAVersionVar $END_VERSIONS_COMMENT"
-            }
-        }
-        else {
-            $_
-        }
-    } | Set-Content $SupportModulePath
+    if ($null -eq $ConfigDefaults.metadata.compatibleOpaVersions) {
+        throw "Fatal Error: Couldn't find metadata.compatibleOpaVersions in ScubaConfigDefaults.json"
+    }
+
+    $PreviousDefault = $CurrentOpaVersion
+    $NewDefault = $LatestOpaVersion
+
+    # Move the previous default to the end of compatibleOpaVersions
+    $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | Where-Object { $_ -ne $PreviousDefault }
+    $Versions += $PreviousDefault
+
+    # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
+    $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
+
+    $Raw = $Raw -replace '"compatibleOpaVersions"\s*:\s*\[[^\]]*\]', ('"compatibleOpaVersions": ' + $CompatibleOpaVersions)
+    $Raw = $Raw -replace '"OPAVersion"\s*:\s*"[^"]*"', ('"OPAVersion": "' + $NewDefault + '"')
+
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($ScubaConfigDefaultsPath, $Raw, $utf8NoBom)
+    Write-Warning "Set defaults.OPAVersion to $NewDefault."
+    Write-Warning "Added previous default ($PreviousDefault) to metadata.compatibleOpaVersions."
 }
 
 function Invoke-UnitTestsWithNewOPAVersion {
