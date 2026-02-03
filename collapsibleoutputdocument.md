@@ -1,6 +1,6 @@
 ![ScubaGear Logo](docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
 
-## Background
+## Object Schema for ScubaGear Output JSON
 
 This document is intended to be an autoritative source of the object schema JSON from ScubaGear
 
