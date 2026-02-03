@@ -1,8 +1,8 @@
 ![ScubaGear Logo](docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
 
-##Background
+## Background
 
-This document is provided to inform a user about how to interpert certain items in the output JSON from ScubaGear
+This document is intended to be an autoritative source of the object schema JSON from ScubaGear
 
 <details>
   <summary>Overview</summary>

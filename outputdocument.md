@@ -1,3 +1,9 @@
+![ScubaGear Logo](docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
+
+## Background
+
+This document is intended to be an autoritative source of the object schema JSON from ScubaGear
+
 ## Overview
 | Field Name | Type | ScubaGear | ScubaGoggles | Description | Location on HTML report | Example |
 | --- | --- | --- | --- | --- | --- | --- |
