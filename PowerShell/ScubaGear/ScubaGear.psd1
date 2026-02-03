@@ -63,8 +63,7 @@ PowerShellVersion = '5.1'
 ScriptsToProcess = @(
     './RaiseFunctionCap.ps1',
     './Dependencies.ps1',
-    './CheckVersion.ps1',
-    './Get-VersionIssues.ps1'
+    './CheckVersion.ps1'
 )
 
 # Type files (.ps1xml) to be loaded when importing this module
@@ -93,7 +92,14 @@ FunctionsToExport = @(
     'Get-ScubaGearEntraMinimumPermissions',
     'Test-ScubaGearVersion',
     'Update-ScubaGear',
-    'Reset-ScubaGearDependencies'
+    'Reset-ScubaGearDependencies',
+    'New-ScubaGearServicePrincipal',
+    'Get-ScubaGearAppPermission',
+    'Get-ScubaGearAppCert',
+    'Remove-ScubaGearAppCert',
+    'New-ScubaGearAppCert',
+    'Set-ScubaGearAppPermission',
+    'Get-ServicePrincipalPermissions'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.

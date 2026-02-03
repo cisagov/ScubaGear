@@ -92,7 +92,7 @@ function Initialize-SCuBA {
         [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
-        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
+        $ExpectedVersion = [ScubaConfig]::GetOpaVersion(),
         [Parameter(Mandatory = $false)]
         [ValidateSet('Windows','MacOS','Linux')]
         [Alias('os')]
@@ -175,31 +175,99 @@ function Initialize-SCuBA {
     foreach ($Module in $ModuleList) {
         $ModuleName = $Module.ModuleName
         if (Get-Module -ListAvailable -Name $ModuleName) {
-            $HighestInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-            $LatestVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
-            if ($HighestInstalledVersion -ge $LatestVersion) {
-                Write-Debug "${ModuleName}: ${HighestInstalledVersion} already has latest installed."
-                if ($Force -eq $true) {
-                    Install-Module -Name $ModuleName `
-                        -Force `
-                        -AllowClobber `
-                        -Scope "$($Scope)" `
-                        -MaximumVersion $Module.MaximumVersion
-                    Write-Information -MessageData "Re-installing module to latest acceptable version: ${ModuleName}."
+            $InstalledModules = Get-Module -ListAvailable -Name $ModuleName
+            $HighestInstalledVersion = ($InstalledModules | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+            $LatestAcceptableVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
+
+            # Check if ANY installed version is in the acceptable range
+            $AcceptableVersionInstalled = $InstalledModules | Where-Object {
+                $_.Version -ge $Module.ModuleVersion -and $_.Version -le $Module.MaximumVersion
+            }
+
+            if ($AcceptableVersionInstalled) {
+                # Check if we already have the latest acceptable version
+                $BestInstalledVersion = ($AcceptableVersionInstalled | Sort-Object Version -Descending | Select-Object -First 1).Version
+
+                if ($BestInstalledVersion -ge $LatestAcceptableVersion) {
+                    # Check for versions above maximum FIRST, then adjust the debug message
+                    $VersionsAboveMax = $InstalledModules | Where-Object { $_.Version -gt $Module.MaximumVersion }
+
+                    if ($VersionsAboveMax) {
+                        $HighestVersion = ($VersionsAboveMax | Sort-Object Version -Descending | Select-Object -First 1).Version
+                        $MaxVersion = $Module.MaximumVersion
+
+                        # Modified debug message that acknowledges both versions if present
+                        Write-Debug "${ModuleName}: ${BestInstalledVersion} (acceptable) is installed, but ${HighestVersion} (above maximum) will be loaded by default."
+
+                        if (-not $ModuleWarnings) {
+                            $ModuleWarnings = @()
+                        }
+                        $ModuleWarnings += "${ModuleName}: Version ${HighestVersion} is installed but exceeds maximum (${MaxVersion}). PowerShell will load ${HighestVersion} by default, which may cause compatibility issues. Run 'Reset-ScubaGearDependencies' to clean up."
+                    }
+                    else {
+                        # No problematic versions - use the original message
+                        Write-Debug "${ModuleName}: ${BestInstalledVersion} already has latest acceptable version installed."
+
+                        if ($Force) {
+                            Write-Information -MessageData "Force reinstalling ${ModuleName}."
+                            Install-Module -Name $ModuleName `
+                                -MinimumVersion $Module.ModuleVersion `
+                                -MaximumVersion $Module.MaximumVersion `
+                                -Force `
+                                -Scope $Scope
+                            $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                            Write-Information -MessageData "Re-installed ${ModuleName} to version ${MaxInstalledVersion}."
+                        }
+                    }
+                }
+                else {
+                    if ($SkipUpdate) {
+                        Write-Debug "Skipping update for ${ModuleName}: ${BestInstalledVersion} to newer version ${LatestAcceptableVersion}."
+                    }
+                    else {
+                        Write-Information -MessageData "Updating ${ModuleName} from ${BestInstalledVersion} to ${LatestAcceptableVersion}."
+                        Install-Module -Name $ModuleName `
+                            -MinimumVersion $Module.ModuleVersion `
+                            -MaximumVersion $Module.MaximumVersion `
+                            -Force `
+                            -Scope $Scope
+                        $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
+                        Write-Information -MessageData "Updated ${ModuleName} to ${MaxInstalledVersion}."
+                    }
                 }
             }
             else {
-                if ($SkipUpdate -eq $true) {
-                    Write-Debug "Skipping update for ${ModuleName}: ${HighestInstalledVersion} to newer version ${LatestVersion}."
-                }
-                else {
-                    Install-Module -Name $ModuleName `
-                        -Force `
-                        -AllowClobber `
-                        -Scope "$($Scope)" `
-                        -MaximumVersion $Module.MaximumVersion
-                    $MaxInstalledVersion = (Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object Version -First 1).Version
-                    Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} updated to version ${MaxInstalledVersion}."
+                # No acceptable version installed - need to install
+                $MinVersion = $Module.ModuleVersion
+                $MaxVersion = $Module.MaximumVersion
+                Write-Information -MessageData "${ModuleName}: ${HighestInstalledVersion} is outside acceptable range (${MinVersion} - ${MaxVersion}). Installing acceptable version."
+                Install-Module -Name $ModuleName `
+                    -MinimumVersion $Module.ModuleVersion `
+                    -MaximumVersion $Module.MaximumVersion `
+                    -Force `
+                    -Scope $Scope
+
+                # After installing, check for the new installed version
+                $NewInstalledModules = Get-Module -ListAvailable -Name $ModuleName
+                $InstalledVersion = ($NewInstalledModules | Where-Object {
+                    $_.Version -ge $Module.ModuleVersion -and $_.Version -le $Module.MaximumVersion
+                } | Sort-Object Version -Descending | Select-Object -First 1).Version
+                Write-Information -MessageData "Installed ${ModuleName} ${InstalledVersion}."
+
+                # Check if versions above maximum still exist
+                $VersionsAboveMax = $NewInstalledModules | Where-Object { $_.Version -gt $Module.MaximumVersion }
+
+                if ($VersionsAboveMax) {
+                    $HighestVersion = ($VersionsAboveMax | Sort-Object Version -Descending | Select-Object -First 1).Version
+                    $MaxVersion = $Module.MaximumVersion
+
+                    # Debug message acknowledging both versions
+                    Write-Debug "${ModuleName}: ${InstalledVersion} (acceptable) is installed, but ${HighestVersion} (above maximum) will be loaded by default."
+
+                    if (-not $ModuleWarnings) {
+                        $ModuleWarnings = @()
+                    }
+                    $ModuleWarnings += "${ModuleName}: Version ${HighestVersion} is installed but exceeds maximum (${MaxVersion}). PowerShell will load ${HighestVersion} by default, which may cause compatibility issues. Run 'Reset-ScubaGearDependencies' to clean up."
                 }
             }
         }
@@ -229,6 +297,45 @@ function Initialize-SCuBA {
     $Stopwatch.stop()
     Write-Output "ScubaGear setup time elapsed (in seconds): $([math]::Round($stopwatch.Elapsed.TotalSeconds,0))"
 
+    # Display all warnings at the end
+    if ($ModuleWarnings -and $ModuleWarnings.Count -gt 0) {
+        Write-Information "" -InformationAction Continue
+
+        # Build the entire warning message as an array
+        $ErrorOutput = @()
+        $ErrorOutput += ""
+        $ErrorOutput += "Warning:"
+
+        # Collect all error messages
+        foreach ($Warning in $ModuleWarnings) {
+            # Split on " Run " to separate the error message from the recommended action
+            $splitIndex = $Warning.LastIndexOf(" Run ")
+
+            if ($splitIndex -gt 0) {
+                $ErrorMessage = $Warning.Substring(0, $splitIndex)
+                $ErrorOutput += $ErrorMessage
+            }
+            else {
+                # Fallback if " Run " not found
+                $ErrorOutput += $Warning
+            }
+        }
+
+        # Add single RECOMMENDED ACTION section
+        $ErrorOutput += ""
+        $ErrorOutput += "--- RECOMMENDED ACTION ---"
+        $ErrorOutput += "Run 'Reset-ScubaGearDependencies' to clean up."
+        $ErrorOutput += ""
+        $ErrorOutput += "Additional Information:"
+        $ErrorOutput += "  - This issue occurs when a module version exceeds the maximum tested version."
+        $ErrorOutput += "  - PowerShell loads the highest version by default, which may cause compatibility issues."
+        $ErrorOutput += "  - Follow the recommended action to remove problematic versions."
+        $ErrorOutput += ""
+
+        # Output the entire message at once
+        $Host.UI.WriteErrorLine($($ErrorOutput -join "`n"))
+    }
+
     $InformationPreference = $PreferenceStack.Pop()
     $DebugPreference = $PreferenceStack.Pop()
 }
@@ -256,7 +363,7 @@ function Install-OPAforSCuBA {
         [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
-        $ExpectedVersion = [ScubaConfig]::ScubaDefault('DefaultOPAVersion'),
+        $ExpectedVersion = [ScubaConfig]::GetOpaVersion(),
         [Parameter(Mandatory = $false)]
         [Alias('name')]
         [string]
@@ -273,11 +380,13 @@ function Install-OPAforSCuBA {
     )
 
     # Constants
-    $ACCEPTABLEVERSIONS = '0.69.0', '0.70.0', '1.0.1', '1.1.0', '1.2.0',
-    '1.3.0', '1.4.2', '1.5.0', '1.6.0',
-    '1.7.1', '1.8.0', '1.9.0', '1.10.1',
-    '1.11.0', [ScubaConfig]::ScubaDefault('DefaultOPAVersion') # End Versions
-    $FILENAME = @{ Windows = "opa_windows_amd64.exe"; MacOS = "opa_darwin_amd64"; Linux = "opa_linux_amd64_static"}
+    $ACCEPTABLEVERSIONS = @([ScubaConfig]::GetCompatibleOpaVersions()) + @([ScubaConfig]::GetOpaVersion())
+    $ACCEPTABLEVERSIONS = $ACCEPTABLEVERSIONS | Sort-Object -Unique
+    $FILENAME = @{
+        Windows = [ScubaConfig]::GetOpaExecutable("Windows");
+        MacOS   = [ScubaConfig]::GetOpaExecutable("MacOS");
+        Linux   = [ScubaConfig]::GetOpaExecutable("Linux")
+    }
 
     # Set preferences for writing messages
     $PreferenceStack = New-Object -TypeName System.Collections.Stack
@@ -294,8 +403,8 @@ function Install-OPAforSCuBA {
         Write-Information "" | Out-Host
     }
     if(-not $ACCEPTABLEVERSIONS.Contains($ExpectedVersion)) {
-        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n" | Out-String
-        throw "Version parameter entered, ${ExpectedVersion}, is not in the list of acceptable versions. Acceptable versions are:`r`n${AcceptableVersionsString}"
+        $AcceptableVersionsString = $ACCEPTABLEVERSIONS -join "`r`n"
+        throw "Version parameter entered, $ExpectedVersion, is not in the list of acceptable versions. Acceptable versions are:`r`n$AcceptableVersionsString"
     }
     $Filename = $FILENAME.$OperatingSystem
     if($OPAExe -eq "") {
@@ -991,6 +1100,9 @@ function Test-ScubaGearVersion {
     .PARAMETER CheckGitHub
         Also check GitHub releases for the latest version.
 
+    .PARAMETER Quiet
+        Suppress detailed Write-Information output. Only return objects.
+
     .OUTPUTS
         PSCustomObject
 
@@ -1004,7 +1116,10 @@ function Test-ScubaGearVersion {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [switch]$CheckGitHub
+        [switch]$CheckGitHub,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Quiet
     )
 
     try {
@@ -1106,21 +1221,89 @@ function Test-ScubaGearVersion {
         $results += $dependencyComponent
         Write-Output $results
 
-        # Display formatted information for modules with multiple versions
-        if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
-            Write-Information "`nModules with Multiple Versions:" -InformationAction Continue
-            Write-Information "================================" -InformationAction Continue
+        if (-not $Quiet){
+            # Display formatted information for modules with multiple versions
+            if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
+                # Separate modules into critical (version outside range) vs cleanup (all versions OK)
+                $criticalModules = @()
+                $cleanupModules = @()
 
-            foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
-                Write-Information "`nModule: $($moduleInfo.ModuleName)" -InformationAction Continue
-                Write-Information "Version Count: $($moduleInfo.VersionCount)" -InformationAction Continue
-                Write-Information "File Locations:" -InformationAction Continue
+                foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
+                    # Parse versions from location strings
+                    $versions = @()
+                    $hasCriticalIssue = $false
 
-                foreach ($location in $moduleInfo.Locations) {
-                    Write-Information "  $location" -InformationAction Continue
+                    foreach ($location in $moduleInfo.Locations) {
+                        # Extract version and status from format: "2.34.0 [STATUS] (Scope): Path"
+                        if ($location -match '^([\d\.]+)\s+\[([^\]]+)\]') {
+                            $version = $matches[1]
+                            $status = $matches[2]
+
+                            $versions += [PSCustomObject]@{
+                                Version = $version
+                                Status = $status
+                            }
+
+                            if ($status -like "ABOVE MAX*" -or $status -like "BELOW MIN*") {
+                                $hasCriticalIssue = $true
+                            }
+                        }
+                    }
+
+                    # Sort versions descending (highest first)
+                    $versions = $versions | Sort-Object { [version]$_.Version } -Descending
+
+                    $moduleEntry = [PSCustomObject]@{
+                        ModuleName = $moduleInfo.ModuleName
+                        Versions = $versions
+                        HighestVersion = $versions[0]
+                    }
+
+                    if ($hasCriticalIssue) {
+                        $criticalModules += $moduleEntry
+                    } else {
+                        $cleanupModules += $moduleEntry
+                    }
                 }
+
+                # Details section
+                Write-Information "Details:" -InformationAction Continue
+
+                # Display critical issues first
+                foreach ($module in $criticalModules) {
+                    $highestVersion = $module.HighestVersion
+                    $statusTag = ""
+
+                    if ($highestVersion.Status -like "ABOVE MAX*") {
+                        # Extract max version from status like "ABOVE MAX: 2.25.0"
+                        if ($highestVersion.Status -match 'ABOVE MAX:\s*([\d\.]+)') {
+                            $maxVer = $matches[1]
+                            $statusTag = "[ABOVE MAX: $maxVer]"
+                        } else {
+                            $statusTag = "[ABOVE MAX]"
+                        }
+                    } elseif ($highestVersion.Status -like "BELOW MIN*") {
+                        if ($highestVersion.Status -match 'BELOW MIN:\s*([\d\.]+)') {
+                            $minVer = $matches[1]
+                            $statusTag = "[BELOW MIN: $minVer]"
+                        } else {
+                            $statusTag = "[BELOW MIN]"
+                        }
+                    }
+
+                    Write-Information "  CRITICAL: $($module.ModuleName) - will load $($highestVersion.Version) $statusTag" -InformationAction Continue
+                }
+
+                # Display cleanup recommendations
+                foreach ($module in $cleanupModules) {
+                    $versionCount = $module.Versions.Count
+                    Write-Information "  CLEANUP: $($module.ModuleName) - will load $($module.HighestVersion.Version) ($versionCount versions installed)" -InformationAction Continue
+                }
+
+                Write-Information "" -InformationAction Continue
+                Write-Information "Run 'Reset-ScubaGearDependencies' to fix." -InformationAction Continue
+                Write-Information "" -InformationAction Continue
             }
-            Write-Information "" -InformationAction Continue
         }
 
     }
@@ -1421,6 +1604,7 @@ function Update-ScubaGear {
     }
 }
 
+
 function Reset-ScubaGearDependencies {
     <#
     .SYNOPSIS
@@ -1612,10 +1796,22 @@ function Reset-ScubaGearDependencies {
                     if ($null -ne $module.VersionsToRemove) {
                         foreach ($version in $module.VersionsToRemove) {
                             try {
-                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction SilentlyContinue
+                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
                             }
-                            catch {
-                                $result.Warnings += "Could not remove $($module.Name) v$version (may require admin)"
+                            catch{
+                                # Remove the module from file path if uninstall fails
+                                try {
+                                    $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
+                                    if ($modulePath) {
+                                        Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
+                                    }
+                                    else {
+                                        $result.Warnings += "Could not locate module path for $($module.Name) v$version"
+                                    }
+                                }
+                                catch {
+                                    $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
+                                }
                             }
                         }
                     }
@@ -1644,12 +1840,27 @@ function Reset-ScubaGearDependencies {
 
                 foreach ($version in $module.VersionsToRemove) {
                     try {
-                        Uninstall-Module -Name $module.Name -RequiredVersion $version -Force
+                        Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
+                        # Only add to cleanedVersions if we get here (uninstall succeeded)
                         $cleanedVersions += "v$version"
                     }
-                    catch {
-                        $failedVersions += "v$version"
-                        $result.Warnings += "Could not remove $($module.Name) v$version (may require admin or module in use)"
+                    catch{
+                        # Remove the module from file path if uninstall fails
+                        try {
+                            $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
+                            if (Test-Path $modulePath) {
+                                Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
+                                $cleanedVersions += "v$version"
+                            }
+                            else {
+                                $result.Warnings += "Could not locate module path for $($module.Name) v$version"
+                                $failedVersions += "v$version"
+                            }
+                        }
+                        catch {
+                            $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
+                            $failedVersions += "v$version"
+                        }
                     }
                 }
 
