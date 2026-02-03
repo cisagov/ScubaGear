@@ -1,4 +1,4 @@
-![ScubaGear Logo](docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
+![ScubaGear Logo](./ScubaGear/docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
 
 ## Object Schema for ScubaGear Output JSON
 
