@@ -27,12 +27,12 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 |                         | User.Read.All                                   |               |                                       |                                       |
 | Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
-| Power Platform          | **Registration required** <sup>2</sup>                                     |               |                                       |                                       |
+| Power Platform          | Registration required <sup>2</sup>                                     |               |                                       |                                       |
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
 
 > [!NOTE]
-> Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-configuration).<sup>1</sup><br>
+> Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details).<sup>1</sup><br>
 > Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup>
 
 ## Service Principal Setup
