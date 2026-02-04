@@ -7,10 +7,6 @@ Running ScubaGear in a non-interactive (automated) fashion requires an applicati
 
 ## Overview
 
-ScubaGear supports two setup approaches:
-- **Automated**: Functions handle all configuration automatically
-- **Manual**: You configure permissions, certificates, and roles yourself
-
 The table below lists the minimum permissions and roles required for ScubaGear to read configuration data for each supported product.
 
 > [!IMPORTANT]
@@ -36,11 +32,14 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 > Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup>
 
 ## Service Principal Setup
-ScubaGear offers both automated and manual service principal setup.
+
+ScubaGear supports two setup approaches:
+- **Automated**: Custom PowerShell functions handle all configuration automatically
+- **Manual**: You configure permissions, certificates, and roles yourself
 
 ### 1. Automated Setup (Recommended)
 > [!NOTE]
-> The automated functions were **created exclusively for ScubaGear**. They configure service principals with the exact permissions and roles needed for ScubaGear assessments.
+> The custom PowerShell functions were **created exclusively for ScubaGear**. They configure service principals with the exact permissions and roles needed for ScubaGear assessments.
 
 **Get started with automated setup:**
 - [Service Principal Workflows](serviceprincipal-workflows.md/#initial-setup-workflow) - Step-by-step guide

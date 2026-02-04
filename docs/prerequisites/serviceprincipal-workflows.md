@@ -39,6 +39,10 @@ Before using the Service Principal module, ensure you have:
 1. **ScubaGear module** installed (see [Installation Guide](../installation/github.md))
 2. **Permissions Required** (Entra ID roles and Microsoft Graph API delegated permissions)
 
+    > [!NOTE]
+    > - **Entra ID roles**: You need only ONE of the listed roles. The **bold** role is the least privileged option.
+    > - **Graph API scopes**: Functions automatically request these permissions when you run them. You must consent when prompted.
+
    | Function | Entra ID Role (any one of)  | Microsoft Graph API Scopes |
    |----------|-------------------------------|---------------------------|
    | `New-ScubaGearServicePrincipal` | **Application Administrator**<br><sup>Global Admin, Security Admin, or Cloud App Admin also work</sup> | `Application.ReadWrite.All`<br>`RoleManagement.ReadWrite.Directory`<br>`User.Read` |
@@ -48,10 +52,6 @@ Before using the Service Principal module, ensure you have:
    | `New-ScubaGearAppCert`<br>`Remove-ScubaGearAppCert` | **Application Administrator**<br><sup>Global Admin, Cloud App Admin, or App Developer* also work</sup> | `Application.ReadWrite.All` |
 
    <sup>*Application Developer can only manage applications they own</sup>
-
-> [!NOTE]
-> - **Entra ID roles**: You need only ONE of the listed roles. The **bold** role is the least privileged option.
-> - **Graph API scopes**: Functions automatically request these permissions when you run them. You must consent when prompted.
 
 ## Initial Setup Workflow
 
