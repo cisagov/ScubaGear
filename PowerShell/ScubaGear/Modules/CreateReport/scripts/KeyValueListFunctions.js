@@ -54,7 +54,7 @@ const groupPermissions = (data, groupKey) => {
 
     data.forEach(obj => {
         let keyVal = obj[groupKey];
-        if (groupKey === "IsAdminConsented" || groupKey === "IsRisky") {
+        if (groupKey === "IsAdminConsented") {
             if (keyVal === true) keyVal = "Admin consented";
             else if (keyVal === false) keyVal = "Not admin consented";
             else keyVal = "Unknown";
