@@ -524,6 +524,42 @@ Invoke-SCuBA -ProductNames exo `
 Invoke-SCuBA -Version
 ```
 
+## DebugScuba
+
+**DebugScuba** enables detailed debug logging and function tracing for troubleshooting ScubaGear execution. When enabled, ScubaGear creates a `DebugLogs` subfolder within the output directory containing detailed log files and a PowerShell transcript.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |
+
+```powershell
+# Enable debug logging for troubleshooting
+Invoke-SCuBA -ProductNames teams `
+  -DebugScuba
+```
+
+When `-DebugScuba` is used, the following debug files are created in the output folder:
+
+```
+M365BaselineConformance_2026_02_06_14_30_45\
+    ├── DebugLogs\
+    │   ├── ScubaGear-DebugLog-<timestamp>.log
+    │   └── ScubaGear-Transcript-<timestamp>.log
+    ├── ProviderSettingsExport.json
+    ├── ScubaResults.json
+    └── BaselineReports.html
+```
+
+The debug log captures:
+- Function entry/exit traces with timing information
+- Detailed execution flow and decision points
+- Error context and stack traces
+- Configuration and environment details
+
+> **Note**: Debug mode impacts performance and should only be used for troubleshooting. Sensitive data (passwords, tokens, keys) is automatically redacted from logs.
 
 ## Muting the Version Check Warnings
 

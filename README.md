@@ -212,6 +212,7 @@ Reset-ScubaGearDependencies
   - [Microsoft Graph](docs/troubleshooting/graph.md)
 - [Network & Proxy](docs/troubleshooting/proxy.md)
 - [ScubaCached](docs/execution/scubacached.md)
+- [Debug Logging](docs/configuration/parameters.md#debugscuba)
 
 ### Automation
 
