@@ -309,35 +309,8 @@ function Invoke-SCuBA {
             return
         }
 
-        # Initialize logging for troubleshooting if DebugScuba is enabled
+        # Initialize logging flag - actual initialization happens after output folder is created
         $Script:ScubaLoggingEnabled = $false
-        if ($DebugScuba) {
-            try {
-                # Setup logging path in Documents folder
-                $DocumentsPath = [Environment]::GetFolderPath('MyDocuments')
-                $ScubaLogFolder = Join-Path $DocumentsPath "ScubaGear-Debug-$(Get-Date -Format 'yyyyMMdd-HHmmss-fff')"
-
-                # Initialize logging WITH tracing for detailed logs, transcript will capture the trace
-                Initialize-ScubaLogging -LogPath $ScubaLogFolder -EnableTracing -LogLevel "Debug" -EnableTranscript
-
-                $Script:ScubaLoggingEnabled = $true
-                Write-Output "ScubaGear DEBUG MODE ENABLED - Detailed logging active"
-                Write-Output "Log folder: $ScubaLogFolder"
-                Write-Output "Note: Console output is minimized, detailed trace is in transcript log"
-                Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active" -Level "Info" -Source "Orchestrator" -Data @{
-                    Version = $ModuleVersion
-                    ProductNames = ($ProductNames -join ', ')
-                    Environment = $M365Environment
-                    LogFolder = $ScubaLogFolder
-                    PerformanceNote = "Debug mode will impact performance - use only for troubleshooting"
-                }
-            }
-            catch {
-                Write-Warning "Failed to initialize ScubaGear debug logging: $_"
-                Write-Warning "Continuing without advanced logging features..."
-                $Script:ScubaLoggingEnabled = $false
-            }
-        }
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
@@ -454,20 +427,42 @@ function Invoke-SCuBA {
         }
 
         # Creates the output folder
-        if ($DebugScuba) {
-            Write-ScubaLog -Message "Creating output folder" -Level "Info" -Source "Orchestrator" -Data @{
-                OutPath = $ScubaConfig.OutPath
-                FolderName = "$($ScubaConfig.OutFolderName)_$(Get-Date -Format 'yyyy_MM_dd_HH_mm_ss')"
-            }
-        }
         $Date = Get-Date -ErrorAction 'Stop'
         $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
+
+        # Initialize logging for troubleshooting if DebugScuba is enabled
+        # Logs are placed in a DebugLogs subfolder within the output folder
         if ($DebugScuba) {
-            Write-ScubaLog -Message "Output folder created successfully" -Level "Debug" -Source "Orchestrator" -Data @{OutFolderPath = $OutFolderPath}
+            try {
+                # Create debug logs folder within the output folder
+                $ScubaLogFolder = Join-Path -Path $OutFolderPath -ChildPath "DebugLogs"
+
+                # Initialize logging WITH tracing for detailed logs, transcript will capture the trace
+                Initialize-ScubaLogging -LogPath $ScubaLogFolder -EnableTracing -LogLevel "Debug" -EnableTranscript
+
+                $Script:ScubaLoggingEnabled = $true
+                Write-Output "ScubaGear DEBUG MODE ENABLED - Detailed logging active"
+                Write-Output "Log folder: $ScubaLogFolder"
+                Write-Output "Note: Console output is minimized, detailed trace is in transcript log"
+                Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active" -Level "Info" -Source "Orchestrator" -Data @{
+                    Version = $ModuleVersion
+                    ProductNames = ($ProductNames -join ', ')
+                    Environment = $M365Environment
+                    OutputFolder = $OutFolderPath
+                    LogFolder = $ScubaLogFolder
+                    PerformanceNote = "Debug mode will impact performance - use only for troubleshooting"
+                }
+                Write-ScubaLog -Message "Output folder created successfully" -Level "Debug" -Source "Orchestrator" -Data @{OutFolderPath = $OutFolderPath}
+            }
+            catch {
+                Write-Warning "Failed to initialize ScubaGear debug logging: $_"
+                Write-Warning "Continuing without advanced logging features..."
+                $Script:ScubaLoggingEnabled = $false
+            }
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
