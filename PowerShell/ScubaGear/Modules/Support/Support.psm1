@@ -1426,9 +1426,12 @@ function Get-DependencyStatus {
                     $dependencyStatus.VersionMismatches += $versionIssues
                 }
 
-                # Check for multiple versions
-                if ($modules.Count -gt 1) {
-                    $dependencyStatus.MultipleVersions += $moduleName
+                # Check for multiple versions or version mismatches
+                if ($modules.Count -gt 1 -or ($versionIssues.Count -gt 0 -and -not $hasValidVersion)) {
+                    # Only add to MultipleVersions if there are actually multiple versions
+                    if ($modules.Count -gt 1) {
+                        $dependencyStatus.MultipleVersions += $moduleName
+                    }
 
                     # Create simplified file location information
                     $locationInfo = [PSCustomObject]@{
