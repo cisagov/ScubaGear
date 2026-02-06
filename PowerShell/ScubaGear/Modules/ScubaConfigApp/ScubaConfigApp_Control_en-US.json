@@ -1,4 +1,5 @@
 {
+  "Version": "2.1.23 (build 955)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
@@ -7,6 +8,7 @@
   "MinimumProductsRequired": 1,
   "MaximumResults": 10,
   "PullOnlineBaselines": false,
+  "EnablePolicyViewer": true,
   "OnlineBaselineMarkdownURL": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines",
   "OfflineBaselineMarkdownPath": "..\\..\\baselines",
   "localeContext": {
@@ -232,37 +234,57 @@
       "id": "Aad",
       "name": "Microsoft Entra ID",
       "displayName": "Microsoft Entra ID (aad)",
-      "supportsExclusions": true
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
     },
     {
       "id": "Defender",
       "name": "Defender",
       "displayName": "Defender (defender)",
-      "supportsExclusions": true
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
     },
     {
       "id": "Exo",
       "name": "Exchange Online",
       "displayName": "Exchange Online (exo)",
-      "supportsExclusions": true
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "PowerBI",
+      "name": "Power BI",
+      "displayName": "Power BI (powerbi)",
+      "supportsExclusions": false,
+      "showInApp": false,
+      "showInViewer": true
     },
     {
       "id": "PowerPlatform",
       "name": "Power Platform",
       "displayName": "Power Platform (powerplatform)",
-      "supportsExclusions": false
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
     },
     {
       "id": "Sharepoint",
       "name": "SharePoint & OneDrive",
       "displayName": "SharePoint & OneDrive (sharepoint)",
-      "supportsExclusions": false
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
     },
     {
       "id": "Teams",
       "name": "Microsoft Teams",
       "displayName": "Microsoft Teams (teams)",
-      "supportsExclusions": false
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
     }
   ],
   "M365Environment": [
@@ -861,6 +883,86 @@
       "invalidScriptMessage": "",
       "invalidScriptChecks": [],
       "sensitive": false
+    }
+  },
+  "policyViewerSettings": {
+    "defaultContentHeaders": {
+      "title": "CISA M365 Secure Configuration Baseline",
+      "description": "Introduction and Key Terminology"
+    },
+    "mainMarkdownMappings": {
+      "rationale": {
+        "displayName": "Introduction",
+        "jsonProperty": ["introduction"]
+      },
+      "implementation": {
+        "displayName": "Key Terminology",
+        "jsonProperty": ["keyTerminology"]
+      },
+      "licenseRequirements": {
+        "displayName": "License Compliance",
+        "jsonProperty": ["licenseCompliance"]
+      },
+      "resources": {
+        "displayName": "Assumptions",
+        "jsonProperty": ["assumptions"]
+      }
+    },
+    "policyMarkdownMappings": {
+      "section": {
+        "displayName": "policySection",
+        "containerIndex": 0,
+        "jsonProperty": ["sectionDescription"],
+        "headerBackground": "#E8E8E8",
+        "borderColor": "#C0C0C0",
+        "contentBackground": "#E8E8E8",
+        "isExpanded": false
+      },
+      "rationale": {
+        "displayName": "Rationale",
+        "containerIndex": 2,
+        "jsonProperty": ["rationale"],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "mitreMapping": {
+        "displayName": "MITRE ATT&CK Mappings",
+        "containerIndex": 3,
+        "jsonProperty": ["mitreMapping"],
+        "headerBackground": "#FEE2E2",
+        "borderColor": "#EF4444",
+        "contentBackground": "#FEF2F2",
+        "isExpanded": false
+      },
+      "implementation": {
+        "displayName": "Implementation Instructions",
+        "containerIndex": 5,
+        "jsonProperty": ["implementation"],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "licenseRequirements": {
+        "displayName": "License Requirements",
+        "containerIndex": 6,
+        "jsonProperty": ["licenseRequirements"],
+        "headerBackground": "#FEF3C7",
+        "borderColor": "#F59E0B",
+        "contentBackground": "#FEF3C7",
+        "isExpanded": false
+      },
+      "resources": {
+        "displayName": "Additional Resources",
+        "containerIndex": 4,
+        "jsonProperty": ["resources"],
+        "headerBackground": "#DBEAFE",
+        "borderColor": "#3B82F6",
+        "contentBackground": "#EFF6FF",
+        "isExpanded": false
+      }
     }
   },
   "graphQueries": {

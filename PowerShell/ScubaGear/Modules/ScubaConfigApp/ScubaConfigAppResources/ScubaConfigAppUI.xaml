@@ -1094,19 +1094,9 @@
                                             <TextBlock Text="*" Foreground="Red" FontWeight="Bold"/>
                                         </StackPanel>
 
-                                        <Grid x:Name="ProductsGrid">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-
-
-                                        </Grid>
+                                        <WrapPanel x:Name="ProductsGrid" Orientation="Vertical" MaxHeight="100">
+                                            <!-- Products dynamically added here -->
+                                        </WrapPanel>
                                     </StackPanel>
 
                                     <!-- Products Supporting Exclusions -->
