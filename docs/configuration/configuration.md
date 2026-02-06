@@ -259,8 +259,8 @@ Defender:
       - "IT Administrators@contoso.com"
     IncludedDomains:
       - "contoso.com"
-    ExcludedUsers: []
-    ExcludedGroups: []
+    ExcludedUsers: ["user3@contoso.com"]
+    ExcludedGroups: ["excludedgroup@constoso.com"]
     ExcludedDomains: []
 
   MS.DEFENDER.1.4v1:
