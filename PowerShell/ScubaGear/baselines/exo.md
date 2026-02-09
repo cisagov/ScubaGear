@@ -912,7 +912,7 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo103v1-instructions)
 
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
-- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. Scanning emails can reduce the number of malware-infected in users' mailboxes.
+- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. Scanning emails can reduce the number of malware-infected emails in users' mailboxes.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
