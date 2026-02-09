@@ -709,7 +709,7 @@ and Social Security numbers (SSNs) via email SHALL be restricted.
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
 
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. DLP provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
+- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
