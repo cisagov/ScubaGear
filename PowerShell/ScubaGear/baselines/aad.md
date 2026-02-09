@@ -951,7 +951,7 @@ Exception cases:
   5. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
   6. Click **Update**.
 
-3. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, apply the same configurations per the steps above to each PIM group's **Member** settings.
+3. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, apply the same configurations as steps 2-8 above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.8v1 Instructions
 
