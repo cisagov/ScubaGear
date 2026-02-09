@@ -79,7 +79,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
-- _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
+- _Rationale:_ This policy protects against anonymous users starting MS Teams meetings to scrape internal contacts. The policy is beneficial for agencies that have implemented custom policies providing flexibility allowing some users to automatically admit “everyone” to an MS Teams meeting.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
@@ -145,7 +145,7 @@ Record an event SHOULD NOT be set to Always record.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.7v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing to always record Live Events can pose data and video recording leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
+- _Rationale:_ Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events, reducing data leakage and other security risks. Administrators can also disable recording for all live events.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-21a
@@ -299,7 +299,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
-- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
+- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ August 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -468,7 +468,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.1v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
+- _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency can better manage app integration and potential exposure points.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
@@ -689,12 +689,12 @@ required, guidance for configuring Microsoft's DLP solution can be found in foll
 ### Policies
 
 #### MS.TEAMS.6.1v1
-A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+A DLP solution SHALL be enabled and SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams61v1-instructions)
 
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -703,13 +703,13 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 
 #### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
-and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs),
+and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, taxpayer identification numbers (TINs),
 and Social Security numbers (SSNs) via email SHALL be restricted.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
 
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
+- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. DLP provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
