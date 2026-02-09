@@ -164,25 +164,6 @@ test_environmentType_ExceptEnvironments_EnvironmentExcepted_Incorrect if {
     ReportDetailString := "1 subsequent environments without DLP policies: ExceptedEnv1"
     TestResult("MS.POWERPLATFORM.2.2v1", Output, ReportDetailString, false) == true
 }
-
-test_environmentType_ExceptEnvironments_EnvironmentExcepted_Incorrect if {
-    Env := json.patch(EnvironmentList, [
-        {"op": "add", "path": "0/EnvironmentName", "value": "ExceptedEnv1"},
-        {"op": "add", "path": "0/IsDefault", "value": false}
-    ])
-
-    Policies := json.patch(DlpPolicies, [
-        {"op": "add", "path": "value/0/environmentType", "value": "ExceptEnvironments"},
-        {"op": "add", "path": "value/0/environments/0/name", "value": "Default-Test Id"},
-        {"op": "add", "path": "value/0/environments/1/name", "value": "ExceptedEnv1"}
-    ])
-
-    Output := powerplatform.tests with input.dlp_policies as [Policies]
-                                  with input.environment_list as Env
-
-    ReportDetailString := "1 subsequent environments without DLP policies: ExceptedEnv1"
-    TestResult("MS.POWERPLATFORM.2.2v1", Output, ReportDetailString, false) == true
-}
 #--
 
 #
