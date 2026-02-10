@@ -388,7 +388,12 @@ function Invoke-SCuBA {
             foreach ( $value in $PSBoundParameters.keys ) {
                 if ( $value -ne "ConfigFilePath" )
                 {
-                    $ScubaConfig[$value] = $PSBoundParameters[$value]
+                    $paramValue = $PSBoundParameters[$value]
+                    # Convert SwitchParameter to bool for schema compatibility
+                    if ($paramValue -is [System.Management.Automation.SwitchParameter]) {
+                        $paramValue = $paramValue.ToBool()
+                    }
+                    $ScubaConfig[$value] = $paramValue
                 }
             }
 
