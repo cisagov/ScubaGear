@@ -918,7 +918,7 @@ Exception cases:
 
 2. In **Microsoft Entra admin center**  select **Roles and Admins**.
 
-3. Select the **Global Administrator role**.
+3. Select the **Global Administrator** role.
 
 4. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
