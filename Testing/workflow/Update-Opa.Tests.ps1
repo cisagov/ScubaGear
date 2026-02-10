@@ -29,31 +29,35 @@ Describe "Update OPA" {
         $ActualCurrentOPAVersion | Should -Be $ExpectedCurrentOPAVersion
     }
 
-    It "Update OPA version in config and support" {
+    It "Update OPA version in ScubaConfigDefaults.json" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $ConfigPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1' -Resolve
-        $SupportPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/Support/Support.psm1' -Resolve
+        $ConfigDefaultsPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json' -Resolve
+
         # Setup mock values
-        $MockCurrentVersion = "1.1.1"  # The version inserted into Support
-        $MockLatestVersion = "33.44.55"  # The version inserted into Config
+        $MockCurrentVersion = "1.1.1"  # The old default (expect this to be added to compatibleOpaVersions)
+        $MockLatestVersion = "33.44.55"  # The new default (expect this to replace OPAVersion)
+
         # Call the function
         . $ScriptPath
         Update-OpaVersion `
             -RepoPath $RepoRootPath `
             -CurrentOpaVersion $MockCurrentVersion `
             -LatestOpaVersion $MockLatestVersion
+
         # Check the results at the file level
-        $ConfigPath | Should -FileContentMatchExactly $MockLatestVersion
-        $SupportPath | Should -FileContentMatchExactly $MockCurrentVersion
-        # For support, check specifically.
-        # Find all specific lines with this comment.
-        $MatchedLines = Select-String -Path $SupportPath -Pattern "# End Versions" -SimpleMatch
-        # There should be only 1 line in the support module that matches
-        $MatchedLines.Count | Should -Be 1
-        # Get that 1 line and test to see if it contains the new value.
-        $UpdatedLine = $MatchedLines[0].Line
-        $UpdatedLine | Should -Match ".`'$MockCurrentVersion`'."  # This is a regex test.
+        $ConfigDefaultsPath | Should -FileContentMatchExactly $MockLatestVersion
+        $ConfigDefaultsPath | Should -FileContentMatchExactly $MockCurrentVersion
+
+        # Parse the updated ScubaConfig defaults JSON
+        $UpdatedDefaults = Get-Content -Path $ConfigDefaultsPath -Raw | ConvertFrom-Json
+
+        # Check that OPAVersion and compatibleOpaVersions are updated correctly
+        $UpdatedDefaults.defaults.OPAVersion | Should -Be $MockLatestVersion
+        $UpdatedDefaults.metadata.compatibleOpaVersions | Should -Contain $MockCurrentVersion
+
+        $CountOfCurrent = ($UpdatedDefaults.metadata.compatibleOpaVersions | Where-Object { $_ -eq $MockCurrentVersion }).Count
+        $CountOfCurrent | Should -Be 1
     }
 }
