@@ -775,7 +775,7 @@ organization, to be made in accordance with their risk tolerance.
 
 
 #### MS.EXO.9.4v1
-Alternatively, filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
+If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo94v1-instructions)
 
