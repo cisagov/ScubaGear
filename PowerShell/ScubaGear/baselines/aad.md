@@ -901,7 +901,7 @@ This policy is based on the ratio below:
 
 1. In **Microsoft Entra admin center**  select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Select the **Global Administrator role**.
+2. Select the **Global Administrator** role.
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
