@@ -491,7 +491,7 @@ Mail flow rules allow incoming email modification, such that email from external
 External sender warnings SHALL be implemented.
 
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
-- _Rationale:_ Phishing is an ever-present threat. Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
+- _Rationale:_ Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -587,7 +587,7 @@ A DLP solution SHALL be used.
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
 
 <!--Policy: MS.EXO.8.2v2; Criticality: SHALL -->
-- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention (DLP) policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ May 2024
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -615,7 +615,7 @@ The selected DLP solution SHOULD offer services comparable to the native DLP sol
 At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.
 
 <!--Policy: MS.EXO.8.4v1; Criticality: SHALL -->
-- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention (DLP) policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ May 2024
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -712,7 +712,7 @@ organization, to be made in accordance with their risk tolerance.
 
 
 #### MS.EXO.9.4v1
-Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
+If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 
 <!--Policy: MS.EXO.9.4v1; Criticality: SHOULD -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -811,8 +811,8 @@ implement malware scanning, see the following policies of the CISA M365 Secure C
 Emails SHALL be scanned for malware.
 
 <!--Policy: MS.EXO.10.1v1; Criticality: SHALL -->
-- _Rationale:_ Email can be used as a mechanism for delivering malware.
-In many cases, malware can be detected through scanning, reducing
+- _Rationale:_ Threat actors can use email as a mechanism for delivering malware.
+In many cases, scanning can detect malware, reducing
 the risk for end users.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
@@ -839,7 +839,7 @@ users cannot interact with those emails.
 Email scanning SHALL be capable of reviewing emails after delivery.
 
 <!--Policy: MS.EXO.10.3v1; Criticality: SHALL -->
-- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
+- _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. Scanning emails can reduce the number of malware-infected emails in users' mailboxes.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -1172,7 +1172,7 @@ Baseline for Defender for Office 365.
 A spam filter SHALL be enabled.
 
 <!--Policy: MS.EXO.14.1v2; Criticality: SHALL -->
-- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
+- _Rationale:_ Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ May 2024
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -1183,8 +1183,7 @@ A spam filter SHALL be enabled.
 Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
 
 <!--Policy: MS.EXO.14.2v1; Criticality: SHALL -->
-- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
-Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
+- _Rationale:_ Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -1196,8 +1195,8 @@ Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 <!--Policy: MS.EXO.14.3v1; Criticality: SHALL -->
 - _Rationale:_ Legitimate emails may be incorrectly filtered
 by spam protections. Adding allowed senders is an acceptable method of
-combating these false positives. Allowing an entire domain, especially
-a common domain like office.com, however, provides for a large number of
+combating these false positives. However, allowing an entire domain, especially
+a common domain like office.com, provides for a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ June 2023
 - _Note:_ Allowed senders MAY be added.
@@ -1209,7 +1208,7 @@ potentially unknown users to bypass spam protections.
 If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.
 
 <!--Policy: MS.EXO.14.4v1; Criticality: SHOULD -->
-- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments. Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
+- _Rationale:_ Filtering out spam reduces user workload burden, prevents junk mail congestion, and reduces potentially malicious content exposure.
 - _Last modified:_ May 2024
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -1496,8 +1495,7 @@ Unified Audit logging SHALL be enabled.
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).
 
 <!--Policy: MS.EXO.17.3v1; Criticality: SHALL -->
-- _Rationale:_ Audit logs may no longer be available when needed if they
-are not retained for a sufficient time.  Increased log retention time
+- _Rationale:_ Increased log retention time
 gives an agency the necessary visibility to investigate incidents that occurred
 some time ago. OMB M-21-13, Appendix C, Table 5 specifically calls out Unified
 Audit Logs in the Cloud Azure log category.
