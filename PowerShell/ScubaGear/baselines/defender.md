@@ -765,7 +765,7 @@ At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.DEFENDER.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
+- _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Administrators are alerted to these events when they occur, minimizing potential user or agency impact.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_

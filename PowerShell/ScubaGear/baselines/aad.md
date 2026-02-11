@@ -270,7 +270,7 @@ If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL
 <!--ExclusionType: CapExclusions-->
 - _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires MFA enforcement, thus reducing single-form authentication risk.
 - _Last modified:_ June 2023
-- _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
+- _Note:_ If a conditional access policy enforces phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2(1), IA-2(2)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
@@ -647,7 +647,7 @@ An admin consent workflow SHALL be configured for applications.
 
 3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
-4. Under **Admin consent requests** > **Users can request admin consent to apps they are unable to consent to** select **Yes**.
+4. Under **Admin consent requests** navigate to **Users can request admin consent to apps they are unable to consent to** and select **Yes**.
 
 5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
 
@@ -787,7 +787,7 @@ Activation of the Global Administrator role SHALL require approval.
 
 
 <!--Policy: MS.AAD.7.6v1; Criticality: SHALL -->
-- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials and it provides visibility of activities indicating a compromise is taking place.
+- _Rationale:_ Requiring approval for a user to activate Global Administrator, which provides unfettered access, makes it more challenging for an attacker to compromise the tenant with stolen credentials, and it provides visibility of activities indicating a compromise is taking place.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(1)
 - _MITRE ATT&CK TTP Mapping:_
@@ -795,7 +795,7 @@ Activation of the Global Administrator role SHALL require approval.
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.7.7v1
-Eligible and Active highly privileged role assignments SHALL trigger an alert.
+Eligible and active highly privileged role assignments SHALL trigger an alert.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -901,7 +901,7 @@ This policy is based on the ratio below:
 
 1. In **Microsoft Entra admin center**  select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. Select the **Global administrator role**.
+2. Select the **Global Administrator** role.
 
 3. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
@@ -916,9 +916,9 @@ Exception cases:
 
 1. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-2. In **Microsoft Entra admin center**  select **Roles and admins**.
+2. In **Microsoft Entra admin center**  select **Roles and Admins**.
 
-3. Select the **Global administrator role**.
+3. Select the **Global Administrator** role.
 
 4. Under **Manage**, select **Assignments** and click the **Active assignments** tab.
 
@@ -936,45 +936,38 @@ Exception cases:
   4.  Select the **Require approval to activate** option.
   5.  Click **Update**.
 
-3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, then also apply the same configurations under step 2 above to each PIM group's **Member** settings.
+3. Review the list of groups that are actively assigned to the **Global Administrator** role. If any of the groups are enrolled in PIM for Groups, also apply the same configurations as steps 2-7 above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.7v1 Instructions
 
 1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
 
-2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
+2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example:
 
-3. Click the **Global Administrator** role.
+  1. Click the **Global Administrator** role.
+  2. Click **Settings** and then click **Edit**.
+  3. Click the **Notification** tab.
+  4. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
+  5. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
+  6. Click **Update**.
 
-4. Click **Settings** and then click **Edit**.
-
-5. Click the **Notification** tab.
-
-6. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
-
-7. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
-
-8. Click **Update**.
-
-9. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, then also apply the same configurations per the steps above to each PIM group's **Member** settings.
+3. For each of the highly privileged roles, if they have any PIM groups actively assigned to them, apply the same configurations as steps 2-8 above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Under **Manage**, select **Microsoft Entra roles**.
 
-2. Under **Manage**, select **Roles**.
+2. Click the **Global Administrator** role.
 
-3. Click the **Global Administrator** role.
+3. Click **Settings** then click **Edit**.
 
-4. Click **Settings** and then click **Edit**.
+4. Click the **Notification** tab.
 
-5. Click the **Notification** tab.
+5. Under **Send notifications when eligible members activate this role**, in the **Role activation alert** select the  **Additional recipients** textbox and enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.
 
-6. Under **Send notifications when eligible members activate this role**, in the **Role activation alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.
+6. Click **Update**.
 
-7. Click **Update**.
-
-8. If the Global Administrator role has any PIM groups actively assigned to it, then also apply the same configurations per the steps above to each PIM group's **Member** settings.
+7. If the Global Administrator role has any PIM groups actively assigned to it, then also apply the same configurations per the steps above to each PIM group's **Member** settings.
 
 #### MS.AAD.7.9v1 Instructions
 
@@ -993,7 +986,7 @@ Guest users SHOULD have limited or restricted access to Microsoft Entra ID direc
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.AAD.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure, should a guest account become compromised or be created by an adversary.
+- _Rationale:_ Limiting the amount of object information available to guest users in the tenant, reduces malicious reconnaissance exposure if a guest account is compromised or created by an adversary.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6
 - _MITRE ATT&CK TTP Mapping:_
