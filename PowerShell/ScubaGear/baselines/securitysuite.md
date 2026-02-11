@@ -1,6 +1,6 @@
 **`TLP:CLEAR`**
 
-# CISA M365 Secure Configuration Supplemental Security Baseline
+# CISA M365 Secure Configuration Security Suite Baseline
 
 Several essential security functions for M365 services require a dedicated security
 tool, e.g., for data loss prevention. M365 provides these security functions
@@ -8,8 +8,7 @@ natively via Defender for Office 365. Notably, Defender for Office 365 capabilit
 require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
 and are available as add-ons for E3 and G3. However, third-party solutions that
 offer comparable security functions can be used in lieu of Defender.
-
-The Supplemental Security baseline enumerates a set of required security
+The Security Suite Baseline enumerates a set of required security
 functions agencies should configure, be it through Defender or a third-party tool
 of their choice. Should an agency elect to use Defender as their tool of choice,
 agencies should follow the implementation guidance included with this baseline.

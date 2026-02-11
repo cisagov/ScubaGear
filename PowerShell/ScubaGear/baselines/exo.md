@@ -11,7 +11,7 @@ natively via Defender for Office 365. Notably, Defender for Office 365 capabilit
 require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
 and are available as add-ons for E3 and G3. However, third-party solutions that
 offer comparable security functions can be used in lieu of Defender.
-Refer to the [CISA M365 Secure Configuration Supplemental Security Baseline](supplementalsecurity.md)
+Refer to the [CISA M365 Secure Configuration Security Suite Baseline](securitysuite.md)
 for additional guidance.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
