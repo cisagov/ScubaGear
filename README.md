@@ -1,3 +1,5 @@
+[![DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/cisagov/ScubaGear)
+
 ![ScubaGear Logo](docs/images/SCuBA%20GitHub%20Graphic%20v6-05.png)
 
 
