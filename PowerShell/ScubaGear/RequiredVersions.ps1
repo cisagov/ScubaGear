@@ -10,7 +10,7 @@ $ModuleList = @(
     @{
         ModuleName = 'ExchangeOnlineManagement' # includes Defender
         ModuleVersion = [version] '3.2.0'
-        MaximumVersion = [version] '3.9.0'
+        MaximumVersion = [version] '3.6.0'
         Purpose = 'Exchange Online and Microsoft Defender management'
         IsPinned = "False"
     },
