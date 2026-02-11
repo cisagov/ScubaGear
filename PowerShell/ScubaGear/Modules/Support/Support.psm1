@@ -1098,9 +1098,6 @@ function Test-ScubaGearVersion {
     .PARAMETER CheckGitHub
         Also check GitHub releases for the latest version.
 
-    .PARAMETER Quiet
-        Suppress detailed Write-Information output. Only return objects.
-
     .OUTPUTS
         PSCustomObject
 
@@ -1114,10 +1111,7 @@ function Test-ScubaGearVersion {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [switch]$CheckGitHub,
-
-        [Parameter(Mandatory = $false)]
-        [switch]$Quiet
+        [switch]$CheckGitHub
     )
 
     try {
@@ -1219,91 +1213,74 @@ function Test-ScubaGearVersion {
         $results += $dependencyComponent
         Write-Output $results
 
-        if (-not $Quiet){
-            # Display formatted information for modules with multiple versions
-            if ($dependencyStatus.ModuleFileLocations.Count -gt 0) {
-                # Separate modules into critical (version outside range) vs cleanup (all versions OK)
-                $criticalModules = @()
-                $cleanupModules = @()
+        # Display formatted Details section if there are any issues
+        if ($dependencyStatus.Missing.Count -gt 0 -or $dependencyStatus.ModuleFileLocations.Count -gt 0) {
+            # Separate modules into critical (version outside range) vs cleanup (all versions OK)
+            $criticalModules = @()
+            $cleanupModules = @()
 
-                foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
-                    # Parse versions from location strings
-                    $versions = @()
-                    $hasCriticalIssue = $false
-
-                    foreach ($location in $moduleInfo.Locations) {
-                        # Extract version and status from format: "2.34.0 [STATUS] (Scope): Path"
-                        if ($location -match '^([\d\.]+)\s+\[([^\]]+)\]') {
-                            $version = $matches[1]
-                            $status = $matches[2]
-
-                            $versions += [PSCustomObject]@{
-                                Version = $version
-                                Status = $status
-                            }
-
-                            if ($status -like "ABOVE MAX*" -or $status -like "BELOW MIN*") {
-                                $hasCriticalIssue = $true
-                            }
-                        }
+            # Process missing modules (critical)
+            if($dependencyStatus.Missing.count -gt 0){
+                foreach ($missingModule in $dependencyStatus.Missing) {
+                    $criticalModules += [PSCustomObject]@{
+                        ModuleName = $missingModule
+                        HighestVersion = $null
+                        HighestStatus = "MISSING"
+                        VersionCount = 0
                     }
+                }
+            }
 
-                    # Sort versions descending (highest first)
-                    $versions = $versions | Sort-Object { [version]$_.Version } -Descending
-
-                    $moduleEntry = [PSCustomObject]@{
+            # Process installed modules with version issues or multiple versions
+            foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
+                # Check if highest version (what PowerShell will load) is acceptable
+                if ($moduleInfo.HighestVersionStatus -ne "OK") {
+                    # Highest version is out of range - CRITICAL
+                    $criticalModules += [PSCustomObject]@{
                         ModuleName = $moduleInfo.ModuleName
-                        Versions = $versions
-                        HighestVersion = $versions[0]
-                    }
-
-                    if ($hasCriticalIssue) {
-                        $criticalModules += $moduleEntry
-                    } else {
-                        $cleanupModules += $moduleEntry
+                        HighestVersion = $moduleInfo.HighestVersion
+                        HighestStatus = $moduleInfo.HighestVersionStatus
+                        VersionCount = $moduleInfo.VersionCount
                     }
                 }
-
-                # Details section
-                Write-Information "Details:" -InformationAction Continue
-
-                # Display critical issues first
-                foreach ($module in $criticalModules) {
-                    $highestVersion = $module.HighestVersion
-                    $statusTag = ""
-
-                    if ($highestVersion.Status -like "ABOVE MAX*") {
-                        # Extract max version from status like "ABOVE MAX: 2.25.0"
-                        if ($highestVersion.Status -match 'ABOVE MAX:\s*([\d\.]+)') {
-                            $maxVer = $matches[1]
-                            $statusTag = "[ABOVE MAX: $maxVer]"
-                        } else {
-                            $statusTag = "[ABOVE MAX]"
-                        }
-                    } elseif ($highestVersion.Status -like "BELOW MIN*") {
-                        if ($highestVersion.Status -match 'BELOW MIN:\s*([\d\.]+)') {
-                            $minVer = $matches[1]
-                            $statusTag = "[BELOW MIN: $minVer]"
-                        } else {
-                            $statusTag = "[BELOW MIN]"
-                        }
+                else {
+                    # Highest version is OK but multiple versions exist - CLEANUP
+                    $cleanupModules += [PSCustomObject]@{
+                        ModuleName = $moduleInfo.ModuleName
+                        HighestVersion = $moduleInfo.HighestVersion
+                        VersionCount = $moduleInfo.VersionCount
                     }
-
-                    Write-Information "  CRITICAL: $($module.ModuleName) - will load $($highestVersion.Version) $statusTag" -InformationAction Continue
                 }
+            }
 
-                # Display cleanup recommendations
-                foreach ($module in $cleanupModules) {
-                    $versionCount = $module.Versions.Count
-                    Write-Information "  CLEANUP: $($module.ModuleName) - will load $($module.HighestVersion.Version) ($versionCount versions installed)" -InformationAction Continue
+            # Details section
+            Write-Information "Details:" -InformationAction Continue
+
+            # Display critical issues first (missing modules or highest version out of range)
+            foreach ($module in $criticalModules) {
+                if ($module.HighestStatus -eq "MISSING") {
+                    Write-Information "  CRITICAL: $($module.ModuleName) - not installed" -InformationAction Continue
                 }
+                else {
+                    Write-Information "  CRITICAL: $($module.ModuleName) - will load $($module.HighestVersion) [$($module.HighestStatus)]" -InformationAction Continue
+                }
+            }
 
-                Write-Information "" -InformationAction Continue
+            # Display cleanup recommendations (highest version OK but multiple exist)
+            foreach ($module in $cleanupModules) {
+                Write-Information "  Cleanup Recommended: $($module.ModuleName) - will load $($module.HighestVersion) [OK] ($($module.VersionCount) versions installed)" -InformationAction Continue
+            }
+
+            Write-Information "" -InformationAction Continue
+
+            # If missing modules suggest Initialize-SCuBA otherwise suggest Reset-ScubaGearDependencies
+            if ($criticalModules.HighestStatus -eq "MISSING" -and -not $dependencyStatus.ModuleFileLocations) {
+                Write-Information "Run 'Initialize-SCuBA' to install missing modules." -InformationAction Continue
+            }else{
                 Write-Information "Run 'Reset-ScubaGearDependencies' to fix." -InformationAction Continue
                 Write-Information "" -InformationAction Continue
             }
         }
-
     }
     catch {
         throw "Error checking ScubaGear version: $($_.Exception.Message)"
@@ -1389,7 +1366,6 @@ function Get-DependencyStatus {
 
                 # Check for version mismatches
                 $versionIssues = @()
-                $hasValidVersion = $false
 
                 foreach ($module in $modules) {
                     $installedVersion = [version]$module.Version
@@ -1414,28 +1390,47 @@ function Get-DependencyStatus {
                             Location = $module.ModuleBase
                         }
                     }
-                    else {
-                        $hasValidVersion = $true
-                    }
                 }
 
-                # If there are version issues and no valid version exists, add to mismatch list
-                if ($versionIssues.Count -gt 0 -and -not $hasValidVersion) {
+                # Always record version issues (PowerShell loads highest version by default)
+                if ($versionIssues.Count -gt 0) {
                     $dependencyStatus.VersionMismatches += $versionIssues
                 }
 
-                # Check for multiple versions
-                if ($modules.Count -gt 1) {
-                    $dependencyStatus.MultipleVersions += $moduleName
+                # Determine highest version and its status (what PowerShell will actually load)
+                $sortedModules = $modules | Sort-Object -Property Version -Descending
+                $highestModule = $sortedModules[0]
+                $highestVersion = [version]$highestModule.Version
 
-                    # Create simplified file location information
+                # Determine highest version status
+                $highestStatus = "OK"
+                if ($highestVersion -lt $minVersion) {
+                    $highestStatus = "BELOW MIN: $($minVersion)"
+                }
+                elseif ($highestVersion -gt $maxVersion) {
+                    $highestStatus = "ABOVE MAX: $($maxVersion)"
+                }
+
+                # Check for multiple versions or version issues
+                if ($modules.Count -gt 1 -or $versionIssues.Count -gt 0) {
+                    # Only add to MultipleVersions if there are actually multiple versions
+                    if ($modules.Count -gt 1) {
+                        $dependencyStatus.MultipleVersions += $moduleName
+                    }
+
+                    # Create file location information with highest version tracking
                     $locationInfo = [PSCustomObject]@{
                         ModuleName = $moduleName
                         VersionCount = $modules.Count
                         MinVersion = $minVersion.ToString()
                         MaxVersion = $maxVersion.ToString()
+                        HighestVersion = $highestVersion.ToString()
+                        HighestVersionStatus = $highestStatus
                         Locations = @()
                     }
+
+                    # Sort modules by Version property to ensure correct min/max
+                    $modules = $modules | Sort-Object -Property Version
 
                     foreach ($module in $modules) {
                         $installedVersion = [version]$module.Version
@@ -1480,71 +1475,77 @@ function Get-DependencyStatus {
         }
     }
 
-    # Determine overall status
-    if ($dependencyStatus.Missing.Count -eq 0) {
-        if ($dependencyStatus.VersionMismatches.Count -gt 0) {
-            $dependencyStatus.Status = "Version Issues"  # Identify when a module version is either below the minimum or above the maximum required version.
+    # Determine overall status based on what PowerShell will actually load
+    if ($dependencyStatus.Missing.Count -gt 0) {
+        $dependencyStatus.Status = "Critical"
+    }
+    else {
+        # Check if any module's highest version (what will be loaded) is out of range
+        $criticalModules = $dependencyStatus.ModuleFileLocations | Where-Object { $_.HighestVersionStatus -ne "OK" }
+
+        if ($criticalModules) {
+            $dependencyStatus.Status = "Critical"
         }
-        elseif ($dependencyStatus.MultipleVersions.Count -eq 0) {
-            $dependencyStatus.Status = "Optimal" # Setup correctly, no issues
-        } else {
-            $dependencyStatus.Status = "Needs Cleanup" # Only multiple versions need to be addressed
+        elseif ($dependencyStatus.MultipleVersions.Count -gt 0) {
+            $dependencyStatus.Status = "Needs Cleanup"
         }
-    } else {
-        $dependencyStatus.Status = "Missing Modules"
+        else {
+            $dependencyStatus.Status = "OK"
+        }
     }
 
-    # Generate recommendations
+    # Generate recommendations based on severity
     $recommendations = @()
+    $criticalRecommendations = @()
+    $cleanupRecommendations = @()
 
-    # Handle version mismatch recommendations
-    if ($dependencyStatus.VersionMismatches.Count -gt 0) {
-        $belowMin = $dependencyStatus.VersionMismatches | Where-Object { $_.Issue -eq "Below Minimum" }
-        $aboveMax = $dependencyStatus.VersionMismatches | Where-Object { $_.Issue -eq "Above Maximum" }
-
-        $versionIssues = @()
-        if ($belowMin.Issue.Count -gt 0) {
-            $uniqueBelowMin = ($belowMin | Select-Object -ExpandProperty ModuleName -Unique) -join ', '
-            $versionIssues += "$uniqueBelowMin below minimum required version"
-        }
-        if ($aboveMax.Issue.Count -gt 0) {
-            $uniqueAboveMax = ($aboveMax | Select-Object -ExpandProperty ModuleName -Unique) -join ', '
-            $versionIssues += "$uniqueAboveMax above maximum required version"
-        }
-
-        if ($versionIssues.Count -gt 0) {
-            $recommendations += ($versionIssues -join ". ") + ". Run 'Reset-ScubaGearDependencies' to fix."
-        }
-    }
-
-    # Handle missing and multiple version scenarios
-    $hasMissing = $dependencyStatus.Missing.Count -gt 0
-    $hasMultiple = $dependencyStatus.MultipleVersions.Count -gt 0
-    $missingCount = $dependencyStatus.Missing.Count
-    $multipleCount = $dependencyStatus.MultipleVersions.Count
-
-    if ($hasMissing -and $hasMultiple) {
-        $moduleText = if ($multipleCount -eq 1) { "module has" } else { "modules have" }
-        $missingText = if ($missingCount -eq 1) { "module is" } else { "modules are" }
-        $recommendations += "$multipleCount $moduleText multiple versions installed. Also $missingCount $missingText missing. Run 'Reset-ScubaGearDependencies' to clean up."
-    }
-    elseif ($hasMissing) {
+    # Check for missing modules (critical)
+    if ($dependencyStatus.Missing.Count -gt 0) {
+        $missingCount = $dependencyStatus.Missing.Count
         $dependencyText = if ($missingCount -eq 1) { "dependency" } else { "dependencies" }
-        $recommendations += "Missing $missingCount $dependencyText. Run 'Initialize-SCuBA' to install."
+        $criticalRecommendations += "Missing $missingCount $dependencyText. Run 'Initialize-SCuBA' to install."
     }
-    elseif ($hasMultiple) {
-        $moduleText = if ($multipleCount -eq 1) { "module has" } else { "modules have" }
-        $recommendations += "$multipleCount $moduleText multiple versions installed. Run 'Reset-ScubaGearDependencies' to clean up."
+
+    # Check for modules where highest version is out of range (critical)
+    foreach ($moduleInfo in $dependencyStatus.ModuleFileLocations) {
+        if ($moduleInfo.HighestVersionStatus -ne "OK") {
+            $statusMsg = if ($moduleInfo.HighestVersionStatus -like "ABOVE MAX*") {
+                "above maximum ($($moduleInfo.MaxVersion))"
+            } else {
+                "below minimum ($($moduleInfo.MinVersion))"
+            }
+            $criticalRecommendations += "$($moduleInfo.ModuleName) will load version $($moduleInfo.HighestVersion) which is $statusMsg - this may cause failures. Run 'Reset-ScubaGearDependencies' to fix."
+        }
+        elseif ($moduleInfo.VersionCount -gt 1) {
+            # Multiple versions but highest is OK (cleanup only)
+            $cleanupRecommendations += "$($moduleInfo.ModuleName) has $($moduleInfo.VersionCount) versions installed but will load $($moduleInfo.HighestVersion) which is acceptable - cleanup recommended for best practice."
+        }
+    }
+
+    # Combine recommendations (critical first, then cleanup)
+    if ($criticalRecommendations.Count -gt 0) {
+        $recommendations += $criticalRecommendations
+    }
+    if ($cleanupRecommendations.Count -gt 0) {
+        if ($criticalRecommendations.Count -eq 0) {
+            # Only cleanup issues - summarize
+            $multipleCount = ($dependencyStatus.ModuleFileLocations | Where-Object { $_.VersionCount -gt 1 }).Count
+            $moduleText = if ($multipleCount -eq 1) { "module has" } else { "modules have" }
+            $recommendations += "$multipleCount $moduleText multiple versions installed. Run 'Reset-ScubaGearDependencies' to clean up."
+        } else {
+            # Both critical and cleanup - add note about cleanup
+            $recommendations += "Also cleanup recommended for modules with multiple versions."
+        }
+    }
+
+    # Default message if everything is OK
+    if ($recommendations.Count -eq 0) {
+        $recommendations += "No action needed."
     }
 
     # Add admin privilege notice if needed
-    if ($dependencyStatus.AdminRequired -and $dependencyStatus.Status -ne "Optimal") {
+    if ($dependencyStatus.AdminRequired -and $dependencyStatus.Status -ne "OK") {
         $recommendations += "Administrator privileges required for some operations."
-    }
-
-    # Add optimal status message
-    if ($dependencyStatus.Status -eq "Optimal") {
-        $recommendations += "All dependencies are installed."
     }
 
     $dependencyStatus.Recommendations = $recommendations
