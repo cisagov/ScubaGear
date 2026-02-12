@@ -318,13 +318,6 @@ class ScubaConfigValidator {
             }
         }
 
-        # Validate M365Environment warnings for government tenants
-        if ($ConfigObject.M365Environment -in @('gcchigh', 'dod')) {
-            $EnvName = if ($ConfigObject.M365Environment -eq 'gcchigh') { 'GCC High' } else { 'DoD' }
-            [void]$Validation.Warnings.Add("$EnvName environment selected. Ensure you have appropriate security clearance and authorization."
-)
-        }
-
         # Check for product exclusions on products that don't support them
         [ScubaConfigValidator]::ValidateUnsupportedProductExclusions($ConfigObject, $Validation)
 
