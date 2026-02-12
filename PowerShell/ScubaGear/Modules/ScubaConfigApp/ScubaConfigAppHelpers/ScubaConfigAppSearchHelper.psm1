@@ -81,8 +81,8 @@ Function Add-SearchAndFilterCapability {
                     } catch {
                         # Fallback: manually clear the search and apply filter
                         $searchBox = $syncHash."$($currentTabType)Search_TextBox"
-                        $criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
-                        $configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
+                        #$criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
+                        #$configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
 
                         if ($searchBox) {
                             $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
@@ -91,17 +91,7 @@ Function Add-SearchAndFilterCapability {
                             $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                             $searchBox.Tag = "Placeholder"
 
-                            # Reset criticality filter to "All"
-                            if ($criticalityComboBox) {
-                                $criticalityComboBox.SelectedIndex = 0
-                            }
-
-                            # Reset configuration status filter to "All"
-                            if ($configuredComboBox) {
-                                $configuredComboBox.SelectedIndex = 0
-                            }
-
-                            # Trigger the search update
+                            # Trigger the search update (filters persist)
                             Set-SearchAndFilter -TabType $currentTabType
                             Write-DebugOutput -Message "Manually cleared search for $currentTabType when switching product tabs (fallback)" -Source $MyInvocation.MyCommand -Level "Debug"
                         }
@@ -172,8 +162,8 @@ Function Add-SearchAndFilterCapability {
 
         $clearButton.Add_Click({
             $searchBox = $syncHash."$($tabType)Search_TextBox"
-            $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
-            $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+            #$criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+            #$configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
 
             if ($searchBox) {
                 $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
@@ -182,15 +172,7 @@ Function Add-SearchAndFilterCapability {
                 $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                 $searchBox.Tag = "Placeholder"
 
-                # Reset default selection to "All" for both filters
-                if ($criticalityComboBox) {
-                    $criticalityComboBox.SelectedIndex = 0
-                }
-                if ($configuredComboBox) {
-                    $configuredComboBox.SelectedIndex = 0
-                }
-
-                # Now trigger the search with cleared state
+                # Trigger the search with cleared text (filters persist)
                 Set-SearchAndFilter -TabType $tabType
             }
         }.GetNewClosure())
