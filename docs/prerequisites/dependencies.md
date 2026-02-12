@@ -19,8 +19,8 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 | Module Name                                   | Minimum Version | Maximum Version  | Purpose                                      |
 |:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
-| MicrosoftTeams |           4.9.3 |            7.5.0 | Microsoft Teams configuration management |
-| ExchangeOnlineManagement |           3.2.0 |            3.9.0 | Exchange Online and Microsoft Defender management |
+| MicrosoftTeams |           4.9.3 |            7.6.0 | Microsoft Teams configuration management |
+| ExchangeOnlineManagement |           3.2.0 |            3.9.2 | Exchange Online and Microsoft Defender management |
 | Microsoft.Online.SharePoint.PowerShell |          16.0.0 | 16.0.24810.12000 | SharePoint and OneDrive management |
 | PnP.PowerShell |          1.12.0 |       1.99.99999 | SharePoint Online management and automation |
 | Microsoft.PowerApps.Administration.PowerShell |         2.0.198 |          2.0.216 | Power Platform administrative functions |
@@ -73,6 +73,7 @@ To verify that OPA is working, use the following command to check the version:
 > **Note**: If ScubaGear is having trouble finding the OPA executable in the `Tools` folder, place the OPA executable in the directory from which you are executing `Invoke-SCuBA`. ScubaGear will also attempt to look in the current executing directory for the OPA executable.
 
 Once the dependencies have been installed, you are ready to set the [permissions](permissions.md).
+
 
 
 
