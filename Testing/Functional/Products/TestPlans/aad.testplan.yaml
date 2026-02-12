@@ -337,28 +337,11 @@ TestPlan:
   - PolicyId: MS.AAD.3.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.5v1 Not-applicable case - preMigration but auth methods disabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: preMigration
-                authentication_method[0].authentication_method_feature_settings:
-                  - Id: Sms
-                    State: disabled
-                  - Id: Voice
-                    State: disabled
-                  - Id: Email
-                    State: disabled
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
       - TestDescription: MS.AAD.3.5v1 Non-compliant case - Sms enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: enabled
@@ -373,7 +356,6 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
@@ -388,7 +370,6 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
@@ -403,7 +384,6 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
