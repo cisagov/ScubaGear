@@ -20,7 +20,10 @@
       "_PreValidationWarnings",
       "AllProductNames",
       "OPAVersion",
-      "OPAExecutable"
+      "OPAExecutable",
+      "Quiet",
+      "DarkMode",
+      "SilenceBODWarnings"
     ],
 
     "policyExclusionMappings": {
@@ -417,15 +420,15 @@
         "friendlyName": "Alphanumeric filename (no extension)"
       },
       "filePath": {
-        "_comment": "Windows or Unix-style file path",
+        "_comment": "Windows, Unix-style, or UNC file path",
         "type": "string",
-        "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$",
+        "pattern": "^[a-zA-Z]:\\\\.*|^\\\\\\\\.*|^\\./.*|^\\.$",
         "friendlyName": "File path format"
       },
       "folderPath": {
-        "_comment": "Directory path with existence validation",
+        "_comment": "Directory path with existence validation (Windows, Unix, or UNC)",
         "type": "string",
-        "pattern": "^[a-zA-Z]:\\\\.*|^\\./.*|^\\.$",
+        "pattern": "^[a-zA-Z]:\\\\.*|^\\\\\\\\.*|^\\./.*|^\\.$",
         "testPath": true,
         "friendlyName": "Directory path"
       },

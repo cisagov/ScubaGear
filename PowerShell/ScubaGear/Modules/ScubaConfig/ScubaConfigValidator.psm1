@@ -441,15 +441,19 @@ class ScubaConfigValidator {
                         )
                         $PropertyExists = $true
                         
-                        # Warn about case mismatch (informational - PowerShell will still use it)
-                        # Skip warning for products that don't support exclusions - they'll get an error later
+                        # Warn about case mismatch only for product exclusion properties (nested objects with patternProperties)
+                        # Root-level Invoke-ScubaGear parameters are case-insensitive by PowerShell design
                         if ($SchemaPropertyName -cne $PropertyName) {
-                            # Products without exclusion support: SharePoint, Teams, PowerPlatform
-                            $ProductsWithoutExclusions = @('SharePoint', 'Teams', 'PowerPlatform')
+                            # Only warn if this is a product property (has patternProperties or is type object with nested properties), not for root-level parameters
+                            $IsProductProperty = $false
+                            if ($PropertySchema.patternProperties -or 
+                                ($PropertySchema.type -eq 'object')) {
+                                $IsProductProperty = $true
+                            }
                             
-                            if ($SchemaPropertyName -notin $ProductsWithoutExclusions) {
-                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'."
-)
+                            # Only issue case warning for product/policy properties, not root-level parameters
+                            if ($IsProductProperty) {
+                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'.")
                             }
                         }
                         break
