@@ -34,7 +34,7 @@ This section helps reduce security risks related to sharing files with users ext
 
 ### Policies
 #### MS.SHAREPOINT.1.1v1
-External sharing for SharePoint SHALL be limited to Existing guests or Only people in your organization.
+External sharing for SharePoint SHALL be limited to "Existing guests" or "Only people in your organization".
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -49,7 +49,7 @@ External sharing for SharePoint SHALL be limited to Existing guests or Only peop
     - [T1213.002: Sharepoint](https://attack.mitre.org/techniques/T1213/002/)
 
 #### MS.SHAREPOINT.1.2v1
-External sharing for OneDrive SHALL be limited to Existing guests or Only people in your organization.
+External sharing for OneDrive SHALL be limited to "Existing guests" or "Only people in your organization".
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -144,7 +144,7 @@ This section provides policies to set the scope and permissions for sharing link
 ### Policies
 
 #### MS.SHAREPOINT.2.1v1
-File and folder default sharing scope SHALL be set to Specific people (only the people the user specifies).
+File and folder default sharing scope SHALL be set to "Specific people (only the people the user specifies)".
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -161,13 +161,13 @@ File and folder default sharing scope SHALL be set to Specific people (only the 
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.2.2v1
-File and folder default sharing permissions SHALL be set to View.
+File and folder default sharing permissions SHALL be set to view only.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
-- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View**, administrators prevent unintended or malicious modification.
+- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes.  By restricting default permissions to **View** only, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6
 - _MITRE ATT&CK TTP Mapping:_
@@ -231,7 +231,7 @@ Expiration days for Anyone links SHALL be set to 30 days or less.
   - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
 
 #### MS.SHAREPOINT.3.2v1
-The allowable file and folder permissions for links SHALL be set to View only.
+The allowable file and folder permissions for links SHALL be set to view only.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -253,7 +253,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
-- _Rationale:_ A verification code may be issued to provide access to information for a short period. By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
+- _Rationale:_ By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-11

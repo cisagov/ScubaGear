@@ -1,66 +1,26 @@
-#Requires -Version 5.1
 <#
-    .SYNOPSIS
-        This script verifies the required Powershell modules used by the
-        assessment tool are installed.
-    .PARAMETER Force
-    This will cause all required dependencies to be installed and updated to latest.
-    .DESCRIPTION
-        Verifies a supported version of the modules required to support SCuBAGear are installed.
+.SYNOPSIS
+    Checks ScubaGear and dependency versions for issues that would prevent execution.
+
+.DESCRIPTION
+    Runs Test-ScubaGearVersion to identify version issues with ScubaGear dependencies.
+    Displays detailed information from Test-ScubaGearVersion if issues are found.
+
+.EXAMPLE
+    .\Dependencies.ps1
 #>
 
-$RequiredModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "RequiredVersions.ps1"
-if (Test-Path -Path $RequiredModulesPath){
-    . $RequiredModulesPath
+[CmdletBinding()]
+param()
+
+try {
+    $SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
+    Import-Module -Name $SupportModulesPath
+
+    # Run version check and display its output
+    $null = Test-ScubaGearVersion
 }
-else {
-    Write-Error "Unable to find required modules path at $RequiredModulesPath"
+catch {
+    Write-Error "An error occurred checking version status: $($_.Exception.Message)"
+    throw
 }
-
-if (!$ModuleList){
-   throw "Required modules list is required."
-}
-
-$SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
-Import-Module -Name $SupportModulesPath
-
-$MissingModules = @()
-
-foreach ($Module in $ModuleList) {
-    Write-Debug "Evaluating module: $($Module.ModuleName)"
-    $InstalledModuleVersions = Get-Module -ListAvailable -Name $($Module.ModuleName)
-    $FoundAcceptableVersion = $false
-
-    foreach ($ModuleVersion in $InstalledModuleVersions){
-
-        if (($ModuleVersion.Version -ge $Module.ModuleVersion) -and ($ModuleVersion.Version -le $Module.MaximumVersion)){
-            $FoundAcceptableVersion = $true
-            break;
-        }
-    }
-
-    if (-not $FoundAcceptableVersion) {
-        $MissingModules += $Module
-    }
-}
-
-if ($MissingModules.Count -gt 0){
-    # Set preferences for writing messages
-    $PreferenceStack = New-Object -TypeName System.Collections.Stack
-    $PreferenceStack.Push($WarningPreference)
-    $WarningPreference = "Continue"
-
-    Write-Warning "
-    The required supporting PowerShell modules are not installed with a supported version.
-    ScubaGear may not function properly until the supporting modules are installed.
-    Run Initialize-SCuBA to install all required dependencies.
-    See Get-Help Initialize-SCuBA for more help."
-
-    Write-Debug "The following modules are not installed:"
-    foreach ($Module in $MissingModules){
-        Write-Debug "`t$($Module.ModuleName)"
-    }
-
-    $WarningPreference = $PreferenceStack.Pop()
-}
-

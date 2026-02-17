@@ -176,7 +176,7 @@ The Invite external users to your organization feature SHOULD be disabled unless
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi31v1-instructions)
 
 <!--Policy: MS.POWERBI.3.1v1; Criticality: SHOULD -->
-- _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the invitation feature can be limited to users in specific security groups to help limit risk.
+- _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the agency can limit the invitation feature to users in specific security groups to help limit risk.
 - _Last modified:_ June 2023
 > Note:
 > If this feature is disabled, existing guest users in the tenant continue to have access to Power BI items they already had access to and continue to be listed in user picker experiences. After it is disabled, an external user who is not already a guest user cannot be added to the tenant through Power BI.
@@ -394,7 +394,7 @@ Python and R interactions SHOULD be disabled.
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi61v1-instructions)
 
 <!--Policy: MS.POWERBI.6.1v1; Criticality: SHOULD -->
-- _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate what is done with the data or integrations. Disabling this will reduce the risk of a data leak or malicious actor.
+- _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate use of  data or integrations. Disabling this feature reduces the risk of a data leak or malicious threat activity.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-3
 - _MITRE ATT&CK TTP Mapping:_
