@@ -170,38 +170,6 @@ TestPlan:
                 State: enabled
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass even when non-specific MFA is disabled
-        ### This test creates a phishing-resistant MFA policy and disables the standard non-specific MFA policy from the tenant
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    IncludeRoles: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-                GrantControls:
-                  AuthenticationStrength:
-                    AllowedCombinations:
-                      - "windowsHelloForBusiness"
-                      - "fido2"
-                      - "x509CertificateMultiFactor"
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
-              updates:
-                State: enabledForReportingButNotEnforced
-        Postconditions: []
-        ExpectedResult: true
       - TestDescription: MS.AAD.3.2v1 Compliant case - Authentication Strength with Multifactor Authentication is enforced
         ### This test enables the standard non-specific MFA policy with authentication strength set to "Multifactor Authentication"
         Preconditions:

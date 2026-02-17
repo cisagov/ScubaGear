@@ -397,8 +397,8 @@ LowSecurityAuthMethodsDisabled := true if {
     every Config in LowSecurityAuthMethods { Config.State == "disabled" }
 }
 
- # First test is for N/A case
- tests contains {
+# First test is for N/A case
+tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
