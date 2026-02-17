@@ -625,3 +625,118 @@ a.control_group:active {
     color: var(--header-color);
     margin-right: 2px;
 }
+
+/* Policy Indicator Badges */
+.policy-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+}
+
+.indicator {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+}
+
+.indicator:hover {
+    opacity: 0.85;
+    text-decoration: none;
+}
+
+/* BOD 25-01 Requirement - Red */
+.indicator-bod {
+    background-color: #C41230;
+    color: #ffffff;
+}
+
+/* Automated Check - Green */
+.indicator-automated {
+    background-color: #5E9732;
+    color: #ffffff;
+}
+
+/* Manual - Teal */
+.indicator-manual {
+    background-color: #046B9A;
+    color: #ffffff;
+}
+
+/* Configurable - Blue */
+.indicator-configurable {
+    background-color: #005288;
+    color: #ffffff;
+}
+
+/* Requires Configuration - Dark Red */
+.indicator-requires-config {
+    background-color: #981D20;
+    color: #ffffff;
+}
+
+/* Other/Unknown - Gray */
+.indicator-other {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+/* Dark mode adjustments for indicators */
+html[data-theme='dark'] .indicator-bod {
+    background-color: #E53E56;
+}
+
+html[data-theme='dark'] .indicator-automated {
+    background-color: #7BB846;
+}
+
+html[data-theme='dark'] .indicator-manual {
+    background-color: #1A8FC4;
+}
+
+html[data-theme='dark'] .indicator-configurable {
+    background-color: #2A7AB8;
+}
+
+html[data-theme='dark'] .indicator-requires-config {
+    background-color: #C0383C;
+}
+
+/* Indicator Legend */
+.indicator-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.5em 3.125em 1em 3.125em;
+    padding: 0;
+    background-color: var(--background-primary);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.8125em;
+    align-items: flex-start;
+    width: 1000px;
+    box-sizing: border-box;
+}
+
+.indicator-legend-title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.23em;
+    font-weight: bold;
+    color: var(--header-color);
+    margin-bottom: 0.25rem;
+    text-align: left;
+}
+
+.indicator-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.indicator-legend-item .indicator {
+    cursor: default;
+}

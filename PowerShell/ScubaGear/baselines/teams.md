@@ -79,7 +79,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
-- _Rationale:_ For agencies that implemented custom policies providing more flexibility to some users to automatically admit "everyone" to a meeting - this policy provides protection from anonymous users starting meeting to scrape internal contacts.
+- _Rationale:_ This policy protects against anonymous users starting Microsoft Teams meetings to scrape internal contacts. The policy is beneficial for agencies that have implemented custom policies, providing flexibility for some users to automatically admit “everyone” to a Microsoft Teams meeting.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
@@ -89,6 +89,8 @@ Anonymous users SHALL NOT be enabled to start meetings.
 
 #### MS.TEAMS.1.3v1
 Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.3v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.  
@@ -143,7 +145,7 @@ Record an event SHOULD NOT be set to Always record.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.7v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing to always record Live Events can pose data and video recording leakage and other security risks. Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events. Administrators can also disable recording for all live events.
+- _Rationale:_ Limiting recording permissions to only the organizer minimizes the security risk to the organizer's discretion for these Live Events, reducing data leakage and other security risks. Administrators can also disable recording for all live events.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-21a
@@ -297,7 +299,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
-- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. This unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
+- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
 - _Last modified:_ August 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -447,6 +449,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
     emails to a channel email address** to **Off**.
 
 ## 5. App Management
+
 This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
 
 - *Microsoft apps*: apps published by Microsoft.
@@ -465,7 +468,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.1v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency will better manage its app integration and potential exposure points.
+- _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency can better manage app integration and potential exposure points.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
@@ -511,6 +514,12 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 - N/A
 
 ### Implementation
+
+**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. Newer Tenants, created within 2024 and newer will follow the newer version 2 policy implementation steps while older tenants will follow the legacy implementation steps. 
+
+**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
+
+**NOTE:** Legacy implementation instructions are below the Version 2 intructions. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions.
 
 #### MS.TEAMS.5.1v2 Instructions
 
@@ -590,6 +599,77 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 11.  Repeat steps 7 to 10 for each application
 
+
+### Legacy Policy Implementation 
+
+**NOTE:** Only Implement these settings if the v2 settings above are not available in your tenant.
+
+#### Legacy MS.TEAMS.5.1v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Permission policies**.
+
+3.  Select **Global (Org-wide default)**.
+
+4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
+
+5.  Click **Allow apps**.
+
+6.  Search and Click **Add** to all appropriate Microsoft Apps.
+
+7.  Click **Allow**.
+
+8.  Click **Save**.
+
+9.  If custom policies have been created, repeat these steps for each
+    policy, selecting the appropriate policy in step 3.
+
+#### Legacy MS.TEAMS.5.2v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Third-party apps** turn off **Third-party apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Third-party apps** to **Block all apps**, unless specific apps
+    have been approved by the agency, in which case select **Allow
+    specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.   If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
+
+#### Legacy MS.TEAMS.5.3v1 Instructions
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Teams apps** > **Manage apps**.
+
+3.  Select **Org-wide app settings** button to access pop-up options.
+    - Under **Custom apps** turn off **Interaction with custom apps**.
+    - Click **Save**.
+
+4.  Select **Teams apps** > **Permission policies**.
+
+5.  Select **Global (Org-wide default)**.
+
+6.  Set **Custom apps** to **Block all apps**, unless specific apps have
+    been approved by the agency, in which case select **Allow specific apps and block all others**.
+
+7.  Click **Save**.
+
+8.  If custom policies have been created, repeat steps 4 to 7 for each
+    policy, selecting the appropriate policy in step 5.
+
 ## 6. Data Loss Prevention
 
 Data loss prevention (DLP) helps prevent both accidental leakage of
@@ -609,12 +689,12 @@ required, guidance for configuring Microsoft's DLP solution can be found in foll
 ### Policies
 
 #### MS.TEAMS.6.1v1
-A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+A DLP solution SHALL be enabled and SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams61v1-instructions)
 
 <!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -623,13 +703,13 @@ A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services
 
 #### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII)
-and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs),
+and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, taxpayer identification numbers (TINs),
 and Social Security numbers (SSNs) via email SHALL be restricted.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
 
 <!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. Data loss prevention policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
+- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
 - _Last modified:_ July 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_

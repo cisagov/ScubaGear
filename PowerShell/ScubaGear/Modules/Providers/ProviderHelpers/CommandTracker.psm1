@@ -7,7 +7,7 @@ class CommandTracker {
     [string[]]$SuccessfulCommands = @()
     [string[]]$UnSuccessfulCommands = @()
 
-    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs, [bool]$SuppressWarning = $false) {
         <#
         .Description
         Wraps the given Command inside a try/catch, run with the provided
@@ -56,13 +56,27 @@ class CommandTracker {
             $this.SuccessfulCommands += $Command
         }
         catch {
-            Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            if (-not $SuppressWarning) {
+                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            }
 
             $this.UnSuccessfulCommands += $Command
             $Result = @()
         }
 
         return $Result
+    }
+
+    [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+        <#
+        .Description
+        Wraps the given Command inside a try/catch, run with the provided
+        arguments, and tracks successes/failures. SuppressWarning defaults to false.
+        .Functionality
+        Internal
+        #>
+
+        return $this.TryCommand($Command, $CommandArgs, $false)
     }
 
     [System.Object[]] TryCommand([string]$Command) {
@@ -74,7 +88,7 @@ class CommandTracker {
         Internal
         #>
 
-        return $this.TryCommand($Command, @{})
+        return $this.TryCommand($Command, @{}, $false)
     }
 
     [void] AddSuccessfulCommand([string]$Command) {

@@ -2,13 +2,6 @@
 
 This guide helps resolve common issues when working with ScubaGear service principals.
 
-## Table of Contents
-
-- [Authentication Issues](#authentication-issues)
-- [Power Platform Issues](#power-platform-issues)
-- [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)
-
-
 ## Authentication Issues
 
 ### Issue: "Failed to connect to Microsoft Graph"

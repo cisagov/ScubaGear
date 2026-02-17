@@ -13,7 +13,7 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
 
-                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs, [bool]$SuppressWarning) {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
@@ -41,6 +41,10 @@ InModuleScope -ModuleName ExportTeamsProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-M365UnifiedTenantSettings" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }
@@ -50,15 +54,21 @@ InModuleScope -ModuleName ExportTeamsProvider {
                         return $Result
                     }
                     catch {
-                        Write-Warning "Error running $($Command). $($_)"
+                        if (-not $SuppressWarning) {
+                            Write-Warning "Error running $($Command). $($_)"
+                        }
                         $this.UnSuccessfulCommands += $Command
                         $Result = @()
                         return $Result
                     }
                 }
 
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+                    return $this.TryCommand($Command, $CommandArgs, $false)
+                }
+
                 [System.Object[]] TryCommand([string]$Command) {
-                    return $this.TryCommand($Command, @{})
+                    return $this.TryCommand($Command, @{}, $false)
                 }
 
                 [void] AddSuccessfulCommand([string]$Command) {
@@ -98,14 +108,50 @@ InModuleScope -ModuleName ExportTeamsProvider {
                 $ValidJson
             }
         }
-        It "returns valid JSON" {
-                $Json = Export-TeamsProvider -M365Environment 'commercial'
+        It "returns valid JSON with interactive auth and unified settings available" {
+                $Json = Export-TeamsProvider
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
+        It "returns valid JSON with CertificateBasedAuth" {
+                $Json = Export-TeamsProvider -CertificateBasedAuth
+                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+                $ValidJson | Should -Be $true
+            }
+        It "returns valid JSON with interactive auth when unified settings unavailable" {
+                # Mock scenario where Get-M365UnifiedTenantSettings returns nothing (older tenant)
+                Mock -ModuleName ExportTeamsProvider Get-CommandTracker {
+                    $Tracker = [MockCommandTracker]::New()
+                    # Override the Get-M365UnifiedTenantSettings to return empty array
+                    $Tracker | Add-Member -MemberType ScriptMethod -Name TryCommand -Value {
+                        param([string]$Command, [hashtable]$CommandArgs = @{}, [bool]$SuppressWarning = $false)
+                        # Parameters CommandArgs and SuppressWarning are required for signature compatibility
+                        $null = $CommandArgs  # Satisfy PSScriptAnalyzer
+                        $null = $SuppressWarning  # Satisfy PSScriptAnalyzer
+                        if ($Command -eq "Get-M365UnifiedTenantSettings") {
+                            $this.UnSuccessfulCommands += $Command
+                            return @()  # Simulate cmdlet failure/no data
+                        }
+                        # Call original mock for other commands
+                        switch ($Command) {
+                            "Get-CsTenant" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsMeetingPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTenantFederationConfiguration" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsClientConfiguration" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsAppPermissionPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            "Get-CsTeamsMeetingBroadcastPolicy" { $this.SuccessfulCommands += $Command; return [pscustomobject]@{} }
+                            default { throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)" }
+                        }
+                    } -Force
+                    return $Tracker
+                }
+                $Json = Export-TeamsProvider
+                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
+                $ValidJson | Should -Be $true
+            }
+        AfterAll {
+            Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
+            Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
+        }
     }
-}
-AfterAll {
-    Remove-Module ExportTeamsProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
 }
