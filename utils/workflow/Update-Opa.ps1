@@ -172,7 +172,7 @@ function Invoke-UnitTestsWithNewOPAVersion {
     }
 
     # Run the unit test with the latest OPA version download
-    .\Testing\RunUnitTests.ps1 -OPAPath "./"
+    .\Testing\RunRegoUnitTests.ps1 -OPAPath "./"
 }
 
 function New-OpaUpdatePr {
