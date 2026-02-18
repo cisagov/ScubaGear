@@ -329,10 +329,9 @@ function Get-ApplicationsWithRiskyPermissions {
                 }
 
                 $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
-                $AdminConsentedPermissions = @($MappedPermissions | Where-Object { $_.IsAdminConsented -eq $true })
 
                 # Exclude applications without risky permissions
-                if ($RiskyPermissions.Count -gt 0 -and $AdminConsentedPermissions.Count -gt 0) {
+                if ($RiskyPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -571,6 +570,17 @@ function Format-RiskyApplications {
                 else {
                     $MergedObject = $App
                 }
+
+                # Calculate severity score after admin consent for permissions has been determined
+                $SeverityInfo = Set-SeverityScore -Object $MergedObject -ObjectType "Application"
+
+                # Add severity info to the merged object
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
+
                 $Applications += $MergedObject
             }
         }
@@ -611,6 +621,16 @@ function Format-RiskyThirdPartyServicePrincipals {
 
                 # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
                 if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
+                    # Calculate severity score after admin consent for permissions has been determined
+                    $SeverityInfo = Set-SeverityScore -Object $ServicePrincipal -ObjectType "ServicePrincipal" -IsThirdParty
+
+                    # Add severity info to the merged object
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
+
                     $ServicePrincipals += $ServicePrincipal
                 }
             }
@@ -641,7 +661,7 @@ function Get-SeverityWeights {
         NonAdminConsentedRiskyPermissions = @{
             PointsPerPermission = 2
             MaxPoints = 10 # Max of 5 non-admin consented risky permissions will be factored into the score
-            Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated        privileges. However, they can still be granted admin consent in the future and should be monitored."
+            Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated privileges. However, they can still be granted admin consent in the future and should be monitored."
         }
         MultiTenant = @{
             Points = 20
@@ -655,14 +675,14 @@ function Get-SeverityWeights {
             PointsPerCredential = 2
             PointsPerLongLivedCredential = 3
             MaxPoints = 10
-            ThreholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
+            ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."
         }
         KeyCredentials = @{
             PointsPerCredential = 1
             PointsPerLongLivedCredential = 2
             MaxPoints = 5
-            ThreholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
+            ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
             Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
         }
         FederatedCredentials = @{
@@ -863,12 +883,10 @@ function Set-SeverityScore {
 
         return [PSCustomObject]@{
             TotalScore = $Score
-            MaxPossibleScore = $Weights.MaxScore.$ObjectType
+            MaxScore = $Weights.MaxScore.$ObjectType
             ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
             SeverityLevel = $SeverityLevel
             ScoreBreakdown = $ScoreBreakdown
-            ObjectType = $ObjectType
-            Weights = $Weights
         }
     }
     catch {
