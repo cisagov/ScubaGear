@@ -296,17 +296,20 @@ class ScubaConfigValidator {
                         }
 
                         if (-not $PathExists) {
-                            if ($PropertyName -eq 'OPAPath') {
-                                # OPAPath must exist - ScubaGear cannot run without it
-                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. ScubaGear cannot run without a valid OPA directory."
-)
-                            } elseif ($PropertyName -eq 'OutPath') {
-                                # OutPath will be created by orchestrator - warn instead of error
-                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs."
+                            # Check validatePathExists from the original property definition (not the resolved ref)
+                            # This allows schema to control whether non-existence is an error or warning
+                            $RequirePathExists = $true  # Default to error if not specified
+                            if ($SchemaProperty.PSObject.Properties.Name -contains 'validatePathExists') {
+                                $RequirePathExists = $SchemaProperty.validatePathExists
+                            }
+
+                            if ($RequirePathExists) {
+                                # Path must exist - error
+                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue."
 )
                             } else {
-                                # Other paths (future-proofing) - treat as error
-                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue."
+                                # Path will be created - warning
+                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs."
 )
                             }
                         }
