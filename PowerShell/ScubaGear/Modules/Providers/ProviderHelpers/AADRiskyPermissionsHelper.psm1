@@ -278,9 +278,10 @@ function Get-ApplicationsWithRiskyPermissions {
                 }
 
                 $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+                $AdminConsentedPermissions = @($MappedPermissions | Where-Object { $_.IsAdminConsented -eq $true })
 
                 # Exclude applications without risky permissions
-                if ($RiskyPermissions.Count -gt 0) {
+                if ($RiskyPermissions.Count -gt 0 -and $AdminConsentedPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -640,6 +641,83 @@ function Format-RiskyThirdPartyServicePrincipals {
 
         return $ServicePrincipals
     }
+}
+
+function Get-SeverityWeights {
+    <#
+    .Description
+    Returns the weight factors used in severity score calculation.
+    .Functionality
+    #Internal
+    #>
+    return [PSCustomObject]@{
+        AdminConsentedRiskyPermission = @{
+            PointsPerPermission = 10
+            MaxPoints = 50 # Max of 5 admin consented risky permissions will be factored into the score
+            Description = "Admin consented permissions pose a higher risk as they have been granted elevated privileges."
+        }
+        NonConsentedRiskyPermission = @{
+            PointsPerPermission = 2
+            MaxPoints = 10 # Max of 5 non-admin consented risky permissions will be factored into the score
+            Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated        privileges. However, they can still be granted admin consent in the future and should be monitored."
+        }
+        MultiTenantEnabled = @{
+            Points = 20
+            Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
+        }
+        ThirdPartyServicePrincipal = @{
+            Points = 20
+            Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
+        }
+        PasswordCredentials = @{
+            BasePointsPerCredential = 2
+            LongLivedPointsPerCredential = 3
+            MaxPoints = 10
+            ThreholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
+            Description = "Credentials can be used to authenticate as the application/service principal."
+        }
+        KeyCredentials = @{
+            BasePointsPerCredential = 1
+            LongLivedPointsPerCredential = 2
+            MaxPoints = 5
+            ThreholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
+            Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
+        }
+        FederatedCredentials = @{
+            PointsPerCredential = 1
+            MaxPoints = 5
+            Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
+        }
+
+        Thresholds = @{
+            Critical = 70
+            High = 45
+            Medium = 25
+            Description = "Severity thresholds for categorizing applications/service principals based on their calculated severity score."
+        }
+
+        MaxScore = @{
+            Application = 100       # 50 (admin) + 10 (non-consented) + 20 (multi-tenant) + 10 (password) + 5 (key) + 5 (federated)
+            ServicePrincipal = 100  # 50 (admin) + 10 (non-consented) + 20 (third-party) + 10 (password) + 5 (key) + 5 (federated)
+            Description = "Maximum achievable score varies by object type"
+        }
+    }
+}
+
+function Calculate-SeverityScore {
+    <#
+    .Description
+    Calculates a severity score for each risky application/service principal based on multiple risk factors:
+    - Number of risky permissions
+    - Number of admin consented risky permissions
+    - Multi-tenant enabled/disabled
+    - Third-party service principal (owned externally)
+    - Long-lived credentials exceeding max duration
+    
+    The total severity score is normalized to 100 to factor in different weight distributions for each of the above risk factors.
+    .Functionality
+    #Internal
+    #>
 }
 
 Export-ModuleMember -Function @(
