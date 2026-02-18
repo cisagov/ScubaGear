@@ -633,17 +633,17 @@ function Get-SeverityWeights {
     #Internal
     #>
     return [PSCustomObject]@{
-        AdminConsentedRiskyPermission = @{
+        AdminConsentedRiskyPermissions = @{
             PointsPerPermission = 10
             MaxPoints = 50 # Max of 5 admin consented risky permissions will be factored into the score
             Description = "Admin consented permissions pose a higher risk as they have been granted elevated privileges."
         }
-        NonConsentedRiskyPermission = @{
+        NonAdminConsentedRiskyPermissions = @{
             PointsPerPermission = 2
             MaxPoints = 10 # Max of 5 non-admin consented risky permissions will be factored into the score
             Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated        privileges. However, they can still be granted admin consent in the future and should be monitored."
         }
-        MultiTenantEnabled = @{
+        MultiTenant = @{
             Points = 20
             Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
         }
@@ -652,15 +652,15 @@ function Get-SeverityWeights {
             Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
         }
         PasswordCredentials = @{
-            BasePointsPerCredential = 2
-            LongLivedPointsPerCredential = 3
+            PointsPerCredential = 2
+            PointsPerLongLivedCredential = 3
             MaxPoints = 10
             ThreholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."
         }
         KeyCredentials = @{
-            BasePointsPerCredential = 1
-            LongLivedPointsPerCredential = 2
+            PointsPerCredential = 1
+            PointsPerLongLivedCredential = 2
             MaxPoints = 5
             ThreholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
             Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
@@ -686,7 +686,63 @@ function Get-SeverityWeights {
     }
 }
 
-function Calculate-SeverityScore {
+function Set-CredentialScore {
+    <#
+    .Description
+    Calculates the severity score for credentials; handles password, key, and federated credentials.
+    .Functionality
+    #Internal
+    #>
+    param (
+        [PSCredential[]]
+        $Credentials,
+
+        [ValidateNotNullOrEmpty()]
+        [Object]
+        $WeightConfig,
+
+        [switch]
+        $CheckLifetime
+    )
+
+    $CredentialPoints = 0
+    $CredentialCount = 0
+    $LongLivedCredentialCount = 0
+
+    if ($null -eq $Credentials -or @($Credentials).Count -eq 0) {
+        return @{
+            CredentialCount = $CredentialCount
+            TotalPoints = $CredentialPoints
+        }
+    }
+
+    foreach ($Credential in $Credentials) {
+        $CredentialCount++
+
+        # Base points for credential existence
+        $CredentialPoints += $WeightConfig.PointsPerCredential
+
+        # Add additional points for long-lived credentials (excludes federated)
+        if ($CheckLifetime -and $null -ne $Credential.StartDateTime -and $null -ne $Credential.EndDateTime) {
+            $Duration = (New-TimeSpan -Start $Credential.StartDateTime -End $Credential.EndDateTime).Days
+
+            if ($Duration -gt $WeightConfig.ThresholdInDays) {
+                $CredentialPoints += $WeightConfig.PointsPerLongLivedCredential
+                $LongLivedCredentialCount++
+            }
+        }
+    }
+
+    $CredentialPoints = [Math]::Min($CredentialPoints, $WeightConfig.MaxPoints)
+
+    return @{
+        CredentialCount = $CredentialCount
+        LongLivedCredentialCount = $LongLivedCredentialCount
+        TotalPoints = $CredentialPoints
+    }
+}
+
+function Set-SeverityScore {
     <#
     .Description
     Calculates a severity score for each risky application/service principal based on multiple risk factors:
@@ -700,6 +756,126 @@ function Calculate-SeverityScore {
     .Functionality
     #Internal
     #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $Object,
+
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("Application","ServicePrincipal")]
+        [string]
+        $ObjectType,
+
+        [switch]
+        $IsThirdPartyServicePrincipal
+    )
+    try {
+        $Weights = Get-SeverityWeights
+
+        $Score = 0
+        $ScoreBreakdown = @{}
+
+        # 1. Determine admin consented risky permission weight factor
+        $AdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
+            $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $true
+        })
+        $AdminConsentedPoints = [Math]::Min(
+            $AdminConsentedRiskyPermissions.Count * $Weights.AdminConsentedRiskyPermissions.PointsPerPermission,
+            $Weights.AdminConsentedRiskyPermissions.MaxPoints
+        )
+        $Score += $AdminConsentedPoints
+        $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
+            PermissionCount = $AdminConsentedRiskyPermissions.Count
+            TotalPoints = $AdminConsentedPoints
+        }
+
+        # 2. Determine non-admin consented risky permission weight factor
+        $NonAdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
+            $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $false
+        })
+        $NonAdminConsentedPoints = [Math]::Min(
+            $NonAdminConsentedRiskyPermissions.Count * $Weights.NonAdminConsentedRiskyPermissions.PointsPerPermission,
+            $Weights.NonAdminConsentedRiskyPermissions.MaxPoints
+        )
+        $Score += $NonAdminConsentedPoints
+        $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
+            PermissionCount = $NonAdminConsentedRiskyPermissions.Count
+            TotalPoints = $NonAdminConsentedPoints
+        }
+
+        # 3. Determine multi-tenant weight factor (used only for applications)
+        $MultiTenantPoints = 0
+        if ($Object.IsMultiTenantEnabled -eq $true) {
+            $MultiTenantPoints = $Weights.MultiTenant.Points
+            $Score += $MultiTenantPoints
+
+            $ScoreBreakdown.MultiTenant = [PSCustomObject]@{
+                IsMultiTenantEnabled = $Object.IsMultiTenantEnabled
+                TotalPoints = $MultiTenantPoints
+            }
+        }
+
+        # 4. Determine third-party service principal weight factor (used only for service principals)
+        $ThirdPartyServicePrincipalPoints = 0
+        if ($IsThirdPartyServicePrincipal -eq $true) {
+            $ThirdPartyServicePrincipalPoints = $Weights.ThirdPartyServicePrincipal.Points
+            $Score += $ThirdPartyServicePrincipalPoints
+
+            $ScoreBreakdown.ThirdPartyServicePrincipal = [PSCustomObject]@{
+                IsThirdPartyServicePrincipal = $IsThirdPartyServicePrincipal
+                TotalPoints = $ThirdPartyServicePrincipalPoints
+            }
+        }
+
+        # 5. Calculate password credential weight factor
+        $PasswordCredentialScore = Set-CredentialScore `
+            -Credentials $Object.PasswordCredentials `
+            -WeightConfig $Weights.PasswordCredentials `
+            -CheckLifetime
+        
+        $Score += $PasswordCredentialScore.TotalPoints
+        $ScoreBreakdown.PasswordCredentials = $PasswordCredentialScore
+
+        # 6. Calculate key credential weight factor
+        $KeyCredentialScore = Set-CredentialScore `
+            -Credentials $Object.KeyCredentials `
+            -WeightConfig $Weights.KeyCredentials `
+            -CheckLifetime
+        
+        $Score += $KeyCredentialScore.TotalPoints
+        $ScoreBreakdown.KeyCredentials = $KeyCredentialScore
+
+        # 7. Calculate federated credential weight factor
+        $FederatedCredentialScore = Set-CredentialScore `
+            -Credentials $Object.FederatedCredentials `
+            -WeightConfig $Weights.FederatedCredentials `
+        
+        $Score += $FederatedCredentialScore.TotalPoints
+        $ScoreBreakdown.FederatedCredentials = $FederatedCredentialScore
+
+        # Determine severity level
+        $SeverityLevel = switch ($Score) {
+            { $_ -ge $Weights.Thresholds.Critical } { "Critical"; break }
+            { $_ -ge $Weights.Thresholds.High } { "High"; break }
+            { $_ -ge $Weights.Thresholds.Medium } { "Medium"; break }
+            default { "Low" }
+        }
+
+        return [PSCustomObject]@{
+            TotalScore = $Score
+            MaxPossibleScore = $Weights.MaxScore.$ObjectType
+            ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
+            SeverityLevel = $SeverityLevel
+            ScoreBreakdown = $ScoreBreakdown
+            ObjectType = $ObjectType
+            Weights = $Weights
+        }
+    }
+    catch {
+        Write-Warning "An error occurred in Set-SeverityScore: $($_.Exception.Message)"
+        Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_
+    }
 }
 
 Export-ModuleMember -Function @(
