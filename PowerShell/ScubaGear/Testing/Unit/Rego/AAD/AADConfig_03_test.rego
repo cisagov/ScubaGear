@@ -126,11 +126,13 @@ test_PhishingResistantMFAUserGroupExclusion_Correct if {
 #--
 
 #
-# Policy MS.AAD.3.2v1
+# Policy MS.AAD.3.2v2
 #--
-test_NoExclusionsConditions_Correct if {
+# Three basic compliant cases
+test_MFA_BuiltInControls_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]}])
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
+                {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
@@ -139,7 +141,40 @@ test_NoExclusionsConditions_Correct if {
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+}
+
+test_MFA_Builtin_AuthenticationStrength_Correct if {
+   CAP := json.patch(ConditionalAccessPolicies,
+               [{"op": "replace", "path": "GrantControls/AuthenticationStrength", "value": BuiltinMultifactorAuthenticationAuthStrength}])
+
+   Output := aad.tests with input.conditional_access_policies as [CAP]
+
+   ReportDetailStr := concat("", [
+       "1 conditional access policy(s) found that meet(s) all requirements:",
+       "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+   ])
+
+   TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+}
+
+CustomMultifactorAuthenticationAuthStrength := {
+  "AllowedCombinations": [
+    "deviceBasedPush"
+  ],
+}
+test_MFA_Custom_AuthenticationStrength_Correct if {
+   CAP := json.patch(ConditionalAccessPolicies,
+               [{"op": "replace", "path": "GrantControls/AuthenticationStrength", "value": CustomMultifactorAuthenticationAuthStrength}])
+
+   Output := aad.tests with input.conditional_access_policies as [CAP]
+
+   ReportDetailStr := concat("", [
+       "1 conditional access policy(s) found that meet(s) all requirements:",
+       "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+   ])
+
+   TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptUsers_Correct if {
@@ -148,15 +183,15 @@ test_NoExclusionsExemptUsers_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 test_NoExclusionsExemptGroups_Correct if {
@@ -165,15 +200,15 @@ test_NoExclusionsExemptGroups_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 test_ApplicationExclusions_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
@@ -184,7 +219,7 @@ test_ApplicationExclusions_Incorrect_V1 if {
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # User exclusions test
@@ -198,7 +233,7 @@ test_UserExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionConditions_Correct if {
@@ -208,15 +243,15 @@ test_UserExclusionConditions_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 test_UserExclusionsNoExempt_Incorrect if {
@@ -230,7 +265,7 @@ test_UserExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_UserExclusionsSingleExempt_Incorrect if {
@@ -241,12 +276,12 @@ test_UserExclusionsSingleExempt_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_MultiUserExclusionsConditions_Correct if {
@@ -257,8 +292,8 @@ test_MultiUserExclusionsConditions_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as [
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
@@ -268,7 +303,7 @@ test_MultiUserExclusionsConditions_Correct if {
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Group Exclusion tests
@@ -282,7 +317,7 @@ test_GroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsConditions_Correct if {
@@ -292,15 +327,15 @@ test_GroupExclusionsConditions_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 test_GroupExclusionsNoExempt_Incorrect if {
@@ -314,7 +349,7 @@ test_GroupExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_GroupExclusionsSingleExempt_Incorrect if {
@@ -325,12 +360,12 @@ test_GroupExclusionsSingleExempt_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_MultiGroupExclusionsConditions_Correct if {
@@ -341,8 +376,8 @@ test_MultiGroupExclusionsConditions_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as [
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as [
                             "49b4dcdf-1f90-41a7c3609b425-9dd7-5e3",
                             "65fea286-22d3-42f9-b4ca-93a6f75817d4"
                         ]
@@ -352,7 +387,7 @@ test_MultiGroupExclusionsConditions_Correct if {
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # User and group exclusions tests
@@ -364,16 +399,16 @@ test_UserGroupExclusionConditions_Correct if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 test_UserGroupExclusionNoExempt_Incorrect if {
@@ -387,7 +422,7 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionUserExemptOnly_Incorrect if {
@@ -398,12 +433,12 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionGroupExemptOnly_Incorrect if {
@@ -414,12 +449,12 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_UserGroupExclusionTooFewUserExempts_Incorrect if {
@@ -431,31 +466,16 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
                 {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
-                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Groups as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # Other conditions
-test_ConditionalAccessPolicies_Correct_V1 if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
-                {"op": "remove", "path": "GrantControls/AuthenticationStrength"}])
-
-    Output := aad.tests with input.conditional_access_policies as [CAP]
-
-    ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
-    ])
-
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
-}
-
 test_IncludeApplications_Incorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
@@ -466,7 +486,7 @@ test_IncludeApplications_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_IncludeUsers_Incorrect_V1 if {
@@ -479,7 +499,7 @@ test_IncludeUsers_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeUsers_Incorrect if {
@@ -492,7 +512,7 @@ test_ExcludeUsers_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeGroups_Incorrect if {
@@ -505,7 +525,7 @@ test_ExcludeGroups_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_ExcludeRoles_Incorrect_V1 if {
@@ -518,7 +538,7 @@ test_ExcludeRoles_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_BuiltInControls_Incorrect_V1 if {
@@ -530,7 +550,7 @@ test_BuiltInControls_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 test_State_Incorrect_V1 if {
@@ -543,7 +563,7 @@ test_State_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -1822,7 +1842,7 @@ test_IsGeneralMFA_WindowsHelloForBusiness_Correct if {
         "<br/>Windows Hello for Business Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for FIDO2
@@ -1839,7 +1859,7 @@ test_IsGeneralMFA_Fido2_Correct if {
         "<br/>FIDO2 Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for X509 Certificate Multi-Factor
@@ -1856,7 +1876,7 @@ test_IsGeneralMFA_X509CertificateMultiFactor_Correct if {
         "<br/>X509 Certificate Multi-Factor Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for Device Based Push
@@ -1873,7 +1893,7 @@ test_IsGeneralMFA_DeviceBasedPush_Correct if {
         "<br/>Device Based Push Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for Temporary Access Pass One Time
@@ -1890,7 +1910,7 @@ test_IsGeneralMFA_TemporaryAccessPassOneTime_Correct if {
         "<br/>Temporary Access Pass One Time Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for Temporary Access Pass Multi Use
@@ -1907,7 +1927,7 @@ test_IsGeneralMFA_TemporaryAccessPassMultiUse_Correct if {
         "<br/>Temporary Access Pass Multi Use Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for multiple authentication combinations
@@ -1925,7 +1945,7 @@ test_IsGeneralMFA_MultipleCombinations_Correct if {
         "<br/>Multiple Authentication Combinations Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
 }
 
 # Test for non-MFA authentication strength (should fail)
@@ -1939,7 +1959,7 @@ test_IsGeneralMFA_NonMFAStrength_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # Test for empty authentication strength (should fail)
@@ -1953,6 +1973,6 @@ test_IsGeneralMFA_EmptyAuthenticationStrength_Incorrect if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 

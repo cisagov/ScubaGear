@@ -236,7 +236,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.2v1
+# MS.AAD.3.2v2
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -257,13 +257,13 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.2v1",
+    "PolicyId": "MS.AAD.3.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": NonSpecificMFAPolicies,
