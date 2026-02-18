@@ -183,6 +183,7 @@ Describe "ScubaConfigValidator Module Unit Tests" {
     Context "Path Pattern Validation" {
         BeforeAll {
             $Schema = [ScubaConfigValidator]::GetSchema()
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $FolderPathPattern = $Schema.definitions.patterns.folderPath.pattern
         }
 
