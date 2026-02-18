@@ -296,13 +296,19 @@ class ScubaConfigValidator {
                         }
 
                         if (-not $PathExists) {
-                            $ErrorType = if ($PropertyName -eq 'OPAPath') {
-                                "Directory does not exist: $PropertyValue. ScubaGear cannot run without a valid OPA directory."
-                            } else {
-                                "Directory does not exist: $PropertyValue."
-                            }
-                            [void]$Validation.Errors.Add("Property '$PropertyName': $ErrorType"
+                            if ($PropertyName -eq 'OPAPath') {
+                                # OPAPath must exist - ScubaGear cannot run without it
+                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. ScubaGear cannot run without a valid OPA directory."
 )
+                            } elseif ($PropertyName -eq 'OutPath') {
+                                # OutPath will be created by orchestrator - warn instead of error
+                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs."
+)
+                            } else {
+                                # Other paths (future-proofing) - treat as error
+                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue."
+)
+                            }
                         }
                     }
                 }
