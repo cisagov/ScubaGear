@@ -88,13 +88,6 @@ function Export-AADProvider {
                 }
             }
         }
-        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-
-        # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary.
-        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
@@ -194,7 +187,8 @@ function Export-AADProvider {
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
-                "M365Environment"=$M365Environment
+                "M365Environment"=$M365Environment;
+                "PrivilegedServicePrincipals"=$PrivilegedServicePrincipals
             })
         }
     )
@@ -223,6 +217,16 @@ function Export-AADProvider {
     # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
     $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
     ##### End block
+    
+    # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function above,
+    # convert privileged users/service principals to JSON after the calls above.
+    $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
+    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+
+    # While ConvertTo-Json won't mess up a dict as described in the above comment,
+    # on error, $TryCommand returns an empty list, not a dictionary.
+    $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
     # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
