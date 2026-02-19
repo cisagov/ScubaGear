@@ -96,6 +96,7 @@ function Format-Permission {
     if ($null -ne $RoleType) {
         $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
         $IsRisky = $RiskyPermissions -contains $Id
+        $RiskLevel = $Json.permissions.$AppDisplayName.$RoleType.$Id.RiskLevel
 
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
@@ -105,6 +106,7 @@ function Format-Permission {
             IsAdminConsented       = $IsAdminConsented
             RequiresAdminConsent   = $RequiresAdminConsent
             IsRisky                = $IsRisky
+            RiskLevel              = $RiskLevel
         }
     }
     return $Map
@@ -670,24 +672,34 @@ function Get-SeverityWeights {
     #Internal
     #>
     return [PSCustomObject]@{
+        RiskLevelWeights = @{
+            Critical = 25
+            High = 15
+            Medium = 5
+            Low = 2
+            Description = "Risk level weights are assigned based on the level of access granted by each permission."
+        }
+
         AdminConsentedRiskyPermissions = @{
-            PointsPerPermission = 10
-            MaxPoints = 50 # Max of 5 admin consented risky permissions will be factored into the score
+            MaxPoints = 50
             Description = "Admin consented permissions pose a higher risk as they have been granted elevated privileges."
         }
+
         NonAdminConsentedRiskyPermissions = @{
-            PointsPerPermission = 2
-            MaxPoints = 10 # Max of 5 non-admin consented risky permissions will be factored into the score
+            MaxPoints = 10
             Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated privileges. However, they can still be granted admin consent in the future and should be monitored."
         }
+
         MultiTenant = @{
             Points = 20
             Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
         }
+
         ThirdPartyServicePrincipal = @{
             Points = 20
             Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
         }
+
         PasswordCredentials = @{
             PointsPerCredential = 2
             PointsPerLongLivedCredential = 3
@@ -695,6 +707,7 @@ function Get-SeverityWeights {
             ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."
         }
+
         KeyCredentials = @{
             PointsPerCredential = 1
             PointsPerLongLivedCredential = 2
@@ -702,6 +715,7 @@ function Get-SeverityWeights {
             ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
             Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
         }
+
         FederatedCredentials = @{
             PointsPerCredential = 1
             MaxPoints = 5
@@ -710,8 +724,8 @@ function Get-SeverityWeights {
 
         Thresholds = @{
             Critical = 70
-            High = 45
-            Medium = 25
+            High = 40
+            Medium = 20
             Description = "Severity thresholds for categorizing applications/service principals based on their calculated severity score."
         }
 
@@ -816,28 +830,36 @@ function Set-SeverityScore {
         $AdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $true
         })
+        $AdminConsentedRawPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
+            $Weights.RiskLevelWeights[$_.RiskLevel]
+        } | Measure-Object -Sum).Sum
         $AdminConsentedPoints = [Math]::Min(
-            $AdminConsentedRiskyPermissions.Count * $Weights.AdminConsentedRiskyPermissions.PointsPerPermission,
+            $AdminConsentedRawPoints,
             $Weights.AdminConsentedRiskyPermissions.MaxPoints
         )
         $Score += $AdminConsentedPoints
         $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $AdminConsentedRiskyPermissions.Count
             TotalPoints = $AdminConsentedPoints
+            PermissionRiskLevels = $AdminConsentedRiskyPermissions | Select-Object RoleDisplayName, RiskLevel
         }
 
         # 2. Determine non-admin consented risky permission weight factor
         $NonAdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $false
         })
+        $NonAdminConsentedRawPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
+            $Weights.RiskLevelWeights[$_.RiskLevel]
+        } | Measure-Object -Sum).Sum
         $NonAdminConsentedPoints = [Math]::Min(
-            $NonAdminConsentedRiskyPermissions.Count * $Weights.NonAdminConsentedRiskyPermissions.PointsPerPermission,
+            $NonAdminConsentedRawPoints,
             $Weights.NonAdminConsentedRiskyPermissions.MaxPoints
         )
         $Score += $NonAdminConsentedPoints
         $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $NonAdminConsentedRiskyPermissions.Count
             TotalPoints = $NonAdminConsentedPoints
+            PermissionRiskLevels = $NonAdminConsentedRiskyPermissions | Select-Object RoleDisplayName, RiskLevel
         }
 
         # 3. Determine multi-tenant weight factor (used only for applications)
