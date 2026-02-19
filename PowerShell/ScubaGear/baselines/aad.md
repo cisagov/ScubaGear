@@ -574,14 +574,14 @@ Only administrators SHALL be allowed to register applications.
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
 #### MS.AAD.5.2v1
-Only administrators SHALL be allowed to consent to applications.
+User consent to applications SHALL be restricted.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 
 <!--Policy: MS.AAD.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Limiting applications consent to only specific privileged users reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
+- _Rationale:_ Restricting user consent for applications reduces risk of users giving insecure applications access to their data via [consent grant attacks](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants?view=o365-worldwide).
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(10), CM-5
 - _MITRE ATT&CK TTP Mapping:_
@@ -608,8 +608,6 @@ An admin consent workflow SHALL be configured for applications.
 
 - [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
 
-- [Enforce Administrators to Provide Consent for Apps Before Use](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-consent-to-apps-accessing-company-data-on-their-behalf.html)
-
 - [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)
 
 ### License Requirements
@@ -630,6 +628,13 @@ An admin consent workflow SHALL be configured for applications.
 
 #### MS.AAD.5.2v1 Instructions
 
+There are a couple of configuration options to restrict user consent. Each option is described below, followed by its respective instructions.
+
+- **Option 1** - Most restrictive - Do not allow users to consent to applications at all. An administrator must perform the consent. Users can submit requests to use an application via the admin consent workflow but they cannot perform the consent themselves.
+- **Option 2** - More flexible - Allow users to consent to applications that use low risk permissions and are from Microsoft verified publishers. When selecting this option, an adminstrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the portal.
+
+**Option 1**. Do not allow user consent.
+
 1.  In **Microsoft Entra admin center** select **Enterprise Applications**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
@@ -637,6 +642,22 @@ An admin consent workflow SHALL be configured for applications.
 3. Under **User consent for applications**, select **Do not allow user consent**.
 
 4. Click **Save**.
+
+**Option 2**. Allow restricted user consent.
+
+1.  In **Microsoft Entra admin center** select **Enterprise Applications**.
+
+2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
+
+3. Under **User consent for applications**, select **Allow user consent for apps from verified publishers, for selected permissions**.
+
+4. Click **Save**.
+
+5. In the page navigation menu, select **Permission classifications**.
+
+6. Click on the **Low** tab.
+
+7. [Add a list of low risk application permissions that users will be able to consent to](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-permission-classifications). We recommend only including permissions that provide minimal access to a user's data. For a reference of permissions that are considered risky and should be avoided [go to this JSON file and examine the permissions listed](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/Permissions/RiskyPermissions.json) in the **Delegated** sections under Microsoft Graph and other apps.
 
 #### MS.AAD.5.3v1 Instructions
 
