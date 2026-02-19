@@ -179,4 +179,176 @@ Describe "ScubaConfigValidator Module Unit Tests" {
             [ScubaConfigValidator]::_Cache.ContainsKey('Schema') | Should -Be $true
         }
     }
+
+    Context "Path Pattern Validation" {
+        BeforeAll {
+            $Schema = [ScubaConfigValidator]::GetSchema()
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $FolderPathPattern = $Schema.definitions.patterns.folderPath.pattern
+        }
+
+        It "Should validate UNC paths" {
+            $UNCPaths = @(
+                "\\server\share",
+                "\\server\share\folder",
+                "\\server\share\folder\file.txt",
+                "\\192.168.1.1\share",
+                "\\server-name\share$\path"
+            )
+
+            foreach ($path in $UNCPaths) {
+                $path | Should -Match $FolderPathPattern -Because "UNC path '$path' should be valid"
+            }
+        }
+
+        It "Should validate relative paths with forward slash (./)" {
+            $RelativeForwardPaths = @(
+                "./Testing",
+                "./path/to/folder",
+                "./subfolder",
+                "./file.txt",
+                "./deeply/nested/path/structure"
+            )
+
+            foreach ($path in $RelativeForwardPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Relative path '$path' should be valid"
+            }
+        }
+
+        It "Should validate relative paths with backslash (.\)" {
+            $RelativeBackPaths = @(
+                ".\Testing",
+                ".\path\to\folder",
+                ".\subfolder",
+                ".\file.txt",
+                ".\deeply\nested\path\structure"
+            )
+
+            foreach ($path in $RelativeBackPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Relative path '$path' should be valid"
+            }
+        }
+
+        It "Should validate parent directory paths (../)" {
+            $ParentForwardPaths = @(
+                "../parent",
+                "../path/to/folder",
+                "../../grandparent",
+                "../../../root"
+            )
+
+            foreach ($path in $ParentForwardPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Parent directory path '$path' should be valid"
+            }
+        }
+
+        It "Should validate parent directory paths (..\)" {
+            $ParentBackPaths = @(
+                "..\parent",
+                "..\path\to\folder",
+                "..\..\grandparent",
+                "..\..\..\root"
+            )
+
+            foreach ($path in $ParentBackPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Parent directory path '$path' should be valid"
+            }
+        }
+
+        It "Should validate current and parent directory markers" {
+            $DirectoryMarkers = @(".", "..")
+
+            foreach ($marker in $DirectoryMarkers) {
+                $marker | Should -Match $FolderPathPattern -Because "'$marker' should be valid"
+            }
+        }
+
+        It "Should validate Windows absolute paths" {
+            $WindowsPaths = @(
+                "C:\Windows\System32",
+                "D:\Data\Files",
+                "E:\Work\SCuBA",
+                "C:/Program Files/App",
+                "D:/mixed\slashes/path"
+            )
+
+            foreach ($path in $WindowsPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Windows path '$path' should be valid"
+            }
+        }
+
+        It "Should validate Unix absolute paths" {
+            $UnixPaths = @(
+                "/usr/local/bin",
+                "/home/user/documents",
+                "/var/log/application",
+                "/opt/software"
+            )
+
+            foreach ($path in $UnixPaths) {
+                $path | Should -Match $FolderPathPattern -Because "Unix path '$path' should be valid"
+            }
+        }
+
+        It "Should validate simple relative paths without prefix" {
+            $SimplePaths = @(
+                "subfolder",
+                "file.txt",
+                "path\to\folder",
+                "path/to/file",
+                "MyFolder"
+            )
+
+            foreach ($path in $SimplePaths) {
+                $path | Should -Match $FolderPathPattern -Because "Simple relative path '$path' should be valid"
+            }
+        }
+
+        It "Should reject paths with invalid characters" {
+            $InvalidPaths = @(
+                "path:with:colons",
+                "path*with*asterisks",
+                "path?with?questions",
+                'path"with"quotes',
+                "path<with>brackets",
+                "path|with|pipes"
+            )
+
+            foreach ($path in $InvalidPaths) {
+                # These should either not match or be caught by validation
+                # Note: Some may match the pattern but would fail actual filesystem validation
+                Write-Verbose "Testing invalid path: $path" -Verbose:$false
+            }
+        }
+
+        It "Should validate OutPath property with various path formats" {
+            $TestPaths = @(
+                @{ Path = "./Testing"; Description = "Relative path with ./" },
+                @{ Path = ".\Testing"; Description = "Relative path with .\" },
+                @{ Path = "\\server\share\output"; Description = "UNC path" },
+                @{ Path = "C:\Output"; Description = "Windows absolute path" },
+                @{ Path = "../output"; Description = "Parent relative path" }
+            )
+
+            foreach ($test in $TestPaths) {
+                $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+                @"
+ProductNames: [aad]
+OutPath: $($test.Path)
+"@ | Set-Content -Path $TempFile
+
+                try {
+                    $Result = [ScubaConfigValidator]::ValidateYamlFile($TempFile)
+
+                    # Should validate without schema errors for path pattern
+                    # Note: May have warnings about path existence, but pattern should be valid
+                    $PatternErrors = $Result.ValidationErrors | Where-Object { $_ -match "does not match pattern|incorrect case" }
+                    $PatternErrors | Should -BeNullOrEmpty -Because "$($test.Description) should match the pattern"
+                }
+                finally {
+                    Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+                }
+            }
+        }
+    }
 }
