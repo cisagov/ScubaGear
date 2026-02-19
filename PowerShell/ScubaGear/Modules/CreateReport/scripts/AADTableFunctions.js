@@ -38,7 +38,8 @@ const TABLE_METADATA = {
         useModal: true,
         columns: [
             { name: "" },
-            { name: "DisplayName" },
+            { name: "DisplayName", className: "display_name" },
+            { name: "SeverityLevel", className: "severity_level" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -53,6 +54,8 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
+            { name: "SeverityLevel", className: "severity_level" },
+            { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
             { name: "FederatedCredentials", className: "federated_credentials" },
@@ -70,6 +73,8 @@ const TABLE_METADATA = {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
+        case "SeverityLevel": return "Risk Level";
+        case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
         case "PasswordCredentials": return "Password Credentials";
@@ -119,6 +124,38 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
     const content = contentBuilder();
     if (content) btn.appendChild(content);
     return btn;
+};
+
+/**
+ * Colors a row in the risk apps/SPs table based on its severity level.
+ * 
+ * Critical = red
+ * High = orange
+ * Medium = yellow
+ * Low/None = no color
+ * 
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "riskyApps", "riskySPs").
+ */
+const colorRiskyRows = (data, tableType) => {
+    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
+        const severityLevel = data[rowIndex]?.SeverityLevel;
+        switch (severityLevel) {
+            case "Critical":
+                row.style.background = "var(--severity-critical)";
+                break;
+            case "High":
+                row.style.background = "var(--severity-high)";
+                break;
+            case "Medium":
+                row.style.background = "var(--severity-medium)";
+                break;
+            case "Low":
+                row.style.background = "var(--severity-low)";
+                break;
+            default: break;
+        }
+    });
 };
 
 /**
@@ -232,11 +269,28 @@ const buildExpandableTable = (data, tableType) => {
 
             tbody.appendChild(tr);
         });
+
+        if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+            colorRiskyRows(data, tableType);
+        }
     }
     catch (error) {
         console.error(`Error building expandable table for ${tableType}:`, error);
     }
 }
+
+/**
+ * Creates a severity badge element for the given severity level.
+ * 
+ * @param {string} level - "Critical", "High", "Medium", or "Low".
+ * @returns {HTMLElement} - A styled <span> badge element.
+ */
+const createSeverityBadge = (level) => {
+    const span = document.createElement("span");
+    span.classList.add("severity-badge", level);
+    span.textContent = level ?? "Unknown";
+    return span;
+};
 
 /**
  * Fills a cell with truncated content and three-dots button (for expanding) if needed.
@@ -308,6 +362,13 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
                 }
             })
         );
+    }
+
+    if (col.name === "SeverityLevel") {
+        td.textContent = "";
+        td.appendChild(createSeverityBadge(cellData));
+        
+        return;
     }
 }
 
@@ -389,6 +450,13 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
         }
 
         td.textContent = cellData ?? "None";
+
+        if (col.name === "SeverityLevel") {
+            td.textContent = "";
+            td.appendChild(createSeverityBadge(cellData));
+
+            return;
+        }
     });
 }
 
@@ -446,6 +514,10 @@ const expandAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillExpandedRow(data, tableType, row, rowIndex);
     });
+
+    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+        colorRiskyRows(data, tableType);
+    }
 }
 
 /**
@@ -471,6 +543,10 @@ const collapseAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillCollapsedRow(data, tableType, row, rowIndex);
     });
+
+    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+        colorRiskyRows(data, tableType);
+    }
 }
 
 /**

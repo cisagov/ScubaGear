@@ -33,6 +33,10 @@
     --btn-primary-border: #005288;
     --btn-primary-hover-bg: #f2f6f8;
     --btn-primary-active-bg: #e3eaee;
+    --severity-critical: #f8d7da;
+    --severity-high: #fde8d8;
+    --severity-medium: #fff3cd;
+    --severity-low: #dce8f8;
 }
 
 html[data-theme='dark'] {
@@ -64,6 +68,10 @@ html[data-theme='dark'] {
     --btn-primary-border: #4aa3d6;
     --btn-primary-hover-bg: #16212a;
     --btn-primary-active-bg: #1c2731;
+    --severity-critical: #5c1a1a;
+    --severity-high: #5c3a1a;
+    --severity-medium: #4a3c00;
+    --severity-low: #1a2e4a;
 }
 
 body {
@@ -625,6 +633,19 @@ a.control_group:active {
     color: var(--header-color);
     margin-right: 2px;
 }
+
+.severity-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+.severity-badge.Critical { background-color: #dc3545; color: #fff; }
+.severity-badge.High     { background-color: #fd7e14; color: #fff; }
+.severity-badge.Medium   { background-color: #ffc107; color: #000; }
+.severity-badge.Low      { background-color: #5b9bd5; color: #fff; }
 
 /* Policy Indicator Badges */
 .policy-indicators {

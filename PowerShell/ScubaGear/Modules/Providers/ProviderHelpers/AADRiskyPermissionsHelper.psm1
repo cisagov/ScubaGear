@@ -626,7 +626,11 @@ function Format-RiskyThirdPartyServicePrincipals {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        # Raw hashtable containing privileged service principals which is keyed by ServicePrincipalId (object id)
+        [hashtable]
+        $PrivilegedServicePrincipals = @{}
     )
     process {
         try {
@@ -638,10 +642,26 @@ function Format-RiskyThirdPartyServicePrincipals {
                     continue
                 }
 
+                # A null value indicates the owner organization is unknown (e.g., agent service principal)
+                # and should not be treated as a third-party service principal.
+                if ($null -eq $ServicePrincipal.AppOwnerOrganizationId) {
+                    Write-Warning "Service principal $($ServicePrincipal.DisplayName) with AppId $($ServicePrincipal.AppId) does not have an AppOwnerOrganizationId. Skipping."
+                    continue
+                }
+
                 # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
                 if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
+                    $PrivilegedRoles = @()
+                    if ($PrivilegedServicePrincipals.ContainsKey($ServicePrincipal.ObjectId)) {
+                        $PrivilegedRoles = $PrivilegedServicePrincipals[$ServicePrincipal.ObjectId].roles
+                    }
+
                     # Calculate severity score after admin consent for permissions has been determined
-                    $SeverityInfo = Set-SeverityScore -Object $ServicePrincipal -ObjectType "ServicePrincipal" -IsThirdParty
+                    $SeverityInfo = Set-SeverityScore `
+                        -Object $ServicePrincipal `
+                        -ObjectType "ServicePrincipal" `
+                        -IsThirdParty `
+                        -PrivilegedRoles $PrivilegedRoles
 
                     # Add severity info to the merged object
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
@@ -649,6 +669,7 @@ function Format-RiskyThirdPartyServicePrincipals {
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "PrivilegedRoles" -Value $PrivilegedRoles
 
                     $ServicePrincipals += $ServicePrincipal
                 }
@@ -668,6 +689,23 @@ function Get-SeverityWeights {
     <#
     .Description
     Returns the weight factors used in severity score calculation.
+
+    Maximum score is 100 for both applications and service principals.
+    The score is composed of the following factors:
+
+    Factor                        App     SP      Notes
+    ─────────────────────────────────────────────────────────────────────────────
+    Admin consented perms         50      50      Weighted by RiskLevel per permission
+    Non-admin consented perms     10      10      Weighted by RiskLevel per permission
+    Multi-tenant                  15      -       Applications only
+    Third-party SP                -       10      Service principals only
+    Privileged roles              -       15      Service principals only
+    Password credentials          8       8       + points for long-lived (>180 days)
+    Key credentials               4       4       + points for long-lived (>365 days)
+    Federated credentials         3       3       No lifetime check
+    ─────────────────────────────────────────────────────────────────────────────
+    Total                         100     100
+
     .Functionality
     #Internal
     #>
@@ -690,20 +728,27 @@ function Get-SeverityWeights {
             Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated privileges. However, they can still be granted admin consent in the future and should be monitored."
         }
 
+        # Context factors (25 points max)
         MultiTenant = @{
-            Points = 20
+            Points = 15
             Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
         }
 
         ThirdPartyServicePrincipal = @{
-            Points = 20
+            Points = 10
             Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
+        }
+
+        PrivilegedRoles = @{
+            PointsPerRole = 8
+            MaxPoints = 15
+            Description = "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
         }
 
         PasswordCredentials = @{
             PointsPerCredential = 2
             PointsPerLongLivedCredential = 3
-            MaxPoints = 10
+            MaxPoints = 8
             ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."
         }
@@ -711,14 +756,14 @@ function Get-SeverityWeights {
         KeyCredentials = @{
             PointsPerCredential = 1
             PointsPerLongLivedCredential = 2
-            MaxPoints = 5
+            MaxPoints = 4
             ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
             Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
         }
 
         FederatedCredentials = @{
             PointsPerCredential = 1
-            MaxPoints = 5
+            MaxPoints = 3
             Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
         }
 
@@ -730,8 +775,8 @@ function Get-SeverityWeights {
         }
 
         MaxScore = @{
-            Application = 100       # 50 (admin) + 10 (non-consented) + 20 (multi-tenant) + 10 (password) + 5 (key) + 5 (federated)
-            ServicePrincipal = 100  # 50 (admin) + 10 (non-consented) + 20 (third-party) + 10 (password) + 5 (key) + 5 (federated)
+            Application = 100
+            ServicePrincipal = 100
             Description = "Maximum achievable score varies by object type"
         }
     }
@@ -818,7 +863,10 @@ function Set-SeverityScore {
         $ObjectType,
 
         [switch]
-        $IsThirdPartyServicePrincipal
+        $IsThirdPartyServicePrincipal,
+
+        [string[]]
+        $PrivilegedRoles = @()
     )
     try {
         $Weights = Get-SeverityWeights
@@ -841,7 +889,6 @@ function Set-SeverityScore {
         $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $AdminConsentedRiskyPermissions.Count
             TotalPoints = $AdminConsentedPoints
-            PermissionRiskLevels = $AdminConsentedRiskyPermissions | Select-Object RoleDisplayName, RiskLevel
         }
 
         # 2. Determine non-admin consented risky permission weight factor
@@ -859,10 +906,25 @@ function Set-SeverityScore {
         $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $NonAdminConsentedRiskyPermissions.Count
             TotalPoints = $NonAdminConsentedPoints
-            PermissionRiskLevels = $NonAdminConsentedRiskyPermissions | Select-Object RoleDisplayName, RiskLevel
         }
 
-        # 3. Determine multi-tenant weight factor (used only for applications)
+        # 3. Determine privileged roles weight factor (used only for service principals)
+        $PrivilegedRolesPoints = 0
+        if ($PrivilegedRoles.Count -gt 0) {
+            $PrivilegedRolesPoints = [Math]::Min(
+                $PrivilegedRoles.Count * $Weights.PrivilegedRoles.PointsPerRole,
+                $Weights.PrivilegedRoles.MaxPoints
+            )
+            $Score += $PrivilegedRolesPoints
+
+            $ScoreBreakdown.PrivilegedRoles = [PSCustomObject]@{
+                RoleCount = $PrivilegedRoles.Count
+                TotalPoints = $PrivilegedRolesPoints
+                Roles = $PrivilegedRoles
+            }
+        }
+
+        # 4. Determine multi-tenant weight factor (used only for applications)
         $MultiTenantPoints = 0
         if ($Object.IsMultiTenantEnabled -eq $true) {
             $MultiTenantPoints = $Weights.MultiTenant.Points
@@ -874,7 +936,7 @@ function Set-SeverityScore {
             }
         }
 
-        # 4. Determine third-party service principal weight factor (used only for service principals)
+        # 5. Determine third-party service principal weight factor (used only for service principals)
         $ThirdPartyServicePrincipalPoints = 0
         if ($IsThirdPartyServicePrincipal -eq $true) {
             $ThirdPartyServicePrincipalPoints = $Weights.ThirdPartyServicePrincipal.Points
@@ -886,7 +948,7 @@ function Set-SeverityScore {
             }
         }
 
-        # 5. Calculate password credential weight factor
+        # 6. Calculate password credential weight factor
         $PasswordCredentialScore = Set-CredentialScore `
             -Credentials $Object.PasswordCredentials `
             -WeightConfig $Weights.PasswordCredentials `
@@ -895,7 +957,7 @@ function Set-SeverityScore {
         $Score += $PasswordCredentialScore.TotalPoints
         $ScoreBreakdown.PasswordCredentials = $PasswordCredentialScore
 
-        # 6. Calculate key credential weight factor
+        # 7. Calculate key credential weight factor
         $KeyCredentialScore = Set-CredentialScore `
             -Credentials $Object.KeyCredentials `
             -WeightConfig $Weights.KeyCredentials `
@@ -904,7 +966,7 @@ function Set-SeverityScore {
         $Score += $KeyCredentialScore.TotalPoints
         $ScoreBreakdown.KeyCredentials = $KeyCredentialScore
 
-        # 7. Calculate federated credential weight factor
+        # 8. Calculate federated credential weight factor
         $FederatedCredentialScore = Set-CredentialScore `
             -Credentials $Object.FederatedCredentials `
             -WeightConfig $Weights.FederatedCredentials `

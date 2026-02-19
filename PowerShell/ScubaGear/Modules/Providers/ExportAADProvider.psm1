@@ -88,13 +88,6 @@ function Export-AADProvider {
                 }
             }
         }
-        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-
-        # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary.
-        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         if ($RequiredServicePlan){
@@ -178,7 +171,7 @@ function Export-AADProvider {
     # "Format-RiskyApplications" will match app registrations with and without a corresponding service principal object.
     # If an app registration does not have a service principal object, only app registration data will be displayed.
     # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
                 "RiskyApps"=$RiskyApps;
@@ -189,15 +182,26 @@ function Export-AADProvider {
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
     # It only returns risky service principals owned by external tenants.
-    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 4 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
-                "M365Environment"=$M365Environment
+                "M365Environment"=$M365Environment;
+                "PrivilegedServicePrincipals"=$PrivilegedServicePrincipals
             })
         }
     )
     ##### End block
+    
+    # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function above,
+    # convert privileged users/service principals to JSON after the calls above.
+    $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
+    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+
+    # While ConvertTo-Json won't mess up a dict as described in the above comment,
+    # on error, $TryCommand returns an empty list, not a dictionary.
+    $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
