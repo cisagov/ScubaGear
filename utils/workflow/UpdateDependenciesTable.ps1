@@ -92,10 +92,14 @@ function Update-DependenciesTable {
         }
     }
 
-    # Write the updated content back to the file
-    Set-Content -Path $DependenciesPath -Value $DependenciesContent -Encoding UTF8
-
-    Write-Output "Successfully updated $updatedCount out of $($ModuleList.Count) modules in dependencies.md"
+    # Only write the file if changes were actually made
+    if ($updatedCount -gt 0) {
+        Set-Content -Path $DependenciesPath -Value $DependenciesContent -Encoding UTF8 -NoNewline
+        Write-Output "Successfully updated $updatedCount out of $($ModuleList.Count) modules in dependencies.md"
+    }
+    else {
+        Write-Output "No changes needed in dependencies.md"
+    }
 
     return $updatedCount
 }

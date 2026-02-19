@@ -109,7 +109,7 @@ if ($updated) {
 
     # Join the updated lines back into content and write to file
     $newContent = $newLines -join "`n"
-    Set-Content -Path $scriptPath -Value $newContent
+    Set-Content -Path $scriptPath -Value $newContent -NoNewline
     Write-Information "RequiredVersions.ps1 file has been updated successfully." -InformationAction Continue
 }
 else {
