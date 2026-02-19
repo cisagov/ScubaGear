@@ -51,7 +51,7 @@ TestPlan:
                 Name="PolicyName"; Expression={$_.name}
               } | Remove-DlpPolicy
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
         Preconditions:
           - Command: |
@@ -108,7 +108,7 @@ TestPlan:
                       - displayName: "Exclude DefaultEnv Policy"
                         environmentType: "ExceptEnvironments"
                         environments:
-                          - name: "Test1"
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                   - EnvironmentName: "Test1"
