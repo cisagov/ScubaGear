@@ -86,18 +86,24 @@ function Format-Permission {
 
         [ValidateNotNullOrEmpty()]
         [boolean]
-        $IsAdminConsented
+        $IsAdminConsented,
+
+        [ValidateNotNullOrEmpty()]
+        [boolean]
+        $RequiresAdminConsent
     )
     $Map = @()
-    if ( $RoleType -ne $null) {
+    if ($null -ne $RoleType) {
         $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
         $IsRisky = $RiskyPermissions -contains $Id
+
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
             RoleType               = if ($null -ne $RoleType) { $RoleType } else { $null }
             RoleDisplayName        = if ($null -ne $RoleDisplayName) { $RoleDisplayName } else { $null }
             ApplicationDisplayName = $AppDisplayName
             IsAdminConsented       = $IsAdminConsented
+            RequiresAdminConsent   = $RequiresAdminConsent
             IsRisky                = $IsRisky
         }
     }
@@ -240,10 +246,15 @@ function Get-ApplicationsWithRiskyPermissions {
                             if ($Role.Type -eq "Role") {
                                 $ReadableRoleType = "Application"
                                 $RoleDisplayName = ($ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }).value
+                                # Application permissions always require admin consent
+                                $RequiresAdminConsent = $true
                             }
                             else {
                                 $ReadableRoleType = "Delegated"
-                                $RoleDisplayName = ($ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }).value
+                                $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
+                                $RoleDisplayName = $OauthScope.value
+                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
+                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
                             }
 
                             $MappedPermissions += Format-Permission `
@@ -252,7 +263,8 @@ function Get-ApplicationsWithRiskyPermissions {
                                 -Id $RoleId `
                                 -RoleType $ReadableRoleType `
                                 -RoleDisplayName $RoleDisplayName `
-                                -IsAdminConsented $IsAdminConsented
+                                -IsAdminConsented $IsAdminConsented `
+                                -RequiresAdminConsent $RequiresAdminConsent
                         }
                     }
                 }
@@ -400,12 +412,16 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                         if ($null -ne $AppRole) {
                                             $ReadableRoleType = "Application"
                                             $RoleDisplayName = $AppRole.value
+                                            # Application permissions always require admin consent
+                                            $RequiresAdminConsent = $true
                                         }
                                         else {
                                             $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
                                             if ($null -ne $OauthScope) {
                                                 $ReadableRoleType = "Delegated"
                                                 $RoleDisplayName = $OauthScope.value
+                                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
+                                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
                                             }
                                         }
 
@@ -415,7 +431,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                             -Id $RoleId `
                                             -RoleType $ReadableRoleType `
                                             -RoleDisplayName $RoleDisplayName `
-                                            -IsAdminConsented $IsAdminConsented
+                                            -IsAdminConsented $IsAdminConsented `
+                                            -RequiresAdminConsent $RequiresAdminConsent
                                     }
                                 }
                             }
