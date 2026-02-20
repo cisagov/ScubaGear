@@ -388,7 +388,12 @@ function Invoke-SCuBA {
             foreach ( $value in $PSBoundParameters.keys ) {
                 if ( $value -ne "ConfigFilePath" )
                 {
-                    $ScubaConfig[$value] = $PSBoundParameters[$value]
+                    $paramValue = $PSBoundParameters[$value]
+                    # Convert SwitchParameter to bool for schema compatibility
+                    if ($paramValue -is [System.Management.Automation.SwitchParameter]) {
+                        $paramValue = $paramValue.ToBool()
+                    }
+                    $ScubaConfig[$value] = $paramValue
                 }
             }
 
@@ -1657,10 +1662,10 @@ function Invoke-SCuBACached {
     A `$true` or `$false` variable that if set to `$true`
     will prompt you to provide credentials if you want to establish a connection
     to the specified M365 products in the **$ProductNames** variable.
-    For most use cases, leave this variable to be `$true`.
-    A connection is established in the current PowerShell terminal session with the first authentication.
-    If you want to run another verification in the same PowerShell session simply set
-    this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
+    For most use cases for cached results, leave this variable to be `$false`.
+    Authentication is skipped by default. If you want to run verification with authentication 
+    in the current PowerShell session, set this variable to `$true` to establish a connection. 
+    Default is $false.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -1759,7 +1764,7 @@ function Invoke-SCuBACached {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $LogIn = [ScubaConfig]::ScubaDefault('DefaultLogIn'),
+        $LogIn = $false,
 
         [Parameter(ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
