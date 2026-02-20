@@ -437,7 +437,10 @@
       "cardName": "Exclusion",
       "showFieldType": true,
       "showDescription": false,
-      "supportsAllProducts": false
+      "supportsAllProducts": false,
+      "filterAllLabel": "All Exclusion Policies",
+      "filterConfiguredLabel": "Configured Exclusions",
+      "filterNotConfiguredLabel": "Non-Configured Exclusions"
     },
     {
       "tabName": "Annotate Policies",
@@ -449,7 +452,10 @@
       "cardName": "Annotate",
       "showFieldType": false,
       "showDescription": true,
-      "supportsAllProducts": true
+      "supportsAllProducts": true,
+      "filterAllLabel": "All Annotate Policies",
+      "filterConfiguredLabel": "Annotated Policies",
+      "filterNotConfiguredLabel": "Non-Annotated Policies"
     },
     {
       "tabName": "Omit Policies",
@@ -461,7 +467,10 @@
       "cardName": "Omit",
       "showFieldType": false,
       "showDescription": true,
-      "supportsAllProducts": true
+      "supportsAllProducts": true,
+      "filterAllLabel": "All Omit Policies",
+      "filterConfiguredLabel": "Omitted Policies",
+      "filterNotConfiguredLabel": "Non-Omitted Policies"
     }
   ],
   "ScubaRunConfig": {
