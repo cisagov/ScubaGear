@@ -647,6 +647,50 @@ a.control_group:active {
 .severity-badge.Medium   { background-color: #ffc107; color: #000; }
 .severity-badge.Low      { background-color: #5b9bd5; color: #fff; }
 
+.sort-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-weight: bold;
+    color: var(--text-color);
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.sort-btn:focus-visible {
+    outline: 2px solid var(--input-border-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.sort-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.sort-indicator:not(.sort-indicator--active) {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+th:hover .sort-indicator:not(.sort-indicator--active),
+.sort-btn:focus-visible + .sort-indicator:not(.sort-indicator--active) {
+    opacity: 1;
+}
+
+.sort-indicator--active {
+    opacity: 1;
+}
+
+[data-dark-mode="true"] .sort-icon {
+    filter: invert(1);
+}
+
 /* Policy Indicator Badges */
 .policy-indicators {
     display: flex;
