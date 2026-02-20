@@ -215,9 +215,9 @@ TestPlan:
                       - displayName: "DLP functional test"
                         environmentType: "ExceptEnvironments"
                         environments:
-                          - name: "default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
-                  - EnvironmentName: "default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                     IsDefault: true
                   - EnvironmentName: "Test1"
                     IsDefault: false
