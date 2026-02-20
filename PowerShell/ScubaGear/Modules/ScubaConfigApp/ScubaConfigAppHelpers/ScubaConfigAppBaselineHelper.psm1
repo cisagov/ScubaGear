@@ -337,17 +337,48 @@ function Update-ScubaConfigBaselineWithMarkdown {
     # Update the configuration
     $configContent.baselines = $newBaselines
 
-    # Save the updated configuration with proper character encoding
-    $jsonOutput = $configContent | ConvertTo-Json -Depth 10
-
-    # Fix common UTF-8 encoding issues in the JSON output using character codes
-    $jsonOutput = $jsonOutput -replace ([char]0x2019), "'"        # Right single quotation mark
-    $jsonOutput = $jsonOutput -replace ([char]0x201C), '"'        # Left double quotation mark
-    $jsonOutput = $jsonOutput -replace ([char]0x201D), '"'        # Right double quotation mark
-    $jsonOutput = $jsonOutput -replace 'â€"', "—"                 # Fix malformed double dash
-    $jsonOutput = $jsonOutput -replace 'â€™', "'"                 # Fix malformed apostrophe
-    $jsonOutput = $jsonOutput -replace 'â€œ', '"'                 # Fix malformed left quote
-    $jsonOutput = $jsonOutput -replace 'â€', '"'                  # Fix malformed right quote
+    # Fix common UTF-8 encoding issues BEFORE converting to JSON
+    # This ensures proper JSON escaping of the replaced characters
+    $configJson = $configContent | ConvertTo-Json -Depth 10 -Compress | ConvertFrom-Json
+    
+    # Recursively clean smart quotes and encoding issues from all string properties
+    function Set-JsonStrings {
+        param($obj)
+        
+        if ($null -eq $obj) { return $obj }
+        
+        if ($obj -is [string]) {
+            # Replace smart quotes and malformed characters
+            $cleaned = $obj -replace ([char]0x2019), "'"        # Right single quotation mark
+            $cleaned = $cleaned -replace ([char]0x201C), '"'    # Left double quotation mark  
+            $cleaned = $cleaned -replace ([char]0x201D), '"'    # Right double quotation mark
+            $cleaned = $cleaned -replace 'â€"', "—"           # Fix malformed double dash
+            $cleaned = $cleaned -replace 'â€™', "'"           # Fix malformed apostrophe
+            $cleaned = $cleaned -replace 'â€œ', '"'           # Fix malformed left quote
+            $cleaned = $cleaned -replace 'â€', '"'            # Fix malformed right quote
+            return $cleaned
+        }
+        elseif ($obj -is [array]) {
+            for ($i = 0; $i -lt $obj.Count; $i++) {
+                $obj[$i] = Set-JsonStrings $obj[$i]
+            }
+            return $obj
+        }
+        elseif ($obj -is [PSCustomObject] -or $obj -is [hashtable]) {
+            $obj.PSObject.Properties | ForEach-Object {
+                $_.Value = Set-JsonStrings $_.Value
+            }
+            return $obj
+        }
+        
+        return $obj
+    }
+    
+    # Clean all strings in the configuration
+    $cleanedConfig = Set-JsonStrings $configJson
+    
+    # Now convert to JSON with cleaned strings
+    $jsonOutput = $cleanedConfig | ConvertTo-Json -Depth 10
 
     $jsonOutput | Set-Content $BaselineFilePath -Encoding UTF8
 

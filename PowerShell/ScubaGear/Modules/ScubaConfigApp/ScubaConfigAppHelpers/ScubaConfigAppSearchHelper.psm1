@@ -222,19 +222,19 @@ Function Add-SearchAndFilterCapability {
 
             # Add "All" option
             $allConfigItem = New-Object System.Windows.Controls.ComboBoxItem
-            $allConfigItem.Content = "All Configurations"
+            $allConfigItem.Content = "All Policies"
             $allConfigItem.Tag = "ALL_CONFIGURATIONS"
             [void]$configuredComboBox.Items.Add($allConfigItem)
 
             # Add "Configured" option (cards with "Saved" tag)
             $configuredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $configuredItem.Content = "Configured Only"
+            $configuredItem.Content = "Configured Policies"
             $configuredItem.Tag = "CONFIGURED"
             [void]$configuredComboBox.Items.Add($configuredItem)
 
             # Add "Not Configured" option (cards with null/empty tag)
             $notConfiguredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $notConfiguredItem.Content = "Not Configured Only"
+            $notConfiguredItem.Content = "Non-Configured Policies"
             $notConfiguredItem.Tag = "NOT_CONFIGURED"
             [void]$configuredComboBox.Items.Add($notConfiguredItem)
 
