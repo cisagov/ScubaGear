@@ -1152,7 +1152,7 @@ test_PolicyMigrationState_migrationInProgress_Incorrect if {
 #--
 
 #
-# Policy MS.AAD.3.5v1
+# Policy MS.AAD.3.5v2
 #--
 test_LowSecurityAuthMethods_SmsEnabled_Incorrect if {
     Auth := json.patch(AuthenticationMethod,
@@ -1161,7 +1161,7 @@ test_LowSecurityAuthMethods_SmsEnabled_Incorrect if {
     Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
-    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+    TestResult("MS.AAD.3.5v2", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_VoiceEnabled_Incorrect if {
@@ -1171,7 +1171,7 @@ test_LowSecurityAuthMethods_VoiceEnabled_Incorrect if {
     Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
-    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+    TestResult("MS.AAD.3.5v2", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_EmailEnabled_Incorrect if {
@@ -1181,7 +1181,7 @@ test_LowSecurityAuthMethods_EmailEnabled_Incorrect if {
     Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
-    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+    TestResult("MS.AAD.3.5v2", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_TwoMethodsEnabled_Incorrect if {
@@ -1192,7 +1192,7 @@ test_LowSecurityAuthMethods_TwoMethodsEnabled_Incorrect if {
     Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
-    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+    TestResult("MS.AAD.3.5v2", Output, ReportDetails, false) == true
 }
 
 test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
@@ -1204,7 +1204,7 @@ test_LowSecurityAuthMethods_AllMethodsEnabled_Incorrect if {
     Output := aad.tests with input.authentication_method as [Auth]
 
     ReportDetails := "Sms, Voice, and Email authentication must be disabled."
-    TestResult("MS.AAD.3.5v1", Output, ReportDetails, false) == true
+    TestResult("MS.AAD.3.5v2", Output, ReportDetails, false) == true
 }
 #--
 

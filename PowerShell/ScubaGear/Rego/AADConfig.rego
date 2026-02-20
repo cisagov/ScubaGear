@@ -381,7 +381,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.5v1
+# MS.AAD.3.5v2
 #--
 
 # Returns all the config states for the methods Sms, Voice, Email
@@ -402,7 +402,7 @@ LowSecurityAuthMethodsDisabled := true if {
 
 # We check that the configuration matches the baseline
 tests contains {
-    "PolicyId": "MS.AAD.3.5v1",
+    "PolicyId": "MS.AAD.3.5v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [LowSecurityAuthMethods],
