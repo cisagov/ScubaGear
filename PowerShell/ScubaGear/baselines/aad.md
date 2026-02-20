@@ -631,7 +631,7 @@ An admin consent workflow SHALL be configured for applications.
 There are a couple of configuration options to restrict user consent. Each option is described below, followed by its respective instructions.
 
 - **Option 1** - Most restrictive - Do not allow users to consent to applications at all. An administrator must perform the consent. Users can submit requests to use an application via the admin consent workflow but they cannot perform the consent themselves.
-- **Option 2** - More flexible - Allow users to consent to applications that use low risk permissions and are from Microsoft verified publishers. When selecting this option, an adminstrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the portal.
+- **Option 2** - More flexible - Allow users to consent to applications that use low risk permissions and are from Microsoft verified publishers. When selecting this option, an administrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the portal.
 
 **Option 1**. Do not allow user consent.
 
