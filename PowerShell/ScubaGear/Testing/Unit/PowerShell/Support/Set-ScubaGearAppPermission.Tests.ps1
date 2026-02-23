@@ -62,7 +62,7 @@ InModuleScope ServicePrincipal {
                 $Result[0] | Should -Be "WhatIf: Would remove delegated permissions: User.Read"
 
                 # Verify the message contains expected missing permissions
-                $Result[1] | Should -Be "WhatIf: Would add missing permissions: PrivilegedAccess.Read.AzureADGroup, Policy.Read.All, PrivilegedEligibilitySchedule.Read.AzureADGroup, RoleManagementPolicy.Read.AzureADGroup, Directory.Read.All, RoleManagement.Read.Directory, User.Read.All, Exchange.ManageAsApp, Sites.FullControl.All"
+                $Result[1] | Should -Be "WhatIf: Would add missing permissions: Policy.Read.All, PrivilegedEligibilitySchedule.Read.AzureADGroup, RoleManagementPolicy.Read.AzureADGroup, Directory.Read.All, RoleManagement.Read.Directory, User.Read.All, Exchange.ManageAsApp, Sites.FullControl.All"
 
                 # Verify the correct role is assigned
                 $Result[2] | Should -Be "WhatIf: Would assign directory role 'Global Reader' to 00000000-0000-0000-0000-000000000001"
