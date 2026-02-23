@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
 
 function Export-AADProvider {
     <#
@@ -525,71 +525,155 @@ class GroupTypeCache{
 }
 
 function GetConfigurationsForPimGroups{
+    <#
+    .SYNOPSIS
+        Gets PIM configurations for groups using PIM v3 API with batch optimization.
+
+    .DESCRIPTION
+        Migrated from deprecated privilegedAccess API to roleManagementPolicyAssignments API.
+        Uses batch requests to efficiently check multiple principals for PIM enrollment.
+
+    #>
     param (
         [ValidateNotNullOrEmpty()]
-        [array]
-        $PrivilegedRoleArray,
+        [array]$PrivilegedRoleArray,
 
         [ValidateNotNullOrEmpty()]
-        [array]
-        $AllRoleAssignments,
+        [array]$AllRoleAssignments,
 
         [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
+        [string]$M365Environment
     )
 
-    # Get a list of the groups that are enrolled in PIM - we want to ignore the others
-    # This will retrieve information from the Graph API directly and not use the cmdlet and return the groups that are enrolled in PIM for group management. API information is contained within the Permissions JSON file.
-    # The "aadGroups" ID parameter specifies we want Azure AD groups managed by PIM (not other resource types)
-    $PIMGroups = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPrivilegedAccessResource" -M365Environment $M365Environment -ID "aadGroups").Value
+    # Collect unique principal IDs from privileged role assignments
+    Write-Verbose "Collecting unique principal IDs from role assignments"
+    # Initialize an empty array to store unique principal IDs
+    $UniquePrincipalIds = @()
 
-    foreach ($RoleAssignment in $AllRoleAssignments){
+    # Build a list of unique principals that need to be checked for PIM group enrollment
+    # Sort and filter role assignments to minimize API calls - we only want to check principals that are assigned to privileged roles and haven't been checked yet
+    $UniquePrincipalIds = ($AllRoleAssignments | Sort-Object -Property PrincipalId, RoleDefinitionId -Unique) |
+        Where-Object {
+            # Only include assignments to privileged roles (by matching RoleDefinitionId against known privileged role template IDs)
+            $PrivilegedRoleArray.RoleTemplateId -contains $_.RoleDefinitionId -and
+            # Only include principals we haven't already checked (not in the cache)
+            $null -eq [GroupTypeCache]::CheckedGroups[$_.PrincipalId]
+        } | Select-Object -ExpandProperty PrincipalId -Unique
 
-        # Check if the assignment in current loop iteration is assigned to a privileged role
-        $Role = $PrivilegedRoleArray | Where-Object RoleTemplateId -EQ $($RoleAssignment.RoleDefinitionId)
+    if ($UniquePrincipalIds.Count -eq 0) {
+        Write-Verbose "No new principals to check for PIM group enrollment"
+        return
+    }
 
-        # If this is a privileged role
-        if ($Role){
-            # Store the Id of the object assigned to the role (could be user,group,service principal)
-            $PrincipalId = $RoleAssignment.PrincipalId
+    Write-Verbose "Found $($UniquePrincipalIds.Count) unique principals to check"
 
-            # If the current object is not a PIM group we skip it
-            $FoundPIMGroup = $PIMGroups | Where-Object { $_.Id -eq $PrincipalId }
-            if ($null -eq $FoundPIMGroup) {
-                continue
-            }
+    # Batch check principals for PIM policy assignments (v3 API) for groups
+    Write-Verbose "Batch checking principals for PIM enrollment using v3 API checking for PIM group policy assignments"
+    $PolicyAssignmentRequests = @()
+    foreach ($PrincipalId in $UniquePrincipalIds) {
+        $PolicyAssignmentRequests += @{
+            id     = $PrincipalId
+            method = "GET"
+            url    = "/policies/roleManagementPolicyAssignments?`$filter=scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'"
+        }
+    }
 
-            # If we haven't processed the current group before, add it to the cache and proceed
-            If ($null -eq [GroupTypeCache]::CheckedGroups[$PrincipalId]){
-                [GroupTypeCache]::CheckedGroups.Add($PrincipalId, $true)
-            }
-            # If we have processed it before, then skip it to avoid unnecessary cycles
-            else {
-                continue
-            }
+    try {
+        $PolicyResults = Invoke-GraphBatchRequest -Requests $PolicyAssignmentRequests -M365Environment $M365Environment -ApiVersion "beta"
+    }
+    catch {
+        Write-Warning "Failed to batch check PIM policy assignments: $($_.Exception.Message)"
+        return
+    }
 
-            # Get all the configuration rules for the current PIM group - get member not owner configs. API information is contained within the Permissions JSON file, however the filter is being defined here since ScubaGear uses this API in other areas that require a different filter.
-            $PolicyAssignment = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyAssignment" -M365Environment $M365Environment -queryParams @{'$filter' = "scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'"}).Value
+    # Extract confirmed PIM group IDs (status 200, successful response)
+    $PIMGroupsIDs = @()
+    foreach ($PrincipalId in $UniquePrincipalIds) {
+        $response = $PolicyResults[$PrincipalId]
+        if ($response.status -eq 200 -and $null -ne $response.body.value -and $response.body.value.Count -gt 0) {
+            # Add to list of confirmed PIM groups to process
+            $PIMGroupsIDs += $PrincipalId
+        }
+        else {
+            # Not a PIM group - mark as checked
+            [GroupTypeCache]::CheckedGroups.Add($PrincipalId, $false)
+        }
+    }
 
-            # Add each configuration rule to the array. There are usually about 17 configurations for a group.
-            # Get the detailed configuration settings. API information is contained within the Permissions JSON file.
-            $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.PolicyId).Value
-            # Filter for the PIM group so we can grab its name
-            $PIMGroup = $PIMGroups | Where-Object {$_.Id -eq $PrincipalId}
-            AddRuleSource -Source $PIMGroup.DisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
+    if ($PIMGroupsIDs.Count -eq 0) {
+        Write-Verbose "No PIM groups found among the principals"
+        return
+    }
 
-            $RoleRules = $Role.psobject.Properties | Where-Object {$_.Name -eq 'Rules'}
-            if ($RoleRules){
-                # Appending rules
-                $Role.Rules += $MemberPolicyRules
-            }
-            else {
-                # Adding rules node if it is not already present
-                $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+    Write-Verbose "Found $($PIMGroupsIDs.Count) PIM groups to process"
+
+    # After identifying PIM groups, retrieve their display name and objectID using batch requests
+    Write-Verbose "Batch fetching display names for PIM groups"
+    $GroupDisplayNameRequests = @()
+    foreach ($PrincipalId in $PIMGroupsIDs) {
+        $GroupDisplayNameRequests += @{
+            id     = $PrincipalId
+            method = "GET"
+            url    = "/groups/${PrincipalId}?`$select=id,displayName"
+        }
+    }
+
+    try {
+        $GroupDisplayNameResults = Invoke-GraphBatchRequest -Requests $GroupDisplayNameRequests -M365Environment $M365Environment -ApiVersion "beta"
+    }
+    catch {
+        Write-Warning "Failed to batch fetch group display names: $($_.Exception.Message)"
+        # Continue with group ObjectID as fallback in the event of failure
+        $GroupDisplayNameResults = @{}
+    }
+
+    # Process each confirmed PIM group to get the rules and PIM Group displayName
+    foreach ($PrincipalId in $PIMGroupsIDs) {
+        # Mark as processed
+        [GroupTypeCache]::CheckedGroups.Add($PrincipalId, $true)
+
+        # Get policy assignment
+        $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
+
+        # Add each configuration rule to the array. There are usually about 17 configurations for a group.
+        # Get the detailed configuration settings. API information is contained within the Permissions JSON file.
+        $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.policyId).Value
+
+        # Get group display name from batch results
+        $GroupDisplayName = $PrincipalId  # Default fallback to objectID if batch fetch fails
+        $displayNameResponse = $GroupDisplayNameResults[$PrincipalId]
+
+        if ($null -ne $displayNameResponse -and $displayNameResponse.status -eq 200 -and $null -ne $displayNameResponse.body.displayName) {
+            $GroupDisplayName = $displayNameResponse.body.displayName
+            Write-Verbose "Successfully retrieved display name for group $PrincipalId : $GroupDisplayName"
+        }
+        else {
+            Write-Warning "Failed to fetch display name for group $PrincipalId from batch results (Status: $($displayNameResponse.status), HasBody: $($null -ne $displayNameResponse.body), HasDisplayName: $($null -ne $displayNameResponse.body.displayName))"
+        }
+
+        # Add PIM Group display name
+        AddRuleSource -Source $GroupDisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
+
+        # Attach rules to All roles this group is assigned to
+        $RoleAssignmentsForGroup = $AllRoleAssignments | Where-Object { $_.PrincipalId -eq $PrincipalId }
+
+        foreach ($RoleAssignment in $RoleAssignmentsForGroup) {
+            $Role = $PrivilegedRoleArray | Where-Object RoleTemplateId -EQ $RoleAssignment.RoleDefinitionId
+
+            if ($Role) {
+                $RoleRules = $Role.psobject.Properties | Where-Object { $_.Name -eq 'Rules' }
+                if ($RoleRules) {
+                    $Role.Rules += $MemberPolicyRules
+                }
+                else {
+                    $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+                }
+                Write-Verbose "Added rules from PIM Group '$GroupDisplayName' to role '$($Role.DisplayName)'"
             }
         }
     }
+
+    Write-Verbose "Completed processing $($PIMGroupsIDs.Count) PIM groups"
 }
 
 function GetConfigurationsForRoles{
