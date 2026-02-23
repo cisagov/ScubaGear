@@ -66,10 +66,10 @@ const TABLE_METADATA = {
 
 // Sort tables in descending order, starting with "Critical" first
 const SEVERITY_SORT_ORDER = {
-    Critical: 0,
-    High: 1,
+    Critical: 4,
+    High: 3,
     Medium: 2,
-    Low: 3,
+    Low: 1,
 };
 
 /* Associate the table type with the sorting column and direction (asc/desc)
