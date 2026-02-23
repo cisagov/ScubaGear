@@ -193,7 +193,7 @@ function Export-AADProvider {
     )
     ##### End block
     
-    # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function above,
+    # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function,
     # convert privileged users/service principals to JSON after the calls above.
     $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
     $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals

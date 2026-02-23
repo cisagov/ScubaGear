@@ -748,6 +748,7 @@ function Get-SeverityWeights {
         PasswordCredentials = @{
             PointsPerCredential = 2
             PointsPerLongLivedCredential = 3
+            #PointsPerServicePrincipalCredential = 5
             MaxPoints = 8
             ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."

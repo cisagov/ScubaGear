@@ -354,6 +354,15 @@ th.permissions {
     width: 25%;
 }
 
+th[data-column] {
+    padding: 0.25em;
+}
+
+th[data-column] .sort-btn {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 #toggle-container {
     width: 100%;
     display: flex;
@@ -657,6 +666,7 @@ a.control_group:active {
     padding: 0;
     display: inline-flex;
     align-items: center;
+    justify-content: space-between;
     gap: 4px;
     width: 100%;
 }
