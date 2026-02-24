@@ -569,6 +569,9 @@ function Debug-SCuBA {
     #>
     [CmdletBinding()]
     param (
+    [Parameter(Mandatory=$false, HelpMessage = 'Directory where diagnostic bundle will be created')]
+        [string]
+        $OutPath = (Get-Location).Path,
         [Parameter(Mandatory=$false, HelpMessage = 'Directory to contain debug report')]
         [string]
         $ReportPath = "$($($(Get-Item $PSScriptRoot).Parent).FullName)\Reports",
@@ -594,9 +597,10 @@ function Debug-SCuBA {
     Write-Debug "Report Path is $ReportPath"
     Write-Debug "Timestamp set as $Timestamp"
 
-    ## Create bundle directory timestamped inside current directory
+    ## Create bundle directory timestamped inside specified output directory
     try {
-        $DiagnosticPath = New-Item -ItemType Directory "ScubaGear_diag_$Timestamp"
+        $DiagnosticFolderName = "ScubaGear_diag_$Timestamp"
+        $DiagnosticPath = New-Item -ItemType Directory -Path (Join-Path -Path $OutPath -ChildPath $DiagnosticFolderName)
         Write-Debug "Created new directory $($DiagnosticPath.FullName)"
 
         $EnvFile= New-Item -Path $(Join-Path -Path $DiagnosticPath -ChildPath EnvInfo_$Timestamp) -ItemType File
