@@ -136,7 +136,8 @@ InModuleScope AADRiskyPermissionsHelper {
             # KeyCredentials/PasswordCredentials/FederatedCredentials are merged into one list
             $ExpectedKeys = @(
                 "ObjectId", "AppId", "DisplayName", "IsMultiTenantEnabled", `
-                "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions"
+                "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions", `
+                "SeverityScore", "MaxScore", "ScorePercentage", "SeverityLevel", "ScoreBreakdown"
             )
             foreach ($App in $AggregateRiskyApps) {
                 # Check for correct properties
@@ -170,6 +171,63 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "throws a ParameterBindingValidationException if the -RiskySPs value is empty" {
             { Format-RiskyApplications -RiskyApps @( @{} ) -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
+        }
+
+        It "returns severity info with valid properties for each application" {
+            $Weights = Get-SeverityWeights
+            $ExpectedSeverityLevels = $Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" }
+
+            foreach ($App in $AggregateRiskyApps) {
+                $App.SeverityScore | Should -BeGreaterOrEqual 0
+                $App.MaxScore | Should -Be $Weights.MaxScore.Application
+                $App.ScorePercentage | Should -BeGreaterOrEqual 0
+                $App.ScorePercentage | Should -BeLessOrEqual 100
+                $App.SeverityLevel | Should -BeIn $ExpectedSeverityLevels
+                $App.ScoreBreakdown | Should -Not -BeNullOrEmpty
+            }
+        }
+
+        It "calculates the correct severity score for Test App 1" {
+            $Weights = Get-SeverityWeights
+            $App = $AggregateRiskyApps | Where-Object { $_.DisplayName -eq "Test App 1" }
+
+            # Contains 2 admin consented risky permissions:
+            #   - Application.ReadWrite.All (Critical = 25pts) + RoleManagement.ReadWrite.Directory (Critical = 25pts) = 50pts
+            $ExpectedAdminConsentedPoints = [Math]::Min(
+                ($Weights.RiskLevelWeights.Critical * 2),
+                $Weights.AdminConsentedRiskyPermissions.MaxPoints
+            )
+            # IsMultiTenantEnabled = $true -> 10pts
+            $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
+
+            # PasswordCredentials: 1 app cred (long-lived) + 1 SP cred (long-lived) = (2+3)+(4+3) = 12pts, capped at 10
+            $ExpectedPasswordCredentialPoints = $Weights.PasswordCredentials.MaxPoints
+            
+            # KeyCredentials: 2 app creds (long-lived) + 1 SP cred (long-lived) = (1+2)+(1+2)+(3+2) = 11pts, capped at 7
+            $ExpectedKeyCredentialPoints = $Weights.KeyCredentials.MaxPoints
+            
+            # FederatedCredentials: 2 app creds (1pt each) = 2pts, capped at 3
+            $ExpectedFederatedCredentialPoints = 2
+            $ExpectedScore = $ExpectedAdminConsentedPoints `
+                             + $ExpectedMultiTenantPoints `
+                             + $ExpectedKeyCredentialPoints `
+                             + $ExpectedPasswordCredentialPoints `
+                             + $ExpectedFederatedCredentialPoints
+            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.Application) * 100, 1)
+
+            $App.SeverityScore | Should -Be $ExpectedScore
+            $App.MaxScore | Should -Be $Weights.MaxScore.Application
+            $App.ScorePercentage | Should -Be $ExpectedScorePercentage
+            $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
+            $App.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
+            $App.ScoreBreakdown.MultiTenant.IsMultiTenantEnabled | Should -Be $true
+            $App.ScoreBreakdown.MultiTenant.TotalPoints | Should -Be $ExpectedMultiTenantPoints
+            $App.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 3
+            $App.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be $ExpectedKeyCredentialPoints
+            $App.ScoreBreakdown.PasswordCredentials.CredentialCount | Should -Be 2
+            $App.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
+            $App.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 2
+            $App.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
         }
     }
 }
