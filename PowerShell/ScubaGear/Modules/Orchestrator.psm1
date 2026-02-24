@@ -654,7 +654,7 @@ function Invoke-SCuBA {
             if ($DebugScuba -and $Script:ScubaLoggingEnabled) {
                 try {
                     Write-Output "ScubaGear DEBUG assessment completed successfully"
-                    Write-ScubaLog -Message "ScubaGear DEBUG assessment completed - Check logs in Documents\ScubaGear-Debug" -Level "Info" -Source "Orchestrator"
+                    Write-ScubaLog -Message "ScubaGear DEBUG assessment completed - Check logs in [$OutFolderPath\DebugLogs]" -Level "Info" -Source "Orchestrator"
                     Stop-ScubaLogging
                 }
                 catch {
