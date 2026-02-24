@@ -660,7 +660,7 @@ function Format-RiskyThirdPartyServicePrincipals {
                     $SeverityInfo = Set-SeverityScore `
                         -Object $ServicePrincipal `
                         -ObjectType "ServicePrincipal" `
-                        -IsThirdParty `
+                        -IsThirdPartyServicePrincipal `
                         -PrivilegedRoles $PrivilegedRoles
 
                     # Add severity info to the merged object
@@ -694,17 +694,20 @@ function Get-SeverityWeights {
     The score is composed of the following factors:
 
     Factor                        App     SP      Notes
-    ─────────────────────────────────────────────────────────────────────────────
+    ---------------------------------------------------------------------------------------
     Admin consented perms         50      50      Weighted by RiskLevel per permission
     Non-admin consented perms     10      10      Weighted by RiskLevel per permission
-    Multi-tenant                  15      -       Applications only
-    Third-party SP                -       10      Service principals only
-    Privileged roles              -       15      Service principals only
-    Password credentials          8       8       + points for long-lived (>180 days)
-    Key credentials               4       4       + points for long-lived (>365 days)
-    Federated credentials         3       3       No lifetime check
-    ─────────────────────────────────────────────────────────────────────────────
-    Total                         100     100
+    Multi-tenant                  10      -       Applications only
+    Third-party SP                -       20      SP only
+    Privileged roles              -       20      SP only
+    Password credentials          10      10      App: 2pts/credential + 3pts if >180 days
+                                                  SP:  4pts/credential + 3pts if >180 days
+    Key credentials               7       7       App: 1pt/cred        + 2pts if >365 days
+                                                  SP:  3pts/cred       + 2pts if >365 days
+    Federated credentials         3       3       App: 1pt/cred
+                                                  SP:  2pts/cred
+    ---------------------------------------------------------------------------------------
+    Total                         90      120
 
     .Functionality
     #Internal
@@ -730,26 +733,27 @@ function Get-SeverityWeights {
 
         # Context factors (25 points max)
         MultiTenant = @{
-            Points = 15
+            Points = 10
             Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
         }
 
         ThirdPartyServicePrincipal = @{
-            Points = 10
+            Points = 20
             Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
         }
 
         PrivilegedRoles = @{
             PointsPerRole = 8
-            MaxPoints = 15
+            MaxPoints = 20
             Description = "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
         }
 
         PasswordCredentials = @{
             PointsPerCredential = 2
             PointsPerLongLivedCredential = 3
-            #PointsPerServicePrincipalCredential = 5
-            MaxPoints = 8
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 4
+            MaxPoints = 10
             ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
             Description = "Credentials can be used to authenticate as the application/service principal."
         }
@@ -757,27 +761,31 @@ function Get-SeverityWeights {
         KeyCredentials = @{
             PointsPerCredential = 1
             PointsPerLongLivedCredential = 2
-            MaxPoints = 4
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 3
+            MaxPoints = 7
             ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
             Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
         }
 
         FederatedCredentials = @{
             PointsPerCredential = 1
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 2
             MaxPoints = 3
             Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
         }
 
         Thresholds = @{
-            Critical = 70
-            High = 40
-            Medium = 20
-            Description = "Severity thresholds for categorizing applications/service principals based on their calculated severity score."
+            Critical = 75
+            High = 45
+            Medium = 25
+            Description = "Percentage-based severity thresholds for categorizing applications/service principals based on their calculated severity score."
         }
 
         MaxScore = @{
-            Application = 100
-            ServicePrincipal = 100
+            Application = 90
+            ServicePrincipal = 120
             Description = "Maximum achievable score varies by object type"
         }
     }
@@ -799,7 +807,13 @@ function Set-CredentialScore {
         $WeightConfig,
 
         [switch]
-        $CheckLifetime
+        $CheckLifetime,
+
+        # If true, uses $PointsPerServicePrincipalCredential instead of $PointsPerCredential.
+        # Azure does not provide a UI option for setting credentials on service principals dircetly,
+        # so their presence indicates deliberate API usage and therefore higher risk.
+        [switch]
+        $IsServicePrincipal
     )
 
     $CredentialPoints = 0
@@ -809,6 +823,7 @@ function Set-CredentialScore {
     if ($null -eq $Credentials -or @($Credentials).Count -eq 0) {
         return @{
             CredentialCount = $CredentialCount
+            LongLivedCredentialCount = $LongLivedCredentialCount
             TotalPoints = $CredentialPoints
         }
     }
@@ -816,8 +831,16 @@ function Set-CredentialScore {
     foreach ($Credential in $Credentials) {
         $CredentialCount++
 
+        # Use elevated base points for service principal credentials if they exist.
+        $BasePoints = if ($IsServicePrincipal) {
+            $WeightConfig.PointsPerServicePrincipalCredential
+        }
+        else {
+            $WeightConfig.PointsPerCredential
+        }
+
         # Base points for credential existence
-        $CredentialPoints += $WeightConfig.PointsPerCredential
+        $CredentialPoints += $BasePoints
 
         # Add additional points for long-lived credentials (excludes federated)
         if ($CheckLifetime -and $null -ne $Credential.StartDateTime -and $null -ne $Credential.EndDateTime) {
@@ -950,33 +973,88 @@ function Set-SeverityScore {
         }
 
         # 6. Calculate password credential weight factor
-        $PasswordCredentialScore = Set-CredentialScore `
-            -Credentials $Object.PasswordCredentials `
+        # Split merged credentials by source so service principal credentials are weighted appropriately
+        $AppPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppPasswordScore = Set-CredentialScore `
+            -Credentials $AppPasswordCredentials `
             -WeightConfig $Weights.PasswordCredentials `
             -CheckLifetime
         
-        $Score += $PasswordCredentialScore.TotalPoints
-        $ScoreBreakdown.PasswordCredentials = $PasswordCredentialScore
+        $ServicePrincipalPasswordScore = Set-CredentialScore `
+            -Credentials $ServicePrincipalPasswordCredentials `
+            -WeightConfig $Weights.PasswordCredentials `
+            -CheckLifetime `
+            -IsServicePrincipal
+        
+        $PasswordCredentialPoints = [Math]::Min(
+            $AppPasswordScore.TotalPoints + $ServicePrincipalPasswordScore.TotalPoints,
+            $Weights.PasswordCredentials.MaxPoints
+        )
+
+        $Score += $PasswordCredentialPoints
+        $ScoreBreakdown.PasswordCredentials = [PSCustomObject]@{
+            CredentialCount = $AppPasswordScore.CredentialCount + $ServicePrincipalPasswordScore.CredentialCount
+            LongLivedCredentialCount = $AppPasswordScore.LongLivedCredentialCount + $ServicePrincipalPasswordScore.LongLivedCredentialCount
+            TotalPoints = $PasswordCredentialPoints
+        }
 
         # 7. Calculate key credential weight factor
-        $KeyCredentialScore = Set-CredentialScore `
-            -Credentials $Object.KeyCredentials `
+        $AppKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppKeyScore = Set-CredentialScore `
+            -Credentials $AppKeyCredentials `
             -WeightConfig $Weights.KeyCredentials `
             -CheckLifetime
-        
-        $Score += $KeyCredentialScore.TotalPoints
-        $ScoreBreakdown.KeyCredentials = $KeyCredentialScore
+
+        $ServicePrincipalKeyScore = Set-CredentialScore `
+            -Credentials $ServicePrincipalKeyCredentials `
+            -WeightConfig $Weights.KeyCredentials `
+            -CheckLifetime `
+            -IsServicePrincipal
+
+        $KeyCredentialPoints = [Math]::Min(
+            $AppKeyScore.TotalPoints + $ServicePrincipalKeyScore.TotalPoints,
+            $Weights.KeyCredentials.MaxPoints
+        )
+
+        $Score += $KeyCredentialPoints
+        $ScoreBreakdown.KeyCredentials = [PSCustomObject]@{
+            CredentialCount = $AppKeyScore.CredentialCount + $ServicePrincipalKeyScore.CredentialCount
+            LongLivedCredentialCount = $AppKeyScore.LongLivedCredentialCount + $ServicePrincipalKeyScore.LongLivedCredentialCount
+            TotalPoints = $KeyCredentialPoints
+        }
 
         # 8. Calculate federated credential weight factor
-        $FederatedCredentialScore = Set-CredentialScore `
-            -Credentials $Object.FederatedCredentials `
+        $AppFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppFederatedScore = Set-CredentialScore `
+            -Credentials $AppFederatedCredentials `
+            -WeightConfig $Weights.FederatedCredentials
+
+        $ServicePrincipalFederatedScore = Set-CredentialScore `
+            -Credentials $ServicePrincipalFederatedCredentials `
             -WeightConfig $Weights.FederatedCredentials `
-        
-        $Score += $FederatedCredentialScore.TotalPoints
-        $ScoreBreakdown.FederatedCredentials = $FederatedCredentialScore
+            -IsServicePrincipal
+
+        $FederatedCredentialPoints = [Math]::Min(
+            $AppFederatedScore.TotalPoints + $ServicePrincipalFederatedScore.TotalPoints,
+            $Weights.FederatedCredentials.MaxPoints
+        )
+
+        $Score += $FederatedCredentialPoints
+        $ScoreBreakdown.FederatedCredentials = [PSCustomObject]@{
+            CredentialCount = $AppFederatedScore.CredentialCount + $ServicePrincipalFederatedScore.CredentialCount
+            TotalPoints = $FederatedCredentialPoints
+        }
+
+        $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
 
         # Determine severity level
-        $SeverityLevel = switch ($Score) {
+        $SeverityLevel = switch ($ScorePercentage) {
             { $_ -ge $Weights.Thresholds.Critical } { "Critical"; break }
             { $_ -ge $Weights.Thresholds.High } { "High"; break }
             { $_ -ge $Weights.Thresholds.Medium } { "Medium"; break }
@@ -986,7 +1064,7 @@ function Set-SeverityScore {
         return [PSCustomObject]@{
             TotalScore = $Score
             MaxScore = $Weights.MaxScore.$ObjectType
-            ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
+            ScorePercentage = $ScorePercentage
             SeverityLevel = $SeverityLevel
             ScoreBreakdown = $ScoreBreakdown
         }
