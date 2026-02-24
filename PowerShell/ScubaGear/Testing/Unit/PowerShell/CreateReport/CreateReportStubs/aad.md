@@ -235,7 +235,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 
 <!--Policy: MS.AAD.3.5v2; Criticality: SHALL -->
 - _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators, forcing users to use stronger MFA methods.
-- _Last modified:_ June 2023
+- _Last modified:_ February 2026
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
