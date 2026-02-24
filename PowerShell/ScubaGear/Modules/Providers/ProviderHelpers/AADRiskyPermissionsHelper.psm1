@@ -128,20 +128,37 @@ function Format-Credentials {
 
         [ValidateNotNullOrEmpty()]
         [boolean]
-        $IsFromApplication
+        $IsFromApplication,
+
+        [switch]
+        $IsFederated
     )
 
     process {
         $ValidCredentials = @()
-        $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
+
+        if ($IsFederated) {
+            $RequiredKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences")
+        }
+        else {
+            $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
+        }
+        
         foreach ($Credential in $AccessKeys) {
             # Only format credentials with the correct keys
             $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
             if ($MissingKeys.Count -eq 0) {
-                # $Credential is of type PSCredential which is immutable, create a copy
-                $CredentialCopy = $Credential | Select-Object -Property `
-                    KeyId, DisplayName, StartDateTime, EndDateTime, `
-                    @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                if ($IsFederated) {
+                    # $Credential is of type PSCredential which is immutable, create a copy
+                    $CredentialCopy = $Credential | Select-Object -Property `
+                        Id, Name, Description, Issuer, Subject, Audiences,`
+                        @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                }
+                else {
+                    $CredentialCopy = $Credential | Select-Object -Property `
+                        KeyId, DisplayName, StartDateTime, EndDateTime, `
+                        @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                }
                 $ValidCredentials += $CredentialCopy
             }
         }
@@ -355,7 +372,7 @@ function Get-ApplicationsWithRiskyPermissions {
                         # Differentiate between the two by setting IsFromApplication=$true
                         KeyCredentials       = Format-Credentials -AccessKeys $App.KeyCredentials -IsFromApplication $true
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
-                        FederatedCredentials = $FederatedCredentialsResults
+                        FederatedCredentials = Format-Credentials -AccessKeys $FederatedCredentialsResults -IsFromApplication $true -IsFederated
                         Permissions          = $MappedPermissions
                     }
                 }
@@ -476,6 +493,10 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                                 # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
                                                 $RequiresAdminConsent = $OauthScope.type -eq "Admin"
                                             }
+                                            else {
+                                                # RoleId not found in either appRoles or oauth2PermissionScopes, skip permission
+                                                continue
+                                            }
                                         }
 
                                         $MappedPermissions += Format-Permission `
@@ -506,7 +527,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 # Differentiate between the two by setting IsFromApplication=$false
                                 KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
                                 PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                                FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                                FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
                                 Permissions             = $MappedPermissions
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
@@ -780,6 +801,7 @@ function Get-SeverityWeights {
             Critical = 75
             High = 45
             Medium = 25
+            Low = 0
             Description = "Percentage-based severity thresholds for categorizing applications/service principals based on their calculated severity score."
         }
 
@@ -791,6 +813,20 @@ function Get-SeverityWeights {
     }
 }
 
+function ConvertFrom-DotNetDate {
+    param(
+        [string]
+        $DateString
+    )
+    
+    if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
+        $EpochMs = [Long]$Matches[1]
+        return [System.DateTimeOffset]::FromUnixTimeMilliseconds($EpochMs).UtcDateTime
+    }
+
+    return [Datetime]::Parse($DateString)
+}
+
 function Set-CredentialScore {
     <#
     .Description
@@ -799,8 +835,8 @@ function Set-CredentialScore {
     #Internal
     #>
     param (
-        [PSCredential[]]
-        $Credentials,
+        [Object[]]
+        $AccessKeys,
 
         [ValidateNotNullOrEmpty()]
         [Object]
@@ -820,7 +856,7 @@ function Set-CredentialScore {
     $CredentialCount = 0
     $LongLivedCredentialCount = 0
 
-    if ($null -eq $Credentials -or @($Credentials).Count -eq 0) {
+    if ($null -eq $AccessKeys -or @($AccessKeys).Count -eq 0) {
         return @{
             CredentialCount = $CredentialCount
             LongLivedCredentialCount = $LongLivedCredentialCount
@@ -828,7 +864,7 @@ function Set-CredentialScore {
         }
     }
 
-    foreach ($Credential in $Credentials) {
+    foreach ($Credential in $AccessKeys) {
         $CredentialCount++
 
         # Use elevated base points for service principal credentials if they exist.
@@ -844,7 +880,9 @@ function Set-CredentialScore {
 
         # Add additional points for long-lived credentials (excludes federated)
         if ($CheckLifetime -and $null -ne $Credential.StartDateTime -and $null -ne $Credential.EndDateTime) {
-            $Duration = (New-TimeSpan -Start $Credential.StartDateTime -End $Credential.EndDateTime).Days
+            $Start = ConvertFrom-DotNetDate -DateString $Credential.StartDateTime
+            $End = ConvertFrom-DotNetDate -DateString $Credential.EndDateTime
+            $Duration = (New-TimeSpan -Start $Start -End $End).Days
 
             if ($Duration -gt $WeightConfig.ThresholdInDays) {
                 $CredentialPoints += $WeightConfig.PointsPerLongLivedCredential
@@ -978,12 +1016,12 @@ function Set-SeverityScore {
         $ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
 
         $AppPasswordScore = Set-CredentialScore `
-            -Credentials $AppPasswordCredentials `
+            -AccessKeys $AppPasswordCredentials `
             -WeightConfig $Weights.PasswordCredentials `
             -CheckLifetime
         
         $ServicePrincipalPasswordScore = Set-CredentialScore `
-            -Credentials $ServicePrincipalPasswordCredentials `
+            -AccessKeys $ServicePrincipalPasswordCredentials `
             -WeightConfig $Weights.PasswordCredentials `
             -CheckLifetime `
             -IsServicePrincipal
@@ -1005,12 +1043,12 @@ function Set-SeverityScore {
         $ServicePrincipalKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $false })
 
         $AppKeyScore = Set-CredentialScore `
-            -Credentials $AppKeyCredentials `
+            -AccessKeys $AppKeyCredentials `
             -WeightConfig $Weights.KeyCredentials `
             -CheckLifetime
 
         $ServicePrincipalKeyScore = Set-CredentialScore `
-            -Credentials $ServicePrincipalKeyCredentials `
+            -AccessKeys $ServicePrincipalKeyCredentials `
             -WeightConfig $Weights.KeyCredentials `
             -CheckLifetime `
             -IsServicePrincipal
@@ -1032,11 +1070,11 @@ function Set-SeverityScore {
         $ServicePrincipalFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $false })
 
         $AppFederatedScore = Set-CredentialScore `
-            -Credentials $AppFederatedCredentials `
+            -AccessKeys $AppFederatedCredentials `
             -WeightConfig $Weights.FederatedCredentials
 
         $ServicePrincipalFederatedScore = Set-CredentialScore `
-            -Credentials $ServicePrincipalFederatedCredentials `
+            -AccessKeys $ServicePrincipalFederatedCredentials `
             -WeightConfig $Weights.FederatedCredentials `
             -IsServicePrincipal
 

@@ -73,7 +73,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
         It "correctly formats federated credentials if they exist" {
             $RiskyApps = Get-ApplicationsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
-            $ExpectedKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences")
+            $ExpectedKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences", "IsFromApplication")
             foreach ($Credential in $RiskyApps[0].FederatedCredentials) {
                 # Check for correct properties
                 $Credential.PSObject.Properties.Name | Should -Be $ExpectedKeys
