@@ -83,6 +83,18 @@ InModuleScope ScubaConfigApp {
                             link = "https://github.com/cisagov/ScubaGear/baselines/teams.md"
                         }
                     )
+                    powerbi = @(
+                        @{
+                            id = "MS.POWERBI.1.1v1"
+                            name = "Test PowerBI Policy 1"
+                            rationale = "Test rationale for PowerBI policy"
+                            criticality = "SHALL"
+                            exclusionField = "none"
+                            omissionField = "Omissions"
+                            annotationField = "Annotations"
+                            link = "https://github.com/cisagov/ScubaGear/baselines/powerbi.md"
+                        }
+                    )
                 }
             }
         }
