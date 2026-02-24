@@ -220,21 +220,29 @@ Function Add-SearchAndFilterCapability {
             # Clear existing items
             $configuredComboBox.Items.Clear()
 
+            # Get labels from the baseline control configuration
+            $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.controlType -eq $tabType }
+            
+            # Use configured labels or fall back to defaults
+            $allLabel = if ($baselineControl.filterAllLabel) { $baselineControl.filterAllLabel } else { "All Policies" }
+            $configuredLabel = if ($baselineControl.filterConfiguredLabel) { $baselineControl.filterConfiguredLabel } else { "Configured Policies" }
+            $notConfiguredLabel = if ($baselineControl.filterNotConfiguredLabel) { $baselineControl.filterNotConfiguredLabel } else { "Non-Configured Policies" }
+
             # Add "All" option
             $allConfigItem = New-Object System.Windows.Controls.ComboBoxItem
-            $allConfigItem.Content = "All Configurations"
+            $allConfigItem.Content = $allLabel
             $allConfigItem.Tag = "ALL_CONFIGURATIONS"
             [void]$configuredComboBox.Items.Add($allConfigItem)
 
             # Add "Configured" option (cards with "Saved" tag)
             $configuredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $configuredItem.Content = "Configured Only"
+            $configuredItem.Content = $configuredLabel
             $configuredItem.Tag = "CONFIGURED"
             [void]$configuredComboBox.Items.Add($configuredItem)
 
             # Add "Not Configured" option (cards with null/empty tag)
             $notConfiguredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $notConfiguredItem.Content = "Not Configured Only"
+            $notConfiguredItem.Content = $notConfiguredLabel
             $notConfiguredItem.Tag = "NOT_CONFIGURED"
             [void]$configuredComboBox.Items.Add($notConfiguredItem)
 
