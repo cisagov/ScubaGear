@@ -633,6 +633,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     let dataType = "";
                     if (col.name === "Permissions") dataType = "Permissions";
                     if (col.name === "KeyCredentials" || col.name === "PasswordCredentials") dataType = "Credentials";
+                    if (col.name === "PrivilegedRoles") dataType = "PrivilegedRoles";
 
                     let node = renderKeyValueList(items, { advanced: true, dataType });
                     const title = `${rowLabel} - ${colLabel}`;
@@ -906,6 +907,12 @@ const renderSummaryList = (colName, items) => {
 
     // Federated credentials do not expire so only display the total count
     if (colName === "FederatedCredentials") {
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+        return ul;
+    }
+
+    if (colName === "PrivilegedRoles") {
         const ul = makeUl();
         addItem(ul, "Total", count);
         return ul;
