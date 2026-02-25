@@ -729,7 +729,6 @@ function Get-SeverityWeights {
     .Description
     Returns the weight factors used in severity score calculation.
 
-    Maximum score is 100 for both applications and service principals.
     The score is composed of the following factors:
 
     Factor                        App     SP      Notes
@@ -837,8 +836,9 @@ function ConvertFrom-DotNetDate {
         $DateString
     )
     
+    # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
     if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
-        $EpochMs = [Long]$Matches[1]
+        $EpochMs = $Matches[1]
         return [System.DateTimeOffset]::FromUnixTimeMilliseconds($EpochMs).UtcDateTime
     }
 
@@ -864,7 +864,7 @@ function Set-CredentialScore {
         $CheckLifetime,
 
         # If true, uses $PointsPerServicePrincipalCredential instead of $PointsPerCredential.
-        # Azure does not provide a UI option for setting credentials on service principals dircetly,
+        # Azure does not provide a UI option for setting credentials on service principals directly,
         # so their presence indicates deliberate API usage and therefore higher risk.
         [switch]
         $IsServicePrincipal
@@ -922,11 +922,12 @@ function Set-SeverityScore {
     <#
     .Description
     Calculates a severity score for each risky application/service principal based on multiple risk factors:
-    - Number of risky permissions
     - Number of admin consented risky permissions
+    - Number of non-admin consented risky permissions
     - Multi-tenant enabled/disabled
     - Third-party service principal (owned externally)
-    - Long-lived credentials exceeding max duration
+    - Privileged roles assigned to risky service principals
+    - Existence of password/key/federated credentials (considers Long-lived credentials)
     
     The total severity score is normalized to 100 to factor in different weight distributions for each of the above risk factors.
     .Functionality
@@ -1109,7 +1110,6 @@ function Set-SeverityScore {
 
         $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
 
-        # Determine severity level
         $SeverityLevel = switch ($ScorePercentage) {
             { $_ -ge $Weights.Thresholds.Critical } { "Critical"; break }
             { $_ -ge $Weights.Thresholds.High } { "High"; break }
