@@ -364,21 +364,17 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 ### Implementation
 
-The list of addresses/domains to flag when impersonated by attackers is managed
-on a per-policy basis. This means that in order for all users to be protected,
-this list must be added to each relevant threat policy. For example, consider
-a tenant with 3 users: Alice, Bob, and Charlie. If Alice has been assigned to
-the standard policy, Bob to the strict, and Charlie to a custom policy, in order
-to protect all 3 users, the tenant has 2 options:
-1. Simply define the list of addresses to flag for impersonation once in the
-default anti-phish policy, as that always applies to all recipients.
-2. Define the list of of addresses to flag for impersonation in all 3 policies
-(standard, strict, and the custom policy).
-
-For simplicity, the implementation steps that follow just instruct users to
-configure impersonation protection in the default anti-phish policy. However,
-agencies are welcome to instead configure it in the other policies if desired,
-as long as ultimately all recipients recieve the impersonation protection checks.
+When evaluating an email for impersonation, both the email *sender* and the
+*recipient* are factors. Impersonation protection is only applied if the *sender*
+has been added to a threat policy's **Users to protect** list and the *recipient*
+has been added to the threat policy where that list is defined.
+As such, one simple way of ensuring the **Users to protect** list applies to all
+recipients is to define the list in the default anti-phish policy, as that applies
+to all recipients. For simplicity, the implementation steps that follow just
+instruct users to configure impersonation protection in the default anti-phish
+policy. However, agencies are welcome to instead configure it in the other
+policies if desired, as long as ultimately all recipients recieve the
+impersonation protection checks.
 
 #### MS.SECURITYSUITE.2.1v1 Instructions
 
@@ -849,7 +845,8 @@ used.
 ### Policies
 
 #### MS.SECURITYSUITE.6.1v1
-Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
+Emails detected as spam, high confidence spam, and phishing SHALL NOT be delivered to the user's
+default inbox.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo142v1-instructions)
 
@@ -890,11 +887,49 @@ potentially unknown users to bypass spam protections.
 
 #### MS.SECURITYSUITE.6.1v2 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender, see the following
-implementation steps for
-[enabling preset security policies](./defender.md#msdefender12v1), which
-include spam filtering.
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+For users not added to the standard or strict preset policies:
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-spam**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary. Note: be sure to
+    select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
+    under **Type** instead of of **Custom output spam policy**.
+    2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
+        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit spam threshold and properties** See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) for configuration guidance. We recommend mirroring
+    the values used for either the standard or strict preset policies. Click **Save**.
+    4. Click **Edit actions**.
+    5. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
+        - **Move message to Junk Email folder**
+        - **Redirect message to email address**
+        - **Delete message**
+        - **Quarantine message**.
+    6. Click **Save**.
+6.  If creating a new policy:
+    1. Click **Create**, then **Inbound**.
+    2. After naming the policy, click **Next**.
+    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+       to be exempted from this policy.
+    5. Click **Next**.
+    6. On the **Bulk email threshold & spam properties**, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) for configuration guidance. We recommend mirroring
+    the values used for either the standard or strict preset policies.
+    7. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
+        - **Move message to Junk Email folder**
+        - **Redirect message to email address**
+        - **Delete message**
+        - **Quarantine message**.
+    8. Click **Next**, **Next**, then **Submit**.
 
 #### MS.SECURITYSUITE.6.2v1 Instructions
 
