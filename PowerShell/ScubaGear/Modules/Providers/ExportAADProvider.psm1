@@ -630,22 +630,15 @@ function GetConfigurationsForPimGroups{
     # Batch fetch policy rules for all PIM groups
     Write-Verbose "Batch fetching policy rules for PIM groups"
     $PolicyRulesRequests = @()
-    # This is used to track which policies we've already added to the batch request since multiple groups can be assigned the same policy and we only need to fetch the policy rules once per unique policy
-    $UniquePolicyIds = @()
 
     foreach ($PrincipalId in $PIMGroupsIDs) {
         $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
         $PolicyId = $PolicyAssignment.policyId
 
-        # Only add unique policy IDs (multiple groups may share the same policy)
-        if ($PolicyId -notin $UniquePolicyIds) {
-            # Mark this policy ID as added to the batch request
-            $UniquePolicyIds += $PolicyId
-            $PolicyRulesRequests += @{
-                id     = $PolicyId
-                method = "GET"
-                url    = "/policies/roleManagementPolicies/$PolicyId/rules"
-            }
+        $PolicyRulesRequests += @{
+            id     = $PolicyId
+            method = "GET"
+            url    = "/policies/roleManagementPolicies/$PolicyId/rules"
         }
     }
 
