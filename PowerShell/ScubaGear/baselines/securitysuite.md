@@ -181,7 +181,8 @@ For users not added to the standard or strict preset policies:
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
     2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
@@ -192,7 +193,8 @@ For users not added to the standard or strict preset policies:
 6.  If creating a new policy:
     1. Click **Create**.
     2. After naming the policy, click **Next**.
-    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
+       **Domains**, enter all the tenant domains.
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
@@ -214,7 +216,8 @@ For users not added to the standard or strict preset policies:
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
     2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
@@ -224,7 +227,8 @@ For users not added to the standard or strict preset policies:
 6.  If creating a new policy:
     1. Click **Create**.
     2. After naming the policy, click **Next**.
-    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
+       **Domains**, enter all the tenant domains.
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
@@ -247,7 +251,8 @@ For users not added to the standard or strict preset policies:
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
     2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
@@ -257,7 +262,8 @@ For users not added to the standard or strict preset policies:
 6.  If creating a new policy:
     1. Click **Create**.
     2. After naming the policy, click **Next**.
-    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
+       Domains**, enter all the tenant domains.
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
@@ -845,8 +851,7 @@ used.
 ### Policies
 
 #### MS.SECURITYSUITE.6.1v1
-Emails detected as spam, high confidence spam, and phishing SHALL NOT be delivered to the user's
-default inbox.
+Emails detected as spam and phishing SHALL NOT be delivered to the user's inbox.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo142v1-instructions)
 
@@ -902,12 +907,14 @@ For users not added to the standard or strict preset policies:
     select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
     under **Type** instead of of **Custom output spam policy**.
     2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
-    3. Click **Edit spam threshold and properties** See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) for configuration guidance. We recommend mirroring
-    the values used for either the standard or strict preset policies. Click **Save**.
+    3. Click **Edit spam threshold and properties** See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
+    for configuration guidance. We recommend mirroring the values used for either the standard or
+    strict preset policies. Click **Save**.
     4. Click **Edit actions**.
     5. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
         - **Move message to Junk Email folder**
@@ -918,12 +925,14 @@ For users not added to the standard or strict preset policies:
 6.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
     2. After naming the policy, click **Next**.
-    3. Under **Domains**, enter all the tenant domains. All users under these domains will be added to the policy.
+    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
+       **Domains**, enter all the tenant domains.
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    6. On the **Bulk email threshold & spam properties**, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) for configuration guidance. We recommend mirroring
-    the values used for either the standard or strict preset policies.
+    6. On the **Bulk email threshold & spam properties** page, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
+    for configuration guidance. We recommend mirroring the values used for either the standard or
+    strict preset policies.
     7. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
         - **Move message to Junk Email folder**
         - **Redirect message to email address**
@@ -933,12 +942,33 @@ For users not added to the standard or strict preset policies:
 
 #### MS.SECURITYSUITE.6.2v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender, see the following
-implementation steps for
-[enabling preset security policies](./defender.md#msdefender12v1), which
-include spam filtering that moves high confidence spam to either the junk
- or quarantine folder.
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+For users not added to the standard or strict preset policies:
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-spam**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary. Note: be sure to
+    select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
+    under **Type** instead of of **Custom output spam policy**.
+    2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit allowed and blocked senders and domains**.
+    4. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then **Delete** (the trash icon).
+    5. Click **Done** and **Save**.
+6.  If creating a new policy: configure the policy as needed, but on the **Allow & block list**
+    page, do not click **Allow domains** under **Allowed**. It should read **Domains (0)** under
+    **Allowed**.
+
 
 ## 7. Link Protection
 
