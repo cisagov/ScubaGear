@@ -627,6 +627,37 @@ function GetConfigurationsForPimGroups{
         $GroupDisplayNameResults = @{}
     }
 
+    # Batch fetch policy rules for all PIM groups
+    Write-Verbose "Batch fetching policy rules for PIM groups"
+    $PolicyRulesRequests = @()
+    # This is used to track which policies we've already added to the batch request since multiple groups can be assigned the same policy and we only need to fetch the policy rules once per unique policy
+    $UniquePolicyIds = @()
+
+    foreach ($PrincipalId in $PIMGroupsIDs) {
+        $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
+        $PolicyId = $PolicyAssignment.policyId
+
+        # Only add unique policy IDs (multiple groups may share the same policy)
+        if ($PolicyId -notin $UniquePolicyIds) {
+            # Mark this policy ID as added to the batch request
+            $UniquePolicyIds += $PolicyId
+            $PolicyRulesRequests += @{
+                id     = $PolicyId
+                method = "GET"
+                url    = "/policies/roleManagementPolicies/$PolicyId/rules"
+            }
+        }
+    }
+
+    try {
+        # This batch request is for fetching the policy rules for each PIM group. Since multiple groups can be assigned the same policy, we only fetch each unique policy once to optimize API calls.
+        $PolicyRulesResults = Invoke-GraphBatchRequest -Requests $PolicyRulesRequests -M365Environment $M365Environment -ApiVersion "beta"
+    }
+    catch {
+        Write-Warning "Failed to batch fetch policy rules: $($_.Exception.Message)"
+        $PolicyRulesResults = @{}
+    }
+
     # Process each confirmed PIM group to get the rules and PIM Group displayName
     foreach ($PrincipalId in $PIMGroupsIDs) {
         # Mark as processed
@@ -634,10 +665,21 @@ function GetConfigurationsForPimGroups{
 
         # Get policy assignment
         $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
+        $PolicyId = $PolicyAssignment.policyId
+
+        # Get the detailed configuration settings from batch results
+        $policyRulesResponse = $PolicyRulesResults[$PolicyId]
 
         # Add each configuration rule to the array. There are usually about 17 configurations for a group.
-        # Get the detailed configuration settings. API information is contained within the Permissions JSON file.
-        $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.policyId).Value
+        if ($null -ne $policyRulesResponse -and $policyRulesResponse.status -eq 200 -and $null -ne $policyRulesResponse.body.value) {
+            # Convert batch response hashtables to PSCustomObjects (required for Add-Member operations)
+            $MemberPolicyRules = @(ConvertFrom-GraphHashtable -GraphData $policyRulesResponse.body.value)
+        }
+        else {
+            # Fallback to individual API call if batch retrieval failed
+            Write-Warning "Failed to retrieve policy rules for policy $PolicyId from batch results. Using fallback API call."
+            $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyId).Value
+        }
 
         # Get group display name from batch results
         $GroupDisplayName = $PrincipalId  # Default fallback to objectID if batch fetch fails
