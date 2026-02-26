@@ -296,13 +296,22 @@ class ScubaConfigValidator {
                         }
 
                         if (-not $PathExists) {
-                            $ErrorType = if ($PropertyName -eq 'OPAPath') {
-                                "Directory does not exist: $PropertyValue. ScubaGear cannot run without a valid OPA directory."
-                            } else {
-                                "Directory does not exist: $PropertyValue."
+                            # Check validatePathExists from the original property definition (not the resolved ref)
+                            # This allows schema to control whether non-existence is an error or warning
+                            $RequirePathExists = $true  # Default to error if not specified
+                            if ($SchemaProperty.PSObject.Properties.Name -contains 'validatePathExists') {
+                                $RequirePathExists = $SchemaProperty.validatePathExists
                             }
-                            [void]$Validation.Errors.Add("Property '$PropertyName': $ErrorType"
+
+                            if ($RequirePathExists) {
+                                # Path must exist - error
+                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue."
 )
+                            } else {
+                                # Path will be created - warning
+                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs."
+)
+                            }
                         }
                     }
                 }
@@ -316,13 +325,6 @@ class ScubaConfigValidator {
                 [void]$Validation.Warnings.Add("ProductNames contains duplicate values. Duplicates will be removed."
 )
             }
-        }
-
-        # Validate M365Environment warnings for government tenants
-        if ($ConfigObject.M365Environment -in @('gcchigh', 'dod')) {
-            $EnvName = if ($ConfigObject.M365Environment -eq 'gcchigh') { 'GCC High' } else { 'DoD' }
-            [void]$Validation.Warnings.Add("$EnvName environment selected. Ensure you have appropriate security clearance and authorization."
-)
         }
 
         # Check for product exclusions on products that don't support them

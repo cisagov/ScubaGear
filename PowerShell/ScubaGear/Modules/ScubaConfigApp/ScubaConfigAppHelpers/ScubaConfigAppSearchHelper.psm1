@@ -81,8 +81,8 @@ Function Add-SearchAndFilterCapability {
                     } catch {
                         # Fallback: manually clear the search and apply filter
                         $searchBox = $syncHash."$($currentTabType)Search_TextBox"
-                        $criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
-                        $configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
+                        #$criticalityComboBox = $syncHash."$($currentTabType)Criticality_ComboBox"
+                        #$configuredComboBox = $syncHash."$($currentTabType)Configured_ComboBox"
 
                         if ($searchBox) {
                             $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
@@ -91,17 +91,7 @@ Function Add-SearchAndFilterCapability {
                             $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                             $searchBox.Tag = "Placeholder"
 
-                            # Reset criticality filter to "All"
-                            if ($criticalityComboBox) {
-                                $criticalityComboBox.SelectedIndex = 0
-                            }
-
-                            # Reset configuration status filter to "All"
-                            if ($configuredComboBox) {
-                                $configuredComboBox.SelectedIndex = 0
-                            }
-
-                            # Trigger the search update
+                            # Trigger the search update (filters persist)
                             Set-SearchAndFilter -TabType $currentTabType
                             Write-DebugOutput -Message "Manually cleared search for $currentTabType when switching product tabs (fallback)" -Source $MyInvocation.MyCommand -Level "Debug"
                         }
@@ -172,8 +162,8 @@ Function Add-SearchAndFilterCapability {
 
         $clearButton.Add_Click({
             $searchBox = $syncHash."$($tabType)Search_TextBox"
-            $criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
-            $configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
+            #$criticalityComboBox = $syncHash."$($tabType)Criticality_ComboBox"
+            #$configuredComboBox = $syncHash."$($tabType)Configured_ComboBox"
 
             if ($searchBox) {
                 $searchBox.Tag = "Clearing" # Prevent TextChanged from triggering search
@@ -182,15 +172,7 @@ Function Add-SearchAndFilterCapability {
                 $searchBox.FontStyle = [System.Windows.FontStyles]::Italic
                 $searchBox.Tag = "Placeholder"
 
-                # Reset default selection to "All" for both filters
-                if ($criticalityComboBox) {
-                    $criticalityComboBox.SelectedIndex = 0
-                }
-                if ($configuredComboBox) {
-                    $configuredComboBox.SelectedIndex = 0
-                }
-
-                # Now trigger the search with cleared state
+                # Trigger the search with cleared text (filters persist)
                 Set-SearchAndFilter -TabType $tabType
             }
         }.GetNewClosure())
@@ -238,21 +220,29 @@ Function Add-SearchAndFilterCapability {
             # Clear existing items
             $configuredComboBox.Items.Clear()
 
+            # Get labels from the baseline control configuration
+            $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.controlType -eq $tabType }
+            
+            # Use configured labels or fall back to defaults
+            $allLabel = if ($baselineControl.filterAllLabel) { $baselineControl.filterAllLabel } else { "All Policies" }
+            $configuredLabel = if ($baselineControl.filterConfiguredLabel) { $baselineControl.filterConfiguredLabel } else { "Configured Policies" }
+            $notConfiguredLabel = if ($baselineControl.filterNotConfiguredLabel) { $baselineControl.filterNotConfiguredLabel } else { "Non-Configured Policies" }
+
             # Add "All" option
             $allConfigItem = New-Object System.Windows.Controls.ComboBoxItem
-            $allConfigItem.Content = "All Configurations"
+            $allConfigItem.Content = $allLabel
             $allConfigItem.Tag = "ALL_CONFIGURATIONS"
             [void]$configuredComboBox.Items.Add($allConfigItem)
 
             # Add "Configured" option (cards with "Saved" tag)
             $configuredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $configuredItem.Content = "Configured Only"
+            $configuredItem.Content = $configuredLabel
             $configuredItem.Tag = "CONFIGURED"
             [void]$configuredComboBox.Items.Add($configuredItem)
 
             # Add "Not Configured" option (cards with null/empty tag)
             $notConfiguredItem = New-Object System.Windows.Controls.ComboBoxItem
-            $notConfiguredItem.Content = "Not Configured Only"
+            $notConfiguredItem.Content = $notConfiguredLabel
             $notConfiguredItem.Tag = "NOT_CONFIGURED"
             [void]$configuredComboBox.Items.Add($notConfiguredItem)
 

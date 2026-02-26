@@ -334,31 +334,14 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.5v1
+  - PolicyId: MS.AAD.3.5v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.5v1 Not-applicable case - preMigration but auth methods disabled
+      - TestDescription: MS.AAD.3.5v2 Non-compliant case - Sms enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: preMigration
-                authentication_method[0].authentication_method_feature_settings:
-                  - Id: Sms
-                    State: disabled
-                  - Id: Voice
-                    State: disabled
-                  - Id: Email
-                    State: disabled
-        Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Sms enabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: enabled
@@ -368,12 +351,11 @@ TestPlan:
                     State: disabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Voice enabled
+      - TestDescription: MS.AAD.3.5v2 Non-compliant case - Voice enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
@@ -383,12 +365,11 @@ TestPlan:
                     State: disabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.5v1 Non-compliant case - Email enabled
+      - TestDescription: MS.AAD.3.5v2 Non-compliant case - Email enabled
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled
@@ -398,12 +379,11 @@ TestPlan:
                     State: enabled
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.5v1 Compliant case
+      - TestDescription: MS.AAD.3.5v2 Compliant case
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
               updates:
-                authentication_method[0].authentication_method_policy.PolicyMigrationState: migrationComplete
                 authentication_method[0].authentication_method_feature_settings:
                   - Id: Sms
                     State: disabled

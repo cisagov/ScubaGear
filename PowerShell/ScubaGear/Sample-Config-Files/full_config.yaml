@@ -148,17 +148,17 @@ Defender:
     # Online Protection' section of the manage protection settings dialog.
     SensitiveAccounts:
       IncludedUsers:
-        - johndoe@random.example.com
+        - johndoe@example.com
       IncludedGroups:
-        - SG-MDE-Users
+        - SG-MDE-Users@example.com
       IncludedDomains:
         - random.mail.example.com
       ExcludedUsers:
-        - janedoe-ga@random.example.com
+        - janedoe-ga@example.com
       ExcludedGroups:
-        - 4a471183-d934-4fb4-b1b3-d9525e0e1b45
+        - SG-MDE-SensitiveAdmins@example.com
       ExcludedDomains:
-        - example.com
+        - contoso.com
 
   # Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
   MS.DEFENDER.1.5v1:
