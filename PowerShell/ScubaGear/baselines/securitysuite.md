@@ -973,8 +973,7 @@ For users not added to the standard or strict preset policies:
 ## 7. Link Protection
 
 Several technologies exist for protecting users from malicious links. For example,
-Microsoft Defender accomplishes this by
-prepending:
+Microsoft Defender accomplishes this by prepending:
 
 `https://*.safelinks.protection.outlook.com/?url=`
 
@@ -1052,29 +1051,74 @@ User click tracking SHOULD be enabled.
 
 #### MS.SECURITYSUITE.7.1v1 Instructions
 
-<!-- TODO update these steps -->
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender for Office 365, see the following
-implementation steps for
-[enabling preset security policies](./defender.md#msdefender13v1), which
-include Safe Links protections to scan URLs in email messages against a list
-of known, malicious links.
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+As the steps for MS.SECURITYSUITE.7.1v1, MS.SECURITYSUITE.7.2v1, and MS.SECURITYSUITE.7.3v1 share
+many steps in common, steps for all three policies are included in this section. Steps that do not
+strictly apply to MS.SECURITYSUITE.7.1v1 are followed by the applicable SCuBA policy in parenthesis.
+
+For users not added to the standard or strict preset policies:
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Safe-links**.
+5.  If modifying an existing policy:
+    1. Click the name of the policy from the policy list to open the policy summary.
+    2. Click **Edit users and domains**.
+        - Add users, groups, and domains as needed. To make the policy apply to all users, under
+          **Domains**, enter all the tenant domains.
+        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+          to be exempted from this policy.
+        - Click **Save**.
+    3. Click **Edit protection settings**.
+    4. Under **Email**, ensure the following options are selected:
+        - **On: Safe Links checks a list of known, malicious links when users click links in email. URLs are rewritten by default.**
+        - **Apply Safe Links to email messages sent within the organization**
+        - **Apply real-time URL scanning for suspicious links and links that point to files** (MS.SECURITYSUITE.7.2v1)
+        - **Wait for URL scanning to complete before delivering the message** (MS.SECURITYSUITE.7.2v1)
+    5. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
+    6. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
+    7. Under **Click protection settings**, select **Track user clicks** (MS.SECURITYSUITE.7.3v1).
+    8. Click **Save**.
+6. If creating a new policy:
+    1. Click **Create**.
+    2. After naming the policy, click **Next**.
+    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
+       **Domains**, enter all the tenant domains.
+    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+       to be exempted from this policy.
+    5. Click **Next**.
+    6. Under **Email**, ensure the following options are selected:
+        - **On: Safe Links checks a list of known, malicious links when users click links in email. URLs are rewritten by default.**
+        - **Apply Safe Links to email messages sent within the organization**
+        - **Apply real-time URL scanning for suspicious links and links that point to files** (MS.SECURITYSUITE.7.2v1)
+        - **Wait for URL scanning to complete before delivering the message** (MS.SECURITYSUITE.7.2v1)
+    7. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
+    8. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
+    9. Under **Click protection settings**, select **Track user clicks** (MS.SECURITYSUITE.7.3v1).
+    10. Click **Next**, **Next**, and **Submit**.
+
 
 #### MS.SECURITYSUITE.7.2v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender for Office 365, see the following
-implementation steps for
-[enabling preset security policies](./defender.md#msdefender13v1), which
-include Safe Links protections to scan links to files for malware.
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+For users not added to the standard or strict preset policies, see [MS.SECURITYSUITE.7.1v1 Instructions](#mssecuritysuite71v1-instructions).
 
 #### MS.SECURITYSUITE.7.3v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender for Office 365, see the following
-implementation steps for
-[enabling preset security policies](./defender.md#msdefender13v1), which
-include Safe Links click protections to track user clicks on links in email.
+Both the standard and strict preset policies meet this baseline policy requirement,
+so no further actions are needed for users added to those policies. See
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
+for instructions on adding users to these policies.
+
+For users not added to the standard or strict preset policies, see [MS.SECURITYSUITE.7.1v1 Instructions](#mssecuritysuite71v1-instructions).
 
 ## 8. IP Allow Lists
 
