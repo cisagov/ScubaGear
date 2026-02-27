@@ -924,7 +924,7 @@ For users not added to the standard or strict preset policies:
         - **Move message to Junk Email folder**
         - **Redirect message to email address**
         - **Delete message**
-        - **Quarantine message**.
+        - **Quarantine message**
     6. Click **Edit allowed and blocked senders and domains**.
     7. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
         **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
@@ -944,7 +944,7 @@ For users not added to the standard or strict preset policies:
         - **Move message to Junk Email folder**
         - **Redirect message to email address**
         - **Delete message**
-        - **Quarantine message**.
+        - **Quarantine message**
     8. Click **Next**
     9. On the **Allow & block list** page, do not click **Allow domains** under **Allowed**. It
     should read **Domains (0)** under **Allowed**. (_MS.SECURITYSUITE.6.2v1_)
@@ -1071,7 +1071,7 @@ For users not added to the standard or strict preset policies:
         - **Wait for URL scanning to complete before delivering the message** (_MS.SECURITYSUITE.7.2v1_)
     5. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
     6. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
-    7. Under **Click protection settings**, select **Track user clicks** (_MS.SECURITYSUITE.7.3v1_).
+    7. Under **Click protection settings**, select **Track user clicks**. (_MS.SECURITYSUITE.7.3v1_)
     8. Click **Save**.
 6. If creating a new policy:
     1. Click **Create**.
@@ -1088,7 +1088,7 @@ For users not added to the standard or strict preset policies:
         - **Wait for URL scanning to complete before delivering the message** (_MS.SECURITYSUITE.7.2v1_)
     7. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
     8. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
-    9. Under **Click protection settings**, select **Track user clicks** (_MS.SECURITYSUITE.7.3v1_).
+    9. Under **Click protection settings**, select **Track user clicks**. (_MS.SECURITYSUITE.7.3v1_)
     10. Click **Next**, **Next**, and **Submit**.
 
 
