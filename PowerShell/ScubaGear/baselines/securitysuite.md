@@ -388,11 +388,13 @@ impersonation protection checks.
 2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Under **Impersonation**, check **Enable users to protect**.
-6.  Click **Manage [x] sender(s)**.
-7.  On the **Manage senders for impersonation protection** page, click **Add user**
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
+6.  Click **Edit protection settings**.
+7.  Under **Impersonation**, select **Enable users to protect**.
+8.  Click **Manage [x] sender(s)**.
+9.  On the **Manage senders for impersonation protection** page, click **Add user**
 then add a name and valid email address for each sensitive account and click **Add** after each.
-8.  Click **Done** then **Save**.
+10. Click **Done** then **Save**.
 
 #### MS.SECURITYSUITE.2.2v1 Instructions
 
@@ -400,8 +402,10 @@ then add a name and valid email address for each sensitive account and click **A
 2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
-6.  Click then **Save**.
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
+6.  Click **Edit protection settings**.
+7.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
+8.  Click **Done** then **Save**.
 
 #### MS.SECURITYSUITE.2.3v1 Instructions
 
@@ -409,11 +413,13 @@ then add a name and valid email address for each sensitive account and click **A
 2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
-6.  Click **Manage [x] custom domain(s)**.
-7.  On the **Manage custom domains for impersonation protection** page, click **Add domain**
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
+6.  Click **Edit protection settings**.
+7.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
+8.  Click **Manage [x] custom domain(s)**.
+9.  On the **Manage custom domains for impersonation protection** page, click **Add domain**
 then add each partner domain.
-8.  Click **Add domains**, **Done**, then **Save**.
+10. Click **Add domains**, **Done**, then **Save**.
 
 ## 3. Data Loss Prevention
 
