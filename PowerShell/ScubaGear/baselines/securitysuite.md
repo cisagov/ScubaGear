@@ -458,8 +458,6 @@ The DLP policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, 
                or endpoint devices. DLP policies should cover all
                affected locations to be effective.
 - _Last modified:_ February 2026
-- _Note:_ The DLP policy referenced here is the same policy
-          configured in [MS.SECURITYSUITE.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -477,8 +475,6 @@ The action for the DLP policy SHOULD be set to block sharing sensitive informati
                explicitly allowed. Specific exemptions can be made based
                on agency policies and valid business justifications.
 - _Last modified:_ February 2026
-- _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.SECURITYSUITE.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -496,8 +492,6 @@ Notifications to inform users and help educate them on the proper use of sensiti
                notifications provides positive feedback to users when
                accessing sensitive information.
 - _Last modified:_ February 2026
-- _Note:_ The custom policy referenced here is the same policy
-          configured in [MS.SECURITYSUITE.4.1v2](#msdefender41v2).
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AT-2b
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -530,6 +524,14 @@ Notifications to inform users and help educate them on the proper use of sensiti
 
 #### MS.SECURITYSUITE.3.1v2 Instructions
 
+DLP is _not_ covered by the preset policies, so these steps need to be taken even if the standard
+or strict policies are used.
+
+As the steps for MS.SECURITYSUITE.3.1v1, MS.SECURITYSUITE.3.2v1, MS.SECURITYSUITE.3.3v1, and
+MS.SECURITYSUITE.3.4v1 share many steps in common, steps for all these policies are included in
+this section. Steps that do not strictly apply to MS.SECURITYSUITE.3.1v1 are followed by the
+applicable SCuBA policy in parenthesis.
+
 1. Sign in to the **Microsoft Purview portal**.
 
 2. Under the **Solutions** section on the left-hand menu, select **Data loss
@@ -552,7 +554,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 9. Under **Choose where to apply the policy**, set **Status** to **On**
    for at least the Exchange email, OneDrive accounts, SharePoint
    sites, Teams chat and channel messages, and Devices locations, then
-   click **Next**.
+   click **Next**. (_MS.SECURITYSUITE.3.2v1_)
 
 10. Under **Define policy settings**, select **Create or customize advanced
    DLP rules**, and then click **Next**.
@@ -579,11 +581,11 @@ Notifications to inform users and help educate them on the proper use of sensiti
 17. Check **Restrict Access or encrypt the content in Microsoft 365
     locations**.
 
-18. Under this action, select **Block Everyone**.
+18. Under this action, select **Block Everyone**. (_MS.SECURITYSUITE.3.3v1_)
 
-19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**.
+19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**. (_MS.SECURITYSUITE.3.4v1_)
 
-20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**.
+20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**. (_MS.SECURITYSUITE.3.4v1_)
 
 21. Click **Save**, then **Next**.
 
@@ -593,19 +595,19 @@ Notifications to inform users and help educate them on the proper use of sensiti
 
 #### MS.SECURITYSUITE.3.2v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#msdefender31v2-instructions) step 8
+See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) step 9
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.SECURITYSUITE.3.3v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#msdefender31v2-instructions) steps
-   15-17 for details on configuring DLP policy to block sharing sensitive
+See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) steps
+   16-18 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.SECURITYSUITE.3.4v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#msdefender31v2-instructions) steps
-   18-19 for details on configuring DLP policy to notify users when accessing
+See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) steps
+   19-20 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
 ## 4. Alerts
@@ -652,7 +654,7 @@ At a minimum, the following alerts SHALL be enabled:
 #### MS.SECURITYSUITE.4.2v1
 The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender52v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite42v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
@@ -764,7 +766,7 @@ Unified Audit logging SHALL be enabled.
 #### MS.SECURITYSUITE.5.2v1
 Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender63v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite52v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.5.3v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
