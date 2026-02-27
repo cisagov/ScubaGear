@@ -890,12 +890,16 @@ potentially unknown users to bypass spam protections.
 
 ### Implementation
 
-#### MS.SECURITYSUITE.6.1v2 Instructions
+#### MS.SECURITYSUITE.6.1v1 Instructions
 
 Both the standard and strict preset policies meet this baseline policy requirement,
 so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
+
+As the steps for MS.SECURITYSUITE.6.1v1 and MS.SECURITYSUITE.6.2v1 share many steps in common,
+steps for both policies are included in this section. Steps that do not strictly apply to
+MS.SECURITYSUITE.6.1v1 are followed by the applicable SCuBA policy in parenthesis.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
@@ -921,7 +925,10 @@ For users not added to the standard or strict preset policies:
         - **Redirect message to email address**
         - **Delete message**
         - **Quarantine message**.
-    6. Click **Save**.
+    6. Click **Edit allowed and blocked senders and domains**.
+    7. [MS.SECURITYSUITE.6.2v1](#mssecuritysuite61v1) Under **Allowed**, click **Allow domains**.
+        Select any domains that have been allowed, then **Delete** (the trash icon).
+    8. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
     2. After naming the policy, click **Next**.
@@ -938,7 +945,10 @@ For users not added to the standard or strict preset policies:
         - **Redirect message to email address**
         - **Delete message**
         - **Quarantine message**.
-    8. Click **Next**, **Next**, then **Submit**.
+    8. Click **Next**
+    9. [MS.SECURITYSUITE.6.2v1](#mssecuritysuite61v1) On the **Allow & block list** page, do not
+        click **Allow domains** under **Allowed**. It should read **Domains (0)** under **Allowed**.
+    10. **Next**, then **Submit**.
 
 #### MS.SECURITYSUITE.6.2v1 Instructions
 
@@ -947,27 +957,7 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
-For users not added to the standard or strict preset policies:
-1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
-3.  Select **Threat policies**.
-4.  Under **Policies**, select **Anti-spam**.
-5.  If modifying an existing policy:
-    1. Click the name of the policy from the policy list to open the policy summary. Note: be sure to
-    select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
-    under **Type** instead of of **Custom output spam policy**.
-    2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Add users, groups, and domains as needed. To make the policy apply to all users, under
-          **Domains**, enter all the tenant domains.
-        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
-          to be exempted from this policy.
-        - Click **Save**.
-    3. Click **Edit allowed and blocked senders and domains**.
-    4. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then **Delete** (the trash icon).
-    5. Click **Done** and **Save**.
-6.  If creating a new policy: configure the policy as needed, but on the **Allow & block list**
-    page, do not click **Allow domains** under **Allowed**. It should read **Domains (0)** under
-    **Allowed**.
+For users not added to the standard or strict preset policies, see [MS.SECURITYSUITE.6.1v1 Instructions](#mssecuritysuite61v1-instructions).
 
 
 ## 7. Link Protection
