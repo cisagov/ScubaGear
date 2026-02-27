@@ -173,6 +173,10 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
+As the steps for MS.SECURITYSUITE.1.1v1 and MS.SECURITYSUITE.1.2v1 share many steps in common,
+steps for both policies are included in this section. Steps that do not strictly apply to
+MS.SECURITYSUITE.1.1v1 are followed by the applicable SCuBA policy in parenthesis.
+
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
 2.  Under **Email & collaboration**, select **Policies & rules**.
@@ -187,9 +191,10 @@ For users not added to the standard or strict preset policies:
           to be exempted from this policy.
         - Click **Save**.
     3. Click **Edit protection settings**
-    4. Check **Enable the common attachments filter**.
-    5. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vba are selected.
-    5. Click **Save**.
+    4. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
+    5. Check **Enable the common attachments filter**.
+    6. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vba are selected.
+    7. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**.
     2. After naming the policy, click **Next**.
@@ -198,9 +203,10 @@ For users not added to the standard or strict preset policies:
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    4. Check **Enable the common attachments filter**.
-    5. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vba are selected, then click **Done**.
-    6. Click **Next** then **Submit**.
+    6. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
+    7. Check **Enable the common attachments filter**.
+    8. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vba are selected, then click **Done**.
+    9. Click **Next** then **Submit**.
 
 #### MS.SECURITYSUITE.1.2v1 Instructions
 Both the standard and strict preset policies meet this baseline policy requirement,
@@ -208,33 +214,7 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
-For users not added to the standard or strict preset policies:
-1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
-3.  Select **Threat policies**.
-4.  Under **Policies**, select **Anti-malware**.
-5.  If modifying an existing policy:
-    1. Click the name of the policy from the policy list to open the policy summary.
-    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Add users, groups, and domains as needed. To make the policy apply to all users, under
-          **Domains**, enter all the tenant domains.
-        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
-          to be exempted from this policy.
-        - Click **Save**.
-    3. Click **Edit protection settings**
-    4. Check **Enable zero-hour auto purge for malware (Recommended)**.
-    5. Click **Save**.
-6.  If creating a new policy:
-    1. Click **Create**.
-    2. After naming the policy, click **Next**.
-    3. Add users, groups, and domains as needed. To make the policy apply to all users, under
-       **Domains**, enter all the tenant domains.
-    4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
-       to be exempted from this policy.
-    5. Click **Next**.
-    4. Check **Enable zero-hour auto purge for malware (Recommended)**.
-    5. Click **Next** then **Submit**.
-
+For users not added to the standard or strict preset policies, see [MS.SECURITYSUITE.1.2v1 Instructions](#mssecuritysuite12v1-instructions).
 
 #### MS.SECURITYSUITE.1.3v1 Instructions
 
