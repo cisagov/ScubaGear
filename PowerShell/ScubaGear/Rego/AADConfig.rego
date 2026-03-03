@@ -647,14 +647,16 @@ tests contains {
 #--
 
 # Return the Id if non-compliant user consent policies
-BadDefaultGrantPolicies contains Policy.Id if {
-    some Policy in input.authorization_policies
-    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
-}
-
+# Option 2: Allow user consent for apps from verified publishers, for selected permissions
 BadDefaultGrantPolicies contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+}
+
+# Option 3: Let Microsoft manage your consent settings (Recommended)
+BadDefaultGrantPolicies contains Policy.Id if {
+    some Policy in input.authorization_policies
+    "ManagePermissionGrantsForSelf.microsoft-user-default-recommended" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
 }
 
 # Return all policy Ids
