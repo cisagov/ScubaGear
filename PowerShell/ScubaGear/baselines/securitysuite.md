@@ -904,24 +904,27 @@ For users not added to the standard or strict preset policies:
     select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
     under **Type** instead of of **Custom output spam policy**.
     2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
-        - Add users, groups, and domains as needed. To make the policy apply to all users, under
-          **Domains**, enter all the tenant domains.
-        - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
-          to be exempted from this policy.
-        - Click **Save**.
+      - Add users, groups, and domains as needed. To make the policy apply to all users, under
+        **Domains**, enter all the tenant domains.
+      - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
+        to be exempted from this policy.
+      - Click **Save**.
     3. Click **Edit spam threshold and properties** See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
     for configuration guidance. We recommend mirroring the values used for either the standard or
     strict preset policies. Click **Save**.
     4. Click **Edit actions**.
     5. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
-        - **Move message to Junk Email folder**
-        - **Redirect message to email address**
-        - **Delete message**
-        - **Quarantine message**
-    6. Click **Edit allowed and blocked senders and domains**.
-    7. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
+      - **Move message to Junk Email folder**
+      - **Redirect message to email address**
+      - **Delete message**
+      - **Quarantine message**
+    6. If you selected **Redirect message to email address**, also fill in an appropriate email for
+      the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
+      spam and phishing messages.
+    7. Click **Edit allowed and blocked senders and domains**.
+    8. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
         **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
-    8. Click **Save**.
+    9. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
     2. After naming the policy, click **Next**.
@@ -934,14 +937,17 @@ For users not added to the standard or strict preset policies:
     for configuration guidance. We recommend mirroring the values used for either the standard or
     strict preset policies.
     7. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
-        - **Move message to Junk Email folder**
-        - **Redirect message to email address**
-        - **Delete message**
-        - **Quarantine message**
-    8. Click **Next**
-    9. On the **Allow & block list** page, do not click **Allow domains** under **Allowed**. It
+      - **Move message to Junk Email folder**
+      - **Redirect message to email address**
+      - **Delete message**
+      - **Quarantine message**
+    8. If you selected **Redirect message to email address**, also fill in an appropriate email for
+      the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
+      spam and phishing messages.
+    9. Click **Next**
+    10. On the **Allow & block list** page, do not click **Allow domains** under **Allowed**. It
     should read **Domains (0)** under **Allowed**. (_MS.SECURITYSUITE.6.2v1_)
-    10. **Next**, then **Submit**.
+    11. **Next**, then **Submit**.
 
 #### MS.SECURITYSUITE.6.2v1 Instructions
 
