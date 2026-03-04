@@ -94,7 +94,7 @@ Emails with click-to-run file attachments SHALL be blocked, including at a minim
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
 <!-- todo link to proper config doc -->
 
-<!--Policy: MS.SECURITYSUITE.1.1v2; Criticality: SHALL -->
+<!--Policy: MS.SECURITYSUITE.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
 Sharing high risk file types, when necessary, is better left to a means other
 than email; the dangers of allowing them to be sent over email outweigh
@@ -421,7 +421,7 @@ A DLP policy SHALL be configured to protect PII and sensitive information, as de
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SECURITYSUITE.3.1v2; Criticality: SHALL -->
+<!--Policy: MS.SECURITYSUITE.3.1v1; Criticality: SHALL -->
 - _Rationale:_ Users may inadvertently share sensitive information with
                others who should not have access to it. DLP policies
                provide a way for agencies to detect and prevent
@@ -535,7 +535,7 @@ and unwanted Bluetooth applications.
 
 ### Implementation
 
-#### MS.SECURITYSUITE.3.1v2 Instructions
+#### MS.SECURITYSUITE.3.1v1 Instructions
 
 DLP is _not_ covered by the preset policies, so these steps need to be taken even if the standard
 or strict policies are used.
@@ -608,18 +608,18 @@ applicable SCuBA policy in parenthesis.
 
 #### MS.SECURITYSUITE.3.2v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) step 9
+See [MS.SECURITYSUITE.3.1v1 Instructions](#mssecuritysuite31v1-instructions) step 9
    for details on enforcing DLP policy in specific M365 service locations.
 
 #### MS.SECURITYSUITE.3.3v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) steps
+See [MS.SECURITYSUITE.3.1v1 Instructions](#mssecuritysuite31v1-instructions) steps
    16-18 for details on configuring DLP policy to block sharing sensitive
    information with everyone.
 
 #### MS.SECURITYSUITE.3.4v1 Instructions
 
-See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) steps
+See [MS.SECURITYSUITE.3.1v1 Instructions](#mssecuritysuite31v1-instructions) steps
    19-20 for details on configuring DLP policy to notify users when accessing
    sensitive information.
 
