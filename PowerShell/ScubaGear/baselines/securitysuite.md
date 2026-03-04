@@ -242,7 +242,7 @@ For users not added to the standard or strict preset policies:
     1. Click **Create**.
     2. After naming the policy, click **Next**.
     3. Add users, groups, and domains as needed. To make the policy apply to all users, under
-       Domains**, enter all the tenant domains.
+       **Domains**, enter all the tenant domains.
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
