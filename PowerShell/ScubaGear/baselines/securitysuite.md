@@ -481,6 +481,29 @@ Notifications to inform users and help educate them on the proper use of sensiti
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
+#### MS.SECURITYSUITE.3.5v1
+The DLP policy SHOULD include an action to block access to sensitive information by restricted apps
+and unwanted Bluetooth applications.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender46v1-instructions)
+
+<!--Policy: MS.SECURITYSUITE.3.5v1; Criticality: SHOULD -->
+- _Rationale:_ Some apps may inappropriately share accessed files or not conform to agency policies
+               for access to sensitive information. Defining a DLP policy with an action to block
+               access from restricted apps and unwanted Bluetooth applications prevents unauthorized
+               disclosure by those programs.
+- _Last modified:_ February 2026
+- _Note:_
+  - This action can only be included if at least one device is onboarded
+    to the agency tenant. Otherwise, the option to block restricted apps will
+    not be available.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-19a
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
+  - [T1485: Data Destruction](https://attack.mitre.org/techniques/T1485/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1486: Data Encrypted for Impact](https://attack.mitre.org/techniques/T1486/)
+
 ### Resources
 
 - [Plan for data loss prevention (DLP) \| Microsoft
@@ -504,6 +527,11 @@ Notifications to inform users and help educate them on the proper use of sensiti
   Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
   for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
 
+- DLP for Endpoint, needed for MS.SECURITYSUITE.3.5v1, requires an E5 or G5 license. See [Get started with
+  Endpoint data loss prevention - Microsoft Purview (compliance) \|
+  Microsoft
+  Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
 
 ### Implementation
 
@@ -594,6 +622,41 @@ See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) ste
 See [MS.SECURITYSUITE.3.1v2 Instructions](#mssecuritysuite31v2-instructions) steps
    19-20 for details on configuring DLP policy to notify users when accessing
    sensitive information.
+
+#### MS.SECURITYSUITE.3.5v1 Instructions
+
+These implementation steps are only applicable if at least one device has been onboarded with
+Defender for Endpoint.
+
+1. Sign in to the **Microsoft Purview portal**.
+2. Under **Settings**, select **Data Loss Prevention**.
+3. (Optional) Select **Restricted apps and app groups**. Add or edit restricted apps per agency
+  discretion.
+4. Select **Unallowed Bluetooth apps** then **Add or edit unallowed Bluetooth apps**.
+5. Ensure **Include Bluetooth apps recommended by Microsoft** is **On**.
+6. (Optional) Add other apps to restrict, per agency discretion.
+7. Click **Save**.
+8. Return to the main menu. Under **Solutions**, select **Data Loss Prevention**.
+9. Select **Policies** from the top of the page.
+10. Find the custom DLP policy configured under
+   [MS.SECURITYSUITE.3.1v1 Instructions](#mssecuritysuite31v1-instructions) in the list
+   and click the Policy name to select.
+11. Select **Edit Policy**.
+12. Click **Next** on each page in the policy wizard until you reach the
+   **Advanced DLP rules page**.
+13. Select the relevant rule and click the pencil icon to edit it.
+14. Under **Actions**, click **Add an action**.
+15. Choose **Audit or restrict activities on device**
+16. Under **File activities for all apps**, select
+    **Apply restrictions to specific activity**.
+17. Check the box next to **Copy or move using unallowed Bluetooth app**
+    and set its action to **Block**.
+18. Under **Restricted app activities**, check the **Access by restricted apps** box
+   and set the action drop-down to **Block**.
+19. Click **Save** to save the changes.
+20. Click **Next** on each page until reaching the
+    **Review your policy and create it** page.
+21. Review the policy and click **Submit** to complete the policy changes.
 
 ## 4. Alerts
 
