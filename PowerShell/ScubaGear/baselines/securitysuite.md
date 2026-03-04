@@ -148,7 +148,7 @@ SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malwar
 <!--Policy: MS.SECURITYSUITE.1.4v1; Criticality: SHOULD -->
 - _Rationale:_ Files shared through Teams or hosted on SharePoint/OneDrive can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
 - _Last modified:_ March 2026
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
