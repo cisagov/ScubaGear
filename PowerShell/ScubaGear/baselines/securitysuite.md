@@ -3,7 +3,7 @@
 # CISA M365 Secure Configuration Security Suite Baseline
 
 Several essential security functions for M365 services require a dedicated security
-tool, e.g., for data loss prevention. M365 provides these security functions
+suite, e.g., for data loss prevention. M365 provides these security functions
 natively via Defender for Office 365. Notably, Defender for Office 365 capabilities
 require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
 and are available as add-ons for E3 and G3. However, third-party solutions that
