@@ -59,3 +59,5 @@ Invoke-Pester -Configuration $Config
 - cisaent (GCC with G5 licensing)
 - g3forthee (GCC with G3 licensing)
 - scubagcchigh (GCC High with G5 licensing)
+
+7. Use custom configuration files for each test tenant to speed up testing.
