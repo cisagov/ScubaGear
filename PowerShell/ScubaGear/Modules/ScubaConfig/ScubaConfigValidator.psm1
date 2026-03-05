@@ -10,6 +10,7 @@ class ScubaConfigValidator {
 
     .EXAMPLE
     # Initialize validator and perform validation
+    using module '.\ScubaConfigValidator.psm1'
     [ScubaConfigValidator]::Initialize("C:\ScubaGear\Modules\ScubaConfig")
     $Result = [ScubaConfigValidator]::ValidateYamlFile("C:\Config\my-config.yaml")
 
@@ -114,6 +115,25 @@ class ScubaConfigValidator {
 
         # No mapping found
         return @()
+    }
+
+    # Detects the current operating system
+    hidden static [string] GetOperatingSystem() {
+        # PowerShell Core has $IsWindows, $IsLinux, $IsMacOS automatic variables
+        # Windows PowerShell 5.1 doesn't have these, so we check if they exist
+        # In classes, we must assign variables locally
+        $IsLinuxVar = Get-Variable -Name 'IsLinux' -ErrorAction SilentlyContinue
+        if ($null -ne $IsLinuxVar -and $IsLinuxVar.Value) {
+            return 'Linux'
+        }
+
+        $IsMacOSVar = Get-Variable -Name 'IsMacOS' -ErrorAction SilentlyContinue
+        if ($null -ne $IsMacOSVar -and $IsMacOSVar.Value) {
+            return 'MacOS'
+        }
+
+        # Default to Windows (either $IsWindows is true or we're in Windows PowerShell 5.1)
+        return 'Windows'
     }
 
     # Validates YAML configuration file with default settings
@@ -265,8 +285,7 @@ class ScubaConfigValidator {
         # This avoids duplicating schema minLength validation
         foreach ($Property in $ConfigObject.PSObject.Properties) {
             if ($Property.Value -is [string] -and $Property.Value.Length -gt 0 -and [string]::IsNullOrWhiteSpace($Property.Value)) {
-                [void]$Validation.Errors.Add("Property '$($Property.Name)' cannot be whitespace only."
-)
+                [void]$Validation.Errors.Add("Property '$($Property.Name)' cannot be whitespace only.")
             }
         }
 
@@ -296,21 +315,19 @@ class ScubaConfigValidator {
                         }
 
                         if (-not $PathExists) {
-                            # Check validatePathExists from the original property definition (not the resolved ref)
+                            # Check pathMustExist from the original property definition (not the resolved ref)
                             # This allows schema to control whether non-existence is an error or warning
                             $RequirePathExists = $true  # Default to error if not specified
-                            if ($SchemaProperty.PSObject.Properties.Name -contains 'validatePathExists') {
-                                $RequirePathExists = $SchemaProperty.validatePathExists
+                            if ($SchemaProperty.PSObject.Properties.Name -contains 'pathMustExist') {
+                                $RequirePathExists = $SchemaProperty.pathMustExist
                             }
 
                             if ($RequirePathExists) {
                                 # Path must exist - error
-                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue."
-)
+                                [void]$Validation.Errors.Add("Property '$PropertyName': Directory does not exist: $PropertyValue.")
                             } else {
                                 # Path will be created - warning
-                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs."
-)
+                                [void]$Validation.Warnings.Add("Property '$PropertyName': Directory does not exist: $PropertyValue. The directory will be created when ScubaGear runs.")
                             }
                         }
                     }
@@ -318,12 +335,96 @@ class ScubaConfigValidator {
             }
         }
 
+        # Validate OPA executable exists
+        $Defaults = [ScubaConfigValidator]::GetDefaults()
+        $OS = [ScubaConfigValidator]::GetOperatingSystem()
+        $OPAExecutableName = $Defaults.defaults.OPAExecutable.$OS
+
+        # Check if user specified a custom OPAPath (from YAML or parameter)
+        # We need to check if OPAPath exists AND is different from the default value
+        $DefaultOPAPath = $Defaults.defaults.OPAPath
+        #$ExpandedDefaultPath = $DefaultOPAPath -replace '~', $env:USERPROFILE
+        $ExpandedDefaultPath = (Get-Item -LiteralPath $DefaultOPAPath).FullName  # Get full path to handle short paths from env variables
+        $UserSpecifiedPath = $false
+
+        if ($ConfigObject.PSObject.Properties.Name -contains 'OPAPath') {
+            # OPAPath exists - check if it's different from default (compare expanded versions)
+            $ConfigOPAPath = $ConfigObject.OPAPath
+            $ExpandedConfigPath = (Get-Item -LiteralPath $ConfigOPAPath).FullName
+            if ($ExpandedConfigPath -ne $ExpandedDefaultPath) {
+                $UserSpecifiedPath = $true
+            }
+        }
+
+        if ($UserSpecifiedPath) {
+            # User specified custom path - validate that path only (no fallback)
+            $CustomOPAPath = $ConfigObject.OPAPath
+            $ExpandedCustomPath = (Get-Item -LiteralPath $CustomOPAPath).FullName
+            $CustomOPAExecutablePath = Join-Path -Path $ExpandedCustomPath -ChildPath $OPAExecutableName
+
+            if (-not (Test-Path -LiteralPath $CustomOPAExecutablePath -PathType Leaf)) {
+                # Custom path specified but OPA not found - error
+                $ErrorMsg = "OPA executable not found: $CustomOPAExecutablePath`n"
+                $ErrorMsg += "  Expected executable: $OPAExecutableName`n"
+                $ErrorMsg += "  Specified OPAPath: $CustomOPAPath"
+                [void]$Validation.Errors.Add($ErrorMsg)
+            }
+        } else {
+            # No custom path specified - use default path with fallback logic
+            $DefaultOPAPath = $Defaults.defaults.OPAPath
+            $ExpandedDefaultPath = $DefaultOPAPath -replace '~', $env:USERPROFILE
+            $DefaultOPAExecutablePath = Join-Path -Path $ExpandedDefaultPath -ChildPath $OPAExecutableName
+
+            # Check if allowOPAFallback is enabled
+            $AllowFallback = if ($false -ne $Defaults.validation.allowOPAFallback) {
+                $Defaults.validation.allowOPAFallback
+            } else {
+                $false  # Default to false - OPA is required
+            }
+
+            #$AllowFallback = $true
+
+            # Check default location first
+            $FoundInDefault = Test-Path -LiteralPath $DefaultOPAExecutablePath -PathType Leaf
+
+            if (-not $FoundInDefault) {
+                if ($AllowFallback) {
+                    # Default location failed, check fallback
+                    $FallbackOPAPath = "."
+                    $ExpandedFallbackPath = (Get-Location).Path
+                    $FallbackOPAExecutablePath = Join-Path -Path $FallbackOPAPath -ChildPath $OPAExecutableName
+
+                    # Issue warning about checking fallback
+                    $WarningMsg = "OPA executable not found: $DefaultOPAExecutablePath, checking fallback location: $ExpandedFallbackPath"
+                    [void]$Validation.Warnings.Add($WarningMsg)
+
+                    # Check fallback location
+                    $FoundInFallback = Test-Path -LiteralPath $FallbackOPAExecutablePath -PathType Leaf
+
+                    if (-not $FoundInFallback) {
+                        # Fallback also failed - error
+                        $ErrorMsg = "OPA executable not found in fallback locations:`n"
+                        $ErrorMsg += "  Expected executable: $OPAExecutableName`n"
+                        $ErrorMsg += "    - Default: $DefaultOPAPath`n"
+                        $ErrorMsg += "    - Fallback: $ExpandedFallbackPath"
+                        [void]$Validation.Errors.Add($ErrorMsg)
+                    }
+                } else {
+                    # No fallback allowed - error immediately
+                    $ErrorMsg = "OPA executable not found in default location: $DefaultOPAExecutablePath`n"
+                    $ErrorMsg += "  Expected executable: $OPAExecutableName`n"
+                    $ErrorMsg += "  Default location: $DefaultOPAPath"
+                    [void]$Validation.Errors.Add($ErrorMsg)
+                }
+            }
+            # If found in default location, validation passes (no error, no warning)
+        }
+
         # Validate ProductNames duplicates
         if ($ConfigObject.ProductNames) {
             $UniqueProducts = $ConfigObject.ProductNames | Select-Object -Unique
             if ($UniqueProducts.Count -ne $ConfigObject.ProductNames.Count) {
-                [void]$Validation.Warnings.Add("ProductNames contains duplicate values. Duplicates will be removed."
-)
+                [void]$Validation.Warnings.Add("ProductNames contains duplicate values. Duplicates will be removed.")
             }
         }
 
@@ -342,6 +443,60 @@ class ScubaConfigValidator {
         }
 
         $ProductCapabilities = $Schema.schemaMetadata.productCapabilities
+        $Defaults = [ScubaConfigValidator]::GetDefaults()
+        $RequireProduct = $Defaults.validation.requireProductInPolicy
+        
+        # Get list of known product names from productCapabilities
+        $KnownProducts = @($ProductCapabilities.PSObject.Properties.Name)
+        
+        # Get list of valid schema properties
+        $ValidSchemaProperties = @()
+        if ($Schema.properties) {
+            $ValidSchemaProperties = @($Schema.properties.PSObject.Properties.Name)
+        }
+        
+        # Get list of properties to ignore from schema metadata
+        $IgnoreProperties = @()
+        if ($Schema.schemaMetadata -and $Schema.schemaMetadata.ignoreProperties) {
+            foreach ($Property in $Schema.schemaMetadata.ignoreProperties) {
+                # Skip comment entries in ignoreProperties
+                if ($Property -notlike "_comment*") {
+                    $IgnoreProperties += $Property
+                }
+            }
+        }
+        
+        # System properties to ignore (PowerShell object metadata)
+        $SystemProperties = @('IsReadOnly', 'IsFixedSize', 'IsSynchronized', 'Keys', 'Values', 'SyncRoot', 'Count')
+        
+        # Check for unknown products (properties that are neither valid config properties nor known products)
+        foreach ($ConfigProperty in $ConfigObject.PSObject.Properties) {
+            $PropertyName = $ConfigProperty.Name
+            
+            # Skip if it's a system property, ignore property, valid schema property, or known product
+            if ($PropertyName -in $SystemProperties -or 
+                $PropertyName -in $IgnoreProperties -or
+                $PropertyName -in $ValidSchemaProperties -or 
+                $PropertyName -in $KnownProducts) {
+                continue
+            }
+            
+            # Check if this might be a YAML anchor (complex object at root level that's not a product)
+            # YAML anchors are typically objects or arrays used for reuse via aliases
+            if ($ConfigProperty.Value -is [PSCustomObject] -or $ConfigProperty.Value -is [System.Collections.Hashtable] -or $ConfigProperty.Value -is [Array]) {
+                # This looks like a YAML anchor definition - skip it silently
+                Write-Debug "Skipping potential YAML anchor property: $PropertyName"
+                continue
+            }
+            
+            # This is an unknown property that's not in the schema
+            $Message = "Unknown product '$PropertyName'. This is not a recognized product name and will be ignored. Valid product names are: $($KnownProducts -join ', ')."
+            if ($RequireProduct) {
+                [void]$Validation.Errors.Add($Message)
+            } else {
+                [void]$Validation.Warnings.Add($Message)
+            }
+        }
 
         foreach ($ProductProperty in $ProductCapabilities.PSObject.Properties) {
             $ProductName = $ProductProperty.Name
@@ -353,8 +508,7 @@ class ScubaConfigValidator {
 
                 # If product doesn't support exclusions but has configuration
                 if (-not $Capabilities.supportsExclusions -and $ProductConfig -and $ProductConfig.PSObject.Properties.Count -gt 0) {
-                    [void]$Validation.Warnings.Add("Product '$ProductName' does not support exclusions. Configuration under '$ProductName' will be ignored."
-)
+                    [void]$Validation.Warnings.Add("Product '$ProductName' does not support exclusions. Configuration under '$ProductName' will be ignored.")
                 }
             }
         }
@@ -442,16 +596,15 @@ class ScubaConfigValidator {
                             $Schema
                         )
                         $PropertyExists = $true
-                        
+
                         # Warn about case mismatch (informational - PowerShell will still use it)
                         # Skip warning for products that don't support exclusions - they'll get an error later
                         if ($SchemaPropertyName -cne $PropertyName) {
                             # Products without exclusion support: SharePoint, Teams, PowerPlatform
                             $ProductsWithoutExclusions = @('SharePoint', 'Teams', 'PowerPlatform')
-                            
+
                             if ($SchemaPropertyName -notin $ProductsWithoutExclusions) {
-                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'."
-)
+                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'.")
                             }
                         }
                         break
@@ -463,8 +616,7 @@ class ScubaConfigValidator {
                 # Property not in schema - treat as warning (ScubaGear can still run with extra properties)
                 # Note: Root-level properties are case-insensitive in PowerShell, so typos may still work
                 # This warning means the property truly doesn't match any known configuration option
-                [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. It will be ignored by ScubaGear."
-)
+                [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. It will be ignored by ScubaGear.")
             }
         }
     }
@@ -520,21 +672,18 @@ class ScubaConfigValidator {
     # Validates array properties
     static [void] ValidateArrayProperty([object]$Value, [object]$Schema, [hashtable]$Validation, [string]$Context) {
         if ($Value -isnot [Array] -and $Value -isnot [System.Collections.IList]) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected array, got $($Value.GetType().Name)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected array, got $($Value.GetType().Name).")
             return
         }
 
         # Validate minItems
         if ($Schema.minItems -and $Value.Count -lt $Schema.minItems) {
-            [void]$Validation.Errors.Add("Property '$Context': Array must have at least $($Schema.minItems) items, found $($Value.Count)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Array must have at least $($Schema.minItems) items, found $($Value.Count).")
         }
 
         # Validate uniqueItems
         if ($Schema.uniqueItems -and ($Value | Select-Object -Unique).Count -ne $Value.Count) {
-            [void]$Validation.Errors.Add("Property '$Context': Array items must be unique."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Array items must be unique.")
         }
 
         # Validate each item
@@ -549,8 +698,7 @@ class ScubaConfigValidator {
     # Validates boolean properties
     static [void] ValidateBooleanProperty([object]$Value, [hashtable]$Validation, [string]$Context) {
         if ($Value -isnot [bool]) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected boolean, got $($Value.GetType().Name) with value '$Value'."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected boolean, got $($Value.GetType().Name) with value '$Value'.")
         }
     }
 
@@ -559,15 +707,13 @@ class ScubaConfigValidator {
         # Check if value is numeric
         $NumericValue = $null
         if (-not [int]::TryParse($Value, [ref]$NumericValue)) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected integer, got '$Value'."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected integer, got '$Value'.")
             return
         }
 
         # Validate enum constraint
         if ($Schema.enum -and $Schema.enum -notcontains $NumericValue) {
-            [void]$Validation.Errors.Add("Property '$Context': Value '$NumericValue' is not in allowed values: $($Schema.enum -join ', ')."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Value '$NumericValue' is not in allowed values: $($Schema.enum -join ', ').")
         }
     }
 
@@ -575,47 +721,40 @@ class ScubaConfigValidator {
     static [void] ValidateNumberProperty([object]$Value, [object]$Schema, [hashtable]$Validation, [string]$Context) {
         $NumericValue = $null
         if (-not [double]::TryParse($Value, [ref]$NumericValue)) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected number, got '$Value'."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected number, got '$Value'.")
         }
     }
 
     # Validates string properties with enum, pattern, length constraints
     static [void] ValidateStringProperty([object]$Value, [object]$Schema, [hashtable]$Validation, [string]$Context) {
         if ($Value -isnot [string]) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected string, got $($Value.GetType().Name)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected string, got $($Value.GetType().Name).")
             return
         }
 
         # Validate minLength
         if ($Schema.minLength -and $Value.Length -lt $Schema.minLength) {
-            [void]$Validation.Errors.Add("Property '$Context': String must be at least $($Schema.minLength) characters, found $($Value.Length)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': String must be at least $($Schema.minLength) characters, found $($Value.Length).")
         }
 
         # Validate maxLength
         if ($Schema.maxLength -and $Value.Length -gt $Schema.maxLength) {
-            [void]$Validation.Errors.Add("Property '$Context': String must be at most $($Schema.maxLength) characters, found $($Value.Length)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': String must be at most $($Schema.maxLength) characters, found $($Value.Length).")
         }
 
         # Validate enum
         if ($Schema.enum -and $Schema.enum -notcontains $Value) {
-            [void]$Validation.Errors.Add("Property '$Context': Value '$Value' is not in allowed values: $($Schema.enum -join ', ')."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Value '$Value' is not in allowed values: $($Schema.enum -join ', ').")
         }
 
         # Validate pattern
         if ($Schema.pattern -and $Value -notmatch $Schema.pattern) {
             $FriendlyName = [ScubaConfigValidator]::GetPatternFriendlyName($Schema.pattern)
             if ($FriendlyName) {
-                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required format: $FriendlyName."
-)
+                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required format: $FriendlyName.")
             }
             else {
-                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required pattern."
-)
+                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required pattern.")
             }
         }
     }
@@ -623,8 +762,7 @@ class ScubaConfigValidator {
     # Validates object properties with additionalProperties support
     static [void] ValidateObjectProperty([object]$Value, [object]$Schema, [hashtable]$Validation, [string]$Context) {
         if ($Value -isnot [PSCustomObject] -and $Value -isnot [hashtable]) {
-            [void]$Validation.Errors.Add("Property '$Context': Expected object, got $($Value.GetType().Name)."
-)
+            [void]$Validation.Errors.Add("Property '$Context': Expected object, got $($Value.GetType().Name).")
             return
         }
 
@@ -656,8 +794,7 @@ class ScubaConfigValidator {
 
                 # If property not found and additionalProperties is false, report error
                 if (-not $PropertyExists -and $Schema.additionalProperties -eq $false) {
-                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProperties -join ', ')."
-)
+                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProperties -join ', ').")
                 }
             }
         }
@@ -668,8 +805,7 @@ class ScubaConfigValidator {
         # Check for enum constraint
         if ($Schema.enum) {
             if ($Schema.enum -notcontains $Value) {
-                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' is not in allowed values: $($Schema.enum -join ', ')."
-)
+                [void]$Validation.Errors.Add("Property '$Context': Value '$Value' is not in allowed values: $($Schema.enum -join ', ').")
             }
         }
 
@@ -678,12 +814,10 @@ class ScubaConfigValidator {
             if ($Value -notmatch $Schema.pattern) {
                 $FriendlyName = [ScubaConfigValidator]::GetPatternFriendlyName($Schema.pattern)
                 if ($FriendlyName) {
-                    [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required format: $FriendlyName."
-)
+                    [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required format: $FriendlyName.")
                 }
                 else {
-                    [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required pattern."
-)
+                    [void]$Validation.Errors.Add("Property '$Context': Value '$Value' does not match required pattern.")
                 }
             }
         }
@@ -706,20 +840,17 @@ class ScubaConfigValidator {
         }
         elseif ($ItemSchema.enum) {
             if ($ItemSchema.enum -notcontains $Item) {
-                [void]$Validation.Errors.Add("Property '$Context': Value '$Item' is not in allowed values: $($ItemSchema.enum -join ', ')."
-)
+                [void]$Validation.Errors.Add("Property '$Context': Value '$Item' is not in allowed values: $($ItemSchema.enum -join ', ').")
             }
         }
         elseif ($ItemSchema.pattern) {
             if ($Item -notmatch $ItemSchema.pattern) {
                 $FriendlyName = [ScubaConfigValidator]::GetPatternFriendlyName($ItemSchema.pattern)
                 if ($FriendlyName) {
-                    [void]$Validation.Errors.Add("Property '$Context': Value '$Item' does not match required format: $FriendlyName."
-)
+                    [void]$Validation.Errors.Add("Property '$Context': Value '$Item' does not match required format: $FriendlyName.")
                 }
                 else {
-                    [void]$Validation.Errors.Add("Property '$Context': Value '$Item' does not match required pattern."
-)
+                    [void]$Validation.Errors.Add("Property '$Context': Value '$Item' does not match required pattern.")
                 }
             }
         }
@@ -769,6 +900,29 @@ class ScubaConfigValidator {
                 foreach ($PolicyId in $PolicyIds) {
                     $PolicyConfig = $ProductConfig.$PolicyId
 
+                    # Validate policy ID format and product name match
+                    # Get effective ProductNames (from config or defaults)
+                    $ProductNamesForValidation = if ($ConfigObject.PSObject.Properties.Name -contains 'ProductNames') {
+                        $ConfigObject.ProductNames
+                    } else {
+                        $Defaults = [ScubaConfigValidator]::GetDefaults()
+                        $Defaults.defaults.ProductNames
+                    }
+
+                    $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($PolicyId, $ProductNamesForValidation)
+                    $Defaults = [ScubaConfigValidator]::GetDefaults()
+                    $RequireProduct = $Defaults.validation.requireProductInPolicy
+                    
+                    if (-not $PolicyValidation.IsValid) {
+                        if ($RequireProduct) {
+                            [void]$Validation.Errors.Add("$ProductName exclusion error: $($PolicyValidation.Error)")
+                        } else {
+                            [void]$Validation.Warnings.Add("$ProductName exclusion warning: $($PolicyValidation.Error)")
+                        }
+                    } elseif ($PolicyValidation.Warning) {
+                        [void]$Validation.Warnings.Add("$ProductName exclusion warning: $($PolicyValidation.Warning)")
+                    }
+
                     # Get allowed exclusion types for this policy
                     $AllowedTypes = [ScubaConfigValidator]::GetAllowedExclusionTypesForPolicy($PolicyId)
 
@@ -793,7 +947,12 @@ class ScubaConfigValidator {
                     if ($AllowedTypes.Count -gt 0 -and $ExclusionTypes.Count -gt 0) {
                         foreach ($ExclusionType in $ExclusionTypes) {
                             if ($ExclusionType -notin $AllowedTypes) {
-                                [void]$Validation.Errors.Add("$ProductName exclusion error: '$ExclusionType' is not valid for this policy. Policy ID '$PolicyId' supports exclusion types: $($AllowedTypes -join ', ').")
+                                $Message = "'$ExclusionType' is not valid for this policy. Policy ID '$PolicyId' supports exclusion types: $($AllowedTypes -join ', ')."
+                                if ($RequireProduct) {
+                                    [void]$Validation.Errors.Add("$ProductName exclusion error: $Message")
+                                } else {
+                                    [void]$Validation.Warnings.Add("$ProductName exclusion warning: $Message")
+                                }
                             }
                         }
                     }
@@ -862,6 +1021,7 @@ class ScubaConfigValidator {
         $Result = [PSCustomObject]@{
             IsValid = $false
             Error = ""
+            Warning = ""
         }
 
         $Defaults = [ScubaConfigValidator]::GetDefaults()
@@ -871,7 +1031,14 @@ class ScubaConfigValidator {
             $PolicyParts = $PolicyId -split "\."
             $ProductInPolicy = if ($PolicyParts.Length -ge 2 -and $PolicyParts[1]) { $PolicyParts[1] } else { $null }
             $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($PolicyPattern, $ProductInPolicy)
-            $Result.Error = "Policy ID: '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
+            $Message = "Policy ID: '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
+            
+            if ($Defaults.validation.requireProductInPolicy) {
+                $Result.Error = $Message
+            } else {
+                $Result.Warning = $Message
+                $Result.IsValid = $true  # Allow it to continue with warning
+            }
             return $Result
         }
 
@@ -886,9 +1053,16 @@ class ScubaConfigValidator {
                 $EffectiveProducts = $Defaults.defaults.AllProductNames
             }
 
-            if ($Defaults.validation.requireProductInPolicy -and $ProductInPolicy -notin $EffectiveProducts) {
-                $Result.Error = "Policy ID: '$PolicyId' references product '$ProductInPolicy' which is not in ProductNames: $($EffectiveProducts -join ', ')"
-                return $Result
+            if ($ProductInPolicy -notin $EffectiveProducts) {
+                $Message = "Policy ID: '$PolicyId' references product '$ProductInPolicy' which is not in ProductNames: $($EffectiveProducts -join ', ')"
+                
+                if ($Defaults.validation.requireProductInPolicy) {
+                    $Result.Error = $Message
+                    return $Result
+                } else {
+                    $Result.Warning = $Message
+                    $Result.IsValid = $true  # Allow it to continue with warning
+                }
             }
         }
 
@@ -967,15 +1141,30 @@ class ScubaConfigValidator {
                         if ($Context -match $PolicyPattern) {
                             $Defaults = [ScubaConfigValidator]::GetDefaults()
                             $ProductNames = $Defaults.defaults.AllProductNames
+                            $RequireProduct = $Defaults.validation.requireProductInPolicy
                             $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($Key, $ProductNames)
+                            
                             if (-not $PolicyValidation.IsValid) {
                                 try {
-                                    Write-Debug "Adding error to Validation.Errors. Type: $($Validation.Errors.GetType().FullName)"
-                                    [void]$Validation.Errors.Add($PolicyValidation.Error)
+                                    if ($RequireProduct) {
+                                        Write-Debug "Adding error to Validation.Errors. Type: $($Validation.Errors.GetType().FullName)"
+                                        [void]$Validation.Errors.Add($PolicyValidation.Error)
+                                    } else {
+                                        Write-Debug "Adding warning to Validation.Warnings"
+                                        [void]$Validation.Warnings.Add($PolicyValidation.Error)
+                                    }
                                 } catch {
-                                    Write-Debug "ERROR adding to Validation.Errors: $_"
+                                    Write-Debug "ERROR adding to Validation collection: $_"
                                     Write-Debug "Validation type: $($Validation.GetType().FullName)"
                                     Write-Debug "Validation.Errors type: $($Validation.Errors.GetType().FullName)"
+                                    throw
+                                }
+                            } elseif ($PolicyValidation.Warning) {
+                                try {
+                                    Write-Debug "Adding warning to Validation.Warnings"
+                                    [void]$Validation.Warnings.Add($PolicyValidation.Warning)
+                                } catch {
+                                    Write-Debug "ERROR adding to Validation.Warnings: $_"
                                     throw
                                 }
                             }
@@ -1197,43 +1386,66 @@ class ScubaConfigValidator {
     }
 
     # Categorizes validation errors into organized sections for better user experience
-    hidden static [array] CategorizeErrors([array]$Errors) {
+    # Returns PSCustomObject with CategorizedErrors array and ActionMessageRefs array
+    # Categorizes messages (errors or warnings) using patterns from configuration
+    # Returns categorized messages and action message refs for recommended actions
+    hidden static [PSCustomObject] CategorizeMessages([array]$Messages, [string]$CategoryType = 'error') {
         $Defaults = [ScubaConfigValidator]::GetDefaults()
+        
+        # Determine which categories to use (errorCategories or warningCategories)
+        $CategoryKey = if ($CategoryType -eq 'warning') { 'warningCategories' } else { 'errorCategories' }
+        
+        # Fall back to errorCategories if warningCategories doesn't exist
+        $CategoriesConfig = if ($Defaults.outputSettings.$CategoryKey) {
+            $Defaults.outputSettings.$CategoryKey
+        } elseif ($Defaults.outputSettings.errorCategories) {
+            $Defaults.outputSettings.errorCategories
+        } else {
+            $null
+        }
 
-        if (-not $Defaults.outputSettings -or -not $Defaults.outputSettings.errorCategories) {
-            return $Errors
+        if (-not $Defaults.outputSettings -or -not $CategoriesConfig) {
+            return [PSCustomObject]@{
+                CategorizedMessages = $Messages
+                ActionMessageRefs = @('default')
+            }
         }
 
         $Categories = @{}
+        $ActionMessageRefs = [System.Collections.Generic.HashSet[string]]::new()
 
         # Initialize categories from array order
-        foreach ($CategoryDef in $Defaults.outputSettings.errorCategories) {
+        foreach ($CategoryDef in $CategoriesConfig) {
             $Categories[$CategoryDef.name] = @()
         }
 
-        # Categorize each error (remove duplicates using trimmed comparison)
-        $SeenErrors = @{}
-        foreach ($ErrorMessage in $Errors) {
-            # Normalize the error message by trimming whitespace for comparison
-            $NormalizedError = $ErrorMessage.Trim()
+        # Categorize each message (remove duplicates using trimmed comparison)
+        $SeenMessages = @{}
+        foreach ($Message in $Messages) {
+            # Normalize the message by trimming whitespace for comparison
+            $NormalizedMessage = $Message.Trim()
 
-            # Skip if we've already seen this exact error
-            if ($SeenErrors.ContainsKey($NormalizedError)) {
+            # Skip if we've already seen this exact message
+            if ($SeenMessages.ContainsKey($NormalizedMessage)) {
                 continue
             }
-            $SeenErrors[$NormalizedError] = $true
+            $SeenMessages[$NormalizedMessage] = $true
 
             $Categorized = $false
 
-            foreach ($CategoryDef in $Defaults.outputSettings.errorCategories) {
-                # Empty pattern means catch-all (typically "Other errors")
+            foreach ($CategoryDef in $CategoriesConfig) {
+                # Empty pattern means catch-all (typically "Other errors/warnings")
                 if ([string]::IsNullOrEmpty($CategoryDef.pattern)) {
                     # This is the catch-all category, skip pattern matching
                     continue
                 }
 
-                if ($ErrorMessage -match $CategoryDef.pattern) {
-                    $Categories[$CategoryDef.name] += $ErrorMessage
+                if ($Message -match $CategoryDef.pattern) {
+                    $Categories[$CategoryDef.name] += $Message
+                    # Track which action message ref is needed
+                    if ($CategoryDef.actionMessageRef) {
+                        [void]$ActionMessageRefs.Add($CategoryDef.actionMessageRef)
+                    }
                     $Categorized = $true
                     break
                 }
@@ -1241,22 +1453,38 @@ class ScubaConfigValidator {
 
             # If not categorized, add to the last category (catch-all with empty pattern)
             if (-not $Categorized) {
-                $LastCategory = $Defaults.outputSettings.errorCategories[-1]
-                $Categories[$LastCategory.name] += $ErrorMessage
+                $LastCategory = $CategoriesConfig[-1]
+                $Categories[$LastCategory.name] += $Message
+                # Track catch-all action message ref
+                if ($LastCategory.actionMessageRef) {
+                    [void]$ActionMessageRefs.Add($LastCategory.actionMessageRef)
+                }
             }
         }
 
         # Build output using array order
         $Output = @()
 
-        foreach ($CategoryDef in $Defaults.outputSettings.errorCategories) {
+        foreach ($CategoryDef in $CategoriesConfig) {
             if ($Categories[$CategoryDef.name].Count -gt 0) {
                 $Output += "`n--- $($CategoryDef.name) ---"
                 $Output += $Categories[$CategoryDef.name]
             }
         }
 
-        return $Output
+        return [PSCustomObject]@{
+            CategorizedMessages = $Output
+            ActionMessageRefs = @($ActionMessageRefs)
+        }
+    }
+    
+    # Legacy wrapper for backward compatibility
+    hidden static [PSCustomObject] CategorizeErrors([array]$Errors) {
+        $Result = [ScubaConfigValidator]::CategorizeMessages($Errors, 'error')
+        return [PSCustomObject]@{
+            CategorizedErrors = $Result.CategorizedMessages
+            ActionMessageRefs = $Result.ActionMessageRefs
+        }
     }
 
 }

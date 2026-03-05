@@ -14,6 +14,11 @@ class ScubaConfig {
     using module '.\ScubaConfig.psm1'
     $Config = [ScubaConfig]::GetInstance()
     $Success = $Config.LoadConfig("C:\MyConfig\scuba-config.yaml")
+    if ($Success) {
+        $ConfigObject = $Config.Configuration
+        # Inspect the loaded configuration
+        $ConfigObject
+    }
 
     .EXAMPLE
     # Access default values and configuration schema
@@ -71,7 +76,14 @@ class ScubaConfig {
             if ($Path -eq "~/.scubagear/Tools") {
                 try {
                     # Convert Unix-style path to Windows path in user's profile
-                    return Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                    $ExpandedPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                    # Check if expanded path exists, fallback to current directory if not
+                    if (Test-Path -LiteralPath $ExpandedPath) {
+                        return $ExpandedPath
+                    } else {
+                        # Fallback to current directory (legacy behavior when OPA not installed)
+                        return "."
+                    }
                 } catch {
                     # Fallback to current directory if home directory expansion fails
                     return "."
@@ -117,7 +129,7 @@ class ScubaConfig {
 
     static [array]GetCompatibleOpaVersions() {
         [ScubaConfig]::InitializeValidator()
-        
+
         return [ScubaConfig]::_ConfigDefaults.metadata.compatibleOpaVersions
     }
 
@@ -217,23 +229,26 @@ class ScubaConfig {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
 
-        # Perform full content validation BEFORE adding defaults to avoid false "unknown property" warnings
-        # This validates the actual YAML content without default values that would trigger warnings
+        # Apply default values and process special configuration properties FIRST
+        # This ensures all required properties have values before validation
+        # Handles wildcards, path expansion (including OPAPath fallback to current directory)
+        $this.SetParameterDefaults()
+
+        # Perform full content validation AFTER applying defaults
+        # This validates the complete configuration with all defaults applied
+        # Includes OPA executable existence check which needs the expanded/fallback OPAPath
         if (-not $SkipValidation) {
             # Validate the complete configuration including schema, Scuba configuration rules, and policy references
             $this.ValidateConfiguration()
         }
 
-        # Apply default values and process special configuration properties
-        # This ensures all required properties have values and handles wildcards, path expansion, etc.
-        $this.SetParameterDefaults()
         # Mark configuration as successfully loaded
         [ScubaConfig]::_IsLoaded = $true
 
         return [ScubaConfig]::_IsLoaded
     }
 
-# Validates current configuration state after overrides. Performs schema + Scuba configuration rules + policy validation.
+    # Validates current configuration state after overrides. Performs schema + Scuba configuration rules + policy validation.
     # Used for deferred validation pattern where config is loaded with SkipValidation=true then validated after overrides.
     # This allows command-line parameters to override config file values before final validation.
     # The method implements a comprehensive validation strategy with multiple phases and detailed error reporting.
@@ -256,8 +271,8 @@ class ScubaConfig {
         # Scuba configuration rules include file path existence, cross-field dependencies, and ScubaGear-specific requirements
         $ScubaConfigValidation = [ScubaConfigValidator]::ValidateScubaConfigRules($ConfigObject, $false)
 
-        # Collect and display all warnings FIRST
-        # Warnings don't prevent execution but provide important guidance and notices
+        # Collect all warnings from initial validation phases
+        # We'll display them later after collecting policy validation warnings too
         $AllWarnings = @()
         # Include pre-validation warnings (e.g., wildcard with other products)
         if ($this.Configuration.ContainsKey('_PreValidationWarnings')) {
@@ -265,16 +280,6 @@ class ScubaConfig {
         }
         $AllWarnings += $SchemaValidation.Warnings
         $AllWarnings += $ScubaConfigValidation.Warnings
-        $AllWarnings = $AllWarnings | Select-Object -Unique
-
-        if ($AllWarnings.Count -gt 0) {
-            $WarningPlural = if ($AllWarnings.Count -ne 1) { 's' } else { '' }
-            $WarningMessage = "Configuration validation found $($AllWarnings.Count) warning$WarningPlural`:`n"
-            foreach ($Warning in $AllWarnings) {
-                $WarningMessage += "  - $Warning`n"
-            }
-            Write-Warning $WarningMessage
-        }
 
         # Collect all errors from both validation phases (remove duplicates)
         # This provides a comprehensive view of all configuration issues in a single validation run
@@ -283,52 +288,108 @@ class ScubaConfig {
         $AllErrors += $ScubaConfigValidation.Errors
         $AllErrors = $AllErrors | Select-Object -Unique
 
-        # Phase 3: Legacy validation for policy IDs (respect validation flags)
-        # This maintains backward compatibility while allowing selective disabling of policy validation
-
-        # Validate OmitPolicy entries if present
-        # OmitPolicy allows users to exclude specific policies from assessment
-        if ($this.Configuration.OmitPolicy) {
-            try {
-                # Validate that omitted policy IDs are properly formatted and reference valid products
-                [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.OmitPolicy, "OmitPolicy", $this.Configuration.ProductNames)
-            }
-            catch {
-                # Capture policy validation errors and add to the overall error collection
-                $AllErrors += $_.Exception.Message
+        # Validate policy-type properties (dynamically discovered from schema)
+        # This validates any property that contains policy IDs (like OmitPolicy, AnnotatePolicy)
+        # added to the schema will be automatically validated here
+        $Schema = [ScubaConfig]::_ConfigSchema
+        if ($Schema.properties) {
+            foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
+                $PropertySchema = $Schema.properties.$PropertyName
+                
+                # Check if this is a policy-type property (has patternProperties with policy ID pattern and oneOf)
+                if ([ScubaConfigValidator]::IsPolicyTypeProperty($PropertyName, $PropertySchema)) {
+                    # Check if this property exists in the configuration
+                    if ($this.Configuration.ContainsKey($PropertyName)) {
+                        Write-Debug "Validating policy-type property: $PropertyName"
+                        
+                        # Validate using the generic policy configuration validator
+                        $PolicyValidation = [ScubaConfig]::ValidatePolicyConfiguration(
+                            $this.Configuration[$PropertyName], 
+                            $PropertyName, 
+                            $this.Configuration.ProductNames
+                        )
+                        
+                        $AllWarnings += $PolicyValidation.Warnings
+                        $AllErrors += $PolicyValidation.Errors
+                    }
+                }
             }
         }
-
-        # Validate AnnotatePolicy entries if present
-        # AnnotatePolicy allows users to add metadata and comments to specific policy results
-        if ($this.Configuration.AnnotatePolicy) {
-            try {
-                # Validate that annotated policy IDs are properly formatted and reference valid products
-                [ScubaConfig]::ValidatePolicyConfiguration($this.Configuration.AnnotatePolicy, "AnnotatePolicy", $this.Configuration.ProductNames)
+        
+        # Remove duplicate warnings (policy validation may overlap with other validations)
+        $AllWarnings = $AllWarnings | Select-Object -Unique
+        
+        # Display all warnings if any were collected (with categorization and recommended actions)
+        if ($AllWarnings.Count -gt 0) {
+            $WarningPlural = if ($AllWarnings.Count -ne 1) { 's' } else { '' }
+            $WarningMessage = "Configuration validation found $($AllWarnings.Count) warning$WarningPlural`:`n"
+            
+            # Categorize warnings using the CategorizeMessages method
+            $CategorizedResult = [ScubaConfigValidator]::CategorizeMessages($AllWarnings, 'warning')
+            
+            foreach ($Warning in $CategorizedResult.CategorizedMessages) {
+                $WarningMessage += "  $Warning`n"
             }
-            catch {
-                # Capture policy validation errors and add to the overall error collection
-                $AllErrors += $_.Exception.Message
+            
+            # Display recommended actions for warnings
+            if ($CategorizedResult.ActionMessageRefs.Count -gt 0) {
+                $Defaults = [ScubaConfigValidator]::GetDefaults()
+                if ($Defaults.outputSettings -and $Defaults.outputSettings.recommendedActionMessages) {
+                    $WarningMessage += "`n--- RECOMMENDED ACTION ---`n"
+                    foreach ($ActionRef in $CategorizedResult.ActionMessageRefs) {
+                        if ($Defaults.outputSettings.recommendedActionMessages.$ActionRef) {
+                            $WarningMessage += "  - $($Defaults.outputSettings.recommendedActionMessages.$ActionRef)`n"
+                            $WarningMessage += "`n" # Add extra newline between different action message groups for readability
+                        }
+                    }
+                }
             }
+            
+            Write-Warning $WarningMessage
         }
+        
+        # Remove duplicate errors
+        $AllErrors = $AllErrors | Select-Object -Unique
 
         # If any validation errors were found, throw a comprehensive error message
         # This prevents execution with invalid configuration and provides clear guidance for remediation
         if ($AllErrors.Count -gt 0) {
-            # Categorize errors for better organization
-            $CategorizedErrors = [ScubaConfigValidator]::CategorizeErrors($AllErrors)
+            # Categorize errors for better organization and get recommended action message refs
+            $CategorizationResult = [ScubaConfigValidator]::CategorizeErrors($AllErrors)
 
-            # Build complete error message with categorized errors and recommended action
+            # Build complete error message with categorized errors
             $Plural = if ($AllErrors.Count -ne 1) { 's' } else { '' }
             $ErrorMessage = "Configuration validation failed ($($AllErrors.Count) error$Plural):`n"
-            foreach ($ErrorLine in $CategorizedErrors) {
+            foreach ($ErrorLine in $CategorizationResult.CategorizedErrors) {
                 $ErrorMessage += "$ErrorLine`n"
             }
 
-            # Add recommended action message
-            $ErrorMessage += "`n--- RECOMMENDED ACTION ---`n"
-            foreach ($Line in [ScubaConfig]::_ConfigDefaults.outputSettings.recommendedActionMessage) {
-                $ErrorMessage += "$Line`n"
+            # Add recommended action messages based on actionMessageRefs from error categorization
+            if ($CategorizationResult.ActionMessageRefs.Count -gt 0) {
+                $ErrorMessage += "`n--- RECOMMENDED ACTION ---`n"
+
+                # Track if we've added any messages to control spacing
+                $MessagesAdded = $false
+
+                # Sort actionMessageRefs to ensure "default" is always last
+                $SortedRefs = $CategorizationResult.ActionMessageRefs | Sort-Object -Property @{
+                    Expression = { if ($_ -eq 'default') { 1 } else { 0 } }
+                }
+
+                # Add recommended action messages in sorted order (unique refs, default last)
+                foreach ($Ref in $SortedRefs) {
+                    if ([ScubaConfig]::_ConfigDefaults.outputSettings.recommendedActionMessages.$Ref) {
+                        # Add blank line between different message groups
+                        if ($MessagesAdded) {
+                            $ErrorMessage += "`n"
+                        }
+
+                        foreach ($Line in [ScubaConfig]::_ConfigDefaults.outputSettings.recommendedActionMessages.$Ref) {
+                            $ErrorMessage += "$Line`n"
+                        }
+                        $MessagesAdded = $true
+                    }
+                }
             }
 
             throw $ErrorMessage
@@ -381,13 +442,27 @@ class ScubaConfig {
         return $Hashtable
     }
 
-    # Validates policy configuration entries for format compliance and product alignment.
-    # This method ensures that OmitPolicy and AnnotatePolicy sections contain valid policy IDs
-    # and that referenced products are actually selected for scanning in ProductNames.
+    # Validates policy configuration entries for format compliance, product alignment, and schema compliance.
+    # This method ensures that OmitPolicy and AnnotatePolicy sections contain valid policy IDs,
+    # reference products selected for scanning, and have properly formatted values per the schema.
     # Policy IDs must follow the format: MS.{PRODUCT}.{GROUP}.{NUMBER}v{VERSION}
-    hidden static [void] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
+    # Returns a PSCustomObject with Errors and Warnings arrays
+    hidden static [PSCustomObject] ValidatePolicyConfiguration([object]$PolicyConfig, [string]$ActionType, [array]$ProductNames) {
         [ScubaConfig]::InitializeValidator()
         $Defaults = [ScubaConfig]::_ConfigDefaults
+        $Schema = [ScubaConfig]::_ConfigSchema
+        $RequireProduct = $Defaults.validation.requireProductInPolicy
+        
+        $Result = [PSCustomObject]@{
+            Errors = @()
+            Warnings = @()
+        }
+
+        # Get the schema definition for this action type (OmitPolicy or AnnotatePolicy)
+        $PropertySchema = $null
+        if ($Schema.properties -and $Schema.properties.$ActionType) {
+            $PropertySchema = $Schema.properties.$ActionType
+        }
 
         # Process each policy ID in the configuration section (OmitPolicy or AnnotatePolicy)
         foreach ($Policy in $PolicyConfig.Keys) {
@@ -405,11 +480,14 @@ class ScubaConfig {
                 $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($Defaults.validation.policyIdPattern, $ProductInPolicy)
 
                 # Build contextual error message based on the action type
-                # Use proper grammar and terminology for each action type
-                $ErrorMessage = "${ActionType}: '$Policy' is not a valid policy ID. "
-                $ErrorMessage += "Expected format: $ExampleFormat. "
-                #$ErrorMessage += "Policy ID does not match expected format."
-                throw $ErrorMessage
+                $Message = "${ActionType}: '$Policy' is not a valid policy ID. Expected format: $ExampleFormat."
+                
+                if ($RequireProduct) {
+                    $Result.Errors += $Message
+                } else {
+                    $Result.Warnings += $Message
+                }
+                continue
             }
 
             # Extract the product name from the policy ID (second component after splitting on periods)
@@ -428,11 +506,57 @@ class ScubaConfig {
             # Verify that the referenced product is actually going to be scanned
             # Prevents configuration errors where policies are specified for products not being tested
             if (-not ($EffectiveProducts -Contains $Product)) {
-                # Build error message with proper action prefix and clear explanation
-                $ErrorMessage = "${ActionType}: '$Policy' references product '$Product' which is not in the selected ProductNames: $(($EffectiveProducts -join ', ').ToUpper())."
-                throw $ErrorMessage
+                # Build message with proper action prefix and clear explanation
+                $Message = "${ActionType}: '$Policy' references product '$Product' which is not in the selected ProductNames: $(($EffectiveProducts -join ', ').ToUpper())."
+                
+                if ($RequireProduct) {
+                    $Result.Errors += $Message
+                } else {
+                    $Result.Warnings += $Message
+                }
+            }
+
+            # Validate the policy value against the schema (Rationale/Expiration or Comment/RemediationDate/IncorrectResult)
+            if ($PropertySchema -and $PropertySchema.patternProperties) {
+                $PolicyValue = $PolicyConfig[$Policy]
+                
+                # Find the matching pattern schema for this policy ID
+                $MatchedPatternSchema = $null
+                foreach ($Pattern in $PropertySchema.patternProperties.PSObject.Properties.Name) {
+                    if ($Policy -match $Pattern) {
+                        $MatchedPatternSchema = $PropertySchema.patternProperties.$Pattern
+                        break
+                    }
+                }
+                
+                if ($MatchedPatternSchema) {
+                    # Create a temporary validation object to collect schema validation errors
+                    $SchemaValidation = @{
+                        Errors = [System.Collections.ArrayList]::new()
+                        Warnings = [System.Collections.ArrayList]::new()
+                    }
+                    
+                    # Validate the value against the pattern schema for this policy ID
+                    [ScubaConfigValidator]::ValidateItemAgainstSchema($PolicyValue, $MatchedPatternSchema, $SchemaValidation, "${ActionType}: '$Policy'")
+                    
+                    # Add schema validation errors/warnings to result based on requireProductInPolicy setting
+                    foreach ($Error in $SchemaValidation.Errors) {
+                        if ($RequireProduct) {
+                            $Result.Errors += $Error
+                        } else {
+                            $Result.Warnings += $Error
+                        }
+                    }
+                    
+                    # Warnings from schema validation should always be warnings
+                    foreach ($Warning in $SchemaValidation.Warnings) {
+                        $Result.Warnings += $Warning
+                    }
+                }
             }
         }
+        
+        return $Result
     }
 
     # Internal configuration storage as hashtable
@@ -496,13 +620,23 @@ class ScubaConfig {
             try {
                 # Build the full path using Windows conventions
                 # This allows Unix-style path notation to work on Windows systems
-                $this.Configuration.OPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                $ExpandedPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                # Check if expanded path exists, fallback to current directory if not (legacy behavior)
+                if (Test-Path -LiteralPath $ExpandedPath) {
+                    $this.Configuration.OPAPath = $ExpandedPath
+                } else {
+                    # Fallback to current directory when default OPA path doesn't exist
+                    # This matches legacy behavior for systems without OPA installed in the default location
+                    $this.Configuration.OPAPath = "."
+                }
             } catch {
                 # Fallback to current directory if profile path resolution fails
                 # This ensures the configuration is still usable even if home directory access fails
                 $this.Configuration.OPAPath = "."
             }
         }
+        # Note: If OPAPath is explicitly set in config file (not the default), it will be used as-is
+        # and validation will fail if OPA executable is not found there (no fallback for explicit paths)
 
         # Special handling for OutPath (resolve relative current directory reference)
         # Convert '.' to the actual current working directory path for absolute path consistency

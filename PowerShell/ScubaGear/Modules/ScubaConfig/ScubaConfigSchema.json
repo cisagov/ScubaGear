@@ -142,13 +142,13 @@
     "OPAPath": {
       "_comment": "Path to OPA executable directory - must exist (ScubaGear cannot run without OPA)",
       "$ref": "#/definitions/patterns/folderPath",
-      "validatePathExists": true
+      "pathMustExist": true
     },
 
     "OutPath": {
       "_comment": "Output directory path for assessment results - will be created if it doesn't exist",
       "$ref": "#/definitions/patterns/folderPath",
-      "validatePathExists": false
+      "pathMustExist": false
     },
 
     "OutFolderName": {
@@ -419,7 +419,7 @@
         "friendlyName": "Alphanumeric filename (no extension)"
       },
       "folderPath": {
-        "_comment": "Directory path with existence validation (Windows, Unix, or UNC). Properties using this ref should set 'validatePathExists': true (error if missing) or false (warning if missing, directory will be created)",
+        "_comment": "Directory path with existence validation (Windows, Unix, or UNC). Properties using this ref should set 'pathMustExist': true (error if missing) or false (warning if missing, directory will be created)",
         "type": "string",
         "pattern": "^([a-zA-Z]:[\\\\\/]|\\\\\\\\|\\.\\.?[\\\\\/]|[\\\\\/]).*$|^\\.\\.?$|^[^:*?\"<>|][^:*?\"<>|]*$",
         "testPath": true,
