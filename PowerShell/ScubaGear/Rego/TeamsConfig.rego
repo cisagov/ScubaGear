@@ -1,7 +1,6 @@
 package teams
 import rego.v1
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.FilterArray

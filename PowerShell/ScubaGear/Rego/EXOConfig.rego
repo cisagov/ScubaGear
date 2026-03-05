@@ -1,6 +1,5 @@
 package exo
 import rego.v1
-import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ArraySizeStr
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.Description
