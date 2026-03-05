@@ -500,6 +500,75 @@ function Get-ServicePrincipalsWithRiskyPermissions {
     }
 }
 
+function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
+    <#
+    .Description
+    Returns an array of service principals where each item contains its Object ID, App ID, Display Name,
+    Key/Password Credentials, and risky API permissions.
+    .Functionality
+    #Internal
+    ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+    process {
+        try {
+            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            $Resources = $RiskyPermissionsJson["resources"]
+
+            $RiskyDelegatedPermissionClassificationResults = @()
+
+            foreach ($Resource in $Resources) {
+                $ResourceId = $Resource.Key
+                $ResourceName = $Resource.Value
+
+                $ServicePrincipal = (
+                    Invoke-GraphDirectly `
+                        -Commandlet "Get-MgServicePrincipal" `
+                        -M365Environment $M365Environment `
+                        -QueryParams @{
+                            '$filter' = "appId eq '$ResourceId'"
+                        }
+                    ).Value
+                
+                $ServicePrincipalId = $ServicePrincipal.id
+
+                $RiskyDelegatedPermissions = $RiskyPermissionsJson["permissions"][$ResourceName]["Delegated"] 
+
+                $PermClassifications = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipalDelagatedPermissionClassifications" -M365Environment $M365Environment -ID $ServicePrincipalId).Value
+
+                $RiskyPermClassifications = @()
+                foreach ($PermClassification in $PermClassifications) {
+                    if ($PermClassification.classifications -eq "low" -and $RiskyDelegatedPermissions.ContainsKey($PermClassification.permissionId)) {
+                        $RiskyPermClassifications += [PSCustomObject]@{
+                            id                = $PermClassification.id
+                            permissionId      = $PermClassification.permissionId
+                            permissionName    = $PermClassification.permissionName
+                            classification    = $PermClassification.classification
+                        }
+                    }
+                }
+
+                if ($RiskyPermClassifications.Count -gt 0) {
+                    $RiskyDelegatedPermissionClassificationResults += [PSCustomObject]@{
+                        ObjectId                        = $ServicePrincipalId
+                        AppId                           = $ResourceId
+                        DisplayName                     = $ServicePrincipal.Name
+                        RiskyPermClassifications        = $RiskPermClassifications.permissionName
+                    }
+                }
+            }
+        } catch {
+            Write-Warning "An error occurred in Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
+        return $RiskyDelegatedPermissionClassificationResults
+    }
+}
+
 function Format-RiskyApplications {
     <#
     .Description
