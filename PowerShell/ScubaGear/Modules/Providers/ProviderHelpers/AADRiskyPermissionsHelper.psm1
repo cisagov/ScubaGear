@@ -565,7 +565,6 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-
         return $RiskyDelegatedPermissionClassificationResults
     }
 }
