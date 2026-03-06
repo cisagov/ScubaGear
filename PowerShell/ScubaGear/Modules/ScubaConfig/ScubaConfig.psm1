@@ -295,42 +295,42 @@ class ScubaConfig {
         if ($Schema.properties) {
             foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
                 $PropertySchema = $Schema.properties.$PropertyName
-                
+
                 # Check if this is a policy-type property (has patternProperties with policy ID pattern and oneOf)
                 if ([ScubaConfigValidator]::IsPolicyTypeProperty($PropertyName, $PropertySchema)) {
                     # Check if this property exists in the configuration
                     if ($this.Configuration.ContainsKey($PropertyName)) {
                         Write-Debug "Validating policy-type property: $PropertyName"
-                        
+
                         # Validate using the generic policy configuration validator
                         $PolicyValidation = [ScubaConfig]::ValidatePolicyConfiguration(
-                            $this.Configuration[$PropertyName], 
-                            $PropertyName, 
+                            $this.Configuration[$PropertyName],
+                            $PropertyName,
                             $this.Configuration.ProductNames
                         )
-                        
+
                         $AllWarnings += $PolicyValidation.Warnings
                         $AllErrors += $PolicyValidation.Errors
                     }
                 }
             }
         }
-        
+
         # Remove duplicate warnings (policy validation may overlap with other validations)
         $AllWarnings = $AllWarnings | Select-Object -Unique
-        
+
         # Display all warnings if any were collected (with categorization and recommended actions)
         if ($AllWarnings.Count -gt 0) {
             $WarningPlural = if ($AllWarnings.Count -ne 1) { 's' } else { '' }
             $WarningMessage = "Configuration validation found $($AllWarnings.Count) warning$WarningPlural`:`n"
-            
+
             # Categorize warnings using the CategorizeMessages method
             $CategorizedResult = [ScubaConfigValidator]::CategorizeMessages($AllWarnings, 'warning')
-            
+
             foreach ($Warning in $CategorizedResult.CategorizedMessages) {
                 $WarningMessage += "  $Warning`n"
             }
-            
+
             # Display recommended actions for warnings
             if ($CategorizedResult.ActionMessageRefs.Count -gt 0) {
                 $Defaults = [ScubaConfigValidator]::GetDefaults()
@@ -344,10 +344,10 @@ class ScubaConfig {
                     }
                 }
             }
-            
+
             Write-Warning $WarningMessage
         }
-        
+
         # Remove duplicate errors
         $AllErrors = $AllErrors | Select-Object -Unique
 
@@ -452,7 +452,7 @@ class ScubaConfig {
         $Defaults = [ScubaConfig]::_ConfigDefaults
         $Schema = [ScubaConfig]::_ConfigSchema
         $RequireProduct = $Defaults.validation.requireProductInPolicy
-        
+
         $Result = [PSCustomObject]@{
             Errors = @()
             Warnings = @()
@@ -481,7 +481,7 @@ class ScubaConfig {
 
                 # Build contextual error message based on the action type
                 $Message = "${ActionType}: '$Policy' is not a valid policy ID. Expected format: $ExampleFormat."
-                
+
                 if ($RequireProduct) {
                     $Result.Errors += $Message
                 } else {
@@ -508,7 +508,7 @@ class ScubaConfig {
             if (-not ($EffectiveProducts -Contains $Product)) {
                 # Build message with proper action prefix and clear explanation
                 $Message = "${ActionType}: '$Policy' references product '$Product' which is not in the selected ProductNames: $(($EffectiveProducts -join ', ').ToUpper())."
-                
+
                 if ($RequireProduct) {
                     $Result.Errors += $Message
                 } else {
@@ -519,7 +519,7 @@ class ScubaConfig {
             # Validate the policy value against the schema (Rationale/Expiration or Comment/RemediationDate/IncorrectResult)
             if ($PropertySchema -and $PropertySchema.patternProperties) {
                 $PolicyValue = $PolicyConfig[$Policy]
-                
+
                 # Find the matching pattern schema for this policy ID
                 $MatchedPatternSchema = $null
                 foreach ($Pattern in $PropertySchema.patternProperties.PSObject.Properties.Name) {
@@ -528,26 +528,26 @@ class ScubaConfig {
                         break
                     }
                 }
-                
+
                 if ($MatchedPatternSchema) {
                     # Create a temporary validation object to collect schema validation errors
                     $SchemaValidation = @{
                         Errors = [System.Collections.ArrayList]::new()
                         Warnings = [System.Collections.ArrayList]::new()
                     }
-                    
+
                     # Validate the value against the pattern schema for this policy ID
                     [ScubaConfigValidator]::ValidateItemAgainstSchema($PolicyValue, $MatchedPatternSchema, $SchemaValidation, "${ActionType}: '$Policy'")
-                    
+
                     # Add schema validation errors/warnings to result based on requireProductInPolicy setting
-                    foreach ($Error in $SchemaValidation.Errors) {
+                    foreach ($ValidationError in $SchemaValidation.Errors) {
                         if ($RequireProduct) {
-                            $Result.Errors += $Error
+                            $Result.Errors += $ValidationError
                         } else {
-                            $Result.Warnings += $Error
+                            $Result.Warnings += $ValidationError
                         }
                     }
-                    
+
                     # Warnings from schema validation should always be warnings
                     foreach ($Warning in $SchemaValidation.Warnings) {
                         $Result.Warnings += $Warning
@@ -555,7 +555,7 @@ class ScubaConfig {
                 }
             }
         }
-        
+
         return $Result
     }
 

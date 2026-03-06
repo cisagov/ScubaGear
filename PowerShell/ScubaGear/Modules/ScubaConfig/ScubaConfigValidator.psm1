@@ -445,16 +445,16 @@ class ScubaConfigValidator {
         $ProductCapabilities = $Schema.schemaMetadata.productCapabilities
         $Defaults = [ScubaConfigValidator]::GetDefaults()
         $RequireProduct = $Defaults.validation.requireProductInPolicy
-        
+
         # Get list of known product names from productCapabilities
         $KnownProducts = @($ProductCapabilities.PSObject.Properties.Name)
-        
+
         # Get list of valid schema properties
         $ValidSchemaProperties = @()
         if ($Schema.properties) {
             $ValidSchemaProperties = @($Schema.properties.PSObject.Properties.Name)
         }
-        
+
         # Get list of properties to ignore from schema metadata
         $IgnoreProperties = @()
         if ($Schema.schemaMetadata -and $Schema.schemaMetadata.ignoreProperties) {
@@ -465,22 +465,22 @@ class ScubaConfigValidator {
                 }
             }
         }
-        
+
         # System properties to ignore (PowerShell object metadata)
         $SystemProperties = @('IsReadOnly', 'IsFixedSize', 'IsSynchronized', 'Keys', 'Values', 'SyncRoot', 'Count')
-        
+
         # Check for unknown products (properties that are neither valid config properties nor known products)
         foreach ($ConfigProperty in $ConfigObject.PSObject.Properties) {
             $PropertyName = $ConfigProperty.Name
-            
+
             # Skip if it's a system property, ignore property, valid schema property, or known product
-            if ($PropertyName -in $SystemProperties -or 
+            if ($PropertyName -in $SystemProperties -or
                 $PropertyName -in $IgnoreProperties -or
-                $PropertyName -in $ValidSchemaProperties -or 
+                $PropertyName -in $ValidSchemaProperties -or
                 $PropertyName -in $KnownProducts) {
                 continue
             }
-            
+
             # Check if this might be a YAML anchor (complex object at root level that's not a product)
             # YAML anchors are typically objects or arrays used for reuse via aliases
             if ($ConfigProperty.Value -is [PSCustomObject] -or $ConfigProperty.Value -is [System.Collections.Hashtable] -or $ConfigProperty.Value -is [Array]) {
@@ -488,7 +488,7 @@ class ScubaConfigValidator {
                 Write-Debug "Skipping potential YAML anchor property: $PropertyName"
                 continue
             }
-            
+
             # This is an unknown property that's not in the schema
             $Message = "Unknown product '$PropertyName'. This is not a recognized product name and will be ignored. Valid product names are: $($KnownProducts -join ', ')."
             if ($RequireProduct) {
@@ -912,7 +912,7 @@ class ScubaConfigValidator {
                     $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($PolicyId, $ProductNamesForValidation)
                     $Defaults = [ScubaConfigValidator]::GetDefaults()
                     $RequireProduct = $Defaults.validation.requireProductInPolicy
-                    
+
                     if (-not $PolicyValidation.IsValid) {
                         if ($RequireProduct) {
                             [void]$Validation.Errors.Add("$ProductName exclusion error: $($PolicyValidation.Error)")
@@ -1032,7 +1032,7 @@ class ScubaConfigValidator {
             $ProductInPolicy = if ($PolicyParts.Length -ge 2 -and $PolicyParts[1]) { $PolicyParts[1] } else { $null }
             $ExampleFormat = [ScubaConfigValidator]::ConvertPatternToExample($PolicyPattern, $ProductInPolicy)
             $Message = "Policy ID: '$PolicyId' does not match expected format. Expected format: $ExampleFormat"
-            
+
             if ($Defaults.validation.requireProductInPolicy) {
                 $Result.Error = $Message
             } else {
@@ -1055,7 +1055,7 @@ class ScubaConfigValidator {
 
             if ($ProductInPolicy -notin $EffectiveProducts) {
                 $Message = "Policy ID: '$PolicyId' references product '$ProductInPolicy' which is not in ProductNames: $($EffectiveProducts -join ', ')"
-                
+
                 if ($Defaults.validation.requireProductInPolicy) {
                     $Result.Error = $Message
                     return $Result
@@ -1143,7 +1143,7 @@ class ScubaConfigValidator {
                             $ProductNames = $Defaults.defaults.AllProductNames
                             $RequireProduct = $Defaults.validation.requireProductInPolicy
                             $PolicyValidation = [ScubaConfigValidator]::ValidatePolicyId($Key, $ProductNames)
-                            
+
                             if (-not $PolicyValidation.IsValid) {
                                 try {
                                     if ($RequireProduct) {
@@ -1391,10 +1391,10 @@ class ScubaConfigValidator {
     # Returns categorized messages and action message refs for recommended actions
     hidden static [PSCustomObject] CategorizeMessages([array]$Messages, [string]$CategoryType = 'error') {
         $Defaults = [ScubaConfigValidator]::GetDefaults()
-        
+
         # Determine which categories to use (errorCategories or warningCategories)
         $CategoryKey = if ($CategoryType -eq 'warning') { 'warningCategories' } else { 'errorCategories' }
-        
+
         # Fall back to errorCategories if warningCategories doesn't exist
         $CategoriesConfig = if ($Defaults.outputSettings.$CategoryKey) {
             $Defaults.outputSettings.$CategoryKey
@@ -1477,7 +1477,7 @@ class ScubaConfigValidator {
             ActionMessageRefs = @($ActionMessageRefs)
         }
     }
-    
+
     # Legacy wrapper for backward compatibility
     hidden static [PSCustomObject] CategorizeErrors([array]$Errors) {
         $Result = [ScubaConfigValidator]::CategorizeMessages($Errors, 'error')
