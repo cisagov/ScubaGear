@@ -516,12 +516,12 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
     process {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
-            $Resources = $RiskyPermissionsJson["resources"]
+            $Resources = $RiskyPermissionsJson.resources.PSObject.Properties
+
 
             $RiskyDelegatedPermissionClassificationResults = @()
-
             foreach ($Resource in $Resources) {
-                $ResourceId = $Resource.Key
+                $ResourceId = $Resource.Name
                 $ResourceName = $Resource.Value
 
                 $ServicePrincipal = (
@@ -535,13 +535,13 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                 
                 $ServicePrincipalId = $ServicePrincipal.id
 
-                $RiskyDelegatedPermissions = $RiskyPermissionsJson["permissions"][$ResourceName]["Delegated"] 
+                $RiskyDelegatedPermissions = $RiskyPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
 
                 $PermClassifications = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipalDelagatedPermissionClassifications" -M365Environment $M365Environment -ID $ServicePrincipalId).Value
 
                 $RiskyPermClassifications = @()
                 foreach ($PermClassification in $PermClassifications) {
-                    if ($PermClassification.classifications -eq "low" -and $RiskyDelegatedPermissions.ContainsKey($PermClassification.permissionId)) {
+                    if ($PermClassification.Classification -eq "low" -and $RiskyDelegatedPermissions.Name -contains $PermClassification.PermissionId) {
                         $RiskyPermClassifications += [PSCustomObject]@{
                             id                = $PermClassification.id
                             permissionId      = $PermClassification.permissionId
@@ -556,7 +556,7 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                         ObjectId                        = $ServicePrincipalId
                         AppId                           = $ResourceId
                         DisplayName                     = $ServicePrincipal.Name
-                        RiskyPermClassifications        = $RiskPermClassifications.permissionName
+                        RiskyPermClassifications        = $RiskyPermClassifications.permissionName
                     }
                 }
             }
@@ -565,6 +565,7 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
+
         return $RiskyDelegatedPermissionClassificationResults
     }
 }
@@ -693,5 +694,6 @@ Export-ModuleMember -Function @(
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
     "Format-RiskyApplications",
-    "Format-RiskyThirdPartyServicePrincipals"
+    "Format-RiskyThirdPartyServicePrincipals",
+    "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications"
 )
