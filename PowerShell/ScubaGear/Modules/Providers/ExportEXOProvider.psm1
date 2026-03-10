@@ -85,8 +85,30 @@ function Export-EXOProvider {
     <#
     MS.EXO.13.1v1
     #>
-    $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object Name, DisplayName, AuditDisabled
+    $OrgConfigProperties = @(
+        "Name",
+        "DisplayName",
+        "AuditDisabled",
+        "HybridConfigurationStatus",
+        "OAuth2ClientProfileEnabled",
+        "DefaultAuthenticationPolicy",
+        "SendFromAliasEnabled",
+        "ConnectorsEnabled",
+        "ConnectorsEnabledForTeams",
+        "CustomerLockboxEnabled",
+        "SmtpActionableMessagesEnabled",
+        "ActivityBasedAuthenticationTimeoutEnabled",
+        "ActivityBasedAuthenticationTimeoutInterval",
+        "BookingsEnabled"
+    )
+    $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object $OrgConfigProperties
     $Config = ConvertTo-Json @($Config)
+
+    # Hybrid / connector configuration
+    $InboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-InboundConnector")) -Depth 4
+    $OutboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-OutboundConnector")) -Depth 4
+    $IntraOrgConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-IntraOrganizationConnector")) -Depth 4
+    $OrgRelationships = ConvertTo-Json @($Tracker.TryCommand("Get-OrganizationRelationship")) -Depth 4
 
     # Used in the reporter to check successful cmdlet invocation
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -104,6 +126,10 @@ function Export-EXOProvider {
     "transport_rule": $TransportRules,
     "conn_filter": $ConnectionFilter,
     "org_config": $Config,
+    "inbound_connectors": $InboundConnectors,
+    "outbound_connectors": $OutboundConnectors,
+    "intra_org_connectors": $IntraOrgConnectors,
+    "org_relationships": $OrgRelationships,
     "exo_successful_commands": $SuccessfulCommands,
     "exo_unsuccessful_commands": $UnSuccessfulCommands,
 "@
