@@ -105,15 +105,14 @@ TestPlan:
               updates:
                 dlp_policies:
                   - value:
-                      - displayName: "DLP functional test"
-                        environments:
-                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                       - displayName: "Exclude DefaultEnv Policy"
                         environmentType: "ExceptEnvironments"
                         environments:
                           - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
                   - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                  - EnvironmentName: "Test1"
+                tenant_id: "ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
         Postconditions: []
         ExpectedResult: false
 
@@ -216,9 +215,10 @@ TestPlan:
                       - displayName: "DLP functional test"
                         environmentType: "ExceptEnvironments"
                         environments:
-                          - name: "Test1"
-                          - name: "Test2"
+                          - name: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
                 environment_list:
+                  - EnvironmentName: "Default-ca08493a-c9c8-4db0-a9e8-d3b4bafac269"
+                    IsDefault: true
                   - EnvironmentName: "Test1"
                     IsDefault: false
                   - EnvironmentName: "Test2"

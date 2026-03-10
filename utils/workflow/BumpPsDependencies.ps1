@@ -8,7 +8,10 @@ $InformationPreference = 'Continue'
 # Read and execute the RequiredVersions.ps1 file to get the module list
 $scriptPath = './PowerShell/ScubaGear/RequiredVersions.ps1'
 $originalContent = Get-Content -Path $scriptPath -Raw
-$originalLines = $originalContent -split "`n"
+
+# Detect original line ending style
+$lineEnding = if ($originalContent -match "`r`n") { "`r`n" } else { "`n" }
+$originalLines = $originalContent -split "`r?`n"
 
 # Execute the script to get the ModuleList variable
 . $scriptPath
@@ -102,14 +105,9 @@ foreach ($moduleName in $moduleInfo.Keys) {
 }
 
 if ($updated) {
-    # Clean up trailing whitespace from all lines before writing
-    for ($i = 0; $i -lt $newLines.Length; $i++) {
-        $newLines[$i] = $newLines[$i].TrimEnd()
-    }
-
-    # Join the updated lines back into content and write to file
-    $newContent = $newLines -join "`n"
-    Set-Content -Path $scriptPath -Value $newContent
+    # Join the updated lines back into content and write to file, preserving original line endings
+    $newContent = $newLines -join $lineEnding
+    Set-Content -Path $scriptPath -Value $newContent -NoNewline
     Write-Information "RequiredVersions.ps1 file has been updated successfully." -InformationAction Continue
 }
 else {

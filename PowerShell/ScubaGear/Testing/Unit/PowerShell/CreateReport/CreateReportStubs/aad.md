@@ -230,13 +230,12 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 the chances of security misconfigurations.
 - _Last modified:_ June 2023
 
-#### MS.AAD.3.5v1
+#### MS.AAD.3.5v2
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
-<!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.5v2; Criticality: SHALL -->
 - _Rationale:_ This policy helps reduce the possibility for users to  register and authenticate with the weakest authenticators, forcing users to use stronger MFA methods.
-- _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
+- _Last modified:_ February 2026
 
 #### MS.AAD.3.6v1
 Phishing-resistant MFA SHALL be required for highly privileged roles.
@@ -319,7 +318,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 1. Go through the process of migrating from the legacy AAD MFA and Self-Service Password Reset (SSPR) administration pages to the new unified Authentication Methods policy page. Follow [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage).
 2. Once ready to finish the migration, follow [these instructions ](https://learn.microsoft.com/en-us/azure/active-directory/authentication/how-to-authentication-methods-manage#finish-the-migration) and set the **Manage Migration** option to **Migration Complete**.
 
-#### MS.AAD.3.5v1 instructions:
+#### MS.AAD.3.5v2 instructions:
 1. In **Azure Active Directory**, click **Security > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 

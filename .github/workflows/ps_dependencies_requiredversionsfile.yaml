@@ -5,7 +5,7 @@ name: Bump RequiredVersions PowerShell Dependencies
 
 on:
   schedule:
-    - cron: "15 6 * * 1-5"
+    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 permissions:
@@ -44,15 +44,24 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add ./PowerShell/ScubaGear/RequiredVersions.ps1
           git add ./docs/prerequisites/dependencies.md
-          git commit -m 'Bump PowerShell dependencies and update documentation' || echo "No changes to commit"
+
+          $status = git diff --cached --name-only
+          if (-not $status) {
+            Write-Host "No changes detected. Skipping branch creation and PR."
+            echo "HAS_CHANGES=false" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            exit 0
+          }
+
+          git commit -m 'Bump PowerShell dependencies and update documentation'
           $timestamp = Get-Date -Format "yyyyMMddHHmmss"
           $branchName = "bump-dependencies-$timestamp"
           git checkout -b $branchName
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:$branchName
           echo "BRANCH_NAME=$branchName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "HAS_CHANGES=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Trigger and wait for smoke test workflow
-        if: success()
+        if: success() && env.HAS_CHANGES == 'true'
         id: smoke_test
         continue-on-error: true
         env:
@@ -139,7 +148,7 @@ jobs:
           }
 
       - name: Check for existing pull requests
-        if: always()
+        if: always() && env.HAS_CHANGES == 'true'
         id: check_pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -158,7 +167,7 @@ jobs:
           }
 
       - name: Delete branch if PR already exists
-        if: always() && env.SHOULD_CREATE_PR == 'false'
+        if: always() && env.HAS_CHANGES == 'true' && env.SHOULD_CREATE_PR == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
@@ -176,7 +185,7 @@ jobs:
           }
 
       - name: Create pull request
-        if: env.SHOULD_CREATE_PR == 'true' && env.SMOKE_TEST_PASSED == 'true'
+        if: env.HAS_CHANGES == 'true' && env.SHOULD_CREATE_PR == 'true' && env.SMOKE_TEST_PASSED == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
@@ -185,8 +194,11 @@ jobs:
           gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
 
       - name: Skip pull request creation
-        if: env.SHOULD_CREATE_PR == 'false' || env.SMOKE_TEST_PASSED == 'false'
+        if: env.HAS_CHANGES == 'false' || env.SHOULD_CREATE_PR == 'false' || env.SMOKE_TEST_PASSED == 'false'
         run: |
+          if ($env:HAS_CHANGES -eq 'false') {
+            Write-Host "Skipped pull request creation because no dependency changes were detected"
+          }
           if ($env:SHOULD_CREATE_PR -eq 'false') {
             Write-Host "Skipped pull request creation because there are already $env:EXISTING_PR_COUNT existing pull request(s) for PowerShell dependency bumps"
           }

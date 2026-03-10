@@ -12,7 +12,7 @@
 RootModule = './ScubaGear.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.7.0'
+ModuleVersion = '1.7.1'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop'
@@ -83,7 +83,8 @@ FunctionsToExport = @(
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
     'Initialize-SCuBA',
-    'Start-ScubaConfigApp',
+    'Start-SCuBAConfigApp',
+    'Show-SCuBABaselinePolicyViewer',
     'Debug-SCuBA',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
