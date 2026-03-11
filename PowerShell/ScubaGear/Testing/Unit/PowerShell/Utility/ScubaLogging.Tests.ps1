@@ -2,7 +2,7 @@ using module '..\..\..\..\Modules\Utility\ScubaLogging.psm1'
 
 InModuleScope ScubaLogging {
     Describe "ScubaLogging Module Tests" {
-        
+
         BeforeAll {
             # Create test directory for logging tests
             $script:TestLogPath = Join-Path $env:TEMP "ScubaLogging-Tests-$(Get-Date -Format 'yyyyMMddHHmmss')"
@@ -10,7 +10,7 @@ InModuleScope ScubaLogging {
                 New-Item -ItemType Directory -Path $script:TestLogPath -Force | Out-Null
             }
         }
-        
+
         BeforeEach {
             # Reset module variables before each test
             $Script:ScubaLogPath = $null
@@ -19,14 +19,14 @@ InModuleScope ScubaLogging {
             $Script:ScubaLogLevel = "Info"
             $Script:ScubaEnhancedTracing = $false
         }
-        
+
         AfterEach {
             # Clean up any logging state after each test
             if ($Script:ScubaLogEnabled) {
                 Stop-ScubaLogging
             }
         }
-        
+
         AfterAll {
             # Clean up test directory
             if (Test-Path $script:TestLogPath) {
@@ -35,100 +35,100 @@ InModuleScope ScubaLogging {
         }
 
         Context "Initialize-ScubaLogging Function" {
-            
+
             It "Should initialize logging with minimal parameters" {
                 Initialize-ScubaLogging
-                
+
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaLogLevel | Should -Be "Info"
                 $Script:ScubaDeepTracing | Should -Be $false
                 $Script:ScubaLogPath | Should -Be $null
             }
-            
+
             It "Should initialize logging with log path" {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath
-                
+
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaLogPath | Should -Match "ScubaGear-DebugLog-\d{8}-\d{6}-\d{3}\.log"
                 Test-Path (Split-Path $Script:ScubaLogPath -Parent) | Should -Be $true
             }
-            
+
             It "Should create log directory if it doesn't exist" {
                 $testPath = Join-Path $script:TestLogPath "NewDirectory"
-                
+
                 Initialize-ScubaLogging -LogPath $testPath
-                
+
                 Test-Path $testPath | Should -Be $true
             }
-            
+
             It "Should enable tracing when EnableTracing is specified" {
                 Initialize-ScubaLogging -EnableTracing
-                
+
                 $Script:ScubaDeepTracing | Should -Be $true
                 $Script:ScubaEnhancedTracing | Should -Be $true
             }
-            
+
             It "Should set custom log level" {
                 Initialize-ScubaLogging -LogLevel "Debug"
-                
+
                 $Script:ScubaLogLevel | Should -Be "Debug"
             }
-            
+
             It "Should handle errors gracefully" {
                 # Mock an error condition
                 Mock New-Item { throw "Test error" } -ParameterFilter { $ItemType -eq "Directory" }
-                
+
                 { Initialize-ScubaLogging -LogPath "C:\InvalidPath\That\DoesNot\Exist" } | Should -Not -Throw
                 $Script:ScubaLogEnabled | Should -Be $false
             }
         }
 
         Context "Write-ScubaLog Function" {
-            
+
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
             }
-            
+
             It "Should write log entry to file when log path is configured" {
                 $testMessage = "Test log message"
-                
+
                 Write-ScubaLog -Message $testMessage -Level "Info"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match $testMessage
             }
-            
+
             It "Should include timestamp in log entry" {
                 Write-ScubaLog -Message "Test message" -Level "Info"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\]"
             }
-            
+
             It "Should include log level in log entry" {
                 Write-ScubaLog -Message "Test message" -Level "Warning"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "\[Warning\s*\]"
             }
-            
+
             It "Should include source in log entry" {
                 Write-ScubaLog -Message "Test message" -Level "Info" -Source "TestSource"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "\[TestSource\s*\]"
             }
-            
+
             It "Should log structured data as JSON" {
                 $testData = @{ Key1 = "Value1"; Key2 = 123 }
-                
+
                 Write-ScubaLog -Message "Test message" -Data $testData
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "Data:"
                 $logContent | Should -Match "Key1.*Value1"
             }
-            
+
             It "Should log exception details" {
                 try {
                     throw "Test exception"
@@ -136,59 +136,59 @@ InModuleScope ScubaLogging {
                 catch {
                     Write-ScubaLog -Message "Test error" -Level "Error" -Exception $_.Exception
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "Exception:"
                 $logContent | Should -Match "Test exception"
             }
-            
+
             It "Should respect log level filtering" {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Warning"
-                
+
                 Write-ScubaLog -Message "Debug message" -Level "Debug"
                 Write-ScubaLog -Message "Info message" -Level "Info"
                 Write-ScubaLog -Message "Warning message" -Level "Warning"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Not -Match "Debug message"
                 $logContent | Should -Not -Match "Info message"
                 $logContent | Should -Match "Warning message"
             }
-            
+
             It "Should not log when logging is disabled" {
                 Stop-ScubaLogging
-                
+
                 Write-ScubaLog -Message "Should not appear" -Level "Info"
-                
+
                 # Should not create any new log files or content
                 $Script:ScubaLogEnabled | Should -Be $false
             }
         }
 
         Context "Trace-ScubaFunction Function" {
-            
+
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
             }
-            
+
             It "Should execute script block and return result" {
                 $result = Trace-ScubaFunction -FunctionName "TestFunction" -ScriptBlock {
                     return "Test Result"
                 }
-                
+
                 $result | Should -Be "Test Result"
             }
-            
+
             It "Should log function entry and exit" {
                 Trace-ScubaFunction -FunctionName "TestFunction" -ScriptBlock {
                     return "Result"
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ENTER: TestFunction"
                 $logContent | Should -Match "EXIT: TestFunction"
             }
-            
+
             It "Should sanitize sensitive parameters" {
                 $params = @{
                     Username = "testuser"
@@ -196,11 +196,11 @@ InModuleScope ScubaLogging {
                     Token = "abc123"
                     SafeValue = "public"
                 }
-                
+
                 Trace-ScubaFunction -FunctionName "TestFunction" -Parameters $params -ScriptBlock {
                     return "Result"
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "Username.*testuser"
                 $logContent | Should -Match "SafeValue.*public"
@@ -208,123 +208,123 @@ InModuleScope ScubaLogging {
                 $logContent | Should -Not -Match "secretpassword"
                 $logContent | Should -Not -Match "abc123"
             }
-            
+
             It "Should measure execution time" {
                 Trace-ScubaFunction -FunctionName "TestFunction" -ScriptBlock {
                     Start-Sleep -Milliseconds 100
                     return "Result"
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ExecutionTimeMs"
             }
-            
+
             It "Should handle exceptions properly" {
                 {
                     Trace-ScubaFunction -FunctionName "TestFunction" -ScriptBlock {
                         throw "Test exception"
                     }
                 } | Should -Throw "Test exception"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "EXIT: TestFunction \(ERROR\)"
                 $logContent | Should -Match "Status.*Error"
             }
-            
+
             It "Should log return values when requested" {
                 Trace-ScubaFunction -FunctionName "TestFunction" -LogReturnValue $true -ScriptBlock {
                     return "Simple Result"
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ReturnValue.*Simple Result"
             }
-            
+
             It "Should handle array return values" {
                 Trace-ScubaFunction -FunctionName "TestFunction" -LogReturnValue $true -ScriptBlock {
                     return @(1, 2, 3, 4, 5)
                 }
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ReturnCount.*5"
             }
         }
 
         Context "Write-ScubaFunctionEntry Function" {
-            
+
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
             }
-            
+
             It "Should log function entry with parameters" {
                 $params = @{ Param1 = "Value1"; Param2 = 123 }
-                
+
                 Write-ScubaFunctionEntry -FunctionName "TestFunction" -Parameters $params
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ENTER: TestFunction"
                 $logContent | Should -Match "Param1.*Value1"
             }
-            
+
             It "Should redact sensitive parameters" {
                 $params = @{ Password = "secret"; Username = "user" }
-                
+
                 Write-ScubaFunctionEntry -FunctionName "TestFunction" -Parameters $params
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "\[REDACTED\]"
                 $logContent | Should -Not -Match "secret"
             }
-            
+
             It "Should truncate large strings" {
                 $longString = "x" * 300
                 $params = @{ LongParam = $longString }
-                
+
                 Write-ScubaFunctionEntry -FunctionName "TestFunction" -Parameters $params
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "truncated"
             }
-            
+
             It "Should summarize large arrays" {
                 $largeArray = 1..20
                 $params = @{ ArrayParam = $largeArray }
-                
+
                 Write-ScubaFunctionEntry -FunctionName "TestFunction" -Parameters $params
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "Array\[.*items\]"
             }
         }
 
         Context "Write-ScubaFunctionExit Function" {
-            
+
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
             }
-            
+
             It "Should log successful function exit" {
                 Write-ScubaFunctionExit -FunctionName "TestFunction" -ExecutionTimeMs 150
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "EXIT: TestFunction"
                 $logContent | Should -Match "ExecutionTimeMs.*150"
                 $logContent | Should -Match "Status.*Success"
             }
-            
+
             It "Should log function exit with result" {
                 Write-ScubaFunctionExit -FunctionName "TestFunction" -ExecutionTimeMs 100 -Result "Test Result"
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "ResultType.*String"
                 $logContent | Should -Match "Result.*Test Result"
             }
-            
+
             It "Should log function exit with exception" {
                 $testException = [System.Exception]::new("Test error")
-                
+
                 Write-ScubaFunctionExit -FunctionName "TestFunction" -ExecutionTimeMs 50 -Exception $testException
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "EXIT: TestFunction \(ERROR\)"
                 $logContent | Should -Match "Status.*Error"
@@ -333,100 +333,331 @@ InModuleScope ScubaLogging {
         }
 
         Context "Stop-ScubaLogging Function" {
-            
+
             It "Should clean up logging state" {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath
-                
+
                 Stop-ScubaLogging
-                
+
                 $Script:ScubaLogEnabled | Should -Be $false
                 $Script:ScubaLogPath | Should -Be $null
                 $Script:ScubaDeepTracing | Should -Be $false
             }
-            
+
             It "Should log shutdown message" {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath
-                
+
                 Stop-ScubaLogging
-                
+
                 $logFiles = Get-ChildItem $script:TestLogPath -Filter "*.log"
                 $logContent = Get-Content $logFiles[0].FullName -Raw
                 $logContent | Should -Match "logging session ending"
             }
-            
+
             It "Should handle errors gracefully when stopping" {
                 # Initialize without transcript to avoid Stop-Transcript errors
                 Initialize-ScubaLogging
-                
+
                 { Stop-ScubaLogging } | Should -Not -Throw
             }
         }
 
         Context "Enable-ScubaAutoTrace Function" {
-            
+
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
             }
-            
+
             It "Should enable enhanced tracing" {
                 Enable-ScubaAutoTrace
-                
+
                 $Script:ScubaEnhancedTracing | Should -Be $true
             }
-            
+
             It "Should log activation message" {
                 Enable-ScubaAutoTrace
-                
+
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "Automatic function tracing enabled"
             }
-            
+
             It "Should do nothing when logging is disabled" {
                 Stop-ScubaLogging
-                
+
                 { Enable-ScubaAutoTrace } | Should -Not -Throw
                 $Script:ScubaEnhancedTracing | Should -Be $false
             }
         }
 
         Context "Module State Management" {
-            
+
             It "Should maintain consistent state across function calls" {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug"
-                
+
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaDeepTracing | Should -Be $true
                 $Script:ScubaLogLevel | Should -Be "Debug"
                 $Script:ScubaLogPath | Should -Not -Be $null
-                
+
                 Write-ScubaLog -Message "Test message"
-                
+
                 # State should remain consistent after logging
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaLogLevel | Should -Be "Debug"
             }
-            
+
             It "Should handle multiple initialization calls" {
                 Initialize-ScubaLogging -LogLevel "Info"
                 Initialize-ScubaLogging -LogLevel "Debug"
-                
+
                 $Script:ScubaLogLevel | Should -Be "Debug"
             }
         }
 
+        Context "Get-ScubaRunDetails - ConfiguredOPAPath Parameter" {
+
+            BeforeEach {
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                # Mock slow/network ops so these tests run quickly in isolation
+                Mock Get-CimInstance { return $null }
+                Mock Test-NetConnection { return $true }
+                Mock Resolve-DnsName { return @([PSCustomObject]@{ QueryType = 'A'; IP4Address = '1.2.3.4' }) }
+            }
+
+            It "Should log 'OPA Executable at configured path' when ConfiguredOPAPath is a file that exists" {
+                $fakeOpa = Join-Path $script:TestLogPath "opa_windows_amd64.exe"
+                Set-Content $fakeOpa "fake" -Encoding UTF8
+
+                Get-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "OPA Executable at configured path"
+                $logContent | Should -Match '"FoundAtConfiguredPath":true'
+            }
+
+            It "Should log 'OPA Executable at configured path' when ConfiguredOPAPath is a directory containing an opa binary" {
+                $opaDir = Join-Path $script:TestLogPath "opadir-$(Get-Date -Format 'fff')"
+                New-Item -ItemType Directory $opaDir -Force | Out-Null
+                Set-Content (Join-Path $opaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
+
+                Get-ScubaRunDetails -ConfiguredOPAPath $opaDir
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "OPA Executable at configured path"
+                $logContent | Should -Match '"FoundAtConfiguredPath":true'
+            }
+
+            It "Should log Warning 'OPA Executable NOT found at configured path' when directory has no opa binary" {
+                $emptyDir = Join-Path $script:TestLogPath "emptydir-$(Get-Date -Format 'fff')"
+                New-Item -ItemType Directory $emptyDir -Force | Out-Null
+
+                Get-ScubaRunDetails -ConfiguredOPAPath $emptyDir
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "OPA Executable NOT found at configured path"
+                $logContent | Should -Match '\[Warning\s*\].*RunDetails'
+                $logContent | Should -Match '"FoundAtConfiguredPath":false'
+            }
+
+            It "Should log Warning 'OPA Executable NOT found at configured path' when path does not exist" {
+                $nonExistent = Join-Path $script:TestLogPath "doesnotexist\opa.exe"
+
+                Get-ScubaRunDetails -ConfiguredOPAPath $nonExistent
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "OPA Executable NOT found at configured path"
+                $logContent | Should -Match '\[Warning\s*\].*RunDetails'
+                $logContent | Should -Match '"FoundAtConfiguredPath":false'
+            }
+
+            It "Should skip ConfiguredOPAPath check when parameter is not provided" {
+                Get-ScubaRunDetails
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Not -Match "OPA Executable at configured path"
+                $logContent | Should -Not -Match "OPA Executable NOT found at configured path"
+            }
+        }
+
+        Context "Get-ScubaRunDetails - Network Connectivity Uses Port 443" {
+
+            BeforeEach {
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Mock Get-CimInstance { return $null }
+                Mock Resolve-DnsName { return @([PSCustomObject]@{ QueryType = 'A'; IP4Address = '1.2.3.4' }) }
+            }
+
+            It "Should call Test-NetConnection with Port 443 not ICMP" {
+                Mock Test-NetConnection { return $true }
+
+                Get-ScubaRunDetails
+
+                Should -Invoke Test-NetConnection -ParameterFilter { $Port -eq 443 } -Times 1
+            }
+
+            It "Should log InternetConnected true when HTTPS port 443 check succeeds" {
+                Mock Test-NetConnection { return $true }
+
+                Get-ScubaRunDetails
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match '"InternetConnected":true'
+            }
+
+            It "Should log InternetConnected false and InternetError when HTTPS check throws" {
+                Mock Test-NetConnection { throw "Connection refused" }
+
+                Get-ScubaRunDetails
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match '"InternetConnected":false'
+                $logContent | Should -Match 'InternetError'
+            }
+        }
+
+        Context "Get-ScubaDebugLogReport - Rego Failure and OPA Path Parsing" {
+
+            BeforeAll {
+                $script:FakeLogPath = 'C:\fake\ScubaGear-DebugLog-test.log'
+
+                # Base log entries satisfying all required Find-Entry lookups in the report generator.
+                # No real files are created — Get-Content and Test-Path are mocked per-test.
+                $script:BaseLogLines = @(
+                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active",
+                    '    Data: {"Version":"1.7.0","ProductNames":"aad","Environment":"commercial","OutputFolder":"C:\\test","LogFolder":"C:\\test\\DebugLogs"}',
+                    "[2026-01-01 10:00:00.001] [Info   ] [RunDetails          ] System OS Information captured",
+                    '    Data: {"OS":"Windows","Version":"10.0","Build":"19045","Architecture":"64-bit"}',
+                    "[2026-01-01 10:00:00.002] [Info   ] [RunDetails          ] PowerShell Version Information captured",
+                    '    Data: {"PSVersion":"7.4.0","PSEdition":"Core","CLRVersion":"8.0.0"}',
+                    "[2026-01-01 10:00:00.003] [Info   ] [RunDetails          ] ScubaGear Version Information captured",
+                    '    Data: {"CurrentLoadedVersion":"1.7.0","CurrentModulePath":"C:\\Modules","InstalledVersions":"1.7.0","AllPaths":"C:\\Modules","InstallSource":"Local"}',
+                    "[2026-01-01 10:00:00.004] [Info   ] [RunDetails          ] OPA Executable found: opa_windows_amd64.exe",
+                    '    Data: {"Path":"C:\\Users\\test\\.scubagear\\Tools\\opa_windows_amd64.exe","SizeMB":85.81,"Version":"Version: 1.13.2"}',
+                    "[2026-01-01 10:00:00.005] [Info   ] [RunDetails          ] Network connectivity status captured",
+                    '    Data: {"InternetConnected":true,"DNSResolution":true,"TestTarget":"www.microsoft.com"}',
+                    "[2026-01-01 10:00:00.006] [Info   ] [RunDetails          ] ScubaGear run details collection completed successfully",
+                    "[2026-01-01 10:00:00.007] [Info   ] [InvokeScuba         ] Starting product authentication",
+                    '    Data: {"ProductNames":"aad","M365Environment":"commercial","UsesServicePrincipal":false}',
+                    "[2026-01-01 10:00:00.008] [Info   ] [InvokeScuba         ] All products authenticated successfully",
+                    "[2026-01-01 10:00:00.009] [Debug  ] [FunctionTrace       ] ENTER: Invoke-RunRego",
+                    '    Data: {"ScubaConfig":"[ScubaConfig Object]"}',
+                    "[2026-01-01 10:00:00.010] [Debug  ] [FunctionTrace       ] EXIT: Invoke-RunRego",
+                    '    Data: {"Status":"Success","ExecutionTimeMs":104}',
+                    "[2026-01-01 10:00:00.020] [Info   ] [InvokeScuba         ] ScubaGear DEBUG assessment completed - Check logs in [C:\test\DebugLogs]"
+                )
+
+                # Mock Test-Path so the ValidateScript on LogPath passes without a real file on disk
+                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+            }
+
+            It "Should show 'Success' for Rego phase when no failure warning exists" {
+                $script:TestLines = $script:BaseLogLines
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match '\| Rego Evaluation \|.*Success'
+                $report | Should -Not -Match ':x: Failed'
+            }
+
+            It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
+                    '    Data: {"FailedProducts":"aad"}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match ':x: Failed'
+                $report | Should -Match 'aad'
+            }
+
+            It "Should show 'Warnings and Errors' section populated when per-product Rego failure is logged" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [RunRego             ] Rego evaluation failed: AAD",
+                    '    Data: {"Product":"aad","OPAPath":".","Error":"cannot find opa binary"}',
+                    "[2026-01-01 10:00:00.012] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
+                    '    Data: {"FailedProducts":"aad"}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match '## Warnings and Errors'
+                $report | Should -Not -Match '_No warnings or errors recorded\._'
+                $report | Should -Match 'Rego evaluation failed: AAD'
+            }
+
+            It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
+                    '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match '## Warnings and Errors'
+                $report | Should -Not -Match '_No warnings or errors recorded\._'
+                $report | Should -Match 'Provider export failed: Defender'
+            }
+
+            It "Should show OPA NOT FOUND warning when configured path entry indicates missing OPA" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [RunDetails          ] OPA Executable NOT found at configured path",
+                    '    Data: {"ConfiguredOPAPath":"C:\\Apps","FoundAtConfiguredPath":false}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match 'OPAPath \(configured\)'
+                $report | Should -Match 'C:\\Apps'
+                $report | Should -Match ':x: NOT FOUND'
+            }
+
+            It "Should show OPA found status when configured path entry indicates OPA present" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Info   ] [RunDetails          ] OPA Executable at configured path",
+                    '    Data: {"ConfiguredOPAPath":"C:\\MyOPA","FoundAtConfiguredPath":true,"ResolvedPath":"C:\\MyOPA\\opa.exe"}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                $report | Should -Match 'OPAPath \(configured\)'
+                $report | Should -Match 'C:\\MyOPA'
+                $report | Should -Match ':white_check_mark: Found'
+            }
+
+            It "Should include per-product report counts in Run Timeline when ReportCreation entries exist" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Info   ] [ReportCreation      ] Report created: AAD",
+                    '    Data: {"Product":"aad","Passes":42,"Failures":3,"Warnings":1,"Manual":5,"Omits":0,"Errors":0}'
+                )
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
+                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+
+                # ReportCreation Info entries should appear in the Run Timeline
+                $report | Should -Match 'Report created: AAD'
+            }
+        }
+
         Context "Integration Tests" {
-            
+
             BeforeEach {
                 # Make sure we start clean for integration tests
                 if ($Script:ScubaLogEnabled) {
                     Stop-ScubaLogging
                 }
-                
+
                 # Clean up any existing log files in the test directory
                 if (Test-Path $script:TestLogPath) {
                     Get-ChildItem $script:TestLogPath -Filter "*.log" | Remove-Item -Force -ErrorAction SilentlyContinue
                 }
-                
+
                 # Reset all module variables to ensure clean state
                 $Script:ScubaLogPath = $null
                 $Script:ScubaLogEnabled = $false
@@ -434,35 +665,35 @@ InModuleScope ScubaLogging {
                 $Script:ScubaLogLevel = "Info"
                 $Script:ScubaEnhancedTracing = $false
             }
-            
+
             It "Should support full logging workflow" {
                 # Initialize with full configuration and Debug level to see all messages
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -EnableTranscript
-                
+
                 # Verify the initialization worked
                 $Script:ScubaLogLevel | Should -Be "Debug"
                 $Script:ScubaDeepTracing | Should -Be $true
-                
+
                 # Store the current log file path for verification
                 $currentLogFile = $Script:ScubaLogPath
                 $currentLogFile | Should -Not -BeNullOrEmpty
-                
+
                 # Perform various logging operations
                 Write-ScubaLog -Message "Test workflow starting" -Level "Warning"
-                
+
                 $result = Trace-ScubaFunction -FunctionName "TestWorkflow" -Parameters @{TestParam = "TestValue"} -ScriptBlock {
                     Write-ScubaLog -Message "Inside function" -Level "Debug"
                     return "Success"
                 }
-                
+
                 Write-ScubaLog -Message "Test workflow completed" -Level "Warning"
-                
+
                 # Clean up
                 Stop-ScubaLogging
-                
+
                 # Verify log file exists and contains expected content
                 Test-Path $currentLogFile | Should -Be $true
-                
+
                 $logContent = Get-Content $currentLogFile -Raw
                 $logContent | Should -Match "Test workflow starting"
                 $logContent | Should -Match "ENTER: TestWorkflow"
@@ -470,7 +701,7 @@ InModuleScope ScubaLogging {
                 $logContent | Should -Match "EXIT: TestWorkflow"
                 $logContent | Should -Match "Test workflow completed"
                 $logContent | Should -Match "logging session ending"
-                
+
                 $result | Should -Be "Success"
             }
         }

@@ -453,7 +453,7 @@ function Invoke-SCuBA {
                 Write-Output "ScubaGear DEBUG MODE ENABLED - Detailed logging active"
                 Write-Output "Log folder: $ScubaLogFolder"
                 Write-Output "Note: Console output is minimized, detailed trace is in transcript log"
-                Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active" -Level "Info" -Source "Orchestrator" -Data @{
+                Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active" -Level "Info" -Source "InvokeScuba" -Data @{
                     Version = $ModuleVersion
                     ProductNames = ($ProductNames -join ', ')
                     Environment = $M365Environment
@@ -461,8 +461,8 @@ function Invoke-SCuBA {
                     LogFolder = $ScubaLogFolder
                     PerformanceNote = "Debug mode will impact performance - use only for troubleshooting"
                 }
-                Write-ScubaLog -Message "Output folder created successfully" -Level "Debug" -Source "Orchestrator" -Data @{OutFolderPath = $OutFolderPath}
-                
+                Write-ScubaLog -Message "Output folder created successfully" -Level "Debug" -Source "InvokeScuba" -Data @{OutFolderPath = $OutFolderPath}
+
                 # Log cmdlet invocation details to capture how ScubaGear was invoked
                 $InvocationParams = @{}
                 foreach ($key in $PSBoundParameters.Keys) {
@@ -474,21 +474,20 @@ function Invoke-SCuBA {
                         $InvocationParams[$key] = $PSBoundParameters[$key]
                     }
                 }
-                Write-ScubaLog -Message "Cmdlet invocation captured" -Level "Info" -Source "Orchestrator" -Data @{
+                Write-ScubaLog -Message "Cmdlet invocation captured" -Level "Info" -Source "InvokeScuba" -Data @{
                     Command = $MyInvocation.MyCommand.Name
                     Parameters = $InvocationParams
                     BoundParameterCount = $PSBoundParameters.Count
                     InvocationLine = $MyInvocation.Line
                 }
-                
-                # Capture comprehensive environment diagnostics using Debug-SCuBA
-                Write-ScubaLog -Message "Capturing environment diagnostics" -Level "Info" -Source "Orchestrator"
+
+                # Capture environment diagnostics using Get-ScubaRunDetails
+                Write-ScubaLog -Message "Capturing environment diagnostics" -Level "Info" -Source "InvokeScuba"
                 try {
-                    Debug-SCuBA -OutPath $ScubaLogFolder -ErrorAction Stop
-                    Write-ScubaLog -Message "Environment diagnostics captured successfully" -Level "Info" -Source "Orchestrator"
+                    Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
                 }
                 catch {
-                    Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "Orchestrator"
+                    Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "InvokeScuba"
                 }
             }
             catch {
@@ -499,39 +498,32 @@ function Invoke-SCuBA {
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
-        if ($DebugScuba) {
-            Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "Orchestrator" -Data @{
-                ProductNames = ($ScubaConfig.ProductNames -join ', ')
-                M365Environment = $ScubaConfig.M365Environment
-                UsesServicePrincipal = ($null -ne $ScubaConfig.AppID)
-            }
+        Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "InvokeScuba" -Data @{
+            ProductNames = ($ScubaConfig.ProductNames -join ', ')
+            M365Environment = $ScubaConfig.M365Environment
+            UsesServicePrincipal = ($null -ne $ScubaConfig.AppID)
         }
+
         $ProdAuthFailed = Invoke-Connection -ScubaConfig $ScubaConfig
         if ($ProdAuthFailed.Count -gt 0) {
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "Orchestrator" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
-            }
+            Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
             $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
             -ProductsFailed $ProdAuthFailed `
             -ExceptionMessage 'All indicated Products were unable to authenticate'
         }
         else {
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "Orchestrator"
-            }
+            Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "InvokeScuba"
         }
 
         # Tenant Metadata for the Report
-        if ($DebugScuba) {
-            Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "Orchestrator" -Data @{
-                ProductNames = ($ScubaConfig.ProductNames -join ', ')
-                M365Environment = $ScubaConfig.M365Environment
-            }
+
+        Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "InvokeScuba" -Data @{
+            ProductNames = ($ScubaConfig.ProductNames -join ', ')
+            M365Environment = $ScubaConfig.M365Environment
         }
+
         $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
-        if ($DebugScuba) {
-            Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "Orchestrator"
-        }
+        Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
 
         # Generate a GUID to uniquely identify the output JSON
         $Guid = New-Guid -ErrorAction 'Stop'
@@ -539,13 +531,12 @@ function Invoke-SCuBA {
         try {
             # Provider Execution
             # Provider parameters consolidated into ScubaConfig; remaining args passed explicitly
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Starting provider execution" -Level "Info" -Source "Orchestrator" -Data @{
-                    ProductNames = ($ScubaConfig.ProductNames -join ', ')
-                    ModuleVersion = $ModuleVersion
-                    Guid = $Guid
-                }
+            Write-ScubaLog -Message "Starting provider execution" -Level "Info" -Source "InvokeScuba" -Data @{
+                ProductNames = ($ScubaConfig.ProductNames -join ', ')
+                ModuleVersion = $ModuleVersion
+                Guid = $Guid
             }
+
             $ProdProviderFailed = if ($DebugScuba) {
                 Trace-ScubaFunction -FunctionName "Invoke-ProviderList" -Parameters @{
                     ScubaConfig = "[ScubaConfig Object]"
@@ -562,26 +553,20 @@ function Invoke-SCuBA {
             }
 
             if ($ProdProviderFailed.Count -gt 0) {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Some providers failed to execute" -Level "Warning" -Source "Orchestrator" -Data @{FailedProducts = ($ProdProviderFailed -join ', ')}
-                }
+                Write-ScubaLog -Message "Some providers failed to execute" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdProviderFailed -join ', ')}
                 $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
                 -ProductsFailed $ProdProviderFailed `
                 -ExceptionMessage 'All indicated Product Providers failed to execute'
             }
             else {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "All providers executed successfully" -Level "Info" -Source "Orchestrator"
-                }
+                Write-ScubaLog -Message "All providers executed successfully" -Level "Info" -Source "InvokeScuba"
             }
 
             # OPA Rego invocation
             # Rego parameters consolidated into ScubaConfig; remaining args passed explicitly
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Starting OPA Rego evaluation" -Level "Info" -Source "Orchestrator" -Data @{
-                    ProductNames = ($ScubaConfig.ProductNames -join ', ')
-                    OPAPath = $ScubaConfig.OPAPath
-                }
+            Write-ScubaLog -Message "Starting OPA Rego evaluation" -Level "Info" -Source "InvokeScuba" -Data @{
+                ProductNames = ($ScubaConfig.ProductNames -join ', ')
+                OPAPath = $ScubaConfig.OPAPath
             }
             $ProdRegoFailed = if ($DebugScuba) {
                 Trace-ScubaFunction -FunctionName "Invoke-RunRego" -Parameters @{
@@ -597,28 +582,25 @@ function Invoke-SCuBA {
             }
 
             if ($ProdRegoFailed.Count -gt 0) {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Some Rego evaluations failed" -Level "Warning" -Source "Orchestrator" -Data @{FailedProducts = ($ProdRegoFailed -join ', ')}
-                }
+                Write-ScubaLog -Message "Some Rego evaluations failed" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdRegoFailed -join ', ')}
+
                 $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
                 -ProductsFailed  $ProdRegoFailed `
                 -ExceptionMessage 'All indicated Product Rego invocations failed'
             }
             else {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "All Rego evaluations completed successfully" -Level "Info" -Source "Orchestrator"
-                }
+                Write-ScubaLog -Message "All Rego evaluations completed successfully" -Level "Info" -Source "InvokeScuba"
+
             }
 
             # Report Creation - using ScubaConfig for most settings
             # Converted back from JSON String for PS Object use
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Starting report creation" -Level "Info" -Source "Orchestrator" -Data @{
-                    DarkMode = $DarkMode.IsPresent
-                    Quiet = $Quiet.IsPresent
-                    KeepIndividualJSON = $KeepIndividualJSON.IsPresent
-                }
+            Write-ScubaLog -Message "Starting report creation" -Level "Info" -Source "InvokeScuba" -Data @{
+                DarkMode = $DarkMode.IsPresent
+                Quiet = $Quiet.IsPresent
+                KeepIndividualJSON = $KeepIndividualJSON.IsPresent
             }
+
             $TenantDetails = $TenantDetails | ConvertFrom-Json
             if ($DebugScuba) {
                 Trace-ScubaFunction -FunctionName "Invoke-ReportCreation" -Parameters @{
@@ -682,7 +664,7 @@ function Invoke-SCuBA {
             if ($DebugScuba -and $Script:ScubaLoggingEnabled) {
                 try {
                     Write-Output "ScubaGear DEBUG assessment completed successfully"
-                    Write-ScubaLog -Message "ScubaGear DEBUG assessment completed - Check logs in [$OutFolderPath\DebugLogs]" -Level "Info" -Source "Orchestrator"
+                    Write-ScubaLog -Message "ScubaGear DEBUG assessment completed - Check logs in [$OutFolderPath\DebugLogs]" -Level "Info" -Source "InvokeScuba"
                     Stop-ScubaLogging
                 }
                 catch {
@@ -803,6 +785,7 @@ function Invoke-ProviderList {
                     'ErrorAction' = 'Stop';
                 }
                 Write-Progress @ProgressParams
+                Write-ScubaLog -Message "Starting provider export: $BaselineName" -Level "Debug" -Source "ProviderList" -Data @{ Product = $Product; N = $N; Total = $Len }
                 try {
                     $RetVal = ""
                     switch ($Product) {
@@ -834,9 +817,14 @@ function Invoke-ProviderList {
                         }
                     }
                     $ProviderJSON += $RetVal
+                    Write-ScubaLog -Message "Provider export succeeded: $BaselineName" -Level "Debug" -Source "ProviderList" -Data @{ Product = $Product }
                 }
                 catch {
                     Write-Warning "Error with the $($BaselineName) Provider: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+                    Write-ScubaLog -Message "Provider export failed: $BaselineName" -Level "Warning" -Source "ProviderList" -Data @{
+                        Product = $Product
+                        Error   = $_.Exception.Message
+                    }
                     $ProdProviderFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
                 }
@@ -941,18 +929,35 @@ function Invoke-RunRego {
                 $InputFile = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutProviderFileName).json" -ErrorAction 'Stop'
                 $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego" -ErrorAction 'Stop'
                 $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego" -ErrorAction 'Stop'
+                $resolvedOPAPath = if ($ScubaConfig.OPAPath) { $ScubaConfig.OPAPath } else { [ScubaConfig]::ScubaDefault('DefaultOPAPath') }
                 $params = @{
                     'InputFile' = $InputFile;
                     'RegoFile' = $RegoFile;
                     'PackageName' = $Product;
-                    'OPAPath' = if ($ScubaConfig.OPAPath) { $ScubaConfig.OPAPath } else { [ScubaConfig]::ScubaDefault('DefaultOPAPath') }
+                    'OPAPath' = $resolvedOPAPath
+                }
+                Write-ScubaLog -Message "Starting Rego evaluation: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{
+                    Product     = $Product
+                    OPAPath     = $resolvedOPAPath
+                    InputFile   = $InputFile
+                    RegoFile    = $RegoFile
+                    InputExists = (Test-Path $InputFile)
+                    RegoExists  = (Test-Path $RegoFile)
                 }
                 try {
                     $RetVal = Invoke-Rego @params
                     $TestResults += $RetVal
+                    Write-ScubaLog -Message "Rego evaluation succeeded: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{ Product = $Product }
                 }
                 catch {
                     Write-Warning "Error with the $($BaselineName) Rego invocation: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+                    Write-ScubaLog -Message "Rego evaluation failed: $BaselineName" -Level "Warning" -Source "RunRego" -Data @{
+                        Product   = $Product
+                        OPAPath   = $resolvedOPAPath
+                        InputFile = $InputFile
+                        RegoFile  = $RegoFile
+                        Error     = $_.Exception.Message
+                    }
                     $ProdRegoFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above"
                 }
@@ -1466,6 +1471,15 @@ function Invoke-ReportCreation {
                 }
 
                 $Report = New-Report @CreateReportParams
+                Write-ScubaLog -Message "Report created: $BaselineName" -Level "Info" -Source "ReportCreation" -Data @{
+                    Product  = $Product
+                    Passes   = $Report.Passes
+                    Failures = $Report.Failures
+                    Warnings = $Report.Warnings
+                    Manual   = $Report.Manual
+                    Omits    = $Report.Omits
+                    Errors   = $Report.Errors
+                }
                 $LinkPath = "$($IndividualReportFolderName)/$($BaselineName)Report.html"
                 $LinkClassName = '"individual_reports"' # uses no escape characters
                 $Link = "<a class=$($LinkClassName) href='$($LinkPath)'>$($FullName)</a>"
@@ -1843,8 +1857,8 @@ function Invoke-SCuBACached {
     will prompt you to provide credentials if you want to establish a connection
     to the specified M365 products in the **$ProductNames** variable.
     For most use cases for cached results, leave this variable to be `$false`.
-    Authentication is skipped by default. If you want to run verification with authentication 
-    in the current PowerShell session, set this variable to `$true` to establish a connection. 
+    Authentication is skipped by default. If you want to run verification with authentication
+    in the current PowerShell session, set this variable to `$true` to establish a connection.
     Default is $false.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
@@ -2078,8 +2092,7 @@ function Invoke-SCuBACached {
                     $Script:ScubaLoggingEnabled = $true
                     Write-Output "ScubaGear DEBUG MODE ENABLED - Detailed logging active"
                     Write-Output "Log folder: $ScubaLogFolder"
-                    Write-Output "Note: Console output is minimized, detailed trace is in transcript log"
-                    Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active (Cached Mode)" -Level "Info" -Source "Orchestrator-Cached" -Data @{
+                    Write-ScubaLog -Message "ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active (Cached Mode)" -Level "Info" -Source "ScubaCached" -Data @{
                         Version = $ModuleVersion
                         ProductNames = ($ProductNames -join ', ')
                         Environment = $M365Environment
@@ -2088,8 +2101,8 @@ function Invoke-SCuBACached {
                         ExportProvider = $ExportProvider
                         PerformanceNote = "Debug mode will impact performance - use only for troubleshooting"
                     }
-                    Write-ScubaLog -Message "Output folder confirmed at $OutFolderPath" -Level "Debug" -Source "Orchestrator-Cached" -Data @{OutFolderPath = $OutFolderPath}
-                    
+                    Write-ScubaLog -Message "Output folder confirmed at $OutFolderPath" -Level "Debug" -Source "ScubaCached" -Data @{OutFolderPath = $OutFolderPath}
+
                     # Log cmdlet invocation details to capture how ScubaGear was invoked
                     $InvocationParams = @{}
                     foreach ($key in $PSBoundParameters.Keys) {
@@ -2101,21 +2114,20 @@ function Invoke-SCuBACached {
                             $InvocationParams[$key] = $PSBoundParameters[$key]
                         }
                     }
-                    Write-ScubaLog -Message "Cmdlet invocation captured (Cached Mode)" -Level "Info" -Source "Orchestrator-Cached" -Data @{
+                    Write-ScubaLog -Message "Cmdlet invocation captured (Cached Mode)" -Level "Info" -Source "ScubaCached" -Data @{
                         Command = $MyInvocation.MyCommand.Name
                         Parameters = $InvocationParams
                         BoundParameterCount = $PSBoundParameters.Count
                         InvocationLine = $MyInvocation.Line
                     }
-                    
-                    # Capture comprehensive environment diagnostics using Debug-SCuBA
-                    Write-ScubaLog -Message "Capturing environment diagnostics (Cached Mode)" -Level "Info" -Source "Orchestrator-Cached"
+
+                    # Capture environment diagnostics using Debug-SCuBA
+                    Write-ScubaLog -Message "Capturing environment diagnostics (Cached Mode)" -Level "Info" -Source "ScubaCached"
                     try {
                         Debug-SCuBA -OutPath $ScubaLogFolder -ErrorAction Stop
-                        Write-ScubaLog -Message "Environment diagnostics captured successfully" -Level "Info" -Source "Orchestrator-Cached"
                     }
                     catch {
-                        Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "Orchestrator-Cached"
+                        Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "ScubaCached"
                     }
                 }
                 catch {
@@ -2127,10 +2139,7 @@ function Invoke-SCuBACached {
 
             Remove-Resources
             Import-Resources # Imports Providers, RunRego, CreateReport, Connection, Support, Utility
-
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Resources imported successfully" -Level "Debug" -Source "Orchestrator-Cached"
-            }
+            Write-ScubaLog -Message "Resources imported successfully" -Level "Debug" -Source "ScubaCached"
 
             # Authenticate - parameters consolidated into a temporary ScubaConfig for cached execution
             $TempScubaConfig = New-Object -Type PSObject -Property @{
@@ -2152,9 +2161,8 @@ function Invoke-SCuBACached {
             }
 
             if ($ExportProvider) {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "ExportProvider enabled - will authenticate and export provider data" -Level "Info" -Source "Orchestrator-Cached"
-                }
+                Write-ScubaLog -Message "ExportProvider enabled - will authenticate and export provider data" -Level "Info" -Source "ScubaCached"
+
                 # Check if there is a previous ScubaResults file
                 # delete if found
                 $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
@@ -2162,24 +2170,19 @@ function Invoke-SCuBACached {
                     $PreviousResultsFiles | ForEach-Object {
                         Remove-Item $_.FullName -Force
                     }
-                    if ($DebugScuba) {
-                        Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "Orchestrator-Cached"
-                    }
+                    Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "ScubaCached"
                 }
 
                 # authenticate
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "Orchestrator-Cached" -Data @{
-                        ProductNames = ($ProductNames -join ', ')
-                        M365Environment = $M365Environment
-                        UsesServicePrincipal = ($null -ne $TempScubaConfig.AppID)
-                    }
+                Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "ScubaCached" -Data @{
+                    ProductNames = ($ProductNames -join ', ')
+                    M365Environment = $M365Environment
+                    UsesServicePrincipal = ($null -ne $TempScubaConfig.AppID)
                 }
+
                 $ProdAuthFailed = Invoke-Connection -ScubaConfig $TempScubaConfig
                 if ($ProdAuthFailed.Count -gt 0) {
-                    if ($DebugScuba) {
-                        Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "Orchestrator-Cached" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
-                    }
+                    Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "ScubaCached" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
                     $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
                     if (-not $Difference) {
                         throw "All products were unable to establish a connection aborting execution"
@@ -2189,42 +2192,30 @@ function Invoke-SCuBACached {
                     }
                 }
                 else {
-                    if ($DebugScuba) {
-                        Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "Orchestrator-Cached"
-                    }
+                    Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
                 }
-                
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "Orchestrator-Cached"
-                }
+
+                Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
                 $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
 
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Starting provider execution" -Level "Info" -Source "Orchestrator-Cached" -Data @{
-                        ProductNames = ($ProductNames -join ', ')
-                        ModuleVersion = $ModuleVersion
-                        Guid = $Guid
-                    }
+                Write-ScubaLog -Message "Starting provider execution" -Level "Info" -Source "ScubaCached" -Data @{
+                    ProductNames = ($ProductNames -join ', ')
+                    ModuleVersion = $ModuleVersion
+                    Guid = $Guid
                 }
                 Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Provider execution completed" -Level "Info" -Source "Orchestrator-Cached"
-                }
+                Write-ScubaLog -Message "Provider execution completed" -Level "Info" -Source "ScubaCached"
             }
             else {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "ExportProvider disabled - using cached provider data" -Level "Info" -Source "Orchestrator-Cached"
-                }
+                Write-ScubaLog -Message "ExportProvider disabled - using cached provider data" -Level "Info" -Source "ScubaCached"
             }
 
             $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
             if (-not (Test-Path $ProviderJSONFilePath)) {
-                if ($DebugScuba) {
-                    Write-ScubaLog -Message "Provider JSON not found as standalone file, extracting from ScubaResults" -Level "Info" -Source "Orchestrator-Cached"
-                }
+                Write-ScubaLog -Message "Provider JSON not found as standalone file, extracting from ScubaResults" -Level "Info" -Source "ScubaCached"
                 # When running Invoke-ScubaCached, the provider output might not exist as a stand-alone
                 # file depending on what version of ScubaGear created the output. If the provider output
                 # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
@@ -2267,24 +2258,15 @@ function Invoke-SCuBACached {
             Write-Debug $ActualSavedLocation
 
             $TenantDetails = $SettingsExport.tenant_details
-            
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Starting Rego verification" -Level "Info" -Source "Orchestrator-Cached" -Data @{
-                    ProductNames = ($TempScubaConfig.ProductNames -join ', ')
-                }
+
+            Write-ScubaLog -Message "Starting Rego verification" -Level "Info" -Source "ScubaCached" -Data @{
+                ProductNames = ($TempScubaConfig.ProductNames -join ', ')
             }
             Invoke-RunRego -ScubaConfig $TempScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Rego verification completed" -Level "Info" -Source "Orchestrator-Cached"
-            }
-            
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Starting report creation" -Level "Info" -Source "Orchestrator-Cached"
-            }
+            Write-ScubaLog -Message "Rego verification completed" -Level "Info" -Source "ScubaCached"
+
+            Write-ScubaLog -Message "Starting report creation" -Level "Info" -Source "ScubaCached"
             Invoke-ReportCreation -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
-            if ($DebugScuba) {
-                Write-ScubaLog -Message "Report creation completed" -Level "Info" -Source "Orchestrator-Cached"
-            }
 
             $FullNameParams = @{
                 'OutJsonFileName'                  = $TempScubaConfig.OutJsonFileName;
@@ -2320,8 +2302,8 @@ function Invoke-SCuBACached {
             # Clean up debug logging module
             if ($DebugScuba -and $Script:ScubaLoggingEnabled) {
                 try {
-                    Write-ScubaLog -Message "ScubaGear execution completed successfully (Cached Mode)" -Level "Info" -Source "Orchestrator-Cached"
-                    Write-ScubaLog -Message "Stopping logging and cleanup" -Level "Info" -Source "Orchestrator-Cached"
+                    Write-ScubaLog -Message "ScubaGear execution completed successfully (Cached Mode)" -Level "Info" -Source "ScubaCached"
+                    Write-ScubaLog -Message "Stopping logging and cleanup" -Level "Info" -Source "ScubaCached"
                     Stop-ScubaLogging
                     Write-Output "`nScubaGear debug logging completed"
                     Write-Output "Debug logs saved to: $(Join-Path -Path $OutFolderPath -ChildPath 'DebugLogs')"
