@@ -664,9 +664,10 @@ tests contains {
 
 # Return the Id if non-compliant user consent policies
 # Option 2: Allow user consent for apps from verified publishers, for selected permissions
-BadDefaultGrantPolicies contains Policy.Id if {
+RiskyDelegatedPermissionClassifications contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+    count([x | x := input.risky_delegated_permission_classifications[_]; x != null]) > 0
 }
 
 # Option 3: Let Microsoft manage your consent settings (Recommended)
@@ -683,7 +684,20 @@ AllDefaultGrantPolicies contains {
     some Policy in input.authorization_policies
 }
 
+BadPolicies := BadDefaultGrantPolicies if {
+    count([x | x := BadDefaultGrantPolicies[_]; x != null]) > 0
+} else := RiskyDelegatedPermissionClassifications if {
+    count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
+} else := []
+
+DescriptionStr := "Option 3 - authorization policies found that allow non-admin users to consent to third-party applications" if {
+    count([x | x := BadDefaultGrantPolicies[_]; x != null]) > 0
+} else := "Option 2 - authorization policies found that allow non-admin users to consent to third-party applications" if {
+    count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
+} else := "Option 1 - authorization policies found that allow non-admin users to consent to third-party applications"
+
 # If there is a policy that allows user to consent to third party apps, fail
+# Option 2
 tests contains {
     "PolicyId": "MS.AAD.5.2v1",
     "Criticality": "Shall",
@@ -692,10 +706,23 @@ tests contains {
     "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
     "RequirementMet": Status
 } if {
-    BadPolicies := BadDefaultGrantPolicies
     Status := Count(BadPolicies) == 0
-    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
+
+# If there is a policy that allows user to consent to third party apps, fail
+# Option 3
+#tests contains {
+#   "PolicyId": "MS.AAD.5.2v1",
+#    "Criticality": "Shall",
+#    "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
+#    "ActualValue": {"all_grant_policy_values": AllDefaultGrantPolicies},
+#    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
+#    "RequirementMet": Status
+#} if {
+#    BadPolicies := BadDefaultGrantPolicies
+#    Status := Count(BadPolicies) == 0
+#    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications (Option 3)"
+#}
 #--
 
 #
