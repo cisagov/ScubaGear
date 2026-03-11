@@ -316,7 +316,7 @@ function New-Report {
                 if ($Result.DisplayString -eq "Fail") {
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id] = @{}
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].IncorrectResult = $IncorrectResult
-                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $UserComment
+                    $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].Comment = $PolicyComment
                     $ReportSummary["AnnotatedFailedPolicies"][$Control.Id].RemediationDate = $RemediationDate
                 }
 
