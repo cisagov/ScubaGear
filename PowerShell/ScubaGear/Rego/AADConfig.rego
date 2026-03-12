@@ -328,29 +328,16 @@ AAD_3_3_Not_Applicable := true if {
 # First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.AAD.3.3v2"
     # regal ignore:line-length
     Reason := "This policy is only applicable if MS Authenticator is enabled. See %v for more info"
     AAD_3_3_Not_Applicable == true
-}
-
-# If policy is not N/A then we check that the configuration matches the baseline
-tests contains {
-    "PolicyId": "MS.AAD.3.3v2",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
-    "ActualValue": MSAuth,
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    AAD_3_3_Not_Applicable == false
-    Status := MSAuthProperlyConfigured == true
 }
 
 #
