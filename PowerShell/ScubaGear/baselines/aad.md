@@ -1065,7 +1065,7 @@ This section provides policies that help reduce security risks related to the us
 
 ### Policies
 #### MS.AAD.9.1v1
-Risky AI agents SHALL be blocked.
+High risk AI agents SHALL be blocked.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
@@ -1096,7 +1096,7 @@ Risky AI agents SHALL be blocked.
 
   Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
-  Conditions > Agent risk (Preview) > Configure > Yes > Configure agent risk levels needed for policy to be enforced > </b>High </b>
+  Conditions > Agent risk (Preview) > Configure > Yes > Configure agent risk levels needed for policy to be enforced > <b>High </b>
 </pre>
 
 
