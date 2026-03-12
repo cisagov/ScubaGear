@@ -1,4 +1,4 @@
-using module '..\..\..\..\Modules\Utility\ScubaLogging.psm1'
+﻿using module '..\..\..\..\Modules\Utility\ScubaLogging.psm1'
 
 InModuleScope ScubaLogging {
     Describe "ScubaLogging Module Tests" {
