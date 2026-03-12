@@ -128,7 +128,7 @@ tests contains {
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
 NoteArray := [
-    "Note that we currently only check for approved external domains.",
+    "Note that we currently only check for approved external domains or if sharing is set to Only people in your organization.",
     "Approved security groups are currently not being checked,",
     "see the baseline policy for instructions on a manual check."
 ]
@@ -150,13 +150,14 @@ tests contains {
     Status := Tenant.SharingDomainRestrictionMode == 1
 }
 
+# Test for N/A case where sharing is set to Only people in your organization
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
@@ -241,14 +242,14 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
     SharingCapability != ANYONE
@@ -302,14 +303,14 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     SharingCapability != ANYONE
@@ -363,14 +364,14 @@ tests contains {
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
     not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
