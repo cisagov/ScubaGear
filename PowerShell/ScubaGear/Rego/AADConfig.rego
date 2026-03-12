@@ -698,8 +698,7 @@ DescriptionStr := "authorization policies found that allow non-admin users to co
     count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
 } else := "authorization policies found that allow non-admin users to consent to risky third-party applications"
 
-# If there is a policy that allows user to consent to third party apps, fail
-# Option 2
+# If there is a policy that allows user to consent to risky third party apps, fail
 tests contains {
     "PolicyId": "MS.AAD.5.2v1",
     "Criticality": "Shall",
@@ -710,22 +709,6 @@ tests contains {
 } if {
     Status := Count(BadPolicies) == 0
 }
-
-# If there is a policy that allows user to consent to third party apps, fail
-# Option 3
-#tests contains {
-#   "PolicyId": "MS.AAD.5.2v1",
-#    "Criticality": "Shall",
-#    "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
-#    "ActualValue": {"all_grant_policy_values": AllDefaultGrantPolicies},
-#    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
-#    "RequirementMet": Status
-#} if {
-#    BadPolicies := BadDefaultGrantPolicies
-#    Status := Count(BadPolicies) == 0
-#    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications (Option 3)"
-#}
-#--
 
 #
 # MS.AAD.5.3v1
