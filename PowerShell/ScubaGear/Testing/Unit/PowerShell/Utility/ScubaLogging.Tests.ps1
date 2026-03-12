@@ -548,11 +548,18 @@ InModuleScope ScubaLogging {
 
                 # Mock Test-Path so the ValidateScript on LogPath passes without a real file on disk
                 Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                
+                # Mock Get-Content to always return $script:TestLines (which tests can modify)
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+            }
+
+            BeforeEach {
+                # Reset TestLines to base - prevents test pollution
+                $script:TestLines = $script:BaseLogLines
             }
 
             It "Should show 'Success' for Rego phase when no failure warning exists" {
                 $script:TestLines = $script:BaseLogLines
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -565,7 +572,6 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
                     '    Data: {"FailedProducts":"aad"}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -580,7 +586,6 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.012] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
                     '    Data: {"FailedProducts":"aad"}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -594,7 +599,6 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
                     '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -608,7 +612,7 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Warning] [RunDetails          ] OPA Executable NOT found at configured path",
                     '    Data: {"ConfiguredOPAPath":"C:\\Apps","FoundAtConfiguredPath":false}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -622,7 +626,7 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Info   ] [RunDetails          ] OPA Executable at configured path",
                     '    Data: {"ConfiguredOPAPath":"C:\\MyOPA","FoundAtConfiguredPath":true,"ResolvedPath":"C:\\MyOPA\\opa.exe"}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
@@ -636,7 +640,6 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Info   ] [ReportCreation      ] Report created: AAD",
                     '    Data: {"Product":"aad","Passes":42,"Failures":3,"Warnings":1,"Manual":5,"Omits":0,"Errors":0}'
                 )
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
 
                 $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
 
