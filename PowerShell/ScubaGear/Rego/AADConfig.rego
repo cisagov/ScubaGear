@@ -670,17 +670,19 @@ AllDefaultGrantPolicies contains {
     some Policy in input.authorization_policies
 }
 
+default BadPolicies := []
 BadPolicies := BadDefaultGrantPolicies if {
     count([x | x := BadDefaultGrantPolicies[_]; x != null]) > 0
 } else := RiskyDelegatedPermissionClassifications if {
     count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
-} else := []
+}
 
+default DescriptionStr := "authorization policies found that allow non-admin users to consent to risky third-party applications"
 DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications" if {
     count([x | x := BadDefaultGrantPolicies[_]; x != null]) > 0
 } else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
     count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
-} else := "authorization policies found that allow non-admin users to consent to risky third-party applications"
+}
 
 # If there is a policy that allows user to consent to risky third party apps, fail
 tests contains {
