@@ -8,21 +8,21 @@
         this script focusing only on one product or multiple such as aad, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
-        .\RunUnitTests.ps1
+        .\RunRegoUnitTests.ps1
         Runs every unit test of every product, no flags necessary
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p teams,sharepoint
+        .\RunRegoUnitTests.ps1 -p teams,sharepoint
         Runs all tests for the specified products. Products must be specified with the -p parameter.
         Valid product names are: aad, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p aad -c 1
+        .\RunRegoUnitTests.ps1 -p aad -c 1
         Will run the AADConfig_01_test.rego. When specifying a control group, only one product is able to be used
         at a time.
 
     .EXAMPLE
-        .\RunUnitTests.ps1 -p -teams -c 3 -t test_AllowPublicUsers_Correct
+        .\RunRegoUnitTests.ps1 -p -teams -c 3 -t test_AllowPublicUsers_Correct
         Will run the specific test inside the TeamsConfig_06_test.rego.
         Only one parameter is allowed for the -t option just as there is only one parameter allowed for the -c option.
 
