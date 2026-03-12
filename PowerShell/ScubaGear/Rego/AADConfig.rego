@@ -662,14 +662,16 @@ tests contains {
 # MS.AAD.5.2v1
 #--
 
-# Return the Id if non-compliant user consent policies
+# Return the Id if non-compliant user consent policies if there are risky delegated permission classifications
 # Option 2: Allow user consent for apps from verified publishers, for selected permissions
 RiskyDelegatedPermissionClassifications contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+    # Checks if any delegated permissions have a classification of low and are found in the RiskyPermissions.json file
     count([x | x := input.risky_delegated_permission_classifications[_]; x != null]) > 0
 }
 
+# Return the Id if non-compliant user consent policies
 # Option 3: Let Microsoft manage your consent settings (Recommended)
 BadDefaultGrantPolicies contains Policy.Id if {
     some Policy in input.authorization_policies
@@ -690,11 +692,11 @@ BadPolicies := BadDefaultGrantPolicies if {
     count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
 } else := []
 
-DescriptionStr := "Option 3 - authorization policies found that allow non-admin users to consent to third-party applications" if {
+DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications" if {
     count([x | x := BadDefaultGrantPolicies[_]; x != null]) > 0
-} else := "Option 2 - authorization policies found that allow non-admin users to consent to third-party applications" if {
+} else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
     count([x | x := RiskyDelegatedPermissionClassifications[_]; x != null]) > 0
-} else := "Option 1 - authorization policies found that allow non-admin users to consent to third-party applications"
+} else := "authorization policies found that allow non-admin users to consent to risky third-party applications"
 
 # If there is a policy that allows user to consent to third party apps, fail
 # Option 2
