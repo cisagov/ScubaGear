@@ -310,16 +310,15 @@ The Authentication Methods Manage Migration feature SHALL be set to Migration Co
 - _MITRE ATT&CK TTP Mapping:_
   - None
 
-#### MS.AAD.3.5v1
+#### MS.AAD.3.5v2
 The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.AAD.3.5v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.5v2; Criticality: SHALL -->
 - _Rationale:_ SMS, voice call, and email OTP are the weakest authenticators. This policy forces users to use stronger MFA methods.
-- _Last modified:_ June 2023
-- _Note:_ This policy is only applicable if the tenant has their Manage Migration feature set to Migration Complete.
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7b, IA-5c
 - _MITRE ATT&CK TTP Mapping:_
   - [T1621: Multi-Factor Authentication Request Generation](https://attack.mitre.org/techniques/T1621/)
@@ -461,7 +460,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 1. Go through the process of [How to migrate MFA and SSPR policy settings to the Authentication methods policy for Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage).
 2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
-#### MS.AAD.3.5v1 Instructions
+#### MS.AAD.3.5v2 Instructions
 1. In **Microsoft Entra admin center** , click **Protection > Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 

@@ -126,6 +126,37 @@ New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,defen
 
 The generated file can then be manually edited to add your specific configuration settings.
 
+## Annotate Policies
+
+ScubaGear supports annotating results for individual policies. Annotated policies will be shown in the HTML with the
+annotation appended to the details column. Annotated policies are intended to:
+- Document action plans for any failed controls. ScubaGear will output a warning for any failing controls that are not
+documented in the config file, though this warning can be silenced with the `-SilenceBODWarnings` flag.
+- Help contextualize results
+- Allow users to identify incorrect results
+
+The `AnnotatePolicy` top-level key allows the user to specify the policies that should be annotated.
+
+Example policy annotations configuration:
+
+```yaml
+AnnotatePolicy:
+  MS.AAD.2.1v1:
+    IncorrectResult: false
+    Comment: "Remediation scheduled for Q2 2024"
+    RemediationDate: 2025-06-30
+  MS.EXO.3.1v1:
+    IncorrectResult: true
+    Comment: "False positive - DMARC is properly configured via third-party service"
+```
+
+For each annotated policy, the config file allows you to indicate the following:
+- `Comment`: **Required for failed controls.** The annotation message to add to the report. A warning will be printed if the control is marked incorrect with no comment provided as justification.
+- `RemediationDate`: **Optional.** The date a failing control is anticipated to be implemented. The expected format is yyyy-mm-dd.
+- `IncorrectResult`: **Optional.** Acceptable values: true or false. Whether or not to mark the result incorrect. Defaults to false.
+
+**Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.**
+
 ## Omit Policies
 
 In some cases, it may be appropriate to omit specific policies from ScubaGear evaluation. For example:
@@ -148,37 +179,6 @@ OmitPolicy:
 For each omitted policy, the config file allows you to indicate the following:
 - `Rationale`: The reason the policy should be omitted from the report. This value will be displayed in the "Details" column of the report. ScubaGear will output a warning if no rationale is provided.
 - `Expiration`: Optional. A date after which the policy should no longer be omitted from the report. The expected format is yyyy-mm-dd.
-
-## Annotate Policies
-
-ScubaGear supports annotating results for individual policies. Annotated policies will be shown in the HTML with the
-annotation appended to the details column. Annotated policies are intended to:
-- Document action plans for any failed controls. ScubaGear will output a warning for any failing controls that are not
-documented in the config file, though this warning can be silenced with the `-SilenceBODWarnings` flag.
-- Allow users to identify incorrect results
-- Help contextualize results
-
-The `AnnotatePolicy` top-level key allows the user to specify the policies that should be annotated.
-
-Example policy annotations configuration:
-
-```yaml
-AnnotatePolicy:
-  MS.AAD.2.1v1:
-    IncorrectResult: false
-    Comment: "Remediation scheduled for Q2 2024"
-    RemediationDate: 2025-06-30
-  MS.EXO.3.1v1:
-    IncorrectResult: true
-    Comment: "False positive - DMARC is properly configured via third-party service"
-```
-
-For each annotated policy, the config file allows you to indicate the following:
-- `IncorrectResult`: Boolean, whether or not to mark the result incorrect. Optional, defaults to false.
-- `Comment`: The annotation to add to the report. A warning will be printed if control is marked incorrect with no comment provided as justification.
-- `RemediationDate`: Optional. The date a failing control is anticipated to be implemented. The expected format is yyyy-mm-dd.
-
-**Exercise care when marking incorrect results because this can inadvertently introduce blind spots when assessing your system.**
 
 ## Product-specific Configuration
 
