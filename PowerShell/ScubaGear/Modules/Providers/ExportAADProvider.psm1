@@ -200,6 +200,26 @@ function Export-AADProvider {
     ##### End block
     $RiskyDelegatedPermissionClassifications =  ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
 
+    ##### This block gathers information on Exchange hybrid application configurations
+    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+
+    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
+    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
+    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
+    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
+    $LegacyExchangeSP = ConvertTo-Json -Depth 3 @(
+        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
+            "M365Environment"=$M365Environment
+        })
+    )
+
+    #$DedicatedExchangeHybridApp = ConvertTo-Json -Depth 3 @(
+    #    $Tracker.TryCommand("Get-DedicatedExchangeHybridApplication", @{
+    #        "M365Environment"=$M365Environment
+    #    })
+    #)
+    ##### End block
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -221,6 +241,7 @@ function Export-AADProvider {
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
+    "legacy_exchange_service_principal": $LegacyExchangeSP,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@

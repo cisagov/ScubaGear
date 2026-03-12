@@ -639,6 +639,8 @@ function Format-RiskyThirdPartyServicePrincipals {
 }
 
 Export-ModuleMember -Function @(
+    "Get-RiskyPermissionsJson",
+    "Format-Credentials",
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
     "Format-RiskyApplications",
