@@ -264,7 +264,6 @@ Describe "Policy Checks for <ProductName>" {
                     $script:OutputFolder = $ReportFolders[0].Name
                 }
 
-
                 Write-Debug "Output folder (ScubaCached) $script:OutputFolder"
                 SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:OutputFolder
 
@@ -272,9 +271,14 @@ Describe "Policy Checks for <ProductName>" {
                     Copy-Item -Path "$script:OutputFolder/ProviderSettingsExport.json" -Destination "$script:OutputFolder/ModifiedProviderSettingsExport.json"
                 }
 
-
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
                 Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
+
+                # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
+                $SavedModifiedProviderFileName = "ModifiedProviderSettingsExport-{0}-{1}.json" -f (Get-Date -Format "yyyyMMdd_HHmmss_fff"), [guid]::NewGuid()
+                # $SavedModifiedProviderFileName = "ModifiedProviderSettingsExport-$([guid]::NewGuid()).json"
+                $SavedModifiedProviderFilePath = Join-Path $script:OutputFolder $SavedModifiedProviderFileName
+                Copy-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json" -Destination $SavedModifiedProviderFilePath
 
                 # Delete the modified settings so next test scenario starts from original cached settings
                 Remove-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json"
