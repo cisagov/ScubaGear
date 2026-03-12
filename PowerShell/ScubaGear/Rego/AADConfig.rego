@@ -20,6 +20,7 @@ import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
 import data.utils.key.Count
+import data.utils.aad.EnsureTrimmedArray
 
 
 #############
@@ -1252,5 +1253,54 @@ tests contains {
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.AAD.8.3v1"),
     "RequirementMet": false
+}
+#--
+
+############
+# MS.AAD.9 #
+############
+
+#
+# MS.AAD.9.1v1
+#--
+
+# If policy matches basic conditions, special conditions,
+# & all exclusions are intentional, save the policy name
+AIAgents contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
+    "all" in CAPolicy.Conditions.ClientAppTypes
+    # CAPolicy.Conditions.AgentIdRiskLevels is a string, which can contain multiple values
+    # The helper function EnsureTrimmedArray turns the string into acomma delimited list
+    # with leading and trailing spaces removed
+    "high" in EnsureTrimmedArray(CAPolicy.Conditions.AgentIdRiskLevels)
+    "block" in CAPolicy.GrantControls.BuiltInControls
+    "All" in CAPolicy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+}
+
+# Pass if at least 1 policy meets all conditions
+tests contains {
+    "PolicyId": "MS.AAD.9.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": AIAgents,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(AIAgents, DescriptionString), CAPLINK]),
+    "RequirementMet": Status
+} if {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Status := Count(AIAgents) > 0
 }
 #--

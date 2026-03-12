@@ -1059,6 +1059,46 @@ Guest invites SHOULD only be allowed to specific external domains that have been
 
 4. Click **Save**.
 
+## 9. AI Security
+
+This section provides policies that help reduce security risks related to the usage of AI Agents and automated services that interact with tenant resources.
+
+### Policies
+#### MS.AAD.9.1v1
+Risky AI agents SHALL be blocked.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+<!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
+- _Rationale:_ AI agents may access tenant resources using application permissiona and can perform actions autonomously. Blocking high-risk AI agents reduces the risk of unauthorized access and automated misuse of resources.
+- _Last modified:_ March 2026
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, AC-6, CM-7(4)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Account](https://attack.mitre.org/techniques/T1078/004/)
+
+### Resources
+
+- [Block access by high-risk agent identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/policy-agent-block-high-risk)
+
+### License Requirements
+
+- N/A
+
+### Implementation
+
+#### MS.AAD.9.1v1 Instructions
+
+1. Create a conditional access policy blocking High Risk AI Agents. Configure the following policy settings in the new conditional access policy, per the values below:
+
+<pre>
+  Assignments > Users, agents (Preview) or workload identities > What does this policy apply to? > Agents (Preview) > Include > <b>All agent identities (Preview) </b>
+
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
+
+  Conditions > Agent risk (Preview) > Configure > Yes > Configure agent risk levels needed for policy to be enforced > </b>High </b>
+</pre>
+
 
 # Appendix A: Microsoft Entra ID hybrid Guidance
 
