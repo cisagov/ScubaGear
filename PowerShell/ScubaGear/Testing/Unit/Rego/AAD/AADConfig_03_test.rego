@@ -1811,7 +1811,7 @@ test_Entra_3_9_Application_Exclusion_Incorrect_V1 if {
 }
 
 # Test for Windows Hello for Business
-test_IsGeneralMFA_WindowsHelloForBusiness_Correct if {
+test_IsGeneralMFA_WindowsHelloForBusiness_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "DisplayName", "value": "Windows Hello for Business Policy"},
                 {"op": "remove", "path": "GrantControls/BuiltInControls"},
@@ -1820,15 +1820,14 @@ test_IsGeneralMFA_WindowsHelloForBusiness_Correct if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Windows Hello for Business Policy. <a href='#caps'>View all CA policies</a>."
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # Test for FIDO2
-test_IsGeneralMFA_Fido2_Correct if {
+test_IsGeneralMFA_Fido2_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "DisplayName", "value": "FIDO2 Policy"},
                 {"op": "remove", "path": "GrantControls/BuiltInControls"},
@@ -1837,15 +1836,14 @@ test_IsGeneralMFA_Fido2_Correct if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>FIDO2 Policy. <a href='#caps'>View all CA policies</a>."
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # Test for X509 Certificate Multi-Factor
-test_IsGeneralMFA_X509CertificateMultiFactor_Correct if {
+test_IsGeneralMFA_X509CertificateMultiFactor_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "DisplayName", "value": "X509 Certificate Multi-Factor Policy"},
                 {"op": "remove", "path": "GrantControls/BuiltInControls"},
@@ -1854,11 +1852,10 @@ test_IsGeneralMFA_X509CertificateMultiFactor_Correct if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>X509 Certificate Multi-Factor Policy. <a href='#caps'>View all CA policies</a>."
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 
 # Test for Device Based Push
@@ -1918,7 +1915,7 @@ test_IsGeneralMFA_MultipleCombinations_Correct if {
                 [{"op": "add", "path": "DisplayName", "value": "Multiple Authentication Combinations Policy"},
                 {"op": "remove", "path": "GrantControls/BuiltInControls"},
                 {"op": "add", "path": "GrantControls/AuthenticationStrength/AllowedCombinations", 
-                "value": ["windowsHelloForBusiness", "password, microsoftAuthenticatorPush", "federatedMultiFactor"]}])
+                "value": ["windowsHelloForBusiness", "password,microsoftAuthenticatorPush", "federatedMultiFactor"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
