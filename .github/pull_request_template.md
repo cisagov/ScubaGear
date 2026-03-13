@@ -55,18 +55,17 @@ Uncomment this section if a screenshot is needed.
 <!-- approved. -->
 
 - [ ] PR passed smoke test check.
-- [ ] Feature branch has been rebased against changes from parent branch, as needed
+- [ ] Feature branch has been rebased against changes from parent branch, as needed.
 
-  Use `Rebase branch` button below or use [this](https://www.digitalocean.com/community/tutorials/how-to-rebase-and-update-a-pull-request) reference to rebase from the command line.
-- [ ] Resolved all merge conflicts on branch
-- [ ] Notified merge coordinator that PR is ready for merge via comment mention
-- [ ] Demonstrate changes to the team for questions and comments. 
-    (Note: Only required for issues of size `Medium` or larger)
+  Use `Update branch` button below or use [this](https://www.digitalocean.com/community/tutorials/how-to-rebase-and-update-a-pull-request) reference to rebase from the command line.
+- [ ] Resolved all merge conflicts on branch.
+- [ ] Squash all commits into one PR level commit using the `Squash and merge` button.
 
 ## ✅ Post-merge checklist ##
 
 <!-- Remove any of the following that do not apply. -->
 <!-- These boxes should remain unchecked until the pull request has been -->
-<!-- approved. This section is for the merge coordinator to complete. -->
+<!-- approved. This section is for the PR assignee to complete. -->
 - [ ] Feature branch deleted after merge to clean up repository.
+- [ ] Close issues resolved by this PR if the [closing keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword) did not activate.
 - [ ] Verified that all checks pass on parent branch (e.g., main or release-name) after merge.
