@@ -148,7 +148,7 @@ Invoke-SCuBA -ProductNames teams `
   -LogIn $false
 ```
 
-> **Note**: Defender will ask for authentication even if this variable is set to false.
+> **Note**: When assessing the Security Suite baseline, Defender will ask for authentication even if this variable is set to false.
 
 ## M365Environment
 
@@ -429,23 +429,23 @@ Invoke-SCuBA -ProductNames exo `
 
 **ProductNames** provides one or more M365 shortened product names that ScubaGear will assess.
 
-| Parameter   | Value                                             |
-|-------------|---------------------------------------------------|
-| Optional    | Yes                                               |
-| Datatype    | List of Strings                                   |
-| Default     | ["aad", "defender", "exo", "sharepoint", "teams"] |
-| Config File | Yes                                               |
+| Parameter   | Value                                                  |
+|-------------|--------------------------------------------------------|
+| Optional    | Yes                                                    |
+| Datatype    | List of Strings                                        |
+| Default     | ["aad", "securitysuite", "exo", "sharepoint", "teams"] |
+| Config File | Yes                                                    |
 
 The list of acceptable values are:
 
-| Product                                      | Product Name |
-|----------------------------------------------|--------------|
-| Entra ID                                     | aad          |
-| Defender for Office 365                      | defender     |
-| Exchange Online                              | exo          |
-| Power Platform                               | powerplatform|
-| SharePoint Online and OneDrive for Business  | sharepoint   |
-| Microsoft Teams                              | teams        |
+| Product                                     | Product Name      |
+|---------------------------------------------|-------------------|
+| Entra ID                                    | aad               |
+| Security Suite                              | securitysuite     |
+| Exchange Online                             | exo               |
+| Power Platform                              | powerplatform     |
+| SharePoint Online and OneDrive for Business | sharepoint        |
+| Microsoft Teams                             | teams             |
 
 ```powershell
 # Assess two products
@@ -453,6 +453,8 @@ Invoke-SCuBA -ProductNames teams, exo
 ```
 
 >**Note**: Product names are separated by commas.
+
+>**Note**: "defender" is also accepted as a product name. It is an alias for the Security Suite baseline.
 
 ## Quiet
 
