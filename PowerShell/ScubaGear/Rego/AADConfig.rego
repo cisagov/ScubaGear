@@ -340,6 +340,19 @@ tests contains {
     AAD_3_3_Not_Applicable == true
 }
 
+# If policy is not N/A then we check that the configuration matches the baseline
+tests contains {
+    "PolicyId": "MS.AAD.3.3v2",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
+    "ActualValue": MSAuth,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    AAD_3_3_Not_Applicable == false
+    Status := MSAuthProperlyConfigured == true
+}
+
 #
 # MS.AAD.3.4v1
 #--
