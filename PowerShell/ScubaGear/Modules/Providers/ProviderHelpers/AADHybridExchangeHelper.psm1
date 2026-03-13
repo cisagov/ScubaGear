@@ -1,20 +1,5 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly
-Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials
-
-# The first-party Microsoft "Office 365 Exchange Online" application.
-# This app's service principal is instantiated in every M365 tenant automatically.
-# In legacy hybrid configurations, Exchange auth certificates were added as keyCredentials
-# to this SP — these credentials were compromised and Microsoft requires customers to
-# remove them and migrate to the new dedicated hybrid app.
-# See: https://learn.microsoft.com/en-us/Exchange/hybrid-deployment/deploy-dedicated-hybrid-app
-$OFFICE365_EXCHANGE_ONLINE_APP_ID = "00000002-0000-0ff1-ce00-000000000000"
-
-# The app role ID for full_access_as_app on Office 365 Exchange Online.
-# This is the permission that the dedicated hybrid app must have — it is hardcoded
-# in the ConfigureExchangeHybridApplication.ps1 script and cannot be customized.
-# This is the reliable identifier we use to find the dedicated hybrid app regardless
-# of what display name the customer chose for it.
-$FULL_ACCESS_AS_APP_ROLE_ID = "dc890d15-9560-4a4c-9b7f-a736ec74ec40"
+Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyPermissionsJson
 
 # Microsoft's tenant ID used to identify first-party Microsoft-owned service principals.
 # Used to filter OUT Microsoft's own apps when searching for the tenant-specific
@@ -25,6 +10,43 @@ $MICROSOFT_TENANT_IDS = @{
     "gcchigh"       = "cab8a31a-1906-4287-a0d8-4eef66b95f6e"
     "dod"           = "cab8a31a-1906-4287-a0d8-4eef66b95f6e"
     "china"         = "a55a4d5b-9241-49b1-b4ff-befa8db00269"
+}
+
+function Get-ExchangeHybridIds {
+    <#
+    .Description
+    Look up the Office 365 Exchange Online app ID and full_access_as_app role ID
+    from the RiskyPermissions.json reference.
+
+    .Functionality
+    Internal
+    #>
+    process {
+        $RiskyPermissionsJson = Get-RiskyPermissionsJson
+
+        # $ExchangeOnlineResource.Name  = appId (00000002-0000-0ff1-ce00-000000000000)
+        # $ExchangeOnlineResource.Value = display name ("Office 365 Exchange Online")
+        $ExchangeOnlineResource = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
+            $_.Value -eq "Office 365 Exchange Online"
+        } | Select-Object -First 1
+
+        if ($null -eq $ExchangeOnlineResource) {
+            throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
+        }
+
+        $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
+            $_.Value -eq "full_access_as_app"
+        } | Select-Object -First 1
+
+        if ($null -eq $FullAccessAsAppRoleId) {
+            throw "Could not find 'full_access_as_app' in RiskyPermissions.json under permissions.'$($ExchangeOnlineResource.Value)'.Application"
+        }
+
+        return @{
+            ExchangeOnlineAppId = $ExchangeOnlineResource.Name
+            FullAccessAsAppRoleId = $FullAccessAsAppRoleId.Name
+        }
+    }
 }
 
 function Get-LegacyExchangeServicePrincipal {
@@ -51,25 +73,29 @@ function Get-LegacyExchangeServicePrincipal {
     )
     process {
         try {
-            $ServicePrincipal = (Invoke-GraphDirectly `
+            $Ids = Get-ExchangeHybridIds
+
+            $ExchangeOnlineSP = (Invoke-GraphDirectly `
                 -Commandlet "Get-MgBetaServicePrincipal" `
                 -M365Environment $M365Environment `
-                -QueryParams @{ '$filter' = "appId eq '$OFFICE365_EXCHANGE_ONLINE_APP_ID'" }
+                -QueryParams @{ '$filter' = "appId eq '$($Ids.ExchangeOnlineAppId)'" }
             ).Value
 
-            if ($null -eq $ServicePrincipal) {
+            if ($null -eq $ExchangeOnlineSP) {
                 Write-Warning "Office 365 Exchange Online service principal not found in tenant."
                 return $null
             }
 
             return [PSCustomObject]@{
-                ObjectId                = $ServicePrincipal.Id
-                AppId                   = $ServicePrincipal.AppId
-                DisplayName             = $ServicePrincipal.DisplayName
-                HasKeyCredentials       = @($ServicePrincipal.KeyCredentials).Count -gt 0
-                KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                ObjectId                = $ExchangeOnlineSP.Id
+                AppId                   = $ExchangeOnlineSP.AppId
+                DisplayName             = $ExchangeOnlineSP.DisplayName
+                SignInAudience          = $ExchangeOnlineSP.SignInAudience
+                HasKeyCredentials       = @($ExchangeOnlineSP.KeyCredentials).Count -gt 0
+                KeyCredentials          = Format-Credentials -AccessKeys $ExchangeOnlineSP.KeyCredentials -IsFromApplication $false
+                PasswordCredentials     = Format-Credentials -AccessKeys $ExchangeOnlineSP.PasswordCredentials -IsFromApplication $false
+                FederatedCredentials    = $ExchangeOnlineSP.FederatedIdentityCredentials
+                AppOwnerOrganizationId  = $ExchangeOnlineSP.AppOwnerOrganizationId
             }
         }
         catch {
@@ -80,6 +106,118 @@ function Get-LegacyExchangeServicePrincipal {
     }
 }
 
+function Get-DedicatedExchangeHybridApplications {
+    <#
+    .Description
+    Queries for the tenant-specific dedicated Exchange hybrid application created by the ConfigureExchangeHybridApplication.ps1 script.
+
+    The script creates a new app registration/service principal in the specified tenant with the display name "ExchangeServerApp-{exchange organization guid}"
+    by default, but users can also specify a custom name to the script above. This function doesn't search for a specific display name, but instead
+    seaches for all tenant-owned apps assigned the full_access_as_app role.
+    
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+    process {
+        try {
+            $Ids = Get-ExchangeHybridIds
+
+            $ExchangeOnlineSP = (Invoke-GraphDirectly `
+                -Commandlet "Get-MgBetaServicePrincipal" `
+                -M365Environment $M365Environment `
+                -QueryParams @{
+                    '$filter' = "appId eq '$($Ids.ExchangeOnlineAppId)'"
+                    '$select' = "id,appId,displayName"
+                }
+            ).Value
+
+            if ($null -eq $ExchangeOnlineSP) {
+                Write-Warning "Office 365 Exchange Online service principal not found in tenant."
+                return [PSCustomObject]@{
+                    DedicatedHybridAppConfigured = $false
+                    Apps                         = $null
+                }
+            }
+
+            $AllAppRoleAssignments = (Invoke-GraphDirectly `
+                -Commandlet "Get-MgBetaServicePrincipalAppRoleAssignedTo" `
+                -M365Environment $M365Environment `
+                -Id $ExchangeOnlineSP.Id `
+            ).Value
+
+            $AppRoleAssignments = @($AllAppRoleAssignments) | Where-Object {
+                $_.AppRoleId -eq $Ids.FullAccessAsAppRoleId
+            }
+
+            if ($null -eq $AppRoleAssignments -or @($AppRoleAssignments).Count -eq 0) {
+                return [PSCustomObject]@{
+                    DedicatedHybridAppConfigured = $false
+                    Apps                         = $null
+                }
+            }
+
+            # Iterate over all service principals assigned the full_access_as_app permission
+            # since a tenant may have more than one exchange hybrid app.
+            $DedicatedHybridApps = @()
+            foreach ($Assignment in $AppRoleAssignments) {
+                $ServicePrincipal = (Invoke-GraphDirectly `
+                    -Commandlet "Get-MgBetaServicePrincipal" `
+                    -M365Environment $M365Environment `
+                    -QueryParams @{
+                        '$filter' = "id eq '$($Assignment.PrincipalId)'"
+                    }
+                ).Value
+
+                if ($null -eq $ServicePrincipal) {
+                    continue
+                }
+
+                $AppRegistration = (Invoke-GraphDirectly `
+                    -Commandlet "Get-MgBetaApplication" `
+                    -M365Environment $M365Environment `
+                    -QueryParams @{
+                        '$filter' = "appId eq '$($ServicePrincipal.AppId)'"
+                    }
+                ).Value
+
+                $ObjectIds = [PSCustomObject]@{
+                    Application      = if ($null -ne $AppRegistration) { $AppRegistration.Id } else { $null }
+                    ServicePrincipal = $ServicePrincipal.Id
+                }
+
+                $DedicatedHybridApps += [PSCustomObject]@{
+                    ObjectId                = $ObjectIds
+                    AppId                   = $ServicePrincipal.AppId
+                    DisplayName             = $ServicePrincipal.DisplayName
+                    AppRegistrationExists   = ($null -ne $AppRegistration)
+                    FullAccessAsAppRole     = $Assignment
+                    HasKeyCredentials       = @($ServicePrincipal.KeyCredentials).Count -gt 0
+                    KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                    PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                    FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                    AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
+                }
+            }
+
+            return [PSCustomObject]@{
+                DedicatedHybridAppConfigured = ($DedicatedHybridApps.Count -gt 0)
+                Apps = if ($DedicatedHybridApps.Count -gt 0) { $DedicatedHybridApps } else { $null }
+            }
+        }
+        catch {
+            Write-Warning "An error occurred in Get-DedicatedExchangeHybridApplications: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
+    }
+}
+
 Export-ModuleMember -Function @(
-    "Get-LegacyExchangeServicePrincipal"
+    "Get-LegacyExchangeServicePrincipal",
+    "Get-DedicatedExchangeHybridApplications"
 )
