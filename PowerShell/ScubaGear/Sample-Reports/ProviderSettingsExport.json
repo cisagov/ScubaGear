@@ -6062,6 +6062,14 @@
                                                      "AppOwnerOrganizationId":  "2e1de604-3fac-4568-88f8-aeb6bd229634"
                                                  }
                                              ],
+    "risky_delegated_permission_classifications": [
+        {
+            "ObjectId":  "ae4b986a-91aa-477e-908b-218fedd7484e",
+            "AppId":  "00000003-0000-0000-c000-000000000000",
+            "DisplayName":  null,
+            "RiskyPermClassifications":  []
+        }
+    ],
     "aad_successful_commands":  [
                                     "Get-MgBetaIdentityConditionalAccessPolicy",
                                     "Get-MgBetaSubscribedSku",
