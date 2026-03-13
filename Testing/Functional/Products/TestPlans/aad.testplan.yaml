@@ -667,12 +667,12 @@ TestPlan:
             Splat:
               updates:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
-                  - ManagePermissionGrantsForSelf.microsoft-user-default-legacy
+                  - ManagePermissionGrantsForSelf.microsoft-user-default-recommended
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps
+      - TestDescription: MS.AAD.5.2v1 Compliant case - Allow user to consent to verified apps with no risky delegated permission classifications
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -681,6 +681,20 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-low
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps with risky delegated permission classifications
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
+                  - ManagePermissionGrantsForSelf.microsoft-user-default-low
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
+                  - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+                risky_delegated_permission_classifications[0].RiskyPermClassifications:
+                  - "Mail.Send"
+                  - "Mail.Read"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - empty grant policy
