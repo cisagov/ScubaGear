@@ -213,11 +213,11 @@ function Export-AADProvider {
         })
     )
 
-    #$DedicatedExchangeHybridApp = ConvertTo-Json -Depth 3 @(
-    #    $Tracker.TryCommand("Get-DedicatedExchangeHybridApplication", @{
-    #        "M365Environment"=$M365Environment
-    #    })
-    #)
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 3 @(
+        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
+            "M365Environment"=$M365Environment
+        })
+    )
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -242,6 +242,7 @@ function Export-AADProvider {
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
     "legacy_exchange_service_principal": $LegacyExchangeSP,
+    "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
