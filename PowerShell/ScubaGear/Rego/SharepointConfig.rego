@@ -128,7 +128,7 @@ tests contains {
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
 NoteArray := [
-    "Note that we currently only check for approved external domains or if sharing is set to Only people in your organization.",
+    "Note that we currently only check for approved external domains.",
     "Approved security groups are currently not being checked,",
     "see the baseline policy for instructions on a manual check."
 ]
