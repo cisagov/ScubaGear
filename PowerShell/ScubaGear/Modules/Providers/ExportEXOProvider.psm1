@@ -105,12 +105,8 @@ function Export-EXOProvider {
     $Config = ConvertTo-Json @($Config)
 
     # Hybrid / connector configuration
-    $InboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-InboundConnector", @{
-        "InboundTestModeConnectors"=$true
-    })) -Depth 4
-    $OutboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-OutboundConnector", @{
-        "InboundTestModeConnectors"=$true
-    })) -Depth 4
+    $InboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-InboundConnector")) -Depth 4
+    $OutboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-OutboundConnector")) -Depth 4
     $IntraOrgConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-IntraOrganizationConnector")) -Depth 4
     $OrgRelationships = ConvertTo-Json @($Tracker.TryCommand("Get-OrganizationRelationship")) -Depth 4
 
