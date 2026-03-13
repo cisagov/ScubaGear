@@ -105,7 +105,7 @@ test_SharingCapability_ExistingGuests_NotApplicable_V1 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 # Test if the Sharepoint external sharing slider is set to "New and existing guests".
@@ -123,7 +123,7 @@ test_SharingCapability_NewExistingGuests_NotApplicable_V1 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 # Test if the Sharepoint external sharing slider is set to "Only people in your organization".
@@ -139,7 +139,7 @@ test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V2 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 # Test if the Sharepoint external sharing slider is set to "Existing guests".
@@ -157,7 +157,7 @@ test_SharingCapability_ExistingGuests_NotApplicable_V2 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 # Test if the Sharepoint external sharing slider is set to "New and existing guests".
@@ -175,7 +175,7 @@ test_SharingCapability_NewExistingGuests_NotApplicable_V2 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 #--
 
@@ -328,7 +328,7 @@ test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicab
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 test_File_Folder_AnonymousLinkType_SharingCapability_ExistingGuests_NotApplicable if {
@@ -345,7 +345,7 @@ test_File_Folder_AnonymousLinkType_SharingCapability_ExistingGuests_NotApplicabl
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplicable if {
@@ -362,7 +362,7 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 #
@@ -444,7 +444,7 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
         "This policy is only applicable if the external sharing slider in the SharePoint admin center",
         "is set to Anyone or New and Existing Guests. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable if {
@@ -460,6 +460,6 @@ test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable i
         "This policy is only applicable if the external sharing slider in the SharePoint admin center",
         "is set to Anyone or New and Existing Guests. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 #--
