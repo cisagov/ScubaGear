@@ -5,13 +5,13 @@
 .DESCRIPTION
     This script is designed to be run as part of the GitHub Actions workflow to automatically
     generate the machine-readable ScubaBaseline.json from the authoritative markdown baseline files.
-    
+
     The script:
     - Parses all baseline markdown files in PowerShell/ScubaGear/baselines/
     - Extracts policy details, exclusion mappings, and metadata
     - Generates a versioned JSON output file
     - Places the file in the PowerShell/ScubaGear/schema/ directory for inclusion in the module package
-    
+
     This ensures the machine-readable SCBs are always in sync with the markdown source of truth.
 
 .PARAMETER OutputPath
@@ -55,14 +55,14 @@ $ErrorActionPreference = 'Stop'
 
 # Get the repository root (2 levels up from utils/workflow)
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-Write-Host "Repository root: $RepoRoot"
+Write-Output "Repository root: $RepoRoot"
 
 # Resolve absolute paths
 $BaselineDirectoryPath = Join-Path $RepoRoot $BaselineDirectory
 $OutputFilePath = Join-Path $RepoRoot $OutputPath
 
-Write-Host "Baseline directory: $BaselineDirectoryPath"
-Write-Host "Output file: $OutputFilePath"
+Write-Output "Baseline directory: $BaselineDirectoryPath"
+Write-Output "Output file: $OutputFilePath"
 
 # Verify baseline directory exists
 if (-not (Test-Path $BaselineDirectoryPath)) {
@@ -75,20 +75,20 @@ if (-not (Test-Path $ModulePath)) {
     throw "Baseline schema helper module not found: $ModulePath"
 }
 
-Write-Host "Importing module: $ModulePath"
+Write-Output "Importing module: $ModulePath"
 Import-Module $ModulePath -Force -Verbose:$false
 
 # Generate the baseline JSON
-Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "Generating ScubaBaseline.json from markdown files" -ForegroundColor Cyan
-Write-Host "========================================`n" -ForegroundColor Cyan
+Write-Output "`n========================================"
+Write-Output "Generating ScubaBaseline.json from markdown files"
+Write-Output "========================================`n"
 
 try {
     # Create output directory if it doesn't exist
     $OutputDir = Split-Path -Parent $OutputFilePath
     if (-not (Test-Path $OutputDir)) {
         New-Item -Path $OutputDir -ItemType Directory -Force | Out-Null
-        Write-Host "Created output directory: $OutputDir"
+        Write-Output "Created output directory: $OutputDir"
     }
 
     # Use the module function to generate the baseline
@@ -96,16 +96,16 @@ try {
         -BaselineFilePath $OutputFilePath `
         -BaselineDirectory $BaselineDirectoryPath
 
-    Write-Host "`n========================================" -ForegroundColor Green
-    Write-Host "✓ Successfully generated ScubaBaseline.json" -ForegroundColor Green
-    Write-Host "========================================" -ForegroundColor Green
-    Write-Host "Output file: $OutputFilePath" -ForegroundColor Green
-    
+    Write-Output "`n========================================"
+    Write-Output "✓ Successfully generated ScubaBaseline.json"
+    Write-Output "========================================"
+    Write-Output "Output file: $OutputFilePath"
+
     # Get file size
     $FileInfo = Get-Item $OutputFilePath
     $FileSizeKB = [math]::Round($FileInfo.Length / 1KB, 2)
-    Write-Host "File size: $FileSizeKB KB" -ForegroundColor Green
-    
+    Write-Output "File size: $FileSizeKB KB"
+
     # Count products and policies
     $JsonContent = Get-Content $OutputFilePath -Raw | ConvertFrom-Json
     $ProductCount = $JsonContent.baselines.PSObject.Properties.Count
@@ -113,20 +113,20 @@ try {
     foreach ($product in $JsonContent.baselines.PSObject.Properties) {
         $TotalPolicies += $product.Value.Count
     }
-    
-    Write-Host "Products: $ProductCount" -ForegroundColor Green
-    Write-Host "Total Policies: $TotalPolicies" -ForegroundColor Green
-    Write-Host "Version: $($JsonContent.Version)" -ForegroundColor Green
+
+    Write-Output "Products: $ProductCount"
+    Write-Output "Total Policies: $TotalPolicies"
+    Write-Output "Version: $($JsonContent.Version)"
 
     # Validate if requested
     if ($Validate) {
-        Write-Host "`n========================================" -ForegroundColor Cyan
-        Write-Host "Validating generated JSON" -ForegroundColor Cyan
-        Write-Host "========================================`n" -ForegroundColor Cyan
-        
+        Write-Output "`n========================================"
+        Write-Output "Validating generated JSON"
+        Write-Output "========================================`n"
+
         # Basic validation checks
         $ValidationErrors = @()
-        
+
         # Check required top-level properties
         $RequiredProps = @('Version', 'DebugMode', 'baselines')
         foreach ($prop in $RequiredProps) {
@@ -134,7 +134,7 @@ try {
                 $ValidationErrors += "Missing required property: $prop"
             }
         }
-        
+
         # Validate each policy has required fields
         $RequiredPolicyFields = @('id', 'name', 'policySection', 'sectionDescription', 'exclusionField', 'omissionField', 'annotationField')
         foreach ($product in $JsonContent.baselines.PSObject.Properties) {
@@ -147,27 +147,27 @@ try {
                 }
             }
         }
-        
+
         if ($ValidationErrors.Count -eq 0) {
-            Write-Host "✓ Validation passed - No errors found" -ForegroundColor Green
+            Write-Output "✓ Validation passed - No errors found"
         } else {
-            Write-Host "✗ Validation failed with $($ValidationErrors.Count) error(s):" -ForegroundColor Red
+            Write-Error "✗ Validation failed with $($ValidationErrors.Count) error(s):"
             foreach ($error in $ValidationErrors) {
-                Write-Host "  - $error" -ForegroundColor Red
+                Write-Error "  - $error"
             }
             exit 1
         }
     }
 
-    Write-Host "`n========================================" -ForegroundColor Cyan
-    Write-Host "Generation Complete" -ForegroundColor Cyan
-    Write-Host "========================================`n" -ForegroundColor Cyan
+    Write-Output "`n========================================"
+    Write-Output "Generation Complete"
+    Write-Output "========================================`n"
 
 } catch {
-    Write-Host "`n========================================" -ForegroundColor Red
-    Write-Host "✗ Error generating ScubaBaseline.json" -ForegroundColor Red
-    Write-Host "========================================" -ForegroundColor Red
-    Write-Host $_.Exception.Message -ForegroundColor Red
-    Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    Write-Output "`n========================================"
+    Write-Error "✗ Error generating ScubaBaseline.json"
+    Write-Output "========================================"
+    Write-Error $_.Exception.Message
+    Write-Error $_.ScriptStackTrace
     exit 1
 }
