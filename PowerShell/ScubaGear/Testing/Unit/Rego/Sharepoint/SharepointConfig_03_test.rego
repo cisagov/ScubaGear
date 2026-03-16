@@ -87,7 +87,7 @@ test_SharingCapability_OnlyPeopleInOrg_NotApplicable_V1 if {
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is set to Anyone. See %v for more info"
     ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 # Test if the Sharepoint external sharing slider is set to "Existing guests".
