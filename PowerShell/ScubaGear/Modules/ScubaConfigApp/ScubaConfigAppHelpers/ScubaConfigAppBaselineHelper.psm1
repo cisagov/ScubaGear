@@ -699,7 +699,50 @@ function Get-ScubaBaselineSections {
         }
     }
 
-    return $policiesByProduct
+    return $result
+}
+
+function Get-ScubaPolicyImplementation {
+    <#
+    .SYNOPSIS
+    Extracts implementation instructions for a specific policy
+    #>
+    param(
+        [string]$Content,
+        [string]$PolicyId
+    )
+
+    # Look for implementation section for this policy
+    $pattern = "(?ms)^####\s+$PolicyId\s+Instructions\s*\n(.*?)(?=^####|^###|^##|\z)"
+
+    if ($Content -match $pattern) {
+        $implementation = $matches[1].Trim()
+
+        # Normalize smart quotes to straight quotes
+        $implementation = $implementation -replace [char]0x201C, '"'  # Left double quotation mark
+        $implementation = $implementation -replace [char]0x201D, '"'  # Right double quotation mark
+        $implementation = $implementation -replace [char]0x2019, "'"  # Right single quotation mark
+
+        # Clean up markdown code blocks
+        # First, handle indented code blocks (4+ spaces or 1+ tabs followed by backticks)
+        $implementation = $implementation -replace '(?ms)^[ \t]*```[\w]*\r?\n(.*?)\r?\n[ \t]*```[ \t]*$', '$1'
+
+        # Handle regular code blocks at start of line
+        $implementation = $implementation -replace '(?ms)^```[\w]*\r?\n(.*?)\r?\n```[ \t]*$', '$1'
+
+        # Handle inline code blocks and remaining artifacts
+        $implementation = $implementation -replace '```[\w]*\r?\n?', ''
+        $implementation = $implementation -replace '\r?\n?```', ''
+        $implementation = $implementation -replace '```', ''
+
+        # Clean up extra whitespace that might remain
+        $implementation = $implementation -replace '^\s+', ''
+        $implementation = $implementation -replace '\s+$', ''
+
+        return $implementation
+    }
+
+    return ""
 }
 
 function Get-ScubaPolicyContent {
