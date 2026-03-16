@@ -139,9 +139,9 @@ try {
         }
 
         if ($ValidationErrors.Count -eq 0) {
-            Write-Output "✓ Validation passed - No errors found"
+            Write-Output "Validation passed - No errors found"
         } else {
-            Write-Error "✗ Validation failed with $($ValidationErrors.Count) error(s):"
+            Write-Error "Validation failed with $($ValidationErrors.Count) error(s):"
             foreach ($error in $ValidationErrors) {
                 Write-Error "  - $error"
             }
