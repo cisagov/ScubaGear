@@ -78,10 +78,6 @@ if (-not (Test-Path $ModulePath)) {
 Write-Output "Importing module: $ModulePath"
 Import-Module $ModulePath -Force -Verbose:$false
 
-# Generate the baseline JSON
-Write-Output "`n========================================"
-Write-Output "Generating ScubaBaseline.json from markdown files"
-Write-Output "========================================`n"
 
 try {
     # Create output directory if it doesn't exist
@@ -96,9 +92,6 @@ try {
         -BaselineFilePath $OutputFilePath `
         -BaselineDirectory $BaselineDirectoryPath
 
-    Write-Output "`n========================================"
-    Write-Output "✓ Successfully generated ScubaBaseline.json"
-    Write-Output "========================================"
     Write-Output "Output file: $OutputFilePath"
 
     # Get file size
@@ -120,9 +113,6 @@ try {
 
     # Validate if requested
     if ($Validate) {
-        Write-Output "`n========================================"
-        Write-Output "Validating generated JSON"
-        Write-Output "========================================`n"
 
         # Basic validation checks
         $ValidationErrors = @()
@@ -159,14 +149,7 @@ try {
         }
     }
 
-    Write-Output "`n========================================"
-    Write-Output "Generation Complete"
-    Write-Output "========================================`n"
-
 } catch {
-    Write-Output "`n========================================"
-    Write-Error "✗ Error generating ScubaBaseline.json"
-    Write-Output "========================================"
     Write-Error $_.Exception.Message
     Write-Error $_.ScriptStackTrace
     exit 1
