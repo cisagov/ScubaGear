@@ -1,4 +1,4 @@
-# How to update ScubaGear baselines json from markdown
+﻿# How to update ScubaGear baselines json from markdown
 
 This guide walks through the recommended process to update Scuba baseline JSON files using both the markdown and the Rego-based baseline tooling.
 
@@ -47,7 +47,7 @@ Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json"
 
 #### Update but filter specific products (repo_)
 
-This will only pull baseline from certain products. 
+This will only pull baseline from certain products.
 
 ```powershell
 Update-ScubaConfigBaselineWithRego -ConfigFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
