@@ -334,15 +334,15 @@ Function Start-SCuBAConfigApp {
         # Strategy 0: Published schema baseline JSON (highest priority - pre-generated baseline)
         try {
             Write-DebugOutput -Message "Attempting to load pre-generated baseline from schema folder" -Source $source -Level "Verbose"
-            
+
             # Schema folder is at: ...\PowerShell\ScubaGear\schema\ScubaBaseline.json
             # PSScriptRoot is: ...\PowerShell\ScubaGear\Modules\ScubaConfigApp
             $SchemaBaselinePath = Join-Path $ModuleBasePath "..\schema\ScubaBaseline.json"
             $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
-            
+
             if (Test-Path $SchemaBaselineResolved) {
                 Write-DebugOutput -Message "Found published baseline at: $SchemaBaselineResolved" -Source $source -Level "Verbose"
-                
+
                 $JsonConfigData = (Get-Content -Path $SchemaBaselineResolved -Raw | ConvertFrom-Json)
                 $syncHash.Baselines = $JsonConfigData.baselines
                 Write-DebugOutput -Message "Successfully loaded baselines using: Published Schema JSON" -Source $source -Level "Info"
@@ -1421,7 +1421,7 @@ Function Show-SCuBABaselinePolicyViewer {
         # Strategy 1: Try to use pre-generated baseline from schema folder (highest priority)
         $usePublishedBaseline = $false
         $SchemaBaselinePath = Join-Path $PSScriptRoot "..\..\schema\ScubaBaseline.json"
-        
+
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
             # No custom baseline specified, check for published baseline
             if (Test-Path $SchemaBaselinePath) {
@@ -1435,7 +1435,7 @@ Function Show-SCuBABaselinePolicyViewer {
         # Strategy 2: Generate baseline from markdown (fallback for custom baselines or if published baseline not found)
         if (-not $usePublishedBaseline) {
             Write-Output "Generating baseline from markdown files..."
-            
+
             # Use the same path resolution as Start-SCuBAConfigApp
             if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
                 # Use the exact same approach as Start-SCuBAConfigApp
@@ -1631,7 +1631,7 @@ Function Show-SCuBABaselinePolicyViewer {
         if ($progressSync.Error) {
             throw "Baseline generation failed: $($progressSync.Error)"
         }
-        
+
         } # End if (-not $usePublishedBaseline)
 
         Write-Output "Launching baseline policy viewer UI..."
