@@ -60,16 +60,16 @@ jobs:
           foreach ($file in $changedFiles) {
             if ($baselineFiles -contains $file) {
               $baselineChanged = $true
-              Write-Host "Baseline file changed: $file"
+              Write-Output "Baseline file changed: $file"
             }
           }
 
           # Set output for next steps
           if ($baselineChanged) {
-            Write-Host "Baseline markdown files have changed - will generate JSON"
+            Write-Output "Baseline markdown files have changed - will generate JSON"
             "baseline_changed=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           } else {
-            Write-Host "Only workflow files changed - skipping JSON generation"
+            Write-Output "Only workflow files changed - skipping JSON generation"
             "baseline_changed=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
 
@@ -77,14 +77,10 @@ jobs:
         if: steps.check_changes.outputs.baseline_changed == 'true'
         shell: pwsh
         run: |
-          Write-Host "========================================" -ForegroundColor Cyan
-          Write-Host "Generating ScubaBaseline.json" -ForegroundColor Cyan
-          Write-Host "========================================`n" -ForegroundColor Cyan
-
           # Run the generation script with validation and output to schema folder
           .\utils\workflow\Generate-ScubaBaseline.ps1 -OutputPath "PowerShell/ScubaGear/schema/ScubaBaseline.json" -Validate
 
-          Write-Host "`nGeneration complete!"
+          Write-Output "`nGeneration complete!"
 
       - name: Check for changes to commit
         if: steps.check_changes.outputs.baseline_changed == 'true'
@@ -94,10 +90,10 @@ jobs:
           # Check if ScubaBaseline.json was modified
           $status = git status --porcelain PowerShell/ScubaGear/schema/ScubaBaseline.json
           if ($status) {
-            Write-Host "ScubaBaseline.json has been modified"
+            Write-Output "ScubaBaseline.json has been modified"
             "has_changes=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           } else {
-            Write-Host "No changes to ScubaBaseline.json"
+            Write-Output "No changes to ScubaBaseline.json"
             "has_changes=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           }
 
@@ -105,7 +101,7 @@ jobs:
         if: steps.check_commit.outputs.has_changes == 'true'
         shell: pwsh
         run: |
-          Write-Host "Committing updated ScubaBaseline.json to PR branch" -ForegroundColor Green
+          Write-Output "Committing updated ScubaBaseline.json to PR branch"
 
           # Add the generated file
           git add PowerShell/ScubaGear/schema/ScubaBaseline.json
@@ -123,7 +119,7 @@ jobs:
           # Push to the PR branch
           git push origin HEAD:${{ github.head_ref }}
 
-          Write-Host "✓ Successfully committed and pushed ScubaBaseline.json" -ForegroundColor Green
+          Write-Output "Successfully committed and pushed ScubaBaseline.json"
 
       - name: Add PR comment
         if: steps.check_commit.outputs.has_changes == 'true'
@@ -160,21 +156,15 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          Write-Host "`n========================================" -ForegroundColor Cyan
-          Write-Host "Workflow Summary" -ForegroundColor Cyan
-          Write-Host "========================================" -ForegroundColor Cyan
-
           if ("${{ steps.check_changes.outputs.baseline_changed }}" -eq "true") {
-            Write-Host "✓ Baseline markdown files changed" -ForegroundColor Green
+            Write-Output "Baseline markdown files changed"
 
             if ("${{ steps.check_commit.outputs.has_changes }}" -eq "true") {
-              Write-Host "✓ ScubaBaseline.json generated and committed" -ForegroundColor Green
+              Write-Output "ScubaBaseline.json generated and committed"
             } else {
-              Write-Host "ℹ ScubaBaseline.json unchanged (no updates needed)" -ForegroundColor Yellow
+              Write-Output "ScubaBaseline.json unchanged (no updates needed)"
             }
           } else {
-            Write-Host "ℹ No baseline markdown changes detected" -ForegroundColor Yellow
-            Write-Host "  Only workflow/script files were modified" -ForegroundColor Yellow
+            Write-Output "No baseline markdown changes detected"
+            Write-Output "  Only workflow/script files were modified"
           }
-
-          Write-Host "`n========================================`n" -ForegroundColor Cyan
