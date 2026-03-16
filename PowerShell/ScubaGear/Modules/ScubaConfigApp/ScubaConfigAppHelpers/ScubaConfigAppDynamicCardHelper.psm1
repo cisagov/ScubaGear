@@ -101,7 +101,7 @@ Function Test-FieldValidation {
     .SYNOPSIS
     Validates both required fields and regex patterns for all fields in a policy card.
     .DESCRIPTION
-    This function performs comprehensive validation including:
+    This function performs validation including:
     - Required field validation (fields marked as required must have values)
     - Regex pattern validation (any field with a value must match its pattern if defined)
     Returns both missing required fields and format validation errors.
@@ -810,7 +810,7 @@ function Add-FieldListControl {
 Function New-FieldListCard {
     <#
     .SYNOPSIS
-    Creates a comprehensive field card UI element for policy configuration.
+    Creates a field card UI element for policy configuration.
     .DESCRIPTION
     This Function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
     When using -OutPolicyOnly, specify -SettingsTypeName to indicate which settings type to save for AutoSave functionality.
@@ -1293,7 +1293,7 @@ Function New-FieldListCard {
         # Get the details panel (parent of button panel)
         $detailsPanel = $this.Parent.Parent
 
-        # Perform comprehensive validation (required fields + regex patterns)
+        # Perform validation (required fields + regex patterns)
         $validationResults = Test-FieldValidation -detailsPanel $detailsPanel -validInputFields $validInputFields -policyId $policyId -CardName $CardName
 
         # Check for validation errors
