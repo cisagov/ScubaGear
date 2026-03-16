@@ -7,7 +7,14 @@ $markdownMappings = Get-ScubaConfigExclusionMappingsFromMarkdown -BaselineDirect
 
 # Update configuration using markdown mappings from GitHub
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
+# Update configuration using markdown mappings from GitHub
+Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
 
+# Update configuration using local markdown files
+Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -BaselineDirectory "..\..\..\baselines"
+
+# Filter specific products -
+Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 # Update configuration using local markdown files
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -BaselineDirectory "..\..\..\baselines"
 
@@ -15,6 +22,7 @@ Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 
 # Update configuration with additional fields
+Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -AdditionalFields @('criticality')
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -AdditionalFields @('criticality')
 #>
 
@@ -337,50 +345,9 @@ function Update-ScubaConfigBaselineWithMarkdown {
     # Update the configuration
     $configContent.baselines = $newBaselines
 
-    # Fix common UTF-8 encoding issues BEFORE converting to JSON
-    # This ensures proper JSON escaping of the replaced characters
-    $configJson = $configContent | ConvertTo-Json -Depth 10 -Compress | ConvertFrom-Json
-    
-    # Recursively clean smart quotes and encoding issues from all string properties
-    function Set-JsonStrings {
-        param($obj)
-        
-        if ($null -eq $obj) { return $obj }
-        
-        if ($obj -is [string]) {
-            # Replace smart quotes and malformed characters
-            $cleaned = $obj -replace ([char]0x2019), "'"        # Right single quotation mark
-            $cleaned = $cleaned -replace ([char]0x201C), '"'    # Left double quotation mark  
-            $cleaned = $cleaned -replace ([char]0x201D), '"'    # Right double quotation mark
-            $cleaned = $cleaned -replace 'â€"', "—"           # Fix malformed double dash
-            $cleaned = $cleaned -replace 'â€™', "'"           # Fix malformed apostrophe
-            $cleaned = $cleaned -replace 'â€œ', '"'           # Fix malformed left quote
-            $cleaned = $cleaned -replace 'â€', '"'            # Fix malformed right quote
-            return $cleaned
-        }
-        elseif ($obj -is [array]) {
-            for ($i = 0; $i -lt $obj.Count; $i++) {
-                $obj[$i] = Set-JsonStrings $obj[$i]
-            }
-            return $obj
-        }
-        elseif ($obj -is [PSCustomObject] -or $obj -is [hashtable]) {
-            $obj.PSObject.Properties | ForEach-Object {
-                $_.Value = Set-JsonStrings $_.Value
-            }
-            return $obj
-        }
-        
-        return $obj
-    }
-    
-    # Clean all strings in the configuration
-    $cleanedConfig = Set-JsonStrings $configJson
-    
-    # Now convert to JSON with cleaned strings
-    $jsonOutput = $cleanedConfig | ConvertTo-Json -Depth 10
-
-    $jsonOutput | Set-Content $BaselineFilePath -Encoding UTF8
+    # Save the updated configuration
+    $jsonOutput = $configContent | ConvertTo-Json -Depth 10
+    $jsonOutput | Set-Content $ConfigFilePath -Encoding UTF8
 
     Write-Output "Successfully updated baselines in configuration file: $BaselineFilePath"
     Write-Output "Updated products: $($newBaselines.Keys -join ', ')"
@@ -707,132 +674,32 @@ function Get-ScubaBaselineSections {
         $currentContent += $line
     }
 
-    # Save final policy and section
-    if ($currentPolicy -and $currentSection) {
-        $currentPolicy.Content = ($currentContent -join "`n").Trim()
-        $policyDetails = Get-ScubaPolicyContent -Content $currentPolicy.Content
-        $currentPolicy.Criticality = $policyDetails.Criticality
-        $currentPolicy.LastModified = $policyDetails.LastModified
-        $currentPolicy.Rationale = $policyDetails.Rationale
-        $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
-        $currentPolicy.Badges = $policyDetails.Badges
-        $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
-        $null = $currentSection.Policies.Add($currentPolicy)
-    }
-
-    # Process final section content
-    if ($currentSection) {
-        if ($currentSubSection -eq "Resources") {
-            $currentSection.Resources = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources"
-        } elseif ($currentSubSection -eq "License Requirements") {
-            $sectionLicenseReq = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "LicenseRequirements"
-            $currentSection.LicenseRequirements = if ($sectionLicenseReq -and $sectionLicenseReq.Count -gt 0) { $sectionLicenseReq } else { @("N/A") }
+        if ($currentPolicy) {
+            $currentPolicy.Content = ($currentContent -join "`n").Trim()
+            $fullContent = $currentPolicy.Content
+            $policyDetails = Get-ScubaPolicyContent -Content $fullContent
+            $currentPolicy.Criticality = $policyDetails.Criticality
+            $currentPolicy.LastModified = $policyDetails.LastModified
+            $currentPolicy.Rationale = $policyDetails.Rationale
+            $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
+            $currentPolicy.Resources = $policyDetails.Resources
+            $policies += $currentPolicy
         }
-        $sections += $currentSection
-    }
 
-    return $sections
-}
-
-function Get-ScubaSectionContent {
-    <#
-    .SYNOPSIS
-    Parses section content for Resources or License Requirements
-    #>
-    param(
-        [string]$Content,
-        [string]$ContentType
-    )
-
-    $result = @()
-
-    if ($ContentType -eq "Resources") {
-        # Parse links for Resources
-        $linkPattern = '\[([^\]]+)\]\(([^)]+)\)'
-        $linkMatches = [regex]::Matches($Content, $linkPattern)
-
-        foreach ($match in $linkMatches) {
-            $linkName = $match.Groups[1].Value.Trim()
-            $linkUrl = $match.Groups[2].Value.Trim()
-            $result += @{ Name = $linkName; Url = $linkUrl }
-        }
-    }
-    elseif ($ContentType -eq "LicenseRequirements") {
-        # Parse bullet points for License Requirements - only split on actual bullets
-        # Use regex to find lines that start with bullet markers (- at beginning of line, possibly with whitespace)
-        $lines = $Content -split "`r?`n"
-        $currentBullet = ""
-
-        foreach ($line in $lines) {
-            $line = $line.Trim()
-            if ($line -match '^-\s*(.*)$') {
-                # This is a new bullet point - save previous one if it exists
-                if (-not [string]::IsNullOrWhiteSpace($currentBullet)) {
-                    $result += $currentBullet.Trim()
-                }
-                # Start new bullet with the content after the dash
-                $currentBullet = $matches[1].Trim()
-            } elseif (-not [string]::IsNullOrWhiteSpace($line) -and -not [string]::IsNullOrWhiteSpace($currentBullet)) {
-                # This is a continuation of the current bullet point
-                $currentBullet += " " + $line
+        # Attach implementation instructions to the policies
+        foreach ($policy in $policies) {
+            if ($implementationInstructions.ContainsKey($policy.PolicyId)) {
+                $policy.Implementation = $implementationInstructions[$policy.PolicyId]
             }
         }
 
-        # Don't forget the last bullet point
-        if (-not [string]::IsNullOrWhiteSpace($currentBullet)) {
-            $result += $currentBullet.Trim()
-        }
-
-        # If no bullets found, ensure we still return an array (even if empty)
-        if ($result.Count -eq 0) {
-            $result = @()
+        if ($policies.Count -gt 0) {
+            $productName = ($file.Name -replace '\.md$', '').ToLower()
+            $policiesByProduct[$productName] = $policies
         }
     }
 
-    return $result
-}
-
-function Get-ScubaPolicyImplementation {
-    <#
-    .SYNOPSIS
-    Extracts implementation instructions for a specific policy
-    #>
-    param(
-        [string]$Content,
-        [string]$PolicyId
-    )
-
-    # Look for implementation section for this policy
-    $pattern = "(?ms)^####\s+$PolicyId\s+Instructions\s*\n(.*?)(?=^####|^###|^##|\z)"
-
-    if ($Content -match $pattern) {
-        $implementation = $matches[1].Trim()
-
-        # Normalize smart quotes to straight quotes
-        $implementation = $implementation -replace [char]0x201C, '"'  # Left double quotation mark
-        $implementation = $implementation -replace [char]0x201D, '"'  # Right double quotation mark
-        $implementation = $implementation -replace [char]0x2019, "'"  # Right single quotation mark
-
-        # Clean up markdown code blocks
-        # First, handle indented code blocks (4+ spaces or 1+ tabs followed by backticks)
-        $implementation = $implementation -replace '(?ms)^[ \t]*```[\w]*\r?\n(.*?)\r?\n[ \t]*```[ \t]*$', '$1'
-
-        # Handle regular code blocks at start of line
-        $implementation = $implementation -replace '(?ms)^```[\w]*\r?\n(.*?)\r?\n```[ \t]*$', '$1'
-
-        # Handle inline code blocks and remaining artifacts
-        $implementation = $implementation -replace '```[\w]*\r?\n?', ''
-        $implementation = $implementation -replace '\r?\n?```', ''
-        $implementation = $implementation -replace '```', ''
-
-        # Clean up extra whitespace that might remain
-        $implementation = $implementation -replace '^\s+', ''
-        $implementation = $implementation -replace '\s+$', ''
-
-        return $implementation
-    }
-
-    return ""
+    return $policiesByProduct
 }
 
 function Get-ScubaPolicyContent {
