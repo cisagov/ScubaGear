@@ -605,7 +605,7 @@ test_MicrosoftAuthDisabled_NotApplicable if {
         "This policy is only applicable if MS Authenticator is enabled.",
         "See %v for more info"])
 
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == false
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailStr), true) == true
 }
 # Test 2: MicrosoftAuthEnabled, isSoftwareOathEnabled true, displayAppInformationRequiredState enabled for not_all_users, 
 # displayLocationInformationRequiredState enabled for all_users
