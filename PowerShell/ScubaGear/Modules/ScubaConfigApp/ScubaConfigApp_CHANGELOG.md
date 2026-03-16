@@ -39,6 +39,23 @@
 - Aligned baseline loading logic with branch design for published baseline schema package
 
 
+## 2.3.16 (03/16/2026) - Baseline Loading Performance Enhancement
+
+### Bug Fixes
+- Fixed baseline policy viewer failure when using pre-generated baseline schema
+
+### Enhancements
+- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaseline.json from schema folder
+- Updated Show-SCuBABaselinePolicyViewer to use published baseline from schema folder instead of regenerating from markdown
+- Significantly improved startup performance by eliminating markdown parsing overhead for standard use cases
+- Maintained backward compatibility for custom baseline directories and GitHub URL scenarios
+
+### Code Improvements
+- Implemented cascading baseline loading strategy with published schema as highest priority
+- Retained markdown generation fallback for development and testing workflows
+- Aligned baseline loading logic with branch design for published baseline schema package
+
+
 ## 1.9.22 [09/15/2025] - UI & Usability Improvements
 
 ### Bug Fixes
