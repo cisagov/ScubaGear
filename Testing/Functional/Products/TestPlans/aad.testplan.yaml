@@ -670,6 +670,8 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-recommended
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+                risky_delegated_permission_classifications:
+                  null
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Allow user to consent to verified apps with no risky delegated permission classifications
@@ -681,8 +683,8 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-low
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
-                risky_delegated_permission_classifications[0].RiskyPermClassifications:
-                  []
+                risky_delegated_permission_classifications:
+                  null
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps with risky delegated permission classifications
@@ -706,6 +708,8 @@ TestPlan:
               updates:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
                   []
+                risky_delegated_permission_classifications:
+                  null
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - chat teams grant policy
@@ -716,6 +720,8 @@ TestPlan:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+                risky_delegated_permission_classifications:
+                  null
         Postconditions: []
         ExpectedResult: true
 
