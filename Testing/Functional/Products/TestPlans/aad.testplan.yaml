@@ -681,6 +681,8 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-low
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
+                risky_delegated_permission_classifications[0].RiskyPermClassifications:
+                  []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps with risky delegated permission classifications
