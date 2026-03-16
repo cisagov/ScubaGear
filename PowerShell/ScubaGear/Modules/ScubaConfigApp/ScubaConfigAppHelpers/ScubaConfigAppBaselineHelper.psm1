@@ -813,7 +813,7 @@ function Get-ScubaPolicyImplementation {
         $implementation = $implementation -replace [char]0x201D, '"'  # Right double quotation mark
         $implementation = $implementation -replace [char]0x2019, "'"  # Right single quotation mark
 
-        # Clean up markdown code blocks - more comprehensive approach
+        # Clean up markdown code blocks
         # First, handle indented code blocks (4+ spaces or 1+ tabs followed by backticks)
         $implementation = $implementation -replace '(?ms)^[ \t]*```[\w]*\r?\n(.*?)\r?\n[ \t]*```[ \t]*$', '$1'
 
