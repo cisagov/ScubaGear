@@ -561,7 +561,7 @@ InModuleScope ScubaLogging {
             It "Should show 'Success' for Rego phase when no failure warning exists" {
                 $script:TestLines = $script:BaseLogLines
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match '\| Rego Evaluation \|.*Success'
                 $report | Should -Not -Match ':x: Failed'
@@ -573,7 +573,7 @@ InModuleScope ScubaLogging {
                     '    Data: {"FailedProducts":"aad"}'
                 )
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match ':x: Failed'
                 $report | Should -Match 'aad'
@@ -587,7 +587,7 @@ InModuleScope ScubaLogging {
                     '    Data: {"FailedProducts":"aad"}'
                 )
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match '## Warnings and Errors'
                 $report | Should -Not -Match '_No warnings or errors recorded\._'
@@ -600,7 +600,7 @@ InModuleScope ScubaLogging {
                     '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
                 )
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match '## Warnings and Errors'
                 $report | Should -Not -Match '_No warnings or errors recorded\._'
@@ -614,7 +614,7 @@ InModuleScope ScubaLogging {
                 )
 
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match 'OPAPath \(configured\)'
                 $report | Should -Match 'C:\\Apps'
@@ -628,7 +628,7 @@ InModuleScope ScubaLogging {
                 )
 
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 $report | Should -Match 'OPAPath \(configured\)'
                 $report | Should -Match 'C:\\MyOPA'
@@ -641,7 +641,7 @@ InModuleScope ScubaLogging {
                     '    Data: {"Product":"aad","Passes":42,"Failures":3,"Warnings":1,"Manual":5,"Omits":0,"Errors":0}'
                 )
 
-                $report = Get-ScubaDebugLogReport -LogPath $script:FakeLogPath
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
                 # ReportCreation Info entries should appear in the Run Timeline
                 $report | Should -Match 'Report created: AAD'
