@@ -1332,3 +1332,81 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
+  ### Exchange Hybrid Application Configuration
+  ### These tests use the RunScubaProvider driver — they run ScubaGear against the
+  ### live tenant and assert on ProviderSettingsExport.json directly. No Rego policy
+  ### is needed. PolicyId is a grouping label used for Pester tag filtering.
+  ### Preconditions mutate the tenant; Postconditions restore it to a clean state.
+
+  - PolicyId: ExchangeHybrid.LegacySP
+    TestDriver: RunScubaProvider
+    Tests:
+      - TestDescription: Legacy SP has no key credentials (clean/compliant state)
+        Preconditions: []
+        Postconditions: []
+        ExpectedProviderOutput:
+          - Path: legacy_exchange_service_principal[0].HasKeyCredentials
+            Value: false
+
+      - TestDescription: Legacy SP has key credentials (compromise indicator)
+        Preconditions:
+          - Command: Add-LegacyExchangeSPKeyCredential
+        Postconditions:
+          - Command: Remove-LegacyExchangeSPKeyCredential
+        ExpectedProviderOutput:
+          - Path: legacy_exchange_service_principal[0].HasKeyCredentials
+            Value: true
+
+  - PolicyId: ExchangeHybrid.DedicatedApp
+    TestDriver: RunScubaProvider
+    Tests:
+      - TestDescription: Dedicated hybrid app not configured
+        Preconditions: []
+        Postconditions: []
+        ExpectedProviderOutput:
+          - Path: dedicated_exchange_hybrid_applications[0].DedicatedHybridAppConfigured
+            Value: false
+
+      - TestDescription: Dedicated hybrid app fully configured with backing app registration
+        Preconditions:
+          - Command: New-DedicatedExchangeHybridApp
+        Postconditions:
+          - Command: Remove-DedicatedExchangeHybridApp
+        ExpectedProviderOutput:
+          - Path: dedicated_exchange_hybrid_applications[0].DedicatedHybridAppConfigured
+            Value: true
+          - Path: dedicated_exchange_hybrid_applications[0].Apps[0].AppRegistrationExists
+            Value: true
+
+      - TestDescription: Orphaned SP - app registration deleted, service principal remains
+        Preconditions:
+          - Command: New-DedicatedExchangeHybridApp
+          - Command: Remove-DedicatedExchangeHybridAppRegOnly
+        Postconditions:
+          - Command: Remove-DedicatedExchangeHybridApp
+        ExpectedProviderOutput:
+          - Path: dedicated_exchange_hybrid_applications[0].DedicatedHybridAppConfigured
+            Value: true
+          - Path: dedicated_exchange_hybrid_applications[0].Apps[0].AppRegistrationExists
+            Value: false
+
+  - PolicyId: ExchangeHybrid.Combined
+    TestDriver: RunScubaProvider
+    Tests:
+      - TestDescription: Both legacy key credentials and dedicated hybrid app are present
+        ### Simulates a tenant mid-migration - dedicated app created but old credentials
+        ### not yet removed from the legacy first-party SP
+        Preconditions:
+          - Command: Add-LegacyExchangeSPKeyCredential
+          - Command: New-DedicatedExchangeHybridApp
+        Postconditions:
+          - Command: Remove-LegacyExchangeSPKeyCredential
+          - Command: Remove-DedicatedExchangeHybridApp
+        ExpectedProviderOutput:
+          - Path: legacy_exchange_service_principal[0].HasKeyCredentials
+            Value: true
+          - Path: dedicated_exchange_hybrid_applications[0].DedicatedHybridAppConfigured
+            Value: true
+          - Path: dedicated_exchange_hybrid_applications[0].Apps[0].AppRegistrationExists
+            Value: true

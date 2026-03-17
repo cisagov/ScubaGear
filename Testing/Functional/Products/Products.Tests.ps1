@@ -56,6 +56,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Variant', Justification = 'False positive as rule does not scan child scopes')]
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ExpectedProviderOutput', Justification = 'False positive as rule does not scan child scopes')]
 
 [CmdletBinding(DefaultParameterSetName='Manual')]
 param (
@@ -167,6 +168,12 @@ BeforeAll {
     # Dot source utility functions
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
+    $script:TestState = @{
+        LegacyExchangeKeyCredentialAdded  = $false
+        DedicatedHybridTestAppId   = $null
+        DedicatedHybridTestSPId    = $null
+    }
+
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
         param(
@@ -192,7 +199,7 @@ BeforeAll {
                 $ScriptBlock = [ScriptBlock]::Create("$($Condition.Command)")
             }
             try {
-                $ScriptBlock.Invoke()
+                . $ScriptBlock
             }
             catch {
                 Write-Error "Exception: SetConditions failed. $_"
@@ -280,6 +287,17 @@ Describe "Policy Checks for <ProductName>" {
                 Remove-Item -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json"
             }
 
+            # RunScubaProvider driver: runs ScubaGear against the live tenant and validates
+            # provider data directly from ProviderSettingsExport.json, without Rego.
+            elseif ('RunScubaProvider' -eq $TestDriver) {
+                Write-Debug "Driver: RunScubaProvider"
+                SetConditions -Conditions $Preconditions.ToArray()
+                RunScuba
+                $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
+                $script:OutputFolder = $ReportFolders[0].Name
+                Write-Debug "Created Output folder (RunScubaProvider) $script:OutputFolder"
+            }
+
             else {
                 Write-Debug "Driver: $TestDriver"
                 Write-Error "Invalid Test Driver: $TestDriver"
@@ -288,25 +306,26 @@ Describe "Policy Checks for <ProductName>" {
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
             Write-Debug "OutputFolder: $OutputFolder"
-            $IntermediateTestResults = LoadTestResults($OutputFolder)
-            # Search the results object for the specific requirement we are validating and ensure the results are what we expect
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
-            $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
-            $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
-            $Url = (Get-Item $BaselineReports).FullName
-            try {
-                $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
-            }
-            catch {
-                # Sometimes Selenium fails to start in a timely manner.  When that happens,
-                # simply try again.  This is a very simplistic attempt to solve the problem,
-                # but it seems to work.
-                $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
-            }
-            Open-SeUrl $Url -Driver $Driver | Out-Null
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" -Tag $PolicyId {
+                if ('RunScubaProvider' -eq $TestDriver) {
+                    # Read ProviderSettingsExport.json directly
+                    $ProviderOutput = Get-Utf8NoBom -FilePath "$script:OutputFolder/ProviderSettingsExport.json" | ConvertFrom-Json
+                    foreach ($Assertion in $ExpectedProviderOutput) {
+                        $ActualValue = Get-NestedProviderValue -InputObject $ProviderOutput -MemberPath $Assertion.Path
+                        $ExpectedValue = $Assertion.Value
+
+                        if ($ActualValue -is [bool]) {
+                            $ExpectedValue = [System.Convert]::ToBoolean($ExpectedValue)
+                        }
+
+                        $ActualValue | Should -Be $ExpectedValue -Because "provider field '$($Assertion.Path)' should equal $($Assertion.Value)"
+                    }
+
+                    return
+                }
+
                 #Check intermediate output
                 ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
@@ -455,7 +474,9 @@ Describe "Policy Checks for <ProductName>" {
         }
         AfterEach {
             SetConditions -Conditions $Postconditions.ToArray()
-            Stop-SeDriver -Driver $Driver | Out-Null
+            if ('RunScubaProvider' -ne $TestDriver) {
+                Stop-SeDriver -Driver $Driver | Out-Null
+            }
         }
     }
 }

@@ -1892,5 +1892,103 @@
             "https://learn.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http"
         ],
         "notes": "Used by the Service Principal module to add permissions."
+    },
+
+    {
+        "moduleCmdlet": "Update-MgServicePrincipal",
+        "apiResource": "/v1.0/servicePrincipals/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-update?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": "Used by functional test helpers to add/remove key credentials on the Office 365 Exchange Online service principal to simulate legacy hybrid Exchange configurations."
+    },
+
+    {
+        "moduleCmdlet": "Remove-MgBetaServicePrincipal",
+        "apiResource": "/beta/servicePrincipals/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Beta.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": "Used by functional test helpers to remove the dedicated Exchange hybrid app service principal during test cleanup."
+    },
+
+    {
+        "moduleCmdlet": "Remove-MgBetaApplication",
+        "apiResource": "/beta/applications/{id}",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Beta.Applications"
+        ],
+        "leastPermissions": [
+            "Application.ReadWrite.All"
+        ],
+        "higherPermissions": [
+            "Directory.ReadWrite.All"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/application-delete?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": "Used by functional test helpers to remove the test app registration during cleanup of dedicated Exchange hybrid app tests."
     }
 ]
