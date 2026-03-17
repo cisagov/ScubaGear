@@ -41,6 +41,7 @@ $Script:ScubaLogEnabled = $false      # Master on/off switch checked by Write-Sc
 $Script:ScubaDeepTracing = $false     # When $true, sets global VerbosePreference/DebugPreference and calls Set-PSDebug
 $Script:ScubaLogLevel = "Info"        # Minimum severity threshold; messages below this level are silently dropped
 $Script:ScubaEnhancedTracing = $false # Tracks whether Enable-ScubaAutoTrace has been called this session
+$Script:ScubaHasErrors = $false       # Tracks if any Error or Warning messages were logged during the session
 
 function Initialize-ScubaLogging {
     <#
@@ -80,6 +81,7 @@ function Initialize-ScubaLogging {
         $Script:ScubaLogEnabled = $true
         $Script:ScubaDeepTracing = $EnableTracing
         $Script:ScubaLogLevel = $LogLevel
+        $Script:ScubaHasErrors = $false  # Reset error tracking for new session
 
         # Setup log directory and file path with timestamp
         if ($LogPath) {
@@ -179,6 +181,11 @@ function Write-ScubaLog {
     $levelPriority = @{ "Debug" = 0; "Info" = 1; "Warning" = 2; "Error" = 3 }
     # Return early if current message level is below the minimum configured level
     if ($levelPriority[$Level] -lt $levelPriority[$Script:ScubaLogLevel]) { return }
+    
+    # Track if errors or warnings occurred during this session
+    if ($Level -in @('Warning', 'Error')) {
+        $Script:ScubaHasErrors = $true
+    }
 
     try {
         # Create structured log entry hashtable with all relevant metadata
@@ -531,6 +538,24 @@ function Stop-ScubaLogging {
             if ($Script:ScubaLogPath) {
                 Write-Output "   Log saved: $Script:ScubaLogPath"
             }
+
+            # Auto-generate debug report if errors or warnings were logged
+            if ($Script:ScubaHasErrors -and $Script:ScubaLogPath) {
+                try {
+                    $Host.UI.WriteErrorLine("Errors detected! Generating debug report...")
+                    $logDir = Split-Path $Script:ScubaLogPath -Parent
+                    $reportPath = Join-Path $logDir "ScubaGear-DebugLog-ErrorReport.md"
+                    
+                    # Generate the debug report
+                    $null = Get-ScubaDebugLogReport -DebugLogPath $Script:ScubaLogPath -OutputPath $reportPath
+                    
+                    $Host.UI.WriteErrorLine("   Debug report saved: $reportPath")
+                    $Host.UI.WriteErrorLine("   Please include this report when opening a GitHub issue.")
+                }
+                catch {
+                    Write-Warning "Failed to generate automatic debug report: $_"
+                }
+            }
         }
     }
     catch {
@@ -541,6 +566,7 @@ function Stop-ScubaLogging {
         $Script:ScubaLogPath = $null           # Clear log file path
         $Script:ScubaLogEnabled = $false       # Disable logging
         $Script:ScubaDeepTracing = $false      # Disable deep tracing
+        $Script:ScubaHasErrors = $false        # Reset error tracking
     }
 }
 
@@ -705,21 +731,49 @@ function Get-ScubaRunDetails {
             }
             Write-ScubaLog -Message "PowerShell modules captured (excluding System32)" -Level "Info" -Source "RunDetails" -Data $depData
 
-            # Log critical ScubaGear dependencies specifically
-            $criticalDeps = @('Microsoft.Graph.Authentication', 'Microsoft.Graph.Users', 'ExchangeOnlineManagement', 'MicrosoftTeams', 'PnP.PowerShell')
-            foreach ($depName in $criticalDeps) {
-                $depModule = $dependencies | Where-Object { $_.Name -eq $depName } | Sort-Object Version -Descending | Select-Object -First 1
-                if ($depModule) {
-                    $criticalDepData = @{
-                        Module = $depName
-                        Version = $depModule.Version.ToString()
-                        Path = $depModule.ModuleBase
+            # Log ScubaGear dependencies by reading from RequiredVersions.ps1
+            $requiredVersionsPath = Join-Path $PSScriptRoot "..\..\RequiredVersions.ps1"
+            $knownDependencyNames = @()
+            
+            if (Test-Path $requiredVersionsPath) {
+                try {
+                    $ModuleList = $null
+                    . $requiredVersionsPath
+                    if ($ModuleList) {
+                        $knownDependencyNames = $ModuleList | ForEach-Object { $_['ModuleName'] }
+                        Write-ScubaLog -Message "Loaded $($knownDependencyNames.Count) required dependencies from RequiredVersions.ps1" -Level "Debug" -Source "RunDetails"
                     }
-                    Write-ScubaLog -Message "Critical dependency: $depName" -Level "Debug" -Source "RunDetails" -Data $criticalDepData
+                    else {
+                        Write-ScubaLog -Message "RequiredVersions.ps1 found but `$ModuleList is empty or null" -Level "Error" -Source "RunDetails"
+                    }
                 }
-                else {
-                    Write-ScubaLog -Message "Critical dependency NOT FOUND: $depName" -Level "Warning" -Source "RunDetails"
+                catch {
+                    Write-ScubaLog -Message "Failed to read RequiredVersions.ps1: $($_.Exception.Message)" -Level "Error" -Source "RunDetails" -Exception $_.Exception
                 }
+            }
+            else {
+                Write-ScubaLog -Message "RequiredVersions.ps1 not found at: $requiredVersionsPath" -Level "Error" -Source "RunDetails"
+            }
+
+            # Log each required ScubaGear dependency specifically
+            if ($knownDependencyNames.Count -gt 0) {
+                foreach ($depName in $knownDependencyNames) {
+                    $depModule = $dependencies | Where-Object { $_.Name -eq $depName } | Sort-Object Version -Descending | Select-Object -First 1
+                    if ($depModule) {
+                        $criticalDepData = @{
+                            Module = $depName
+                            Version = $depModule.Version.ToString()
+                            Path = $depModule.ModuleBase
+                        }
+                        Write-ScubaLog -Message "Required dependency: $depName" -Level "Debug" -Source "RunDetails" -Data $criticalDepData
+                    }
+                    else {
+                        Write-ScubaLog -Message "Required dependency NOT FOUND: $depName" -Level "Warning" -Source "RunDetails"
+                    }
+                }
+            }
+            else {
+                Write-ScubaLog -Message "No required dependencies loaded from RequiredVersions.ps1 - cannot verify ScubaGear dependencies" -Level "Error" -Source "RunDetails"
             }
         }
         catch {
@@ -1070,7 +1124,7 @@ function Get-ScubaDebugLogReport {
     - All Warning and Error log entries
     - A condensed run timeline showing Info-and-above milestones in chronological order
 
-    .PARAMETER LogPath
+    .PARAMETER DebugLogPath
     Full path to the ScubaGear-DebugLog-*.log file to parse.
 
     .PARAMETER OutputPath
@@ -1095,9 +1149,21 @@ function Get-ScubaDebugLogReport {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0)]
-        [ValidateScript({ Test-Path $_ -PathType Leaf })]
-        [string]$LogPath,
+        [Parameter(Mandatory = $true, Position = 0, valueFromPipeline = $true)]
+        [ValidateScript({
+            if (-not (Test-Path $_ -PathType Leaf)) {
+                throw "File not found: $_"
+            }
+            $fileName = Split-Path $_ -Leaf
+            if ($fileName -like "*Transcript*") {
+                throw "Invalid log file: This appears to be a transcript log. Please select the DebugLog file (ScubaGear-DebugLog-*.log), not the Transcript file (ScubaGear-Transcript-*.log)."
+            }
+            if ($fileName -notlike "*DebugLog*") {
+                throw "Invalid log file: Expected a ScubaGear debug log file with 'DebugLog' in the name (e.g., ScubaGear-DebugLog-20260311-111827-956.log)."
+            }
+            $true
+        })]
+        [string]$DebugLogPath,
 
         [Parameter(Mandatory = $false)]
         [string]$OutputPath,
@@ -1125,7 +1191,7 @@ function Get-ScubaDebugLogReport {
     $entries = [System.Collections.Generic.List[PSCustomObject]]::new()
     $current = $null
 
-    foreach ($line in (Get-Content $LogPath -Encoding UTF8)) {
+    foreach ($line in (Get-Content $DebugLogPath -Encoding UTF8)) {
         if ($line -match $linePattern) {
             if ($current) { $entries.Add($current) }
             $current = [PSCustomObject]@{
@@ -1311,7 +1377,7 @@ function Get-ScubaDebugLogReport {
 
     $sb.AppendLine('# ScubaGear Debug Report') | Out-Null
     $sb.AppendLine('') | Out-Null
-    $sb.AppendLine("> **Log file:** ``$LogPath``") | Out-Null
+    $sb.AppendLine("> **Log file:** ``$DebugLogPath``") | Out-Null
     $sb.AppendLine("> **Report generated:** $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')") | Out-Null
     $sb.AppendLine('') | Out-Null
 
@@ -1501,9 +1567,68 @@ function Get-ScubaDebugLogReport {
     $sb.AppendLine('') | Out-Null
 
     # -------------------------------------------------------------------------
-    # Step 5 — Emit the report
+    # Step 5 — Apply redactions based on schema
+    # -------------------------------------------------------------------------
+    function Invoke-ScubaLogRedaction {
+        param([string]$Text)
+        
+        # Locate the schema file relative to this module
+        $schemaPath = Join-Path (Split-Path $PSCommandPath -Parent) 'ScubaLoggingRedactions.json'
+        
+        if (-not (Test-Path $schemaPath)) {
+            Write-ScubaLog -Level Warning -Source 'Get-ScubaDebugLogReport' `
+                -Message "Redaction schema not found at: $schemaPath. Skipping redactions."
+            return $Text
+        }
+        
+        try {
+            $schema = Get-Content $schemaPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            
+            $redactedText = $Text
+            $redactionCount = 0
+            
+            foreach ($rule in $schema.patterns) {
+                if (-not $rule.enabled) { continue }
+                
+                try {
+                    # Build replacement string: capture group 1 + redactionText + capture group 3
+                    # This preserves parameter names and quotes while redacting the value
+                    $replacement = "`$1$($schema.redactionText)`$3"
+                    
+                    $beforeLength = $redactedText.Length
+                    $redactedText = $redactedText -replace $rule.pattern, $replacement
+                    
+                    if ($redactedText.Length -ne $beforeLength) {
+                        $redactionCount++
+                    }
+                }
+                catch {
+                    Write-ScubaLog -Level Warning -Source 'Get-ScubaDebugLogReport' `
+                        -Message "Failed to apply redaction rule '$($rule.name)': $_"
+                }
+            }
+            
+            if ($redactionCount -gt 0) {
+                Write-ScubaLog -Level Info -Source 'Get-ScubaDebugLogReport' `
+                    -Message "Applied $redactionCount redaction rule(s) to report."
+            }
+            
+            return $redactedText
+        }
+        catch {
+            Write-ScubaLog -Level Warning -Source 'Get-ScubaDebugLogReport' `
+                -Message "Failed to load or parse redaction schema: $_. Skipping redactions."
+            return $Text
+        }
+    }
+
+    # -------------------------------------------------------------------------
+    # Step 6 — Emit the report
     # -------------------------------------------------------------------------
     $reportText = $sb.ToString()
+    
+    # Apply redactions if schema is available
+    $reportText = Invoke-ScubaLogRedaction -Text $reportText
 
     Write-Output $reportText
 
