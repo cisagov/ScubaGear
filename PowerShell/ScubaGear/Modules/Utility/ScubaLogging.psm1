@@ -181,7 +181,7 @@ function Write-ScubaLog {
     $levelPriority = @{ "Debug" = 0; "Info" = 1; "Warning" = 2; "Error" = 3 }
     # Return early if current message level is below the minimum configured level
     if ($levelPriority[$Level] -lt $levelPriority[$Script:ScubaLogLevel]) { return }
-    
+
     # Track if errors or warnings occurred during this session
     if ($Level -in @('Warning', 'Error')) {
         $Script:ScubaHasErrors = $true
@@ -545,10 +545,10 @@ function Stop-ScubaLogging {
                     $Host.UI.WriteErrorLine("Errors detected! Generating debug report...")
                     $logDir = Split-Path $Script:ScubaLogPath -Parent
                     $reportPath = Join-Path $logDir "ScubaGear-DebugLog-ErrorReport.md"
-                    
+
                     # Generate the debug report
                     $null = Get-ScubaDebugLogReport -DebugLogPath $Script:ScubaLogPath -OutputPath $reportPath
-                    
+
                     $Host.UI.WriteErrorLine("   Debug report saved: $reportPath")
                     $Host.UI.WriteErrorLine("   Please include this report when opening a GitHub issue.")
                 }
@@ -734,7 +734,7 @@ function Get-ScubaRunDetails {
             # Log ScubaGear dependencies by reading from RequiredVersions.ps1
             $requiredVersionsPath = Join-Path $PSScriptRoot "..\..\RequiredVersions.ps1"
             $knownDependencyNames = @()
-            
+
             if (Test-Path $requiredVersionsPath) {
                 try {
                     $ModuleList = $null
@@ -1149,7 +1149,7 @@ function Get-ScubaDebugLogReport {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0, valueFromPipeline = $true)]
+        [Parameter(Mandatory = $true, Position = 0]
         [ValidateScript({
             if (-not (Test-Path $_ -PathType Leaf)) {
                 throw "File not found: $_"
@@ -1571,33 +1571,33 @@ function Get-ScubaDebugLogReport {
     # -------------------------------------------------------------------------
     function Invoke-ScubaLogRedaction {
         param([string]$Text)
-        
+
         # Locate the schema file relative to this module
         $schemaPath = Join-Path (Split-Path $PSCommandPath -Parent) 'ScubaLoggingRedactions.json'
-        
+
         if (-not (Test-Path $schemaPath)) {
             Write-ScubaLog -Level Warning -Source 'Get-ScubaDebugLogReport' `
                 -Message "Redaction schema not found at: $schemaPath. Skipping redactions."
             return $Text
         }
-        
+
         try {
             $schema = Get-Content $schemaPath -Raw -Encoding UTF8 | ConvertFrom-Json
-            
+
             $redactedText = $Text
             $redactionCount = 0
-            
+
             foreach ($rule in $schema.patterns) {
                 if (-not $rule.enabled) { continue }
-                
+
                 try {
                     # Build replacement string: capture group 1 + redactionText + capture group 3
                     # This preserves parameter names and quotes while redacting the value
                     $replacement = "`$1$($schema.redactionText)`$3"
-                    
+
                     $beforeLength = $redactedText.Length
                     $redactedText = $redactedText -replace $rule.pattern, $replacement
-                    
+
                     if ($redactedText.Length -ne $beforeLength) {
                         $redactionCount++
                     }
@@ -1607,12 +1607,12 @@ function Get-ScubaDebugLogReport {
                         -Message "Failed to apply redaction rule '$($rule.name)': $_"
                 }
             }
-            
+
             if ($redactionCount -gt 0) {
                 Write-ScubaLog -Level Info -Source 'Get-ScubaDebugLogReport' `
                     -Message "Applied $redactionCount redaction rule(s) to report."
             }
-            
+
             return $redactedText
         }
         catch {
@@ -1626,7 +1626,7 @@ function Get-ScubaDebugLogReport {
     # Step 6 — Emit the report
     # -------------------------------------------------------------------------
     $reportText = $sb.ToString()
-    
+
     # Apply redactions if schema is available
     $reportText = Invoke-ScubaLogRedaction -Text $reportText
 
