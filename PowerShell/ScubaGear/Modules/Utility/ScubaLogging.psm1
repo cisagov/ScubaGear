@@ -1149,7 +1149,7 @@ function Get-ScubaDebugLogReport {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0]
+        [Parameter(Mandatory = $true, Position = 0)]
         [ValidateScript({
             if (-not (Test-Path $_ -PathType Leaf)) {
                 throw "File not found: $_"
