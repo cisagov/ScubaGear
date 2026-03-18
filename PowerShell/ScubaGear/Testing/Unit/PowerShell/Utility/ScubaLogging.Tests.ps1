@@ -39,7 +39,7 @@ InModuleScope ScubaLogging {
         Context "Initialize-ScubaLogging Function" {
 
             It "Should initialize logging with minimal parameters" {
-                Initialize-ScubaLogging
+                Initialize-ScubaLogging -DisableAutoReport
 
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaLogLevel | Should -Be "Info"
@@ -48,7 +48,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should initialize logging with log path" {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -DisableAutoReport
 
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaLogPath | Should -Match "ScubaGear-DebugLog-\d{8}-\d{6}-\d{3}\.log"
@@ -58,20 +58,20 @@ InModuleScope ScubaLogging {
             It "Should create log directory if it doesn't exist" {
                 $testPath = Join-Path $script:TestLogPath "NewDirectory"
 
-                Initialize-ScubaLogging -LogPath $testPath
+                Initialize-ScubaLogging -LogPath $testPath -DisableAutoReport
 
                 Test-Path $testPath | Should -Be $true
             }
 
             It "Should enable tracing when EnableTracing is specified" {
-                Initialize-ScubaLogging -EnableTracing
+                Initialize-ScubaLogging -EnableTracing -DisableAutoReport
 
                 $Script:ScubaDeepTracing | Should -Be $true
                 $Script:ScubaEnhancedTracing | Should -Be $true
             }
 
             It "Should set custom log level" {
-                Initialize-ScubaLogging -LogLevel "Debug"
+                Initialize-ScubaLogging -LogLevel "Debug" -DisableAutoReport
 
                 $Script:ScubaLogLevel | Should -Be "Debug"
             }
@@ -91,7 +91,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should set ScubaAutoReportEnabled to true by default" {
-                Initialize-ScubaLogging
+                Initialize-ScubaLogging  # Don't use -DisableAutoReport here - we're testing the default
 
                 $Script:ScubaAutoReportEnabled | Should -Be $true
             }
@@ -157,7 +157,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should respect log level filtering" {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Warning"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Warning" -DisableAutoReport
 
                 Write-ScubaLog -Message "Debug message" -Level "Debug"
                 Write-ScubaLog -Message "Info message" -Level "Info"
@@ -182,7 +182,7 @@ InModuleScope ScubaLogging {
         Context "Trace-ScubaFunction Function" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
             }
 
             It "Should execute script block and return result" {
@@ -267,7 +267,7 @@ InModuleScope ScubaLogging {
         Context "Write-ScubaFunctionEntry Function" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
             }
 
             It "Should log function entry with parameters" {
@@ -314,7 +314,7 @@ InModuleScope ScubaLogging {
         Context "Write-ScubaFunctionExit Function" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
             }
 
             It "Should log successful function exit" {
@@ -349,7 +349,7 @@ InModuleScope ScubaLogging {
         Context "Stop-ScubaLogging Function" {
 
             It "Should clean up logging state" {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -DisableAutoReport
 
                 Stop-ScubaLogging
 
@@ -359,7 +359,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should log shutdown message" {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -DisableAutoReport
 
                 Stop-ScubaLogging
 
@@ -370,7 +370,7 @@ InModuleScope ScubaLogging {
 
             It "Should handle errors gracefully when stopping" {
                 # Initialize without transcript to avoid Stop-Transcript errors
-                Initialize-ScubaLogging
+                Initialize-ScubaLogging -DisableAutoReport
 
                 { Stop-ScubaLogging } | Should -Not -Throw
             }
@@ -379,7 +379,7 @@ InModuleScope ScubaLogging {
         Context "Enable-ScubaAutoTrace Function" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
             }
 
             It "Should enable enhanced tracing" {
@@ -406,7 +406,7 @@ InModuleScope ScubaLogging {
         Context "Module State Management" {
 
             It "Should maintain consistent state across function calls" {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -DisableAutoReport
 
                 $Script:ScubaLogEnabled | Should -Be $true
                 $Script:ScubaDeepTracing | Should -Be $true
@@ -421,8 +421,8 @@ InModuleScope ScubaLogging {
             }
 
             It "Should handle multiple initialization calls" {
-                Initialize-ScubaLogging -LogLevel "Info"
-                Initialize-ScubaLogging -LogLevel "Debug"
+                Initialize-ScubaLogging -LogLevel "Info" -DisableAutoReport
+                Initialize-ScubaLogging -LogLevel "Debug" -DisableAutoReport
 
                 $Script:ScubaLogLevel | Should -Be "Debug"
             }
@@ -431,7 +431,7 @@ InModuleScope ScubaLogging {
         Context "Get-ScubaRunDetails - ConfiguredOPAPath Parameter" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
                 # Mock slow/network ops so these tests run quickly in isolation
                 Mock Get-CimInstance { return $null }
                 Mock Test-NetConnection { return $true }
@@ -496,7 +496,7 @@ InModuleScope ScubaLogging {
         Context "Get-ScubaRunDetails - Network Connectivity Uses Port 443" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
                 Mock Get-CimInstance { return $null }
                 Mock Resolve-DnsName { return @([PSCustomObject]@{ QueryType = 'A'; IP4Address = '1.2.3.4' }) }
             }
@@ -685,7 +685,7 @@ InModuleScope ScubaLogging {
 
             It "Should support full logging workflow" {
                 # Initialize with full configuration and Debug level to see all messages
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -EnableTranscript
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -EnableTranscript -DisableAutoReport
 
                 # Verify the initialization worked
                 $Script:ScubaLogLevel | Should -Be "Debug"

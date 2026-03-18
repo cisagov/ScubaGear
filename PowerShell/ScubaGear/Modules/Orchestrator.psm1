@@ -363,6 +363,10 @@ function Invoke-SCuBA {
             }
             catch {
                 # Display clean validation error without PowerShell stack trace
+                Write-ScubaLog -Message "Configuration loading failed" -Level "Error" -Source "InvokeScuba" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                }
                 Write-Warning $_.Exception.Message
                 return
             }
@@ -412,6 +416,10 @@ function Invoke-SCuBA {
             }
             catch {
                 # Display clean validation error without PowerShell stack trace
+                Write-ScubaLog -Message "Configuration validation failed" -Level "Error" -Source "InvokeScuba" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                }
                 #Write-Warning $_.Exception.Message
                 $Host.UI.WriteErrorLine("`nERROR: " + $_.Exception.Message)
                 return
@@ -487,10 +495,17 @@ function Invoke-SCuBA {
                     Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
                 }
                 catch {
-                    Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "InvokeScuba"
+                    Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "InvokeScuba" -Data @{
+                        Error = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
+                    }
                 }
             }
             catch {
+                Write-ScubaLog -Message "Failed to initialize ScubaGear debug logging" -Level "Warning" -Source "InvokeScuba" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                }
                 Write-Warning "Failed to initialize ScubaGear debug logging: $_"
                 Write-Warning "Continuing without advanced logging features..."
                 $Script:ScubaLoggingEnabled = $false
@@ -668,6 +683,10 @@ function Invoke-SCuBA {
                     Stop-ScubaLogging
                 }
                 catch {
+                    Write-ScubaLog -Message "Failed to stop ScubaGear logging" -Level "Warning" -Source "InvokeScuba" -Data @{
+                        Error = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
+                    }
                     $Script:ScubaLoggingEnabled = $false
                 }
             }
@@ -824,6 +843,7 @@ function Invoke-ProviderList {
                     Write-ScubaLog -Message "Provider export failed: $BaselineName" -Level "Warning" -Source "ProviderList" -Data @{
                         Product = $Product
                         Error   = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
                     }
                     $ProdProviderFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above `n`n"
@@ -871,6 +891,10 @@ function Invoke-ProviderList {
             $ProdProviderFailed
         }
         catch {
+            Write-ScubaLog -Message "Fatal error in provider functions" -Level "Error" -Source "ProviderList" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
             $InvokeProviderListErrorMessage = "Fatal Error involving the Provider functions. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`"
             `n$($_.ScriptStackTrace)"
@@ -957,6 +981,7 @@ function Invoke-RunRego {
                         InputFile = $InputFile
                         RegoFile  = $RegoFile
                         Error     = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
                     }
                     $ProdRegoFailed += $Product
                     Write-Warning "$($Product) will be omitted from the output because of the failure above"
@@ -970,6 +995,10 @@ function Invoke-RunRego {
             $ProdRegoFailed
         }
         catch {
+            Write-ScubaLog -Message "Fatal error in OPA output function" -Level "Error" -Source "RunRego" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
             $InvokeRegoErrorMessage = "Fatal Error involving the OPA output function. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`"
             `n$($_.ScriptStackTrace)"
@@ -1202,6 +1231,10 @@ function ConvertTo-ResultsCsv {
             }
         }
         catch {
+            Write-ScubaLog -Message "Error creating CSV output file" -Level "Warning" -Source "CreateCsv" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
             Write-Warning "Error creating CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
@@ -1368,6 +1401,11 @@ function Merge-JsonOutput {
         }
         catch {
             if ($_.FullyQualifiedErrorId -eq "GetContentWriterPathTooLongError,Microsoft.PowerShell.Commands.SetContentCommand") {
+                Write-ScubaLog -Message "Path too long error in JSON merge" -Level "Error" -Source "MergeJson" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                    ErrorId = $_.FullyQualifiedErrorId
+                }
                 $MAX_WINDOWS_PATH_LEN = 256
                 $PathLengthErrorMessage = "ScubaGear was likely executed in a location where the maximum file path length is greater than the allowable Windows file system limit `
                 Please execute ScubaGear in a directory where for Windows file path limit is less than $($MAX_WINDOWS_PATH_LEN).`
@@ -1378,6 +1416,10 @@ function Merge-JsonOutput {
                 throw $PathLengthErrorMessage
             }
             else {
+                Write-ScubaLog -Message "Fatal error in JSON merge" -Level "Error" -Source "MergeJson" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                }
                 $MergeJsonErrorMessage = "Fatal Error involving the Json reports aggregation. `
                 Ending ScubaGear execution. Error: $($_.Exception.Message) `
                 Stacktrace: $($_.ScriptStackTrace)"
@@ -1583,6 +1625,10 @@ function Invoke-ReportCreation {
             }
         }
         catch {
+            Write-ScubaLog -Message "Fatal error in report creation" -Level "Error" -Source "CreateReport" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
             $InvokeReportErrorMessage = "Fatal Error involving the Report Creation. `
             Ending ScubaGear execution. Error: $($_.Exception.Message)`"
             `n$($_.ScriptStackTrace)"
@@ -1785,6 +1831,10 @@ function Import-Resources {
         }
     }
     catch {
+        Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
+            Error = $_.Exception.Message
+            StackTrace = $_.ScriptStackTrace
+        }
         $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
             Ending ScubaGear execution. Error: $($_.Exception.Message) `
             `n$($_.ScriptStackTrace)"
@@ -2127,10 +2177,17 @@ function Invoke-SCuBACached {
                         Debug-SCuBA -OutPath $ScubaLogFolder -ErrorAction Stop
                     }
                     catch {
-                        Write-ScubaLog -Message "Failed to capture environment diagnostics: $_" -Level "Warning" -Source "ScubaCached"
+                        Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "ScubaCached" -Data @{
+                            Error = $_.Exception.Message
+                            StackTrace = $_.ScriptStackTrace
+                        }
                     }
                 }
                 catch {
+                    Write-ScubaLog -Message "Failed to initialize ScubaGear debug logging" -Level "Warning" -Source "ScubaCached" -Data @{
+                        Error = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
+                    }
                     Write-Warning "Failed to initialize ScubaGear debug logging: $_"
                     Write-Warning "Continuing without advanced logging features..."
                     $Script:ScubaLoggingEnabled = $false
@@ -2309,6 +2366,10 @@ function Invoke-SCuBACached {
                     Write-Output "Debug logs saved to: $(Join-Path -Path $OutFolderPath -ChildPath 'DebugLogs')"
                 }
                 catch {
+                    Write-ScubaLog -Message "Error during logging cleanup" -Level "Warning" -Source "ScubaCached" -Data @{
+                        Error = $_.Exception.Message
+                        StackTrace = $_.ScriptStackTrace
+                    }
                     Write-Warning "Error during logging cleanup: $_"
                 }
             }
