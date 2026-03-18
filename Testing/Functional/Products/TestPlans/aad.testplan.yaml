@@ -671,7 +671,7 @@ TestPlan:
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
                 risky_delegated_permission_classifications:
-                  null
+                  [null]
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Allow user to consent to verified apps with no risky delegated permission classifications
@@ -684,7 +684,7 @@ TestPlan:
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
                 risky_delegated_permission_classifications:
-                  null
+                  [null]
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.5.2v1 Non-Compliant case - Allow user to consent to verified apps with risky delegated permission classifications
@@ -709,7 +709,7 @@ TestPlan:
                 authorization_policies[0].PermissionGrantPolicyIdsAssignedToDefaultUserRole:
                   []
                 risky_delegated_permission_classifications:
-                  null
+                  [null]
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - chat teams grant policy
@@ -721,7 +721,7 @@ TestPlan:
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
                 risky_delegated_permission_classifications:
-                  null
+                  [null]
         Postconditions: []
         ExpectedResult: true
 

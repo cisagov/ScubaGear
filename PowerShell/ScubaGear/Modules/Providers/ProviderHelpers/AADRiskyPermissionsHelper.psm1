@@ -560,13 +560,12 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                     }
                 }
             }
+            return $RiskyDelegatedPermissionClassificationResults
         } catch {
             Write-Warning "An error occurred in Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications: $($_.Exception.Message)"
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-
-        return $RiskyDelegatedPermissionClassificationResults
     }
 }
 

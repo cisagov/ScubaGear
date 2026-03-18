@@ -200,10 +200,6 @@ function Export-AADProvider {
     ##### End block
     $RiskyDelegatedPermissionClassifications =  ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
 
-    $RiskyDelegatedPermissionClassifications = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{
-        "M365Environment"=$M365Environment;
-    })
-
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
