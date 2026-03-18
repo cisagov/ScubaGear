@@ -662,12 +662,6 @@ BadDefaultGrantPolicies contains Policy.Id if {
     "ManagePermissionGrantsForSelf.microsoft-user-default-recommended" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
 }
 
-# Option 3: Let Microsoft manage your consent settings (Recommended)
-BadDefaultGrantPolicies contains Policy.Id if {
-    some Policy in input.authorization_policies
-    "ManagePermissionGrantsForSelf.microsoft-user-default-recommended" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
-}
-
 # Return all policy Ids
 AllDefaultGrantPolicies contains {
     "DefaultUser_DefaultGrantPolicy": Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole,
