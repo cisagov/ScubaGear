@@ -572,27 +572,6 @@ InModuleScope ScubaLogging {
                 $script:TestLines = $script:BaseLogLines
             }
 
-            It "Should show 'Success' for Rego phase when no failure warning exists" {
-                $script:TestLines = $script:BaseLogLines
-
-                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
-
-                $report | Should -Match '\| Rego Evaluation \|.*Success'
-                $report | Should -Not -Match ':x: Failed'
-            }
-
-            It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
-                $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
-                    '    Data: {"FailedProducts":"aad"}'
-                )
-
-                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
-
-                $report | Should -Match ':x: Failed'
-                $report | Should -Match 'aad'
-            }
-
             It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
                     "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
@@ -619,6 +598,28 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '## Warnings and Errors'
                 $report | Should -Not -Match '_No warnings or errors recorded\._'
                 $report | Should -Match 'Rego evaluation failed: AAD'
+            }
+
+            It "Should show 'Success' for Rego phase when no failure warning exists" {
+                $script:TestLines = $script:BaseLogLines
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                $report | Should -Match '\| Rego Evaluation \|.*Success'
+                $report | Should -Not -Match ':x: Failed'
+            }
+
+
+            It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
+                    '    Data: {"FailedProducts":"aad"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                $report | Should -Match ':x: Failed'
+                $report | Should -Match 'aad'
             }
 
             It "Should show OPA NOT FOUND warning when configured path entry indicates missing OPA" {
