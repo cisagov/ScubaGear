@@ -527,11 +527,12 @@ class GroupTypeCache{
 function GetConfigurationsForPimGroups{
     <#
     .SYNOPSIS
-        Gets PIM configurations for groups using PIM v3 API with batch optimization.
+        Gets PIM configurations for groups using batch optimization.
 
     .DESCRIPTION
-        Migrated from deprecated privilegedAccess API to roleManagementPolicyAssignments API.
-        Uses batch requests to efficiently check multiple principals for PIM enrollment.
+        Retrieves all groups enrolled in PIM for Groups management using the
+        privilegedAccess groups API, batch fetches display names, batch fetches
+        policy assignments to get policyIds, then batch fetches all policy rules.
 
     #>
     param (
@@ -545,119 +546,69 @@ function GetConfigurationsForPimGroups{
         [string]$M365Environment
     )
 
-    # Collect unique principal IDs from privileged role assignments
-    Write-Verbose "Collecting unique principal IDs from role assignments"
-    # Initialize an empty array to store unique principal IDs
-    $UniquePrincipalIds = @()
+    # Get all groups enrolled in PIM for Groups management in the tenant. This only returns the ObjectID of the PIM Group as ID.
+    # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
+    $PIMGroups = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroup" -M365Environment $M365Environment).Value
 
-    # Build a list of unique principals that need to be checked for PIM group enrollment
-    # Sort and filter role assignments to minimize API calls - we only want to check principals that are assigned to privileged roles and haven't been checked yet
-    $UniquePrincipalIds = ($AllRoleAssignments | Sort-Object -Property PrincipalId, RoleDefinitionId -Unique) |
-        Where-Object {
-            # Only include assignments to privileged roles (by matching RoleDefinitionId against known privileged role template IDs)
-            $PrivilegedRoleArray.RoleTemplateId -contains $_.RoleDefinitionId -and
-            # Only include principals we haven't already checked (not in the cache)
-            $null -eq [GroupTypeCache]::CheckedGroups[$_.PrincipalId]
-        } | Select-Object -ExpandProperty PrincipalId -Unique
-
-    if ($UniquePrincipalIds.Count -eq 0) {
-        Write-Verbose "No new principals to check for PIM group enrollment"
+    if ($null -eq $PIMGroups -or $PIMGroups.Count -eq 0) {
         return
     }
 
-    Write-Verbose "Found $($UniquePrincipalIds.Count) unique principals to check"
 
-    # Batch check principals for PIM policy assignments (v3 API) for groups
-    Write-Verbose "Batch checking principals for PIM enrollment using v3 API checking for PIM group policy assignments"
-    $PolicyAssignmentRequests = @()
-    foreach ($PrincipalId in $UniquePrincipalIds) {
-        $PolicyAssignmentRequests += @{
-            id     = $PrincipalId
-            method = "GET"
-            url    = "/policies/roleManagementPolicyAssignments?`$filter=scopeId eq '$PrincipalId' and scopeType eq 'Group' and roleDefinitionId eq 'member'"
-        }
-    }
-
+    # Batch fetch display names for all PIM groups ($PIMGroups only returns Id, not DisplayName)
     try {
-        $PolicyResults = Invoke-GraphBatchRequest -Requests $PolicyAssignmentRequests -M365Environment $M365Environment -ApiVersion "beta"
-    }
-    catch {
-        Write-Warning "Failed to batch check PIM policy assignments: $($_.Exception.Message)"
-        return
-    }
-
-    # Extract confirmed PIM group IDs (status 200, successful response)
-    $PIMGroupsIDs = @()
-    foreach ($PrincipalId in $UniquePrincipalIds) {
-        $response = $PolicyResults[$PrincipalId]
-        if ($response.status -eq 200 -and $null -ne $response.body.value -and $response.body.value.Count -gt 0) {
-            # Add to list of confirmed PIM groups to process
-            $PIMGroupsIDs += $PrincipalId
-        }
-        else {
-            # Not a PIM group - mark as checked
-            [GroupTypeCache]::CheckedGroups.Add($PrincipalId, $false)
-        }
-    }
-
-    if ($PIMGroupsIDs.Count -eq 0) {
-        Write-Verbose "No PIM groups found among the principals"
-        return
-    }
-
-    Write-Verbose "Found $($PIMGroupsIDs.Count) PIM groups to process"
-
-    # After identifying PIM groups, retrieve their display name and objectID using batch requests
-    Write-Verbose "Batch fetching display names for PIM groups"
-    $GroupDisplayNameRequests = @()
-    foreach ($PrincipalId in $PIMGroupsIDs) {
-        $GroupDisplayNameRequests += @{
-            id     = $PrincipalId
-            method = "GET"
-            url    = "/groups/${PrincipalId}?`$select=id,displayName"
-        }
-    }
-
-    try {
-        $GroupDisplayNameResults = Invoke-GraphBatchRequest -Requests $GroupDisplayNameRequests -M365Environment $M365Environment -ApiVersion "beta"
+        $GroupDisplayNameResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
+            -UrlScript { "/groups/$($_.Id)?`$select=displayName" } `
+            -M365Environment $M365Environment -ApiVersion "beta"
     }
     catch {
         Write-Warning "Failed to batch fetch group display names: $($_.Exception.Message)"
-        # Continue with group ObjectID as fallback in the event of failure
         $GroupDisplayNameResults = @{}
     }
 
-    # Batch fetch policy rules for all PIM groups
-    Write-Verbose "Batch fetching policy rules for PIM groups"
-    $PolicyRulesRequests = @()
-
-    foreach ($PrincipalId in $PIMGroupsIDs) {
-        $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
-        $PolicyId = $PolicyAssignment.policyId
-
-        $PolicyRulesRequests += @{
-            id     = $PolicyId
-            method = "GET"
-            url    = "/policies/roleManagementPolicies/$PolicyId/rules"
+    # Add display names to the PIM group objects for easier access later
+    foreach ($Group in $PIMGroups) {
+        $displayNameResponse = $GroupDisplayNameResults[$Group.Id]
+        if ($null -ne $displayNameResponse -and $displayNameResponse.status -eq 200 -and $null -ne $displayNameResponse.body.displayName) {
+            $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value $displayNameResponse.body.displayName
+        }
+        else {
+            Write-Warning "Failed to fetch display name for group $($Group.Id) from batch results (Status: $($displayNameResponse.status), HasBody: $($null -ne $displayNameResponse.body), HasDisplayName: $($null -ne $displayNameResponse.body.displayName))"
+            $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "Unknown Display Name"
         }
     }
 
+    # Batch fetch policy assignments for all PIM groups to retrieve the policyId for each group
     try {
-        # This batch request is for fetching the policy rules for each PIM group. Since multiple groups can be assigned the same policy, we only fetch each unique policy once to optimize API calls.
-        $PolicyRulesResults = Invoke-GraphBatchRequest -Requests $PolicyRulesRequests -M365Environment $M365Environment -ApiVersion "beta"
+        $PolicyResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
+            -UrlScript { "/policies/roleManagementPolicyAssignments?`$filter=scopeId eq '$($_.Id)' and scopeType eq 'Group' and roleDefinitionId eq 'member'" } `
+            -M365Environment $M365Environment -ApiVersion "beta"
+    }
+    catch {
+        Write-Warning "Failed to batch fetch PIM policy assignments: $($_.Exception.Message)"
+        return
+    }
+
+    # Batch fetch policy rules for all PIM groups
+    $PolicyRulesInput = $PIMGroups | Select-Object @{n='PolicyId'; e={ $PolicyResults[$_.Id].body.value[0].policyId }}
+    try {
+        $PolicyRulesResults = Invoke-GraphBatchRequest -InputObject $PolicyRulesInput `
+            -IdScript { $_.PolicyId } `
+            -UrlScript { "/policies/roleManagementPolicies/$($_.PolicyId)/rules" } `
+            -M365Environment $M365Environment -ApiVersion "beta"
     }
     catch {
         Write-Warning "Failed to batch fetch policy rules: $($_.Exception.Message)"
         $PolicyRulesResults = @{}
     }
 
-    # Process each confirmed PIM group to get the rules and PIM Group displayName
-    foreach ($PrincipalId in $PIMGroupsIDs) {
-        # Mark as processed
-        [GroupTypeCache]::CheckedGroups.Add($PrincipalId, $true)
+    # Process each PIM group and attach its policy rules to any privileged roles it is assigned to
+    foreach ($Group in $PIMGroups) {
+        # Mark as processed in the cache
+        [GroupTypeCache]::CheckedGroups[$Group.Id] = $true
 
-        # Get policy assignment
-        $PolicyAssignment = $PolicyResults[$PrincipalId].body.value[0]
+        # Get the policyId from the batch policy assignment results
+        $PolicyAssignment = $PolicyResults[$Group.Id].body.value[0]
         $PolicyId = $PolicyAssignment.policyId
 
         # Get the detailed configuration settings from batch results
@@ -674,23 +625,11 @@ function GetConfigurationsForPimGroups{
             $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyId).Value
         }
 
-        # Get group display name from batch results
-        $GroupDisplayName = $PrincipalId  # Default fallback to objectID if batch fetch fails
-        $displayNameResponse = $GroupDisplayNameResults[$PrincipalId]
+        # Add PIM Group display name (already fetched and stored on the $Group object)
+        AddRuleSource -Source $Group.DisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
 
-        if ($null -ne $displayNameResponse -and $displayNameResponse.status -eq 200 -and $null -ne $displayNameResponse.body.displayName) {
-            $GroupDisplayName = $displayNameResponse.body.displayName
-            Write-Verbose "Successfully retrieved display name for group $PrincipalId : $GroupDisplayName"
-        }
-        else {
-            Write-Warning "Failed to fetch display name for group $PrincipalId from batch results (Status: $($displayNameResponse.status), HasBody: $($null -ne $displayNameResponse.body), HasDisplayName: $($null -ne $displayNameResponse.body.displayName))"
-        }
-
-        # Add PIM Group display name
-        AddRuleSource -Source $GroupDisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
-
-        # Attach rules to All roles this group is assigned to
-        $RoleAssignmentsForGroup = $AllRoleAssignments | Where-Object { $_.PrincipalId -eq $PrincipalId }
+        # Attach rules to all privileged roles this group is assigned to
+        $RoleAssignmentsForGroup = $AllRoleAssignments | Where-Object { $_.PrincipalId -eq $Group.Id }
 
         foreach ($RoleAssignment in $RoleAssignmentsForGroup) {
             $Role = $PrivilegedRoleArray | Where-Object RoleTemplateId -EQ $RoleAssignment.RoleDefinitionId
@@ -703,12 +642,9 @@ function GetConfigurationsForPimGroups{
                 else {
                     $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
                 }
-                Write-Verbose "Added rules from PIM Group '$GroupDisplayName' to role '$($Role.DisplayName)'"
             }
         }
     }
-
-    Write-Verbose "Completed processing $($PIMGroupsIDs.Count) PIM groups"
 }
 
 function GetConfigurationsForRoles{
@@ -782,11 +718,13 @@ function Get-PrivilegedRole {
 
         # Get ALL the roles and users actively assigned to them, API information is contained within the Permissions JSON file.
         $AllRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
+        $AllEligibleRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
 
         # Each of the helper functions below add configuration settings (aka rules) to the role array.
         # Get the PIM configurations for the roles
         GetConfigurationsForRoles -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments
         # Get the PIM configurations for the groups
+        $AllRoleAssignments += $AllEligibleRoleAssignments # Add eligible only for PIM groups
         GetConfigurationsForPimGroups -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
     }
 

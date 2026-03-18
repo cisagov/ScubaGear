@@ -16,6 +16,7 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 | ----------------------- | ----------------------------------------------- | ------------- | ------------------------------------- | ------------------------------------- |
 | Entra ID                | Directory.Read.All                              |               | Microsoft.Graph                       | 00000003-0000-0000-c000-000000000000  |
 |                         | Policy.Read.All                                 |               |                                       |                                       |
+|                         | PrivilegedAccess.Read.AzureADGroup              |               |                                       |                                       |
 |                         | PrivilegedEligibilitySchedule.Read.AzureADGroup |               |                                       |                                       |
 |                         | RoleManagement.Read.Directory                   |               |                                       |                                       |
 |                         | RoleManagementPolicy.Read.AzureADGroup          |               |                                       |                                       |

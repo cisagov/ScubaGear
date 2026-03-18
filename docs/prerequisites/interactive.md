@@ -32,6 +32,7 @@ The following API permissions are required for Microsoft Graph Powershell:
 
 - Directory.Read.All
 - Policy.Read.All
+- PrivilegedAccess.Read.AzureADGroup
 - PrivilegedEligibilitySchedule.Read.AzureADGroup
 - RoleManagement.Read.Directory
 - RoleManagementPolicy.Read.AzureADGroup
