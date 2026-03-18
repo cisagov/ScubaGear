@@ -129,7 +129,7 @@ function Initialize-ScubaLogging {
             Write-ScubaLog -Message "Transcript logging started: $transcriptPath" -Level "Info" -Source "LoggingSystem"
         }
 
-        Write-Output "?? ScubaGear logging initialized successfully"
+        Write-Output "ScubaGear logging initialized successfully"
         if ($LogPath) {
             Write-Output "   Log file: $Script:ScubaLogPath"
         }

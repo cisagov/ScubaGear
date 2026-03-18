@@ -593,6 +593,19 @@ InModuleScope ScubaLogging {
                 $report | Should -Match 'aad'
             }
 
+            It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
+                    '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                $report | Should -Match '## Warnings and Errors'
+                $report | Should -Not -Match '_No warnings or errors recorded\._'
+                $report | Should -Match 'Provider export failed: Defender'
+            }
+
             It "Should show 'Warnings and Errors' section populated when per-product Rego failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
                     "[2026-01-01 10:00:00.011] [Warning] [RunRego             ] Rego evaluation failed: AAD",
@@ -606,19 +619,6 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '## Warnings and Errors'
                 $report | Should -Not -Match '_No warnings or errors recorded\._'
                 $report | Should -Match 'Rego evaluation failed: AAD'
-            }
-
-            It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
-                $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
-                    '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
-                )
-
-                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
-
-                $report | Should -Match '## Warnings and Errors'
-                $report | Should -Not -Match '_No warnings or errors recorded\._'
-                $report | Should -Match 'Provider export failed: Defender'
             }
 
             It "Should show OPA NOT FOUND warning when configured path entry indicates missing OPA" {

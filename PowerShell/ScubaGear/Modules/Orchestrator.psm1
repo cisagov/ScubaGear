@@ -103,6 +103,9 @@ function Invoke-SCuBA {
     .Parameter SkipDoH
     If true, do not fallback to DoH should the traditional DNS requests fail
     when retrieving any DNS records required by specific SCuBA policies.
+    .Parameter DebugScuba
+    Set switch to enable detailed logging for troubleshooting purposes. Logs will be placed in a DebugLogs subfolder within the output folder.
+    Note: Debug mode will impact performance - use only for troubleshooting.
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
