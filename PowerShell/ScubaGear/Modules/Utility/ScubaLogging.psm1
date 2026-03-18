@@ -42,6 +42,7 @@ $Script:ScubaDeepTracing = $false     # When $true, sets global VerbosePreferenc
 $Script:ScubaLogLevel = "Info"        # Minimum severity threshold; messages below this level are silently dropped
 $Script:ScubaEnhancedTracing = $false # Tracks whether Enable-ScubaAutoTrace has been called this session
 $Script:ScubaHasErrors = $false       # Tracks if any Error or Warning messages were logged during the session
+$Script:ScubaAutoReportEnabled = $true # Enable automatic debug report generation on errors (disable for testing)
 
 function Initialize-ScubaLogging {
     <#
@@ -63,6 +64,9 @@ function Initialize-ScubaLogging {
 
     .PARAMETER EnableTranscript
     Enable Start-Transcript for complete console output capture
+    
+    .PARAMETER DisableAutoReport
+    Disable automatic debug report generation on errors (useful for testing)
 
     .EXAMPLE
     Initialize-ScubaLogging -LogPath "C:\Logs\ScubaGear" -EnableTracing -EnableTranscript
@@ -73,7 +77,8 @@ function Initialize-ScubaLogging {
         [switch]$EnableTracing,
         [ValidateSet("Debug", "Info", "Warning", "Error")]
         [string]$LogLevel = "Info",
-        [switch]$EnableTranscript
+        [switch]$EnableTranscript,
+        [switch]$DisableAutoReport
     )
 
     try {
@@ -82,6 +87,7 @@ function Initialize-ScubaLogging {
         $Script:ScubaDeepTracing = $EnableTracing
         $Script:ScubaLogLevel = $LogLevel
         $Script:ScubaHasErrors = $false  # Reset error tracking for new session
+        $Script:ScubaAutoReportEnabled = -not $DisableAutoReport  # Control automatic report generation
 
         # Setup log directory and file path with timestamp
         if ($LogPath) {
@@ -539,8 +545,8 @@ function Stop-ScubaLogging {
                 Write-Output "   Log saved: $Script:ScubaLogPath"
             }
 
-            # Auto-generate debug report if errors or warnings were logged
-            if ($Script:ScubaHasErrors -and $Script:ScubaLogPath) {
+            # Auto-generate debug report if errors or warnings were logged and auto-report is enabled
+            if ($Script:ScubaHasErrors -and $Script:ScubaLogPath -and $Script:ScubaAutoReportEnabled) {
                 try {
                     $Host.UI.WriteErrorLine("Errors detected! Generating debug report...")
                     $logDir = Split-Path $Script:ScubaLogPath -Parent
@@ -567,6 +573,7 @@ function Stop-ScubaLogging {
         $Script:ScubaLogEnabled = $false       # Disable logging
         $Script:ScubaDeepTracing = $false      # Disable deep tracing
         $Script:ScubaHasErrors = $false        # Reset error tracking
+        $Script:ScubaAutoReportEnabled = $true # Reset auto-report to default enabled state
     }
 }
 

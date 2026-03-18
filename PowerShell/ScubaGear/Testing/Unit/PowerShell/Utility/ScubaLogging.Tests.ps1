@@ -18,6 +18,8 @@ InModuleScope ScubaLogging {
             $Script:ScubaDeepTracing = $false
             $Script:ScubaLogLevel = "Info"
             $Script:ScubaEnhancedTracing = $false
+            $Script:ScubaHasErrors = $false
+            $Script:ScubaAutoReportEnabled = $false  # Disable auto-report during tests
         }
 
         AfterEach {
@@ -80,6 +82,18 @@ InModuleScope ScubaLogging {
 
                 { Initialize-ScubaLogging -LogPath "C:\InvalidPath\That\DoesNot\Exist" } | Should -Not -Throw
                 $Script:ScubaLogEnabled | Should -Be $false
+            }
+
+            It "Should set ScubaAutoReportEnabled to false when DisableAutoReport is used" {
+                Initialize-ScubaLogging -DisableAutoReport
+
+                $Script:ScubaAutoReportEnabled | Should -Be $false
+            }
+
+            It "Should set ScubaAutoReportEnabled to true by default" {
+                Initialize-ScubaLogging
+
+                $Script:ScubaAutoReportEnabled | Should -Be $true
             }
         }
 
