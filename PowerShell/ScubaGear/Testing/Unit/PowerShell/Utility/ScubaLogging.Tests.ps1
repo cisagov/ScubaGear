@@ -20,12 +20,22 @@ InModuleScope ScubaLogging {
             $Script:ScubaEnhancedTracing = $false
             $Script:ScubaHasErrors = $false
             $Script:ScubaAutoReportEnabled = $false  # Disable auto-report during tests
+            
+            # Clean up any existing log files from previous tests to prevent accumulation
+            if (Test-Path $script:TestLogPath) {
+                Get-ChildItem -Path $script:TestLogPath -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+            }
         }
 
         AfterEach {
             # Clean up any logging state after each test
             if ($Script:ScubaLogEnabled) {
                 Stop-ScubaLogging
+            }
+            
+            # Additional cleanup: Remove any log files created during the test
+            if (Test-Path $script:TestLogPath) {
+                Get-ChildItem -Path $script:TestLogPath -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
             }
         }
 
@@ -100,7 +110,7 @@ InModuleScope ScubaLogging {
         Context "Write-ScubaLog Function" {
 
             BeforeEach {
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug"
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
             }
 
             It "Should write log entry to file when log path is configured" {
@@ -574,7 +584,7 @@ InModuleScope ScubaLogging {
 
             It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [ProviderList        ] Provider export failed: Defender",
+                    "[2026-01-01 10:00:00.011] [Warning ] [ProviderList        ] Provider export failed: Defender",
                     '    Data: {"Product":"defender","Error":"Timeout connecting to API"}'
                 )
 
@@ -587,9 +597,9 @@ InModuleScope ScubaLogging {
 
             It "Should show 'Warnings and Errors' section populated when per-product Rego failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [RunRego             ] Rego evaluation failed: AAD",
+                    "[2026-01-01 10:00:00.011] [Warning ] [RunRego             ] Rego evaluation failed: AAD",
                     '    Data: {"Product":"aad","OPAPath":".","Error":"cannot find opa binary"}',
-                    "[2026-01-01 10:00:00.012] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
+                    "[2026-01-01 10:00:00.012] [Warning ] [InvokeScuba         ] Some Rego evaluations failed",
                     '    Data: {"FailedProducts":"aad"}'
                 )
 
@@ -612,7 +622,7 @@ InModuleScope ScubaLogging {
 
             It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
                 $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [InvokeScuba         ] Some Rego evaluations failed",
+                    "[2026-01-01 10:00:00.011] [Warning ] [InvokeScuba         ] Some Rego evaluations failed",
                     '    Data: {"FailedProducts":"aad"}'
                 )
 
@@ -624,7 +634,7 @@ InModuleScope ScubaLogging {
 
             It "Should show OPA NOT FOUND warning when configured path entry indicates missing OPA" {
                 $script:TestLines = $script:BaseLogLines + @(
-                    "[2026-01-01 10:00:00.011] [Warning] [RunDetails          ] OPA Executable NOT found at configured path",
+                    "[2026-01-01 10:00:00.011] [Warning ] [RunDetails          ] OPA Executable NOT found at configured path",
                     '    Data: {"ConfiguredOPAPath":"C:\\Apps","FoundAtConfiguredPath":false}'
                 )
 
