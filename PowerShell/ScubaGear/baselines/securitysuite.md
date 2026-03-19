@@ -5,14 +5,14 @@
 Several essential security functions for M365 services require a dedicated security suite, e.g., for
 data loss prevention. M365 provides these security functions natively via Defender for Office 365
 and Microsoft Purview. Notably, some of these capabilities require licenses not included by default
-with E3 or G3, such Defender for Office 365 Plan 1 and 2. They are however are included with E5 and
-G5 and are available as add-ons for E3 and G3. However, third-party solutions that offer comparable
-security functions can be used in lieu of Defender or Purview. The Security Suite Baseline
+with E3 or G3, such Defender for Office 365 Plan 1 and 2. These licenses are included with E5 and G5
+and are available as add-ons for E3 and G3. However, third-party solutions that offer comparable
+security functions can be used in lieu of Defender and Purview. The Security Suite Baseline
 enumerates a set of required security functions agencies should configure, be it through Defender
-and Purview or a third-party tool of their choice. Should an agency elect to use Defender and
+and Purview or third-party tools of their choice. Should an agency elect to use Defender and
 Purview, agencies should follow the implementation guidance included with this baseline. However,
-regardless of whether or not Defender is used, the policies in this baseline are applicable to all
-M365 users.
+regardless of whether Defender and Purview are used, the policies in this baseline are applicable
+to all M365 users.
 
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
