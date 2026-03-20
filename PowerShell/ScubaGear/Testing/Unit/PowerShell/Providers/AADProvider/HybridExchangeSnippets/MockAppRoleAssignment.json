@@ -1,0 +1,10 @@
+{
+    "DeletedDateTime":  null,
+    "ResourceId": "00000000-0000-0000-0000-000000000001",
+    "Id": "00000000-0000-0000-0000-000000000030",
+    "PrincipalId": "00000000-0000-0000-0000-000000000020",
+    "ResourceDisplayName": "Office 365 Exchange Online",
+    "CreationTimestamp":  "\/Date(1773438870403)\/",
+    "PrincipalDisplayName": "ExchangeServerApp-0626ac82-7d72-41c7-9e9b-720b276e98f2",
+    "AppRoleId":  "dc890d15-9560-4a4c-9b7f-a736ec74ec40"
+}
