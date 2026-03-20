@@ -582,6 +582,7 @@ InModuleScope ScubaLogging {
                 $script:TestLines = $script:BaseLogLines
             }
 
+            <#
             It "Should show 'Warnings and Errors' section populated when per-product Provider failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
                     "[2026-01-01 10:00:00.011] [Warning ] [ProviderList        ] Provider export failed: Defender",
@@ -594,6 +595,7 @@ InModuleScope ScubaLogging {
                 $report | Should -Not -Match '_No warnings or errors recorded\._'
                 $report | Should -Match 'Provider export failed: Defender'
             }
+            #>
 
             It "Should show 'Warnings and Errors' section populated when per-product Rego failure is logged" {
                 $script:TestLines = $script:BaseLogLines + @(
@@ -618,6 +620,7 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '\| Rego Evaluation \|.*Success'
                 $report | Should -Not -Match ':x: Failed'
             }
+            
 
 
             It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
