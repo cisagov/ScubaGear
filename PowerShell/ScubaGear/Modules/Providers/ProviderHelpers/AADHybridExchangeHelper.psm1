@@ -1,17 +1,6 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyPermissionsJson
 
-# Microsoft's tenant ID used to identify first-party Microsoft-owned service principals.
-# Used to filter OUT Microsoft's own apps when searching for the tenant-specific
-# dedicated hybrid app via app role assignments.
-$MICROSOFT_TENANT_IDS = @{
-    "commercial"    = "f8cdef31-a31e-4b4a-93e4-5f571e91255a"
-    "gcc"           = "f8cdef31-a31e-4b4a-93e4-5f571e91255a"
-    "gcchigh"       = "cab8a31a-1906-4287-a0d8-4eef66b95f6e"
-    "dod"           = "cab8a31a-1906-4287-a0d8-4eef66b95f6e"
-    "china"         = "a55a4d5b-9241-49b1-b4ff-befa8db00269"
-}
-
 function Get-ExchangeHybridIds {
     <#
     .Description
@@ -190,23 +179,47 @@ function Get-DedicatedExchangeHybridApplications {
                     ServicePrincipal = $ServicePrincipal.Id
                 }
 
+                # Fetch federated credentials separately via a dedicated Graph endpoint.
+                $FederatedCredentialsResults = $null
+                if ($null -ne $AppRegistration) {
+                    $FederatedCredentials = (Invoke-GraphDirectly `
+                        -Commandlet "Get-MgBetaApplicationFederatedIdentityCredential" `
+                        -M365Environment $M365Environment `
+                        -Id $AppRegistration.Id
+                    ).Value
+
+                    if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
+                        $FederatedCredentialsResults = @()
+                        foreach ($FederatedCredential in $FederatedCredentials) {
+                            $FederatedCredentialsResults += [PSCustomObject]@{
+                                Id          = $FederatedCredential.Id
+                                Name        = $FederatedCredential.Name
+                                Description = $FederatedCredential.Description
+                                Issuer      = $FederatedCredential.Issuer
+                                Subject     = $FederatedCredential.Subject
+                                Audiences   = $FederatedCredential.Audiences | Out-String
+                            }
+                        }
+                    }
+                }
+
                 $DedicatedHybridApps += [PSCustomObject]@{
                     ObjectId                = $ObjectIds
                     AppId                   = $ServicePrincipal.AppId
                     DisplayName             = $ServicePrincipal.DisplayName
                     AppRegistrationExists   = ($null -ne $AppRegistration)
                     FullAccessAsAppRole     = $Assignment
-                    HasKeyCredentials       = @($ServicePrincipal.KeyCredentials).Count -gt 0
-                    KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                    PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                    FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                    HasKeyCredentials       = ($null -ne $AppRegistration) -and @($AppRegistration.KeyCredentials).Count -gt 0
+                    KeyCredentials          = if ($null -ne $AppRegistration) { Format-Credentials -AccessKeys $AppRegistration.KeyCredentials -IsFromApplication $true } else { $null }
+                    PasswordCredentials     = if ($null -ne $AppRegistration) { Format-Credentials -AccessKeys $AppRegistration.PasswordCredentials -IsFromApplication $true } else { $null }
+                    FederatedCredentials    = $FederatedCredentialsResults
                     AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                 }
             }
 
             return [PSCustomObject]@{
-                DedicatedHybridAppConfigured = ($DedicatedHybridApps.Count -gt 0)
-                Apps = if ($DedicatedHybridApps.Count -gt 0) { $DedicatedHybridApps } else { $null }
+                DedicatedHybridAppConfigured = (@($DedicatedHybridApps).Count -gt 0)
+                Apps = if (@($DedicatedHybridApps).Count -gt 0) { @($DedicatedHybridApps) } else { $null }
             }
         }
         catch {
