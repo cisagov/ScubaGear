@@ -167,7 +167,10 @@ InModuleScope AADRiskyPermissionsHelper {
             # No federated credentials -> 0pts
             # No privileged roles -> 0pts
 
-            $ExpectedScore = $ExpectedAdminConsentedPoints + $ExpectedThirdPartyPoints + $ExpectedPasswordCredentialPoints
+            # Credential volume: 2 active creds -> (2-1) * 5 = 5pts
+            $ExpectedCredentialVolumePoints = (2 - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
+
+            $ExpectedScore = $ExpectedAdminConsentedPoints + $ExpectedThirdPartyPoints + $ExpectedPasswordCredentialPoints + $ExpectedCredentialVolumePoints
 
             $SP.PriorityScore | Should -Be $ExpectedScore
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
@@ -178,6 +181,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
             $SP.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 0
             $SP.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be 0
+            $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 2
+            $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -BeNullOrEmpty
         }
@@ -210,12 +215,16 @@ InModuleScope AADRiskyPermissionsHelper {
             # FederatedCredentials: 1 cred = 1 * 50 = 50pts
             $ExpectedFederatedCredentialPoints = 1 * $CredBase
 
+            # Credential volume: 3 active creds (1+1+1) -> (3-1) * 5 = 10pts
+            $ExpectedCredentialVolumePoints = (3 - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
+
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                            + $ExpectedThirdPartyPoints `
                            + $ExpectedPrivilegedRolePoints `
                            + $ExpectedKeyCredentialPoints `
                            + $ExpectedPasswordCredentialPoints `
-                           + $ExpectedFederatedCredentialPoints
+                           + $ExpectedFederatedCredentialPoints `
+                           + $ExpectedCredentialVolumePoints
 
             $SP.PriorityScore | Should -Be $ExpectedScore
 
@@ -231,6 +240,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
             $SP.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 1
             $SP.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
+            $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 3
+            $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -HaveCount 1
             $SP.PrivilegedRoles[0] | Should -Be "Exchange Administrator"

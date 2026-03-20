@@ -727,6 +727,7 @@ function Get-SeverityWeights {
                                     Critical context = 50/cred, High = 35, Medium = 15, Low = 5
                                   Lifetime tiers add bonus: >730d +5, >365d +3, >180d +2
                                   Expired credentials excluded.
+    Credential volume             +5 per active credential beyond the first (more auth paths = more risk)
     Multi-tenant                  +10 for applications with multi-tenant enabled
     Third-party SP                +20 for externally-owned service principals
     Privileged roles              +8 per privileged role on service principal
@@ -773,6 +774,11 @@ function Get-SeverityWeights {
             @{ MinDays = 365; Points = 3 }   # 1-2 years
             @{ MinDays = 180; Points = 2 }   # 6 months - 1 year
         )
+
+        CredentialVolume = @{
+            PointsPerCredentialAfterFirst = 5
+            Description = "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
+        }
 
         PermissionVolume = @{
             PointsPer10Permissions = 1
@@ -888,6 +894,7 @@ function Set-PriorityScore {
     Factors:
     - Each risky permission adds its RiskLevel weight (Critical=50, High=15, Medium=5, Low=2)
     - Credentials scored by context (highest risk level on the app determines base points per credential)
+    - Credential volume (5pts per active credential beyond the first)
     - Multi-tenant, third-party, privileged roles as additive bonuses
     - Permission volume (1pt per 10 total permissions)
 
@@ -1034,7 +1041,19 @@ function Set-PriorityScore {
             TotalPoints = $FederatedScore.TotalPoints
         }
 
-        # 10. Permission volume factor
+        # 10. Credential volume factor
+        $TotalActiveCredentials = $PasswordScore.CredentialCount + $KeyScore.CredentialCount + $FederatedScore.CredentialCount
+        $CredentialVolumePoints = 0
+        if ($TotalActiveCredentials -gt 1) {
+            $CredentialVolumePoints = ($TotalActiveCredentials - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
+            $Score += $CredentialVolumePoints
+        }
+        $ScoreBreakdown.CredentialVolume = [PSCustomObject]@{
+            TotalActiveCredentials = $TotalActiveCredentials
+            TotalPoints = $CredentialVolumePoints
+        }
+
+        # 11. Permission volume factor
         $TotalPermissionCount = if ($null -ne $Object.TotalPermissionCount -and $Object.TotalPermissionCount -gt 0) {
             $Object.TotalPermissionCount
         } else {

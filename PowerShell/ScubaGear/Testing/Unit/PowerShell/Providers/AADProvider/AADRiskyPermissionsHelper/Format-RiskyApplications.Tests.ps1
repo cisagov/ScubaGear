@@ -200,11 +200,15 @@ InModuleScope AADRiskyPermissionsHelper {
             # FederatedCredentials: 2 creds = 2 * 50 = 100pts
             $ExpectedFederatedCredentialPoints = 2 * $CredBase
 
+            # Credential volume: 7 active creds (3+2+2) -> (7-1) * 5 = 30pts
+            $ExpectedCredentialVolumePoints = (3 + 2 + 2 - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
+
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                              + $ExpectedMultiTenantPoints `
                              + $ExpectedKeyCredentialPoints `
                              + $ExpectedPasswordCredentialPoints `
-                             + $ExpectedFederatedCredentialPoints
+                             + $ExpectedFederatedCredentialPoints `
+                             + $ExpectedCredentialVolumePoints
 
             $App.PriorityScore | Should -Be $ExpectedScore
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
@@ -217,6 +221,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $App.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
             $App.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 2
             $App.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
+            $App.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 7
+            $App.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
         }
     }
 }
