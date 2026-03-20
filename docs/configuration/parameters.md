@@ -524,9 +524,9 @@ Invoke-SCuBA -ProductNames exo `
 Invoke-SCuBA -Version
 ```
 
-## DebugScuba
+## Transcript
 
-**DebugScuba** enables detailed debug logging and function tracing for troubleshooting ScubaGear execution. When enabled, ScubaGear creates a `DebugLogs` subfolder within the output directory containing detailed log files and a PowerShell transcript.
+**Transcript** enables PowerShell transcript logging to capture all console output in addition to the debug logs that are always created. Debug logs are automatically generated for every ScubaGear run; the `-Transcript` parameter adds a transcript file for complete console capture.
 
 | Parameter   | Value  |
 |-------------|--------|
@@ -536,18 +536,18 @@ Invoke-SCuBA -Version
 | Config File | No     |
 
 ```powershell
-# Enable debug logging for troubleshooting
+# Enable transcript logging for complete console capture
 Invoke-SCuBA -ProductNames teams `
-  -DebugScuba
+  -Transcript
 ```
 
-When `-DebugScuba` is used, the following debug files are created in the output folder:
+Debug logs are always created in a `DebugLogs` subfolder within the output directory. When `-Transcript` is used, an additional transcript file is created:
 
 ```
 M365BaselineConformance_2026_02_06_14_30_45\
     ├── DebugLogs\
-    │   ├── ScubaGear-DebugLog-<timestamp>.log
-    │   └── ScubaGear-Transcript-<timestamp>.log
+    │   ├── ScubaGear-DebugLog-<timestamp>.log      (always created)
+    │   └── ScubaGear-Transcript-<timestamp>.log    (only when -Transcript is used)
     ├── ProviderSettingsExport.json
     ├── ScubaResults.json
     └── BaselineReports.html
@@ -559,7 +559,7 @@ The debug log captures:
 - Error context and stack traces
 - Configuration and environment details
 
-> **Note**: Debug mode impacts performance and should only be used for troubleshooting. Sensitive data (passwords, tokens, keys) is automatically redacted from logs.
+> **Note**: All debug and verbose output is written only to the log file—not to the console—to avoid output spam. Enhanced tracing may increase run time. Sensitive data (passwords, tokens, keys) is automatically redacted from logs.
 
 ## Muting the Version Check Warnings
 

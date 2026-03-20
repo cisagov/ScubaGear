@@ -34,8 +34,8 @@ CORE FUNCTIONALITY:
 
 # Module-level state variables — these drive the behavior of every logging function in this module.
 # Initialize-ScubaLogging populates them; Stop-ScubaLogging resets them to these defaults.
-# All public functions check $Script:ScubaLogEnabled first and return immediately when it is $false,
-# so there is zero runtime overhead when -DebugScuba is not passed to InvokeScuba.
+# All public functions check $Script:ScubaLogEnabled first and return immediately when it is $false.
+# Debug logs are always created by InvokeScuba; transcript logging is optional via -Transcript parameter.
 $Script:ScubaLogPath = $null          # Absolute path to the active log file; $null disables file output
 $Script:ScubaLogEnabled = $false      # Master on/off switch checked by Write-ScubaLog and Trace-ScubaFunction
 $Script:ScubaDeepTracing = $false     # When $true, sets global VerbosePreference/DebugPreference and calls Set-PSDebug
@@ -62,14 +62,14 @@ function Initialize-ScubaLogging {
     .PARAMETER LogLevel
     Minimum log level to capture (Debug, Info, Warning, Error)
 
-    .PARAMETER EnableTranscript
+    .PARAMETER Transcript
     Enable Start-Transcript for complete console output capture
-    
+
     .PARAMETER DisableAutoReport
     Disable automatic debug report generation on errors (useful for testing)
 
     .EXAMPLE
-    Initialize-ScubaLogging -LogPath "C:\Logs\ScubaGear" -EnableTracing -EnableTranscript
+    Initialize-ScubaLogging -LogPath "C:\Logs\ScubaGear" -EnableTracing -Transcript
     #>
     [CmdletBinding()]
     param(
@@ -77,7 +77,7 @@ function Initialize-ScubaLogging {
         [switch]$EnableTracing,
         [ValidateSet("Debug", "Info", "Warning", "Error")]
         [string]$LogLevel = "Info",
-        [switch]$EnableTranscript,
+        [switch]$Transcript,
         [switch]$DisableAutoReport
     )
 
@@ -94,7 +94,6 @@ function Initialize-ScubaLogging {
             # Create the log directory if it doesn't exist
             if (!(Test-Path $LogPath)) {
                 New-Item -ItemType Directory -Path $LogPath -Force | Out-Null
-                Write-Output "Created log directory: $LogPath"
             }
 
             # Create unique timestamped log filename to avoid conflicts
@@ -102,7 +101,7 @@ function Initialize-ScubaLogging {
             $Script:ScubaLogPath = Join-Path $LogPath "ScubaGear-DebugLog-$timestamp.log"
 
             # Create initial log entry
-            $initMessage = "ScubaGear Logging Initialized - Level: $LogLevel, Tracing: $EnableTracing, Transcript: $EnableTranscript"
+            $initMessage = "ScubaGear Logging Initialized - Level: $LogLevel, Tracing: $EnableTracing, Transcript: $Transcript"
             Write-ScubaLog -Message $initMessage -Level "Info" -Source "LoggingSystem"
         }
 
@@ -110,9 +109,9 @@ function Initialize-ScubaLogging {
         if ($EnableTracing) {
             # Use enhanced structured logging for detailed troubleshooting without console spam
             $Script:ScubaEnhancedTracing = $true
-            # Set PowerShell preference variables to capture verbose and debug output
-            $Global:VerbosePreference = "Continue"
-            $Global:DebugPreference = "Continue"
+            # DO NOT set global VerbosePreference or DebugPreference to "Continue"
+            # as that causes ALL cmdlet verbose/debug output to appear on console.
+            # Instead, all debug/verbose messages go ONLY to the log file.
 
             # Enable automatic function tracing to capture function entry/exit
             Enable-ScubaAutoTrace
@@ -121,19 +120,20 @@ function Initialize-ScubaLogging {
         }
 
         # Start PowerShell transcript if requested to capture all console output
-        if ($EnableTranscript -and $LogPath) {
+        if ($Transcript -and $LogPath) {
+            # When transcript is enabled, use GLOBAL scope for VerbosePreference/DebugPreference
+            # so that cmdlets from ALL modules will output verbose/debug to the transcript.
+            # We clean this up in Stop-ScubaLogging to avoid polluting the session.
+            $Script:ScubaDeepTracing = $true
+            $Global:VerbosePreference = "Continue"
+            $Global:DebugPreference = "Continue"
+
             # Create transcript file with same timestamp as main log
             $transcriptPath = Join-Path $LogPath "ScubaGear-Transcript-$timestamp.log"
             # Start transcript to capture all PowerShell console activity
             Start-Transcript -Path $transcriptPath -Append -ErrorAction SilentlyContinue
-            Write-ScubaLog -Message "Transcript logging started: $transcriptPath" -Level "Info" -Source "LoggingSystem"
+            Write-ScubaLog -Message "Transcript logging started: $transcriptPath (verbose/debug output enabled globally)" -Level "Info" -Source "LoggingSystem"
         }
-
-        Write-Output "ScubaGear logging initialized successfully"
-        if ($LogPath) {
-            Write-Output "   Log file: $Script:ScubaLogPath"
-        }
-
     }
     catch {
         Write-Warning "Failed to initialize ScubaGear logging: $_"
@@ -240,9 +240,9 @@ function Write-ScubaLog {
         # Write to console based on level - control console noise while preserving file logging
         switch ($Level) {
             "Debug" {
-                # Debug messages only go to file, not console (unless $DebugPreference is explicitly set)
-                # This prevents debug spam on the console while keeping detailed file logs
-                if ($DebugPreference -eq 'Continue') {
+                # Debug messages only go to console when transcript is enabled (ScubaDeepTracing = true)
+                # This allows transcript to capture verbose/debug output while keeping console clean otherwise
+                if ($Script:ScubaDeepTracing -and $Script:DebugPreference -eq 'Continue') {
                     Write-Debug $logLine
                 }
             }
@@ -531,18 +531,15 @@ function Stop-ScubaLogging {
             }
 
             # Disable PowerShell debugging features if they were enabled.
-            # Restoring VerbosePreference and DebugPreference is important — leaving them set to
-            # "Continue" would cause verbose/debug output to appear for any subsequent cmdlets
-            # run in the same PowerShell session after ScubaGear completes.
+            # Reset Global preferences to clean up after transcript logging
             if ($Script:ScubaDeepTracing) {
                 Set-PSDebug -Off
                 $Global:VerbosePreference = "SilentlyContinue"
                 $Global:DebugPreference = "SilentlyContinue"
             }
 
-            Write-Output "ScubaGear logging stopped"
             if ($Script:ScubaLogPath) {
-                Write-Output "   Log saved: $Script:ScubaLogPath"
+                Write-Output "DONE: Log saved: $Script:ScubaLogPath"
             }
 
             # Auto-generate debug report if errors or warnings were logged and auto-report is enabled
@@ -630,8 +627,6 @@ function Get-ScubaRunDetails {
         [Parameter(Mandatory = $false)]
         [string]$ConfiguredOPAPath
     )
-
-    Write-ScubaLog -Message "Starting ScubaGear run details collection..." -Level "Info" -Source "RunDetails"
 
     try {
         # 1. System OS and Build Information
@@ -1095,12 +1090,6 @@ function Get-ScubaRunDetails {
         else {
             Write-ScubaLog -Message "Error collection skipped (use -IncludeErrors to enable)" -Level "Debug" -Source "RunDetails"
         }
-
-        Write-ScubaLog -Message "ScubaGear run details collection completed successfully" -Level "Info" -Source "RunDetails"
-        Write-Output "✓ ScubaGear run details have been logged"
-        if ($Script:ScubaLogPath) {
-            Write-Output "   Check log file: $Script:ScubaLogPath"
-        }
     }
     catch {
         Write-ScubaLog -Message "Error during run details collection: $($_.Exception.Message)" -Level "Error" -Source "RunDetails" -Exception $_.Exception
@@ -1114,9 +1103,9 @@ function Get-ScubaDebugLogReport {
     Parse a ScubaGear debug log file and produce a readable summary report.
 
     .DESCRIPTION
-    Reads a ScubaGear-DebugLog-*.log file (produced when -DebugScuba is passed to
-    InvokeScuba) and transforms the structured log entries into a concise, human-readable
-    Markdown report suitable for pasting into a GitHub issue or email.
+    Reads a ScubaGear-DebugLog-*.log file (produced by InvokeScuba) and transforms
+    the structured log entries into a concise, human-readable Markdown report
+    suitable for pasting into a GitHub issue or email.
 
     The transcript file is intentionally not parsed — only the structured debug log.
 
@@ -1138,7 +1127,7 @@ function Get-ScubaDebugLogReport {
     Optional. If provided the Markdown report is also saved to this file path.
 
     .PARAMETER FromScubaCached
-    Optional switch. Determines which orchestrator command the debugScuba was ran
+    Optional switch. Determines which orchestrator command was used (Invoke-SCuBA vs Invoke-SCuBACached).
 
     .EXAMPLE
     Get-ScubaDebugLogReport -LogPath "C:\Scuba\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log"

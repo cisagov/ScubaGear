@@ -696,7 +696,7 @@ InModuleScope ScubaLogging {
 
             It "Should support full logging workflow" {
                 # Initialize with full configuration and Debug level to see all messages
-                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -EnableTranscript -DisableAutoReport
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -EnableTracing -LogLevel "Debug" -Transcript -DisableAutoReport
 
                 # Verify the initialization worked
                 $Script:ScubaLogLevel | Should -Be "Debug"

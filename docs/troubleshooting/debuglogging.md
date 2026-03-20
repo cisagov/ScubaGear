@@ -1,10 +1,10 @@
 # Debug Logging
 
-ScubaGear includes a debug logging module (`ScubaLogging`) that captures structured diagnostic information during a run. When enabled, it writes timestamped log entries to a `DebugLogs` subfolder inside the output folder and starts a PowerShell transcript to capture all console output.
+ScubaGear includes a debug logging module (`ScubaLogging`) that captures structured diagnostic information during every run. It writes timestamped log entries to a `DebugLogs` subfolder inside the output folder. Optionally, you can also enable PowerShell transcript logging to capture all console output.
 
 ## Overview
 
-Debug logging is off by default and adds no overhead to normal runs. When enabled, the module captures:
+Debug logging is **always enabled** and captures:
 
 - Run invocation details (command line, parameters, products assessed, environment)
 - System and PowerShell environment information
@@ -15,37 +15,39 @@ Debug logging is off by default and adds no overhead to normal runs. When enable
 - Function entry and exit trace with execution durations
 - All warnings and errors encountered during the run
 
-## Enabling Debug Logging
+## Enabling Transcript Logging
 
-Pass the `-DebugScuba` switch to `Invoke-SCuBA`:
+Debug logs are created automatically. To also enable PowerShell transcript logging, pass the `-Transcript` switch to `Invoke-SCuBA`:
+
+> IMPORTANT: Transcript logging is menat fro developers and to troubleshoot the module. It does not redact sensitive information and can be faily large in size
 
 ```powershell
-Invoke-SCuBA -ProductNames * -DebugScuba
+Invoke-SCuBA -ProductNames * -Transcript
 ```
 
 ```powershell
-Invoke-SCuBA -ProductNames aad, teams -M365Environment gcchigh -DebugScuba
+Invoke-SCuBA -ProductNames aad, teams -M365Environment gcchigh -Transcript
 ```
 
 ScubaGear prints the log folder path at the start of the run:
 
 ```text
-ScubaGear DEBUG MODE ENABLED - Detailed logging active
+ScubaGear logging enabled
 Log folder: C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs
 ```
 
 > [!NOTE]
-> Debug mode sets `VerbosePreference` and `DebugPreference` to `Continue` for the duration of the run and restores them to `SilentlyContinue` when the run completes. It also enables automatic function tracing, which increases run time. Use it only when troubleshooting.
+> Debug logging and function tracing capture detailed execution information. All debug and verbose output is written only to the log file to avoid console spam. Tracing may increase run time slightly.
 
 ## Output Files
 
-When `-DebugScuba` is used, a `DebugLogs` subfolder is created inside the timestamped output folder:
+A `DebugLogs` subfolder is created inside the timestamped output folder:
 
 ```text
 M365BaselineConformance_2026_03_11_11_18_27\
   └── DebugLogs\
       ├── ScubaGear-DebugLog-20260311-111827-956.log
-      └── ScubaGear-Transcript-20260311-111827-956.log
+      └── ScubaGear-Transcript-20260311-111827-956.log  (only if -Transcript was used)
 ```
 
 ### Debug Log
@@ -64,6 +66,8 @@ Each entry includes a high-precision timestamp, a severity level (`Debug`, `Info
 `ScubaGear-Transcript-*.log` captures all PowerShell console output during the run using `Start-Transcript`. It is more verbose than the debug log and includes all output written to the PowerShell host, including verbose and debug streams. Review the transcript when the debug log alone does not contain enough detail to diagnose an issue.
 
 ## Generating a Debug Report
+
+A markdown formatted report is generated autoamtically if the scubalogging detects errors. If there are no errors, the file is not screated, however you can run the command below to create one
 
 `Get-ScubaDebugLogReport` parses a debug log file and produces a Markdown summary suitable for sharing in a GitHub issue or support request.
 
