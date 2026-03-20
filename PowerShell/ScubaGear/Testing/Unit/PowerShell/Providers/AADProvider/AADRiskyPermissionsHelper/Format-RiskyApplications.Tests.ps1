@@ -135,7 +135,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ExpectedKeys = @(
                 "ObjectId", "AppId", "DisplayName", "IsMultiTenantEnabled", `
                 "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions", `
-                "SeverityScore", "MaxScore", "ScorePercentage", "SeverityLevel", "ScoreBreakdown"
+                "TotalPermissionCount", "PriorityScore", "ScoreBreakdown"
             )
             foreach ($App in $AggregateRiskyApps) {
                 # Check for correct properties
@@ -171,51 +171,42 @@ InModuleScope AADRiskyPermissionsHelper {
             { Format-RiskyApplications -RiskyApps @( @{} ) -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
 
-        It "returns severity info with valid properties for each application" {
-            $Weights = Get-SeverityWeights
-            $ExpectedSeverityLevels = $Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" }
-
+        It "returns priority score info with valid properties for each application" {
             foreach ($App in $AggregateRiskyApps) {
-                $App.SeverityScore | Should -BeGreaterOrEqual 0
-                $App.MaxScore | Should -Be $Weights.MaxScore.Application
-                $App.ScorePercentage | Should -BeGreaterOrEqual 0
-                $App.ScorePercentage | Should -BeLessOrEqual 100
-                $App.SeverityLevel | Should -BeIn $ExpectedSeverityLevels
+                $App.PriorityScore | Should -BeGreaterOrEqual 0
                 $App.ScoreBreakdown | Should -Not -BeNullOrEmpty
             }
         }
 
-        It "calculates the correct severity score for Test App 1" {
+        It "calculates the correct priority score for Test App 1" {
             $Weights = Get-SeverityWeights
             $App = $AggregateRiskyApps | Where-Object { $_.DisplayName -eq "Test App 1" }
 
             # Contains 2 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Critical = 25pts) + RoleManagement.ReadWrite.Directory (Critical = 25pts) = 50pts
-            $ExpectedAdminConsentedPoints = [Math]::Min(
-                ($Weights.RiskLevelWeights.Critical * 2),
-                $Weights.AdminConsentedRiskyPermissions.MaxPoints
-            )
+            #   - Application.ReadWrite.All (Critical = 50pts) + RoleManagement.ReadWrite.Directory (Critical = 50pts) = 100pts
+            $ExpectedAdminConsentedPoints = $Weights.RiskLevelWeights.Critical * 2
             # IsMultiTenantEnabled = $true -> 10pts
             $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
 
-            # PasswordCredentials: 1 app cred (long-lived) + 1 SP cred (long-lived) = (2+3)+(4+3) = 12pts, capped at 10
-            $ExpectedPasswordCredentialPoints = $Weights.PasswordCredentials.MaxPoints
+            # Highest risk level = Critical -> credential context = 50pts/cred
+            $CredBase = $Weights.CredentialContextWeights.Critical
+
+            # PasswordCredentials: 2 creds (long-lived) = 2 * (50 + 5) = 110pts
+            $ExpectedPasswordCredentialPoints = 2 * ($CredBase + 5)
             
-            # KeyCredentials: 2 app creds (long-lived) + 1 SP cred (long-lived) = (1+2)+(1+2)+(3+2) = 11pts, capped at 7
-            $ExpectedKeyCredentialPoints = $Weights.KeyCredentials.MaxPoints
+            # KeyCredentials: 3 creds (long-lived) = 3 * (50 + 5) = 165pts
+            $ExpectedKeyCredentialPoints = 3 * ($CredBase + 5)
             
-            # FederatedCredentials: 2 app creds (1pt each) = 2pts, capped at 3
-            $ExpectedFederatedCredentialPoints = 2
+            # FederatedCredentials: 2 creds = 2 * 50 = 100pts
+            $ExpectedFederatedCredentialPoints = 2 * $CredBase
+
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                              + $ExpectedMultiTenantPoints `
                              + $ExpectedKeyCredentialPoints `
                              + $ExpectedPasswordCredentialPoints `
                              + $ExpectedFederatedCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.Application) * 100, 1)
 
-            $App.SeverityScore | Should -Be $ExpectedScore
-            $App.MaxScore | Should -Be $Weights.MaxScore.Application
-            $App.ScorePercentage | Should -Be $ExpectedScorePercentage
+            $App.PriorityScore | Should -Be $ExpectedScore
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
             $App.ScoreBreakdown.MultiTenant.IsMultiTenantEnabled | Should -Be $true

@@ -124,25 +124,18 @@ InModuleScope AADRiskyPermissionsHelper {
             { Format-RiskyThirdPartyServicePrincipals -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
 
-        It "returns severity info for valid properties for each third-party service principal" {
+        It "returns priority score info with valid properties for each third-party service principal" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
 
-            $Weights = Get-SeverityWeights
-            $ExpectedSeverityLevels = $Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" }
-
             foreach ($SP in $ThirdPartySPs) {
-                $SP.SeverityScore | Should -BeGreaterOrEqual 0
-                $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-                $SP.ScorePercentage | Should -BeGreaterOrEqual 0
-                $SP.ScorePercentage | Should -BeLessOrEqual 100
-                $SP.SeverityLevel | Should -BeIn $ExpectedSeverityLevels
+                $SP.PriorityScore | Should -BeGreaterOrEqual 0
                 $SP.ScoreBreakdown | Should -Not -BeNullOrEmpty
                 $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             }
         }
 
-        It "calculates the correct severity score for Test SP 4" {
+        It "calculates the correct priority score for Test SP 4" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
             $Weights = Get-SeverityWeights
@@ -150,34 +143,33 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 4" }
 
             # Contains 8 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Critical = 25 pts)
-            #   - RoleManagement.ReadWrite.Directory (Critical = 25 pts)
-            #   - User.Read.All (High = 15 pts)
+            #   - Application.ReadWrite.All (Critical = 50 pts)
+            #   - RoleManagement.ReadWrite.Directory (Critical = 50 pts)
+            #   - User.Read.All (Medium = 5 pts)
             #   - Mail.ReadWrite (High = 15 pts)
-            #   - GroupMember.ReadWrite.All (Medium = 5 pts)
-            #   - Files.ReadWrite.All (Medium = 5 pts)
-            #   - full_access_as_app (Critical = 25 pts)
-            #   - Mail.ReadWrite (High = 15 pts)
-            #   = 130 pts total, capped at 50
-            $ExpectedAdminConsentedPoints = $Weights.AdminConsentedRiskyPermissions.MaxPoints
+            #   - GroupMember.ReadWrite.All (High = 15 pts)
+            #   - Files.ReadWrite.All (Critical = 50 pts)
+            #   - full_access_as_app (Critical = 50 pts)
+            #   - Mail.ReadWrite (Critical = 50 pts)
+            #   = 285 pts total
+            $ExpectedAdminConsentedPoints = 285
 
             # IsThirdPartyServicePrincipal = $true -> 20pts
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # PasswordCredentials: 2 SP long-lived creds = (4+3)+(4+3) = 14pts, capped at 10
-            $ExpectedPasswordCredentialPoints = $Weights.PasswordCredentials.MaxPoints
+            # Highest risk level = Critical -> credential context = 50pts/cred
+            $CredBase = $Weights.CredentialContextWeights.Critical
+
+            # PasswordCredentials: 2 SP long-lived creds = 2 * (50 + 5) = 110pts
+            $ExpectedPasswordCredentialPoints = 2 * ($CredBase + 5)
 
             # No key credentials -> 0pts
             # No federated credentials -> 0pts
             # No privileged roles -> 0pts
 
             $ExpectedScore = $ExpectedAdminConsentedPoints + $ExpectedThirdPartyPoints + $ExpectedPasswordCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.ServicePrincipal) * 100, 1)
 
-            $SP.SeverityScore | Should -Be $ExpectedScore
-            $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-            $SP.ScorePercentage | Should -Be $ExpectedScorePercentage
-            $SP.SeverityLevel | Should -BeIn ($Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" })
+            $SP.PriorityScore | Should -Be $ExpectedScore
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.IsThirdPartyServicePrincipal | Should -Be $true
@@ -190,15 +182,15 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.PrivilegedRoles | Should -BeNullOrEmpty
         }
 
-        It "calculates the correct severity score for Test SP 6" {
+        It "calculates the correct priority score for Test SP 6" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
             $Weights = Get-SeverityWeights
 
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 6" }
 
-            # Contains 8 admin consented risky permissions, raw = 130pts, capped at 50
-            $ExpectedAdminConsentedPoints = $Weights.AdminConsentedRiskyPermissions.MaxPoints
+            # Contains 8 admin consented risky permissions = 285pts
+            $ExpectedAdminConsentedPoints = 285
 
             # IsThirdPartyServicePrincipal = $true -> 20pts
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
@@ -206,14 +198,17 @@ InModuleScope AADRiskyPermissionsHelper {
             # 1 privileged role (Exchange Administrator) -> PointsPerRole pts
             $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole
 
-            # KeyCredentials: 1 SP long-lived cred = (3 base + 2 long-lived) = 5pts
-            $ExpectedKeyCredentialPoints = 5
+            # Highest risk level = Critical -> credential context = 50pts/cred
+            $CredBase = $Weights.CredentialContextWeights.Critical
 
-            # PasswordCredentials: 1 SP long-lived cred = (4 base + 3 long-lived) = 7pts
-            $ExpectedPasswordCredentialPoints = 7
+            # KeyCredentials: 1 long-lived cred = 1 * (50 + 5) = 55pts
+            $ExpectedKeyCredentialPoints = 1 * ($CredBase + 5)
 
-            # FederatedCredentials: 1 SP federated cred -> PointsPerServicePrincipalCredential pts
-            $ExpectedFederatedCredentialPoints = $Weights.FederatedCredentials.PointsPerServicePrincipalCredential
+            # PasswordCredentials: 1 long-lived cred = 1 * (50 + 5) = 55pts
+            $ExpectedPasswordCredentialPoints = 1 * ($CredBase + 5)
+
+            # FederatedCredentials: 1 cred = 1 * 50 = 50pts
+            $ExpectedFederatedCredentialPoints = 1 * $CredBase
 
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                            + $ExpectedThirdPartyPoints `
@@ -221,12 +216,8 @@ InModuleScope AADRiskyPermissionsHelper {
                            + $ExpectedKeyCredentialPoints `
                            + $ExpectedPasswordCredentialPoints `
                            + $ExpectedFederatedCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.ServicePrincipal) * 100, 1)
 
-            $SP.SeverityScore | Should -Be $ExpectedScore
-            $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-            $SP.ScorePercentage | Should -Be $ExpectedScorePercentage
-            $SP.SeverityLevel | Should -BeIn ($Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" })
+            $SP.PriorityScore | Should -Be $ExpectedScore
 
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
