@@ -185,10 +185,11 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 2
             $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
 
-            # Risk indicators for Test SP 4: Critical admin perms, high-risk perms, password creds, long-lived, third-party, cred volume
+            # Risk indicators for Test SP 4: Critical admin perms, high-risk perms, medium perms, password creds, long-lived, third-party, cred volume
             # Credential base points = CredentialContextWeights.Critical = 50
-            $SP.RiskIndicators | Should -Contain "4 Critical permissions (admin consent) +200 pts"
+            $SP.RiskIndicators | Should -Contain "5 Critical permissions (admin consent) +250 pts"
             $SP.RiskIndicators | Should -Contain "2 High-risk permissions (admin consent) +30 pts"
+            $SP.RiskIndicators | Should -Contain "1 Medium-risk permissions (admin consent) +5 pts"
             $SP.RiskIndicators | Should -Contain "2 Password credentials +100 pts"
             $SP.RiskIndicators | Should -Contain "2 Long-lived credentials +10 pts"
             $SP.RiskIndicators | Should -Contain "Credential volume (2 active) +5 pts"
@@ -253,9 +254,10 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 3
             $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
 
-            # Risk indicators for Test SP 6: Critical admin perms, high-risk perms, all 3 cred types, long-lived, privileged role, cred volume
-            $SP.RiskIndicators | Should -Contain "4 Critical permissions (admin consent) +200 pts"
+            # Risk indicators for Test SP 6: Critical admin perms, high-risk perms, medium perms, all 3 cred types, long-lived, privileged role, cred volume
+            $SP.RiskIndicators | Should -Contain "5 Critical permissions (admin consent) +250 pts"
             $SP.RiskIndicators | Should -Contain "2 High-risk permissions (admin consent) +30 pts"
+            $SP.RiskIndicators | Should -Contain "1 Medium-risk permissions (admin consent) +5 pts"
             $SP.RiskIndicators | Should -Contain "1 Password credentials +50 pts"
             $SP.RiskIndicators | Should -Contain "1 Key credentials +50 pts"
             $SP.RiskIndicators | Should -Contain "1 Federated credentials +50 pts"
