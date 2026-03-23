@@ -124,18 +124,19 @@ InModuleScope AADRiskyPermissionsHelper {
             { Format-RiskyThirdPartyServicePrincipals -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
 
-        It "returns priority score info with valid properties for each third-party service principal" {
+        It "returns risk score info with valid properties for each third-party service principal" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
 
             foreach ($SP in $ThirdPartySPs) {
-                $SP.PriorityScore | Should -BeGreaterOrEqual 0
+                $SP.RiskScore | Should -BeGreaterOrEqual 0
                 $SP.ScoreBreakdown | Should -Not -BeNullOrEmpty
+                $SP.RiskIndicators | Should -Not -BeNullOrEmpty
                 $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             }
         }
 
-        It "calculates the correct priority score for Test SP 4" {
+        It "calculates the correct risk score for Test SP 4" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
             $Weights = Get-SeverityWeights
@@ -172,7 +173,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $ExpectedScore = $ExpectedAdminConsentedPoints + $ExpectedThirdPartyPoints + $ExpectedPasswordCredentialPoints + $ExpectedCredentialVolumePoints
 
-            $SP.PriorityScore | Should -Be $ExpectedScore
+            $SP.RiskScore | Should -Be $ExpectedScore
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.IsThirdPartyServicePrincipal | Should -Be $true
@@ -183,11 +184,16 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be 0
             $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 2
             $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
+
+            # Risk indicators for Test SP 4: Critical admin perms, password creds, long-lived
+            $SP.RiskIndicators | Should -Contain "4 Critical permissions (admin consent)"
+            $SP.RiskIndicators | Should -Contain "2 Password credentials"
+            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials"
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -BeNullOrEmpty
         }
 
-        It "calculates the correct priority score for Test SP 6" {
+        It "calculates the correct risk score for Test SP 6" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
             $Weights = Get-SeverityWeights
@@ -226,7 +232,7 @@ InModuleScope AADRiskyPermissionsHelper {
                            + $ExpectedFederatedCredentialPoints `
                            + $ExpectedCredentialVolumePoints
 
-            $SP.PriorityScore | Should -Be $ExpectedScore
+            $SP.RiskScore | Should -Be $ExpectedScore
 
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
@@ -242,6 +248,14 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
             $SP.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 3
             $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
+
+            # Risk indicators for Test SP 6: Critical admin perms, all 3 cred types, long-lived, privileged role
+            $SP.RiskIndicators | Should -Contain "4 Critical permissions (admin consent)"
+            $SP.RiskIndicators | Should -Contain "1 Password credentials"
+            $SP.RiskIndicators | Should -Contain "1 Key credentials"
+            $SP.RiskIndicators | Should -Contain "1 Federated credentials"
+            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials"
+            $SP.RiskIndicators | Should -Contain "1 Privileged roles (Exchange Administrator)"
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -HaveCount 1
             $SP.PrivilegedRoles[0] | Should -Be "Exchange Administrator"

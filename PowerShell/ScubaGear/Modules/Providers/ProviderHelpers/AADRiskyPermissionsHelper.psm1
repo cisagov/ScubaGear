@@ -621,12 +621,13 @@ function Format-RiskyApplications {
                     $MergedObject = $App
                 }
 
-                # Calculate priority score after admin consent for permissions has been determined
-                $ScoreInfo = Set-PriorityScore -Object $MergedObject -ObjectType "Application"
+                # Calculate risk score after admin consent for permissions has been determined
+                $ScoreInfo = Set-RiskScore -Object $MergedObject -ObjectType "Application"
 
-                # Add priority score info to the merged object
-                $MergedObject | Add-Member -MemberType NoteProperty -Name "PriorityScore" -Value $ScoreInfo.PriorityScore
+                # Add risk score info to the merged object
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "RiskScore" -Value $ScoreInfo.RiskScore
                 $MergedObject | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $ScoreInfo.ScoreBreakdown
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "RiskIndicators" -Value $ScoreInfo.RiskIndicators
 
                 $Applications += $MergedObject
             }
@@ -684,16 +685,17 @@ function Format-RiskyThirdPartyServicePrincipals {
                         $PrivilegedRoles = $PrivilegedServicePrincipals[$ServicePrincipal.ObjectId].roles
                     }
 
-                    # Calculate priority score after admin consent for permissions has been determined
-                    $ScoreInfo = Set-PriorityScore `
+                    # Calculate risk score after admin consent for permissions has been determined
+                    $ScoreInfo = Set-RiskScore `
                         -Object $ServicePrincipal `
                         -ObjectType "ServicePrincipal" `
                         -IsThirdPartyServicePrincipal `
                         -PrivilegedRoles $PrivilegedRoles
 
-                    # Add priority score info to the service principal
-                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "PriorityScore" -Value $ScoreInfo.PriorityScore
+                    # Add risk score info to the service principal
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "RiskScore" -Value $ScoreInfo.RiskScore
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $ScoreInfo.ScoreBreakdown
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "RiskIndicators" -Value $ScoreInfo.RiskIndicators
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "PrivilegedRoles" -Value $PrivilegedRoles
 
                     $ServicePrincipals += $ServicePrincipal
@@ -713,10 +715,10 @@ function Format-RiskyThirdPartyServicePrincipals {
 function Get-SeverityWeights {
     <#
     .Description
-    Returns the weight factors used in priority score calculation.
+    Returns the weight factors used in risk score calculation.
 
-    The priority score is a raw additive value — higher means higher risk.
-    Apps/SPs are sorted by priority score descending. No thresholds or severity labels.
+    The risk score is a raw additive value — higher means higher risk.
+    Apps/SPs are sorted by risk score descending. No thresholds or severity labels.
 
     Factor                        Notes
     ---------------------------------------------------------------------------------------
@@ -809,7 +811,7 @@ function ConvertFrom-DotNetDate {
 function Set-CredentialScore {
     <#
     .Description
-    Calculates the priority score contribution from credentials. Base points per credential
+    Calculates the risk score contribution from credentials. Base points per credential
     are determined by the highest risk level permission on the parent app/SP. Lifetime tier
     bonuses are added for long-lived credentials. Expired credentials are excluded.
     .Functionality
@@ -843,7 +845,6 @@ function Set-CredentialScore {
     }
 
     foreach ($Credential in $AccessKeys) {
-        $CredentialCount++
         $ThisCredentialPoints = 0
 
         # Skip expired credentials — they cannot be used for authentication
@@ -853,6 +854,8 @@ function Set-CredentialScore {
                 continue
             }
         }
+
+        $CredentialCount++
 
         # Base points determined by the app/SP's highest risk level
         $ThisCredentialPoints += $BasePointsPerCredential
@@ -885,10 +888,10 @@ function Set-CredentialScore {
     }
 }
 
-function Set-PriorityScore {
+function Set-RiskScore {
     <#
     .Description
-    Calculates a priority score for each risky application/service principal. The score is a raw
+    Calculates a risk score for each risky application/service principal. The score is a raw
     additive value — higher means higher risk. No thresholds, percentages, or severity labels.
 
     Factors:
@@ -898,7 +901,7 @@ function Set-PriorityScore {
     - Multi-tenant, third-party, privileged roles as additive bonuses
     - Permission volume (1pt per 10 total permissions)
 
-    Apps/SPs should be displayed sorted by PriorityScore descending.
+    Apps/SPs should be displayed sorted by RiskScore descending.
     .Functionality
     #Internal
     #>
@@ -1066,13 +1069,69 @@ function Set-PriorityScore {
             TotalPoints = $PermissionVolumePoints
         }
 
+        # 12. Generate risk indicators — plain-English flags that explain WHY the score is high
+        $RiskIndicators = @()
+
+        # Critical/High admin-consented permissions
+        $CriticalAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" }).Count
+        $HighAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }).Count
+        if ($CriticalAdminCount -gt 0) {
+            $RiskIndicators += "$CriticalAdminCount Critical permissions (admin consent)"
+        }
+        elseif ($HighAdminCount -gt 0) {
+            $RiskIndicators += "$HighAdminCount High-risk permissions (admin consent)"
+        }
+
+        # Non-admin consented risky permissions
+        if ($NonAdminConsentedRiskyPermissions.Count -gt 0) {
+            $RiskIndicators += "$($NonAdminConsentedRiskyPermissions.Count) Risky permissions (no admin consent)"
+        }
+
+        # Credential presence — show each type so admins can see what auth paths exist
+        if ($PasswordScore.CredentialCount -gt 0) {
+            $RiskIndicators += "$($PasswordScore.CredentialCount) Password credentials"
+        }
+        if ($KeyScore.CredentialCount -gt 0) {
+            $RiskIndicators += "$($KeyScore.CredentialCount) Key credentials"
+        }
+        if ($FederatedScore.CredentialCount -gt 0) {
+            $RiskIndicators += "$($FederatedScore.CredentialCount) Federated credentials"
+        }
+
+        # Long-lived credentials
+        $TotalLongLived = $PasswordScore.LongLivedCredentialCount + $KeyScore.LongLivedCredentialCount
+        if ($TotalLongLived -gt 0) {
+            $RiskIndicators += "$TotalLongLived Long-lived credentials"
+        }
+
+        # Multi-tenant
+        if ($MultiTenantPoints -gt 0) {
+            $RiskIndicators += "Multi-tenant app"
+        }
+
+        # Third-party: not shown as a risk indicator because the third-party SPs table
+        # is already filtered to third-party only. The bonus points still apply to the score.
+
+        # Privileged roles
+        if ($PrivilegedRolesPoints -gt 0) {
+            $RoleCount = $PrivilegedRoles.Count
+            $RoleNames = $PrivilegedRoles -join ", "
+            $RiskIndicators += "$RoleCount Privileged roles ($RoleNames)"
+        }
+
+        # Over-permissioned
+        if ($TotalPermissionCount -gt 20) {
+            $RiskIndicators += "Over-permissioned ($TotalPermissionCount total)"
+        }
+
         return [PSCustomObject]@{
-            PriorityScore = $Score
+            RiskScore = $Score
             ScoreBreakdown = $ScoreBreakdown
+            RiskIndicators = $RiskIndicators
         }
     }
     catch {
-        Write-Warning "An error occurred in Set-PriorityScore: $($_.Exception.Message)"
+        Write-Warning "An error occurred in Set-RiskScore: $($_.Exception.Message)"
         Write-Warning "Stack trace: $($_.ScriptStackTrace)"
         throw $_
     }

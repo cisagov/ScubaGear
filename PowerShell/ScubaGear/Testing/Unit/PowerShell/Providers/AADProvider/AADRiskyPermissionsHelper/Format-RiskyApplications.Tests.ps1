@@ -135,7 +135,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ExpectedKeys = @(
                 "ObjectId", "AppId", "DisplayName", "IsMultiTenantEnabled", `
                 "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions", `
-                "TotalPermissionCount", "PriorityScore", "ScoreBreakdown"
+                "TotalPermissionCount", "RiskScore", "ScoreBreakdown", "RiskIndicators"
             )
             foreach ($App in $AggregateRiskyApps) {
                 # Check for correct properties
@@ -171,14 +171,15 @@ InModuleScope AADRiskyPermissionsHelper {
             { Format-RiskyApplications -RiskyApps @( @{} ) -RiskySPs @() | Should -Throw -ErrorType System.Management.Automation.ParameterBindingValidationException }
         }
 
-        It "returns priority score info with valid properties for each application" {
+        It "returns risk score info with valid properties for each application" {
             foreach ($App in $AggregateRiskyApps) {
-                $App.PriorityScore | Should -BeGreaterOrEqual 0
+                $App.RiskScore | Should -BeGreaterOrEqual 0
                 $App.ScoreBreakdown | Should -Not -BeNullOrEmpty
+                $App.RiskIndicators | Should -Not -BeNullOrEmpty
             }
         }
 
-        It "calculates the correct priority score for Test App 1" {
+        It "calculates the correct risk score for Test App 1" {
             $Weights = Get-SeverityWeights
             $App = $AggregateRiskyApps | Where-Object { $_.DisplayName -eq "Test App 1" }
 
@@ -210,7 +211,7 @@ InModuleScope AADRiskyPermissionsHelper {
                              + $ExpectedFederatedCredentialPoints `
                              + $ExpectedCredentialVolumePoints
 
-            $App.PriorityScore | Should -Be $ExpectedScore
+            $App.RiskScore | Should -Be $ExpectedScore
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
             $App.ScoreBreakdown.MultiTenant.IsMultiTenantEnabled | Should -Be $true
@@ -223,6 +224,14 @@ InModuleScope AADRiskyPermissionsHelper {
             $App.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
             $App.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 7
             $App.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
+
+            # Risk indicators for Test App 1: 2 Critical admin, 3 types of creds, long-lived, multi-tenant
+            $App.RiskIndicators | Should -Contain "2 Critical permissions (admin consent)"
+            $App.RiskIndicators | Should -Contain "2 Password credentials"
+            $App.RiskIndicators | Should -Contain "3 Key credentials"
+            $App.RiskIndicators | Should -Contain "2 Federated credentials"
+            $App.RiskIndicators | Should -Contain "5 Long-lived credentials"
+            $App.RiskIndicators | Should -Contain "Multi-tenant app"
         }
     }
 }

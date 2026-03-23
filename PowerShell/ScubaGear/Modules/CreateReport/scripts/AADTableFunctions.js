@@ -39,7 +39,8 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
-            { name: "PriorityScore", className: "priority_score" },
+            { name: "RiskScore", className: "risk_score" },
+            { name: "RiskIndicators", className: "risk_indicators" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -54,7 +55,8 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
-            { name: "PriorityScore", className: "priority_score" },
+            { name: "RiskScore", className: "risk_score" },
+            { name: "RiskIndicators", className: "risk_indicators" },
             { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -64,17 +66,17 @@ const TABLE_METADATA = {
     }
 };
 
-// Sort tables in descending order by PriorityScore (highest first)
+// Sort tables in descending order by RiskScore (highest first)
 
 /* Associate the table type with the sorting column and direction (asc/desc)
  *
- * { [tableType]: { column: "PriorityScore", ascending: "asc"/"desc" } }
+ * { [tableType]: { column: "RiskScore", ascending: "asc"/"desc" } }
  */
 const tableSortState = {};
 
 /**
  * Sorts a data array by a given column and direction.
- * Numeric columns (like PriorityScore) sort numerically.
+ * Numeric columns (like RiskScore) sort numerically.
  *
  * @param {Array} data - The data array to sort.
  * @param {string} column - The column name to sort by.
@@ -87,7 +89,7 @@ const sortData = (data, column, direction) => {
         let valueB = b[column];
 
         if (typeof valueA === "number" && typeof valueB === "number") {
-            // Numeric sort (PriorityScore, TotalPermissionCount, etc.)
+            // Numeric sort (RiskScore, TotalPermissionCount, etc.)
         }
         // Arrays/objects (e.g. Permissions, Credentials) sort by count
         else if (Array.isArray(valueA) || typeof valueA === "object") {
@@ -219,7 +221,8 @@ const handleSortClick = (data, tableType, column) => {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
-        case "PriorityScore": return "Priority Score";
+        case "RiskScore": return "Risk Score";
+        case "RiskIndicators": return "Risk Indicators";
         case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
@@ -228,6 +231,29 @@ const normalizeColumnNames = (name) => {
         case "TotalPermissionCount": return "Total Permissions";
         default: return name;
     }
+};
+
+/**
+ * Maps a risk indicator string to a CSS severity class for color-coding.
+ *
+ * @param {string} indicator - The risk indicator text.
+ * @returns {string} - CSS class: "indicator-critical", "indicator-high", "indicator-medium", or "indicator-low".
+ */
+const getIndicatorSeverityClass = (indicator) => {
+    const text = indicator.toLowerCase();
+    if (text.includes("critical permissions") || text.includes("privileged role")) {
+        return "indicator-critical";
+    }
+    if (text.includes("high-risk permissions") || text.includes("third-party")) {
+        return "indicator-high";
+    }
+    if (text.includes("long-lived") || text.includes("risky permissions") || text.includes("multi-tenant")) {
+        return "indicator-medium";
+    }
+    if (text.includes("password credentials") || text.includes("key credentials") || text.includes("federated credentials") || text.includes("over-permissioned")) {
+        return "indicator-low";
+    }
+    return "indicator-low";
 };
 
 /**
@@ -338,11 +364,11 @@ const buildExpandableTable = (data, tableType) => {
         collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
         buttons.appendChild(collapseAll);
 
-        // Sort risky tables by PriorityScore in descending order by default
+        // Sort risky tables by RiskScore in descending order by default
         if (isSortable) {
-            const sorted = sortData(data, "PriorityScore", "desc");
+            const sorted = sortData(data, "RiskScore", "desc");
             data.splice(0, data.length, ...sorted);
-            tableSortState[tableType] = { column: "PriorityScore", direction: "desc" };
+            tableSortState[tableType] = { column: "RiskScore", direction: "desc" };
         }
 
         const table = document.createElement("table");
@@ -360,7 +386,7 @@ const buildExpandableTable = (data, tableType) => {
             // Exclude 0th column since it's set to "" for the expand/collapse arrows.
             if (isSortable && col.name !== "") {
                 th.dataset.column = col.name;
-                th.setAttribute("aria-sort", col.name === "PriorityScore" ? "descending" : "none");
+                th.setAttribute("aria-sort", col.name === "RiskScore" ? "descending" : "none");
 
                 const btn = document.createElement("button");
                 btn.classList.add("sort-btn");
@@ -374,7 +400,7 @@ const buildExpandableTable = (data, tableType) => {
                 indicator.classList.add("sort-indicator");
                 indicator.setAttribute("aria-hidden", "true");
                 
-                if (col.name === "PriorityScore") {
+                if (col.name === "RiskScore") {
                     // Default sorted column - show desc icon immediately
                     indicator.appendChild(createSortIcon("desc"));
                     indicator.classList.add("sort-indicator--active");
@@ -452,6 +478,26 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 
     if (cellData === null || cellData === undefined) {
         td.textContent = "None";
+        return;
+    }
+
+    // Render RiskIndicators as inline tags (no truncation)
+    if (col.name === "RiskIndicators") {
+        td.textContent = ""; // Clear any existing content (e.g. after collapse)
+        const indicators = normalizeToArray(cellData);
+        if (indicators.length === 0) {
+            td.textContent = "None";
+            return;
+        }
+        const container = document.createElement("div");
+        container.className = "risk-indicators-container";
+        indicators.forEach(indicator => {
+            const tag = document.createElement("span");
+            tag.className = "risk-indicator-tag " + getIndicatorSeverityClass(indicator);
+            tag.textContent = indicator;
+            container.appendChild(tag);
+        });
+        td.appendChild(container);
         return;
     }
 
@@ -538,6 +584,25 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                 })
             );
 
+            return;
+        }
+
+        // Render RiskIndicators as inline tags in expanded view
+        if (col.name === "RiskIndicators") {
+            const indicators = normalizeToArray(cellData || []);
+            if (indicators.length === 0) {
+                td.textContent = "None";
+                return;
+            }
+            const container = document.createElement("div");
+            container.className = "risk-indicators-container";
+            indicators.forEach(indicator => {
+                const tag = document.createElement("span");
+                tag.className = "risk-indicator-tag " + getIndicatorSeverityClass(indicator);
+                tag.textContent = indicator;
+                container.appendChild(tag);
+            });
+            td.appendChild(container);
             return;
         }
         
