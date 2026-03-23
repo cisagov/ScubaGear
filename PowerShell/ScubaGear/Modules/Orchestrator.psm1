@@ -540,9 +540,6 @@ function Invoke-SCuBA {
             # Some products succeeded - continue with the successful ones
             $ScubaConfig.ProductNames = $Difference
         }
-        else {
-            Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "InvokeScuba"
-        }
 
         # Capture module snapshot after authentication to log what modules were imported
         if ($Script:ScubaLoggingEnabled) {
@@ -599,9 +596,6 @@ function Invoke-SCuBA {
                 -ProductsFailed $ProdProviderFailed `
                 -ExceptionMessage 'All indicated Product Providers failed to execute'
             }
-            else {
-                Write-ScubaLog -Message "All providers executed successfully" -Level "Info" -Source "InvokeScuba"
-            }
 
             # OPA Rego invocation
             # Rego parameters consolidated into ScubaConfig; remaining args passed explicitly
@@ -628,10 +622,6 @@ function Invoke-SCuBA {
                 $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
                 -ProductsFailed  $ProdRegoFailed `
                 -ExceptionMessage 'All indicated Product Rego invocations failed'
-            }
-            else {
-                Write-ScubaLog -Message "All Rego evaluations completed successfully" -Level "Info" -Source "InvokeScuba"
-
             }
 
             # Report Creation - using ScubaConfig for most settings

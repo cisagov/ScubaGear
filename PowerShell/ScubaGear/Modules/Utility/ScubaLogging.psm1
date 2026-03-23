@@ -1172,9 +1172,10 @@ function Update-ScubaModuleSnapshot {
         }
 
         # Get all currently loaded modules
-        $loadedModules = Get-Module | Where-Object { $_.Name -in $requiredModuleNames -or $_.Name -eq 'ScubaGear' }
+        # Wrap in @() to ensure it's always an array, even with a single result, so .Count works correctly
+        $loadedModules = @(Get-Module | Where-Object { $_.Name -in $requiredModuleNames -or $_.Name -eq 'ScubaGear' })
 
-        if ($loadedModules) {
+        if ($loadedModules.Count -gt 0) {
             # Build a structured list of loaded modules
             $moduleData = @{
                 SnapshotName = $SnapshotName
