@@ -38,7 +38,8 @@ const TABLE_METADATA = {
         useModal: true,
         columns: [
             { name: "" },
-            { name: "DisplayName" },
+            { name: "DisplayName", className: "display_name" },
+            { name: "SeverityLevel", className: "severity_level" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -53,12 +54,168 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
+            { name: "SeverityLevel", className: "severity_level" },
+            { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
             { name: "FederatedCredentials", className: "federated_credentials" },
             { name: "Permissions", className: "permissions" }
         ]
     }
+};
+
+// Sort tables in descending order, starting with "Critical" first
+const SEVERITY_SORT_ORDER = {
+    Critical: 4,
+    High: 3,
+    Medium: 2,
+    Low: 1,
+};
+
+/* Associate the table type with the sorting column and direction (asc/desc)
+ *
+ * { [tableType]: { column: "SeverityLevel", ascending: "asc"/"desc" } }
+ */
+const tableSortState = {};
+
+/**
+ * Sorts a data array by a given column and direction.
+ * SeverityLevel uses SEVERITY_SORT_ORDER for ordering rather than alphabetical.
+ *
+ * @param {Array} data - The data array to sort.
+ * @param {string} column - The column name to sort by.
+ * @param {string} direction - "asc" or "desc".
+ * @returns {Array} - Sorted copy of the data array.
+ */
+const sortData = (data, column, direction) => {
+    return [...data].sort((a, b) => {
+        let valueA = a[column];
+        let valueB = b[column];
+
+        if (column === "SeverityLevel") {
+            valueA = SEVERITY_SORT_ORDER[valueA];
+            valueB = SEVERITY_SORT_ORDER[valueB];
+        }
+        // Arrays/objects (e.g. Permissions, Credentials) sort by count
+        else if (Array.isArray(valueA) || typeof valueA === "object") {
+            valueA = normalizeToArray(valueA).length;
+            valueB = normalizeToArray(valueB).length;
+        }
+        // Booleans
+        else if (typeof valueA === "boolean") {
+            valueA = valueA ? 0 : 1;
+            valueB = valueB ? 0 : 1;
+        }
+        // Strings
+        else {
+            valueA = String(valueA ?? "").toLowerCase();
+            valueB = String(valueB ?? "").toLowerCase();
+        }
+
+        if (valueA < valueB) return direction === "asc" ? -1 : 1;
+        if (valueA > valueB) return direction === "asc" ? 1 : -1;
+        return 0;
+    })
+};
+
+/**
+ * Creates a sort indicator <img> icon for the given state.
+ * 
+ * @param {"asc" | "desc" | "none"} state - The sort state.
+ * @returns {HTMLImageElement} - An <img> element.
+ */
+const createSortIcon = (state) => {
+    const img = document.createElement("img");
+    const map = {
+        asc:  { src: "images/arrow-up.svg", alt: "Sorted ascending" },
+        desc: { src: "images/arrow-down.svg", alt: "Sorted descending" },
+        none: { src: "images/arrow-down-up.svg", alt: "Sort" }
+    };
+
+    const metadata = map[state] || map.none;
+    img.setAttribute("src", metadata.src);
+    img.setAttribute("alt", metadata.alt);
+    img.classList.add("sort-icon");
+    return img;
+};
+
+/**
+ * Updates the sort indicator icons on all column headers for the given table.
+ *
+ * @param {string} tableType - The type of table (e.g., "riskyApps", "riskyThirdPartySPs").
+ * @param {string} activeColumn - The currently sorted column name.
+ * @param {string} direction - "asc" or "desc".
+ */
+const updateSortIndicators = (tableType, activeColumn, direction) => {
+    document.querySelectorAll(`.${tableType}_table thead th`).forEach(th => {
+        const indicator = th.querySelector(".sort-indicator");
+        if (!indicator) return;
+
+        const col = th.dataset.column;
+        indicator.textContent = "";
+        if (col === activeColumn) {
+            indicator.appendChild(createSortIcon(direction));
+            indicator.setAttribute("aria-label", direction === "asc" ? "sorted ascending" : "sorted descending");
+            indicator.classList.add("sort-indicator--active");
+            th.setAttribute("aria-sort", direction === "asc" ? "ascending" : "descending");
+        }
+        else {
+            indicator.appendChild(createSortIcon("none"));
+            indicator.removeAttribute("aria-label");
+            indicator.classList.remove("sort-indicator--active");
+            th.setAttribute("aria-sort", "none");
+        }
+    });
+};
+
+/**
+ * Handles a column header click to sort the table by that column.
+ * Toggles between ascending and descending; defaults to descending on first click.
+ *
+ * @param {Array} data - The original data array.
+ * @param {string} tableType - The type of table.
+ * @param {string} column - The column name to sort by.
+ */
+const handleSortClick = (data, tableType, column) => {
+    const currentState = tableSortState[tableType] || {};
+    const direction = (currentState.column === column && currentState.direction === "desc")
+        ? "asc"
+        : "desc";
+
+    tableSortState[tableType] = { column, direction };
+
+    const sorted = sortData(data, column, direction);
+
+    // Replace data in-place so all existing references (expand/collapse) stay in sync
+    data.splice(0, data.length, ...sorted);
+
+    const tbody = document.querySelector(`.${tableType}_table tbody`);
+    const colNames = TABLE_METADATA[tableType].columns;
+
+    tbody.querySelectorAll("tr").forEach((row, rowIndex) => {
+        colNames.forEach((_, colIndex) => {
+            const td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
+            td.textContent = "";
+
+            if (colIndex === 0) {
+                td.appendChild(
+                    createRowActionButton({
+                        title: `Show more info for row ${rowIndex + 1}`,
+                        className: "chevron",
+                        rowIndex,
+                        onClick: (event) => expandRow(data, tableType, event),
+                        contentBuilder: () => createChevronIcon("right", 10)
+                    })
+                );
+            }
+            else {
+                fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+            }
+        });
+    });
+
+    colorRiskyRows(data, tableType);
+    updateSortIndicators(tableType, column, direction);
 };
 
 /**
@@ -70,6 +227,8 @@ const TABLE_METADATA = {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
+        case "SeverityLevel": return "Risk Level";
+        case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
         case "PasswordCredentials": return "Password Credentials";
@@ -122,6 +281,40 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
 };
 
 /**
+ * Colors a row in the risk apps/SPs table based on its severity level.
+ * 
+ * Critical = red
+ * High = orange
+ * Medium = yellow
+ * Low/None = no color
+ * 
+ * @param {Array} data - The table content.
+ * @param {string} tableType - The type of table (e.g., "riskyApps", "riskySPs").
+ */
+const colorRiskyRows = (data, tableType) => {
+    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
+        const severityLevel = data[rowIndex]?.SeverityLevel;
+        switch (severityLevel) {
+            case "Critical":
+                row.style.background = "var(--severity-critical)";
+                break;
+            case "High":
+                row.style.background = "var(--severity-high)";
+                break;
+            case "Medium":
+                row.style.background = "var(--severity-medium)";
+                break;
+            case "Low":
+                row.style.background = "var(--severity-low)";
+                break;
+            default: 
+                row.style.background = "transparent";
+                break;
+        }
+    });
+};
+
+/**
  * Shared function to build a table with expand/collapse chevrons and truncation.
  * 
  * @param {Array} data - The data array.
@@ -148,6 +341,7 @@ const buildExpandableTable = (data, tableType) => {
             return;
         }
 
+        const isSortable = tableType === "riskyApps" || tableType === "riskyThirdPartySPs";
         const colNames = metadata.columns;
         const section = document.createElement("section");
         section.className = metadata.wrapperClass;
@@ -185,6 +379,13 @@ const buildExpandableTable = (data, tableType) => {
         collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
         buttons.appendChild(collapseAll);
 
+        // Sort risky tables by SeverityLevel in descending order by default
+        if (isSortable) {
+            const sorted = sortData(data, "SeverityLevel", "desc");
+            data.splice(0, data.length, ...sorted);
+            tableSortState[tableType] = { column: "SeverityLevel", direction: "desc" };
+        }
+
         const table = document.createElement("table");
         table.className = `${tableType}_table`;
         section.appendChild(table);
@@ -194,9 +395,44 @@ const buildExpandableTable = (data, tableType) => {
 
         colNames.forEach(col => {
             const th = document.createElement("th");
-            th.textContent = normalizeColumnNames(col.name);
-
+            //th.textContent = normalizeColumnNames(col.name);
             if (col.className) th.classList.add(col.className);
+            
+            // Exclude 0th column since it's set to "" for the expand/collapse arrows.
+            if (isSortable && col.name !== "") {
+                th.dataset.column = col.name;
+                th.setAttribute("aria-sort", col.name === "SeverityLevel" ? "descending" : "none");
+
+                const btn = document.createElement("button");
+                btn.classList.add("sort-btn");
+                btn.title = `Sort by ${normalizeColumnNames(col.name)}`;
+                btn.addEventListener("click", () => handleSortClick(data, tableType, col.name));
+
+                const label = document.createElement("span");
+                label.textContent = normalizeColumnNames(col.name);
+
+                const indicator = document.createElement("span");
+                indicator.classList.add("sort-indicator");
+                indicator.setAttribute("aria-hidden", "true");
+                
+                if (col.name === "SeverityLevel") {
+                    // Default sorted column - show desc icon immediately
+                    indicator.appendChild(createSortIcon("desc"));
+                    indicator.classList.add("sort-indicator--active");
+                }
+                else {
+                    // All other columns - show neutral icon only on hover
+                    indicator.appendChild(createSortIcon("none"));
+                }
+
+                btn.appendChild(label);
+                btn.appendChild(indicator);
+                th.appendChild(btn);
+            }
+            else {
+                th.textContent = normalizeColumnNames(col.name);
+            }
+
             header.appendChild(th);
         });
 
@@ -232,11 +468,28 @@ const buildExpandableTable = (data, tableType) => {
 
             tbody.appendChild(tr);
         });
+
+        if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+            colorRiskyRows(data, tableType);
+        }
     }
     catch (error) {
         console.error(`Error building expandable table for ${tableType}:`, error);
     }
 }
+
+/**
+ * Creates a severity badge element for the given severity level.
+ * 
+ * @param {string} level - "Critical", "High", "Medium", or "Low".
+ * @returns {HTMLElement} - A styled <span> badge element.
+ */
+const createSeverityBadge = (level) => {
+    const span = document.createElement("span");
+    span.classList.add("severity-badge", level);
+    span.textContent = level ?? "Unknown";
+    return span;
+};
 
 /**
  * Fills a cell with truncated content and three-dots button (for expanding) if needed.
@@ -309,6 +562,13 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
             })
         );
     }
+
+    if (col.name === "SeverityLevel") {
+        td.textContent = "";
+        td.appendChild(createSeverityBadge(cellData));
+        
+        return;
+    }
 }
 
 /**
@@ -373,6 +633,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     let dataType = "";
                     if (col.name === "Permissions") dataType = "Permissions";
                     if (col.name === "KeyCredentials" || col.name === "PasswordCredentials") dataType = "Credentials";
+                    if (col.name === "PrivilegedRoles") dataType = "PrivilegedRoles";
 
                     let node = renderKeyValueList(items, { advanced: true, dataType });
                     const title = `${rowLabel} - ${colLabel}`;
@@ -389,6 +650,13 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
         }
 
         td.textContent = cellData ?? "None";
+
+        if (col.name === "SeverityLevel") {
+            td.textContent = "";
+            td.appendChild(createSeverityBadge(cellData));
+
+            return;
+        }
     });
 }
 
@@ -446,6 +714,10 @@ const expandAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillExpandedRow(data, tableType, row, rowIndex);
     });
+
+    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+        colorRiskyRows(data, tableType);
+    }
 }
 
 /**
@@ -471,6 +743,10 @@ const collapseAllRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         fillCollapsedRow(data, tableType, row, rowIndex);
     });
+
+    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+        colorRiskyRows(data, tableType);
+    }
 }
 
 /**
@@ -631,6 +907,12 @@ const renderSummaryList = (colName, items) => {
 
     // Federated credentials do not expire so only display the total count
     if (colName === "FederatedCredentials") {
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+        return ul;
+    }
+
+    if (colName === "PrivilegedRoles") {
         const ul = makeUl();
         addItem(ul, "Total", count);
         return ul;

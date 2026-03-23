@@ -86,19 +86,27 @@ function Format-Permission {
 
         [ValidateNotNullOrEmpty()]
         [boolean]
-        $IsAdminConsented
+        $IsAdminConsented,
+
+        [ValidateNotNullOrEmpty()]
+        [boolean]
+        $RequiresAdminConsent
     )
     $Map = @()
-    if ( $RoleType -ne $null) {
+    if ($null -ne $RoleType) {
         $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
         $IsRisky = $RiskyPermissions -contains $Id
+        $RiskLevel = $Json.permissions.$AppDisplayName.$RoleType.$Id.RiskLevel
+
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
             RoleType               = if ($null -ne $RoleType) { $RoleType } else { $null }
             RoleDisplayName        = if ($null -ne $RoleDisplayName) { $RoleDisplayName } else { $null }
             ApplicationDisplayName = $AppDisplayName
             IsAdminConsented       = $IsAdminConsented
+            RequiresAdminConsent   = $RequiresAdminConsent
             IsRisky                = $IsRisky
+            RiskLevel              = $RiskLevel
         }
     }
     return $Map
@@ -120,20 +128,37 @@ function Format-Credentials {
 
         [ValidateNotNullOrEmpty()]
         [boolean]
-        $IsFromApplication
+        $IsFromApplication,
+
+        [switch]
+        $IsFederated
     )
 
     process {
         $ValidCredentials = @()
-        $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
+
+        if ($IsFederated) {
+            $RequiredKeys = @("Id", "Name", "Description", "Issuer", "Subject", "Audiences")
+        }
+        else {
+            $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
+        }
+        
         foreach ($Credential in $AccessKeys) {
             # Only format credentials with the correct keys
             $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
             if ($MissingKeys.Count -eq 0) {
-                # $Credential is of type PSCredential which is immutable, create a copy
-                $CredentialCopy = $Credential | Select-Object -Property `
-                    KeyId, DisplayName, StartDateTime, EndDateTime, `
-                    @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                if ($IsFederated) {
+                    # $Credential is of type PSCredential which is immutable, create a copy
+                    $CredentialCopy = $Credential | Select-Object -Property `
+                        Id, Name, Description, Issuer, Subject, Audiences,`
+                        @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                }
+                else {
+                    $CredentialCopy = $Credential | Select-Object -Property `
+                        KeyId, DisplayName, StartDateTime, EndDateTime, `
+                        @{ Name = "IsFromApplication"; Expression = { $IsFromApplication }}
+                }
                 $ValidCredentials += $CredentialCopy
             }
         }
@@ -291,10 +316,15 @@ function Get-ApplicationsWithRiskyPermissions {
                             if ($Role.Type -eq "Role") {
                                 $ReadableRoleType = "Application"
                                 $RoleDisplayName = ($ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }).value
+                                # Application permissions always require admin consent
+                                $RequiresAdminConsent = $true
                             }
                             else {
                                 $ReadableRoleType = "Delegated"
-                                $RoleDisplayName = ($ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }).value
+                                $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
+                                $RoleDisplayName = $OauthScope.value
+                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
+                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
                             }
 
                             $MappedPermissions += Format-Permission `
@@ -303,7 +333,8 @@ function Get-ApplicationsWithRiskyPermissions {
                                 -Id $RoleId `
                                 -RoleType $ReadableRoleType `
                                 -RoleDisplayName $RoleDisplayName `
-                                -IsAdminConsented $IsAdminConsented
+                                -IsAdminConsented $IsAdminConsented `
+                                -RequiresAdminConsent $RequiresAdminConsent
                         }
                     }
                 }
@@ -328,8 +359,10 @@ function Get-ApplicationsWithRiskyPermissions {
                     $FederatedCredentialsResults = $null
                 }
 
+                $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+
                 # Exclude applications without risky permissions
-                if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
+                if ($RiskyPermissions.Count -gt 0) {
                     $ApplicationResults += [PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
@@ -339,7 +372,7 @@ function Get-ApplicationsWithRiskyPermissions {
                         # Differentiate between the two by setting IsFromApplication=$true
                         KeyCredentials       = Format-Credentials -AccessKeys $App.KeyCredentials -IsFromApplication $true
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
-                        FederatedCredentials = $FederatedCredentialsResults
+                        FederatedCredentials = Format-Credentials -AccessKeys $FederatedCredentialsResults -IsFromApplication $true -IsFederated
                         Permissions          = $MappedPermissions
                     }
                 }
@@ -449,12 +482,20 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                         if ($null -ne $AppRole) {
                                             $ReadableRoleType = "Application"
                                             $RoleDisplayName = $AppRole.value
+                                            # Application permissions always require admin consent
+                                            $RequiresAdminConsent = $true
                                         }
                                         else {
                                             $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
                                             if ($null -ne $OauthScope) {
                                                 $ReadableRoleType = "Delegated"
                                                 $RoleDisplayName = $OauthScope.value
+                                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
+                                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
+                                            }
+                                            else {
+                                                # RoleId not found in either appRoles or oauth2PermissionScopes, skip permission
+                                                continue
                                             }
                                         }
 
@@ -464,7 +505,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                             -Id $RoleId `
                                             -RoleType $ReadableRoleType `
                                             -RoleDisplayName $RoleDisplayName `
-                                            -IsAdminConsented $IsAdminConsented
+                                            -IsAdminConsented $IsAdminConsented `
+                                            -RequiresAdminConsent $RequiresAdminConsent
                                     }
                                 }
                             }
@@ -472,8 +514,10 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                             Write-Warning "Error for service principal $($Result.id): $($Result.status)"
                         }
 
+                        $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+
                         # Exclude service principals without risky permissions
-                        if ($MappedPermissions.Count -gt 0 -and ($MappedPermissions | Where-Object { $_.IsRisky -eq $true }).Count -gt 0) {
+                        if ($RiskyPermissions.Count -gt 0) {
                             $ServicePrincipalResults += [PSCustomObject]@{
                                 ObjectId                = $ServicePrincipal.Id
                                 AppId                   = $ServicePrincipal.AppId
@@ -483,7 +527,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 # Differentiate between the two by setting IsFromApplication=$false
                                 KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
                                 PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                                FederatedCredentials    = $ServicePrincipal.FederatedIdentityCredentials
+                                FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
                                 Permissions             = $MappedPermissions
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
@@ -566,6 +610,17 @@ function Format-RiskyApplications {
                 else {
                     $MergedObject = $App
                 }
+
+                # Calculate severity score after admin consent for permissions has been determined
+                $SeverityInfo = Set-SeverityScore -Object $MergedObject -ObjectType "Application"
+
+                # Add severity info to the merged object
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
+
                 $Applications += $MergedObject
             }
         }
@@ -592,7 +647,11 @@ function Format-RiskyThirdPartyServicePrincipals {
 
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        # Raw hashtable containing privileged service principals which is keyed by ServicePrincipalId (object id)
+        [hashtable]
+        $PrivilegedServicePrincipals = @{}
     )
     process {
         try {
@@ -604,8 +663,35 @@ function Format-RiskyThirdPartyServicePrincipals {
                     continue
                 }
 
+                # A null value indicates the owner organization is unknown (e.g., agent service principal)
+                # and should not be treated as a third-party service principal.
+                if ($null -eq $ServicePrincipal.AppOwnerOrganizationId) {
+                    Write-Warning "Service principal $($ServicePrincipal.DisplayName) with AppId $($ServicePrincipal.AppId) does not have an AppOwnerOrganizationId. Skipping."
+                    continue
+                }
+
                 # If the service principal's owner id is not the same as this tenant then it is a 3rd party principal
                 if ($ServicePrincipal.AppOwnerOrganizationId -ne $OrgInfo.Id) {
+                    $PrivilegedRoles = @()
+                    if ($PrivilegedServicePrincipals.ContainsKey($ServicePrincipal.ObjectId)) {
+                        $PrivilegedRoles = $PrivilegedServicePrincipals[$ServicePrincipal.ObjectId].roles
+                    }
+
+                    # Calculate severity score after admin consent for permissions has been determined
+                    $SeverityInfo = Set-SeverityScore `
+                        -Object $ServicePrincipal `
+                        -ObjectType "ServicePrincipal" `
+                        -IsThirdPartyServicePrincipal `
+                        -PrivilegedRoles $PrivilegedRoles
+
+                    # Add severity info to the merged object
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "PrivilegedRoles" -Value $PrivilegedRoles
+
                     $ServicePrincipals += $ServicePrincipal
                 }
             }
@@ -617,6 +703,414 @@ function Format-RiskyThirdPartyServicePrincipals {
         }
 
         return $ServicePrincipals
+    }
+}
+
+function Get-SeverityWeights {
+    <#
+    .Description
+    Returns the weight factors used in severity score calculation.
+
+    The score is composed of the following factors:
+
+    Factor                        App     SP      Notes
+    ---------------------------------------------------------------------------------------
+    Admin consented perms         50      50      Weighted by RiskLevel per permission
+    Non-admin consented perms     10      10      Weighted by RiskLevel per permission
+    Multi-tenant                  10      -       Applications only
+    Third-party SP                -       20      SP only
+    Privileged roles              -       20      SP only
+    Password credentials          10      10      App: 2pts/credential + 3pts if >180 days
+                                                  SP:  4pts/credential + 3pts if >180 days
+    Key credentials               7       7       App: 1pt/cred        + 2pts if >365 days
+                                                  SP:  3pts/cred       + 2pts if >365 days
+    Federated credentials         3       3       App: 1pt/cred
+                                                  SP:  2pts/cred
+    ---------------------------------------------------------------------------------------
+    Total                         90      120
+
+    .Functionality
+    #Internal
+    #>
+    return [PSCustomObject]@{
+        RiskLevelWeights = @{
+            Critical = 25
+            High = 15
+            Medium = 5
+            Low = 2
+            Description = "Risk level weights are assigned based on the level of access granted by each permission."
+        }
+
+        AdminConsentedRiskyPermissions = @{
+            MaxPoints = 50
+            Description = "Admin consented permissions pose a higher risk as they have been granted elevated privileges."
+        }
+
+        NonAdminConsentedRiskyPermissions = @{
+            MaxPoints = 10
+            Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated privileges. However, they can still be granted admin consent in the future and should be monitored."
+        }
+
+        # Context factors (25 points max)
+        MultiTenant = @{
+            Points = 10
+            Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
+        }
+
+        ThirdPartyServicePrincipal = @{
+            Points = 20
+            Description = "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
+        }
+
+        PrivilegedRoles = @{
+            PointsPerRole = 8
+            MaxPoints = 20
+            Description = "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
+        }
+
+        PasswordCredentials = @{
+            PointsPerCredential = 2
+            PointsPerLongLivedCredential = 3
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 4
+            MaxPoints = 10
+            ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
+            Description = "Credentials can be used to authenticate as the application/service principal."
+        }
+
+        KeyCredentials = @{
+            PointsPerCredential = 1
+            PointsPerLongLivedCredential = 2
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 3
+            MaxPoints = 7
+            ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
+            Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
+        }
+
+        FederatedCredentials = @{
+            PointsPerCredential = 1
+            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+            PointsPerServicePrincipalCredential = 2
+            MaxPoints = 3
+            Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
+        }
+
+        Thresholds = @{
+            Critical = 75
+            High = 45
+            Medium = 25
+            Low = 0
+            Description = "Percentage-based severity thresholds for categorizing applications/service principals based on their calculated severity score."
+        }
+
+        MaxScore = @{
+            Application = 90
+            ServicePrincipal = 120
+            Description = "Maximum achievable score varies by object type"
+        }
+    }
+}
+
+function ConvertFrom-DotNetDate {
+    param(
+        [string]
+        $DateString
+    )
+    
+    # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
+    if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
+        $EpochMs = $Matches[1]
+        return [System.DateTimeOffset]::FromUnixTimeMilliseconds($EpochMs).UtcDateTime
+    }
+
+    return [Datetime]::Parse($DateString)
+}
+
+function Set-CredentialScore {
+    <#
+    .Description
+    Calculates the severity score for credentials; handles password, key, and federated credentials.
+    .Functionality
+    #Internal
+    #>
+    param (
+        [Object[]]
+        $AccessKeys,
+
+        [ValidateNotNullOrEmpty()]
+        [Object]
+        $WeightConfig,
+
+        [switch]
+        $CheckLifetime,
+
+        # If true, uses $PointsPerServicePrincipalCredential instead of $PointsPerCredential.
+        # Azure does not provide a UI option for setting credentials on service principals directly,
+        # so their presence indicates deliberate API usage and therefore higher risk.
+        [switch]
+        $IsServicePrincipal
+    )
+
+    $CredentialPoints = 0
+    $CredentialCount = 0
+    $LongLivedCredentialCount = 0
+
+    if ($null -eq $AccessKeys -or @($AccessKeys).Count -eq 0) {
+        return @{
+            CredentialCount = $CredentialCount
+            LongLivedCredentialCount = $LongLivedCredentialCount
+            TotalPoints = $CredentialPoints
+        }
+    }
+
+    foreach ($Credential in $AccessKeys) {
+        $CredentialCount++
+
+        # Use elevated base points for service principal credentials if they exist.
+        $BasePoints = if ($IsServicePrincipal) {
+            $WeightConfig.PointsPerServicePrincipalCredential
+        }
+        else {
+            $WeightConfig.PointsPerCredential
+        }
+
+        # Base points for credential existence
+        $CredentialPoints += $BasePoints
+
+        # Add additional points for long-lived credentials (excludes federated)
+        if ($CheckLifetime -and $null -ne $Credential.StartDateTime -and $null -ne $Credential.EndDateTime) {
+            $Start = ConvertFrom-DotNetDate -DateString $Credential.StartDateTime
+            $End = ConvertFrom-DotNetDate -DateString $Credential.EndDateTime
+            $Duration = (New-TimeSpan -Start $Start -End $End).Days
+
+            if ($Duration -gt $WeightConfig.ThresholdInDays) {
+                $CredentialPoints += $WeightConfig.PointsPerLongLivedCredential
+                $LongLivedCredentialCount++
+            }
+        }
+    }
+
+    $CredentialPoints = [Math]::Min($CredentialPoints, $WeightConfig.MaxPoints)
+
+    return @{
+        CredentialCount = $CredentialCount
+        LongLivedCredentialCount = $LongLivedCredentialCount
+        TotalPoints = $CredentialPoints
+    }
+}
+
+function Set-SeverityScore {
+    <#
+    .Description
+    Calculates a severity score for each risky application/service principal based on multiple risk factors:
+    - Number of admin consented risky permissions
+    - Number of non-admin consented risky permissions
+    - Multi-tenant enabled/disabled
+    - Third-party service principal (owned externally)
+    - Privileged roles assigned to risky service principals
+    - Existence of password/key/federated credentials (considers Long-lived credentials)
+    
+    The total severity score is normalized to 100 to factor in different weight distributions for each of the above risk factors.
+    .Functionality
+    #Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [Object[]]
+        $Object,
+
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("Application","ServicePrincipal")]
+        [string]
+        $ObjectType,
+
+        [switch]
+        $IsThirdPartyServicePrincipal,
+
+        [string[]]
+        $PrivilegedRoles = @()
+    )
+    try {
+        $Weights = Get-SeverityWeights
+
+        $Score = 0
+        $ScoreBreakdown = @{}
+
+        # 1. Determine admin consented risky permission weight factor
+        $AdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
+            $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $true
+        })
+        $AdminConsentedRawPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
+            $Weights.RiskLevelWeights[$_.RiskLevel]
+        } | Measure-Object -Sum).Sum
+        $AdminConsentedPoints = [Math]::Min(
+            $AdminConsentedRawPoints,
+            $Weights.AdminConsentedRiskyPermissions.MaxPoints
+        )
+        $Score += $AdminConsentedPoints
+        $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
+            PermissionCount = $AdminConsentedRiskyPermissions.Count
+            TotalPoints = $AdminConsentedPoints
+        }
+
+        # 2. Determine non-admin consented risky permission weight factor
+        $NonAdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
+            $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $false
+        })
+        $NonAdminConsentedRawPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
+            $Weights.RiskLevelWeights[$_.RiskLevel]
+        } | Measure-Object -Sum).Sum
+        $NonAdminConsentedPoints = [Math]::Min(
+            $NonAdminConsentedRawPoints,
+            $Weights.NonAdminConsentedRiskyPermissions.MaxPoints
+        )
+        $Score += $NonAdminConsentedPoints
+        $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
+            PermissionCount = $NonAdminConsentedRiskyPermissions.Count
+            TotalPoints = $NonAdminConsentedPoints
+        }
+
+        # 3. Determine privileged roles weight factor (used only for service principals)
+        $PrivilegedRolesPoints = 0
+        if ($PrivilegedRoles.Count -gt 0) {
+            $PrivilegedRolesPoints = [Math]::Min(
+                $PrivilegedRoles.Count * $Weights.PrivilegedRoles.PointsPerRole,
+                $Weights.PrivilegedRoles.MaxPoints
+            )
+            $Score += $PrivilegedRolesPoints
+
+            $ScoreBreakdown.PrivilegedRoles = [PSCustomObject]@{
+                RoleCount = $PrivilegedRoles.Count
+                TotalPoints = $PrivilegedRolesPoints
+                Roles = $PrivilegedRoles
+            }
+        }
+
+        # 4. Determine multi-tenant weight factor (used only for applications)
+        $MultiTenantPoints = 0
+        if ($Object.IsMultiTenantEnabled -eq $true) {
+            $MultiTenantPoints = $Weights.MultiTenant.Points
+            $Score += $MultiTenantPoints
+
+            $ScoreBreakdown.MultiTenant = [PSCustomObject]@{
+                IsMultiTenantEnabled = $Object.IsMultiTenantEnabled
+                TotalPoints = $MultiTenantPoints
+            }
+        }
+
+        # 5. Determine third-party service principal weight factor (used only for service principals)
+        $ThirdPartyServicePrincipalPoints = 0
+        if ($IsThirdPartyServicePrincipal -eq $true) {
+            $ThirdPartyServicePrincipalPoints = $Weights.ThirdPartyServicePrincipal.Points
+            $Score += $ThirdPartyServicePrincipalPoints
+
+            $ScoreBreakdown.ThirdPartyServicePrincipal = [PSCustomObject]@{
+                IsThirdPartyServicePrincipal = $IsThirdPartyServicePrincipal
+                TotalPoints = $ThirdPartyServicePrincipalPoints
+            }
+        }
+
+        # 6. Calculate password credential weight factor
+        # Split merged credentials by source so service principal credentials are weighted appropriately
+        $AppPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppPasswordScore = Set-CredentialScore `
+            -AccessKeys $AppPasswordCredentials `
+            -WeightConfig $Weights.PasswordCredentials `
+            -CheckLifetime
+        
+        $ServicePrincipalPasswordScore = Set-CredentialScore `
+            -AccessKeys $ServicePrincipalPasswordCredentials `
+            -WeightConfig $Weights.PasswordCredentials `
+            -CheckLifetime `
+            -IsServicePrincipal
+        
+        $PasswordCredentialPoints = [Math]::Min(
+            $AppPasswordScore.TotalPoints + $ServicePrincipalPasswordScore.TotalPoints,
+            $Weights.PasswordCredentials.MaxPoints
+        )
+
+        $Score += $PasswordCredentialPoints
+        $ScoreBreakdown.PasswordCredentials = [PSCustomObject]@{
+            CredentialCount = $AppPasswordScore.CredentialCount + $ServicePrincipalPasswordScore.CredentialCount
+            LongLivedCredentialCount = $AppPasswordScore.LongLivedCredentialCount + $ServicePrincipalPasswordScore.LongLivedCredentialCount
+            TotalPoints = $PasswordCredentialPoints
+        }
+
+        # 7. Calculate key credential weight factor
+        $AppKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppKeyScore = Set-CredentialScore `
+            -AccessKeys $AppKeyCredentials `
+            -WeightConfig $Weights.KeyCredentials `
+            -CheckLifetime
+
+        $ServicePrincipalKeyScore = Set-CredentialScore `
+            -AccessKeys $ServicePrincipalKeyCredentials `
+            -WeightConfig $Weights.KeyCredentials `
+            -CheckLifetime `
+            -IsServicePrincipal
+
+        $KeyCredentialPoints = [Math]::Min(
+            $AppKeyScore.TotalPoints + $ServicePrincipalKeyScore.TotalPoints,
+            $Weights.KeyCredentials.MaxPoints
+        )
+
+        $Score += $KeyCredentialPoints
+        $ScoreBreakdown.KeyCredentials = [PSCustomObject]@{
+            CredentialCount = $AppKeyScore.CredentialCount + $ServicePrincipalKeyScore.CredentialCount
+            LongLivedCredentialCount = $AppKeyScore.LongLivedCredentialCount + $ServicePrincipalKeyScore.LongLivedCredentialCount
+            TotalPoints = $KeyCredentialPoints
+        }
+
+        # 8. Calculate federated credential weight factor
+        $AppFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        $ServicePrincipalFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $false })
+
+        $AppFederatedScore = Set-CredentialScore `
+            -AccessKeys $AppFederatedCredentials `
+            -WeightConfig $Weights.FederatedCredentials
+
+        $ServicePrincipalFederatedScore = Set-CredentialScore `
+            -AccessKeys $ServicePrincipalFederatedCredentials `
+            -WeightConfig $Weights.FederatedCredentials `
+            -IsServicePrincipal
+
+        $FederatedCredentialPoints = [Math]::Min(
+            $AppFederatedScore.TotalPoints + $ServicePrincipalFederatedScore.TotalPoints,
+            $Weights.FederatedCredentials.MaxPoints
+        )
+
+        $Score += $FederatedCredentialPoints
+        $ScoreBreakdown.FederatedCredentials = [PSCustomObject]@{
+            CredentialCount = $AppFederatedScore.CredentialCount + $ServicePrincipalFederatedScore.CredentialCount
+            TotalPoints = $FederatedCredentialPoints
+        }
+
+        $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
+
+        $SeverityLevel = switch ($ScorePercentage) {
+            { $_ -ge $Weights.Thresholds.Critical } { "Critical"; break }
+            { $_ -ge $Weights.Thresholds.High } { "High"; break }
+            { $_ -ge $Weights.Thresholds.Medium } { "Medium"; break }
+            default { "Low" }
+        }
+
+        return [PSCustomObject]@{
+            TotalScore = $Score
+            MaxScore = $Weights.MaxScore.$ObjectType
+            ScorePercentage = $ScorePercentage
+            SeverityLevel = $SeverityLevel
+            ScoreBreakdown = $ScoreBreakdown
+        }
+    }
+    catch {
+        Write-Warning "An error occurred in Set-SeverityScore: $($_.Exception.Message)"
+        Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+        throw $_
     }
 }
 
