@@ -546,10 +546,6 @@ function Stop-ScubaLogging {
                 $Global:DebugPreference = "SilentlyContinue"
             }
 
-            if ($Script:ScubaLogPath) {
-                Write-Output "DONE: Log saved: $Script:ScubaLogPath"
-            }
-
             # Auto-generate debug report if errors or warnings were logged and auto-report is enabled
             if ($Script:ScubaHasErrors -and $Script:ScubaLogPath -and $Script:ScubaAutoReportEnabled) {
                 try {
