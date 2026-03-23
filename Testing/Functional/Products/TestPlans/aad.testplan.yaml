@@ -147,31 +147,21 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.3.2v1
+  - PolicyId: MS.AAD.3.2v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.3.2v1 Non-Compliant case - Report Only
-        ### This test disables the standard non-specific MFA policy from the tenant
+      - TestDescription: MS.AAD.3.2v2 Non-Compliant case - No MFA policies
+        ### This test deletes the conditional access policies from the provider export which should result in a non-compliant result
+        ### The reason we have to delete the CAPs from the export is because the test tenants have an MFA policy enabled which would cause this scenario to pass
         Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
+          - Command: UpdateProviderExport
             Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
               updates:
-                State: enabledForReportingButNotEnforced
+                conditional_access_policies: []
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Non specific MFA method is enforced
-        ### This test enables the standard non-specific MFA policy from the tenant - should already be enabled but just in case
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: Automated Test 1 - DO NOT MODIFY
-              updates:
-                State: enabled
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Phishing-resistant MFA is enforced so automatically pass even when non-specific MFA is disabled
-        ### This test creates a phishing-resistant MFA policy and disables the standard non-specific MFA policy from the tenant
+      - TestDescription: MS.AAD.3.2v2 Compliant case - Non specific MFA method is enforced via BuiltInControls
+        ### This test creates a non-specific MFA policy with the BuiltInControls node instead of authentication strength
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -190,20 +180,12 @@ TestPlan:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
                 GrantControls:
-                  AuthenticationStrength:
-                    AllowedCombinations:
-                      - "windowsHelloForBusiness"
-                      - "fido2"
-                      - "x509CertificateMultiFactor"
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
-              updates:
-                State: enabledForReportingButNotEnforced
+                  BuiltInControls:
+                    - "mfa"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.3.2v1 Compliant case - Authentication Strength with Multifactor Authentication is enforced
-        ### This test enables the standard non-specific MFA policy with authentication strength set to "Multifactor Authentication"
+      - TestDescription: MS.AAD.3.2v2 Compliant case - Authentication Strength with Multifactor Authentication is enforced
+        ### This test creates a non-specific MFA policy with authentication strength set to "Multifactor Authentication"
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -241,6 +223,31 @@ TestPlan:
                       - "hardwareOath, federatedSingleFactor"
                       - "sms, federatedSingleFactor"
                       - "voice, federatedSingleFactor"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.3.2v2 Compliant case - Custom Authentication Strength passwordless MFA
+        ### This test creates a custom MFA policy with authentication strength set to allow passwordless MFA only
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "deviceBasedPush"
         Postconditions: []
         ExpectedResult: true
 

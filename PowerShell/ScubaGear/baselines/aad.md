@@ -229,7 +229,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 This section provides policies that help reduce security risks related to user authentication and registration.
 
-Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), but for a variety of reasons, implementing it for all users may be challenging. This section provides additional backup security policies to mitigate risk associated with lesser forms of MFA. For example, Policy MS.AAD.3.2v1 below enforces MFA without stipulating the specific MFA method.
+Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf).
 
 <img src="/images/aad-mfa.png"
 alt="Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Microsoft Entra certificate-based authentication (preferred) and federated PIV card." />
@@ -240,7 +240,7 @@ Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Mic
 #### MS.AAD.3.1v1
 Phishing-resistant MFA SHALL be enforced for all users.
 
-The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key**, **Windows Hello for Business**, and **device-bound passkeys** (in the authenticator app of choice) are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
+The phishing-resistant methods **Microsoft Entra ID certificate-based authentication (CBA)**, **FIDO2 Security Key**, **Windows Hello for Business**, and **device-bound passkeys** are the recommended authentication options since they offer forms of MFA with the least weaknesses. For federal agencies, Microsoft Entra ID CBA supports federal PIV card authentication directly to Microsoft Entra ID.
 
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
@@ -258,19 +258,18 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
     - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
 
-#### MS.AAD.3.2v1
-If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
+#### MS.AAD.3.2v2
+MFA SHALL be enforced for all users.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 
-<!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.2v2; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
-- _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires MFA enforcement, thus reducing single-form authentication risk.
-- _Last modified:_ June 2023
-- _Note:_ If a conditional access policy enforces phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
+- _Rationale:_ This policy helps protect the tenant for guest users or any other group with multifactor authentication where phishing-resistant MFA is not enforceable due to technical limitations. It protects against the weaknesses inherent in singlefactor authentication.
+- _Last modified:_ February 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2(1), IA-2(2)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1110: Brute Force](https://attack.mitre.org/techniques/T1110/)
@@ -433,9 +432,27 @@ Device code authentication SHOULD be blocked.
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
-#### MS.AAD.3.2v1 Instructions
+#### MS.AAD.3.2v2 Instructions
 
-1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate MFA method. Configure the following policy settings in the new conditional access policy, per the values below:
+There are a few different options to implement a conditional access policy that enforces MFA. Each option is described below, followed by our recommendation and the respective instructions for each option.
+
+- **Option 1** - Create a custom authentication strength that includes the specific multifactor authentication methods supported by your organization and then create a policy that enforces your custom authentication strength.
+- **Option 2** - Create a policy that enforces multifactor authentication (no specific MFA method).
+- **Option 3** - Create a policy that enforces the built-in authentication strength named "Multifactor authentication" (no specific MFA method).
+
+We recommend using a custom authentication strength because you can enforce the specific methods that offer the highest security. We recommend that you require the passwordless authentication strength Microsoft Authenticator (Phone Sign-in) in lieu of alternative MFA methods, since it removes passwords from the sign-in flow, reducing the exposure to credential compromise.
+
+**Option 1**. [Follow the instructions at this link](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-strength-advanced-options#create-a-custom-authentication-strength) to create a custom authentication strength. Create a conditional access policy that enforces your custom authentication. Configure the following policy settings in the new conditional access policy, per the values below:
+
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
+
+  Access controls > Grant > Grant Access > <b>Require authentication strength</b> > <b>YOUR_CUSTOM_AUTHENTICATION_STRENGTH</b>
+</pre>
+
+**Option 2**. Create a conditional access policy that enforces MFA but does not dictate a specific MFA method. Configure the following policy settings in the new conditional access policy, per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
@@ -443,6 +460,16 @@ Device code authentication SHOULD be blocked.
   Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
+</pre>
+
+**Option 3**. Create a conditional access policy that enforces the built-in authentication strength named "Multifactor authentication" and does not dictate a specific MFA method. Configure the following policy settings in the new conditional access policy, per the values below:
+
+<pre>
+  Users > Include > <b>All users</b>
+
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
+
+  Access controls > Grant > Grant Access > <b>Require authentication strength</b> > <b>Multifactor authentication</b>
 </pre>
 
 #### MS.AAD.3.3v2 Instructions
