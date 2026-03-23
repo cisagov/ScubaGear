@@ -20,7 +20,7 @@ InModuleScope ScubaLogging {
             $Script:ScubaEnhancedTracing = $false
             $Script:ScubaHasErrors = $false
             $Script:ScubaAutoReportEnabled = $false  # Disable auto-report during tests
-            
+
             # Clean up any existing log files from previous tests to prevent accumulation
             if (Test-Path $script:TestLogPath) {
                 Get-ChildItem -Path $script:TestLogPath -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -32,7 +32,7 @@ InModuleScope ScubaLogging {
             if ($Script:ScubaLogEnabled) {
                 Stop-ScubaLogging
             }
-            
+
             # Additional cleanup: Remove any log files created during the test
             if (Test-Path $script:TestLogPath) {
                 Get-ChildItem -Path $script:TestLogPath -Filter "*.log" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -547,7 +547,7 @@ InModuleScope ScubaLogging {
                 # Base log entries satisfying all required Find-Entry lookups in the report generator.
                 # No real files are created — Get-Content and Test-Path are mocked per-test.
                 $script:BaseLogLines = @(
-                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear DEBUG MODE ENABLED - Full troubleshooting logging active",
+                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear logging initialized - Full troubleshooting logging active",
                     '    Data: {"Version":"1.7.0","ProductNames":"aad","Environment":"commercial","OutputFolder":"C:\\test","LogFolder":"C:\\test\\DebugLogs"}',
                     "[2026-01-01 10:00:00.001] [Info   ] [RunDetails          ] System OS Information captured",
                     '    Data: {"OS":"Windows","Version":"10.0","Build":"19045","Architecture":"64-bit"}',
@@ -572,7 +572,7 @@ InModuleScope ScubaLogging {
 
                 # Mock Test-Path so the ValidateScript on LogPath passes without a real file on disk
                 Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
-                
+
                 # Mock Get-Content to always return $script:TestLines (which tests can modify)
                 Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
             }
@@ -620,7 +620,7 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '\| Rego Evaluation \|.*Success'
                 $report | Should -Not -Match ':x: Failed'
             }
-            
+
 
 
             It "Should show ':x: Failed' for Rego phase when 'Some Rego evaluations failed' Warning is present" {
@@ -673,6 +673,55 @@ InModuleScope ScubaLogging {
 
                 # ReportCreation Info entries should appear in the Run Timeline
                 $report | Should -Match 'Report created: AAD'
+            }
+
+            It "Should include Module Loading Progression table when ModuleSnapshot entries exist" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Info   ] [ModuleSnapshot      ] Module snapshot 'InitialLoad' captured: 2 module(s)",
+                    '    Data: {"SnapshotName":"InitialLoad","ModuleCount":2,"Modules":["ScubaGear (1.7.1)","powershell-yaml (0.4.7)"],"ModulePaths":["ScubaGear=C:\\Modules\\ScubaGear","powershell-yaml=C:\\Modules\\yaml"],"ModuleSummary":"ScubaGear (1.7.1); powershell-yaml (0.4.7)","ModulePathsSummary":"ScubaGear=C:\\Modules\\ScubaGear; powershell-yaml=C:\\Modules\\yaml"}',
+                    "[2026-01-01 10:00:00.012] [Info   ] [ModuleSnapshot      ] Module snapshot 'PostAuthentication' captured: 3 module(s)",
+                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":3,"Modules":["ScubaGear (1.7.1)","powershell-yaml (0.4.7)","Microsoft.Graph.Authentication (2.25.0)"],"ModulePaths":["ScubaGear=C:\\Modules\\ScubaGear","powershell-yaml=C:\\Modules\\yaml","Microsoft.Graph.Authentication=C:\\Modules\\Graph"],"ModuleSummary":"ScubaGear (1.7.1); powershell-yaml (0.4.7); Microsoft.Graph.Authentication (2.25.0)","ModulePathsSummary":"ScubaGear=C:\\Modules\\ScubaGear; powershell-yaml=C:\\Modules\\yaml; Microsoft.Graph.Authentication=C:\\Modules\\Graph"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                $report | Should -Match '## Module Loading Progression'
+                $report | Should -Match '\| Snapshot \| Module \| Version \| Path \|'
+                $report | Should -Match 'InitialLoad'
+                $report | Should -Match 'PostAuthentication'
+                $report | Should -Match 'Microsoft\.Graph\.Authentication'
+                $report | Should -Match '2\.25\.0'
+            }
+
+            It "Should show unique modules only in Module Loading Progression table" {
+                $script:TestLines = $script:BaseLogLines + @(
+                    "[2026-01-01 10:00:00.011] [Info   ] [ModuleSnapshot      ] Module snapshot 'InitialLoad' captured: 1 module(s)",
+                    '    Data: {"SnapshotName":"InitialLoad","ModuleCount":1,"Modules":["powershell-yaml (0.4.7)"],"ModulePaths":["powershell-yaml=C:\\Modules\\yaml"],"ModuleSummary":"powershell-yaml (0.4.7)","ModulePathsSummary":"powershell-yaml=C:\\Modules\\yaml"}',
+                    "[2026-01-01 10:00:00.012] [Info   ] [ModuleSnapshot      ] Module snapshot 'PostAuthentication' captured: 2 module(s)",
+                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":2,"Modules":["powershell-yaml (0.4.7)","Microsoft.Graph.Authentication (2.25.0)"],"ModulePaths":["powershell-yaml=C:\\Modules\\yaml","Microsoft.Graph.Authentication=C:\\Modules\\Graph"],"ModuleSummary":"powershell-yaml (0.4.7); Microsoft.Graph.Authentication (2.25.0)","ModulePathsSummary":"powershell-yaml=C:\\Modules\\yaml; Microsoft.Graph.Authentication=C:\\Modules\\Graph"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Extract only the Module Loading Progression section
+                if ($report -match '(?s)## Module Loading Progression.*?(##|$)') {
+                    $moduleSection = $Matches[0]
+                    # powershell-yaml appears in both snapshots but should only be listed once in the table under InitialLoad
+                    $yamlMatches = ([regex]::Matches($moduleSection, 'powershell-yaml')).Count
+                    $yamlMatches | Should -Be 1
+                }
+                else {
+                    throw "Module Loading Progression section not found in report"
+                }
+            }
+
+            It "Should include Comments section in markdown report" {
+                $script:TestLines = $script:BaseLogLines
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                $report | Should -Match '## Comments / Additional Notes'
+                $report | Should -Match 'Use this section to add any additional context'
             }
         }
 
@@ -734,6 +783,98 @@ InModuleScope ScubaLogging {
                 $logContent | Should -Match "logging session ending"
 
                 $result | Should -Be "Success"
+            }
+        }
+
+        Context "Update-ScubaModuleSnapshot Function" {
+
+            BeforeEach {
+                Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
+
+                # Create a temporary RequiredVersions.ps1 file for mocking
+                $script:TempRequiredVersionsPath = Join-Path $script:TestLogPath "TempRequiredVersions.ps1"
+            }
+
+            AfterEach {
+                # Clean up temp file
+                if (Test-Path $script:TempRequiredVersionsPath) {
+                    Remove-Item $script:TempRequiredVersionsPath -Force
+                }
+            }
+
+            It "Should capture module snapshot with required modules" {
+                # Create temporary RequiredVersions.ps1 with test module list
+                Set-Content -Path $script:TempRequiredVersionsPath -Value '$ModuleList = @(@{ModuleName="TestModule1"},@{ModuleName="TestModule2"})'
+
+                # Mock Join-Path to return our temp file path
+                Mock Join-Path { return $script:TempRequiredVersionsPath } -ParameterFilter { $ChildPath -eq "..\..\RequiredVersions.ps1" }
+
+                # Mock Get-Module to return test modules
+                Mock Get-Module {
+                    return @(
+                        [PSCustomObject]@{Name="TestModule1"; Version="1.0.0"; ModuleBase="C:\Test\Module1"},
+                        [PSCustomObject]@{Name="ScubaGear"; Version="1.7.1"; ModuleBase="C:\Test\ScubaGear"}
+                    )
+                }
+
+                Update-ScubaModuleSnapshot -SnapshotName "TestSnapshot"
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "Module snapshot 'TestSnapshot' captured"
+                $logContent | Should -Match "TestModule1"
+                $logContent | Should -Match "ModuleSnapshot"
+            }
+
+            It "Should handle empty module list gracefully" {
+                # Create temporary RequiredVersions.ps1 with empty module list
+                Set-Content -Path $script:TempRequiredVersionsPath -Value '$ModuleList = @()'
+
+                # Mock Join-Path to return our temp file path
+                Mock Join-Path { return $script:TempRequiredVersionsPath } -ParameterFilter { $ChildPath -eq "..\..\RequiredVersions.ps1" }
+
+                Mock Get-Module { return @() }
+
+                Update-ScubaModuleSnapshot -SnapshotName "EmptySnapshot"
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "has no module list"
+                $logContent | Should -Match "Warning"
+            }
+
+            It "Should handle missing RequiredVersions.ps1 file" {
+                # Mock Join-Path to return a non-existent path
+                Mock Join-Path { return "C:\NonExistent\RequiredVersions.ps1" } -ParameterFilter { $ChildPath -eq "..\..\RequiredVersions.ps1" }
+
+                Update-ScubaModuleSnapshot -SnapshotName "MissingFile"
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "RequiredVersions.ps1 not found"
+                $logContent | Should -Match "Warning"
+            }
+
+            It "Should skip when logging is disabled" {
+                Stop-ScubaLogging
+                $Script:ScubaLogEnabled = $false
+
+                { Update-ScubaModuleSnapshot -SnapshotName "DisabledLogging" } | Should -Not -Throw
+            }
+
+            It "Should log module count in snapshot data" {
+                # Create temporary RequiredVersions.ps1 with single test module
+                Set-Content -Path $script:TempRequiredVersionsPath -Value '$ModuleList = @(@{ModuleName="TestModule"})'
+
+                # Mock Join-Path to return our temp file path
+                Mock Join-Path { return $script:TempRequiredVersionsPath } -ParameterFilter { $ChildPath -eq "..\..\RequiredVersions.ps1" }
+
+                Mock Get-Module {
+                    return @([PSCustomObject]@{Name="TestModule"; Version="1.0.0"; ModuleBase="C:\Test"})
+                }
+
+                Update-ScubaModuleSnapshot -SnapshotName "CountTest"
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match '"ModuleCount":1'
+                $logContent | Should -Match '"SnapshotName":"CountTest"'
             }
         }
     }

@@ -19,7 +19,7 @@ Debug logging is **always enabled** and captures:
 
 Debug logs are created automatically. To also enable PowerShell transcript logging, pass the `-Transcript` switch to `Invoke-SCuBA`:
 
-> IMPORTANT: Transcript logging is meant fro developers and to troubleshoot the module. It does not redact sensitive information and can be fairly large in size
+> IMPORTANT: Transcript logging is meant for developers and to troubleshoot the module. It does not redact sensitive information and can be fairly large in size
 
 ```powershell
 Invoke-SCuBA -ProductNames * -Transcript
@@ -67,7 +67,7 @@ Each entry includes a high-precision timestamp, a severity level (`Debug`, `Info
 
 ## Generating a Debug Report
 
-A markdown formatted report is generated autoamtically if the scubalogging detects errors. If there are no errors, the file is not screated, however you can run the command below to create one
+A markdown formatted report is generated automatically if ScubaLogging detects errors. If there are no errors, the file is not created, however you can run the command below to create one
 
 `Get-ScubaDebugLogReport` parses a debug log file and produces a Markdown summary suitable for sharing in a GitHub issue or support request.
 
@@ -75,7 +75,7 @@ A markdown formatted report is generated autoamtically if the scubalogging detec
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `-LogPath` | Yes | Full path to the `ScubaGear-DebugLog-*.log` file to parse |
+| `-DebugLogPath` | Yes | Full path to the `ScubaGear-DebugLog-*.log` file to parse |
 | `-OutputPath` | No | If provided, the Markdown report is also saved to this file path |
 | `-FromScubaCached` | No | Pass this switch when the log was produced by `Invoke-SCuBACached`. It tells the report parser to match log entries against the `ScubaCached` source header instead of the default `Invoke-SCuBA` source header. Without it, the run summary and phase timing sections will be empty for cached runs |
 
@@ -84,21 +84,21 @@ A markdown formatted report is generated autoamtically if the scubalogging detec
 Print the report to the console:
 
 ```powershell
-Get-ScubaDebugLogReport -LogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log"
+Get-ScubaDebugLogReport -DebugLogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log"
 ```
 
 Save the report to a file:
 
 ```powershell
 Get-ScubaDebugLogReport `
-    -LogPath    "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
-    -OutputPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.md"
+    -DebugLogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
+    -OutputPath   "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.md"
 ```
 Generate a report from a log produced by `Invoke-SCuBACached`:
 
 ```powershell
 Get-ScubaDebugLogReport `
-    -LogPath         "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
+    -DebugLogPath    "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
     -OutputPath      "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.txt" `
     -FromScubaCached
 ```
@@ -111,12 +111,13 @@ The generated report includes the following sections:
 | Run Summary | Start time, command line, ScubaGear version, environment, products assessed, output folder |
 | System Environment | OS name and build, PowerShell version and edition, .NET CLR version |
 | ScubaGear Installation | Loaded version and path, installed versions and paths, version mismatch warning if applicable |
-| ScubaGear-Related Modules Loaded in Memory | Module names and versions found in memory during the run |
+| Module Loading Progression | Unified table showing when each required module was loaded (e.g., InitialLoad, PostAuthentication) with module names, versions, and paths |
 | OPA Executable | Version, path, and file size |
 | Network Connectivity | Internet connectivity, DNS resolution, proxy detection |
 | Phase Timing | Duration and status for authentication, provider execution, Rego evaluation, and report creation |
 | Warnings and Errors | All `Warning` and `Error` level entries with timestamps and source components |
 | Run Timeline | Condensed chronological view of `Info` and above milestones plus function trace entries |
+| Comments / Additional Notes | Blank section for users to add context, observations, or notes when sharing the report |
 
 > [!TIP]
 > The transcript file is not parsed by `Get-ScubaDebugLogReport`. Open `ScubaGear-Transcript-*.log` directly when you need the full console output from the run.

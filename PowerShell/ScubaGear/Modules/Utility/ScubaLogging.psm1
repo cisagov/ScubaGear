@@ -17,7 +17,7 @@ KEY FEATURES:
 • Minimal performance impact with optional features that can be enabled as needed
 
 CORE FUNCTIONALITY:
-1. INITIALIZATION: Initialize-ScubaLogging sets up the logging Module with configurable paths,
+1. INITIALIZATION: Initialize-ScubaLogging sets up the logging system with configurable paths,
    log levels, tracing options, and transcript recording.
 
 2. STRUCTURED LOGGING: Write-ScubaLog provides centralized logging with structured data support,
@@ -27,7 +27,7 @@ CORE FUNCTIONALITY:
    parameters, return values, execution timing, and error handling.
 
 4. AUTOMATIC TRACING: Enable-ScubaAutoTrace provides transparent function interception for
-   Detailed debugging without manual instrumentation.
+   detailed debugging without manual instrumentation.
 
 5. CLEANUP: Stop-ScubaLogging properly shuts down logging, stops transcripts, and resets state.
 #>
@@ -47,7 +47,7 @@ $Script:ScubaAutoReportEnabled = $true # Enable automatic debug report generatio
 function Initialize-ScubaLogging {
     <#
     .SYNOPSIS
-    Initialize the ScubaGear logging Module
+    Initialize the ScubaGear logging system
 
     .DESCRIPTION
     Sets up logging for ScubaGear with configurable output paths,
@@ -510,7 +510,7 @@ function Write-ScubaFunctionExit {
 function Stop-ScubaLogging {
     <#
     .SYNOPSIS
-    Clean up logging Module
+    Clean up logging system
 
     .DESCRIPTION
     Stops transcript, disables debugging, and cleans up logging resources.
@@ -561,7 +561,7 @@ function Stop-ScubaLogging {
                     $null = Get-ScubaDebugLogReport -DebugLogPath $Script:ScubaLogPath -OutputPath $reportPath
 
                     $Host.UI.WriteErrorLine("   Debug report saved: $reportPath")
-                    $Host.UI.WriteErrorLine("   Please include this report when opening a GitHub issue.")
+                    $Host.UI.WriteErrorLine("   It is recommended to include this report when opening a GitHub issue.")
                 }
                 catch {
                     Write-Warning "Failed to generate automatic debug report: $_"
@@ -684,7 +684,7 @@ function Get-ScubaRunDetails {
                 }
 
                 # Determine install source: Install-Module (PSGallery) always writes PSGetModuleInfo.xml;
-                # a GitHub clone or manual copy does not.  Import-Clixml reads the serialised object.
+                # a GitHub clone or manual copy does not.  Import-Clixml reads the serialized object.
                 $psGetInfoPath = if ($currentScuba) { Join-Path $currentScuba.ModuleBase 'PSGetModuleInfo.xml' } else { $null }
                 if ($psGetInfoPath -and (Test-Path $psGetInfoPath)) {
                     try {
@@ -1561,12 +1561,12 @@ function Get-ScubaDebugLogReport {
                     if ($modInfo -match '^(.+) \((.+)\)$') {
                         $modName = $Matches[1]
                         $modVer = $Matches[2]
-                        
+
                         # Skip if we've already added this module
                         if ($listedModules.ContainsKey($modName)) {
                             continue
                         }
-                        
+
                         $modPath = if ($pathLookup.ContainsKey($modName)) {
                             $pathLookup[$modName]
                         } else {
@@ -1579,7 +1579,7 @@ function Get-ScubaDebugLogReport {
                             Version = $modVer
                             Path = $modPath
                         }
-                        
+
                         # Mark this module as listed to avoid duplicates from other snapshots
                         $listedModules[$modName] = $true
                     }
@@ -1714,6 +1714,16 @@ function Get-ScubaDebugLogReport {
         $sb.AppendLine("$time $icon $src $($e.Message)$extra") | Out-Null
     }
     $sb.AppendLine('```') | Out-Null
+    $sb.AppendLine('') | Out-Null
+
+    # --- Comments / Additional Notes ---
+    $sb.AppendLine('## Comments / Additional Notes') | Out-Null
+    $sb.AppendLine('') | Out-Null
+    $sb.AppendLine('_Use this section to add any additional context, observations, or notes about the issue:_') | Out-Null
+    $sb.AppendLine('') | Out-Null
+    $sb.AppendLine('') | Out-Null
+    $sb.AppendLine('') | Out-Null
+    $sb.AppendLine('') | Out-Null
     $sb.AppendLine('') | Out-Null
 
     # -------------------------------------------------------------------------

@@ -2208,10 +2208,10 @@ function Invoke-SCuBACached {
                     InvocationLine = $MyInvocation.Line
                 }
 
-                # Capture environment diagnostics using Debug-SCuBA
+                # Capture environment diagnostics using Get-ScubaRunDetails
                 Write-ScubaLog -Message "Capturing environment diagnostics (Cached Mode)" -Level "Info" -Source "ScubaCached"
                 try {
-                    Debug-SCuBA -OutPath $ScubaLogFolder -ErrorAction Stop
+                    Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -ErrorAction Stop
                 }
                 catch {
                     Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "ScubaCached" -Data @{
@@ -2253,20 +2253,21 @@ function Invoke-SCuBACached {
                 'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
             }
 
-            if ($ExportProvider) {
-                Write-ScubaLog -Message "ExportProvider enabled - will authenticate and export provider data" -Level "Info" -Source "ScubaCached"
+            try {
+                if ($ExportProvider) {
+                    Write-ScubaLog -Message "ExportProvider enabled - will authenticate and export provider data" -Level "Info" -Source "ScubaCached"
 
-                # Check if there is a previous ScubaResults file
-                # delete if found
-                $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
-                if ($PreviousResultsFiles) {
-                    $PreviousResultsFiles | ForEach-Object {
-                        Remove-Item $_.FullName -Force
+                    # Check if there is a previous ScubaResults file
+                    # delete if found
+                    $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
+                    if ($PreviousResultsFiles) {
+                        $PreviousResultsFiles | ForEach-Object {
+                            Remove-Item $_.FullName -Force
+                        }
+                        Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "ScubaCached"
                     }
-                    Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "ScubaCached"
-                }
 
-                # authenticate
+                # logging product authentication start with details on which products are being authenticated, the environment, and whether service principal auth is being used
                 Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "ScubaCached" -Data @{
                     ProductNames = ($ProductNames -join ', ')
                     M365Environment = $M365Environment
@@ -2276,16 +2277,35 @@ function Invoke-SCuBACached {
                 $ProdAuthFailed = Invoke-Connection -ScubaConfig $TempScubaConfig
                 if ($ProdAuthFailed.Count -gt 0) {
                     Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "ScubaCached" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
+
+                    # Check if ALL products failed authentication
                     $Difference = Compare-Object $ProductNames -DifferenceObject $ProdAuthFailed -PassThru
                     if (-not $Difference) {
-                        throw "All products were unable to establish a connection aborting execution"
+                        # All products failed - log critical error (triggers automatic report generation in Stop-ScubaLogging)
+                        Write-ScubaLog -Message "CRITICAL: All products failed authentication - aborting execution" -Level "Error" -Source "ScubaCached" -Data @{
+                            RequestedProducts = ($ProductNames -join ', ')
+                            FailedProducts = ($ProdAuthFailed -join ', ')
+                        }
+                        return
                     }
-                    else {
-                        $ProductNames = $Difference
-                    }
+
+                    # Some products succeeded - continue with the successful ones
+                    $ProductNames = $Difference
                 }
                 else {
                     Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
+                }
+
+                # Capture module snapshot after authentication to see what modules were imported
+                if ($Script:ScubaLoggingEnabled) {
+                    try {
+                        Update-ScubaModuleSnapshot -SnapshotName "PostAuthentication"
+                    }
+                    catch {
+                        Write-ScubaLog -Message "Failed to capture post-authentication module snapshot" -Level "Warning" -Source "ScubaCached" -Data @{
+                            Error = $_.Exception.Message
+                        }
+                    }
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
@@ -2391,26 +2411,23 @@ function Invoke-SCuBACached {
                 'OutActionPlanFileName' = $TempScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
-
+        }
+        finally {
             # Clean up debug logging module
-            if ($Script:ScubaLoggingEnabled) {
-                try {
-                    Write-ScubaLog -Message "ScubaGear execution completed successfully (Cached Mode)" -Level "Info" -Source "ScubaCached"
-                    Write-ScubaLog -Message "Stopping logging and cleanup" -Level "Info" -Source "ScubaCached"
-                    Stop-ScubaLogging
-                    Write-Output "`nScubaGear logging completed"
-                    Write-Output "Debug logs saved to: $(Join-Path -Path $OutFolderPath -ChildPath 'DebugLogs')"
+            try {
+                Write-ScubaLog -Message "ScubaGear assessment completed! Check report in [$OutFolderPath]" -Level "Info" -Source "ScubaCached"
+                Stop-ScubaLogging
+            }
+            catch {
+                Write-ScubaLog -Message "Failed to stop ScubaGear logging" -Level "Warning" -Source "ScubaCached" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
                 }
-                catch {
-                    Write-ScubaLog -Message "Error during logging cleanup" -Level "Warning" -Source "ScubaCached" -Data @{
-                        Error = $_.Exception.Message
-                        StackTrace = $_.ScriptStackTrace
-                    }
-                    Write-Warning "Error during logging cleanup: $_"
-                }
+                $Script:ScubaLoggingEnabled = $false
             }
         }
     }
+}
 
 Export-ModuleMember -Function @(
     'Invoke-SCuBA',
