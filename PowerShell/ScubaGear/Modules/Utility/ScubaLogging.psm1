@@ -260,7 +260,15 @@ function Write-ScubaLog {
                 Write-Warning $Message
             }
             "Error" {
-                Write-Error $Message
+                # Use WriteErrorLine instead of Write-Error to avoid terminating execution
+                # This preserves error visibility while allowing the finally block to run
+                try {
+                    $Host.UI.WriteErrorLine("ERROR: $Message")
+                }
+                catch {
+                    # Fallback if WriteErrorLine is not available
+                    Write-Warning "ERROR: $Message"
+                }
             }
         }
 
@@ -1048,6 +1056,7 @@ function Get-ScubaRunDetails {
                 if ($recentErrors.Count -gt 0) {
                     Write-ScubaLog -Message "Found $($recentErrors.Count) recent error(s) in `$Error variable" -Level "Warning" -Source "RunDetails"
 
+                    # Log each error with structured details, including exception message, type, category, target object, and stack trace (truncated
                     foreach ($err in $recentErrors) {
                         $errorData = @{
                             Message = $err.Exception.Message
@@ -1090,10 +1099,111 @@ function Get-ScubaRunDetails {
         else {
             Write-ScubaLog -Message "Error collection skipped (use -IncludeErrors to enable)" -Level "Debug" -Source "RunDetails"
         }
+
+        # 10. Capture module snapshot if IncludeLoadedModules is specified
+        if ($IncludeLoadedModules) {
+            Update-ScubaModuleSnapshot -SnapshotName "InitialLoad"
+        }
     }
     catch {
         Write-ScubaLog -Message "Error during run details collection: $($_.Exception.Message)" -Level "Error" -Source "RunDetails" -Exception $_.Exception
         Write-Error "Failed to collect complete run details. Check logs for partial information."
+    }
+}
+
+function Update-ScubaModuleSnapshot {
+    <#
+    .SYNOPSIS
+    Capture a snapshot of currently loaded PowerShell modules
+
+    .DESCRIPTION
+    Captures which modules are currently loaded in memory and logs them with a timestamp.
+    This function reads RequiredVersions.ps1 to identify what modules ScubaGear depends on,
+    then captures the current state of those modules without hardcoding any module names.
+
+    Can be called at any point during execution to track module loading progression
+    (e.g., before authentication, after authentication, after provider execution).
+
+    .PARAMETER SnapshotName
+    Descriptive name for this snapshot (e.g., "PreAuthentication", "PostAuthentication", "PostProviderExecution")
+
+    .EXAMPLE
+    Update-ScubaModuleSnapshot -SnapshotName "PostAuthentication"
+    Captures which required modules are loaded after authentication completes.
+
+    .NOTES
+    Uses the logging system to store snapshots - no global variables needed.
+    Module requirements are read dynamically from RequiredVersions.ps1.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$SnapshotName
+    )
+
+    try {
+        Write-ScubaLog -Message "Capturing module snapshot: $SnapshotName" -Level "Debug" -Source "ModuleSnapshot"
+
+        # Read required modules from RequiredVersions.ps1 dynamically
+        $requiredVersionsPath = Join-Path $PSScriptRoot "..\..\RequiredVersions.ps1"
+        $requiredModuleNames = @()
+
+        if (Test-Path $requiredVersionsPath) {
+            try {
+                $ModuleList = $null
+                . $requiredVersionsPath
+                if ($ModuleList -and $ModuleList.Count -gt 0) {
+                    $requiredModuleNames = $ModuleList | ForEach-Object { $_['ModuleName'] }
+                    Write-ScubaLog -Message "Loaded $($requiredModuleNames.Count) module names from RequiredVersions.ps1" -Level "Debug" -Source "ModuleSnapshot"
+                }
+                else {
+                    Write-ScubaLog -Message "RequiredVersions.ps1 has no module list - cannot identify required modules" -Level "Warning" -Source "ModuleSnapshot"
+                    return
+                }
+            }
+            catch {
+                Write-ScubaLog -Message "Failed to read RequiredVersions.ps1: $($_.Exception.Message)" -Level "Warning" -Source "ModuleSnapshot"
+                return
+            }
+        }
+        else {
+            Write-ScubaLog -Message "RequiredVersions.ps1 not found at: $requiredVersionsPath" -Level "Warning" -Source "ModuleSnapshot"
+            return
+        }
+
+        # Get all currently loaded modules
+        $loadedModules = Get-Module | Where-Object { $_.Name -in $requiredModuleNames -or $_.Name -eq 'ScubaGear' }
+
+        if ($loadedModules) {
+            # Build a structured list of loaded modules
+            $moduleData = @{
+                SnapshotName = $SnapshotName
+                ModuleCount = $loadedModules.Count
+                Modules = @()
+                ModulePaths = @()
+            }
+
+            foreach ($module in $loadedModules) {
+                $moduleInfo = "$($module.Name) ($($module.Version))"
+                $moduleData.Modules += $moduleInfo
+                $moduleData.ModulePaths += "$($module.Name)=$($module.ModuleBase)"
+            }
+
+            # Join arrays for logging
+            $moduleData.ModuleSummary = $moduleData.Modules -join "; "
+            $moduleData.ModulePathsSummary = $moduleData.ModulePaths -join "; "
+
+            Write-ScubaLog -Message "Module snapshot '$SnapshotName' captured: $($loadedModules.Count) module(s)" -Level "Info" -Source "ModuleSnapshot" -Data $moduleData
+        }
+        else {
+            Write-ScubaLog -Message "Module snapshot '$SnapshotName': No required modules loaded yet" -Level "Info" -Source "ModuleSnapshot" -Data @{
+                SnapshotName = $SnapshotName
+                ModuleCount = 0
+            }
+        }
+    }
+    catch {
+        Write-ScubaLog -Message "Failed to capture module snapshot '$SnapshotName': $($_.Exception.Message)" -Level "Warning" -Source "ModuleSnapshot" -Exception $_.Exception
     }
 }
 
@@ -1240,7 +1350,7 @@ function Get-ScubaDebugLogReport {
     # -------------------------------------------------------------------------
 
     # --- Run summary ---
-    $initEntry   = Find-Entry $OrchestratorCommand  'DEBUG MODE ENABLED'
+    $initEntry   = Find-Entry $OrchestratorCommand  'ScubaGear logging initialized'
     $invokeEntry = Find-Entry $OrchestratorCommand  'Cmdlet invocation captured'
     $firstEntry  = $entries | Select-Object -First 1
 
@@ -1421,33 +1531,77 @@ function Get-ScubaDebugLogReport {
     }
     $sb.AppendLine('') | Out-Null
 
-    # --- Dependencies loaded in memory ---
-    $sb.AppendLine('## ScubaGear-Related Modules Loaded in Memory') | Out-Null
+    # --- Module Loading Progression (Combined Table) ---
+    $sb.AppendLine('## Module Loading Progression') | Out-Null
     $sb.AppendLine('') | Out-Null
-    if ($relatedModsStr) {
-        $sb.AppendLine('| Module | Version | Path |') | Out-Null
-        $sb.AppendLine('|--------|---------|------|') | Out-Null
-        # Build a name→path lookup from the ModulePaths field logged by Get-ScubaRunDetails
-        $pathLookup = @{}
-        if ($relatedModsPaths) {
-            foreach ($pair in ($relatedModsPaths -split '; ')) {
-                if ($pair -match '^(.+?)=(.+)$') { $pathLookup[$Matches[1]] = $Matches[2] }
+
+    # Find all module snapshot entries logged by Update-ScubaModuleSnapshot
+    $moduleSnapshots = $entries | Where-Object { $_.Source -eq 'ModuleSnapshot' -and $_.Message -like '*snapshot*captured*' }
+
+    if ($moduleSnapshots -and $moduleSnapshots.Count -gt 0) {
+        # Build a unified list of all modules across all snapshots
+        $allModules = @()
+        $listedModules = @{}  # Track which modules we've already added
+
+        foreach ($snapshot in $moduleSnapshots) {
+            $snapshotName = if ($snapshot.Data.SnapshotName) { $snapshot.Data.SnapshotName } else { 'Unknown' }
+            $moduleCount = if ($snapshot.Data.ModuleCount) { $snapshot.Data.ModuleCount } else { 0 }
+
+            if ($moduleCount -gt 0 -and $snapshot.Data.Modules -and $snapshot.Data.ModulePathsSummary) {
+                # Build path lookup from ModulePathsSummary
+                $pathLookup = @{}
+                foreach ($pair in ($snapshot.Data.ModulePathsSummary -split '; ')) {
+                    if ($pair -match '^(.+?)=(.+)$') {
+                        $pathLookup[$Matches[1]] = $Matches[2]
+                    }
+                }
+
+                # Add each module to the unified list (only if not already listed)
+                foreach ($modInfo in $snapshot.Data.Modules) {
+                    if ($modInfo -match '^(.+) \((.+)\)$') {
+                        $modName = $Matches[1]
+                        $modVer = $Matches[2]
+                        
+                        # Skip if we've already added this module
+                        if ($listedModules.ContainsKey($modName)) {
+                            continue
+                        }
+                        
+                        $modPath = if ($pathLookup.ContainsKey($modName)) {
+                            $pathLookup[$modName]
+                        } else {
+                            '—'
+                        }
+
+                        $allModules += [PSCustomObject]@{
+                            Snapshot = $snapshotName
+                            Module = $modName
+                            Version = $modVer
+                            Path = $modPath
+                        }
+                        
+                        # Mark this module as listed to avoid duplicates from other snapshots
+                        $listedModules[$modName] = $true
+                    }
+                }
             }
         }
-        foreach ($mod in ($relatedModsStr -split '; ')) {
-            if ($mod -match '^(.+) \((.+)\)$') {
-                $modName = $Matches[1]
-                $modVer  = $Matches[2]
-                $modPath = if ($pathLookup.ContainsKey($modName)) { "``$($pathLookup[$modName])``" } else { '—' }
-                $sb.AppendLine("| $modName | $modVer | $modPath |") | Out-Null
+
+        if ($allModules.Count -gt 0) {
+            $sb.AppendLine('| Snapshot | Module | Version | Path |') | Out-Null
+            $sb.AppendLine('|----------|--------|---------|------|') | Out-Null
+
+            foreach ($mod in $allModules) {
+                $sb.AppendLine("| $($mod.Snapshot) | $($mod.Module) | $($mod.Version) | ``$($mod.Path)`` |") | Out-Null
             }
-            else {
-                $sb.AppendLine("| $mod | — | — |") | Out-Null
-            }
+        }
+        else {
+            $sb.AppendLine('_No modules captured in any snapshots._') | Out-Null
         }
     }
     else {
-        $sb.AppendLine('_No ScubaGear-related modules found in memory._') | Out-Null
+        # Fallback to old behavior if no snapshots found (legacy logs)
+        $sb.AppendLine('_No module snapshots captured. Use Get-ScubaRunDetails with -IncludeLoadedModules to enable module tracking._') | Out-Null
     }
     $sb.AppendLine('') | Out-Null
 
@@ -1648,5 +1802,6 @@ Export-ModuleMember -Function @(
     'Write-ScubaFunctionEntry',
     'Write-ScubaFunctionExit',
     'Get-ScubaRunDetails',
+    'Update-ScubaModuleSnapshot',
     'Get-ScubaDebugLogReport'
 )

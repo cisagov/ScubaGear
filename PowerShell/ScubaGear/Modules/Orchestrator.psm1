@@ -476,7 +476,7 @@ function Invoke-SCuBA {
                 LogFolder = $ScubaLogFolder
                 TranscriptEnabled = $Transcript
             }
-            
+
             # Log cmdlet invocation details to capture how ScubaGear was invoked
             $InvocationParams = @{}
             foreach ($key in $PSBoundParameters.Keys) {
@@ -525,12 +525,35 @@ function Invoke-SCuBA {
         $ProdAuthFailed = Invoke-Connection -ScubaConfig $ScubaConfig
         if ($ProdAuthFailed.Count -gt 0) {
             Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
-            $ScubaConfig.ProductNames = Compare-ProductList -ProductNames $ScubaConfig.ProductNames `
-            -ProductsFailed $ProdAuthFailed `
-            -ExceptionMessage 'All indicated Products were unable to authenticate'
+
+            # Check if ALL products failed authentication
+            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
+            if (-not $Difference) {
+                # All products failed - log critical error (triggers automatic report generation in Stop-ScubaLogging)
+                Write-ScubaLog -Message "CRITICAL: All products failed authentication - aborting execution" -Level "Error" -Source "InvokeScuba" -Data @{
+                    RequestedProducts = ($ScubaConfig.ProductNames -join ', ')
+                    FailedProducts = ($ProdAuthFailed -join ', ')
+                }
+                return
+            }
+
+            # Some products succeeded - continue with the successful ones
+            $ScubaConfig.ProductNames = $Difference
         }
         else {
             Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "InvokeScuba"
+        }
+
+        # Capture module snapshot after authentication to log what modules were imported
+        if ($Script:ScubaLoggingEnabled) {
+            try {
+                Update-ScubaModuleSnapshot -SnapshotName "PostAuthentication"
+            }
+            catch {
+                Write-ScubaLog -Message "Failed to capture post-authentication module snapshot" -Level "Warning" -Source "InvokeScuba" -Data @{
+                    Error = $_.Exception.Message
+                }
+            }
         }
 
         # Tenant Metadata for the Report
@@ -690,7 +713,7 @@ function Invoke-SCuBA {
                 }
                 $Script:ScubaLoggingEnabled = $false
             }
-            
+
         }
     }
 }
@@ -1756,6 +1779,12 @@ function Compare-ProductList {
 
     $Difference = Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
     if (-not $Difference) {
+        # Log critical failure before aborting - all products failed authentication
+        Write-ScubaLog -Message "CRITICAL: All products failed authentication; aborting execution" -Level "Error" -Source "CompareProductList" -Data @{
+            RequestedProducts = ($ProductNames -join ', ')
+            FailedProducts = ($ProductsFailed -join ', ')
+            ExceptionMessage = $ExceptionMessage
+        }
         throw "$($ExceptionMessage); aborting ScubaGear execution"
     }
     else {

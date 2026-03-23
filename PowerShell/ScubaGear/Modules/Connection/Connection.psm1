@@ -33,6 +33,7 @@ function Connect-Tenant {
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+   Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -204,6 +205,17 @@ function Connect-Tenant {
            }
        }
        catch {
+           $ErrorDetails = @{
+               Product = $Product
+               ErrorMessage = $_.Exception.Message
+               ErrorType = $_.Exception.GetType().FullName
+               ScriptStackTrace = $_.ScriptStackTrace
+               TargetObject = if ($_.TargetObject) { $_.TargetObject.ToString() } else { "N/A" }
+           }
+           
+           # Log detailed error information for troubleshooting
+           Write-ScubaLog -Message "Authentication failed for product: $Product" -Level "Error" -Source "ConnectTenant" -Data $ErrorDetails
+           
            Write-Warning "Error establishing a connection with $($Product): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
            $ProdAuthFailed += $Product
            Write-Warning "$($Product) will be omitted from the output because of failed authentication"
