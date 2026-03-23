@@ -376,15 +376,19 @@ th.conditions {
 
 th.multi_tenant_enabled {
     text-align: center;
-    width: 5%;
+    width: 7%;
+}
+
+th.privileged_roles {
+    width: 7%;
 }
 
 th.key_credentials, th.password_credentials, th.federated_credentials {
-    width: 10%;
+    width: 9%;
 }
 
 th.permissions {
-    width: 10%;
+    width: 9%;
 }
 
 /* Risk Indicators */
@@ -436,11 +440,26 @@ th.risk_indicators {
 }
 
 th.risk_score {
-    width: 6%;
+    width: 5%;
 }
 
 th.display_name {
-    width: 14%;
+    width: 18%;
+    text-align: left;
+    padding-left: 0.2em;
+}
+
+td.display_name {
+    text-align: left;
+    padding-left: 0.2em;
+}
+
+th.chevron_col,
+td.chevron_col {
+    width: 1.5%;
+    min-width: 1.5em;
+    padding: 0;
+    text-align: center;
 }
 
 th[data-column] {

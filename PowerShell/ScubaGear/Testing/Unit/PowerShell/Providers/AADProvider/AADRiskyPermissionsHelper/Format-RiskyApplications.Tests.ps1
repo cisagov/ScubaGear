@@ -225,13 +225,15 @@ InModuleScope AADRiskyPermissionsHelper {
             $App.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 7
             $App.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
 
-            # Risk indicators for Test App 1: 2 Critical admin, 3 types of creds, long-lived, multi-tenant
-            $App.RiskIndicators | Should -Contain "2 Critical permissions (admin consent)"
-            $App.RiskIndicators | Should -Contain "2 Password credentials"
-            $App.RiskIndicators | Should -Contain "3 Key credentials"
-            $App.RiskIndicators | Should -Contain "2 Federated credentials"
-            $App.RiskIndicators | Should -Contain "5 Long-lived credentials"
-            $App.RiskIndicators | Should -Contain "Multi-tenant app"
+            # Risk indicators for Test App 1: 2 Critical admin, 3 types of creds, long-lived, multi-tenant, cred volume
+            # Credential base points = CredentialContextWeights.Critical = 50
+            $App.RiskIndicators | Should -Contain "2 Critical permissions (admin consent) +100 pts"
+            $App.RiskIndicators | Should -Contain "2 Password credentials +100 pts"
+            $App.RiskIndicators | Should -Contain "3 Key credentials +150 pts"
+            $App.RiskIndicators | Should -Contain "2 Federated credentials +100 pts"
+            $App.RiskIndicators | Should -Contain "5 Long-lived credentials +25 pts"
+            $App.RiskIndicators | Should -Contain "Multi-tenant app +10 pts"
+            $App.RiskIndicators | Should -Contain "Credential volume (7 active) +30 pts"
         }
     }
 }

@@ -1070,58 +1070,85 @@ function Set-RiskScore {
         }
 
         # 12. Generate risk indicators — plain-English flags that explain WHY the score is high
+        #     Each indicator includes its point contribution so admins can see impact at a glance.
+        #     The sum of all indicator points should equal the RiskScore.
         $RiskIndicators = @()
 
-        # Critical/High admin-consented permissions
+        # Admin-consented permissions by risk level — show every level that has points
         $CriticalAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" }).Count
         $HighAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }).Count
+        $MediumAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }).Count
+        $LowAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }).Count
         if ($CriticalAdminCount -gt 0) {
-            $RiskIndicators += "$CriticalAdminCount Critical permissions (admin consent)"
+            $CriticalAdminPoints = $CriticalAdminCount * $Weights.RiskLevelWeights.Critical
+            $RiskIndicators += "$CriticalAdminCount Critical permissions (admin consent) +$CriticalAdminPoints pts"
         }
-        elseif ($HighAdminCount -gt 0) {
-            $RiskIndicators += "$HighAdminCount High-risk permissions (admin consent)"
+        if ($HighAdminCount -gt 0) {
+            $HighAdminPoints = $HighAdminCount * $Weights.RiskLevelWeights.High
+            $RiskIndicators += "$HighAdminCount High-risk permissions (admin consent) +$HighAdminPoints pts"
+        }
+        if ($MediumAdminCount -gt 0) {
+            $MediumAdminPoints = $MediumAdminCount * $Weights.RiskLevelWeights.Medium
+            $RiskIndicators += "$MediumAdminCount Medium-risk permissions (admin consent) +$MediumAdminPoints pts"
+        }
+        if ($LowAdminCount -gt 0) {
+            $LowAdminPoints = $LowAdminCount * $Weights.RiskLevelWeights.Low
+            $RiskIndicators += "$LowAdminCount Low-risk permissions (admin consent) +$LowAdminPoints pts"
         }
 
         # Non-admin consented risky permissions
         if ($NonAdminConsentedRiskyPermissions.Count -gt 0) {
-            $RiskIndicators += "$($NonAdminConsentedRiskyPermissions.Count) Risky permissions (no admin consent)"
+            $RiskIndicators += "$($NonAdminConsentedRiskyPermissions.Count) Risky permissions (no admin consent) +$NonAdminConsentedPoints pts"
         }
 
-        # Credential presence — show each type so admins can see what auth paths exist
+        # Credential presence — show base points per type (excluding long-lived bonus)
+        $PasswordBasePoints = $PasswordScore.CredentialCount * $CredentialBasePoints
+        $KeyBasePoints = $KeyScore.CredentialCount * $CredentialBasePoints
+        $FederatedBasePoints = $FederatedScore.CredentialCount * $CredentialBasePoints
         if ($PasswordScore.CredentialCount -gt 0) {
-            $RiskIndicators += "$($PasswordScore.CredentialCount) Password credentials"
+            $RiskIndicators += "$($PasswordScore.CredentialCount) Password credentials +$PasswordBasePoints pts"
         }
         if ($KeyScore.CredentialCount -gt 0) {
-            $RiskIndicators += "$($KeyScore.CredentialCount) Key credentials"
+            $RiskIndicators += "$($KeyScore.CredentialCount) Key credentials +$KeyBasePoints pts"
         }
         if ($FederatedScore.CredentialCount -gt 0) {
-            $RiskIndicators += "$($FederatedScore.CredentialCount) Federated credentials"
+            $RiskIndicators += "$($FederatedScore.CredentialCount) Federated credentials +$FederatedBasePoints pts"
         }
 
-        # Long-lived credentials
+        # Long-lived credentials — bonus points on top of credential base
         $TotalLongLived = $PasswordScore.LongLivedCredentialCount + $KeyScore.LongLivedCredentialCount
         if ($TotalLongLived -gt 0) {
-            $RiskIndicators += "$TotalLongLived Long-lived credentials"
+            $PasswordLongLivedBonus = $PasswordScore.TotalPoints - $PasswordBasePoints
+            $KeyLongLivedBonus = $KeyScore.TotalPoints - $KeyBasePoints
+            $TotalLongLivedBonus = $PasswordLongLivedBonus + $KeyLongLivedBonus
+            $RiskIndicators += "$TotalLongLived Long-lived credentials +$TotalLongLivedBonus pts"
+        }
+
+        # Credential volume
+        if ($CredentialVolumePoints -gt 0) {
+            $RiskIndicators += "Credential volume ($TotalActiveCredentials active) +$CredentialVolumePoints pts"
         }
 
         # Multi-tenant
         if ($MultiTenantPoints -gt 0) {
-            $RiskIndicators += "Multi-tenant app"
+            $RiskIndicators += "Multi-tenant app +$MultiTenantPoints pts"
         }
 
-        # Third-party: not shown as a risk indicator because the third-party SPs table
-        # is already filtered to third-party only. The bonus points still apply to the score.
+        # Third-party service principal
+        if ($ThirdPartyServicePrincipalPoints -gt 0) {
+            $RiskIndicators += "Third-party service principal +$ThirdPartyServicePrincipalPoints pts"
+        }
 
         # Privileged roles
         if ($PrivilegedRolesPoints -gt 0) {
             $RoleCount = $PrivilegedRoles.Count
             $RoleNames = $PrivilegedRoles -join ", "
-            $RiskIndicators += "$RoleCount Privileged roles ($RoleNames)"
+            $RiskIndicators += "$RoleCount Privileged roles ($RoleNames) +$PrivilegedRolesPoints pts"
         }
 
-        # Over-permissioned
-        if ($TotalPermissionCount -gt 20) {
-            $RiskIndicators += "Over-permissioned ($TotalPermissionCount total)"
+        # Permission volume
+        if ($PermissionVolumePoints -gt 0) {
+            $RiskIndicators += "Permission volume ($TotalPermissionCount total) +$PermissionVolumePoints pts"
         }
 
         return [PSCustomObject]@{

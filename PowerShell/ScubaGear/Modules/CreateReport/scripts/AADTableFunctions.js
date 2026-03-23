@@ -22,7 +22,7 @@ const TABLE_METADATA = {
         wrapperClass: "expandable_wrapper",
         useModal: false,
         columns: [
-            { name: "" },
+            { name: "", className: "chevron_col" },
             { name: "Name" },
             { name: "State", className: "state" },
             { name: "Users", className: "users" },
@@ -37,7 +37,7 @@ const TABLE_METADATA = {
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
-            { name: "" },
+            { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
             { name: "RiskScore", className: "risk_score" },
             { name: "RiskIndicators", className: "risk_indicators" },
@@ -53,7 +53,7 @@ const TABLE_METADATA = {
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
-            { name: "" },
+            { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
             { name: "RiskScore", className: "risk_score" },
             { name: "RiskIndicators", className: "risk_indicators" },
@@ -247,10 +247,10 @@ const getIndicatorSeverityClass = (indicator) => {
     if (text.includes("high-risk permissions") || text.includes("third-party")) {
         return "indicator-high";
     }
-    if (text.includes("long-lived") || text.includes("risky permissions") || text.includes("multi-tenant")) {
+    if (text.includes("long-lived") || text.includes("risky permissions") || text.includes("multi-tenant") || text.includes("medium-risk permissions")) {
         return "indicator-medium";
     }
-    if (text.includes("password credentials") || text.includes("key credentials") || text.includes("federated credentials") || text.includes("over-permissioned")) {
+    if (text.includes("password credentials") || text.includes("key credentials") || text.includes("federated credentials") || text.includes("permission volume") || text.includes("credential volume") || text.includes("low-risk permissions")) {
         return "indicator-low";
     }
     return "indicator-low";
@@ -430,8 +430,9 @@ const buildExpandableTable = (data, tableType) => {
         data.forEach((_, rowIndex) => {
             const tr = document.createElement("tr");
 
-            colNames.forEach((_, colIndex) => {
+            colNames.forEach((col, colIndex) => {
                 const td = document.createElement("td");
+                if (col.className) td.classList.add(col.className);
 
                 if (colIndex === 0) {
                     td.appendChild(
