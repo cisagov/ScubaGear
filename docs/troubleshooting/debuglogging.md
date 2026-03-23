@@ -19,7 +19,7 @@ Debug logging is **always enabled** and captures:
 
 Debug logs are created automatically. To also enable PowerShell transcript logging, pass the `-Transcript` switch to `Invoke-SCuBA`:
 
-> IMPORTANT: Transcript logging is menat fro developers and to troubleshoot the module. It does not redact sensitive information and can be faily large in size
+> IMPORTANT: Transcript logging is meant fro developers and to troubleshoot the module. It does not redact sensitive information and can be fairly large in size
 
 ```powershell
 Invoke-SCuBA -ProductNames * -Transcript
