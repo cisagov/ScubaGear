@@ -1387,11 +1387,6 @@ function Get-ScubaDebugLogReport {
     $scubaGalleryRepo   = if ($scubaVerEntry.Data.GalleryRepository)    { $scubaVerEntry.Data.GalleryRepository }    else { $null }
     $versionMismatch    = ($scubaLoaded -ne 'Unknown' -and $scubaInstalled -ne 'Unknown' -and $scubaLoaded -ne $scubaInstalled)
 
-    # --- ScubaGear-related modules loaded in memory ---
-    $relatedModsEntry = Find-Entry 'RunDetails' 'ScubaGear-related modules'
-    $relatedModsStr   = if ($relatedModsEntry.Data.Modules)     { $relatedModsEntry.Data.Modules }     else { $null }
-    $relatedModsPaths = if ($relatedModsEntry.Data.ModulePaths) { $relatedModsEntry.Data.ModulePaths } else { $null }
-
     # --- OPA ---
     # Default-location discovery: what Get-ScubaRunDetails found in ~/.scubagear/Tools
     $opaEntry   = Find-Entry 'RunDetails' 'OPA Executable found'
