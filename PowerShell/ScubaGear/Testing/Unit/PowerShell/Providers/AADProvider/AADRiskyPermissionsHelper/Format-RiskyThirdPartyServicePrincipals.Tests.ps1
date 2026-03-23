@@ -140,7 +140,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
             $Weights = Get-SeverityWeights
-            
+
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 4" }
 
             # Contains 8 admin consented risky permissions:

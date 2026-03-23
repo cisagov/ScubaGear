@@ -143,7 +143,7 @@ function Format-Credentials {
         else {
             $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
         }
-        
+
         foreach ($Credential in $AccessKeys) {
             # Only format credentials with the correct keys
             $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
@@ -622,7 +622,7 @@ function Format-RiskyApplications {
                 }
 
                 # Calculate risk score after admin consent for permissions has been determined
-                $ScoreInfo = Set-RiskScore -Object $MergedObject -ObjectType "Application"
+                $ScoreInfo = Set-RiskScore -Object $MergedObject
 
                 # Add risk score info to the merged object
                 $MergedObject | Add-Member -MemberType NoteProperty -Name "RiskScore" -Value $ScoreInfo.RiskScore
@@ -688,7 +688,6 @@ function Format-RiskyThirdPartyServicePrincipals {
                     # Calculate risk score after admin consent for permissions has been determined
                     $ScoreInfo = Set-RiskScore `
                         -Object $ServicePrincipal `
-                        -ObjectType "ServicePrincipal" `
                         -IsThirdPartyServicePrincipal `
                         -PrivilegedRoles $PrivilegedRoles
 
@@ -717,7 +716,7 @@ function Get-SeverityWeights {
     .Description
     Returns the weight factors used in risk score calculation.
 
-    The risk score is a raw additive value — higher means higher risk.
+    The risk score is a raw additive value - higher means higher risk.
     Apps/SPs are sorted by risk score descending. No thresholds or severity labels.
 
     Factor                        Notes
@@ -794,7 +793,7 @@ function ConvertFrom-DotNetDate {
         [string]
         $DateString
     )
-    
+
     if ([string]::IsNullOrEmpty($DateString)) {
         return $null
     }
@@ -847,7 +846,7 @@ function Set-CredentialScore {
     foreach ($Credential in $AccessKeys) {
         $ThisCredentialPoints = 0
 
-        # Skip expired credentials — they cannot be used for authentication
+        # Skip expired credentials - they cannot be used for authentication
         if ($CheckLifetime -and $null -ne $Credential.EndDateTime) {
             $End = ConvertFrom-DotNetDate -DateString $Credential.EndDateTime
             if ($null -ne $End -and $End -lt (Get-Date)) {
@@ -892,7 +891,7 @@ function Set-RiskScore {
     <#
     .Description
     Calculates a risk score for each risky application/service principal. The score is a raw
-    additive value — higher means higher risk. No thresholds, percentages, or severity labels.
+    additive value - higher means higher risk. No thresholds, percentages, or severity labels.
 
     Factors:
     - Each risky permission adds its RiskLevel weight (Critical=50, High=15, Medium=5, Low=2)
@@ -909,11 +908,6 @@ function Set-RiskScore {
         [ValidateNotNullOrEmpty()]
         [Object[]]
         $Object,
-
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet("Application","ServicePrincipal")]
-        [string]
-        $ObjectType,
 
         [switch]
         $IsThirdPartyServicePrincipal,
@@ -1069,12 +1063,12 @@ function Set-RiskScore {
             TotalPoints = $PermissionVolumePoints
         }
 
-        # 12. Generate risk indicators — plain-English flags that explain WHY the score is high
+        # 12. Generate risk indicators - plain-English flags that explain WHY the score is high
         #     Each indicator includes its point contribution so admins can see impact at a glance.
         #     The sum of all indicator points should equal the RiskScore.
         $RiskIndicators = @()
 
-        # Admin-consented permissions by risk level — show every level that has points
+        # Admin-consented permissions by risk level - show every level that has points
         $CriticalAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" }).Count
         $HighAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }).Count
         $MediumAdminCount = @($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }).Count
@@ -1101,7 +1095,7 @@ function Set-RiskScore {
             $RiskIndicators += "$($NonAdminConsentedRiskyPermissions.Count) Risky permissions (no admin consent) +$NonAdminConsentedPoints pts"
         }
 
-        # Credential presence — show base points per type (excluding long-lived bonus)
+        # Credential presence - show base points per type (excluding long-lived bonus)
         $PasswordBasePoints = $PasswordScore.CredentialCount * $CredentialBasePoints
         $KeyBasePoints = $KeyScore.CredentialCount * $CredentialBasePoints
         $FederatedBasePoints = $FederatedScore.CredentialCount * $CredentialBasePoints
@@ -1115,7 +1109,7 @@ function Set-RiskScore {
             $RiskIndicators += "$($FederatedScore.CredentialCount) Federated credentials +$FederatedBasePoints pts"
         }
 
-        # Long-lived credentials — bonus points on top of credential base
+        # Long-lived credentials - bonus points on top of credential base
         $TotalLongLived = $PasswordScore.LongLivedCredentialCount + $KeyScore.LongLivedCredentialCount
         if ($TotalLongLived -gt 0) {
             $PasswordLongLivedBonus = $PasswordScore.TotalPoints - $PasswordBasePoints

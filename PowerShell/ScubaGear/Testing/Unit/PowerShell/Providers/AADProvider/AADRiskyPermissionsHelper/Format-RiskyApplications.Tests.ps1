@@ -194,10 +194,10 @@ InModuleScope AADRiskyPermissionsHelper {
 
             # PasswordCredentials: 2 creds (long-lived) = 2 * (50 + 5) = 110pts
             $ExpectedPasswordCredentialPoints = 2 * ($CredBase + 5)
-            
+
             # KeyCredentials: 3 creds (long-lived) = 3 * (50 + 5) = 165pts
             $ExpectedKeyCredentialPoints = 3 * ($CredBase + 5)
-            
+
             # FederatedCredentials: 2 creds = 2 * 50 = 100pts
             $ExpectedFederatedCredentialPoints = 2 * $CredBase
 
