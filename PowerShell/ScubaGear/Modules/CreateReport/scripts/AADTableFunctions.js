@@ -36,7 +36,7 @@ const TABLE_METADATA = {
         title: "Risky Applications",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Hover over any score to see exactly what is driving the risk.",
+        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your applications.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
@@ -52,7 +52,7 @@ const TABLE_METADATA = {
         title: "Risky Third Party Service Principals",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Hover over any score to see exactly what is driving the risk.",
+        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your third-party service principals.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
@@ -265,7 +265,8 @@ const getIndicatorSeverityClass = (indicator) => {
 
 /**
  * Returns an HSL color string for the RiskScore cell and row.
- * Lightness is constrained to 92%-72% so dark text always meets WCAG AA (4.5:1+).
+ * In light mode: lightness 92%-72% with dark text (WCAG AA).
+ * In dark mode: lightness 18%-30% with light text (WCAG AA).
  *
  * @param {number} score - The current row's RiskScore.
  * @param {number} maxScore - The highest RiskScore in the table.
@@ -275,6 +276,11 @@ const getRiskScoreColor = (score, maxScore) => {
     if (maxScore <= 0) return "transparent";
     const ratio = Math.min(score / maxScore, 1);
     const hue = Math.round(120 * (1 - ratio));
+    const isDark = document.documentElement.dataset.theme === "dark";
+    if (isDark) {
+        const lightness = 18 + Math.round(12 * ratio);
+        return `hsl(${hue}, 50%, ${lightness}%)`;
+    }
     const lightness = 92 - Math.round(20 * ratio);
     return `hsl(${hue}, 70%, ${lightness}%)`;
 };
@@ -296,14 +302,15 @@ const getRiskScoreRowColor = (score, maxScore) => {
 
 /**
  * Returns the text color for risk-score-colored cells.
- * Always returns dark text since backgrounds are kept light enough for WCAG AA compliance.
+ * Light mode: dark text. Dark mode: light text.
  *
  * @param {number} score - The current row's RiskScore.
  * @param {number} maxScore - The highest RiskScore in the table.
  * @returns {string} - Text color.
  */
 const getRiskScoreTextColor = (score, maxScore) => {
-    return "#1a1a2e";
+    const isDark = document.documentElement.dataset.theme === "dark";
+    return isDark ? "#e0e0e0" : "#1a1a2e";
 };
 
 /**
@@ -580,6 +587,22 @@ const buildExpandableTable = (data, tableType) => {
 
             tbody.appendChild(tr);
         });
+
+        // Observe theme changes to recolor rows with inline styles
+        if (isSortable) {
+            const recolorRows = () => {
+                const rows = tbody.querySelectorAll("tr");
+                rows.forEach((row, idx) => {
+                    const score = typeof data[idx].RiskScore === "number" ? data[idx].RiskScore : 0;
+                    row.querySelectorAll("td").forEach(cell => {
+                        cell.style.backgroundColor = getRiskScoreColor(score, maxRiskScore);
+                        cell.style.color = getRiskScoreTextColor(score, maxRiskScore);
+                    });
+                });
+            };
+            const observer = new MutationObserver(recolorRows);
+            observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+        }
 
     }
     catch (error) {

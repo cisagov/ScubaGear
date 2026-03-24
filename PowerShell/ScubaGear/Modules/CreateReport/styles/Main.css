@@ -452,11 +452,11 @@ th.permissions {
     min-width: 280px;
     max-width: 400px;
     padding: 0.5em;
-    background: #1a1a2e;
-    color: #fff;
-    border: 1px solid #444;
+    background: #f5f5f5;
+    color: #1a1a2e;
+    border: 1px solid #ccc;
     border-radius: 0.4em;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     flex-direction: column;
     gap: 0.2em;
 }
@@ -484,6 +484,42 @@ th.permissions {
     line-height: 1.5;
     margin: 0.25em 0 0.75em 0;
     max-width: 80em;
+}
+
+/* Dark mode overrides for risky apps/SPs section */
+html[data-theme='dark'] .risk-score-tooltip {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    border-color: #444;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+html[data-theme='dark'] .risk-indicator-tag.indicator-critical {
+    color: #fff;
+    background-color: hsl(0, 60%, 30%);
+    border-color: hsl(0, 60%, 22%);
+}
+
+html[data-theme='dark'] .risk-indicator-tag.indicator-high {
+    color: #fff;
+    background-color: hsl(36, 60%, 32%);
+    border-color: hsl(36, 60%, 24%);
+}
+
+html[data-theme='dark'] .risk-indicator-tag.indicator-medium {
+    color: #fff;
+    background-color: hsl(72, 50%, 30%);
+    border-color: hsl(72, 50%, 22%);
+}
+
+html[data-theme='dark'] .risk-indicator-tag.indicator-low {
+    color: #fff;
+    background-color: hsl(108, 40%, 30%);
+    border-color: hsl(108, 40%, 22%);
+}
+
+html[data-theme='dark'] .section-synopsis {
+    color: #999;
 }
 
 th.risk_score {
