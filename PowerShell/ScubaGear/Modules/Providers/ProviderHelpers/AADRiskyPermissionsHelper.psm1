@@ -555,7 +555,7 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                     $RiskyDelegatedPermissionClassificationResults += [PSCustomObject]@{
                         ObjectId                        = $ServicePrincipalId
                         AppId                           = $ResourceId
-                        DisplayName                     = $ServicePrincipal.Name
+                        DisplayName                     = $ServicePrincipal.DisplayName
                         RiskyPermClassifications        = $RiskyPermClassifications.permissionName
                     }
                 }
