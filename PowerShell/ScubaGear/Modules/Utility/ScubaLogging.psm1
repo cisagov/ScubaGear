@@ -868,6 +868,7 @@ function Get-ScubaRunDetails {
                     $configuredData.FoundAtConfiguredPath = $true
                     $configuredData.ResolvedPath          = $opaItem.FullName
                     $configuredData.SizeMB                = [math]::Round($opaItem.Length / 1MB, 2)
+                    # Try to get OPA version by executing it
                     try {
                         $ver = & $opaItem.FullName version 2>&1
                         if ($ver) { $configuredData.Version = ($ver | Select-Object -First 1).ToString() }
@@ -1448,7 +1449,17 @@ function Get-ScubaDebugLogReport {
     $regoExit     = $entries | Where-Object { $_.Source -like '*FunctionTrace*' -and $_.Message -match 'EXIT: Invoke-RunRego' }         | Select-Object -First 1
     $reportExit   = $entries | Where-Object { $_.Source -like '*FunctionTrace*' -and $_.Message -match 'EXIT: Invoke-ReportCreation' }  | Select-Object -First 1
 
-    $providerStatus = if ($providerExit.Data.Status) { $providerExit.Data.Status } else { 'N/A' }
+    # Provider status: Check for provider failure warnings, not just function trace status
+    $providerFailedEntry = Find-Entry $OrchestratorCommand 'Some providers failed to execute'
+    $providerStatus = if ($providerFailedEntry) {
+        $failedList = if ($providerFailedEntry.Data.FailedProducts) { $providerFailedEntry.Data.FailedProducts } else { 'unknown' }
+        ":x: Failed ($failedList)"
+    } elseif ($providerExit.Data.Status) {
+        $providerExit.Data.Status
+    } else {
+        'N/A'
+    }
+
     # Trace-ScubaFunction marks Invoke-RunRego as "Success" if it returns without throwing,
     # even when it returns a non-empty list of failed products.  Override with the Warning
     # entry logged by the orchestrator after inspecting the return value.
@@ -1464,11 +1475,19 @@ function Get-ScubaDebugLogReport {
     $reportStatus   = if ($reportExit.Data.Status)   { $reportExit.Data.Status }   else { 'N/A' }
 
     # Authentication timing is derived from timestamps because it is not wrapped in Trace-ScubaFunction
+    # Authentication succeeds if we reach "Retrieving tenant details" or "Starting provider execution"
+    # Authentication fails if we see "All products failed authentication" or "failed authentication" errors
     $authStartEntry = Find-Entry $OrchestratorCommand  'Starting product authentication'
-    $authEndEntry   = $entries | Where-Object {
-        $_.Source -like '*InvokeScuba*' -and ($_.Message -match 'authenticated successfully' -or $_.Message -match 'failed authentication')
+    $authFailedEntry = $entries | Where-Object {
+        $_.Source -like '*InvokeScuba*' -and $_.Message -match 'All products failed authentication'
     } | Select-Object -First 1
+    $authSuccessEntry   = $entries | Where-Object {
+        $_.Source -like '*InvokeScuba*' -and ($_.Message -match 'Retrieving tenant details' -or $_.Message -match 'Starting provider execution')
+    } | Select-Object -First 1
+
     $authMs = $null
+    # Use PS 5.1 compatible null-coalescing
+    $authEndEntry = if ($authFailedEntry) { $authFailedEntry } else { $authSuccessEntry }
     if ($authStartEntry -and $authEndEntry) {
         try {
             $t1    = [datetime]::ParseExact($authStartEntry.Timestamp, 'yyyy-MM-dd HH:mm:ss.fff', $null)
@@ -1478,7 +1497,7 @@ function Get-ScubaDebugLogReport {
             $authMs = $null
         }
     }
-    $authStatus = if ($authEndEntry.Message -match 'successfully') { 'Success' } else { ':warning: Failed' }
+    $authStatus = if ($authFailedEntry) { ':warning: Failed' } elseif ($authSuccessEntry) { 'Success' } else { 'N/A' }
 
     # --- Warnings and Errors ---
     $issues = $entries | Where-Object { $_.Level -in @('Warning', 'Error') }
@@ -1561,6 +1580,7 @@ function Get-ScubaDebugLogReport {
     # Find all module snapshot entries logged by Update-ScubaModuleSnapshot
     $moduleSnapshots = $entries | Where-Object { $_.Source -eq 'ModuleSnapshot' -and $_.Message -like '*snapshot*captured*' }
 
+    # Process all snapshots together to build a table of modules and their loading progression across snapshots.
     if ($moduleSnapshots -and $moduleSnapshots.Count -gt 0) {
         # Build a unified list of all modules across all snapshots
         $allModules = @()
@@ -1590,12 +1610,14 @@ function Get-ScubaDebugLogReport {
                             continue
                         }
 
+                        # Look up the path for this module from the path lookup; if not found, use '—' to indicate unknown
                         $modPath = if ($pathLookup.ContainsKey($modName)) {
                             $pathLookup[$modName]
                         } else {
                             '—'
                         }
 
+                        # Add to the list with snapshot name, module name, version, and path to object
                         $allModules += [PSCustomObject]@{
                             Snapshot = $snapshotName
                             Module = $modName
@@ -1610,6 +1632,7 @@ function Get-ScubaDebugLogReport {
             }
         }
 
+        # populate list of all modules that are in object and build markdown table
         if ($allModules.Count -gt 0) {
             $sb.AppendLine('| Snapshot | Module | Version | Path |') | Out-Null
             $sb.AppendLine('|----------|--------|---------|------|') | Out-Null
@@ -1629,6 +1652,8 @@ function Get-ScubaDebugLogReport {
     $sb.AppendLine('') | Out-Null
 
     # --- OPA ---
+    # Show configured path details first since that is what ScubaGear will actually use at runtime, then show the default-location discovery details for comparison.
+    #Highlight any mismatches or missing OPA issues.
     $sb.AppendLine('## OPA Executable') | Out-Null
     $sb.AppendLine('') | Out-Null
     $sb.AppendLine('| Field | Value |') | Out-Null

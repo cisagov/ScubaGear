@@ -1773,8 +1773,8 @@ function Compare-ProductList {
 
     $Difference = Compare-Object $ProductNames -DifferenceObject $ProductsFailed -PassThru
     if (-not $Difference) {
-        # Log critical failure before aborting - all products failed authentication
-        Write-ScubaLog -Message "CRITICAL: All products failed authentication; aborting execution" -Level "Error" -Source "CompareProductList" -Data @{
+        # Log critical failure before aborting - use the provided exception message for accuracy
+        Write-ScubaLog -Message "CRITICAL: $ExceptionMessage; aborting execution" -Level "Error" -Source "CompareProductList" -Data @{
             RequestedProducts = ($ProductNames -join ', ')
             FailedProducts = ($ProductsFailed -join ', ')
             ExceptionMessage = $ExceptionMessage

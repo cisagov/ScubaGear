@@ -876,5 +876,175 @@ InModuleScope ScubaLogging {
                 $logContent | Should -Match '"SnapshotName":"CountTest"'
             }
         }
+
+        Context "Get-ScubaDebugLogReport - Redaction Patterns" {
+
+            BeforeAll {
+                $script:FakeLogPath = 'C:\fake\ScubaGear-DebugLog-redaction-test.log'
+
+                # Mock Test-Path so ValidateScript passes
+                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                
+                # Mock Get-Content to return test log content
+                Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+            }
+
+            BeforeEach {
+                # Reset test lines - base structure needed for report generation
+                $script:TestRedactionLines = @(
+                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear logging initialized",
+                    '    Data: {"Version":"1.7.0","ProductNames":"aad","Environment":"commercial","OutputFolder":"C:\\test","LogFolder":"C:\\test\\DebugLogs"}',
+                    "[2026-01-01 10:00:00.001] [Info   ] [InvokeScuba         ] Cmdlet invocation captured",
+                    '    Data: {"InvocationLine":"Invoke-SCuBA -ProductNames aad -AppId c5158c26-353e-47a2-a1ef-03607d417140 -CertificateThumbprint D0A37EC3BD70417A784020270A5890337AFFFB89 -Organization dtolab.onmicrosoft.com"}',
+                    "[2026-01-01 10:00:00.002] [Info   ] [RunDetails          ] System OS Information captured",
+                    '    Data: {"OS":"Windows","Version":"10.0","Build":"19045","Architecture":"64-bit"}',
+                    "[2026-01-01 10:00:00.003] [Info   ] [RunDetails          ] PowerShell Version Information captured",
+                    '    Data: {"PSVersion":"7.4.0","PSEdition":"Core","CLRVersion":"8.0.0"}',
+                    "[2026-01-01 10:00:00.004] [Info   ] [RunDetails          ] ScubaGear Version Information captured",
+                    '    Data: {"CurrentLoadedVersion":"1.7.0","CurrentModulePath":"C:\\Modules","InstalledVersions":"1.7.0","AllPaths":"C:\\Modules","InstallSource":"Local"}',
+                    "[2026-01-01 10:00:00.005] [Info   ] [RunDetails          ] OPA Executable found: opa_windows_amd64.exe",
+                    '    Data: {"Path":"C:\\Users\\johndoe\\.scubagear\\Tools\\opa_windows_amd64.exe","SizeMB":85.81,"Version":"Version: 1.13.2"}',
+                    "[2026-01-01 10:00:00.006] [Info   ] [RunDetails          ] Network connectivity status captured",
+                    '    Data: {"InternetConnected":true,"DNSResolution":true,"TestTarget":"www.microsoft.com"}',
+                    "[2026-01-01 10:00:00.007] [Info   ] [InvokeScuba         ] Starting product authentication...",
+                    '    Data: {"ProductNames":"aad","M365Environment":"commercial","UsesServicePrincipal":true}'
+                )
+            }
+
+            It "Should redact AppID in command line parameters" {
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact the AppID GUID
+                $report | Should -Not -Match 'c5158c26-353e-47a2-a1ef-03607d417140'
+                $report | Should -Match '-AppId \[.*REDACTED.*\]'
+            }
+
+            It "Should redact CertificateThumbprint in command line" {
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact the certificate thumbprint
+                $report | Should -Not -Match 'D0A37EC3BD70417A784020270A5890337AFFFB89'
+                $report | Should -Match '-CertificateThumbprint \[.*REDACTED.*\]'
+            }
+
+            It "Should redact Organization tenant domain in command line" {
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact the onmicrosoft.com domain
+                $report | Should -Not -Match 'dtolab\.onmicrosoft\.com'
+                $report | Should -Match '-Organization \[.*REDACTED.*\]'
+            }
+
+            It "Should redact local user path in JSON-escaped format" {
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # The log has JSON-escaped paths (C:\\Users\\johndoe\\) but the markdown report displays them with single backslashes
+                # Should redact the username in the displayed path
+                $report | Should -Not -Match 'johndoe'
+                $report | Should -Match 'C:\\Users\\\[.*REDACTED.*\]'
+            }
+
+            It "Should redact AppID in Azure AD authentication error messages with quotes" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.010] [Error  ] [Connection          ] Authentication failed",
+                    '    Data: {"Error":"AADSTS700016: Application with identifier ''c5158c26-353e-47a2-a1ef-03607d417140'' was not found"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact AppID in error message
+                $report | Should -Not -Match "identifier 'c5158c26-353e-47a2-a1ef-03607d417140'"
+                $report | Should -Match "identifier '\[.*REDACTED.*\]'"
+            }
+
+            It "Should redact AppID in JSON-escaped Unicode quotes" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.011] [Error  ] [Connection          ] Graph API error",
+                    '    Data: {"ErrorDetails":"Application with identifier \\u0027c5158c26-353e-47a2-a1ef-03607d417140\\u0027 not authorized"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact AppID with Unicode quotes
+                $report | Should -Not -Match '\\u0027c5158c26-353e-47a2-a1ef-03607d417140\\u0027'
+                $report | Should -Match '\\u0027\[.*REDACTED.*\]\\u0027'
+            }
+
+            It "Should redact ConfiguredOPAPath with username in JSON data" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.012] [Warning] [RunDetails          ] OPA Executable NOT found at configured path",
+                    '    Data: {"FoundAtConfiguredPath":false,"ConfiguredOPAPath":"C:\\Users\\johndoe\\.scubagear\\Tools"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact username from JSON-escaped path
+                $report | Should -Not -Match '"ConfiguredOPAPath":"C:\\\\Users\\\\johndoe\\\\'
+                $report | Should -Match 'C:\\\\Users\\\\\[.*REDACTED.*\]\\\\'
+            }
+
+            It "Should preserve non-sensitive UUIDs and paths" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.013] [Info   ] [InvokeScuba         ] Starting provider execution...",
+                    '    Data: {"ModuleVersion":"1.7.1","ProductNames":"aad","Guid":"d38604c0-5c0b-4997-b268-c632af060bd3"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should preserve non-AppID GUIDs (not in sensitive contexts)
+                $report | Should -Match 'd38604c0-5c0b-4997-b268-c632af060bd3'
+                
+                # Should preserve system paths without usernames
+                $report | Should -Match 'C:\\Modules'
+            }
+
+            It "Should redact multiple sensitive values in the same report" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.014] [Warning] [ProviderList        ] Provider export failed: AAD",
+                    '    Data: {"Error":"Authentication error for app c5158c26-353e-47a2-a1ef-03607d417140 in tenant dtolab.onmicrosoft.com","ConfigPath":"C:\\Users\\johndoe\\.scubagear"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # All sensitive values should be redacted
+                $report | Should -Not -Match 'c5158c26-353e-47a2-a1ef-03607d417140'
+                $report | Should -Not -Match 'dtolab\.onmicrosoft\.com'
+                $report | Should -Not -Match 'johndoe'
+                $report | Should -Match '\[.*REDACTED.*\]'
+            }
+
+            It "Should redact local user paths in non-JSON format" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.015] [Warning] [RunDetails          ] No OPA executable found in C:\Users\johndoe\.scubagear\Tools"
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact username from single-backslash path
+                $report | Should -Not -Match 'C:\\Users\\johndoe\\'
+                $report | Should -Match 'C:\\Users\\\[.*REDACTED.*\]\\'
+            }
+
+            It "Should handle reports with no sensitive data gracefully" {
+                $script:TestRedactionLines = @(
+                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear logging initialized",
+                    '    Data: {"Version":"1.7.0","ProductNames":"aad"}',
+                    "[2026-01-01 10:00:00.001] [Info   ] [RunDetails          ] System OS Information captured",
+                    '    Data: {"OS":"Windows"}',
+                    "[2026-01-01 10:00:00.002] [Info   ] [RunDetails          ] PowerShell Version Information captured",
+                    '    Data: {"PSVersion":"7.4.0"}',
+                    "[2026-01-01 10:00:00.003] [Info   ] [RunDetails          ] ScubaGear Version Information captured",
+                    '    Data: {"CurrentLoadedVersion":"1.7.0"}',
+                    "[2026-01-01 10:00:00.004] [Info   ] [RunDetails          ] OPA Executable found: opa_windows_amd64.exe",
+                    '    Data: {"Version":"Version: 1.13.2"}',
+                    "[2026-01-01 10:00:00.005] [Info   ] [RunDetails          ] Network connectivity status captured",
+                    '    Data: {"InternetConnected":true}',
+                    "[2026-01-01 10:00:00.006] [Info   ] [InvokeScuba         ] Starting product authentication...",
+                    '    Data: {"ProductNames":"aad"}'
+                )
+
+                { Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath } | Should -Not -Throw
+            }
+        }
     }
 }

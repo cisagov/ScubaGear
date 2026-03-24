@@ -3,13 +3,23 @@
   "redactionText": "[***REDACTED***]",
   "patterns": [
     {
-      "name": "TenantDomain",
+      "name": "TenantDomain_Parameter",
       "pattern": "(-Organization\\s+['\"]?)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.com)(['\"]?)",
       "enabled": true
     },
     {
-      "name": "AppID",
+      "name": "TenantDomain_InText",
+      "pattern": "(tenant\\s+)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.com)([ ;,\"'])",
+      "enabled": true
+    },
+    {
+      "name": "AppID_Parameter",
       "pattern": "(-AppId\\s+['\"]?)([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(['\"]?)",
+      "enabled": true
+    },
+    {
+      "name": "AppID_AfterApp",
+      "pattern": "(app\\s+)([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})([ ;,\"'])",
       "enabled": true
     },
     {
@@ -20,6 +30,21 @@
     {
       "name": "LocalUserPath",
       "pattern": "([C-Z]:\\\\Users\\\\)([^\\\\]+)(\\\\)",
+      "enabled": true
+    },
+    {
+      "name": "LocalUserPath_JSONEscaped",
+      "pattern": "([C-Z]:\\\\\\\\Users\\\\\\\\)([^\\\\]+)(\\\\\\\\)",
+      "enabled": true
+    },
+    {
+      "name": "AppID_InQuotes",
+      "pattern": "(identifier\\s+['\"])([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(['\"])",
+      "enabled": true
+    },
+    {
+      "name": "AppID_JSONEscapedQuote",
+      "pattern": "(\\\\u0027)([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(\\\\u0027)",
       "enabled": true
     },
     {
