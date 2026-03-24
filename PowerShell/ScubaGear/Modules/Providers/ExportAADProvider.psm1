@@ -519,11 +519,6 @@ function AddRuleSource{
     }
 }
 
-# This cache keeps track of PIM groups that we've already processed
-class GroupTypeCache{
-    static [hashtable]$CheckedGroups = @{}
-}
-
 function GetConfigurationsForPimGroups{
     <#
     .SYNOPSIS
@@ -600,9 +595,6 @@ function GetConfigurationsForPimGroups{
 
     # Process each PIM group and attach its policy rules to the privileged roles it is assigned to
     foreach ($Group in $PIMGroups) {
-        # Mark as processed in the cache
-        [GroupTypeCache]::CheckedGroups[$Group.Id] = $true
-
         # Get the policyId from the batch policy assignment results
         $PolicyId = $PolicyResults[$Group.Id].body.value[0].policyId
 
@@ -698,9 +690,6 @@ function Get-PrivilegedRole {
 
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
-        # Clear the cache of already processed PIM groups because this is a static variable
-        [GroupTypeCache]::CheckedGroups.Clear()
-
         # Get ALL the roles and users actively assigned to them, API information is contained within the Permissions JSON file.
         $AllRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
         $AllEligibleRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
