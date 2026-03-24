@@ -554,93 +554,78 @@ function GetConfigurationsForPimGroups{
         return
     }
 
-
-    # Batch fetch display names for all PIM groups ($PIMGroups only returns Id, not DisplayName)
-    try {
-        $GroupDisplayNameResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
-            -UrlScript { "/groups/$($_.Id)?`$select=displayName" } `
-            -M365Environment $M365Environment -ApiVersion "beta"
-    }
-    catch {
-        Write-Warning "Failed to batch fetch group display names: $($_.Exception.Message)"
-        $GroupDisplayNameResults = @{}
-    }
+    # Batch fetch PIM group names ($PIMGroups only returns Id, not DisplayName)
+    $GroupDisplayNameResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
+        -UrlScript { "/groups/$($_.Id)?`$select=displayName" } `
+        -M365Environment $M365Environment -ApiVersion "beta"
 
     # Add display names to the PIM group objects for easier access later
     foreach ($Group in $PIMGroups) {
         $displayNameResponse = $GroupDisplayNameResults[$Group.Id]
-        if ($null -ne $displayNameResponse -and $displayNameResponse.status -eq 200 -and $null -ne $displayNameResponse.body.displayName) {
+        if ($displayNameResponse.status -eq 200) {
             $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value $displayNameResponse.body.displayName
         }
+        # If there were any errors batch fetching the PIM group names, abort execution with the details of the error.
         else {
-            Write-Warning "Failed to fetch display name for group $($Group.Id) from batch results (Status: $($displayNameResponse.status), HasBody: $($null -ne $displayNameResponse.body), HasDisplayName: $($null -ne $displayNameResponse.body.displayName))"
-            $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "Unknown Display Name"
+            throw "Failed to fetch display name for group $($Group.Id) from batch results. Status: $($displayNameResponse.status). Body: $(($displayNameResponse.body | ConvertTo-Json -Depth 10))"
         }
     }
 
     # Batch fetch policy assignments for all PIM groups to retrieve the policyId for each group
-    try {
-        $PolicyResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
-            -UrlScript { "/policies/roleManagementPolicyAssignments?`$filter=scopeId eq '$($_.Id)' and scopeType eq 'Group' and roleDefinitionId eq 'member'" } `
-            -M365Environment $M365Environment -ApiVersion "beta"
-    }
-    catch {
-        Write-Warning "Failed to batch fetch PIM policy assignments: $($_.Exception.Message)"
-        return
+    $PolicyResults = Invoke-GraphBatchRequest -InputObject $PIMGroups `
+        -UrlScript { "/policies/roleManagementPolicyAssignments?`$filter=scopeId eq '$($_.Id)' and scopeType eq 'Group' and roleDefinitionId eq 'member'" } `
+        -M365Environment $M365Environment -ApiVersion "beta"
+
+    # If there were any errors batch fetching the PIM group policy assignments, abort execution with the details of the error.
+    foreach ($PolicyResultsResponse in $PolicyResults.Values) {
+        if ($PolicyResultsResponse.status -ne 200) {
+            throw "Failed to fetch policy assignment for a PIM group from batch results. Status: $($PolicyResultsResponse.status). Body: $(($PolicyResultsResponse.body | ConvertTo-Json -Depth 10))"
+        }
     }
 
-    # Batch fetch policy rules for all PIM groups
+    # Extract the distinct policyIds from the batch results to use in the next batch request to get the policy rules (aka configurations)
     $PolicyRulesInput = $PIMGroups | Select-Object @{n='PolicyId'; e={ $PolicyResults[$_.Id].body.value[0].policyId }}
-    try {
-        $PolicyRulesResults = Invoke-GraphBatchRequest -InputObject $PolicyRulesInput `
-            -IdScript { $_.PolicyId } `
-            -UrlScript { "/policies/roleManagementPolicies/$($_.PolicyId)/rules" } `
-            -M365Environment $M365Environment -ApiVersion "beta"
-    }
-    catch {
-        Write-Warning "Failed to batch fetch policy rules: $($_.Exception.Message)"
-        $PolicyRulesResults = @{}
+    # Batch fetch policy rules (aka configurations) for all PIM groups
+    $PolicyRulesResults = Invoke-GraphBatchRequest -InputObject $PolicyRulesInput `
+        -IdScript { $_.PolicyId } `
+        -UrlScript { "/policies/roleManagementPolicies/$($_.PolicyId)/rules" } `
+        -M365Environment $M365Environment -ApiVersion "beta"
+
+    # If there were any errors batch fetching the PIM group policy configurations, abort execution with the details of the error.
+    foreach ($PolicyRulesResponse in $PolicyRulesResults.Values) {
+        if ($PolicyRulesResponse.status -ne 200) {
+            throw "Failed to fetch policy rules for a PIM group from batch results. Status: $($PolicyRulesResponse.status). Body: $(($PolicyRulesResponse.body | ConvertTo-Json -Depth 10))"
+        }
     }
 
-    # Process each PIM group and attach its policy rules to any privileged roles it is assigned to
+    # Process each PIM group and attach its policy rules to the privileged roles it is assigned to
     foreach ($Group in $PIMGroups) {
         # Mark as processed in the cache
         [GroupTypeCache]::CheckedGroups[$Group.Id] = $true
 
         # Get the policyId from the batch policy assignment results
-        $PolicyAssignment = $PolicyResults[$Group.Id].body.value[0]
-        $PolicyId = $PolicyAssignment.policyId
+        $PolicyId = $PolicyResults[$Group.Id].body.value[0].policyId
 
-        # Get the detailed configuration settings from batch results
-        $policyRulesResponse = $PolicyRulesResults[$PolicyId]
-
-        # Add each configuration rule to the array. There are usually about 17 configurations for a group.
-        if ($null -ne $policyRulesResponse -and $policyRulesResponse.status -eq 200 -and $null -ne $policyRulesResponse.body.value) {
-            # Convert batch response hashtables to PSCustomObjects (required for Add-Member operations)
-            $MemberPolicyRules = @(ConvertFrom-GraphHashtable -GraphData $policyRulesResponse.body.value)
-        }
-        else {
-            # Fallback to individual API call if batch retrieval failed
-            Write-Warning "Failed to retrieve policy rules for policy $PolicyId from batch results. Using fallback API call."
-            $MemberPolicyRules = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyId).Value
-        }
+        # Convert batch response hashtables to PSCustomObjects (required for Add-Member operations)
+        $PIMGroupsPolicyRules = @(ConvertFrom-GraphHashtable -GraphData $PolicyRulesResults[$PolicyId].body.value)
 
         # Add PIM Group display name (already fetched and stored on the $Group object)
-        AddRuleSource -Source $Group.DisplayName -SourceType "PIM Group" -Rules $MemberPolicyRules
+        AddRuleSource -Source $Group.DisplayName -SourceType "PIM Group" -Rules $PIMGroupsPolicyRules
 
-        # Attach rules to all privileged roles this group is assigned to
+        # Filter all the role assignments for this group
         $RoleAssignmentsForGroup = $AllRoleAssignments | Where-Object { $_.PrincipalId -eq $Group.Id }
 
+        # Attach rules (aka configurations) to the privileged roles this group is assigned to
         foreach ($RoleAssignment in $RoleAssignmentsForGroup) {
             $Role = $PrivilegedRoleArray | Where-Object RoleTemplateId -EQ $RoleAssignment.RoleDefinitionId
 
             if ($Role) {
                 $RoleRules = $Role.psobject.Properties | Where-Object { $_.Name -eq 'Rules' }
                 if ($RoleRules) {
-                    $Role.Rules += $MemberPolicyRules
+                    $Role.Rules += $PIMGroupsPolicyRules
                 }
                 else {
-                    $Role | Add-Member -Name "Rules" -Value $MemberPolicyRules -MemberType NoteProperty
+                    $Role | Add-Member -Name "Rules" -Value $PIMGroupsPolicyRules -MemberType NoteProperty
                 }
             }
         }
