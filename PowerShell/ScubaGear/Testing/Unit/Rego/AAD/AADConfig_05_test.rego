@@ -53,7 +53,7 @@ test_UserConsentNotAllowed_Correct if {
     Output := aad.tests with input.authorization_policies as [AuthorizationPolicies]
 
     ReportDetailStr :=
-        "0 authorization policies found that allow non-admin users to consent to risky third-party applications"
+        "0 authorization policies found that allow non-admin users to consent to third-party applications"
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
 }
 
@@ -64,7 +64,7 @@ test_UserConsentNotAllowedEmptyDefaultUserArray_Correct if {
     Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr :=
-        "0 authorization policies found that allow non-admin users to consent to risky third-party applications"
+        "0 authorization policies found that allow non-admin users to consent to third-party applications"
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
 }
 
@@ -80,7 +80,7 @@ test_UserConsentFromVerifiedPublishersAllowed_Incorrect if {
     Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
-        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+        "1 authorization policies found that allow Microsoft to manage consent settings:",
         "<br/>authorizationPolicy"
     ])
 
@@ -99,7 +99,7 @@ test_UserConsentAllowedNoRiskyDelegatedPermissionClassifications_Correct if {
     Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
-        "0 authorization policies found that allow non-admin users to consent to risky third-party applications"
+        "0 authorization policies found that allow non-admin users to consent to third-party applications"
     ])
 
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true

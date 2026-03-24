@@ -677,8 +677,8 @@ BadPolicies := BadDefaultGrantPolicies if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
 }
 
-default DescriptionStr := "authorization policies found that allow non-admin users to consent to risky third-party applications"
-DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications" if {
+default DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
+DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
 } else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
