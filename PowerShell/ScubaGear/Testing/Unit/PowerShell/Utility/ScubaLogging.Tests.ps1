@@ -970,6 +970,19 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '\\u0027\[.*REDACTED.*\]\\u0027'
             }
 
+            It "Should redact tenant short name in directory error messages" {
+                $script:TestRedactionLines += @(
+                    "[2026-01-01 10:00:00.011] [Error  ] [Connection          ] Tenant lookup failed",
+                    '    Data: {"Error":"Tenant was not found in the directory \\u0027dtolab\\u0027. Check to make sure you have the correct tenant ID"}'
+                )
+
+                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                # Should redact tenant short name in directory context
+                $report | Should -Not -Match 'directory \\u0027dtolab\\u0027'
+                $report | Should -Match 'directory \\u0027\[.*REDACTED.*\]\\u0027'
+            }
+
             It "Should redact ConfiguredOPAPath with username in JSON data" {
                 $script:TestRedactionLines += @(
                     "[2026-01-01 10:00:00.012] [Warning] [RunDetails          ] OPA Executable NOT found at configured path",
@@ -978,9 +991,10 @@ InModuleScope ScubaLogging {
 
                 $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
-                # Should redact username from JSON-escaped path
-                $report | Should -Not -Match '"ConfiguredOPAPath":"C:\\\\Users\\\\johndoe\\\\'
-                $report | Should -Match 'C:\\\\Users\\\\\[.*REDACTED.*\]\\\\'
+                # The markdown report displays paths with single backslashes (display format, not JSON format)
+                # Should redact the username
+                $report | Should -Not -Match 'johndoe'
+                $report | Should -Match 'C:\\Users\\\[.*REDACTED.*\]'
             }
 
             It "Should preserve non-sensitive UUIDs and paths" {

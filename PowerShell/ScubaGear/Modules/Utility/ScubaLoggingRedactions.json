@@ -13,6 +13,11 @@
       "enabled": true
     },
     {
+      "name": "TenantShortName_InDirectory",
+      "pattern": "(directory \\\\u0027)([a-zA-Z0-9][a-zA-Z0-9-]*)(\\\\u0027)",
+      "enabled": true
+    },
+    {
       "name": "AppID_Parameter",
       "pattern": "(-AppId\\s+['\"]?)([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(['\"]?)",
       "enabled": true
