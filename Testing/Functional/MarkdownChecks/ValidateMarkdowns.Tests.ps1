@@ -23,11 +23,11 @@ InModuleScope CreateReport {
     Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
         @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
         @{Product = "defender"; GroupCount = 6; PolicyCount = 20}
-        @{Product = "exo"; GroupCount = 17; PolicyCount = 37}
+        @{Product = "exo"; GroupCount = 8; PolicyCount = 24}
         @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
         @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
         @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 11}
-        @{Product = "teams"; GroupCount = 8; PolicyCount = 21}
+        @{Product = "teams"; GroupCount = 5; PolicyCount = 14}
     ){
         BeforeEach{
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Baseline', Justification = 'Variable is used in another scope')]

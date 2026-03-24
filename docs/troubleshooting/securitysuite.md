@@ -1,6 +1,6 @@
-# Defender
+# Security Suite
 
-The ExchangeOnlineManagement PowerShell module is used to connect to Exchange and Defender. This module may already exist on your computer, or you might have installed it previously with  `Initialize-SCuBA` (see the [dependencies page](../prerequisites/dependencies.md)). When running ScubaGear against Defender, you may see a connection error about OAuth in the Powershell window: 
+The ExchangeOnlineManagement PowerShell module is used to connect to Exchange and Defender. This module may already exist on your computer, or you might have installed it previously with  `Initialize-SCuBA` (see the [dependencies page](../prerequisites/dependencies.md)). When running ScubaGear against the Security Suite baseline, you may see a connection error about OAuth in the Powershell window:
 
 > WARNING: Please note that you can only use above 9 new EXO cmdlets (the one with *-EXO* naming pattern). You can't use other cmdlets as we couldn't establish a Remote PowerShell session as basic auth is disabled in your client machine. To enable Basic Auth, please check instruction here https://docs.microsoft.com/en-us/powershell/exchange/exchange-online-powershell-v2?view=exchange-ps#prerequisites-for-the-exo-v2-module Create Powershell Session is failed using OAuth.
 
