@@ -76,8 +76,9 @@ A markdown formatted report is generated automatically if ScubaLogging detects e
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | `-DebugLogPath` | Yes | Full path to the `ScubaGear-DebugLog-*.log` file to parse |
-| `-OutputPath` | No | If provided, the Markdown report is also saved to this file path |
+| `-OutputPath` | No | If provided, the Markdown report is saved to this file path. When specified without `-PassThru`, the report is not displayed on screen |
 | `-FromScubaCached` | No | Pass this switch when the log was produced by `Invoke-SCuBACached`. It tells the report parser to match log entries against the `ScubaCached` source header instead of the default `Invoke-SCuBA` source header. Without it, the run summary and phase timing sections will be empty for cached runs |
+| `-PassThru` | No | When specified, the report is written to the pipeline (displayed on screen). Use this with `-OutputPath` to both save the report and display it on screen |
 
 ### Usage Examples
 
@@ -87,21 +88,32 @@ Print the report to the console:
 Get-ScubaDebugLogReport -DebugLogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log"
 ```
 
-Save the report to a file:
+Save the report to a file **without** displaying it in terminal:
 
 ```powershell
 Get-ScubaDebugLogReport `
     -DebugLogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
     -OutputPath   "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.md"
 ```
+
+Save the report to a file and display it in terminal:
+
+```powershell
+Get-ScubaDebugLogReport `
+    -DebugLogPath "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
+    -OutputPath   "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.md" `
+    -PassThru
+```
+
 Generate a report from a log produced by `Invoke-SCuBACached`:
 
 ```powershell
 Get-ScubaDebugLogReport `
     -DebugLogPath    "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" `
-    -OutputPath      "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.txt" `
+    -OutputPath      "C:\ScubaResults\M365BaselineConformance_2026_03_11_11_18_27\DebugLogs\ScubaGearDebugReport.md" `
     -FromScubaCached
 ```
+
 ### Report Contents
 
 The generated report includes the following sections:

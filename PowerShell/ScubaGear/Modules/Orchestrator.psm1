@@ -467,8 +467,9 @@ function Invoke-SCuBA {
                 Initialize-ScubaLogging -LogPath $ScubaLogFolder -EnableTracing -LogLevel "Debug"
             }
 
+            #enable the scoped logging flag to indicate that logging is active for the rest of the execution.
             $Script:ScubaLoggingEnabled = $true
-            Write-ScubaLog -Message "ScubaGear logging initialized - Full troubleshooting logging active" -Level "Info" -Source "InvokeScuba" -Data @{
+            Write-ScubaLog -Message "ScubaGear logging initialized" -Level "Info" -Source "InvokeScuba" -Data @{
                 Version = $ModuleVersion
                 ProductNames = ($ProductNames -join ', ')
                 Environment = $M365Environment
@@ -512,6 +513,7 @@ function Invoke-SCuBA {
                 Error = $_.Exception.Message
                 StackTrace = $_.ScriptStackTrace
             }
+            Write-Warning "Failed to initialize ScubaGear logging: $_"
             $Script:ScubaLoggingEnabled = $false
         }
 
@@ -534,6 +536,8 @@ function Invoke-SCuBA {
                     RequestedProducts = ($ScubaConfig.ProductNames -join ', ')
                     FailedProducts = ($ProdAuthFailed -join ', ')
                 }
+                # Stop logging and generate error report before exiting
+                Stop-ScubaLogging
                 return
             }
 
@@ -1849,6 +1853,10 @@ function Import-Resources {
             Write-Debug "Importing $_ module"
             Import-Module -Name $ModulePath
         }
+
+        # Import ScubaLogging explicitly (not part of Utility folder import)
+        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
+        Import-Module -Name $ScubaLoggingPath -Force
     }
     catch {
         Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
@@ -1881,6 +1889,7 @@ function Remove-Resources {
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
     Remove-Module "Connection" -ErrorAction "SilentlyContinue"
+    Remove-Module "ScubaLogging" -ErrorAction "SilentlyContinue"
 }
 
 function Invoke-SCuBACached {
@@ -2160,16 +2169,13 @@ function Invoke-SCuBACached {
                 # Transcript is only enabled if -Transcript switch was used
                 if ($Transcript) {
                     Initialize-ScubaLogging -LogPath $ScubaLogFolder -EnableTracing -LogLevel "Debug" -Transcript
-                    Write-Output "ScubaGear logging enabled with transcript (Cached Mode)"
                 }
                 else {
                     Initialize-ScubaLogging -LogPath $ScubaLogFolder -EnableTracing -LogLevel "Debug"
-                    Write-Output "ScubaGear logging enabled (Cached Mode)"
                 }
 
                 $Script:ScubaLoggingEnabled = $true
-                Write-Output "Log folder: $ScubaLogFolder"
-                Write-ScubaLog -Message "ScubaGear logging initialized - Full troubleshooting logging active (Cached Mode)" -Level "Info" -Source "ScubaCached" -Data @{
+                Write-ScubaLog -Message "ScubaGear logging initialized (Cached Mode)" -Level "Info" -Source "ScubaCached" -Data @{
                     Version = $ModuleVersion
                     ProductNames = ($ProductNames -join ', ')
                     Environment = $M365Environment
@@ -2216,7 +2222,6 @@ function Invoke-SCuBACached {
                     StackTrace = $_.ScriptStackTrace
                 }
                 Write-Warning "Failed to initialize ScubaGear logging: $_"
-                Write-Warning "Continuing without advanced logging features..."
                 $Script:ScubaLoggingEnabled = $false
             }
 
@@ -2276,6 +2281,8 @@ function Invoke-SCuBACached {
                             RequestedProducts = ($ProductNames -join ', ')
                             FailedProducts = ($ProdAuthFailed -join ', ')
                         }
+                        # Stop logging and generate error report before exiting
+                        Stop-ScubaLogging
                         return
                     }
 

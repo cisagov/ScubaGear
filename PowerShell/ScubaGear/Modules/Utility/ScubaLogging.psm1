@@ -668,21 +668,42 @@ function Get-ScubaRunDetails {
         # 3. Current ScubaGear Version(s) Installed
         Write-ScubaLog -Message "Collecting ScubaGear version information..." -Level "Debug" -Source "RunDetails"
         try {
-            $scubaModules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
-            if ($scubaModules) {
-                $currentScuba = Get-Module ScubaGear | Select-Object -First 1
-                $scubaData = @{
-                    InstalledVersions = ($scubaModules | ForEach-Object { $_.Version.ToString() }) -join ", "
-                    InstalledCount = $scubaModules.Count
-                    CurrentLoadedVersion = if ($currentScuba) { $currentScuba.Version.ToString() } else { "Not loaded" }
-                    CurrentModulePath = if ($currentScuba) { $currentScuba.ModuleBase } else { "N/A" }
-                    AllPaths = ($scubaModules | ForEach-Object { $_.ModuleBase }) -join "; "
-                }
+            # First, check for the currently loaded module (will exist since we're running from it)
+            $currentScuba = Get-Module ScubaGear | Select-Object -First 1
 
-                # Determine install source: Install-Module (PSGallery) always writes PSGetModuleInfo.xml;
-                # a GitHub clone or manual copy does not.  Import-Clixml reads the serialized object.
-                $psGetInfoPath = if ($currentScuba) { Join-Path $currentScuba.ModuleBase 'PSGetModuleInfo.xml' } else { $null }
-                if ($psGetInfoPath -and (Test-Path $psGetInfoPath)) {
+            # Then check for installed versions (may be empty for GitHub clones not in PSModulePath)
+            $scubaModules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
+
+            # Build the data structure - use loaded module info as fallback
+            $scubaData = @{}
+
+            # Current loaded version (always available since we're running from ScubaGear)
+            if ($currentScuba) {
+                $scubaData.CurrentLoadedVersion = $currentScuba.Version.ToString()
+                $scubaData.CurrentModulePath = $currentScuba.ModuleBase
+            }
+            else {
+                $scubaData.CurrentLoadedVersion = "Unknown"
+                $scubaData.CurrentModulePath = "N/A"
+            }
+
+            # Installed versions (may be empty for dev/GitHub installs)
+            if ($scubaModules) {
+                $scubaData.InstalledVersions = ($scubaModules | ForEach-Object { $_.Version.ToString() }) -join ", "
+                $scubaData.InstalledCount = $scubaModules.Count
+                $scubaData.AllPaths = ($scubaModules | ForEach-Object { $_.ModuleBase }) -join "; "
+            }
+            else {
+                $scubaData.InstalledVersions = "Not in PSModulePath"
+                $scubaData.InstalledCount = 0
+                $scubaData.AllPaths = "N/A"
+            }
+
+            # Determine install source: Install-Module (PSGallery) always writes PSGetModuleInfo.xml;
+            # a GitHub clone or manual copy does not. This is informational only.
+            if ($currentScuba) {
+                $psGetInfoPath = Join-Path $currentScuba.ModuleBase 'PSGetModuleInfo.xml'
+                if (Test-Path $psGetInfoPath) {
                     try {
                         $psGetInfo = Import-Clixml -Path $psGetInfoPath -ErrorAction Stop
                         $scubaData.InstallSource     = 'PowerShell Gallery'
@@ -692,19 +713,19 @@ function Get-ScubaRunDetails {
                         $scubaData.GalleryRepository = if ($psGetInfo.Repository)     { $psGetInfo.Repository }                      else { 'N/A' }
                     }
                     catch {
-                        $scubaData.InstallSource = "PowerShell Gallery (PSGetModuleInfo.xml unreadable: $($_.Exception.Message))"
+                        $scubaData.InstallSource = "PowerShell Gallery (metadata unreadable)"
                     }
                 }
                 else {
-                    # No PSGetModuleInfo.xml — module was cloned from GitHub or installed manually
-                    $scubaData.InstallSource = 'GitHub / manual install (no PSGetModuleInfo.xml found)'
+                    # No PSGetModuleInfo.xml — module was cloned from GitHub or loaded from a dev folder
+                    $scubaData.InstallSource = 'Development / GitHub clone'
                 }
-
-                Write-ScubaLog -Message "ScubaGear Version Information captured" -Level "Info" -Source "RunDetails" -Data $scubaData
             }
             else {
-                Write-ScubaLog -Message "No ScubaGear modules found installed" -Level "Warning" -Source "RunDetails"
+                $scubaData.InstallSource = 'Unknown'
             }
+
+            Write-ScubaLog -Message "ScubaGear Version Information captured" -Level "Info" -Source "RunDetails" -Data $scubaData
         }
         catch {
             Write-ScubaLog -Message "Failed to retrieve ScubaGear version: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
@@ -1236,6 +1257,10 @@ function Get-ScubaDebugLogReport {
     .PARAMETER FromScubaCached
     Optional switch. Determines which orchestrator command was used (Invoke-SCuBA vs Invoke-SCuBACached).
 
+    .PARAMETER PassThru
+    Optional switch. When specified, the report is written to the pipeline (displayed on screen).
+    Without this switch, the report is only saved to OutputPath if specified, with no console output.
+
     .EXAMPLE
     Get-ScubaDebugLogReport -LogPath "C:\Scuba\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log"
 
@@ -1246,6 +1271,9 @@ function Get-ScubaDebugLogReport {
 
     .EXAMPLE
     Get-ScubaDebugLogReport -LogPath "C:\Scuba\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" -FromScubaCached
+
+    .EXAMPLE
+    Get-ScubaDebugLogReport -LogPath "C:\Scuba\DebugLogs\ScubaGear-DebugLog-20260311-111827-956.log" -OutputPath "C:\Scuba\report.md" -PassThru
 
     .FUNCTIONALITY
     Public
@@ -1271,7 +1299,10 @@ function Get-ScubaDebugLogReport {
         [Parameter(Mandatory = $false)]
         [string]$OutputPath,
 
-        [switch]$FromScubaCached
+        [switch]$FromScubaCached,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$PassThru
     )
 
 
@@ -1485,7 +1516,7 @@ function Get-ScubaDebugLogReport {
     $sb.AppendLine('| Field | Value |') | Out-Null
     $sb.AppendLine('|-------|-------|') | Out-Null
     $sb.AppendLine("| **Start Time** | $runStartTime |") | Out-Null
-    $sb.AppendLine("| **Command** | ``$invokeLine`` |") | Out-Null
+    $sb.AppendLine("| **Command** | ``$($invokeLine.Trim())`` |") | Out-Null
     $sb.AppendLine("| **ScubaGear Version (loaded)** | $runVersion |") | Out-Null
     $sb.AppendLine("| **Environment** | $runEnv |") | Out-Null
     #$sb.AppendLine("| **Organization** | $invokeOrg |") | Out-Null
@@ -1782,7 +1813,15 @@ function Get-ScubaDebugLogReport {
     # Apply redactions if schema is available
     $reportText = Invoke-ScubaLogRedaction -Text $reportText
 
-    Write-Output $reportText
+    # Output to pipeline based on context:
+    # - If PassThru is specified: always output
+    # - If OutputPath is specified without PassThru: don't output (just save to file)
+    # - If neither OutputPath nor PassThru is specified: output (default behavior)
+    $shouldOutput = $PassThru -or (-not $OutputPath)
+
+    if ($shouldOutput) {
+        Write-Output $reportText
+    }
 
     if ($OutputPath) {
         $reportText | Set-Content -Path $OutputPath -Encoding UTF8

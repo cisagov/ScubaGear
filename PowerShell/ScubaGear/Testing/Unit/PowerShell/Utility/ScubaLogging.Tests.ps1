@@ -547,7 +547,7 @@ InModuleScope ScubaLogging {
                 # Base log entries satisfying all required Find-Entry lookups in the report generator.
                 # No real files are created — Get-Content and Test-Path are mocked per-test.
                 $script:BaseLogLines = @(
-                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear logging initialized - Full troubleshooting logging active",
+                    "[2026-01-01 10:00:00.000] [Info   ] [InvokeScuba         ] ScubaGear logging initialized",
                     '    Data: {"Version":"1.7.0","ProductNames":"aad","Environment":"commercial","OutputFolder":"C:\\test","LogFolder":"C:\\test\\DebugLogs"}',
                     "[2026-01-01 10:00:00.001] [Info   ] [RunDetails          ] System OS Information captured",
                     '    Data: {"OS":"Windows","Version":"10.0","Build":"19045","Architecture":"64-bit"}',
