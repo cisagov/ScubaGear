@@ -149,16 +149,16 @@
                 "77e65b5a-ceae-48b3-9490-50a86a038a48": "User.ReadBasic.All"
             },
             "Delegated": {
-                "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42": "Calendars.Read",
-                "ff74d97f-43af-4b68-9f2a-b77ee6968c5d": "Contacts.Read",
-                "d56682ec-c09e-4743-aaf4-1a3aac4caa21": "Contacts.ReadWrite",
-                "570282fd-fa5c-430d-a7fd-fc8dc98a9dca": "Mail.Read",
-                "024d486e-b451-40bb-833d-3e66d98c5c73": "Mail.ReadWrite",
-                "e383f46e-2787-4529-855e-0e479a3ffac0": "Mail.Send",
-                "87f447af-9fa4-4c32-9dfa-4a57a73d18ce": "MailboxSettings.Read",
-                "818c620a-27a9-40bd-a6a5-d96f7d610b4b": "MailboxSettings.ReadWrite",
-                "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All",
-                "b340eb25-3456-403f-be2f-af7a0d370277": "User.ReadBasic.All"
+                "5b9be81f-2977-4d27-8faf-bb43af8fc705": "Calendar.Read",
+                "181aac24-028a-486e-a649-b3742c74ec71": "Contacts.Read",
+                "32253599-e142-4cf0-810d-4827eedd1cfa": "Contacts.ReadWrite",
+                "185758ba-798d-4b72-9e54-429a413a2510": "Mail.Read",
+                "75767999-c7a8-481e-a6b4-19458e0b30a5": "Mail.ReadWrite",
+                "5eb43c10-865a-4259-960a-83946678f8dd": "Mail.Send",
+                "d36ad51d-15a2-458d-9b3a-16dbe4c51c30": "MailboxSettings.Read",
+                "2e83d72d-8895-4b66-9eea-abb43449ab8b": "MailboxSettings.ReadWrite",
+                "eb665d05-7f76-4d1b-b176-1cfc814e668d": "User.Read.All",
+                "6222dbab-a24c-4210-9d91-2f47cf565614": "User.ReadBasic.All"
             }
         },
         "Office 365 SharePoint Online": {
@@ -170,11 +170,12 @@
                 "df021288-bdef-4463-88db-98f22de89214": "User.Read.All"
             },
             "Delegated": {
-                "205e70e5-aba6-4c52-a976-6d2d46c48043": "Sites.Read.All",
-                "89fe6a52-be36-487e-b7d8-d061c450a026": "Sites.ReadWrite.All",
-                "5a54b8b3-347c-476d-8f8e-42d5c7424d29": "Sites.FullControl.All",
-                "204e0828-b5ca-4ad8-b9f3-f32a958e7cc4": "User.ReadWrite.All",
-                "a154be20-db9c-4678-8ab7-66f6cc099a59": "User.Read.All"
+                "4e0d77b0-96ba-4398-af14-3baa780278f4": "AllSites.Read",
+                "640ddd16-e5b7-4d71-9690-3f4022699ee7": "AllSites.Write",
+                "56680e0d-d2a3-4ae1-80d8-3c4f2100e3d0": "AllSites.FullControl",
+                "b3f70a70-8a4b-4f95-9573-d71c496a53f4": "AllSites.Manage",
+                "82866913-39a9-4be7-8091-f4fa781088ae": "User.ReadWrite.All",
+                "0cea5a30-f6f8-42b5-87a0-84cc26822e02": "User.Read.All"
             }
         }
     }
