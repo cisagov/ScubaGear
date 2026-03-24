@@ -36,7 +36,7 @@ const TABLE_METADATA = {
         title: "Risky Applications",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your applications.",
+        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your applications. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
@@ -52,7 +52,7 @@ const TABLE_METADATA = {
         title: "Risky Third Party Service Principals",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your third-party service principals.",
+        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant.  Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your third-party service principals. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
