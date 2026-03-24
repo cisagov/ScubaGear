@@ -189,17 +189,20 @@ InModuleScope AADRiskyPermissionsHelper {
             # IsMultiTenantEnabled = $true -> 10pts
             $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
 
-            # Highest risk level = Critical -> credential context = 50pts/cred
+            # Highest risk level = Critical -> credential context = 50pts base
             $CredBase = $Weights.CredentialContextWeights.Critical
 
-            # PasswordCredentials: 2 creds (long-lived) = 2 * (50 + 5) = 110pts
-            $ExpectedPasswordCredentialPoints = 2 * ($CredBase + 5)
+            # PasswordCredentials: 2 creds (long-lived), factor 1.0 = 2 * (50 + 5) = 110pts
+            $PasswordBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Password)
+            $ExpectedPasswordCredentialPoints = 2 * ($PasswordBaseRate + 5)
 
-            # KeyCredentials: 3 creds (long-lived) = 3 * (50 + 5) = 165pts
-            $ExpectedKeyCredentialPoints = 3 * ($CredBase + 5)
+            # KeyCredentials: 3 creds (long-lived), factor 0.5 = 3 * (25 + 5) = 90pts
+            $KeyBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Key)
+            $ExpectedKeyCredentialPoints = 3 * ($KeyBaseRate + 5)
 
-            # FederatedCredentials: 2 creds = 2 * 50 = 100pts
-            $ExpectedFederatedCredentialPoints = 2 * $CredBase
+            # FederatedCredentials: 2 creds, factor 0.25 = 2 * 12 = 24pts
+            $FederatedBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Federated)
+            $ExpectedFederatedCredentialPoints = 2 * $FederatedBaseRate
 
             # Credential volume: 7 active creds (3+2+2) -> (7-1) * 5 = 30pts
             $ExpectedCredentialVolumePoints = (3 + 2 + 2 - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
@@ -225,13 +228,18 @@ InModuleScope AADRiskyPermissionsHelper {
             $App.ScoreBreakdown.CredentialVolume.TotalActiveCredentials | Should -Be 7
             $App.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
 
-            # Risk indicators for Test App 1: 2 Critical admin, 3 types of creds, long-lived, multi-tenant, cred volume
-            # Credential base points = CredentialContextWeights.Critical = 50
+            # Risk indicators for Test App 1: 2 Critical admin, 3 types of creds (discounted), long-lived, multi-tenant, cred volume
+            $PasswordIndicatorPts = 2 * $PasswordBaseRate
+            $KeyIndicatorPts = 3 * $KeyBaseRate
+            $FederatedIndicatorPts = 2 * $FederatedBaseRate
+            $PasswordLongLivedBonus = $ExpectedPasswordCredentialPoints - $PasswordIndicatorPts
+            $KeyLongLivedBonus = $ExpectedKeyCredentialPoints - $KeyIndicatorPts
+            $TotalLongLivedBonus = $PasswordLongLivedBonus + $KeyLongLivedBonus
             $App.RiskIndicators | Should -Contain "2 Critical permissions (admin consent) +100 pts"
-            $App.RiskIndicators | Should -Contain "2 Password credentials +100 pts"
-            $App.RiskIndicators | Should -Contain "3 Key credentials +150 pts"
-            $App.RiskIndicators | Should -Contain "2 Federated credentials +100 pts"
-            $App.RiskIndicators | Should -Contain "5 Long-lived credentials +25 pts"
+            $App.RiskIndicators | Should -Contain "2 Password credentials +$PasswordIndicatorPts pts"
+            $App.RiskIndicators | Should -Contain "3 Key credentials +$KeyIndicatorPts pts"
+            $App.RiskIndicators | Should -Contain "2 Federated credentials +$FederatedIndicatorPts pts"
+            $App.RiskIndicators | Should -Contain "5 Long-lived credentials +$TotalLongLivedBonus pts"
             $App.RiskIndicators | Should -Contain "Multi-tenant app +10 pts"
             $App.RiskIndicators | Should -Contain "Credential volume (7 active) +30 pts"
         }

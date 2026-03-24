@@ -754,6 +754,17 @@ function Get-SeverityWeights {
             Description = "Credential base points scale by the highest risk level permission on the app/SP."
         }
 
+        # Credential type discount factors (applied to base points)
+        # Password credentials (client secrets) are the highest risk - easily exfiltrated
+        # Key credentials (certificates) are harder to steal - discounted
+        # Federated credentials have no shared secret - most discounted
+        CredentialTypeFactors = @{
+            Password = 1.0
+            Key = 0.5
+            Federated = 0.25
+            Description = "Multiplier applied to credential base points by credential type. Passwords are highest risk, certificates less so, federated least."
+        }
+
         # Context factors
         MultiTenant = @{
             Points = 10
@@ -996,11 +1007,12 @@ function Set-RiskScore {
             }
         }
 
-        # 7. Password credentials (all use same context-based base points)
+        # 7. Password credentials (full base points - highest risk credential type)
+        $PasswordBaseRate = [Math]::Floor($CredentialBasePoints * $Weights.CredentialTypeFactors.Password)
         $AllPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $null -ne $_ })
         $PasswordScore = Set-CredentialScore `
             -AccessKeys $AllPasswordCredentials `
-            -BasePointsPerCredential $CredentialBasePoints `
+            -BasePointsPerCredential $PasswordBaseRate `
             -LifetimeTiers $Weights.CredentialLifetimeTiers `
             -CheckLifetime
 
@@ -1011,11 +1023,12 @@ function Set-RiskScore {
             TotalPoints = $PasswordScore.TotalPoints
         }
 
-        # 8. Key credentials
+        # 8. Key credentials (discounted - certificates are harder to exfiltrate)
+        $KeyBaseRate = [Math]::Floor($CredentialBasePoints * $Weights.CredentialTypeFactors.Key)
         $AllKeyCredentials = @($Object.KeyCredentials | Where-Object { $null -ne $_ })
         $KeyScore = Set-CredentialScore `
             -AccessKeys $AllKeyCredentials `
-            -BasePointsPerCredential $CredentialBasePoints `
+            -BasePointsPerCredential $KeyBaseRate `
             -LifetimeTiers $Weights.CredentialLifetimeTiers `
             -CheckLifetime
 
@@ -1026,11 +1039,12 @@ function Set-RiskScore {
             TotalPoints = $KeyScore.TotalPoints
         }
 
-        # 9. Federated credentials (no lifetime check)
+        # 9. Federated credentials (most discounted - no shared secret, no lifetime check)
+        $FederatedBaseRate = [Math]::Floor($CredentialBasePoints * $Weights.CredentialTypeFactors.Federated)
         $AllFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $null -ne $_ })
         $FederatedScore = Set-CredentialScore `
             -AccessKeys $AllFederatedCredentials `
-            -BasePointsPerCredential $CredentialBasePoints
+            -BasePointsPerCredential $FederatedBaseRate
 
         $Score += $FederatedScore.TotalPoints
         $ScoreBreakdown.FederatedCredentials = [PSCustomObject]@{
@@ -1095,10 +1109,10 @@ function Set-RiskScore {
             $RiskIndicators += "$($NonAdminConsentedRiskyPermissions.Count) Risky permissions (no admin consent) +$NonAdminConsentedPoints pts"
         }
 
-        # Credential presence - show base points per type (excluding long-lived bonus)
-        $PasswordBasePoints = $PasswordScore.CredentialCount * $CredentialBasePoints
-        $KeyBasePoints = $KeyScore.CredentialCount * $CredentialBasePoints
-        $FederatedBasePoints = $FederatedScore.CredentialCount * $CredentialBasePoints
+        # Credential presence - show base points per type (using discounted rates)
+        $PasswordBasePoints = $PasswordScore.CredentialCount * $PasswordBaseRate
+        $KeyBasePoints = $KeyScore.CredentialCount * $KeyBaseRate
+        $FederatedBasePoints = $FederatedScore.CredentialCount * $FederatedBaseRate
         if ($PasswordScore.CredentialCount -gt 0) {
             $RiskIndicators += "$($PasswordScore.CredentialCount) Password credentials +$PasswordBasePoints pts"
         }

@@ -158,11 +158,12 @@ InModuleScope AADRiskyPermissionsHelper {
             # IsThirdPartyServicePrincipal = $true -> 20pts
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # Highest risk level = Critical -> credential context = 50pts/cred
+            # Highest risk level = Critical -> credential context = 50pts base
             $CredBase = $Weights.CredentialContextWeights.Critical
 
-            # PasswordCredentials: 2 SP long-lived creds = 2 * (50 + 5) = 110pts
-            $ExpectedPasswordCredentialPoints = 2 * ($CredBase + 5)
+            # PasswordCredentials: 2 SP long-lived creds, factor 1.0 = 2 * (50 + 5) = 110pts
+            $PasswordBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Password)
+            $ExpectedPasswordCredentialPoints = 2 * ($PasswordBaseRate + 5)
 
             # No key credentials -> 0pts
             # No federated credentials -> 0pts
@@ -186,12 +187,13 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.CredentialVolume.TotalPoints | Should -Be $ExpectedCredentialVolumePoints
 
             # Risk indicators for Test SP 4: Critical admin perms, high-risk perms, medium perms, password creds, long-lived, third-party, cred volume
-            # Credential base points = CredentialContextWeights.Critical = 50
+            $PasswordIndicatorPts = 2 * $PasswordBaseRate
+            $PasswordLongLivedBonus = $ExpectedPasswordCredentialPoints - $PasswordIndicatorPts
             $SP.RiskIndicators | Should -Contain "5 Critical permissions (admin consent) +250 pts"
             $SP.RiskIndicators | Should -Contain "2 High-risk permissions (admin consent) +30 pts"
             $SP.RiskIndicators | Should -Contain "1 Medium-risk permissions (admin consent) +5 pts"
-            $SP.RiskIndicators | Should -Contain "2 Password credentials +100 pts"
-            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials +10 pts"
+            $SP.RiskIndicators | Should -Contain "2 Password credentials +$PasswordIndicatorPts pts"
+            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials +$PasswordLongLivedBonus pts"
             $SP.RiskIndicators | Should -Contain "Credential volume (2 active) +5 pts"
             $SP.RiskIndicators | Should -Contain "Third-party service principal +20 pts"
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
@@ -214,17 +216,20 @@ InModuleScope AADRiskyPermissionsHelper {
             # 1 privileged role (Exchange Administrator) -> PointsPerRole pts
             $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole
 
-            # Highest risk level = Critical -> credential context = 50pts/cred
+            # Highest risk level = Critical -> credential context = 50pts base
             $CredBase = $Weights.CredentialContextWeights.Critical
 
-            # KeyCredentials: 1 long-lived cred = 1 * (50 + 5) = 55pts
-            $ExpectedKeyCredentialPoints = 1 * ($CredBase + 5)
+            # KeyCredentials: 1 long-lived cred, factor 0.5 = 1 * (25 + 5) = 30pts
+            $KeyBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Key)
+            $ExpectedKeyCredentialPoints = 1 * ($KeyBaseRate + 5)
 
-            # PasswordCredentials: 1 long-lived cred = 1 * (50 + 5) = 55pts
-            $ExpectedPasswordCredentialPoints = 1 * ($CredBase + 5)
+            # PasswordCredentials: 1 long-lived cred, factor 1.0 = 1 * (50 + 5) = 55pts
+            $PasswordBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Password)
+            $ExpectedPasswordCredentialPoints = 1 * ($PasswordBaseRate + 5)
 
-            # FederatedCredentials: 1 cred = 1 * 50 = 50pts
-            $ExpectedFederatedCredentialPoints = 1 * $CredBase
+            # FederatedCredentials: 1 cred, factor 0.25 = 1 * 12 = 12pts
+            $FederatedBaseRate = [Math]::Floor($CredBase * $Weights.CredentialTypeFactors.Federated)
+            $ExpectedFederatedCredentialPoints = 1 * $FederatedBaseRate
 
             # Credential volume: 3 active creds (1+1+1) -> (3-1) * 5 = 10pts
             $ExpectedCredentialVolumePoints = (3 - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
@@ -258,10 +263,16 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.RiskIndicators | Should -Contain "5 Critical permissions (admin consent) +250 pts"
             $SP.RiskIndicators | Should -Contain "2 High-risk permissions (admin consent) +30 pts"
             $SP.RiskIndicators | Should -Contain "1 Medium-risk permissions (admin consent) +5 pts"
-            $SP.RiskIndicators | Should -Contain "1 Password credentials +50 pts"
-            $SP.RiskIndicators | Should -Contain "1 Key credentials +50 pts"
-            $SP.RiskIndicators | Should -Contain "1 Federated credentials +50 pts"
-            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials +10 pts"
+            $PasswordIndicatorPts = 1 * $PasswordBaseRate
+            $KeyIndicatorPts = 1 * $KeyBaseRate
+            $FederatedIndicatorPts = 1 * $FederatedBaseRate
+            $PasswordLongLivedBonus = $ExpectedPasswordCredentialPoints - $PasswordIndicatorPts
+            $KeyLongLivedBonus = $ExpectedKeyCredentialPoints - $KeyIndicatorPts
+            $TotalLongLivedBonus = $PasswordLongLivedBonus + $KeyLongLivedBonus
+            $SP.RiskIndicators | Should -Contain "1 Password credentials +$PasswordIndicatorPts pts"
+            $SP.RiskIndicators | Should -Contain "1 Key credentials +$KeyIndicatorPts pts"
+            $SP.RiskIndicators | Should -Contain "1 Federated credentials +$FederatedIndicatorPts pts"
+            $SP.RiskIndicators | Should -Contain "2 Long-lived credentials +$TotalLongLivedBonus pts"
             $SP.RiskIndicators | Should -Contain "1 Privileged roles (Exchange Administrator) +8 pts"
             $SP.RiskIndicators | Should -Contain "Credential volume (3 active) +10 pts"
             $SP.RiskIndicators | Should -Contain "Third-party service principal +20 pts"
