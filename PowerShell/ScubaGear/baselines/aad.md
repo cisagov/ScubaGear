@@ -631,7 +631,7 @@ An admin consent workflow SHALL be configured for applications.
 There are a couple of configuration options to restrict user consent. Each option is described below, followed by its respective instructions.
 
 - **Option 1** - Most restrictive - Do not allow user consent for applications. An administrator is required to consent for all applications. Users can submit requests to use an application via the admin consent workflow but they cannot perform the consent themselves.
-- **Option 2** - More flexible - Allow users to consent to applications that use low risk permissions and are from Microsoft verified publishers. When selecting this option, an administrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the portal.
+- **Option 2** - More flexible - Allow users to consent to applications from Microsoft verified publishers that use low-risk permissions. When selecting this option, an administrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the Microsoft Entra admin center.
 
 **Option 1**. Do not allow user consent.
 
