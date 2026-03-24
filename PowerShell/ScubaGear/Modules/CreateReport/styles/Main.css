@@ -380,15 +380,18 @@ th.multi_tenant_enabled {
 }
 
 th.privileged_roles {
+    text-align: center;
     width: 7%;
 }
 
 th.key_credentials, th.password_credentials, th.federated_credentials {
-    width: 9%;
+    text-align: center;
+    width: 11%;
 }
 
 th.permissions {
-    width: 9%;
+    text-align: center;
+    width: 11%;
 }
 
 /* Risk Indicators */
@@ -412,39 +415,83 @@ th.permissions {
 }
 
 .risk-indicator-tag.indicator-critical {
-    color: #fff;
-    background-color: #c62828;
-    border: 1px solid #b71c1c;
+    color: #1a1a2e;
+    background-color: hsl(0, 70%, 72%);
+    border: 1px solid hsl(0, 70%, 62%);
 }
 
 .risk-indicator-tag.indicator-high {
     color: #1a1a2e;
-    background-color: #ff9800;
-    border: 1px solid #e68a00;
+    background-color: hsl(36, 70%, 78%);
+    border: 1px solid hsl(36, 70%, 68%);
 }
 
 .risk-indicator-tag.indicator-medium {
     color: #1a1a2e;
-    background-color: #ffd166;
-    border: 1px solid #e6b84d;
+    background-color: hsl(72, 70%, 84%);
+    border: 1px solid hsl(72, 70%, 74%);
 }
 
 .risk-indicator-tag.indicator-low {
     color: #1a1a2e;
-    background-color: #90caf9;
-    border: 1px solid #64b5f6;
+    background-color: hsl(108, 70%, 90%);
+    border: 1px solid hsl(108, 70%, 80%);
 }
 
-th.risk_indicators {
-    width: 18%;
+/* Risk Score tooltip (hover over score to see indicators) */
+.has-risk-tooltip {
+    cursor: pointer;
+}
+
+.risk-score-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 100;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 280px;
+    max-width: 400px;
+    padding: 0.5em;
+    background: #1a1a2e;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 0.4em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    flex-direction: column;
+    gap: 0.2em;
+}
+
+.risk-score-tooltip.tooltip-below {
+    top: 100%;
+    bottom: auto;
+}
+
+.risk-score-tooltip.tooltip-above {
+    bottom: 100%;
+    top: auto;
+}
+
+.has-risk-tooltip:hover .risk-score-tooltip,
+.has-risk-tooltip:focus .risk-score-tooltip,
+.has-risk-tooltip:focus-within .risk-score-tooltip {
+    display: flex;
+}
+
+/* Section synopsis */
+.section-synopsis {
+    color: #555;
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin: 0.25em 0 0.75em 0;
+    max-width: 80em;
 }
 
 th.risk_score {
-    width: 5%;
+    width: 6%;
 }
 
 th.display_name {
-    width: 18%;
+    width: 22%;
     text-align: left;
     padding-left: 0.2em;
 }
@@ -783,6 +830,14 @@ a.control_group:active {
     justify-content: space-between;
     gap: 4px;
     width: 100%;
+}
+
+th.privileged_roles .sort-btn,
+th.key_credentials .sort-btn,
+th.password_credentials .sort-btn,
+th.federated_credentials .sort-btn,
+th.permissions .sort-btn {
+    justify-content: center;
 }
 
 .sort-btn:focus-visible {

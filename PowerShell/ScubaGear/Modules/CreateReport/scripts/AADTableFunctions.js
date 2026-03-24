@@ -36,11 +36,11 @@ const TABLE_METADATA = {
         title: "Risky Applications",
         wrapperClass: "expandable_wrapper",
         useModal: true,
+        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Hover over any score to see exactly what is driving the risk.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
             { name: "RiskScore", className: "risk_score" },
-            { name: "RiskIndicators", className: "risk_indicators" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -52,11 +52,11 @@ const TABLE_METADATA = {
         title: "Risky Third Party Service Principals",
         wrapperClass: "expandable_wrapper",
         useModal: true,
+        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Hover over any score to see exactly what is driving the risk.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
             { name: "RiskScore", className: "risk_score" },
-            { name: "RiskIndicators", className: "risk_indicators" },
             { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -186,6 +186,7 @@ const handleSortClick = (data, tableType, column) => {
 
     const tbody = document.querySelector(`.${tableType}_table tbody`);
     const colNames = TABLE_METADATA[tableType].columns;
+    const maxRiskScore = Math.max(...data.map(d => typeof d.RiskScore === "number" ? d.RiskScore : 0), 0);
 
     tbody.querySelectorAll("tr").forEach((row, rowIndex) => {
         colNames.forEach((_, colIndex) => {
@@ -204,8 +205,15 @@ const handleSortClick = (data, tableType, column) => {
                 );
             }
             else {
-                fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                fillTruncatedCell(data, tableType, td, rowIndex, colIndex, maxRiskScore);
             }
+        });
+
+        // Apply row coloring after all cells are rebuilt
+        const score = typeof data[rowIndex].RiskScore === "number" ? data[rowIndex].RiskScore : 0;
+        row.querySelectorAll("td").forEach(cell => {
+            cell.style.backgroundColor = getRiskScoreColor(score, maxRiskScore);
+            cell.style.color = getRiskScoreTextColor(score, maxRiskScore);
         });
     });
 
@@ -222,7 +230,6 @@ const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
         case "RiskScore": return "Risk Score";
-        case "RiskIndicators": return "Risk Indicators";
         case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
@@ -254,6 +261,103 @@ const getIndicatorSeverityClass = (indicator) => {
         return "indicator-low";
     }
     return "indicator-low";
+};
+
+/**
+ * Returns an HSL color string for the RiskScore cell and row.
+ * Lightness is constrained to 92%-72% so dark text always meets WCAG AA (4.5:1+).
+ *
+ * @param {number} score - The current row's RiskScore.
+ * @param {number} maxScore - The highest RiskScore in the table.
+ * @returns {string} - HSL color string for the background.
+ */
+const getRiskScoreColor = (score, maxScore) => {
+    if (maxScore <= 0) return "transparent";
+    const ratio = Math.min(score / maxScore, 1);
+    const hue = Math.round(120 * (1 - ratio));
+    const lightness = 92 - Math.round(20 * ratio);
+    return `hsl(${hue}, 70%, ${lightness}%)`;
+};
+
+/**
+ * Returns a lighter HSL tint color for the entire table row.
+ *
+ * @param {number} score - The current row's RiskScore.
+ * @param {number} maxScore - The highest RiskScore in the table.
+ * @returns {string} - HSL color string for the row background.
+ */
+const getRiskScoreRowColor = (score, maxScore) => {
+    if (maxScore <= 0) return "transparent";
+    const ratio = Math.min(score / maxScore, 1);
+    const hue = Math.round(120 * (1 - ratio));
+    const lightness = 97 - Math.round(17 * ratio);
+    return `hsl(${hue}, 60%, ${lightness}%)`;
+};
+
+/**
+ * Returns the text color for risk-score-colored cells.
+ * Always returns dark text since backgrounds are kept light enough for WCAG AA compliance.
+ *
+ * @param {number} score - The current row's RiskScore.
+ * @param {number} maxScore - The highest RiskScore in the table.
+ * @returns {string} - Text color.
+ */
+const getRiskScoreTextColor = (score, maxScore) => {
+    return "#1a1a2e";
+};
+
+/**
+ * Builds a tooltip element containing risk indicator tags for a RiskScore cell.
+ *
+ * @param {Array} indicators - The RiskIndicators array for the row.
+ * @returns {HTMLElement} - A tooltip div element.
+ */
+const buildRiskScoreTooltip = (indicators) => {
+    const tooltip = document.createElement("div");
+    tooltip.className = "risk-score-tooltip";
+    tooltip.setAttribute("role", "tooltip");
+    tooltip.id = "risk-tooltip-" + Math.random().toString(36).substring(2, 9);
+    const arr = normalizeToArray(indicators || []);
+    if (arr.length === 0) {
+        tooltip.textContent = "No risk indicators";
+        return tooltip;
+    }
+    arr.forEach(indicator => {
+        const tag = document.createElement("span");
+        tag.className = "risk-indicator-tag " + getIndicatorSeverityClass(indicator);
+        tag.textContent = indicator;
+        tooltip.appendChild(tag);
+    });
+    return tooltip;
+};
+
+/**
+ * Positions the tooltip above or below the cell depending on available viewport space,
+ * and scrolls it into view if needed.
+ *
+ * @param {HTMLElement} td - The RiskScore cell with the tooltip.
+ */
+const positionRiskTooltip = (td) => {
+    const tooltip = td.querySelector(".risk-score-tooltip");
+    if (!tooltip) return;
+
+    // Reset position classes
+    tooltip.classList.remove("tooltip-above", "tooltip-below");
+
+    const cellRect = td.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - cellRect.bottom;
+    const tooltipHeight = 200; // estimated max height
+
+    if (spaceBelow < tooltipHeight) {
+        tooltip.classList.add("tooltip-above");
+    } else {
+        tooltip.classList.add("tooltip-below");
+    }
+
+    // Scroll tooltip into view after it renders
+    requestAnimationFrame(() => {
+        tooltip.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
 };
 
 /**
@@ -337,6 +441,14 @@ const buildExpandableTable = (data, tableType) => {
         h2.textContent = metadata.title;
         section.appendChild(h2);
 
+        // Add synopsis paragraph if defined
+        if (metadata.synopsis) {
+            const synopsis = document.createElement("p");
+            synopsis.className = "section-synopsis";
+            synopsis.textContent = metadata.synopsis;
+            section.appendChild(synopsis);
+        }
+
         if (data.length === 0) {
             // If there is no data, don't create a table, instead display this message
             let noDataWarning = document.createElement("p");
@@ -370,6 +482,11 @@ const buildExpandableTable = (data, tableType) => {
             data.splice(0, data.length, ...sorted);
             tableSortState[tableType] = { column: "RiskScore", direction: "desc" };
         }
+
+        // Compute max RiskScore for color scaling
+        const maxRiskScore = isSortable
+            ? Math.max(...data.map(d => typeof d.RiskScore === "number" ? d.RiskScore : 0), 0)
+            : 0;
 
         const table = document.createElement("table");
         table.className = `${tableType}_table`;
@@ -444,13 +561,22 @@ const buildExpandableTable = (data, tableType) => {
                             contentBuilder: () => createChevronIcon("right", 10)
                         })
                     );
-                } 
+                }
                 else {
-                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex, maxRiskScore);
                 }
 
                 tr.appendChild(td);
             });
+
+            // Apply row coloring after all cells are built
+            if (isSortable) {
+                const score = typeof data[rowIndex].RiskScore === "number" ? data[rowIndex].RiskScore : 0;
+                tr.querySelectorAll("td").forEach(cell => {
+                    cell.style.backgroundColor = getRiskScoreColor(score, maxRiskScore);
+                    cell.style.color = getRiskScoreTextColor(score, maxRiskScore);
+                });
+            }
 
             tbody.appendChild(tr);
         });
@@ -470,7 +596,7 @@ const buildExpandableTable = (data, tableType) => {
  * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
  * @param {number} colIndex - The column index (0-indexed).
  */
-const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
+const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex, maxRiskScore) => {
     const colNames = TABLE_METADATA[tableType].columns;
     const col = colNames[colIndex];
     const cellData = data[rowIndex][col.name];
@@ -482,23 +608,37 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
         return;
     }
 
-    // Render RiskIndicators as inline tags (no truncation)
-    if (col.name === "RiskIndicators") {
-        td.textContent = ""; // Clear any existing content (e.g. after collapse)
-        const indicators = normalizeToArray(cellData);
-        if (indicators.length === 0) {
-            td.textContent = "None";
-            return;
+    // Render RiskScore with color and hover tooltip
+    if (col.name === "RiskScore") {
+        const score = typeof cellData === "number" ? cellData : 0;
+        const max = maxRiskScore || 0;
+        td.textContent = score;
+        td.style.backgroundColor = getRiskScoreColor(score, max);
+        td.style.color = getRiskScoreTextColor(score, max);
+        td.style.fontWeight = "700";
+        td.style.textAlign = "center";
+        td.style.position = "relative";
+
+        // Color the entire row to match the score cell
+        const tr = td.closest("tr");
+        if (tr) {
+            tr.querySelectorAll("td").forEach(cell => {
+                cell.style.backgroundColor = getRiskScoreColor(score, max);
+                cell.style.color = getRiskScoreTextColor(score, max);
+            });
         }
-        const container = document.createElement("div");
-        container.className = "risk-indicators-container";
-        indicators.forEach(indicator => {
-            const tag = document.createElement("span");
-            tag.className = "risk-indicator-tag " + getIndicatorSeverityClass(indicator);
-            tag.textContent = indicator;
-            container.appendChild(tag);
-        });
-        td.appendChild(container);
+
+        // Build tooltip from RiskIndicators
+        const indicators = data[rowIndex]["RiskIndicators"];
+        if (indicators) {
+            const tooltip = buildRiskScoreTooltip(indicators);
+            td.appendChild(tooltip);
+            td.classList.add("has-risk-tooltip");
+            td.setAttribute("tabindex", "0");
+            td.setAttribute("aria-describedby", tooltip.id);
+            td.addEventListener("mouseenter", () => positionRiskTooltip(td));
+            td.addEventListener("focus", () => positionRiskTooltip(td));
+        }
         return;
     }
 
@@ -565,6 +705,7 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 const fillExpandedRow = (data, tableType, row, rowIndex) => {
     const metadata = TABLE_METADATA[tableType];
     const colNames = metadata.columns;
+    const maxRiskScore = Math.max(...data.map(d => typeof d.RiskScore === "number" ? d.RiskScore : 0), 0);
 
     colNames.forEach((col, colIndex) => {
         const cellData = data[rowIndex][col.name];
@@ -588,22 +729,26 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
             return;
         }
 
-        // Render RiskIndicators as inline tags in expanded view
-        if (col.name === "RiskIndicators") {
-            const indicators = normalizeToArray(cellData || []);
-            if (indicators.length === 0) {
-                td.textContent = "None";
-                return;
+        // Render RiskScore with color and tooltip in expanded view
+        if (col.name === "RiskScore") {
+            const score = typeof cellData === "number" ? cellData : 0;
+            td.textContent = score;
+            td.style.backgroundColor = getRiskScoreColor(score, maxRiskScore);
+            td.style.color = getRiskScoreTextColor(score, maxRiskScore);
+            td.style.fontWeight = "700";
+            td.style.textAlign = "center";
+            td.style.position = "relative";
+
+            const indicators = data[rowIndex]["RiskIndicators"];
+            if (indicators) {
+                const tooltip = buildRiskScoreTooltip(indicators);
+                td.appendChild(tooltip);
+                td.classList.add("has-risk-tooltip");
+                td.setAttribute("tabindex", "0");
+                td.setAttribute("aria-describedby", tooltip.id);
+                td.addEventListener("mouseenter", () => positionRiskTooltip(td));
+                td.addEventListener("focus", () => positionRiskTooltip(td));
             }
-            const container = document.createElement("div");
-            container.className = "risk-indicators-container";
-            indicators.forEach(indicator => {
-                const tag = document.createElement("span");
-                tag.className = "risk-indicator-tag " + getIndicatorSeverityClass(indicator);
-                tag.textContent = indicator;
-                container.appendChild(tag);
-            });
-            td.appendChild(container);
             return;
         }
         
@@ -653,6 +798,13 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
 
         td.textContent = cellData ?? "None";
     });
+
+    // Apply row coloring after all cells are processed
+    const score = typeof data[rowIndex].RiskScore === "number" ? data[rowIndex].RiskScore : 0;
+    row.querySelectorAll("td").forEach(cell => {
+        cell.style.backgroundColor = getRiskScoreColor(score, maxRiskScore);
+        cell.style.color = getRiskScoreTextColor(score, maxRiskScore);
+    });
 }
 
 /**
@@ -665,10 +817,11 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
  */
 const fillCollapsedRow = (data, tableType, row, rowIndex) => {
     const colNames = TABLE_METADATA[tableType].columns;
+    const maxRiskScore = Math.max(...data.map(d => typeof d.RiskScore === "number" ? d.RiskScore : 0), 0);
 
     colNames.forEach((_, colIndex) => {
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
-        fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+        fillTruncatedCell(data, tableType, td, rowIndex, colIndex, maxRiskScore);
     });
 
     // We have to manually "reset" the content of the first column to an empty value,
