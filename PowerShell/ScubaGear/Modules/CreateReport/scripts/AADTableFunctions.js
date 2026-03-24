@@ -36,7 +36,7 @@ const TABLE_METADATA = {
         title: "Risky Applications",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are application registrations in your tenant that have been granted risky API permissions. Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your applications. Look for apps with high Risk Scores -- they combine dangerous permissions with active credentials, creating paths an attacker could exploit. It is recommended that you review these applications to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk.",
+        synopsis: "Application registrations with risky API permissions. Higher Risk Scores can indicate dangerous permission and credential combinations -- hover over any score to see the breakdown. Row coloring reflects comparative risk within this tenant.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
@@ -52,7 +52,7 @@ const TABLE_METADATA = {
         title: "Risky Third Party Service Principals",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "These are service principals owned by external organizations that have been granted risky API permissions in your tenant.  Row coloring is scaled relative to this tenant's scores and reflects the comparative risk among your third-party service principals. Third-party apps are outside your direct security controls, so focus on entries with high Risk Scores. It is recommended that you review these service principals to determine if the credentials are still required for functionality of the application. Expand each row to view the credentials and/or hover over any score to see exactly what is driving the risk.",
+        synopsis: "Externally owned service principals with risky API permissions -- outside your direct security controls. Higher Risk Scores canindicate dangerous permission, credential, and privileged role combinations -- hover over any score to see the breakdown. Row coloring reflects comparative risk within this tenant.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
