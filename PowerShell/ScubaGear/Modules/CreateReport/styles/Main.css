@@ -394,13 +394,6 @@ th.permissions {
     width: 11%;
 }
 
-/* Risk Indicators */
-.risk-indicators-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15em;
-}
-
 .risk-indicator-tag {
     display: block;
     padding: 0.1em 0.35em;

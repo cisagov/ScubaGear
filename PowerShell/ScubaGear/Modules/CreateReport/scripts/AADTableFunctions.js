@@ -52,7 +52,7 @@ const TABLE_METADATA = {
         title: "Risky Third Party Service Principals",
         wrapperClass: "expandable_wrapper",
         useModal: true,
-        synopsis: "Externally owned service principals with risky API permissions -- outside your direct security controls. Higher Risk Scores canindicate dangerous permission, credential, and privileged role combinations -- hover over any score to see the breakdown. Row coloring reflects comparative risk within this tenant.",
+        synopsis: "Externally owned service principals with risky API permissions -- outside your direct security controls. Higher Risk Scores can indicate dangerous permission, credential, and privileged role combinations -- hover over any score to see the breakdown. Row coloring reflects comparative risk within this tenant.",
         columns: [
             { name: "", className: "chevron_col" },
             { name: "DisplayName", className: "display_name" },
@@ -285,20 +285,7 @@ const getRiskScoreColor = (score, maxScore) => {
     return `hsl(${hue}, 70%, ${lightness}%)`;
 };
 
-/**
- * Returns a lighter HSL tint color for the entire table row.
- *
- * @param {number} score - The current row's RiskScore.
- * @param {number} maxScore - The highest RiskScore in the table.
- * @returns {string} - HSL color string for the row background.
- */
-const getRiskScoreRowColor = (score, maxScore) => {
-    if (maxScore <= 0) return "transparent";
-    const ratio = Math.min(score / maxScore, 1);
-    const hue = Math.round(120 * (1 - ratio));
-    const lightness = 97 - Math.round(17 * ratio);
-    return `hsl(${hue}, 60%, ${lightness}%)`;
-};
+
 
 /**
  * Returns the text color for risk-score-colored cells.
