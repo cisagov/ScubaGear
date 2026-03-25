@@ -14,8 +14,6 @@ $ModuleList = @(
         Purpose = 'Exchange Online and Microsoft Defender management'
         IsPinned = "False"
     },
-    # SharePoint modules removed - using direct REST API calls instead
-    # Microsoft.Online.SharePoint.PowerShell and PnP.PowerShell no longer required
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
         ModuleVersion = [version] '2.0.198'

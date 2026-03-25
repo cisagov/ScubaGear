@@ -143,18 +143,12 @@ function Get-SPOAccessTokenInteractive {
         { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us" }
     }
 
-    # Generate PKCE code verifier and challenge
-    $CodeVerifierBytes = [byte[]]::new(32)
-    [System.Security.Cryptography.RandomNumberGenerator]::Fill($CodeVerifierBytes)
-    $CodeVerifier = [System.Convert]::ToBase64String($CodeVerifierBytes) -replace '\+', '-' -replace '/', '_' -replace '='
-    
-    $CodeChallengeBytes = [System.Security.Cryptography.SHA256]::Create().ComputeHash([System.Text.Encoding]::UTF8.GetBytes($CodeVerifier))
-    $CodeChallenge = [System.Convert]::ToBase64String($CodeChallengeBytes) -replace '\+', '-' -replace '/', '_' -replace '='
+    # Generate state for CSRF protection
+    $State = [guid]::NewGuid().ToString()
 
     # Build authorization URL - use SharePoint resource
-    $State = [guid]::NewGuid().ToString()
     $Resource = $AdminUrl
-    $AuthUrl = "$AuthEndpoint/$Tenant/oauth2/authorize?" + 
+    $AuthUrl = "$AuthEndpoint/$Tenant/oauth2/authorize?" +
         "client_id=$ClientId" +
         "&response_type=code" +
         "&redirect_uri=$([System.Web.HttpUtility]::UrlEncode($RedirectUri))" +
@@ -162,16 +156,16 @@ function Get-SPOAccessTokenInteractive {
         "&state=$State" +
         "&prompt=select_account"
 
-    Write-Host "Opening browser for SharePoint authentication..." -ForegroundColor Cyan
-    Write-Host "Please sign in with a SharePoint Administrator account." -ForegroundColor Yellow
-    
+    Write-Information "Opening browser for SharePoint authentication..."
+    Write-Information "Please sign in with a SharePoint Administrator account."
+
     # Open browser for authentication
     Start-Process $AuthUrl
 
     # Prompt user to paste the redirect URL
-    Write-Host ""
-    Write-Host "After signing in, you will be redirected to a page." -ForegroundColor Cyan
-    Write-Host "Copy the ENTIRE URL from your browser's address bar and paste it here:" -ForegroundColor Yellow
+    Write-Information ""
+    Write-Information "After signing in, you will be redirected to a page."
+    Write-Information "Copy the ENTIRE URL from your browser's address bar and paste it here:"
     $RedirectResponse = Read-Host "Paste URL"
 
     # Parse authorization code from the pasted URL
@@ -205,7 +199,7 @@ function Get-SPOAccessTokenInteractive {
 
     try {
         $TokenResponse = Invoke-RestMethod -Uri $TokenUrl -Method POST -Body $TokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
-        Write-Host "Authentication successful!" -ForegroundColor Green
+        Write-Information "Authentication successful!"
         return $TokenResponse.access_token
     }
     catch {
@@ -335,6 +329,7 @@ function Get-SPOSiteRest {
         Internal
     #>
     [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [string]$AdminUrl,

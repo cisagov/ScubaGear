@@ -7,6 +7,7 @@ function Export-SharePointProvider {
     Internal
     #>
     [CmdletBinding()]
+    [OutputType([System.String])]
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
@@ -14,16 +15,8 @@ function Export-SharePointProvider {
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [switch]
-        $PnPFlag,
-
-        [Parameter(Mandatory = $false)]
         [hashtable]
-        $ServicePrincipalParams = @{},
-
-        [Parameter(Mandatory = $false)]
-        [string]
-        $TenantDomain = ""
+        $ServicePrincipalParams = @{}
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -70,13 +63,13 @@ function Export-SharePointProvider {
 
         # Get tenant settings via REST
         $TenantData = Get-SPOTenantRest -AdminUrl $AdminUrl -AccessToken $AccessToken
-        
+
         # Map ODBSharingCapability to OneDriveSharingCapability for Rego policy compatibility
         # REST API returns ODBSharingCapability, but Rego expects OneDriveSharingCapability
-        if ($TenantData.ODBSharingCapability -ne $null -and $TenantData.OneDriveSharingCapability -eq $null) {
+        if ($null -ne $TenantData.ODBSharingCapability -and $null -eq $TenantData.OneDriveSharingCapability) {
             $TenantData | Add-Member -NotePropertyName "OneDriveSharingCapability" -NotePropertyValue $TenantData.ODBSharingCapability -Force
         }
-        
+
         $SPOTenant = ConvertTo-Json @($TenantData) -Depth 10
         $Tracker.AddSuccessfulCommand("SharePoint REST API")
 
