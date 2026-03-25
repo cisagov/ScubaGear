@@ -645,7 +645,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 **Option 2**. Allow restricted user consent.
 
-1.  In **Microsoft Entra admin center** select **Enterprise Applications**.
+1.  In **Microsoft Entra admin center** select **Enterprise apps**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User Consent Settings**.
 
