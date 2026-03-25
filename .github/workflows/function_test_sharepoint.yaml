@@ -83,7 +83,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant1_PNP
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Shr_Tenant2_PNP:
     name: Shr_Tenant2_PNP
     runs-on: windows-latest
@@ -129,7 +129,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant2_PNP
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Shr_Tenant6_PNP:
     name: Shr_Tenant6_PNP
     runs-on: windows-latest
@@ -175,7 +175,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant6_PNP
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Shr_Tenant7_PNP:
     name: Shr_Tenant7_PNP
     runs-on: windows-latest
@@ -221,7 +221,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Shr_Tenant7_PNP
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   email:
     name: Email
     runs-on: windows-latest
@@ -240,7 +240,7 @@ jobs:
         env:
           # Could use any of previous jobs as the alias
           Alias: Shr_Tenant1_PNP
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         uses: dawidd6/action-send-mail@v3
         with:

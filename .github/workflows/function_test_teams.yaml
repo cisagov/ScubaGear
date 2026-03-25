@@ -83,7 +83,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant1_GCC:
     name: Tms_Tenant1_GCC
     runs-on: windows-latest
@@ -132,7 +132,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant1_GCC
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant2:
     name: Tms_Tenant2
     runs-on: windows-latest
@@ -178,7 +178,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant2
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant2_GCC:
     name: Tms_Tenant2_GCC
     runs-on: windows-latest
@@ -227,7 +227,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant2_GCC
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant6:
     name: Tms_Tenant6
     runs-on: windows-latest
@@ -273,7 +273,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant6
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant6_GCC:
     name: Tms_Tenant6_GCC
     runs-on: windows-latest
@@ -322,7 +322,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant6_GCC
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant7:
     name: Tms_Tenant7
     runs-on: windows-latest
@@ -368,7 +368,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant7
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Tms_Tenant7_EX:
     name: Tms_Tenant7_EX
     runs-on: windows-latest
@@ -417,7 +417,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Tms_Tenant7_EX
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   email:
     name: Email
     runs-on: windows-latest
@@ -440,7 +440,7 @@ jobs:
         env:
           # Could use any of previous jobs as the alias
           Alias: Tms_Tenant1
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         uses: dawidd6/action-send-mail@v3
         with:
