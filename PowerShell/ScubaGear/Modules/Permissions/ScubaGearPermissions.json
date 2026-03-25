@@ -895,6 +895,40 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaIdentityGovernancePrivilegedAccessGroup",
+        "apiResource": "/beta/identityGovernance/privilegedAccess/group/resources",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Beta.Identity.Governance"
+        ],
+        "leastPermissions": [
+            "PrivilegedAccess.Read.AzureADGroup"
+        ],
+        "higherPermissions": [
+            "PrivilegedAccess.ReadWrite.AzureADGroup"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaIdentityGovernancePrivilegedAccessGroup?view=graph-powershell-beta",
+            "https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccessroot?view=graph-rest-1.0"
+        ],
+        "notes": ""
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaOrganization",
         "apiResource": "/beta/organization",
         "apiFilter": "",
@@ -1035,45 +1069,6 @@
         "notes": [
             "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'",
             "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
-        ]
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaPrivilegedAccessResource",
-        "apiResource": "/beta/privilegedAccess/{id}/resources",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "PrivilegedAccess.Read.AzureADGroup"
-        ],
-        "higherPermissions": [
-            "PrivilegedAccess.ReadWrite.AzureADGroup"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.governance/get-mgbetaprivilegedaccessresource?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccess?view=graph-rest-beta"
-        ],
-        "notes": [
-            "There are 3 options for this API when it comes to pulling back information.",
-            "The first is aadgroups/resources, which will return all resources for privileged access management in Azure AD groups. This is the default and will return all resources.",
-            "The second is aadroles/resources, which will return Entra roles.",
-            "The third option is azureResources/resources, which will all azure resources that the user has access to."
         ]
     },
 

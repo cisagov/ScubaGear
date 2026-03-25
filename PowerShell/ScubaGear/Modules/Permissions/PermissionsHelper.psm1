@@ -409,6 +409,22 @@ Function Get-ScubaGearEntraMinimumPermissions{
 }
 
 Function Get-ServicePrincipalPermissions {
+    <#
+    .SYNOPSIS
+        This Function is used to retrieve the permissions that are needed for running ScubaGear with a service principal
+
+    .DESCRIPTION
+        This Function is used to retrieve the permissions of the SCuBAGear module for service principals. It also accounts for the minimum permissions required for Entra roles which may overwrite least permissions.
+
+    .PARAMETER Environment
+
+        The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
+        Different environments may have different minimum permissions, I.E. GCCHigh
+
+    .EXAMPLE
+        Get-ServicePrincipalPermissions
+    #>
+
     param(
         [Parameter(Mandatory = $false)]
         [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
@@ -451,7 +467,7 @@ Function Get-ServicePrincipalPermissions {
     # loop thru each module and grab the least permissions unless the higher permissions is one from the $overriteHigherPermissions
     # Don't include the least permissions that are overwriten by the higher permissions
     foreach($permission in $allPermissions){
-        if ($OverwriteHigherPermissions.Count -eq 0 -or 
+        if ($OverwriteHigherPermissions.Count -eq 0 -or
             (Compare-Object $permission.higherPermissions -DifferenceObject $OverwriteHigherPermissions -IncludeEqual).SideIndicator -notcontains "=="){
             $filteredPermissions += $permission
         }

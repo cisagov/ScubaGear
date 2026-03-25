@@ -13,13 +13,6 @@
     "MissingPermissions":  [
         {
             "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
-            "Permission":  "PrivilegedAccess.Read.AzureADGroup",
-            "AppRoleID":  "01e37dc9-c035-40bd-b438-b2879c4870a6",
-            "Product":  "aad",
-            "InManifest":  false
-        },
-        {
-            "ResourceAPI":  "00000003-0000-0000-c000-000000000000",
             "Permission":  "Policy.Read.All",
             "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
             "Product":  "aad",
@@ -82,13 +75,6 @@
     "MissingRoles":  "Global Reader",
     "PowerPlatformRegistered":  false,
     "ScubaGearSPPermissions":  [
-                                   {
-                                       "leastPermissions":  [
-                                                                "PrivilegedAccess.Read.AzureADGroup"
-                                                            ],
-                                       "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
-                                       "scubaGearProduct":  "aad"
-                                   },
                                    {
                                        "leastPermissions":  [
                                                                 "Policy.Read.All"
@@ -157,12 +143,6 @@
     "AppRoleIDs":  [
                        {
                            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
-                           "APIName":  "PrivilegedAccess.Read.AzureADGroup",
-                           "AppRoleID":  "01e37dc9-c035-40bd-b438-b2879c4870a6",
-                           "Product":  "aad"
-                       },
-                       {
-                           "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
                            "APIName":  "Policy.Read.All",
                            "AppRoleID":  "246dd0d5-5bd0-4def-940b-0421030a5b68",
                            "Product":  "aad"
@@ -210,6 +190,6 @@
                            "Product":  "sharepoint"
                        }
                    ],
-    "Status":  "Action needed: you have missing permissions [PrivilegedAccess.Read.AzureADGroup, Policy.Read.All, PrivilegedEligibilitySchedule.Read.AzureADGroup, RoleManagementPolicy.Read.AzureADGroup, Directory.Read.All, RoleManagement.Read.Directory, User.Read.All, Exchange.ManageAsApp, Sites.FullControl.All] and delegated permissions [User.Read] and missing role [Global Reader] and Power Platform not registered. See FixPermissionIssues for resolution.",
+    "Status":  "Action needed: you have missing permissions [Policy.Read.All, PrivilegedEligibilitySchedule.Read.AzureADGroup, RoleManagementPolicy.Read.AzureADGroup, Directory.Read.All, RoleManagement.Read.Directory, User.Read.All, Exchange.ManageAsApp, Sites.FullControl.All] and delegated permissions [User.Read] and missing role [Global Reader] and Power Platform not registered. See FixPermissionIssues for resolution.",
     "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 52420846-b406-49f2-96fe-5232048659f5 -M365Environment commercial -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerPlatform\u0027, \u0027defender\u0027 | Set-ScubaGearAppPermission"
 }

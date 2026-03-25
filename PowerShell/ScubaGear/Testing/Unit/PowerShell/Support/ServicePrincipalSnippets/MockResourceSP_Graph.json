@@ -4,10 +4,6 @@
     "displayName": "Microsoft Graph",
     "appRoles": [
         {
-            "id": "01e37dc9-c035-40bd-b438-b2879c4870a6",
-            "value": "PrivilegedAccess.Read.AzureADGroup"
-        },
-        {
             "id": "246dd0d5-5bd0-4def-940b-0421030a5b68",
             "value": "Policy.Read.All"
         },
