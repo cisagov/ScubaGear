@@ -4,12 +4,12 @@
   "patterns": [
     {
       "name": "TenantDomain_Parameter",
-      "pattern": "(-Organization\\s+['\"]?)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.com)(['\"]?)",
+      "pattern": "(-Organization\\s+['\"]?)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.(com|us))(['\"]?)",
       "enabled": true
     },
     {
       "name": "TenantDomain_InText",
-      "pattern": "(tenant\\s+)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.com)([ ;,\"'])",
+      "pattern": "(tenant\\s+)([a-zA-Z0-9][a-zA-Z0-9-]*\\.onmicrosoft\\.(com|us))([ ;,\"'])",
       "enabled": true
     },
     {
@@ -51,6 +51,12 @@
       "name": "AppID_JSONEscapedQuote",
       "pattern": "(\\\\u0027)([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})(\\\\u0027)",
       "enabled": true
+    },
+    {
+      "name": "GUID_Blanket",
+      "pattern": "([ :=,\"'\\(\\{])([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})([ ;,\"'\\)\\}\\n])",
+      "enabled": false,
+      "comment": "Catch-all for any GUID format. Runs last after specific patterns. May redact debugging IDs like correlation/request IDs - disable if troubleshooting."
     },
     {
       "name": "EmailAddress",
