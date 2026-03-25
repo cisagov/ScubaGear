@@ -19,13 +19,6 @@
     "ScubaGearSPPermissions":  [
         {
             "leastPermissions":  [
-                                    "PrivilegedAccess.Read.AzureADGroup"
-                                ],
-            "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",
-            "scubaGearProduct":  "aad"
-        },
-        {
-            "leastPermissions":  [
                                     "Policy.Read.All"
                                 ],
             "resourceAPIAppId":  "00000003-0000-0000-c000-000000000000",

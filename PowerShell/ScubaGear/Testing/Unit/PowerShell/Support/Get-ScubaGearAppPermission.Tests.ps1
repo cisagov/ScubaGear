@@ -14,11 +14,6 @@ InModuleScope ServicePrincipal {
             Mock -CommandName Get-ServicePrincipalPermissions -MockWith {
                 return @(
                     [PSCustomObject]@{
-                        leastPermissions    = @('PrivilegedAccess.Read.AzureADGroup')
-                        resourceAPIAppId    = '00000003-0000-0000-c000-000000000000'
-                        scubaGearProduct    = 'aad'
-                    },
-                    [PSCustomObject]@{
                         leastPermissions    = @('Policy.Read.All')
                         resourceAPIAppId    = '00000003-0000-0000-c000-000000000000'
                         scubaGearProduct    = 'aad'
@@ -71,12 +66,6 @@ InModuleScope ServicePrincipal {
 
             Mock -CommandName Get-ScubaGearAppRoleID -MockWith {
                 return @(
-                    [PSCustomObject]@{
-                        resourceAPIAppId = '00000003-0000-0000-c000-000000000000'
-                        APIName = 'PrivilegedAccess.Read.AzureADGroup'
-                        AppRoleID = '01e37dc9-c035-40bd-b438-b2879c4870a6'
-                        Product = 'aad'
-                    },
                     [PSCustomObject]@{
                         resourceAPIAppId = '00000003-0000-0000-c000-000000000000'
                         APIName = 'Policy.Read.All'

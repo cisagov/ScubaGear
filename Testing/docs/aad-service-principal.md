@@ -20,14 +20,11 @@ Select Application permissions and then add all of the required permissions in t
 ## Microsoft Graph API permissions
 
 - Directory.Read.All
-- GroupMember.Read.All
-- Organization.Read.All
 - Policy.Read.All
-- RoleManagement.Read.Directory
-- User.Read.All
 - PrivilegedEligibilitySchedule.Read.AzureADGroup
-- PrivilegedAccess.Read.AzureADGroup
+- RoleManagement.Read.Directory
 - RoleManagementPolicy.Read.AzureADGroup
+- User.Read.All
 
 ## Office 365 Exchange Online API permissions (select from APIs my organization users)
 
