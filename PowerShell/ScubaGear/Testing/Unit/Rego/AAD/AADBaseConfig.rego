@@ -288,3 +288,25 @@ PrivilegedUsers := {
         ]
     }
 }
+
+BuiltinMultifactorAuthenticationAuthStrength := {
+  "AllowedCombinations": [
+    "windowsHelloForBusiness",
+    "fido2",
+    "x509CertificateMultiFactor",
+    "deviceBasedPush",
+    "temporaryAccessPassOneTime",
+    "temporaryAccessPassMultiUse",
+    "password,microsoftAuthenticatorPush",
+    "password,softwareOath",
+    "password,hardwareOath",
+    "password,sms",
+    "password,voice",
+    "federatedMultiFactor",
+    "microsoftAuthenticatorPush,federatedSingleFactor",
+    "softwareOath,federatedSingleFactor",
+    "hardwareOath,federatedSingleFactor",
+    "sms,federatedSingleFactor",
+    "voice,federatedSingleFactor"
+  ],
+}

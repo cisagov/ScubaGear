@@ -236,11 +236,8 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.2v1
+# MS.AAD.3.2v2
 #--
-
-# Save all policy names if PhishingResistantMFAPolicies exist
-AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
@@ -260,21 +257,21 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.2v1",
+    "PolicyId": "MS.AAD.3.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AllMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
+    "ActualValue": NonSpecificMFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := Count(AllMFA) > 0
+    Status := Count(NonSpecificMFAPolicies) > 0
 }
 #--
 
