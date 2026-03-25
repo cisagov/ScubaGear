@@ -888,24 +888,19 @@ InModuleScope ScubaLogging {
                 # Mock Get-Content to return test log content
                 Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
                 
-                # Override Get-Content for the redaction schema to force all patterns enabled for testing
-                # This reads the real file but enables all patterns regardless of their actual state
+                # Override Get-Content for the redaction schema to return the real file as-is
                 Mock Get-Content {
-                    # Get the module's root directory
-                    $modulePath = (Get-Module ScubaLogging).ModuleBase
+                    # Find module file location to locate redaction JSON
+                    $moduleFile = Get-Command Get-ScubaDebugLogReport | Select-Object -ExpandProperty ScriptBlock | Select-Object -ExpandProperty File
+                    $modulePath = Split-Path $moduleFile -Parent
                     $actualPath = Join-Path $modulePath 'ScubaLoggingRedactions.json'
                     
-                    # Use & to call the original cmdlet to avoid recursion
-                    $content = & (Get-Command Get-Content -CommandType Cmdlet) -Path $actualPath -Raw -ErrorAction Stop
-                    $schema = $content | ConvertFrom-Json
-                    
-                    # Force all patterns to enabled=true for testing
-                    foreach ($pattern in $schema.patterns) {
-                        $pattern.enabled = $true
+                    if (-not (Test-Path $actualPath)) {
+                        throw "Redaction file not found at: $actualPath"
                     }
                     
-                    # Return the modified schema as JSON string
-                    return ($schema | ConvertTo-Json -Depth 10)
+                    # Return actual file content without modification
+                    return [System.IO.File]::ReadAllText($actualPath)
                 } -ParameterFilter { $Path -like '*ScubaLoggingRedactions.json' }
             }
 
@@ -1080,31 +1075,58 @@ InModuleScope ScubaLogging {
                 { Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath } | Should -Not -Throw
             }
 
-            It "Should redact any GUID format (blanket redaction for user/group/resource IDs)" {
-                $script:TestRedactionLines += @(
-                    "[2026-01-01 10:00:00.016] [Warning] [ProviderList        ] Error running command",
-                    '    Data: {"Command":"Get-MgBetaUser","Error":"User with ID a1b2c3d4-e5f6-7890-abcd-ef1234567890 not found","StackTrace":"at line 42"}'
-                )
+            Context "GUID Blanket Redaction Tests (normally disabled)" {
+                BeforeAll {
+                    # Override the mock to enable GUID_Blanket pattern for these specific tests
+                    Mock Get-Content {
+                        $moduleFile = Get-Command Get-ScubaDebugLogReport | Select-Object -ExpandProperty ScriptBlock | Select-Object -ExpandProperty File
+                        $modulePath = Split-Path $moduleFile -Parent
+                        $actualPath = Join-Path $modulePath 'ScubaLoggingRedactions.json'
+                        
+                        if (-not (Test-Path $actualPath)) {
+                            throw "Redaction file not found at: $actualPath"
+                        }
+                        
+                        # Read and modify to enable GUID_Blanket
+                        $content = [System.IO.File]::ReadAllText($actualPath)
+                        $schema = $content | ConvertFrom-Json
+                        
+                        # Enable GUID_Blanket pattern specifically for these tests
+                        $guidPattern = $schema.patterns | Where-Object { $_.name -eq 'GUID_Blanket' }
+                        if ($guidPattern) {
+                            $guidPattern.enabled = $true
+                        }
+                        
+                        return ($schema | ConvertTo-Json -Depth 10)
+                    } -ParameterFilter { $Path -like '*ScubaLoggingRedactions.json' }
+                }
 
-                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+                It "Should redact any GUID format (blanket redaction for user/group/resource IDs)" {
+                    $script:TestRedactionLines += @(
+                        "[2026-01-01 10:00:00.016] [Warning] [ProviderList        ] Error running command",
+                        '    Data: {"Command":"Get-MgBetaUser","Error":"User with ID a1b2c3d4-e5f6-7890-abcd-ef1234567890 not found","StackTrace":"at line 42"}'
+                    )
 
-                # Should redact user/group/resource IDs in GUID format
-                $report | Should -Not -Match 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
-                $report | Should -Match 'User with ID \[.*REDACTED.*\] not found'
-            }
+                    $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
 
-            It "Should redact multiple GUIDs in error messages from CommandTracker" {
-                $script:TestRedactionLines += @(
-                    "[2026-01-01 10:00:00.017] [Warning] [ProviderList        ] Error running command",
-                    '    Data: {"Command":"Get-MgBetaGroupMember","Error":"Cannot retrieve members of group 12345678-abcd-1234-abcd-1234567890ab for user 98765432-dcba-4321-dcba-0987654321fe","StackTrace":"at line 99"}'
-                )
+                    # Should redact user/group/resource IDs in GUID format
+                    $report | Should -Not -Match 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+                    $report | Should -Match 'User with ID \[.*REDACTED.*\] not found'
+                }
 
-                $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+                It "Should redact multiple GUIDs in error messages from CommandTracker" {
+                    $script:TestRedactionLines += @(
+                        "[2026-01-01 10:00:00.017] [Warning] [ProviderList        ] Error running command",
+                        '    Data: {"Command":"Get-MgBetaGroupMember","Error":"Cannot retrieve members of group 12345678-abcd-1234-abcd-1234567890ab for user 98765432-dcba-4321-dcba-0987654321fe","StackTrace":"at line 99"}'
+                    )
 
-                # Should redact both group ID and user ID
-                $report | Should -Not -Match '12345678-abcd-1234-abcd-1234567890ab'
-                $report | Should -Not -Match '98765432-dcba-4321-dcba-0987654321fe'
-                $report | Should -Match 'group \[.*REDACTED.*\] for user \[.*REDACTED.*\]'
+                    $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
+
+                    # Should redact both group ID and user ID
+                    $report | Should -Not -Match '12345678-abcd-1234-abcd-1234567890ab'
+                    $report | Should -Not -Match '98765432-dcba-4321-dcba-0987654321fe'
+                    $report | Should -Match 'group \[.*REDACTED.*\] for user \[.*REDACTED.*\]'
+                }
             }
         }
     }
