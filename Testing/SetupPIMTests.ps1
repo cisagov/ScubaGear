@@ -49,13 +49,13 @@ $ConfigJson = Get-Content -Path $ConfigJsonPath | ConvertFrom-Json
 
 # Update the privilegedRoles array with values from the local variable
 if ($TestScenario -eq "pass") {
-    Write-Host "Configuring PASS scenario in ScubaConfigDefaults.json"
+    Write-Output "Configuring PASS scenario in ScubaConfigDefaults.json"
     $ConfigJson.privilegedRoles = $PassPrivilegedRoles
 }
 else {
-    Write-Host "Configuring FAIL scenario in ScubaConfigDefaults.json"
+    Write-Output "Configuring FAIL scenario in ScubaConfigDefaults.json"
     $ConfigJson.privilegedRoles = $FailPrivilegedRoles
-} 
+}
 
 # Write the updated JSON back to file
 $ConfigJson | ConvertTo-Json -Depth 100 | Set-Content -Path $ConfigJsonPath -Encoding UTF8
@@ -70,15 +70,15 @@ $RegoContent = Get-Content -Path $RegoFilePath -Raw
 
 # Replace all occurrences of "Global Administrator" with the new global admin role
 if ($TestScenario -eq "pass") {
-    Write-Host "Configuring PASS scenario in Rego"
+    Write-Output "Configuring PASS scenario in Rego"
     $RegoContent = $RegoContent -replace "`"$GlobalAdminString`"", "`"$NewPassGlobalAdmin`""
     $RegoContent = $RegoContent -replace "`"$NewFailGlobalAdmin`"", "`"$NewPassGlobalAdmin`""
 }
 else {
-    Write-Host "Configuring FAIL scenario in Rego"
+    Write-Output "Configuring FAIL scenario in Rego"
     $RegoContent = $RegoContent -replace "`"$GlobalAdminString`"", "`"$NewFailGlobalAdmin`""
     $RegoContent = $RegoContent -replace "`"$NewPassGlobalAdmin`"", "`"$NewFailGlobalAdmin`""
-} 
+}
 
 # Write the updated rego back to file
 Set-Content -Path $RegoFilePath -Value $RegoContent -Encoding UTF8
