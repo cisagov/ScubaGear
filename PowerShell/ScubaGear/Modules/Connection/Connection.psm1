@@ -134,48 +134,9 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       $InitialDomain = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value.VerifiedDomains | Where-Object {$_.isInitial}
-                       $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-                       $SPOParams = @{
-                           'ErrorAction' = 'Stop';
-                       }
-                       $PnPParams = @{
-                           'ErrorAction' = 'Stop';
-                       }
-
-                       #pull api endpoint from json
-                       $Url = Get-ScubaGearPermissions -Product "sharepoint" -Environment $M365Environment -Domain $InitialDomainPrefix -OutAs endpoint
-                       $SPOParams += @{
-                            'Url'= $Url;
-                       }
-                       $PnPParams += @{
-                            'Url'= $Url;
-                       }
-
-                       #populate the rest of the parameters for splatting
-                       switch ($M365Environment) {
-                            "gcchigh" {
-                                 $SPOParams += @{'Region' = "ITAR"; }
-                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentHigh';}
-                            }
-                            "dod" {
-                                 $SPOParams += @{'Region' = "ITAR"; }
-                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentDoD';}
-                            }
-
-                       }
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $PnPParams += @{
-                               Thumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                               ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                               Tenant  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
-                           }
-                           $env:PNPPOWERSHELL_UPDATECHECK = "false"  # disable PnP update banner
-                           Connect-PnPOnline @PnPParams | Out-Null
-                       }
-                       else {
-                           Connect-SPOService @SPOParams | Out-Null
-                       }
+                       # SharePoint authentication is now handled via REST API in ExportSharePointProvider
+                       # Token is acquired on-demand using browser auth (interactive) or certificate (service principal)
+                       Write-Verbose "SharePoint will use REST API authentication (no SPO/PnP module required)"
                        $SPOAuthRequired = $false
                    }
                }
@@ -265,11 +226,7 @@ function Disconnect-SCuBATenant {
            Write-Verbose "Disconnecting from $Product."
            if (($Product -eq "aad") -or ($Product -eq "sharepoint")) {
                Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
-
-               if($Product -eq "sharepoint") {
-                   Disconnect-SPOService -ErrorAction SilentlyContinue
-                   Disconnect-PnPOnline -ErrorAction SilentlyContinue
-               }
+               # SharePoint uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif ($Product -eq "teams") {
                Disconnect-MicrosoftTeams -Confirm:$false -ErrorAction SilentlyContinue

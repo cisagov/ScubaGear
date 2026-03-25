@@ -1562,14 +1562,14 @@
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
+        "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.com",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1585,20 +1585,20 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
+        "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.us",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1613,20 +1613,20 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
+        "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.mil.us",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1641,94 +1641,9 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
-    },
-
-    {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.com",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "PnP.PowerShell"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc"
-        ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
-        ],
-        "notes": ""
-    },
-
-    {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.us",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "PnP.PowerShell"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "gcchigh"
-        ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
-        ],
-        "notes": ""
-    },
-
-    {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.mil.us",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "PnP.PowerShell"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
-        ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
 
     {

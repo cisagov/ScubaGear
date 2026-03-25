@@ -11265,9 +11265,9 @@
 ],
     "OneDrive_successful_commands": [
     "Get-MgBetaOrganization",
-    "Get-SPOTenant",
-    "Get-SPOSite",
-    "Get-SPOTenantSyncClientRestriction"
+    "SharePoint REST API",
+    "SharePoint REST API",
+    "SharePoint REST API"
 ],
     "OneDrive_unsuccessful_commands": [
 
@@ -11516,8 +11516,8 @@
 ],
     "SharePoint_successful_commands": [
     "Get-MgBetaOrganization",
-    "Get-SPOTenant",
-    "Get-SPOSite"
+    "SharePoint REST API",
+    "SharePoint REST API"
 ],
     "SharePoint_unsuccessful_commands": [
 
@@ -12336,3 +12336,5 @@
 
 ]
 }
+
+

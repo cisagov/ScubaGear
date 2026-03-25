@@ -16845,10 +16845,10 @@
     "OneDrive_PnP_Flag":  false,
     "SharePoint_successful_commands":  [
                                            "Get-MgBetaOrganization",
-                                           "Get-SPOTenant",
-                                           "Get-SPOSite",
-                                           "Get-PnPTenant",
-                                           "Get-PnPTenantSite"
+                                           "SharePoint REST API",
+                                           "SharePoint REST API",
+                                           "SharePoint REST API",
+                                           "SharePoint REST API"
                                        ],
     "SharePoint_unsuccessful_commands":  [
 

@@ -68,7 +68,7 @@ else := concat("", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -90,7 +90,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [OneDriveSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -138,7 +138,7 @@ NOTESTRING := concat(" ", NoteArray)
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [
         Tenant.SharingDomainRestrictionMode,
         SharingCapability
@@ -153,7 +153,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false
@@ -178,7 +178,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [Tenant.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -198,7 +198,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [Tenant.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -225,7 +225,7 @@ ErrStr := concat(" ", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [
         SharingCapability,
         Tenant.RequireAnonymousLinksExpireInDays
@@ -245,7 +245,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false
@@ -286,7 +286,7 @@ FileAndFolderLinkPermission(2, 1) := concat(": ", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [FileLinkType, FolderLinkType],
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
@@ -306,7 +306,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false
@@ -349,7 +349,7 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [
         SharingCapability,
         Tenant.EmailAttestationRequired,
@@ -367,7 +367,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall/Not-Implemented",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": false

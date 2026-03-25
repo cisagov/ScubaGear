@@ -14,20 +14,8 @@ $ModuleList = @(
         Purpose = 'Exchange Online and Microsoft Defender management'
         IsPinned = "False"
     },
-    @{
-        ModuleName = 'Microsoft.Online.SharePoint.PowerShell' # includes OneDrive
-        ModuleVersion = [version] '16.0.0'
-        MaximumVersion = [version] '16.0.24810.12000'
-        Purpose = 'SharePoint and OneDrive management'
-        IsPinned = "True"
-    },
-    @{
-        ModuleName = 'PnP.PowerShell' # alternate for SharePoint PowerShell
-        ModuleVersion = [version] '1.12.0'
-        MaximumVersion = [version] '1.99.99999'
-        Purpose = 'SharePoint Online management and automation'
-        IsPinned = "True"
-    },
+    # SharePoint modules removed - using direct REST API calls instead
+    # Microsoft.Online.SharePoint.PowerShell and PnP.PowerShell no longer required
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
         ModuleVersion = [version] '2.0.198'

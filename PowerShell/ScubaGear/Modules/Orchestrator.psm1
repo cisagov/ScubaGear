@@ -807,6 +807,7 @@ function Invoke-ProviderList {
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
                 $PnPFlag = $true
                 $SPOProviderParams += @{PnPFlag = $PnPFlag }
+                $SPOProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams }
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {

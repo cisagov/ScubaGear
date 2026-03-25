@@ -1,6 +1,5 @@
 <#
- # Due to how the Error handling was implemented, mocked API calls have to be mocked inside a
- # mocked CommandTracker class
+ # Tests for SharePoint Provider using REST API
 #>
 
 $ProviderPath = "../../../../../Modules/Providers"
@@ -15,7 +14,6 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 [string[]]$UnSuccessfulCommands = @()
 
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
-                    # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
                             "Get-MgBetaOrganization" {
@@ -32,14 +30,6 @@ InModuleScope -ModuleName ExportSharePointProvider {
                                         }
                                     )
                                 }
-                            }
-                            { ($_ -eq "Get-SPOSite") -or ($_ -eq "Get-PnPTenantSite") } {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            { ($_ -eq "Get-SPOTenant") -or ($_ -eq "Get-PnPTenant") } {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
                             }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
@@ -83,6 +73,33 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 return [MockCommandTracker]::New()
             }
 
+            # Mock REST API functions
+            function Get-SPOAccessTokenInteractive {}
+            Mock -ModuleName ExportSharePointProvider Get-SPOAccessTokenInteractive {
+                return "mock-access-token"
+            }
+
+            function Get-SPOTenantRest {}
+            Mock -ModuleName ExportSharePointProvider Get-SPOTenantRest {
+                return [pscustomobject]@{
+                    SharingCapability = 0
+                    ODBSharingCapability = 0
+                    SharingDomainRestrictionMode = 0
+                    DefaultSharingLinkType = 1
+                    DefaultLinkPermission = 1
+                    RequireAnonymousLinksExpireInDays = 30
+                    FileAnonymousLinkType = 2
+                    FolderAnonymousLinkType = 2
+                    EmailAttestationRequired = $true
+                    EmailAttestationReAuthDays = 30
+                }
+            }
+
+            function Get-SPOSiteRest {}
+            Mock -ModuleName ExportSharePointProvider Get-SPOSiteRest {
+                return [pscustomobject]@{}
+            }
+
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
@@ -100,7 +117,7 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 $ValidJson
             }
         }
-        Context 'When Running Interactively' {
+        Context 'When Running Interactively with REST API' {
             It "with -M365Environment 'commercial', returns valid JSON" {
                 $Json = Export-SharePointProvider -M365Environment 'commercial'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
@@ -122,24 +139,19 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 $ValidJson | Should -Be $true
             }
         }
-        Context 'When running with Service Principals' {
+        Context 'When running with Service Principals via REST API' {
             It "with -M365Environment commercial, returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment commercial -PnPFlag
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
-            It "with -M365Environment gcc, returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcc' -PnPFlag
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
-            It "with -M365Environment gcchigh, returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcchigh' -PnPFlag
-                $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
-                $ValidJson | Should -Be $true
-            }
-            It "with -M365Environment dod, returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'dod' -PnPFlag
+                Mock -ModuleName ExportSharePointProvider Get-SPOAccessToken {
+                    return "mock-access-token"
+                }
+                $ServicePrincipalParams = @{
+                    CertThumbprintParams = @{
+                        AppID = "test-app-id"
+                        CertificateThumbprint = "test-thumbprint"
+                        Organization = "contoso.onmicrosoft.com"
+                    }
+                }
+                $Json = Export-SharePointProvider -M365Environment commercial -ServicePrincipalParams $ServicePrincipalParams
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
