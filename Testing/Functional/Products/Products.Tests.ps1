@@ -142,6 +142,22 @@ BeforeDiscovery {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         }
+
+        # SharePoint functional tests need an SPO module connection to call Set-SPOTenant for preconditions
+        if ($ProductName -eq "sharepoint") {
+            $DomainPrefix = $TenantDomain.Split(".")[0]
+            $AdminUrl = switch ($M365Environment) {
+                "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
+                "dod"     { "https://$DomainPrefix-admin.sharepoint-mil.us" }
+                default   { "https://$DomainPrefix-admin.sharepoint.com" }
+            }
+            if (-Not [string]::IsNullOrEmpty($AppId)) {
+                Connect-SPOService -Url $AdminUrl -ClientId $AppId -Thumbprint $Thumbprint
+            }
+            else {
+                Connect-SPOService -Url $AdminUrl
+            }
+        }
     }
 }
 
