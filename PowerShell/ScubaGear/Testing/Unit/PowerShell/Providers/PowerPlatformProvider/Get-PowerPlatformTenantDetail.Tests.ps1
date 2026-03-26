@@ -63,5 +63,4 @@ InModuleScope ExportPowerPlatformProvider {
 
 AfterAll {
     Remove-Module ExportPowerPlatformProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module Microsoft.PowerApps.Administration.PowerShell -Force -ErrorAction SilentlyContinue
 }

@@ -277,7 +277,6 @@ function Get-PowerPlatformTenantDetail {
         [string]
         $M365Environment
     )
-    Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
     try {
         $TenantDetails = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value

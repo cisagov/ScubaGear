@@ -15,8 +15,6 @@ InModuleScope Connection {
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Connect-MicrosoftTeams{throw 'this will be mocked'}
             Mock Connect-MicrosoftTeams -MockWith {}
-            function Add-PowerAppsAccount{throw 'this will be mocked'}
-            Mock Add-PowerAppsAccount -MockWith {}
             function Connect-EXOHelper {throw 'this will be mocked'}
             Mock -ModuleName Connection Connect-EXOHelper -MockWith {}
             function Invoke-GraphDirectly {throw 'this will be mocked'}
@@ -40,7 +38,7 @@ InModuleScope Connection {
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
             @{ProductNames = "defender"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
-            @{ProductNames = "powerplatform"; Services = @('Add-PowerAppsAccount')}
+            @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper')}
             @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper')}  # SharePoint uses REST API, only needs Graph for tenant info
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
             @{
@@ -48,7 +46,6 @@ InModuleScope Connection {
                 Services = @(
                     'Connect-GraphHelper',
                     'Connect-EXOHelper',
-                    'Add-PowerAppsAccount',
                     'Connect-MicrosoftTeams'
                 )
             }
