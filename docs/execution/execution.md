@@ -28,15 +28,7 @@ Interactive mode simply means that the user will be prompted for their credentia
 
 ### SharePoint Authentication
 
-When assessing SharePoint, the authentication flow requires an additional step:
-
-1. A browser window will automatically open to the Microsoft sign-in page
-2. Sign in with an account that has **SharePoint Administrator** permissions
-3. After successful sign-in, you will be redirected to a page (the URL will start with `https://oauth.spops.microsoft.com/`)
-4. **Copy the entire URL** from your browser's address bar
-5. Paste the URL into the PowerShell prompt when asked
-
-> **Note**: This browser-based flow is required because SharePoint uses the SharePoint Online Management Shell for authentication. The URL contains an authorization code that ScubaGear exchanges for an access token.
+When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
 
 ### All Products
 
