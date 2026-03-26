@@ -801,12 +801,11 @@ function Invoke-ProviderList {
                 'M365Environment' = $ScubaConfig.M365Environment
             }
 
-            $PnPFlag = $false
+            $ServicePrincipalAuth = $false
             if ($ScubaConfig.AppID) {
                 $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
-                $PnPFlag = $true
-                $SPOProviderParams += @{PnPFlag = $PnPFlag }
+                $ServicePrincipalAuth = $true
                 $SPOProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams }
             }
 
@@ -843,7 +842,7 @@ function Invoke-ProviderList {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "teams" {
-                            if ($PnPFlag) {
+                            if ($ServicePrincipalAuth) {
                                 $RetVal = Export-TeamsProvider -CertificateBasedAuth | Select-Object -Last 1
                             }
                             else {
