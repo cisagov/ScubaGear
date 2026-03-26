@@ -223,19 +223,27 @@ class ScubaConfig {
         # The validator has already converted YAML to PowerShell objects safely
         $this.Configuration = $ValidationResult.ParsedContent
 
+        # IMPORTANT: Validate required fields BEFORE converting to hashtable
+        # PSCustomObject preserves case-sensitive property names, hashtable doesn't
+        # This ensures minRequired check validates exact property names from YAML
+        if (-not $SkipValidation) {
+            [ScubaConfig]::ValidateRequiredFields($this.Configuration)
+        }
+
         # Convert to hashtable for compatibility with internal configuration management
         # PSCustomObjects from YAML parsing need to be converted to hashtables for consistent access patterns
+        # Note: Hashtables are case-insensitive, which is why we validate BEFORE conversion
         if ($this.Configuration -is [PSCustomObject]) {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
 
-        # Apply default values and process special configuration properties FIRST
-        # This ensures all required properties have values before validation
+        # Apply default values and process special configuration properties
+        # This ensures all required properties have values for subsequent processing
         # Handles wildcards, path expansion (including OPAPath fallback to current directory)
         $this.SetParameterDefaults()
 
         # Perform full content validation AFTER applying defaults
-        # This validates the complete configuration with all defaults applied
+        # This validates the complete configuration with all applied
         # Includes OPA executable existence check which needs the expanded/fallback OPAPath
         if (-not $SkipValidation) {
             # Validate the complete configuration including schema, Scuba configuration rules, and policy references
@@ -246,6 +254,55 @@ class ScubaConfig {
         [ScubaConfig]::_IsLoaded = $true
 
         return [ScubaConfig]::_IsLoaded
+    }
+
+    # Validates that required fields are present in configuration BEFORE defaults are applied
+    # This prevents minRequired validation from being bypassed by default values
+    # Throws error if any required field is missing (schema-driven from defaults.json minRequired)
+    # Takes PSCustomObject to preserve case-sensitive property names (hashtable is case-insensitive)
+    static [void] ValidateRequiredFields([PSCustomObject]$ConfigObject) {
+        [ScubaConfig]::InitializeValidator()
+        $Defaults = [ScubaConfig]::_ConfigDefaults
+
+        if (-not $Defaults.minRequired) {
+            return
+        }
+
+        $MissingFields = @()
+        foreach ($RequiredField in $Defaults.minRequired) {
+            # Check if property exists (case-sensitive for exact match)
+            # PSCustomObject preserves exact case from YAML, unlike hashtable which is case-insensitive
+            $PropertyNames = @($ConfigObject.PSObject.Properties.Name)
+
+            if ($RequiredField -cnotin $PropertyNames) {
+                # Also check case-insensitive to provide helpful case mismatch warnings
+                $FoundCaseInsensitive = $false
+                foreach ($PropName in $PropertyNames) {
+                    if ($PropName.ToLower() -eq $RequiredField.ToLower()) {
+                        $FoundCaseInsensitive = $true
+                        Write-Warning "Required property '$RequiredField' found with incorrect case: '$PropName'. Recommended using exact case: '$RequiredField'."
+                        # Case-insensitive match found - don't add to missing fields
+                        break
+                    }
+                }
+
+                if (-not $FoundCaseInsensitive) {
+                    $MissingFields += $RequiredField
+                }
+            }
+        }
+
+        if ($MissingFields.Count -gt 0) {
+            $Plural = if ($MissingFields.Count -ne 1) { 's' } else { '' }
+            $ErrorMessage = "Configuration validation failed ($($MissingFields.Count) error$Plural):`n"
+            foreach ($Field in $MissingFields) {
+                $ErrorMessage += "  - Required property '$Field' is missing.`n"
+            }
+            $ErrorMessage += "`n--- RECOMMENDED ACTION ---`n"
+            $ErrorMessage += "  - It is recommended to use the new ScubaGear Configuration Editor to build a configuration file.`n"
+            $ErrorMessage += "  - Run: 'Start-ScubaConfigApp' to launch the configuration application.`n"
+            throw $ErrorMessage
+        }
     }
 
     # Validates current configuration state after overrides. Performs schema + Scuba configuration rules + policy validation.

@@ -1,5 +1,4 @@
-class ScubaConfigValidator {
-    <#
+<#
     .SYNOPSIS
     ScubaConfigValidator provides metadata-driven validation of ScubaGear configuration files using JSON Schema
 
@@ -9,16 +8,39 @@ class ScubaConfigValidator {
     validate that exclusion types match the policy IDs being configured.
 
     .EXAMPLE
-    # Initialize validator and perform validation
-    using module '.\ScubaConfigValidator.psm1'
-    [ScubaConfigValidator]::Initialize("C:\ScubaGear\Modules\ScubaConfig")
-    $Result = [ScubaConfigValidator]::ValidateYamlFile("C:\Config\my-config.yaml")
+    # Replace <CONFIG_PATH> with your YAML file path
+    using module '.\ScubaConfig.psm1'
+    [ScubaConfig]::ResetInstance()
+    [ScubaConfig]::GetInstance().LoadConfig('<CONFIG_PATH>')"
 
     .EXAMPLE
-    # Get allowed exclusion types for a specific policy
-    $AllowedTypes = [ScubaConfigValidator]::GetAllowedExclusionTypesForPolicy("MS.AAD.1.1v1")
-    # Returns: @("CapExclusions")
-    #>
+
+    # Quick Config Validation Test Steps
+    # ===================================
+
+    # Step 1: Navigate to ScubaConfig module directory
+    $yamlfilePath =  'e:\Work\Scuba\ScubaGearTests\ScubaUIYamlTests\dtolab.onmicrosoft.com.fullexclusion.yaml'
+
+    # Step 2 Navigate to ScubaConfig module directory
+    cd 'C:\path\to\ScubaGear\Modules\ScubaConfig'
+
+
+    # Step 2: Test your YAML file (replace path with your file)
+    using module '.\ScubaConfig.psm1'
+    try {
+        [ScubaConfig]::ResetInstance()
+        $config = [ScubaConfig]::GetInstance()
+        $result = $config.LoadConfig($yamlfilePath)
+        Write-Host 'Configuration is valid!' -ForegroundColor Green
+        Write-Host 'OrgName:' $config.Configuration.OrgName
+        Write-Host 'ProductNames:' ($config.Configuration.ProductNames -join ', ')
+    }catch {
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
+#>
+
+class ScubaConfigValidator {
+
 
     # Static cache for loaded resources
     hidden static [hashtable]$_Cache = @{}
@@ -245,22 +267,9 @@ class ScubaConfigValidator {
         $Schema = [ScubaConfigValidator]::GetSchema()
         $Defaults = [ScubaConfigValidator]::GetDefaults()
 
-        # Validate required fields
-        if ($Defaults.minRequired) {
-            foreach ($RequiredField in $Defaults.minRequired) {
-                # Handle both hashtables (from ConvertFrom-Yaml) and PSCustomObjects (from ConvertFrom-Json)
-                $HasProperty = if ($ConfigObject -is [hashtable]) {
-                    $ConfigObject.ContainsKey($RequiredField)
-                }
-                else {
-                    $ConfigObject.PSObject.Properties.Name -contains $RequiredField
-                }
-
-                if (-not $HasProperty) {
-                    [void]$Validation.Errors.Add("Required property '$RequiredField' is missing.")
-                }
-            }
-        }
+        # Note: minRequired validation is handled in ScubaConfig.ValidateRequiredFields()
+        # which runs BEFORE defaults are applied to catch truly missing fields
+        # This prevents default values from hiding missing required properties
 
         # Validate all properties against schema
         [ScubaConfigValidator]::ValidateAllPropertiesAgainstSchema($ConfigObject, $Schema, $Validation)
@@ -443,60 +452,9 @@ class ScubaConfigValidator {
         }
 
         $ProductCapabilities = $Schema.schemaMetadata.productCapabilities
-        $Defaults = [ScubaConfigValidator]::GetDefaults()
-        $RequireProduct = $Defaults.validation.requireProductInPolicy
 
-        # Get list of known product names from productCapabilities
-        $KnownProducts = @($ProductCapabilities.PSObject.Properties.Name)
-
-        # Get list of valid schema properties
-        $ValidSchemaProperties = @()
-        if ($Schema.properties) {
-            $ValidSchemaProperties = @($Schema.properties.PSObject.Properties.Name)
-        }
-
-        # Get list of properties to ignore from schema metadata
-        $IgnoreProperties = @()
-        if ($Schema.schemaMetadata -and $Schema.schemaMetadata.ignoreProperties) {
-            foreach ($Property in $Schema.schemaMetadata.ignoreProperties) {
-                # Skip comment entries in ignoreProperties
-                if ($Property -notlike "_comment*") {
-                    $IgnoreProperties += $Property
-                }
-            }
-        }
-
-        # System properties to ignore (PowerShell object metadata)
-        $SystemProperties = @('IsReadOnly', 'IsFixedSize', 'IsSynchronized', 'Keys', 'Values', 'SyncRoot', 'Count')
-
-        # Check for unknown products (properties that are neither valid config properties nor known products)
-        foreach ($ConfigProperty in $ConfigObject.PSObject.Properties) {
-            $PropertyName = $ConfigProperty.Name
-
-            # Skip if it's a system property, ignore property, valid schema property, or known product
-            if ($PropertyName -in $SystemProperties -or
-                $PropertyName -in $IgnoreProperties -or
-                $PropertyName -in $ValidSchemaProperties -or
-                $PropertyName -in $KnownProducts) {
-                continue
-            }
-
-            # Check if this might be a YAML anchor (complex object at root level that's not a product)
-            # YAML anchors are typically objects or arrays used for reuse via aliases
-            if ($ConfigProperty.Value -is [PSCustomObject] -or $ConfigProperty.Value -is [System.Collections.Hashtable] -or $ConfigProperty.Value -is [Array]) {
-                # This looks like a YAML anchor definition - skip it silently
-                Write-Debug "Skipping potential YAML anchor property: $PropertyName"
-                continue
-            }
-
-            # This is an unknown property that's not in the schema
-            $Message = "Unknown product '$PropertyName'. This is not a recognized product name and will be ignored. Valid product names are: $($KnownProducts -join ', ')."
-            if ($RequireProduct) {
-                [void]$Validation.Errors.Add($Message)
-            } else {
-                [void]$Validation.Warnings.Add($Message)
-            }
-        }
+        # Note: Unknown properties are already validated by ValidatePropertyAgainstSchema()
+        # This method focuses solely on validating product exclusion configurations
 
         foreach ($ProductProperty in $ProductCapabilities.PSObject.Properties) {
             $ProductName = $ProductProperty.Name
@@ -559,55 +517,73 @@ class ScubaConfigValidator {
                 continue
             }
 
-            # Check if property is defined in schema (case-sensitive match for JSON Schema compliance)
+            # Check if property is defined in schema
+            # Case sensitivity is controlled by schema property 'caseSensitive'
             $PropertyExists = $false
+            $MatchedSchemaProperty = $null
+            $CaseMismatch = $false
+
+            # First pass: Try exact case match
             foreach ($SchemaPropertyName in $Schema.properties.PSObject.Properties.Name) {
                 if ($SchemaPropertyName -ceq $PropertyName) {
                     $PropertyExists = $true
-                    $PropertySchema = $Schema.properties.$PropertyName
-
-                    # Validate the property against its schema
-                    [ScubaConfigValidator]::ValidatePropertyBySchema(
-                        $PropertyValue,
-                        $PropertySchema,
-                        $Validation,
-                        $PropertyName,
-                        $PropertyName,
-                        $null,
-                        $Schema
-                    )
+                    $MatchedSchemaProperty = $SchemaPropertyName
                     break
                 }
             }
 
-            # Check ALL schema properties with case-insensitive match (PowerShell parameters are case-insensitive)
+            # Second pass: Try case-insensitive match if exact match not found
             if (-not $PropertyExists) {
                 foreach ($SchemaPropertyName in $Schema.properties.PSObject.Properties.Name) {
                     if ($SchemaPropertyName.ToLower() -eq $PropertyName.ToLower()) {
-                        # Found a case-insensitive match - validate using the canonical property name
-                        $PropertySchema = $Schema.properties.$SchemaPropertyName
-                        [ScubaConfigValidator]::ValidatePropertyBySchema(
-                            $PropertyValue,
-                            $PropertySchema,
-                            $Validation,
-                            $PropertyName,
-                            $PropertyName,
-                            $null,
-                            $Schema
-                        )
                         $PropertyExists = $true
-
-                        # Warn about case mismatch (informational - PowerShell will still use it)
-                        # Skip warning for products that don't support exclusions - they'll get an error later
-                        if ($SchemaPropertyName -cne $PropertyName) {
-                            # Products without exclusion support: SharePoint, Teams, PowerPlatform
-                            $ProductsWithoutExclusions = @('SharePoint', 'Teams', 'PowerPlatform')
-
-                            if ($SchemaPropertyName -notin $ProductsWithoutExclusions) {
-                                [void]$Validation.Warnings.Add("Property '$PropertyName' has incorrect case. Recommended using: '$SchemaPropertyName'.")
-                            }
-                        }
+                        $MatchedSchemaProperty = $SchemaPropertyName
+                        $CaseMismatch = $true
                         break
+                    }
+                }
+            }
+
+            # If property found (exact or case-insensitive), validate it
+            if ($PropertyExists) {
+                $PropertySchema = $Schema.properties.$MatchedSchemaProperty
+
+                # Validate the property against its schema
+                [ScubaConfigValidator]::ValidatePropertyBySchema(
+                    $PropertyValue,
+                    $PropertySchema,
+                    $Validation,
+                    $PropertyName,
+                    $PropertyName,
+                    $null,
+                    $Schema
+                )
+
+                # Check for case mismatch on case-sensitive properties
+                if ($CaseMismatch) {
+                    # Get the caseSensitive setting from schema (property-level)
+                    $IsCaseSensitive = if ($null -ne $PropertySchema.caseSensitive) {
+                        $PropertySchema.caseSensitive
+                    } else {
+                        $false  # Default to case-insensitive if not specified
+                    }
+
+                    if ($IsCaseSensitive) {
+                        # This property requires exact case - check global setting for error vs warning
+                        $Defaults = [ScubaConfigValidator]::GetDefaults()
+                        $ErrorOnCaseMismatch = if ($null -ne $Defaults.validation.errorCaseSensitive) {
+                            $Defaults.validation.errorCaseSensitive
+                        } else {
+                            $false  # Default to warning
+                        }
+
+                        $Message = "Property '$PropertyName' has incorrect case. Required case-sensitive name: '$MatchedSchemaProperty'."
+
+                        if ($ErrorOnCaseMismatch) {
+                            [void]$Validation.Errors.Add($Message)
+                        } else {
+                            [void]$Validation.Warnings.Add($Message)
+                        }
                     }
                 }
             }
@@ -779,22 +755,57 @@ class ScubaConfigValidator {
             $AllowedProperties = @($Schema.properties.PSObject.Properties.Name)
 
             foreach ($PropName in $ValueProperties) {
-                # Case-sensitive match for JSON Schema compliance
+                # Check for exact case match first
                 $PropertyExists = $false
+                $MatchedProp = $null
+                $CaseMismatch = $false
+
                 foreach ($AllowedProp in $AllowedProperties) {
                     if ($AllowedProp -ceq $PropName) {
                         $PropertyExists = $true
-                        # Validate the property value against its schema
-                        $PropSchema = $Schema.properties.$PropName
-                        $PropValue = if ($Value -is [hashtable]) { $Value[$PropName] } else { $Value.$PropName }
-                        [ScubaConfigValidator]::ValidatePropertyBySchema($PropValue, $PropSchema, $Validation, "$Context.$PropName", $PropName, $null, [ScubaConfigValidator]::GetSchema())
+                        $MatchedProp = $AllowedProp
                         break
                     }
                 }
 
-                # If property not found and additionalProperties is false, report error
-                if (-not $PropertyExists -and $Schema.additionalProperties -eq $false) {
-                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProperties -join ', ').")
+                # Try case-insensitive match if exact match not found
+                if (-not $PropertyExists) {
+                    foreach ($AllowedProp in $AllowedProperties) {
+                        if ($AllowedProp.ToLower() -eq $PropName.ToLower()) {
+                            $PropertyExists = $true
+                            $MatchedProp = $AllowedProp
+                            $CaseMismatch = $true
+                            break
+                        }
+                    }
+                }
+
+                if ($PropertyExists) {
+                    # Validate the property value against its schema
+                    $PropSchema = $Schema.properties.$MatchedProp
+                    $PropValue = if ($Value -is [hashtable]) { $Value[$PropName] } else { $Value.$PropName }
+                    [ScubaConfigValidator]::ValidatePropertyBySchema($PropValue, $PropSchema, $Validation, "$Context.$PropName", $PropName, $null, [ScubaConfigValidator]::GetSchema())
+
+                    # Check case sensitivity from schema
+                    if ($CaseMismatch) {
+                        $IsCaseSensitive = if ($null -ne $PropSchema.caseSensitive) { $PropSchema.caseSensitive } else { $false }
+
+                        if ($IsCaseSensitive) {
+                            $Defaults = [ScubaConfigValidator]::GetDefaults()
+                            $ErrorOnCaseMismatch = if ($null -ne $Defaults.validation.errorCaseSensitive) { $Defaults.validation.errorCaseSensitive } else { $false }
+
+                            $Message = "Property '$Context.$PropName': Incorrect case. Required: '$MatchedProp'. Property names are case-sensitive for this property."
+
+                            if ($ErrorOnCaseMismatch) {
+                                [void]$Validation.Errors.Add($Message)
+                            } else {
+                                [void]$Validation.Warnings.Add($Message)
+                            }
+                        }
+                    }
+                } elseif ($Schema.additionalProperties -eq $false) {
+                    # Property not found and additional properties not allowed
+                    [void]$Validation.Errors.Add("Property '$Context': Invalid property '$PropName'. Valid properties: $($AllowedProperties -join ', ').")
                 }
             }
         }
@@ -1226,8 +1237,43 @@ class ScubaConfigValidator {
                             # Check for invalid properties (additionalProperties: false)
                             if ($Option.additionalProperties -eq $false) {
                                 foreach ($ItemProp in $ItemKeys) {
-                                    if ($ItemProp -notin $AllowedProps) {
-                                        [void]$TempValidation.Errors.Add("${Context}: Invalid property '$ItemProp'. Property names are case-sensitive and will be ignored by Rego if incorrect. Valid properties: $($AllowedProps -join ', ')")
+                                    # Check exact case match
+                                    $PropExists = $ItemProp -cin $AllowedProps
+
+                                    if (-not $PropExists) {
+                                        # Check case-insensitive
+                                        $CaseInsensitiveMatch = $null
+                                        foreach ($AllowedProp in $AllowedProps) {
+                                            if ($AllowedProp.ToLower() -eq $ItemProp.ToLower()) {
+                                                $CaseInsensitiveMatch = $AllowedProp
+                                                break
+                                            }
+                                        }
+
+                                        if ($CaseInsensitiveMatch) {
+                                            # Found case-insensitive match - check if property is case-sensitive
+                                            $PropSchema = $Option.properties.$CaseInsensitiveMatch
+                                            $IsCaseSensitive = if ($null -ne $PropSchema.caseSensitive) { $PropSchema.caseSensitive } else { $false }
+
+                                            if ($IsCaseSensitive) {
+                                                # Case matters for this property
+                                                $Defaults = [ScubaConfigValidator]::GetDefaults()
+                                                $ErrorOnCaseMismatch = if ($null -ne $Defaults.validation.errorCaseSensitive) { $Defaults.validation.errorCaseSensitive } else { $false }
+
+                                                $Message = "${Context}: Property '$ItemProp' has incorrect case. Required: '$CaseInsensitiveMatch'. This property is case-sensitive."
+
+                                                if ($ErrorOnCaseMismatch) {
+                                                    [void]$TempValidation.Errors.Add($Message)
+                                                } else {
+                                                    # Warning - but still validate the value
+                                                    # Note: This is added to temp validation, not main validation
+                                                }
+                                            }
+                                            # If not case-sensitive, we accept the case-insensitive match
+                                        } else {
+                                            # Property doesn't exist at all
+                                            [void]$TempValidation.Errors.Add("${Context}: Invalid property '$ItemProp'. Valid properties: $($AllowedProps -join ', ')")
+                                        }
                                     }
                                 }
                             }

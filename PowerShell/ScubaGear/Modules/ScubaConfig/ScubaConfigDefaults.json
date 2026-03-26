@@ -31,6 +31,7 @@
     "SkipDoH": false
   },
   "minRequired": [
+    "OrgName",
     "ProductNames"
   ],
   "privilegedRoles": [
@@ -52,6 +53,7 @@
         "maxFileSizeBytes: Maximum allowed file size for configuration files, in bytes.",
         "ignoreAnchorsInYaml: When true, ignores YAML anchors and aliases during validation to prevent issues with duplicate keys. This allows users to use anchors for reuse without causing validation errors.",
         "requireProductInPolicy: When true, enforces that the product name must be included in the policy ID.",
+        "errorCaseSensitive: When true, found case sensitive properties will error during validation. If false, warnings messages are shown instead.",
         "allowOPAFallback: When true, allows runtime fallback if OPAPath doesn't exist. Fallback chain: 1) If $env:USERPROFILE is not set, defaults to current directory (.). 2) Expands ~ to user profile. 3) If expanded path doesn't exist, falls back to current directory (.). This matches the legacy DefaultOPAPath behavior: try {Join-Path $env:USERPROFILE '.scubagear\\Tools'} catch {'.'}. When false, requires OPAPath to exist at validation time."
     ],
     "policyIdPattern": "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$",
@@ -61,6 +63,7 @@
     "maxFileSizeBytes": 1048576,
     "ignoreAnchorsInYaml": true,
     "requireProductInPolicy": false,
+    "errorCaseSensitive": false,
     "allowOPAFallback": true
   },
   "outputSettings": {
@@ -81,7 +84,7 @@
     "errorCategories": [
       {
         "name": "Property errors",
-        "pattern": "^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Required\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
@@ -123,7 +126,7 @@
     "warningCategories": [
       {
         "name": "Property warnings",
-        "pattern": "^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Unknown\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
