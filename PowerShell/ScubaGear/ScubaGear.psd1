@@ -73,7 +73,7 @@ ScriptsToProcess = @(
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('Modules\Support\Support.psm1')
+NestedModules = @('Modules\Support\Support.psm1','Modules\Utility\ScubaLogging.psm1')
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
@@ -85,7 +85,7 @@ FunctionsToExport = @(
     'Initialize-SCuBA',
     'Start-SCuBAConfigApp',
     'Show-SCuBABaselinePolicyViewer',
-    'Debug-SCuBA',
+    'Get-ScubaDebugLogReport',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
     'New-SCuBAConfig',

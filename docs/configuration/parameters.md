@@ -524,6 +524,42 @@ Invoke-SCuBA -ProductNames exo `
 Invoke-SCuBA -Version
 ```
 
+## Transcript
+
+**Transcript** enables PowerShell transcript logging to capture all console output in addition to the debug logs that are always created. Debug logs are automatically generated for every ScubaGear run; the `-Transcript` parameter adds a transcript file for complete console capture.
+
+| Parameter   | Value  |
+|-------------|--------|
+| Optional    | Yes    |
+| Datatype    | Switch |
+| Default     | n/a    |
+| Config File | No     |
+
+```powershell
+# Enable transcript logging for complete console capture
+Invoke-SCuBA -ProductNames teams `
+  -Transcript
+```
+
+Debug logs are always created in a `DebugLogs` subfolder within the output directory. When `-Transcript` is used, an additional transcript file is created:
+
+```
+M365BaselineConformance_2026_02_06_14_30_45\
+    ├── DebugLogs\
+    │   ├── ScubaGear-DebugLog-<timestamp>.log      (always created)
+    │   └── ScubaGear-Transcript-<timestamp>.log    (only when -Transcript is used)
+    ├── ProviderSettingsExport.json
+    ├── ScubaResults.json
+    └── BaselineReports.html
+```
+
+The debug log captures:
+- Function entry/exit traces with timing information
+- Detailed execution flow and decision points
+- Error context and stack traces
+- Configuration and environment details
+
+> **Note**: All debug and verbose output is written only to the log file—not to the console—to avoid output spam. Enhanced tracing may increase run time. Sensitive data (passwords, tokens, keys) is automatically redacted from logs.
 
 ## Muting the Version Check Warnings
 
