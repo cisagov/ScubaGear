@@ -31,3 +31,7 @@
 **/M365BaselineConformance*
 /Testing/Functional/Reports*
 /Testing/Functional/Archive*
+
+# Debug Logs
+/testing/M365Baseline*
+*DebugLogs*
