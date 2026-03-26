@@ -111,6 +111,20 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
             Mock -ModuleName ExportPowerPlatformProvider Get-DlpPolicy {}
             function Get-PowerAppTenantIsolationPolicy {}
             Mock -ModuleName ExportPowerPlatformProvider Get-PowerAppTenantIsolationPolicy {}
+            function Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
+            function Get-PowerPlatformAccessTokenInteractive { return "mock-access-token" }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformAccessTokenInteractive { return "mock-access-token" }
+            function Get-PowerPlatformAccessToken { return "mock-access-token" }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformAccessToken { return "mock-access-token" }
+            function Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
+            function Get-PowerPlatformEnvironmentsRest { return @() }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformEnvironmentsRest { return @() }
+            function Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
+            function Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
+            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
