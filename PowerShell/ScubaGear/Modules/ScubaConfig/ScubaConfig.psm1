@@ -262,6 +262,7 @@ class ScubaConfig {
     # Takes PSCustomObject to preserve case-sensitive property names (hashtable is case-insensitive)
     static [void] ValidateRequiredFields([PSCustomObject]$ConfigObject) {
         [ScubaConfig]::InitializeValidator()
+
         $Defaults = [ScubaConfig]::_ConfigDefaults
 
         if (-not $Defaults.minRequired) {

@@ -265,7 +265,6 @@ class ScubaConfigValidator {
         }
 
         $Schema = [ScubaConfigValidator]::GetSchema()
-        $Defaults = [ScubaConfigValidator]::GetDefaults()
 
         # Note: minRequired validation is handled in ScubaConfig.ValidateRequiredFields()
         # which runs BEFORE defaults are applied to catch truly missing fields
