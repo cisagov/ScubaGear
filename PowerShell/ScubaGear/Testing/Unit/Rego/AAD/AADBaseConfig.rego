@@ -92,6 +92,10 @@ AuthorizationPolicies := {
     "Id": "authorizationPolicy"
 }
 
+Classifications := {
+    "risky_delegated_permission_classifications": []
+}
+
 DirectorySettings := {
     "DisplayName": "Setting display name",
     "Values": [

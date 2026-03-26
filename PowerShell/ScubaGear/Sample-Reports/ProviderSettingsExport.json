@@ -1207,7 +1207,7 @@
                                        "PermissionGrantPolicyIdsAssignedToDefaultUserRole":  [
                                                                                                  "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                                                                                                  "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
-                                                                                                 "ManagePermissionGrantsForSelf.microsoft-user-default-recommended"
+                                                                                                 "ManagePermissionGrantsForSelf.microsoft-user-default-low"
                                                                                              ],
                                        "GuestUserRoleId":  "10dae51f-b6af-4016-8d66-8c2a99b929b3",
                                        "Description":  "Used to manage authorization related settings across the company.",
@@ -6062,6 +6062,17 @@
                                                      "AppOwnerOrganizationId":  "2e1de604-3fac-4568-88f8-aeb6bd229634"
                                                  }
                                              ],
+    "risky_delegated_permission_classifications": [
+        {
+            "ObjectId":  "ae4b986a-91aa-477e-908b-218fedd7484e",
+            "AppId":  "00000003-0000-0000-c000-000000000000",
+            "DisplayName":  null,
+            "RiskyPermClassifications": [
+                                         "Mail.Read",
+                                         "Mail.Send"
+            ]
+        }
+    ],
     "aad_successful_commands":  [
                                     "Get-MgBetaIdentityConditionalAccessPolicy",
                                     "Get-MgBetaSubscribedSku",

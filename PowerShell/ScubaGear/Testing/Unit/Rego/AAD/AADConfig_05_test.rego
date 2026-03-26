@@ -74,20 +74,20 @@ test_UserConsentFromVerifiedPublishersAllowed_Incorrect if {
                 "value": [
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
-                    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+                    "ManagePermissionGrantsForSelf.microsoft-user-default-recommended"
                 ]}])
 
     Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
-        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+        "1 authorization policies found that allow Microsoft to manage consent settings:",
         "<br/>authorizationPolicy"
     ])
 
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
 
-test_UserConsentAllowed_Incorrect if {
+test_UserConsentAllowedNoRiskyDelegatedPermissionClassifications_Correct if {
     Policies := json.patch(AuthorizationPolicies,
                 [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole",
                 "value": [
@@ -99,12 +99,38 @@ test_UserConsentAllowed_Incorrect if {
     Output := aad.tests with input.authorization_policies as [Policies]
 
     ReportDetailStr := concat("", [
-        "1 authorization policies found that allow non-admin users to consent to third-party applications:",
+        "0 authorization policies found that allow non-admin users to consent to third-party applications"
+    ])
+
+    TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, true) == true
+}
+
+test_UserConsentAllowedWithRiskyDelegatedPermissionClassifications_Incorrect if {
+    Policies := json.patch(AuthorizationPolicies,
+                [{"op": "add", "path": "PermissionGrantPolicyIdsAssignedToDefaultUserRole",
+                "value": [
+                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat",
+                    "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+                    "ManagePermissionGrantsForSelf.microsoft-user-default-low"
+                ]}])
+    
+    RiskyClassifications := json.patch(Classifications,
+                [{"op": "add", "path": "RiskyPermClassifications",
+                "value": [
+                    "Mail.Read",
+                    "Mail.Send"
+                ]}])
+
+    Output := aad.tests with input.authorization_policies as [Policies] with input.risky_delegated_permission_classifications as [RiskyClassifications]
+
+    ReportDetailStr := concat("", [
+        "1 authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications:",
         "<br/>authorizationPolicy"
     ])
 
     TestResult("MS.AAD.5.2v1", Output, ReportDetailStr, false) == true
 }
+
 #--
 
 #
