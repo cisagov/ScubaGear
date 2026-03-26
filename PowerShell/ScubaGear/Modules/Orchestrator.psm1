@@ -836,7 +836,13 @@ function Invoke-ProviderList {
                             $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
                         }
                         "powerplatform" {
-                            $RetVal = Export-PowerPlatformProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
+                            $PPProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                            }
+                            if ($ServicePrincipalParams) {
+                                $PPProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                            }
+                            $RetVal = Export-PowerPlatformProvider @PPProviderParams | Select-Object -Last 1
                         }
                         "sharepoint" {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1

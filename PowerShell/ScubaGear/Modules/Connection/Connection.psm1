@@ -83,43 +83,18 @@ function Connect-Tenant {
                    }
                }
                "powerplatform" {
-                   $AddPowerAppsParams = @{
-                       'ErrorAction' = 'Stop';
-                   }
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $AddPowerAppsParams += @{
-                           CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                           ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                           TenantID  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                       }
-                   }
-                   switch ($M365Environment) {
-                       "commercial" {
-                           $AddPowerAppsParams += @{'Endpoint'='prod';}
-                       }
-                       "gcc" {
-                           $AddPowerAppsParams += @{'Endpoint'='usgov';}
-                       }
-                       "gcchigh" {
-                           $AddPowerAppsParams += @{'Endpoint'='usgovhigh';}
-                       }
-                       "dod" {
-                           $AddPowerAppsParams += @{'Endpoint'='dod';}
-                       }
-                   }
-                   Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
-
                    if ($AADAuthRequired) {
-                        $LimitedGraphParams = @{
-                            'M365Environment' = $M365Environment;
-                            'ErrorAction' = 'Stop';
-                        }
-                        if ($ServicePrincipalParams) {
-                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
-                        }
-                        Connect-GraphHelper @LimitedGraphParams
-                        $AADAuthRequired = $false
-                    }
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
+                   Write-Verbose "Power Platform uses REST API with on-demand MSAL token - no persistent PowerApps connection needed"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -232,7 +207,8 @@ function Disconnect-SCuBATenant {
                Disconnect-MicrosoftTeams -Confirm:$false -ErrorAction SilentlyContinue
            }
            elseif ($Product -eq "powerplatform") {
-               Remove-PowerAppsAccount -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               # Power Platform uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
                if($Product -eq "defender") {

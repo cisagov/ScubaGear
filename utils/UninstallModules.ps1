@@ -18,8 +18,6 @@ $ModuleList = @(
     "MicrosoftTeams",
     "ExchangeOnlineManagement", # includes Defender
     # Microsoft.Online.SharePoint.PowerShell and PnP.PowerShell no longer required (using REST API)
-    "Microsoft.PowerApps.Administration.PowerShell",
-    "Microsoft.PowerApps.PowerShell",
     "Microsoft.Graph.Authentication", # starting here, MS Graph modules for AAD
     "powershell-yaml"
     )
