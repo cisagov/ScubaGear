@@ -1,9 +1,48 @@
+function Initialize-Msal {
+    <#
+    .SYNOPSIS
+        Ensures the MSAL (Microsoft.Identity.Client) assembly is loaded and types are resolvable.
+    .DESCRIPTION
+        The Microsoft.Graph.Authentication module loads the MSAL assembly, but PowerShell cannot
+        resolve the types via [TypeName] syntax until Add-Type is called explicitly.
+        This function finds the DLL from the Graph module and loads it.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param()
+
+    # Check if already resolvable
+    try {
+        $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
+        return
+    }
+    catch {
+        # Type not yet resolvable, need to load explicitly
+    }
+
+    $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
+    if (-not $GraphModule) {
+        throw "Microsoft.Graph.Authentication module is not loaded. Ensure Connect-MgGraph has been called before acquiring SharePoint tokens."
+    }
+
+    $ModulePath = $GraphModule.Path | Split-Path
+    $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if (-not $MsalDll) {
+        throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+    }
+
+    Add-Type -Path $MsalDll.FullName
+}
+
 function Get-SPOAccessToken {
     <#
     .SYNOPSIS
         Acquires an OAuth2 access token for SharePoint Admin API using certificate authentication.
     .DESCRIPTION
-        Creates a JWT assertion signed with the certificate private key and exchanges it for an access token.
+        Uses MSAL (Microsoft.Identity.Client) ConfidentialClientApplication to acquire a token
+        scoped to the SharePoint Admin URL. MSAL is loaded as a dependency of Microsoft.Graph.Authentication.
     .PARAMETER CertificateThumbprint
         The thumbprint of the certificate to use for authentication.
     .PARAMETER AppID
@@ -36,10 +75,11 @@ function Get-SPOAccessToken {
         [string]$AdminUrl
     )
 
-    # Determine token endpoint based on environment
-    $TokenEndpoint = switch ($M365Environment) {
-        { $_ -in @("commercial", "gcc") } { "https://login.microsoftonline.com" }
-        { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us" }
+    Initialize-Msal
+
+    $Authority = switch ($M365Environment) {
+        { $_ -in @("commercial", "gcc") } { "https://login.microsoftonline.com/$Tenant" }
+        { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us/$Tenant" }
     }
 
     # Load certificate from store (try CurrentUser first, then LocalMachine)
@@ -51,53 +91,14 @@ function Get-SPOAccessToken {
         throw "Certificate with thumbprint '$CertificateThumbprint' not found in CurrentUser or LocalMachine certificate stores."
     }
 
-    # Build JWT header
-    $CertHash = $Certificate.GetCertHash()
-    $X5t = [System.Convert]::ToBase64String($CertHash) -replace '\+', '-' -replace '/', '_' -replace '='
-    $JwtHeader = @{
-        alg = "RS256"
-        typ = "JWT"
-        x5t = $X5t
-    } | ConvertTo-Json -Compress
-
-    # Build JWT payload
-    $Now = [System.DateTimeOffset]::UtcNow
-    $JwtPayload = @{
-        aud = "$TokenEndpoint/$Tenant/oauth2/v2.0/token"
-        iss = $AppID
-        sub = $AppID
-        jti = [guid]::NewGuid().ToString()
-        nbf = $Now.ToUnixTimeSeconds()
-        exp = $Now.AddMinutes(10).ToUnixTimeSeconds()
-    } | ConvertTo-Json -Compress
-
-    # Base64Url encode header and payload
-    $HeaderB64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($JwtHeader)) -replace '\+', '-' -replace '/', '_' -replace '='
-    $PayloadB64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($JwtPayload)) -replace '\+', '-' -replace '/', '_' -replace '='
-
-    # Sign the JWT
-    $DataToSign = [System.Text.Encoding]::UTF8.GetBytes("$HeaderB64.$PayloadB64")
-    $RSA = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($Certificate)
-    $Signature = $RSA.SignData($DataToSign, [System.Security.Cryptography.HashAlgorithmName]::SHA256, [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
-    $SignatureB64 = [System.Convert]::ToBase64String($Signature) -replace '\+', '-' -replace '/', '_' -replace '='
-
-    $ClientAssertion = "$HeaderB64.$PayloadB64.$SignatureB64"
-
-    # Request token
-    $TokenUrl = "$TokenEndpoint/$Tenant/oauth2/v2.0/token"
-    $Scope = "$AdminUrl/.default"
-
-    $Body = @{
-        client_id             = $AppID
-        client_assertion_type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-        client_assertion      = $ClientAssertion
-        scope                 = $Scope
-        grant_type            = "client_credentials"
-    }
-
     try {
-        $Response = Invoke-RestMethod -Uri $TokenUrl -Method POST -Body $Body -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
-        return $Response.access_token
+        $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+            WithCertificate($Certificate).
+            WithAuthority($Authority).
+            Build()
+
+        $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@("$AdminUrl/.default")).ExecuteAsync().GetAwaiter().GetResult()
+        return $TokenResult.AccessToken
     }
     catch {
         throw "Failed to acquire SharePoint access token: $($_.Exception.Message)"
@@ -109,8 +110,8 @@ function Get-SPOAccessTokenInteractive {
     .SYNOPSIS
         Acquires an OAuth2 access token for SharePoint Admin API using interactive browser authentication.
     .DESCRIPTION
-        Uses authorization code flow with PKCE via browser popup for user authentication.
-        Uses SharePoint Online Management Shell app ID which is pre-authorized for SharePoint Admin API.
+        Uses MSAL (Microsoft.Identity.Client) PublicClientApplication to acquire a token via
+        interactive browser sign-in. MSAL handles the browser popup, redirect, and code exchange.
     .PARAMETER Tenant
         The tenant domain or ID.
     .PARAMETER M365Environment
@@ -133,77 +134,32 @@ function Get-SPOAccessTokenInteractive {
         [string]$AdminUrl
     )
 
+    Initialize-Msal
+
     # SharePoint Online Management Shell app ID - pre-authorized for SharePoint Admin API
     $ClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
-    $RedirectUri = "https://oauth.spops.microsoft.com/"
+    $RedirectUri = "http://localhost"
 
-    # Determine endpoints based on environment
-    $AuthEndpoint = switch ($M365Environment) {
-        { $_ -in @("commercial", "gcc") } { "https://login.microsoftonline.com" }
-        { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us" }
-    }
-
-    # Generate state for CSRF protection
-    $State = [guid]::NewGuid().ToString()
-
-    # Build authorization URL - use SharePoint resource
-    $Resource = $AdminUrl
-    $AuthUrl = "$AuthEndpoint/$Tenant/oauth2/authorize?" +
-        "client_id=$ClientId" +
-        "&response_type=code" +
-        "&redirect_uri=$([System.Web.HttpUtility]::UrlEncode($RedirectUri))" +
-        "&resource=$([System.Web.HttpUtility]::UrlEncode($Resource))" +
-        "&state=$State" +
-        "&prompt=select_account"
-
-    Write-Information "Opening browser for SharePoint authentication..."
-    Write-Information "Please sign in with a SharePoint Administrator account."
-
-    # Open browser for authentication
-    Start-Process $AuthUrl
-
-    # Prompt user to paste the redirect URL
-    Write-Information ""
-    Write-Information "After signing in, you will be redirected to a page."
-    Write-Information "Copy the ENTIRE URL from your browser's address bar and paste it here:"
-    $RedirectResponse = Read-Host "Paste URL"
-
-    # Parse authorization code from the pasted URL
-    try {
-        $Uri = [System.Uri]$RedirectResponse
-        $QueryString = [System.Web.HttpUtility]::ParseQueryString($Uri.Query)
-        $AuthCode = $QueryString["code"]
-        $ErrorCode = $QueryString["error"]
-    }
-    catch {
-        throw "Invalid URL format. Make sure you copied the complete URL from the browser."
-    }
-
-    if ($ErrorCode) {
-        throw "Authentication failed: $ErrorCode - $($QueryString["error_description"])"
-    }
-
-    if (-not $AuthCode) {
-        throw "No authorization code found in the URL. Make sure you copied the complete URL."
-    }
-
-    # Exchange authorization code for token (OAuth 1.0 endpoint for v1 tokens)
-    $TokenUrl = "$AuthEndpoint/$Tenant/oauth2/token"
-    $TokenBody = @{
-        client_id    = $ClientId
-        grant_type   = "authorization_code"
-        code         = $AuthCode
-        redirect_uri = $RedirectUri
-        resource     = $Resource
+    $Authority = switch ($M365Environment) {
+        { $_ -in @("commercial", "gcc") } { "https://login.microsoftonline.com/$Tenant" }
+        { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us/$Tenant" }
     }
 
     try {
-        $TokenResponse = Invoke-RestMethod -Uri $TokenUrl -Method POST -Body $TokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
-        Write-Information "Authentication successful!"
-        return $TokenResponse.access_token
+        $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+            WithAuthority($Authority).
+            WithRedirectUri($RedirectUri).
+            Build()
+
+        $Scopes = [string[]]@("$AdminUrl/.default")
+        $TokenResult = $MsalApp.AcquireTokenInteractive($Scopes).
+            WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+            ExecuteAsync().GetAwaiter().GetResult()
+
+        return $TokenResult.AccessToken
     }
     catch {
-        throw "Failed to exchange code for token: $($_.Exception.Message)"
+        throw "Failed to acquire SharePoint access token interactively: $($_.Exception.Message)"
     }
 }
 
