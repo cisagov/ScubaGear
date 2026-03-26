@@ -112,7 +112,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance1.LoadConfig($TempFile)
+                $Instance1.LoadConfig($TempFile, $true)
                 $HasConfig1 = $Instance1.Configuration -ne $null
 
                 [ScubaConfig]::ResetInstance()
@@ -222,9 +222,12 @@ Describe "ScubaConfig Module Unit Tests" {
         It "Should load configuration files" {
             $Instance = [ScubaConfig]::GetInstance()
 
-            # Create a minimal test file
+            # Create a minimal test file with required fields
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            "ProductNames: [aad]" | Set-Content -Path $TempFile
+            @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
 
             try {
                 { $Instance.LoadConfig($TempFile) } | Should -Not -Throw
@@ -248,7 +251,10 @@ Describe "ScubaConfig Module Unit Tests" {
                 $OPAPathCreated = $true
             }
             
-            "ProductNames: [aad]" | Set-Content -Path $TempFile
+            @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
 
             try {
                 $Instance.LoadConfig($TempFile)
@@ -267,12 +273,17 @@ Describe "ScubaConfig Module Unit Tests" {
         It "Should support skip validation parameter in LoadConfig" {
             $Instance = [ScubaConfig]::GetInstance()
 
-            # Create a minimal test file
+            # Create a minimal test file - SkipValidation=true allows partial config
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
                 { $Instance.LoadConfig($TempFile, $true) } | Should -Not -Throw
+                # For SkipValidation=$false, need complete config with required fields
+                @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
                 { $Instance.LoadConfig($TempFile, $false) } | Should -Not -Throw
             }
             finally {
@@ -307,7 +318,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance.LoadConfig($TempFile)
+                $Instance.LoadConfig($TempFile, $true)
                 $Instance.Configuration | Should -Not -BeNullOrEmpty
 
                 # Get same instance and check configuration persists
@@ -327,7 +338,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance.LoadConfig($TempFile)
+                $Instance.LoadConfig($TempFile, $true)
                 $Instance.Configuration | Should -Not -BeNullOrEmpty
 
                 # Reset and get new instance

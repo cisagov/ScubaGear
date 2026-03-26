@@ -137,6 +137,21 @@ M365Environment: invalid-env
                 $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
                 New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
 
+                # Create dummy OPA executable
+                $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+                $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+                if ($IsLinuxOS) {
+                    $DummyOPAName = "opa_linux_amd64"
+                }
+                elseif ($IsMacOSOS) {
+                    $DummyOPAName = "opa_darwin_amd64"
+                }
+                else {
+                    $DummyOPAName = "opa_windows_amd64.exe"
+                }
+                $dummyOpaPath = Join-Path $tempOpaPath $DummyOPAName
+                New-Item -Path $dummyOpaPath -ItemType File -Force | Out-Null
+
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('invalid-product')
@@ -200,6 +215,21 @@ M365Environment: invalid-env
                 # Create temp directory for OPAPath
                 $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
                 New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
+
+                # Create dummy OPA executable
+                $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+                $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+                if ($IsLinuxOS) {
+                    $DummyOPAName = "opa_linux_amd64"
+                }
+                elseif ($IsMacOSOS) {
+                    $DummyOPAName = "opa_darwin_amd64"
+                }
+                else {
+                    $DummyOPAName = "opa_windows_amd64.exe"
+                }
+                $dummyOpaPath = Join-Path $tempOpaPath $DummyOPAName
+                New-Item -Path $dummyOpaPath -ItemType File -Force | Out-Null
 
                 function global:ConvertFrom-Yaml {
                     @{

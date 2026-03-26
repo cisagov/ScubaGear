@@ -319,7 +319,8 @@ ProductNames:
 M365Environment: commercial
 OrgName: Test Organization
 OmitPolicy:
-    MS.DEFENDEDRS.1.1v1: Invalid product reference
+    MS.DEFENDEDRS.1.1v1:
+        Rationale: Invalid product reference
 "@
 
                         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
@@ -331,15 +332,18 @@ OmitPolicy:
                                         M365Environment='commercial'
                                         OrgName='Test Organization'
                                         OmitPolicy=@{
-                                                'MS.DEFENDEDRS.1.1v1'='Invalid product reference'
+                                                'MS.DEFENDEDRS.1.1v1'=@{
+                                                        Rationale='Invalid product reference'
+                                                }
                                         }
                                 }
                         }
 
                         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
-                        $ValidationResult.IsValid | Should -BeFalse
-                        ($ValidationResult.ValidationErrors -join ' ') | Should -Match "references product 'defendedrs' which is not in ProductNames"
+                        # With requireProductInPolicy=false (default), validation passes but issues warning
+                        $ValidationResult.IsValid | Should -BeTrue
+                        ($ValidationResult.Warnings -join ' ') | Should -Match "references product 'defendedrs' which is not in ProductNames"
 
                         Remove-Item -Path $TempFile -Force
                 }

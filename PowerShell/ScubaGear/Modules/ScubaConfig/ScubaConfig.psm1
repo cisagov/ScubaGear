@@ -258,7 +258,7 @@ class ScubaConfig {
 
     # Validates that required fields are present in configuration BEFORE defaults are applied
     # This prevents minRequired validation from being bypassed by default values
-    # Throws error if any required field is missing (schema-driven from defaults.json minRequired)
+    # Issues warning if any required field is missing (schema-driven from defaults.json minRequired)
     # Takes PSCustomObject to preserve case-sensitive property names (hashtable is case-insensitive)
     static [void] ValidateRequiredFields([PSCustomObject]$ConfigObject) {
         [ScubaConfig]::InitializeValidator()
@@ -295,14 +295,14 @@ class ScubaConfig {
 
         if ($MissingFields.Count -gt 0) {
             $Plural = if ($MissingFields.Count -ne 1) { 's' } else { '' }
-            $ErrorMessage = "Configuration validation failed ($($MissingFields.Count) error$Plural):`n"
+            $WarningMessage = "Configuration validation warning ($($MissingFields.Count) warning$Plural):`n"
             foreach ($Field in $MissingFields) {
-                $ErrorMessage += "  - Required property '$Field' is missing.`n"
+                $WarningMessage += "  - Required property '$Field' is missing.`n"
             }
-            $ErrorMessage += "`n--- RECOMMENDED ACTION ---`n"
-            $ErrorMessage += "  - It is recommended to use the new ScubaGear Configuration Editor to build a configuration file.`n"
-            $ErrorMessage += "  - Run: 'Start-ScubaConfigApp' to launch the configuration application.`n"
-            throw $ErrorMessage
+            $WarningMessage += "`n--- RECOMMENDED ACTION ---`n"
+            $WarningMessage += "  - It is recommended to use the new ScubaGear Configuration Editor to build a configuration file.`n"
+            $WarningMessage += "  - Run: 'Start-ScubaConfigApp' to launch the configuration application.`n"
+            Write-Warning $WarningMessage
         }
     }
 
