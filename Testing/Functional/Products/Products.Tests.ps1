@@ -158,6 +158,26 @@ BeforeDiscovery {
                 Connect-SPOService -Url $AdminUrl
             }
         }
+
+        # Power Platform functional tests need a REST token to call precondition helper functions
+        if ($ProductName -eq "powerplatform") {
+            $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
+            Import-Module $PPHelperPath -Force
+            $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+            $InitialDomain = $TenantDomain
+            if (-Not [string]::IsNullOrEmpty($AppId)) {
+                $script:PPAccessToken = Get-PowerPlatformAccessToken `
+                    -CertificateThumbprint $Thumbprint `
+                    -AppID $AppId `
+                    -Tenant $InitialDomain `
+                    -M365Environment $M365Environment
+            }
+            else {
+                $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive `
+                    -Tenant $InitialDomain `
+                    -M365Environment $M365Environment
+            }
+        }
     }
 }
 

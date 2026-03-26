@@ -1,6 +1,82 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
+# -----------------------------------------------------------------------
+# Power Platform REST wrappers for functional test preconditions
+# These replace the removed Microsoft.PowerApps.Administration.PowerShell
+# cmdlets. $script:PPBaseUrl and $script:PPAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+function Get-TenantSettings {
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType "application/json"
+    return $Response
+}
+
+function Set-TenantSettings {
+    param([Parameter(Position=0)][object]$Settings, [hashtable]$RequestBody)
+    if ($RequestBody) { $Body = $RequestBody | ConvertTo-Json -Depth 10 }
+    else              { $Body = $Settings    | ConvertTo-Json -Depth 10 }
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+}
+
+function Get-AdminPowerAppEnvironment {
+    param([switch]$Default)
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    if ($Default) {
+        return $Response.value | Where-Object { $_.properties.isDefault -eq $true } | Select-Object -First 1 |
+               Select-Object @{ Name="EnvironmentName"; Expression={ $_.name } }
+    }
+    return $Response.value
+}
+
+function Get-DlpPolicy {
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    return $Response
+}
+
+function Remove-DlpPolicy {
+    param([Parameter(ValueFromPipelineByPropertyName=$true)][string]$PolicyName)
+    process {
+        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2016-11-01" `
+            -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
+    }
+}
+
+function New-AdminDlpPolicy {
+    param([string]$DisplayName, [string]$EnvironmentName)
+    $Body = @{
+        displayName              = $DisplayName
+        environmentType          = "OnlyEnvironments"
+        environments             = @(@{ id = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentName"; name = $EnvironmentName; type = "Microsoft.BusinessAppPlatform/scopes/environments" })
+        connectorGroups          = @(
+            @{ classification = "Confidential"; connectors = @() }
+            @{ classification = "General";      connectors = @() }
+            @{ classification = "Blocked";      connectors = @() }
+        )
+        defaultConnectorsClassification = "General"
+    } | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+}
+
+function Get-PowerAppTenantIsolationPolicy {
+    param([string]$TenantId)
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    return $Response
+}
+
+function Set-PowerAppTenantIsolationPolicy {
+    param([string]$TenantId, [object]$TenantIsolationPolicy)
+    $Body = $TenantIsolationPolicy | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+        -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+}
+
 # Helper functions for functional test
 function IsEquivalence{
   <#
