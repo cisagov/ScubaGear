@@ -360,7 +360,7 @@ function Get-SPOSiteRest {
     }
     catch {
         # Site properties are not used by current policies - return empty object on failure
-        Write-Warning "Could not retrieve site properties for '$Identity'. This data is not required for current SharePoint policies."
+        Write-Verbose "Could not retrieve site properties for '$Identity'. This data is not required for current SharePoint policies."
         return @{}
     }
 }

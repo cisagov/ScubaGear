@@ -19,7 +19,7 @@ function Get-SPOSiteHelper {
     )
     $SPOSiteIdentity = ""
     switch ($M365Environment) {
-        {"commercial" -or "gcc"} {
+        {$_ -in @("commercial", "gcc")} {
             $SPOSiteIdentity = "https://$($InitialDomainPrefix).sharepoint.com/"
         }
         "gcchigh" {
