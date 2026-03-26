@@ -19,6 +19,7 @@ function Initialize-Msal {
     }
     catch {
         # Type not yet resolvable, need to load explicitly
+        Write-Verbose "MSAL types not yet resolvable. Loading Microsoft.Identity.Client.dll explicitly."
     }
 
     $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
