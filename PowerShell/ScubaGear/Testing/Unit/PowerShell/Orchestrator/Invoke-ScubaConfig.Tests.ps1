@@ -11,6 +11,26 @@ InModuleScope Orchestrator {
         # Set up all mocks ONCE for all tests
         $script:TestSplat = @{}
         
+        # Create a dummy OPA executable for testing (required for configuration validation)
+        # Determine OS-specific executable name
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        
+        if ($IsLinuxOS) {
+            $script:DummyOPAName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $script:DummyOPAName = "opa_darwin_amd64"
+        }
+        else {
+            $script:DummyOPAName = "opa_windows_amd64.exe"
+        }
+        $script:DummyOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $script:DummyOPAName
+        # Create empty file to satisfy OPA validation
+        if (-not (Test-Path $script:DummyOPAPath)) {
+            New-Item -Path $script:DummyOPAPath -ItemType File -Force | Out-Null
+        }
+        
         # Define stub functions that will be mocked
         function ConvertTo-ResultsCsv {throw 'this will be mocked'}
         function Disconnect-SCuBATenant {throw 'this will be mocked'}
@@ -161,6 +181,13 @@ InModuleScope Orchestrator {
             It "Verify parameter, ProductNames, reflects all products"{
                 $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
+        }
+    }
+    
+    # Cleanup - remove dummy OPA executable
+    AfterAll {
+        if (Test-Path $script:DummyOPAPath) {
+            Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue
         }
     }
 }
