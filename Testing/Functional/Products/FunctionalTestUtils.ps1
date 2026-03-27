@@ -124,14 +124,13 @@ function Set-SPOTenant {
         "IF-MATCH"       = "*"
     }
 
-    # Anonymous-link fields require SharingCapability to already be set to "Anyone" (2).
-    # If SharingCapability is being changed in the same call, send it in a separate first
-    # request so the constraint check passes for the second request.
-    $AnonymousLinkFields = @('RequireAnonymousLinksExpireInDays','FileAnonymousLinkType','FolderAnonymousLinkType')
+    # Anonymous-link fields and EmailAttestation fields require SharingCapability to already
+    # be at the correct level before the API accepts them. If SharingCapability is being
+    # changed in the same call, always send it in a separate first request.
     $HasSharingCapability = $PSBoundParameters.ContainsKey('SharingCapability')
-    $HasAnonymousLinkField = ($PSBoundParameters.Keys | Where-Object { $_ -in $AnonymousLinkFields }).Count -gt 0
+    $HasOtherFields = ($PSBoundParameters.Keys | Where-Object { $_ -ne 'SharingCapability' }).Count -gt 0
 
-    if ($HasSharingCapability -and $HasAnonymousLinkField) {
+    if ($HasSharingCapability -and $HasOtherFields) {
         # First call: set SharingCapability alone
         $FirstBody = @{
             "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" }
