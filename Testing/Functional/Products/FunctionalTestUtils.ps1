@@ -116,8 +116,53 @@ function Set-SPOTenant {
     $DefaultSharingLinkTypeMap       = @{ None = 0; Direct = 1; Internal = 2; AnonymousAccess = 3 }
     $LinkPermissionMap               = @{ None = 0; View = 1; Edit = 2 }
 
-    $Body = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
+    $Headers = @{
+        Authorization    = "Bearer $script:SPOAccessToken"
+        Accept           = "application/json;odata=verbose"
+        "Content-Type"   = "application/json;odata=verbose"
+        "X-HTTP-Method"  = "MERGE"
+        "IF-MATCH"       = "*"
+    }
 
+    # Anonymous-link fields require SharingCapability to already be set to "Anyone" (2).
+    # If SharingCapability is being changed in the same call, send it in a separate first
+    # request so the constraint check passes for the second request.
+    $AnonymousLinkFields = @('RequireAnonymousLinksExpireInDays','FileAnonymousLinkType','FolderAnonymousLinkType')
+    $HasSharingCapability = $PSBoundParameters.ContainsKey('SharingCapability')
+    $HasAnonymousLinkField = ($PSBoundParameters.Keys | Where-Object { $_ -in $AnonymousLinkFields }).Count -gt 0
+
+    if ($HasSharingCapability -and $HasAnonymousLinkField) {
+        # First call: set SharingCapability alone
+        $FirstBody = @{
+            "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" }
+            SharingCapability = $SharingCapabilityMap[$SharingCapability]
+        }
+        Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+
+        # Second call: remaining fields (skip SharingCapability)
+        $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
+        foreach ($Param in $PSBoundParameters.Keys | Where-Object { $_ -ne 'SharingCapability' }) {
+            $Value = $PSBoundParameters[$Param]
+            $Mapped = switch ($Param) {
+                'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
+                'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
+                'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }
+                'FileAnonymousLinkType'        { $LinkPermissionMap[$Value] }
+                'FolderAnonymousLinkType'      { $LinkPermissionMap[$Value] }
+                default                        { $Value }
+            }
+            $RestBody[$Param] = $Mapped
+        }
+        if ($RestBody.Count -gt 1) {
+            Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+        }
+        return
+    }
+
+    # Single call: no anonymous-link field dependency conflict
+    $Body = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
     foreach ($Param in $PSBoundParameters.Keys) {
         $Value = $PSBoundParameters[$Param]
         $Mapped = switch ($Param) {
@@ -131,15 +176,6 @@ function Set-SPOTenant {
         }
         $Body[$Param] = $Mapped
     }
-
-    $Headers = @{
-        Authorization    = "Bearer $script:SPOAccessToken"
-        Accept           = "application/json;odata=verbose"
-        "Content-Type"   = "application/json;odata=verbose"
-        "X-HTTP-Method"  = "MERGE"
-        "IF-MATCH"       = "*"
-    }
-
     Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
         -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
 }
