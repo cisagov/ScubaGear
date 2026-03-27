@@ -3,6 +3,29 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigLoadConfig' {
         BeforeAll {
+            # Create default OPA directory for tests (needed in CI environments)
+            $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+            if (-not (Test-Path $script:DefaultOPAPath)) {
+                New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+            }
+
+            # Create dummy OPA executable
+            $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+            $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+            if ($IsLinuxOS) {
+                $script:OPAExeName = "opa_linux_amd64"
+            }
+            elseif ($IsMacOSOS) {
+                $script:OPAExeName = "opa_darwin_amd64"
+            }
+            else {
+                $script:OPAExeName = "opa_windows_amd64.exe"
+            }
+            $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
+            if (-not (Test-Path $script:OPAExePath)) {
+                New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
+            }
+
             Mock -CommandName Write-Warning {}
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
@@ -12,6 +35,11 @@ InModuleScope ScubaConfig {
         AfterAll {
             # Reset instance after all tests in this file
             [ScubaConfig]::ResetInstance()
+            
+            # Clean up dummy OPA executable
+            if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+                Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
+            }
         }
 
         context 'Handling repeated keys in YAML file' {

@@ -64,6 +64,29 @@ Describe "ScubaConfigValidator Basic Validation" {
             }
         }
 
+        # Create default OPA directory for tests (needed in CI environments)
+        $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+        if (-not (Test-Path $script:DefaultOPAPath)) {
+            New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+        }
+
+        # Create dummy OPA executable
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        if ($IsLinuxOS) {
+            $script:OPAExeName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $script:OPAExeName = "opa_darwin_amd64"
+        }
+        else {
+            $script:OPAExeName = "opa_windows_amd64.exe"
+        }
+        $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
+        if (-not (Test-Path $script:OPAExePath)) {
+            New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
+        }
+
         # Initialize the validator
         [ScubaConfigValidator]::Initialize("$PSScriptRoot\..\..\..\..\Modules\ScubaConfig")
 
@@ -240,6 +263,11 @@ Defender:
         # Clean up the global ConvertFrom-Yaml mock
         if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
             Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        }
+        
+        # Clean up dummy OPA executable
+        if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+            Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
         }
     }
 }
