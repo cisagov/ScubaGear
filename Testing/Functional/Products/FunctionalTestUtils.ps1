@@ -102,9 +102,14 @@ function Set-SPOTenant {
         [int]$EmailAttestationReAuthDays
     )
 
-    # Integer enum mappings required by the SharePoint OData REST API
+    # Integer enum mappings matching the values returned by the SPO REST provider
+    # and consumed by SharepointConfig.rego:
+    #   0 = Disabled (Only People In Your Organization)
+    #   1 = ExternalUserSharingOnly (New and Existing Guests)
+    #   2 = ExternalUserAndGuestSharing (Anyone)
+    #   3 = ExistingExternalUserSharingOnly (Existing Guests)
     $SharingCapabilityMap = @{
-        Disabled = 0; ExternalUserSharingOnly = 1; ExistingExternalUserSharingOnly = 2; ExternalUserAndGuestSharing = 3
+        Disabled = 0; ExternalUserSharingOnly = 1; ExternalUserAndGuestSharing = 2; ExistingExternalUserSharingOnly = 3
     }
     $SharingDomainRestrictionModeMap = @{ None = 0; AllowList = 1; BlockList = 2 }
     $DefaultSharingLinkTypeMap       = @{ None = 0; AnonymousAccess = 1; Internal = 2; Direct = 3 }
