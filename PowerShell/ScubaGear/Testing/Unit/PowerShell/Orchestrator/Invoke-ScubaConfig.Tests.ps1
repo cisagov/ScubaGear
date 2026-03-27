@@ -1,5 +1,29 @@
 using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 BeforeDiscovery {
+    # Create default OPA directory EARLY for tests (needed in CI environments like GitHub Actions)
+    # This must happen in BeforeDiscovery because 'using module' loads ScubaConfig which validates OPA path
+    $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+    if (-not (Test-Path $DefaultOPAPath)) {
+        New-Item -Path $DefaultOPAPath -ItemType Directory -Force | Out-Null
+    }
+    
+    # Create dummy OPA executable
+    $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+    $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+    if ($IsLinuxOS) {
+        $OPAExeName = "opa_linux_amd64"
+    }
+    elseif ($IsMacOSOS) {
+        $OPAExeName = "opa_darwin_amd64"
+    }
+    else {
+        $OPAExeName = "opa_windows_amd64.exe"
+    }
+    $OPAExePath = Join-Path -Path $DefaultOPAPath -ChildPath $OPAExeName
+    if (-not (Test-Path $OPAExePath)) {
+        New-Item -Path $OPAExePath -ItemType File -Force | Out-Null
+    }
+    
     $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules'
     
     # Import the branch version of Orchestrator
@@ -10,6 +34,12 @@ InModuleScope Orchestrator {
     BeforeAll {
         # Set up all mocks ONCE for all tests
         $script:TestSplat = @{}
+        
+        # Create default OPA directory for tests (needed in CI environments like GitHub Actions)
+        $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+        if (-not (Test-Path $script:DefaultOPAPath)) {
+            New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+        }
         
         # Create a dummy OPA executable for testing (required for configuration validation)
         # Determine OS-specific executable name
@@ -25,7 +55,7 @@ InModuleScope Orchestrator {
         else {
             $script:DummyOPAName = "opa_windows_amd64.exe"
         }
-        $script:DummyOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $script:DummyOPAName
+        $script:DummyOPAPath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:DummyOPAName
         # Create empty file to satisfy OPA validation
         if (-not (Test-Path $script:DummyOPAPath)) {
             New-Item -Path $script:DummyOPAPath -ItemType File -Force | Out-Null
