@@ -34,5 +34,10 @@ function Initialize-Msal {
         throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
     }
 
+    $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
+    if ($Sig.Status -ne 'Valid') {
+        throw "Microsoft.Identity.Client.dll signature is not valid (status: $($Sig.Status)). Aborting MSAL load."
+    }
+
     Add-Type -Path $MsalDll.FullName
 }
