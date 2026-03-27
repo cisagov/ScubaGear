@@ -77,6 +77,64 @@ function Set-PowerAppTenantIsolationPolicy {
         -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
+# -----------------------------------------------------------------------
+# SharePoint Online REST wrapper for functional test preconditions.
+# Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
+# cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before this function is called.
+# -----------------------------------------------------------------------
+function Set-SPOTenant {
+    [CmdletBinding()]
+    param(
+        [string]$SharingCapability,
+        [string]$SharingDomainRestrictionMode,
+        [string]$SharingBlockedDomainList,
+        [string]$SharingAllowedDomainList,
+        [string]$DefaultSharingLinkType,
+        [string]$DefaultLinkPermission,
+        [int]$RequireAnonymousLinksExpireInDays,
+        [string]$FileAnonymousLinkType,
+        [string]$FolderAnonymousLinkType,
+        [bool]$EmailAttestationRequired,
+        [int]$EmailAttestationReAuthDays
+    )
+
+    # Integer enum mappings required by the SharePoint OData REST API
+    $SharingCapabilityMap = @{
+        Disabled = 0; ExternalUserSharingOnly = 1; ExistingExternalUserSharingOnly = 2; ExternalUserAndGuestSharing = 3
+    }
+    $SharingDomainRestrictionModeMap = @{ None = 0; AllowList = 1; BlockList = 2 }
+    $DefaultSharingLinkTypeMap       = @{ None = 0; AnonymousAccess = 1; Internal = 2; Direct = 3 }
+    $LinkPermissionMap               = @{ None = 0; View = 1; Edit = 2 }
+
+    $Body = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
+
+    foreach ($Param in $PSBoundParameters.Keys) {
+        $Value = $PSBoundParameters[$Param]
+        $Mapped = switch ($Param) {
+            'SharingCapability'            { $SharingCapabilityMap[$Value] }
+            'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
+            'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
+            'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }
+            'FileAnonymousLinkType'        { $LinkPermissionMap[$Value] }
+            'FolderAnonymousLinkType'      { $LinkPermissionMap[$Value] }
+            default                        { $Value }
+        }
+        $Body[$Param] = $Mapped
+    }
+
+    $Headers = @{
+        Authorization    = "Bearer $script:SPOAccessToken"
+        Accept           = "application/json;odata=verbose"
+        "Content-Type"   = "application/json;odata=verbose"
+        "X-HTTP-Method"  = "MERGE"
+        "IF-MATCH"       = "*"
+    }
+
+    Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+}
+
 # Helper functions for functional test
 function IsEquivalence{
   <#

@@ -142,42 +142,6 @@ BeforeDiscovery {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         }
-
-        # SharePoint functional tests need an SPO module connection to call Set-SPOTenant for preconditions
-        if ($ProductName -eq "sharepoint") {
-            $DomainPrefix = $TenantDomain.Split(".")[0]
-            $AdminUrl = switch ($M365Environment) {
-                "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
-                "dod"     { "https://$DomainPrefix-admin.sharepoint-mil.us" }
-                default   { "https://$DomainPrefix-admin.sharepoint.com" }
-            }
-            if (-Not [string]::IsNullOrEmpty($AppId)) {
-                Connect-SPOService -Url $AdminUrl -ClientId $AppId -Thumbprint $Thumbprint
-            }
-            else {
-                Connect-SPOService -Url $AdminUrl
-            }
-        }
-
-        # Power Platform functional tests need a REST token to call precondition helper functions
-        if ($ProductName -eq "powerplatform") {
-            $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
-            Import-Module $PPHelperPath -Force
-            $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
-            $InitialDomain = $TenantDomain
-            if (-Not [string]::IsNullOrEmpty($AppId)) {
-                $script:PPAccessToken = Get-PowerPlatformAccessToken `
-                    -CertificateThumbprint $Thumbprint `
-                    -AppID $AppId `
-                    -Tenant $InitialDomain `
-                    -M365Environment $M365Environment
-            }
-            else {
-                $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive `
-                    -Tenant $InitialDomain `
-                    -M365Environment $M365Environment
-            }
-        }
     }
 }
 
@@ -202,6 +166,55 @@ BeforeAll {
 
     # Dot source utility functions
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
+
+    # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "sharepoint") {
+        $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
+        Import-Module $SPOHelperPath -Force
+        $DomainPrefix = $TenantDomain.Split(".")[0]
+        $script:SPOAdminUrl = switch ($M365Environment) {
+            "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
+            "dod"     { "https://$DomainPrefix-admin.sharepoint-mil.us" }
+            default   { "https://$DomainPrefix-admin.sharepoint.com" }
+        }
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:SPOAccessToken = Get-SPOAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -AdminUrl $script:SPOAdminUrl
+        }
+        else {
+            $script:SPOAccessToken = Get-SPOAccessTokenInteractive `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -AdminUrl $script:SPOAdminUrl
+        }
+    }
+
+    # Power Platform functional tests: acquire REST token for precondition helper calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "powerplatform") {
+        $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
+        Import-Module $PPHelperPath -Force
+        $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:PPAccessToken = Get-PowerPlatformAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment
+        }
+        else {
+            $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment
+        }
+    }
 
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
