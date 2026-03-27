@@ -33,7 +33,7 @@ function Get-AdminPowerAppEnvironment {
 }
 
 function Get-DlpPolicy {
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2018-11-01" `
         -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     return $Response
 }
@@ -41,25 +41,28 @@ function Get-DlpPolicy {
 function Remove-DlpPolicy {
     param([Parameter(ValueFromPipelineByPropertyName=$true)][string]$PolicyName)
     process {
-        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2016-11-01" `
+        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2018-11-01" `
             -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
     }
 }
 
 function New-AdminDlpPolicy {
     param([string]$DisplayName, [string]$EnvironmentName)
+    $EnvId = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentName"
     $Body = @{
-        displayName              = $DisplayName
-        environmentType          = "OnlyEnvironments"
-        environments             = @(@{ id = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentName"; name = $EnvironmentName; type = "Microsoft.BusinessAppPlatform/scopes/environments" })
-        connectorGroups          = @(
+        displayName     = $DisplayName
+        environmentType = "OnlyEnvironments"
+        environments    = @(
+            @{ id = $EnvId; name = $EnvironmentName; type = "Microsoft.BusinessAppPlatform/scopes/environments" }
+        )
+        connectorGroups = @(
             @{ classification = "Confidential"; connectors = @() }
             @{ classification = "General";      connectors = @() }
             @{ classification = "Blocked";      connectors = @() }
         )
         defaultConnectorsClassification = "General"
     } | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2018-11-01" `
         -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
