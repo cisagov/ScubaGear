@@ -705,8 +705,8 @@ TestPlan:
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
                 risky_delegated_permission_classifications:
                   - RiskyPermClassifications:
-                    - "Mail.Send"
-                    - "Mail.Read"
+                      - "Mail.Send"
+                      - "Mail.Read"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - empty grant policy
