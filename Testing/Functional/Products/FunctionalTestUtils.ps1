@@ -112,7 +112,8 @@ function Set-SPOTenant {
         Disabled = 0; ExternalUserSharingOnly = 1; ExternalUserAndGuestSharing = 2; ExistingExternalUserSharingOnly = 3
     }
     $SharingDomainRestrictionModeMap = @{ None = 0; AllowList = 1; BlockList = 2 }
-    $DefaultSharingLinkTypeMap       = @{ None = 0; AnonymousAccess = 1; Internal = 2; Direct = 3 }
+    # REST API / Rego values: 0=None, 1=Direct (Specific People, compliant), 2=Internal (Org only), 3=AnonymousAccess (Anyone)
+    $DefaultSharingLinkTypeMap       = @{ None = 0; Direct = 1; Internal = 2; AnonymousAccess = 3 }
     $LinkPermissionMap               = @{ None = 0; View = 1; Edit = 2 }
 
     $Body = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
