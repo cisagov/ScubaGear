@@ -90,6 +90,7 @@ function Set-SPOTenant {
     [CmdletBinding()]
     param(
         [string]$SharingCapability,
+        [string]$ODBSharingCapability,
         [string]$SharingDomainRestrictionMode,
         [string]$SharingBlockedDomainList,
         [string]$SharingAllowedDomainList,
@@ -111,6 +112,7 @@ function Set-SPOTenant {
     $SharingCapabilityMap = @{
         Disabled = 0; ExternalUserSharingOnly = 1; ExternalUserAndGuestSharing = 2; ExistingExternalUserSharingOnly = 3
     }
+    $ODBSharingCapabilityMap = $SharingCapabilityMap
     $SharingDomainRestrictionModeMap = @{ None = 0; AllowList = 1; BlockList = 2 }
     # REST API / Rego values: 0=None, 1=Direct (Specific People, compliant), 2=Internal (Org only), 3=AnonymousAccess (Anyone)
     $DefaultSharingLinkTypeMap       = @{ None = 0; Direct = 1; Internal = 2; AnonymousAccess = 3 }
@@ -144,6 +146,7 @@ function Set-SPOTenant {
         foreach ($Param in $PSBoundParameters.Keys | Where-Object { $_ -ne 'SharingCapability' }) {
             $Value = $PSBoundParameters[$Param]
             $Mapped = switch ($Param) {
+                'ODBSharingCapability'         { $ODBSharingCapabilityMap[$Value] }
                 'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
                 'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
                 'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }
@@ -166,6 +169,7 @@ function Set-SPOTenant {
         $Value = $PSBoundParameters[$Param]
         $Mapped = switch ($Param) {
             'SharingCapability'            { $SharingCapabilityMap[$Value] }
+            'ODBSharingCapability'         { $ODBSharingCapabilityMap[$Value] }
             'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
             'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
             'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }

@@ -34,13 +34,36 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.1.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant - ExternalUserAndGuestSharing (Anyone)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              ODBSharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant - ExternalUserSharingOnly (New and existing guests)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              ODBSharingCapability: ExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.2v1 Compliant - ExistingExternalUserSharingOnly (Existing guests)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              ODBSharingCapability: ExistingExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.2v1 Compliant - Disabled (Only people in org)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              ODBSharingCapability: Disabled
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.1.3v1
     TestDriver: RunScuba
