@@ -56,7 +56,6 @@ function New-AdminDlpPolicy {
             @{ classification = "General";      connectors = @() }
             @{ classification = "Blocked";      connectors = @() }
         )
-        defaultConnectorsClassification = "General"
     } | ConvertTo-Json -Depth 10
     Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
         -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
