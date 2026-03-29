@@ -33,7 +33,7 @@ function Get-AdminPowerAppEnvironment {
 }
 
 function Get-DlpPolicy {
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2018-11-01" `
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2019-10-01" `
         -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     return $Response
 }
@@ -41,7 +41,7 @@ function Get-DlpPolicy {
 function Remove-DlpPolicy {
     param([Parameter(ValueFromPipelineByPropertyName=$true)][string]$PolicyName)
     process {
-        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2018-11-01" `
+        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2019-10-01" `
             -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
     }
 }
@@ -62,7 +62,7 @@ function New-AdminDlpPolicy {
         )
         defaultConnectorsClassification = "General"
     } | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2018-11-01" `
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2019-10-01" `
         -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
