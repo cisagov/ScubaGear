@@ -46,8 +46,7 @@ TestPlan:
       - TestDescription: MS.POWERPLATFORM.2.1v1 Non-compliant - no DLP policy in default environment
         Preconditions:
           - Command: |
-              $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
-              (Get-DlpPolicy).value | Where { $_.environments.name -eq $DefaultEnv } | Select-Object @{
+              (Get-DlpPolicy).value | Where-Object { $_.displayName -eq "DLP functional test" } | Select-Object @{
                 Name="PolicyName"; Expression={$_.name}
               } | Remove-DlpPolicy
         Postconditions: []
@@ -55,10 +54,9 @@ TestPlan:
       - TestDescription: MS.POWERPLATFORM.2.1v1 Compliant - create DLP policy in default environment
         Preconditions:
           - Command: |
-              $DefaultEnv = (Get-AdminPowerAppEnvironment -Default).EnvironmentName
-              $ExistingPolicy = (Get-DlpPolicy).value | Where-Object { $_.environments.name -eq $DefaultEnv }
+              $ExistingPolicy = (Get-DlpPolicy).value | Where-Object { $_.displayName -eq "DLP functional test" }
               if (-not $ExistingPolicy) {
-                New-AdminDlpPolicy -DisplayName "DLP functional test" -EnvironmentName $DefaultEnv
+                New-AdminDlpPolicy -DisplayName "DLP functional test"
               }
         Postconditions: []
         ExpectedResult: true

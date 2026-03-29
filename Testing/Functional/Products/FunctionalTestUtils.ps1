@@ -48,13 +48,9 @@ function Remove-DlpPolicy {
 
 function New-AdminDlpPolicy {
     param([string]$DisplayName, [string]$EnvironmentName)
-    $EnvId = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentName"
     $Body = @{
         displayName     = $DisplayName
-        environmentType = "OnlyEnvironments"
-        environments    = @(
-            @{ id = $EnvId; name = $EnvironmentName; type = "Microsoft.BusinessAppPlatform/scopes/environments" }
-        )
+        environmentType = "AllEnvironments"
         connectorGroups = @(
             @{ classification = "Confidential"; connectors = @() }
             @{ classification = "General";      connectors = @() }
@@ -62,7 +58,7 @@ function New-AdminDlpPolicy {
         )
         defaultConnectorsClassification = "General"
     } | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2019-10-01" `
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
         -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
