@@ -47,7 +47,7 @@ function Remove-DlpPolicy {
 }
 
 function New-AdminDlpPolicy {
-    param([string]$DisplayName, [string]$EnvironmentName)
+    param([string]$DisplayName)
     $Body = @{
         displayName     = $DisplayName
         environmentType = "AllEnvironments"
