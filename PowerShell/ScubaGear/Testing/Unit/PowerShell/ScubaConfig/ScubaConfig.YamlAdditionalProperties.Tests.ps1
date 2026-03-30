@@ -107,7 +107,6 @@ ProductNames:
   - aad
   - teams
 M365Environment: commercial
-OPAPath: .
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
