@@ -20,24 +20,11 @@
       "_PreValidationWarnings",
       "AllProductNames",
       "OPAVersion",
-      "OPAExecutable"
-"ignoreProperties": [
-"_comment: Properties to ignore during validation (PowerShell metadata and internal properties)",
-"IsReadOnly",
-"IsFixedSize",
-"IsSynchronized",
-"Keys",
-"Values",
-"SyncRoot",
-"Count",
-"_PreValidationWarnings",
-"AllProductNames",
-"OPAVersion",
-"OPAExecutable",
-"Quiet",
-"SilenceBODWarnings",
-"DarkMode"
-],
+      "OPAExecutable",
+      "Quiet",
+      "SilenceBODWarnings",
+      "DarkMode"
+      ],
 
     "policyExclusionMappings": {
       "_comment": "Maps policy IDs to their supported exclusion types for automated validation",
