@@ -58,7 +58,11 @@ TestPlan:
               if (-not $ExistingPolicy) {
                 New-AdminDlpPolicy -DisplayName "DLP functional test"
               }
-        Postconditions: []
+        Postconditions:
+          - Command: |
+              (Get-DlpPolicy).value | Where-Object { $_.displayName -eq "DLP functional test" } | Select-Object @{
+                Name="PolicyName"; Expression={$_.id}
+              } | Remove-DlpPolicy
         ExpectedResult: true
 
   - PolicyId: MS.POWERPLATFORM.2.1v1
