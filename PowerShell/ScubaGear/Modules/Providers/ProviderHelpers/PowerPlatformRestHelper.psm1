@@ -88,17 +88,26 @@ function Get-PowerPlatformAccessToken {
         throw "Certificate with thumbprint '$CertificateThumbprint' not found in CurrentUser or LocalMachine certificate stores."
     }
 
-    try {
-        $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
-            WithCertificate($Certificate).
-            WithAuthority($Authority).
-            Build()
+    $MaxAttempts = 3
+    $Attempt = 0
+    while ($Attempt -lt $MaxAttempts) {
+        $Attempt++
+        try {
+            $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+                WithCertificate($Certificate).
+                WithAuthority($Authority).
+                Build()
 
-        $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
-        return $TokenResult.AccessToken
-    }
-    catch {
-        throw "Failed to acquire Power Platform access token: $($_.Exception.Message)"
+            $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
+            return $TokenResult.AccessToken
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) {
+                throw "Failed to acquire Power Platform access token: $($_.Exception.Message)"
+            }
+            Write-Warning "Power Platform token acquisition attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
     }
 }
 
@@ -135,21 +144,30 @@ function Get-PowerPlatformAccessTokenInteractive {
         { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us/$Tenant" }
     }
 
-    try {
-        $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-            WithAuthority($Authority).
-            WithRedirectUri($RedirectUri).
-            Build()
+    $MaxAttempts = 3
+    $Attempt = 0
+    while ($Attempt -lt $MaxAttempts) {
+        $Attempt++
+        try {
+            $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                WithAuthority($Authority).
+                WithRedirectUri($RedirectUri).
+                Build()
 
-        $Scopes = [string[]]@($Scope)
-        $TokenResult = $MsalApp.AcquireTokenInteractive($Scopes).
-            WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-            ExecuteAsync().GetAwaiter().GetResult()
+            $Scopes = [string[]]@($Scope)
+            $TokenResult = $MsalApp.AcquireTokenInteractive($Scopes).
+                WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+                ExecuteAsync().GetAwaiter().GetResult()
 
-        return $TokenResult.AccessToken
-    }
-    catch {
-        throw "Failed to acquire Power Platform access token interactively: $($_.Exception.Message)"
+            return $TokenResult.AccessToken
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) {
+                throw "Failed to acquire Power Platform access token interactively: $($_.Exception.Message)"
+            }
+            Write-Warning "Power Platform token acquisition attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
     }
 }
 
