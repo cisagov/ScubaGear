@@ -33,9 +33,17 @@ function Get-AdminPowerAppEnvironment {
 }
 
 function Get-DlpPolicy {
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2019-10-01" `
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
         -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
-    return $Response
+    # Normalize ARM response: hoist properties.displayName to root to match
+    # original Get-DlpPolicy cmdlet output expected by test plan filters.
+    $Normalized = $Response.value | ForEach-Object {
+        [PSCustomObject]@{
+            name        = $_.name
+            displayName = $_.properties.displayName
+        }
+    }
+    return [PSCustomObject]@{ value = @($Normalized) }
 }
 
 function Remove-DlpPolicy {
