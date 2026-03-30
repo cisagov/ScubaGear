@@ -47,7 +47,7 @@ TestPlan:
         Preconditions:
           - Command: |
               (Get-DlpPolicy).value | Where-Object { $_.displayName -eq "DLP functional test" } | Select-Object @{
-                Name="PolicyName"; Expression={$_.name}
+                Name="PolicyName"; Expression={$_.id}
               } | Remove-DlpPolicy
         Postconditions: []
         ExpectedResult: false

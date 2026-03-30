@@ -35,11 +35,13 @@ function Get-AdminPowerAppEnvironment {
 function Get-DlpPolicy {
     $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
         -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
-    # Normalize ARM response: hoist properties.displayName to root to match
-    # original Get-DlpPolicy cmdlet output expected by test plan filters.
+    # Normalize ARM response: hoist properties.displayName and id to root to
+    # match original Get-DlpPolicy cmdlet output expected by test plan filters.
+    # id is preserved as the full ARM resource path for use in Remove-DlpPolicy.
     $Normalized = $Response.value | ForEach-Object {
         [PSCustomObject]@{
             name        = $_.name
+            id          = $_.id
             displayName = $_.properties.displayName
         }
     }
@@ -49,7 +51,16 @@ function Get-DlpPolicy {
 function Remove-DlpPolicy {
     param([Parameter(ValueFromPipelineByPropertyName=$true)][string]$PolicyName)
     process {
-        Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$($PolicyName)?api-version=2019-10-01" `
+        # PolicyName should be the full ARM resource id (e.g.
+        # /providers/.../environments/Default-xxx/apiPolicies/guid) so the
+        # DELETE hits the exact scoped path the API created the policy under.
+        # Fall back to the tenant-scoped path if only a bare GUID is supplied.
+        $Path = if ($PolicyName -match '^/providers/') {
+            $PolicyName
+        } else {
+            "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$PolicyName"
+        }
+        Invoke-RestMethod -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
             -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
     }
 }
