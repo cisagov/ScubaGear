@@ -212,17 +212,17 @@ TestPlan:
                       - "deviceBasedPush"
                       - "temporaryAccessPassOneTime"
                       - "temporaryAccessPassMultiUse"
-                      - "password, microsoftAuthenticatorPush"
-                      - "password, softwareOath"
-                      - "password, hardwareOath"
-                      - "password, sms"
-                      - "password, voice"
+                      - "password,microsoftAuthenticatorPush"
+                      - "password,softwareOath"
+                      - "password,hardwareOath"
+                      - "password,sms"
+                      - "password,voice"
                       - "federatedMultiFactor"
-                      - "microsoftAuthenticatorPush, federatedSingleFactor"
-                      - "softwareOath, federatedSingleFactor"
-                      - "hardwareOath, federatedSingleFactor"
-                      - "sms, federatedSingleFactor"
-                      - "voice, federatedSingleFactor"
+                      - "microsoftAuthenticatorPush,federatedSingleFactor"
+                      - "softwareOath,federatedSingleFactor"
+                      - "hardwareOath,federatedSingleFactor"
+                      - "sms,federatedSingleFactor"
+                      - "voice,federatedSingleFactor"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.AAD.3.2v2 Compliant case - Custom Authentication Strength passwordless MFA
@@ -703,9 +703,10 @@ TestPlan:
                   - ManagePermissionGrantsForSelf.microsoft-user-default-low
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat
                   - ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team
-                risky_delegated_permission_classifications[0].RiskyPermClassifications:
-                  - "Mail.Send"
-                  - "Mail.Read"
+                risky_delegated_permission_classifications:
+                  - RiskyPermClassifications:
+                      - "Mail.Send"
+                      - "Mail.Read"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.AAD.5.2v1 Compliant case - Do NOT allow users to consent to apps - empty grant policy
