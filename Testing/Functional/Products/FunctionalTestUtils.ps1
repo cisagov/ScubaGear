@@ -48,14 +48,27 @@ function Remove-DlpPolicy {
 
 function New-AdminDlpPolicy {
     param([string]$DisplayName)
+    # The 2016-11-01 endpoint uses a legacy nested schema (properties.definition).
+    # Omitting environmentFilter1 creates an AllEnvironments policy.
     $Body = @{
-        displayName     = $DisplayName
-        environmentType = "AllEnvironments"
-        connectorGroups = @(
-            @{ classification = "Confidential"; connectors = @() }
-            @{ classification = "General";      connectors = @() }
-            @{ classification = "Blocked";      connectors = @() }
-        )
+        properties = @{
+            displayName = $DisplayName
+            definition  = @{
+                '$schema'  = "https://schema.management.azure.com/providers/Microsoft.BusinessAppPlatform/schemas/2016-10-01-preview/apiPolicyDefinition.json#"
+                apiGroups  = @{
+                    lbi = @{ description = "No business data allowed"; apis = @() }
+                    hbi = @{ description = "Business data only";       apis = @() }
+                }
+                defaultApiGroup = "lbi"
+                rules = @{
+                    dataFlowRule = @{
+                        type       = "DataFlowRestriction"
+                        parameters = @{ destinationApiGroup = "lbi"; sourceApiGroup = "hbi" }
+                        actions    = @{ blockAction = @{ type = "Block" } }
+                    }
+                }
+            }
+        }
     } | ConvertTo-Json -Depth 10
     Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
         -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null

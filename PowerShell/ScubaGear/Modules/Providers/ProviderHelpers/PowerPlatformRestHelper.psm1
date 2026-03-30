@@ -302,7 +302,37 @@ function Get-PowerPlatformDlpPoliciesRest {
 
     try {
         $Response = Invoke-PowerPlatformRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
-        return $Response
+
+        # The 2016-11-01 endpoint returns a nested schema (properties.definition) rather than
+        # the flat schema (displayName, environmentType, environments at the top level) that
+        # Rego expects. Normalize the response to match the flat schema.
+        $NormalizedPolicies = foreach ($Policy in $Response.value) {
+            $Def = $Policy.properties.definition
+            $Ef = $Def.constraints.environmentFilter1
+
+            if ($null -eq $Ef) {
+                $EnvType = "AllEnvironments"
+                $Environments = @()
+            }
+            elseif ($Ef.parameters.filterType -eq "include") {
+                $EnvType = "OnlyEnvironments"
+                $Environments = @($Ef.parameters.environments)
+            }
+            else {
+                $EnvType = "ExceptEnvironments"
+                $Environments = @($Ef.parameters.environments)
+            }
+
+            [PSCustomObject]@{
+                name            = $Policy.name
+                displayName     = $Policy.properties.displayName
+                environmentType = $EnvType
+                environments    = $Environments
+                connectorGroups = @()
+            }
+        }
+
+        return [PSCustomObject]@{ value = @($NormalizedPolicies) }
     }
     catch {
         throw "Failed to get Power Platform DLP Policies: $($_.Exception.Message)"
