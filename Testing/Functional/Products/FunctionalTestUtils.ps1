@@ -95,16 +95,36 @@ function New-AdminDlpPolicy {
 
 function Get-PowerAppTenantIsolationPolicy {
     param([string]$TenantId)
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
-    return $Response
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            return Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Get-PowerAppTenantIsolationPolicy attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
 }
 
 function Set-PowerAppTenantIsolationPolicy {
     param([string]$TenantId, [object]$TenantIsolationPolicy)
     $Body = $TenantIsolationPolicy | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-        -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+            return
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Set-PowerAppTenantIsolationPolicy attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
 }
 
 # -----------------------------------------------------------------------
