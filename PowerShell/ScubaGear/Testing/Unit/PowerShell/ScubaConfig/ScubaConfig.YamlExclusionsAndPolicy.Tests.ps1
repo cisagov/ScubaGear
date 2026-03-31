@@ -2,6 +2,29 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "ScubaConfig Exclusions and Policy Validation Tests" {
     BeforeAll {
+        # Create default OPA directory for tests (needed in CI environments)
+        $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+        if (-not (Test-Path $script:DefaultOPAPath)) {
+            New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+        }
+
+        # Create dummy OPA executable
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        if ($IsLinuxOS) {
+            $script:OPAExeName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $script:OPAExeName = "opa_darwin_amd64"
+        }
+        else {
+            $script:OPAExeName = "opa_windows_amd64.exe"
+        }
+        $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
+        if (-not (Test-Path $script:OPAExePath)) {
+            New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
+        }
+
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
 
@@ -22,6 +45,11 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
+        
+        # Clean up dummy OPA executable
+        if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+            Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
+        }
     }
 
     Context "When validation flags are enabled" {
@@ -319,7 +347,8 @@ ProductNames:
 M365Environment: commercial
 OrgName: Test Organization
 OmitPolicy:
-    MS.DEFENDEDRS.1.1v1: Invalid product reference
+    MS.DEFENDEDRS.1.1v1:
+        Rationale: Invalid product reference
 "@
 
                         $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
@@ -331,15 +360,18 @@ OmitPolicy:
                                         M365Environment='commercial'
                                         OrgName='Test Organization'
                                         OmitPolicy=@{
-                                                'MS.DEFENDEDRS.1.1v1'='Invalid product reference'
+                                                'MS.DEFENDEDRS.1.1v1'=@{
+                                                        Rationale='Invalid product reference'
+                                                }
                                         }
                                 }
                         }
 
                         $ValidationResult = [ScubaConfig]::ValidateConfigFile($TempFile)
 
-                        $ValidationResult.IsValid | Should -BeFalse
-                        ($ValidationResult.ValidationErrors -join ' ') | Should -Match "references product 'defendedrs' which is not in ProductNames"
+                        # With requireProductInPolicy=false (default), validation passes but issues warning
+                        $ValidationResult.IsValid | Should -BeTrue
+                        ($ValidationResult.Warnings -join ' ') | Should -Match "references product 'defendedrs' which is not in ProductNames"
 
                         Remove-Item -Path $TempFile -Force
                 }

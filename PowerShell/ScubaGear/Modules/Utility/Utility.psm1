@@ -165,12 +165,12 @@ function Invoke-GraphDirectly {
     The body of the request, typically used for POST or PATCH requests.
 
     .Example
-    Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment "Commercial" -queryParams @{ filter = "displayName eq 'Test'" } -apiHeader -ID "12345"
+    Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment "Commercial" -queryParams @{ filter = "displayName eq 'Test'" } -ID "12345"
 
     This example invokes the Microsoft Graph API to get a service principal with the specified filter, using the commercial environment and including API headers.
 
     .Example
-    Invoke-GraphDirectly -commandlet "New-MgBetaServicePrincipal" -M365Environment "Commercial" -Body @{ displayName = "New SP"; appId = "12345678-1234-1234-1234-123456789012" } -Method "POST"
+    Invoke-GraphDirectly -commandlet "New-MgBetaServicePrincipal" -M365Environment "Commercial" -Body @{ displayName = "New SP"; appId = "12345678-1234-1234-1234-123456789012" }
 
     This example invokes the Microsoft Graph API to create a new service principal with the specified body, using the commercial environment.
 
@@ -227,36 +227,74 @@ function Invoke-GraphDirectly {
     }
     Write-Debug "Graph Api direct: $endpoint"
 
-    If($null -eq $endpoint){
+    If ($null -eq $endpoint) {
         Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
 
-    if($Null -ne $apiHeader.PSObject.Properties.Name) {
-        # If the API header is passed in, we add it to the request.
+    $graphParams = @{
+        Uri         = $endpoint
+        Method      = $Method
+    }
+
+    # If the API header is stored in the PermissionsHelper module for the commandlet, we add it to the request
+    if ($null -ne $apiHeader.PSObject.Properties.Name) {
         $headers = @{}
         foreach ($property in $apiHeader.PSObject.Properties) {
             $headers[$property.Name] = $property.Value
         }
-
-        if ($Body) {
-            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers -Method $Method -Body ($Body | ConvertTo-Json -Depth 10) -ContentType "application/json"
-        } else {
-            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Headers $headers -Method $Method
-        }
-    } else {
-        if ($Body) {
-            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Method $Method -Body ($Body | ConvertTo-Json -Depth 10) -ContentType "application/json"
-        } else {
-            $resp = Invoke-MgGraphRequest -ErrorAction Stop -Uri $endpoint -Method $Method
-        }
+        $graphParams['Headers'] = $headers
     }
 
-    if($Method -notmatch "DELETE|PATCH"){
+    # Add body if provided
+    if ($Body) {
+        $graphParams['Body']        = $Body | ConvertTo-Json -Depth 10
+        $graphParams['ContentType'] = 'application/json'
+    }
+
+    # Execute the initial request
+    $resp = Invoke-MgGraphRequest @graphParams
+
+    if ($Method -notmatch "DELETE|PATCH") {
+        # If the response is a collection (has a 'value' key)
+        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
+            $allItems = [System.Collections.Generic.List[object]]::new()
+            foreach ($item in $resp['value']) {
+                $allItems.Add($item)
+            }
+
+            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
+            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
+            if ($graphParams.ContainsKey('Headers')) {
+                $pageParams['Headers'] = $graphParams['Headers']
+            }
+
+            # Get the next page link from the initial response
+            $nextLink = $resp['@odata.nextLink']
+
+            # Follow pagination until no more pages remain
+            while ($null -ne $nextLink -and $nextLink -ne '') {
+                Write-Debug "Following @odata.nextLink: $nextLink"
+
+                # Update the URI to the next page; all other params (Headers, Method) carry over
+                $pageParams['Uri'] = $nextLink
+                $pageResp = Invoke-MgGraphRequest @pageParams
+
+                # Accumulate results from this page
+                foreach ($item in $pageResp['value']) {
+                    $allItems.Add($item)
+                }
+
+                # Advance to the next page (null when no more pages exist)
+                $nextLink = $pageResp['@odata.nextLink']
+            }
+
+            $resp['value'] = $allItems.ToArray()
+        }
+
         return $resp | ConvertFrom-GraphHashtable
     }
-
 }
 
 Function ConvertFrom-GraphHashtable {
@@ -355,7 +393,20 @@ function Invoke-GraphBatchRequest {
         Automatically handles batching if more than 20 requests are provided.
 
     .PARAMETER Requests
-        Array of request objects. Each object should have: id, method, url
+        Array of request objects. Each object should have: id, method, url. Use this parameter set
+        when you have already built the request objects externally.
+
+    .PARAMETER InputObject
+        Collection of objects to transform into batch requests. Use with -UrlScript (and optionally
+        -IdScript) instead of building request objects manually.
+
+    .PARAMETER IdScript
+        Scriptblock that produces the request id from each InputObject element (default: { $_.Id }).
+        The current element is available as $_ inside the scriptblock.
+
+    .PARAMETER UrlScript
+        Scriptblock that produces the request URL from each InputObject element.
+        The current element is available as $_ inside the scriptblock.
 
     .PARAMETER M365Environment
         The M365 environment to use for the batch request.
@@ -382,14 +433,45 @@ function Invoke-GraphBatchRequest {
 
         This example executes two GET requests in a single batch call to retrieve users and groups using the beta API version.
 
+    .EXAMPLE
+        $groups = @(
+            [PSCustomObject]@{ Id = "aaaa-1111" }
+            [PSCustomObject]@{ Id = "bbbb-2222" }
+        )
+        $results = Invoke-GraphBatchRequest -InputObject $groups `
+            -UrlScript { "/groups/$($_.Id)?`$select=displayName" } `
+            -M365Environment "commercial" -ApiVersion "beta"
+
+        This example uses -InputObject and -UrlScript to batch fetch display names without manually
+        building request objects. The default -IdScript ({ $_.Id }) is used as the request id.
+
+    .EXAMPLE
+        $policyInputs = $groups | Select-Object @{n='PolicyId'; e={ $policyResults[$_.Id].body.value[0].policyId }}
+        $results = Invoke-GraphBatchRequest -InputObject $policyInputs `
+            -IdScript { $_.PolicyId } `
+            -UrlScript { "/policies/roleManagementPolicies/$($_.PolicyId)/rules" } `
+            -M365Environment "commercial" -ApiVersion "beta"
+
+        This example uses a custom -IdScript when the batch request id should come from a derived
+        property (PolicyId) rather than the default Id property.
+
     .NOTES
         This function is part of the ScubaGear PowerShell module and is intended for internal use to facilitate
         efficient Graph API interactions by minimizing the number of HTTP requests.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Requests')]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Requests', Mandatory = $true)]
         [array]$Requests,
+
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $true)]
+        [array]$InputObject,
+
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
+        [scriptblock]$IdScript = { $_.Id },
+
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $true)]
+        [scriptblock]$UrlScript,
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
@@ -399,6 +481,18 @@ function Invoke-GraphBatchRequest {
         [ValidateSet("v1.0", "beta", IgnoreCase = $True)]
         [string]$ApiVersion = "v1.0"
     )
+
+    # If InputObject parameter set is used, build $Requests from the collection + scriptblocks
+    if ($PSCmdlet.ParameterSetName -eq 'InputObject') {
+        $Requests = @()
+        foreach ($item in $InputObject) {
+            $Requests += @{
+                id     = $item | ForEach-Object $IdScript
+                method = "GET"
+                url    = $item | ForEach-Object $UrlScript
+            }
+        }
+    }
 
     $allResults = @{}
     $batchSize = 20  # Microsoft Graph batch limit

@@ -20,8 +20,11 @@
       "_PreValidationWarnings",
       "AllProductNames",
       "OPAVersion",
-      "OPAExecutable"
-    ],
+      "OPAExecutable",
+      "Quiet",
+      "SilenceBODWarnings",
+      "DarkMode"
+      ],
 
     "policyExclusionMappings": {
       "_comment": "Maps policy IDs to their supported exclusion types for automated validation",
@@ -29,7 +32,7 @@
       "MS.AAD.2.1v1": ["CapExclusions"],
       "MS.AAD.2.3v1": ["CapExclusions"],
       "MS.AAD.3.1v1": ["CapExclusions"],
-      "MS.AAD.3.2v1": ["CapExclusions"],
+      "MS.AAD.3.2v2": ["CapExclusions"],
       "MS.AAD.3.6v1": ["CapExclusions"],
       "MS.AAD.3.7v1": ["CapExclusions"],
       "MS.AAD.3.8v1": ["CapExclusions"],
@@ -76,20 +79,24 @@
       "_comment": "Organization display name for documentation purposes",
       "type": "string",
       "minLength": 1,
-      "maxLength": 100
+      "maxLength": 100,
+      "caseSensitive": false
     },
 
     "OrgUnitName": {
       "_comment": "Organizational unit or department name",
       "type": "string",
       "minLength": 1,
-      "maxLength": 100
+      "maxLength": 100,
+      "caseSensitive": false
     },
 
     "Description": {
       "_comment": "Detailed description of this configuration file, its purpose, and any special considerations",
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 500,
+      "caseSensitive": false
     },
 
     "ProductNames": {
@@ -100,55 +107,65 @@
         "enum": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams", "*"]
       },
       "minItems": 1,
-      "uniqueItems": true
+      "uniqueItems": true,
+      "caseSensitive": false
     },
 
     "M365Environment": {
       "_comment": "Microsoft 365 environment type for authentication",
       "type": "string",
-      "enum": ["commercial", "gcc", "gcchigh", "dod"]
+      "enum": ["commercial", "gcc", "gcchigh", "dod"],
+      "caseSensitive": false
     },
 
     "LogIn": {
       "_comment": "Whether to prompt for credentials during execution",
-      "type": "boolean"
+      "type": "boolean",
+      "caseSensitive": false
     },
 
     "DisconnectOnExit": {
       "_comment": "Whether to disconnect from Microsoft services on exit",
-      "type": "boolean"
+      "type": "boolean",
+      "caseSensitive": false
     },
 
     "Organization": {
       "_comment": "Tenant domain name (FQDN) for service principal authentication",
-      "$ref": "#/definitions/patterns/orgDomain"
+      "$ref": "#/definitions/patterns/orgDomain",
+      "caseSensitive": false
     },
 
     "AppID": {
       "_comment": "Entra ID Application (client) ID for service principal authentication",
-      "$ref": "#/definitions/patterns/appGuid"
+      "$ref": "#/definitions/patterns/appGuid",
+      "caseSensitive": false
     },
 
     "CertificateThumbprint": {
       "_comment": "Certificate thumbprint for service principal authentication (40 hex characters)",
-      "$ref": "#/definitions/patterns/thumbprint"
+      "$ref": "#/definitions/patterns/thumbprint",
+      "caseSensitive": false
     },
 
     "KeepIndividualJSON": {
       "_comment": "Whether to keep individual JSON result files for each product",
-      "type": "boolean"
+      "type": "boolean",
+      "caseSensitive": false
     },
 
     "OPAPath": {
       "_comment": "Path to OPA executable directory - must exist (ScubaGear cannot run without OPA)",
       "$ref": "#/definitions/patterns/folderPath",
-      "validatePathExists": true
+      "pathMustExist": true,
+      "caseSensitive": false
     },
 
     "OutPath": {
       "_comment": "Output directory path for assessment results - will be created if it doesn't exist",
       "$ref": "#/definitions/patterns/folderPath",
-      "validatePathExists": false
+      "pathMustExist": false,
+      "caseSensitive": true
     },
 
     "OutFolderName": {
@@ -161,43 +178,50 @@
     "OutProviderFileName": {
       "_comment": "Provider settings export filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
     },
 
     "OutRegoFileName": {
       "_comment": "Rego test results filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": true
     },
 
     "OutReportName": {
       "_comment": "HTML report filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
     },
 
     "OutJsonFileName": {
       "_comment": "JSON results filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
     },
 
     "OutCsvFileName": {
       "_comment": "CSV results filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
     },
 
     "OutActionPlanFileName": {
       "_comment": "Action plan filename (without extension)",
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
     },
 
     "NumberOfUUIDCharactersToTruncate": {
       "_comment": "Number of UUID characters to truncate in output for readability",
       "type": "integer",
-      "enum": [0, 13, 18, 36]
+      "enum": [0, 13, 18, 36],
+      "caseSensitive": false
     },
 
     "PreferredDnsResolvers": {
@@ -205,12 +229,14 @@
       "type": "array",
       "items": {
         "$ref": "#/definitions/patterns/ipv4"
-      }
+      },
+      "caseSensitive": false
     },
 
     "SkipDoH": {
       "_comment": "Skip DNS over HTTPS for failed DNS queries",
-      "type": "boolean"
+      "type": "boolean",
+      "caseSensitive": false
     },
 
     "Aad": {
@@ -230,7 +256,8 @@
           "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "Defender": {
@@ -256,7 +283,8 @@
           "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "Exo": {
@@ -279,28 +307,32 @@
           "additionalProperties": false
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "PowerPlatform": {
       "_comment": "Power Platform - does not support exclusions",
       "type": "object",
       "patternProperties": {},
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "SharePoint": {
       "_comment": "SharePoint & OneDrive - does not support exclusions",
       "type": "object",
       "patternProperties": {},
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "Teams": {
       "_comment": "Microsoft Teams - does not support exclusions",
       "type": "object",
       "patternProperties": {},
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": true
     },
 
     "OmitPolicy": {
@@ -309,11 +341,6 @@
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
           "oneOf": [
-            {
-              "_comment": "Simple string rationale for omitting the policy",
-              "type": "string",
-              "minLength": 1
-            },
             {
               "_comment": "Detailed omission configuration with expiration date",
               "type": "object",
@@ -335,7 +362,8 @@
           ]
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": false
     },
 
     "AnnotatePolicy": {
@@ -344,11 +372,6 @@
       "patternProperties": {
         "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
           "oneOf": [
-            {
-              "_comment": "Simple string comment for the policy",
-              "type": "string",
-              "minLength": 1
-            },
             {
               "_comment": "Detailed annotation with remediation tracking",
               "type": "object",
@@ -374,7 +397,8 @@
           ]
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "caseSensitive": false
     }
   },
 
@@ -419,7 +443,7 @@
         "friendlyName": "Alphanumeric filename (no extension)"
       },
       "folderPath": {
-        "_comment": "Directory path with existence validation (Windows, Unix, or UNC). Properties using this ref should set 'validatePathExists': true (error if missing) or false (warning if missing, directory will be created)",
+        "_comment": "Directory path with existence validation (Windows, Unix, or UNC). Properties using this ref should set 'pathMustExist': true (error if missing) or false (warning if missing, directory will be created)",
         "type": "string",
         "pattern": "^([a-zA-Z]:[\\\\\/]|\\\\\\\\|\\.\\.?[\\\\\/]|[\\\\\/]).*$|^\\.\\.?$|^[^:*?\"<>|][^:*?\"<>|]*$",
         "testPath": true,

@@ -236,11 +236,8 @@ tests contains {
 #--
 
 #
-# MS.AAD.3.2v1
+# MS.AAD.3.2v2
 #--
-
-# Save all policy names if PhishingResistantMFAPolicies exist
-AllMFA := NonSpecificMFAPolicies | PhishingResistantMFAPolicies
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
@@ -260,21 +257,21 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
 }
 
 # Pass if at least 1 policy meets all conditions
 tests contains {
-    "PolicyId": "MS.AAD.3.2v1",
+    "PolicyId": "MS.AAD.3.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": AllMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AllMFA, DescriptionString), CAPLINK]),
+    "ActualValue": NonSpecificMFAPolicies,
+    "ReportDetails": concat(". ", [ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString), CAPLINK]),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := Count(AllMFA) > 0
+    Status := Count(NonSpecificMFAPolicies) > 0
 }
 #--
 
@@ -646,15 +643,20 @@ tests contains {
 # MS.AAD.5.2v1
 #--
 
-# Return the Id if non-compliant user consent policies
-BadDefaultGrantPolicies contains Policy.Id if {
-    some Policy in input.authorization_policies
-    "ManagePermissionGrantsForSelf.microsoft-user-default-legacy" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
-}
-
-BadDefaultGrantPolicies contains Policy.Id if {
+# Return the Id if non-compliant user consent policies if there are risky delegated permission classifications
+# Option 2: Allow user consent for apps from verified publishers, for selected permissions
+RiskyDelegatedPermissionClassifications contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
+    # Checks if any delegated permissions have a classification of low and are found in the RiskyPermissions.json file
+    count([x | some x in input.risky_delegated_permission_classifications; x != null]) > 0
+}
+
+# Return the Id if non-compliant user consent policies
+# Option 3: Let Microsoft manage your consent settings (Recommended)
+BadDefaultGrantPolicies contains Policy.Id if {
+    some Policy in input.authorization_policies
+    "ManagePermissionGrantsForSelf.microsoft-user-default-recommended" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
 }
 
 # Return all policy Ids
@@ -665,7 +667,21 @@ AllDefaultGrantPolicies contains {
     some Policy in input.authorization_policies
 }
 
-# If there is a policy that allows user to consent to third party apps, fail
+default BadPolicies := []
+BadPolicies := BadDefaultGrantPolicies if {
+    count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
+} else := RiskyDelegatedPermissionClassifications if {
+    count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
+}
+
+default DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
+DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
+    count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
+} else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
+    count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
+}
+
+# If there is a policy that allows user to consent to risky third party apps, fail
 tests contains {
     "PolicyId": "MS.AAD.5.2v1",
     "Criticality": "Shall",
@@ -674,11 +690,8 @@ tests contains {
     "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionStr),
     "RequirementMet": Status
 } if {
-    BadPolicies := BadDefaultGrantPolicies
     Status := Count(BadPolicies) == 0
-    DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 }
-#--
 
 #
 # MS.AAD.5.3v1
