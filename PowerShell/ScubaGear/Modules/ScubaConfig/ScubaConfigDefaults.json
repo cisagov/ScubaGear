@@ -13,7 +13,7 @@
       "Linux": "opa_linux_amd64_static"
     },
     "ProductNames": ["aad", "defender", "exo", "sharepoint", "teams"],
-    "AllProductNames": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams"],
+    "AllProductNames": ["aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams"],
     "M365Environment": "commercial",
     "LogIn": true,
     "DisconnectOnExit": false,

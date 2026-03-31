@@ -140,7 +140,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -317,7 +317,7 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
@@ -719,6 +719,7 @@ $ArgToProd = @{
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
+    powerbi = "PowerBI";
 }
 
 $ProdToFullName = @{
@@ -728,6 +729,7 @@ $ProdToFullName = @{
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
+    PowerBI = "Microsoft Power BI";
 }
 
 $IndividualReportFolderName = "IndividualReports"
@@ -846,6 +848,18 @@ function Invoke-ProviderList {
                         }
                         "sharepoint" {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                        }
+                        "powerbi" {
+                            $PBIProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                            }
+                            if (-not [string]::IsNullOrEmpty($ScubaConfig.AppID)) {
+                                $PBIProviderParams += @{
+                                    ClientID              = $ScubaConfig.AppID
+                                    CertificateThumbprint = $ScubaConfig.CertificateThumbprint
+                                }
+                            }
+                            $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
                             if ($ServicePrincipalAuth) {
@@ -1169,7 +1183,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1275,7 +1289,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1672,7 +1686,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1696,6 +1710,9 @@ function Get-TenantDetail {
     }
     elseif ($ProductNames.Contains("powerplatform")) {
         Get-PowerPlatformTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("powerbi")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
@@ -1761,13 +1778,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1886,7 +1903,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider")
+    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
@@ -2023,7 +2040,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 

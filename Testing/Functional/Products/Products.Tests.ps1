@@ -216,6 +216,27 @@ BeforeAll {
         }
     }
 
+    # Power BI functional tests: acquire REST token for precondition helper calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "powerbi") {
+        $PBIHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1"
+        Import-Module $PBIHelperPath -Force
+        $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:PBIAccessToken = Get-PowerBIAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment
+        }
+        else {
+            $script:PBIAccessToken = Get-PowerBIAccessTokenInteractive `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment
+        }
+    }
+
     function SetConditions {
         [CmdletBinding(DefaultParameterSetName = 'Actual')]
         param(

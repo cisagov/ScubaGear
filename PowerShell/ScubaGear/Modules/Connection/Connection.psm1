@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+   [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -95,6 +95,20 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    Write-Verbose "Power Platform uses REST API with on-demand MSAL token - no persistent PowerApps connection needed"
+               }
+               "powerbi" {
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
+                   Write-Verbose "Power BI uses REST API with on-demand MSAL token - no persistent connection needed"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -183,10 +197,10 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-       [ValidateSet("aad", "defender", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+       [ValidateSet("aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-       $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+       $ProductNames = @("aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams")
    )
    $ErrorActionPreference = "SilentlyContinue"
 
@@ -209,6 +223,10 @@ function Disconnect-SCuBATenant {
            elseif ($Product -eq "powerplatform") {
                Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                # Power Platform uses REST API with on-demand token - no persistent connection to disconnect
+           }
+           elseif ($Product -eq "powerbi") {
+               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               # Power BI uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
                if($Product -eq "defender") {

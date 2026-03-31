@@ -23,13 +23,15 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 |                         | User.Read.All                                   |               |                                       |                                       |
 | Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
+| Power BI                | Tenant.Read.All                                 | Fabric Administrator | Power BI Service                      | 00000009-0000-0000-c000-000000000000  |
 | Power Platform          | Registration required <sup>2</sup>                                     |               |                                       |                                       |
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
 
 > [!NOTE]
 > Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details).<sup>1</sup><br>
-> Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup>
+> Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup><br>
+> Power BI requires a Power BI Admin portal tenant setting to be enabled before service principal access works, detailed in [this section](#power-bi-tenant-setting).<sup>3</sup>
 
 ## Service Principal Setup
 
@@ -85,6 +87,33 @@ Save these values for running ScubaGear:
 
 Continue to the [Power Platform Registration](#power-platform-registration) section below if you're assessing Power Platform.
 
+## Power BI Tenant Setting
+
+When running ScubaGear to assess Power BI, the service principal requires both the `Tenant.Read.All` application permission from the `Power BI Service` API and the **Fabric Administrator** Entra ID role assigned directly to the service principal. The `Tenant.Read.All` permission alone is insufficient — the `/v1/admin/` endpoints require the Fabric Administrator role.
+
+Additionally, the Power BI Admin portal must be configured to allow service principal access before ScubaGear can retrieve Power BI settings.
+
+### Step 1: Enable Service Principal Access
+
+In the [Power BI Admin portal](https://app.powerbi.com/admin-portal/tenantSettings):
+1. Navigate to **Tenant settings** → **Admin API settings**
+2. Enable **"Allow service principals to use read-only admin APIs"**
+3. Under **Apply to**, select **Specific security groups** and add a security group that contains the service principal
+
+> [!IMPORTANT]
+> Power BI does not allow adding service principals directly — the SP must be a member of a security group, and that group must be added to the setting.
+
+### Step 2: Verify Access
+
+After enabling the setting, confirm the SP can reach the API:
+
+```powershell
+Invoke-SCuBA -ProductNames powerbi -AppID <app-id> -CertificateThumbprint <thumbprint> -Organization <tenant>.onmicrosoft.com
+```
+
+> [!NOTE]
+> For GCC High tenants, use `-M365Environment gcchigh`. See [Power BI in GCC High](#power-bi-in-gcc-high) for additional details.
+
 ## Power Platform Registration
 
 > [!NOTE]
@@ -138,3 +167,7 @@ When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, t
 ### SharePoint in GCC High
 
 When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
+
+### Power BI in GCC High
+
+When running ScubaGear to assess Power BI in a GCC High tenant, the `Tenant.Read.All` application permission must be added from the `Power BI Service` API (App ID `00000009-0000-0000-c000-000000000000`) rather than the commercial API.

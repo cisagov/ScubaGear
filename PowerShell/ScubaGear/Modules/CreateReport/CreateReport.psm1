@@ -149,13 +149,13 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerBI", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power BI", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
         [string]
         $FullName,
 
