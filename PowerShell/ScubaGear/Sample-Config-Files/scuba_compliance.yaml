@@ -45,14 +45,18 @@ Aad:
         - ""
       Users:
         - ""
+      Applications:
+        - ""
+      GuestUserTypes:
+        - ""
   MS.AAD.2.1v1: *OrgCapExclusions
   MS.AAD.2.3v1: *OrgCapExclusions
   MS.AAD.3.1v1: *OrgCapExclusions
   MS.AAD.3.2v2: *OrgCapExclusions
-  MS.AAD.3.3v2: *OrgCapExclusions
   MS.AAD.3.6v1: *OrgCapExclusions
   MS.AAD.3.7v1: *OrgCapExclusions
   MS.AAD.3.8v1: *OrgCapExclusions
+  MS.AAD.3.9v1: *OrgCapExclusions
   MS.AAD.7.4v1:
     RoleExclusions:
       Groups:

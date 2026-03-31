@@ -60,7 +60,9 @@ ConditionalAccessPolicies := {
 ScubaConfig := {
             "CapExclusions": {
                 "Users": [],
-                "Groups": []
+                "Groups": [],
+                "Applications": [],
+                "GuestUserTypes": []
             },
             "RoleExclusions": {
                 "Users": [],
