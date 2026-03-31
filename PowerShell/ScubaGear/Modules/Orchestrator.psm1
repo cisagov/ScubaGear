@@ -136,7 +136,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entraid", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entra", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -309,16 +309,16 @@ function Invoke-SCuBA {
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
-       # Transform ProductNames into list of all products if it contains wildcard
-        if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entraid')){
-            $ProductNames = $ProductNames | Where-Object { $_ -ne 'entraid'}
+        # Transform ProductNames into list of all products if it contains wildcard
+        if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entra')){
+            $ProductNames = $ProductNames | Where-Object { $_ -ne 'entra'}
             Write-Debug "Removing duplicate productnames parameter"
         }
 
-               # Transform ProductNames into list of all products if it contains wildcard
-        if ($ProductNames.Contains('entraid')){
+        # Transform ProductNames into list of all products if it contains wildcard
+        if ($ProductNames.Contains('entra')){
             $ProductNames = $ProductNames | ForEach-Object {
-                if ($_ -eq 'entraid') {
+                if ($_ -eq 'entra') {
                     'aad'
                 }
                 else {
@@ -535,7 +535,7 @@ $ArgToProd = @{
     exo = "EXO";
     defender = "Defender";
     aad = "AAD";
-    entraid = "AAD";
+    entra = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
 }
@@ -947,7 +947,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("entraid", "teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("entra", "teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1424,7 +1424,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entraid", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", "entra", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1437,7 +1437,7 @@ function Get-TenantDetail {
     )
 
     # organized by best tenant details information
-    if ($ProductNames.Contains("aad") -or $ProductNames.Contains("entraid")) {
+    if ($ProductNames.Contains("aad") -or $ProductNames.Contains("entra")) {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("sharepoint")) {
@@ -1760,7 +1760,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', "entraid", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', "entra", IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -1880,7 +1880,7 @@ function Invoke-SCuBACached {
             }
 
             # Transform ProductNames into list of all products if it contains wildcard
-            if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entraid')) {
+            if ($ProductNames.Contains('aad') -and $ProductNames.Contains('entra')) {
                 $ProductNames = $ProductNames.Remove('aad')
                 Write-Debug "Removing duplicate AAD productnames parameter"
             }

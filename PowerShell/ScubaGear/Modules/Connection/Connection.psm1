@@ -47,15 +47,16 @@ function Connect-Tenant {
    foreach ($Product in $ProductNames) {
        $N += 1
        $Percent = $N*100/$Len
+       $BaselineProgessBarName = if ($Product -eq "aad") {"entra"} else {$Product}
        $ProgressParams = @{
            'Activity' = "Authenticating to each Product";
-           'Status' = "Authenticating to $($Product); $($N) of $($Len) Products authenticated to.";
+           'Status' = "Authenticating to $($BaselineProgessBarName); $($N) of $($Len) Products authenticated to.";
            'PercentComplete' = $Percent;
        }
        Write-Progress @ProgressParams
        try {
            switch ($Product) {
-               {($_ -eq "aad") -or ($_ -eq "entraid")}  {
+               {($_ -eq "aad") -or ($_ -eq "entra")}  {
                    $GraphScopes = Get-ScubaGearEntraMinimumPermissions
 
                    $GraphParams = @{
