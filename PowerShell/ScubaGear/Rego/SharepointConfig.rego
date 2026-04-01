@@ -152,11 +152,11 @@ tests contains {
 
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     SharingCapability == ONLYPEOPLEINORG
     PolicyId := "MS.SHAREPOINT.1.3v1"
@@ -244,11 +244,11 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.1v1"
     SharingCapability != ANYONE
@@ -305,11 +305,11 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
     SharingCapability != ANYONE
@@ -366,11 +366,11 @@ tests contains {
 # Test for N/A case
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["SharePoint REST API"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.SHAREPOINT.3.3v1"
     not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
