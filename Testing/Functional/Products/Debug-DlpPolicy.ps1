@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Local debug script to verify Get-DlpPolicy / Remove-DlpPolicy work correctly
     before running the full Pester suite.
@@ -16,53 +16,54 @@ Import-Module (Resolve-Path $ScubaModule) -Force
 $PPHelperPath = Join-Path $PSScriptRoot "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
 Import-Module (Resolve-Path $PPHelperPath) -Force
 
-Write-Host "`n--- Authenticating interactively ---" -ForegroundColor Cyan
+Write-Output "`n--- Authenticating interactively ---" -ForegroundColor Cyan
 $script:PPBaseUrl    = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
 $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive -Tenant $TenantDomain -M365Environment $M365Environment
 
 # Dot-source test utilities (defines Get-DlpPolicy, Remove-DlpPolicy, etc.)
 . (Join-Path $PSScriptRoot "FunctionalTestUtils.ps1")
 
-Write-Host "`n--- Current DLP policies ---" -ForegroundColor Cyan
+Write-Output "`n--- Current DLP policies ---" -ForegroundColor Cyan
 $Before = Get-DlpPolicy
 if ($Before.value.Count -eq 0) {
-    Write-Host "  (none)" -ForegroundColor Yellow
+    Write-Output "  (none)" -ForegroundColor Yellow
 } else {
     $Before.value | ForEach-Object {
-        Write-Host "  name=$($_.name)" -ForegroundColor White
-        Write-Host "  id  =$($_.id)" -ForegroundColor Gray
-        Write-Host "  displayName=$($_.displayName)" -ForegroundColor White
-        Write-Host ""
+        Write-Output "  name=$($_.name)" -ForegroundColor White
+        Write-Output "  id  =$($_.id)" -ForegroundColor Gray
+        Write-Output "  displayName=$($_.displayName)" -ForegroundColor White
+        Write-Output ""
     }
 }
 
 $Target = $Before.value | Where-Object { $_.displayName -eq "DLP functional test" }
 if (-not $Target) {
-    Write-Host "`n'DLP functional test' policy not found — creating one for testing..." -ForegroundColor Yellow
+    Write-Output "`n'DLP functional test' policy not found — creating one for testing..." -ForegroundColor Yellow
     New-AdminDlpPolicy -DisplayName "DLP functional test"
     $Target = (Get-DlpPolicy).value | Where-Object { $_.displayName -eq "DLP functional test" }
-    Write-Host "Created. id=$($Target.id)" -ForegroundColor Green
+    Write-Output "Created. id=$($Target.id)" -ForegroundColor Green
 }
 
-Write-Host "`n--- Attempting to delete 'DLP functional test' via id ---" -ForegroundColor Cyan
-Write-Host "  PolicyName (id) = $($Target.id)" -ForegroundColor Gray
+Write-Output "`n--- Attempting to delete 'DLP functional test' via id ---" -ForegroundColor Cyan
+Write-Output "  PolicyName (id) = $($Target.id)" -ForegroundColor Gray
 try {
     $Target | Select-Object @{ Name="PolicyName"; Expression={$_.id} } | Remove-DlpPolicy
-    Write-Host "  DELETE call completed without exception." -ForegroundColor Green
+    Write-Output "  DELETE call completed without exception." -ForegroundColor Green
 } catch {
-    Write-Host "  DELETE FAILED: $_" -ForegroundColor Red
+    Write-Output "  DELETE FAILED: $_" -ForegroundColor Red
 }
 
-Write-Host "`n--- DLP policies after delete ---" -ForegroundColor Cyan
+Write-Output "`n--- DLP policies after delete ---" -ForegroundColor Cyan
 $After = Get-DlpPolicy
 if ($After.value.Count -eq 0) {
-    Write-Host "  (none) - DELETE WORKED" -ForegroundColor Green
+    Write-Output "  (none) - DELETE WORKED" -ForegroundColor Green
 } else {
     $After.value | ForEach-Object {
         $Color = if ($_.displayName -eq "DLP functional test") { "Red" } else { "White" }
-        Write-Host "  - $($_.displayName) [$($_.id)]" -ForegroundColor $Color
+        Write-Output "  - $($_.displayName) [$($_.id)]" -ForegroundColor $Color
     }
     if ($After.value | Where-Object { $_.displayName -eq "DLP functional test" }) {
-        Write-Host "`n  'DLP functional test' STILL EXISTS after delete!" -ForegroundColor Red
+        Write-Output "`n  'DLP functional test' STILL EXISTS after delete!" -ForegroundColor Red
     }
 }
+
