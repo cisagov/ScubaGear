@@ -200,7 +200,7 @@ TestPlan:
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
@@ -226,7 +226,7 @@ TestPlan:
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
@@ -235,7 +235,7 @@ TestPlan:
               SharingCapability: Disabled
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
 
   # - PolicyId: MS.SHAREPOINT.3.2v1
   #   TestDriver: RunScuba
@@ -341,7 +341,7 @@ TestPlan:
               EmailAttestationReAuthDays: 31
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
         Preconditions:
           - Command: Set-PnPTenant
@@ -369,7 +369,7 @@ TestPlan:
               EmailAttestationReAuthDays: 30
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
         Preconditions:
           - Command: Set-PnPTenant
@@ -397,4 +397,4 @@ TestPlan:
               EmailAttestationReAuthDays: 29
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
