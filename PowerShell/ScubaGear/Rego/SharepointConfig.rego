@@ -150,10 +150,15 @@ tests contains {
     Status := Tenant.SharingDomainRestrictionMode == 1
 }
 
+# Test for N/A case where sharing is set to Only people in your organization
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
+<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
+=======
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -241,11 +246,15 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
+<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
+=======
+    "Commandlet": ["Get-SPOTenant"],
+>>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -302,11 +311,15 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
+<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
+=======
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -363,11 +376,15 @@ tests contains {
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",
+<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
+=======
+    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+>>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true

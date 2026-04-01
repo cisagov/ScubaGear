@@ -54,7 +54,7 @@ test_AllowEmailIntoChannel_Correct_V2 if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V2_multi if {
@@ -65,7 +65,7 @@ test_AllowEmailIntoChannel_Correct_V2_multi if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3 if {
@@ -76,7 +76,7 @@ test_AllowEmailIntoChannel_Correct_V3 if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V3_multi if {
@@ -90,7 +90,7 @@ test_AllowEmailIntoChannel_Correct_V3_multi if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4 if {
@@ -104,7 +104,7 @@ test_AllowEmailIntoChannel_Correct_V4 if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 
 test_AllowEmailIntoChannel_Correct_V4_multi if {
@@ -118,6 +118,6 @@ test_AllowEmailIntoChannel_Correct_V4_multi if {
                             with input.teams_tenant_info as [Tenant]
 
     ReportDetailString := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), false) == true
+    TestResult("MS.TEAMS.4.1v1", Output, CheckedSkippedDetails("MS.TEAMS.4.1v1", ReportDetailString), true) == true
 }
 #--
