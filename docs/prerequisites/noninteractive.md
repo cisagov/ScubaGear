@@ -23,7 +23,7 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 |                         | User.Read.All                                   |               |                                       |                                       |
 | Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
-| Power BI                | Tenant.Read.All                                 | Fabric Administrator | Power BI Service                      | 00000009-0000-0000-c000-000000000000  |
+| Power BI                | Tenant.Read.All                                 |               | Power BI Service                      | 00000009-0000-0000-c000-000000000000  |
 | Power Platform          | Registration required <sup>2</sup>                                     |               |                                       |                                       |
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
@@ -89,21 +89,26 @@ Continue to the [Power Platform Registration](#power-platform-registration) sect
 
 ## Power BI Tenant Setting
 
-When running ScubaGear to assess Power BI, the service principal requires both the `Tenant.Read.All` application permission from the `Power BI Service` API and the **Fabric Administrator** Entra ID role assigned directly to the service principal. The `Tenant.Read.All` permission alone is insufficient — the `/v1/admin/` endpoints require the Fabric Administrator role.
+The Power BI Admin portal must be configured to allow service principal access before ScubaGear can retrieve Power BI settings.
 
-Additionally, the Power BI Admin portal must be configured to allow service principal access before ScubaGear can retrieve Power BI settings.
+> [!IMPORTANT]
+> Power BI does not allow adding service principals directly to this setting — the SP must be a member of a security group, and that group must be added to the setting.
 
-### Step 1: Enable Service Principal Access
+### Step 1: Create a Security Group
+
+Create a plain security group in Entra ID (without role assignment) and add the service principal as a member.
+
+### Step 2: Enable Read-Only Admin API Access
 
 In the [Power BI Admin portal](https://app.powerbi.com/admin-portal/tenantSettings):
 1. Navigate to **Tenant settings** → **Admin API settings**
-2. Enable **"Allow service principals to use read-only admin APIs"**
-3. Under **Apply to**, select **Specific security groups** and add a security group that contains the service principal
+2. Enable **"Service principals can access read-only admin APIs"**
+3. Under **Apply to**, select **Specific security groups** and add the security group from Step 1
 
-> [!IMPORTANT]
-> Power BI does not allow adding service principals directly — the SP must be a member of a security group, and that group must be added to the setting.
+> [!NOTE]
+> This setting only supports "Specific security groups" — the "Entire organization" option is not available.
 
-### Step 2: Verify Access
+### Step 3: Verify Access
 
 After enabling the setting, confirm the SP can reach the API:
 
