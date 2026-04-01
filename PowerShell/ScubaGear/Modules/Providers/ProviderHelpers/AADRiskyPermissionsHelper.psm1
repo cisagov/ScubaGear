@@ -182,57 +182,6 @@ function Merge-Credentials {
     return $MergedCredentials
 }
 
-function Get-ServicePrincipalAll {
-    <#
-    .Description
-    Returns all service principals in the tenant, this is used to determine if they have risky permissions.
-
-    .PARAMETER
-    M365Environment
-
-    The M365 environment to use for the Graph API call. This is used to determine the correct endpoint for the API call.
-
-    .EXAMPLE
-    Get-ServicePrincipalAll -M365Environment commercial
-
-    Returns all service principals in the tenant for the commercial environment.
-
-    #>
-    param (
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment
-    )
-
-    # Initialize an empty array to store all service principals
-    $allServicePrincipals = @()
-
-    # Get the first page of results
-    $result = Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment
-
-    # Add the current page of service principals to our collection
-    if ($result.Value) {
-        $allServicePrincipals += $result.Value
-    }
-
-    # Continue fetching next pages as long as there's a nextLink
-    while ($result.'@odata.nextLink') {
-
-        # Extract the URI from the nextLink
-        $nextLink = $result.'@odata.nextLink'
-
-        # Use the URI directly for the next request
-        $result = Invoke-MgGraphRequest -Uri $nextLink -Method "GET"
-
-        # Add the new page of results to our collection
-        if ($result.Value) {
-            $allServicePrincipals += $result.Value
-        }
-    }
-
-    return $allServicePrincipals
-}
-
 function Get-ApplicationsWithRiskyPermissions {
     <#
     .Description
@@ -373,8 +322,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         try {
             $RiskyPermissionsJson = Get-RiskyPermissionsJson
             $ServicePrincipalResults = @()
-            # Get all service principals including ones owned by Microsoft
-            $ServicePrincipals = Get-ServicePrincipalAll -M365Environment $M365Environment
+            # Get all service principals
+            $ServicePrincipals = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment).Value
 
             # Prepare service principal IDs for batch processing
             $ServicePrincipalIds = $ServicePrincipals.Id
@@ -497,6 +446,75 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             throw $_
         }
         return $ServicePrincipalResults
+    }
+}
+
+function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
+    <#
+    .Description
+    Returns an array of service principals where each item contains its Object ID, App ID, Display Name,
+    Key/Password Credentials, and risky API permissions.
+    .Functionality
+    #Internal
+    ##>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+    process {
+        try {
+            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            $Resources = $RiskyPermissionsJson.resources.PSObject.Properties
+
+
+            $RiskyDelegatedPermissionClassificationResults = @()
+            foreach ($Resource in $Resources) {
+                $ResourceId = $Resource.Name
+                $ResourceName = $Resource.Value
+
+                $ServicePrincipal = (
+                    Invoke-GraphDirectly `
+                        -Commandlet "Get-MgServicePrincipal" `
+                        -M365Environment $M365Environment `
+                        -QueryParams @{
+                            '$filter' = "appId eq '$ResourceId'"
+                        }
+                    ).Value
+                
+                $ServicePrincipalId = $ServicePrincipal.id
+
+                $RiskyDelegatedPermissions = $RiskyPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
+
+                $PermClassifications = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipalDelagatedPermissionClassifications" -M365Environment $M365Environment -ID $ServicePrincipalId).Value
+
+                $RiskyPermClassifications = @()
+                foreach ($PermClassification in $PermClassifications) {
+                    if ($PermClassification.Classification -eq "low" -and $RiskyDelegatedPermissions.Name -contains $PermClassification.PermissionId) {
+                        $RiskyPermClassifications += [PSCustomObject]@{
+                            id                = $PermClassification.id
+                            permissionId      = $PermClassification.permissionId
+                            permissionName    = $PermClassification.permissionName
+                            classification    = $PermClassification.classification
+                        }
+                    }
+                }
+
+                if ($RiskyPermClassifications.Count -gt 0) {
+                    $RiskyDelegatedPermissionClassificationResults += [PSCustomObject]@{
+                        ObjectId                        = $ServicePrincipalId
+                        AppId                           = $ResourceId
+                        DisplayName                     = $ServicePrincipal.DisplayName
+                        RiskyPermClassifications        = $RiskyPermClassifications.permissionName
+                    }
+                }
+            }
+            return $RiskyDelegatedPermissionClassificationResults
+        } catch {
+            Write-Warning "An error occurred in Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications: $($_.Exception.Message)"
+            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+            throw $_
+        }
     }
 }
 
@@ -624,5 +642,6 @@ Export-ModuleMember -Function @(
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
     "Format-RiskyApplications",
-    "Format-RiskyThirdPartyServicePrincipals"
+    "Format-RiskyThirdPartyServicePrincipals",
+    "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications"
 )

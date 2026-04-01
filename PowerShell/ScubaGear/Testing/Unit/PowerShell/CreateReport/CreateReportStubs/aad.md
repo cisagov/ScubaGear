@@ -184,7 +184,7 @@ Sign-ins detected as high risk SHALL be blocked.
 
 This section provides policies that help reduce security risks related to user authentication and registration.
 
-Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in enforcing phishing-resistant MFA for all users for various reasons, we provide additional backup security policies to mitigate the risks associated with lesser forms of MFA. One example of this is policy MS.AAD.3.2v1 below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
+Per [OMB memorandum M-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf), MFA is required and it must be phishing-resistant. Since there may be gaps in enforcing phishing-resistant MFA for all users for various reasons, we provide additional backup security policies to mitigate the risks associated with lesser forms of MFA. One example of this is policy MS.AAD.3.2v2 below which enforces MFA but does not stipulate the specific MFA method. That said, phishing-resistant MFA is the overarching requirement.
 
 <img src="/images/aad-mfa.png"
 alt="Weak MFA (SMS/Voice) Stronger MFA (Push Notifications, Software OTP, Hardware Token OTP) Strongest MFA (FIDO2, PIV, Windows Hello)" />
@@ -207,10 +207,10 @@ The **Federal PIV card (federated from agency on-premises Active Directory Feder
 - _Rationale:_ Allowing weaker forms of MFA does not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 
-#### MS.AAD.3.2v1
+#### MS.AAD.3.2v2
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
 
-<!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.3.2v2; Criticality: SHALL -->
 - _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires that MFA is enforced, thus reducing the risks of single form authentication.
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy has been created enforcing phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
@@ -291,7 +291,7 @@ Managed Devices SHOULD be required to register MFA.
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
 
-#### MS.AAD.3.2v1 instructions:
+#### MS.AAD.3.2v2 instructions:
 
 1. If phishing-resistant MFA has not been enforced for all users yet, create a conditional access policy that enforces MFA but does not dictate the MFA method.  Configure the following policy settings in the new conditional access policy as per the values below:
 

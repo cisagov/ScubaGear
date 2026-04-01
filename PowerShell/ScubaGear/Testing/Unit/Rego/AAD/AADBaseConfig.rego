@@ -92,6 +92,10 @@ AuthorizationPolicies := {
     "Id": "authorizationPolicy"
 }
 
+Classifications := {
+    "risky_delegated_permission_classifications": []
+}
+
 DirectorySettings := {
     "DisplayName": "Setting display name",
     "Values": [
@@ -287,4 +291,26 @@ PrivilegedUsers := {
             "Global Administrator"
         ]
     }
+}
+
+BuiltinMultifactorAuthenticationAuthStrength := {
+  "AllowedCombinations": [
+    "windowsHelloForBusiness",
+    "fido2",
+    "x509CertificateMultiFactor",
+    "deviceBasedPush",
+    "temporaryAccessPassOneTime",
+    "temporaryAccessPassMultiUse",
+    "password,microsoftAuthenticatorPush",
+    "password,softwareOath",
+    "password,hardwareOath",
+    "password,sms",
+    "password,voice",
+    "federatedMultiFactor",
+    "microsoftAuthenticatorPush,federatedSingleFactor",
+    "softwareOath,federatedSingleFactor",
+    "hardwareOath,federatedSingleFactor",
+    "sms,federatedSingleFactor",
+    "voice,federatedSingleFactor"
+  ],
 }

@@ -8,6 +8,4 @@ Numerous test cases in the AAD functional test plan associated with conditional 
 
 - **Step 2** - The following conditional access policies are also required to be created in the tenant and configure as per the respective AAD baseline policy instructions, including setting Enable Policy to **On**. The policy names in the tenant must be configure exactly as described below:
   - MS.AAD.1.1v1 Legacy authentication SHALL be blocked
-  - MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
-  - MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
-  - MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users
+  - MS.AAD.3.9v1 Device code authentication SHOULD be blocked

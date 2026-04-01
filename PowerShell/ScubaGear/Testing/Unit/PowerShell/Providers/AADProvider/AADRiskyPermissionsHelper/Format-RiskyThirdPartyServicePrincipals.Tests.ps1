@@ -3,6 +3,8 @@ $AADRiskyPermissionsHelper = "$($ModulesPath)/Providers/ProviderHelpers/AADRisky
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADRiskyPermissionsHelper) -force
 
 InModuleScope AADRiskyPermissionsHelper {
+    $PermissionsModule = "../../../../../../Modules/Permissions/PermissionsHelper.psm1"
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $PermissionsModule) -Function Get-ScubaGearPermissions
     Describe "Format-RiskyThirdPartyServicePrincipals" {
         BeforeAll {
             # Import mock data
@@ -14,9 +16,14 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Get-ServicePrincipalAll { $MockServicePrincipals }
+            Mock Invoke-GraphDirectly {
+                return @{
+                    "value" = $MockServicePrincipals
+                }
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" } -ModuleName AADRiskyPermissionsHelper
 
-            Mock Get-ServicePrincipalAll { $MockServicePrincipals }
+            function Invoke-MgGraphRequest { }
+
             Mock Invoke-MgGraphRequest {
                 return @{
                     responses = @(

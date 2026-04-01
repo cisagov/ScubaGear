@@ -3,6 +3,29 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 InModuleScope ScubaConfig {
     Describe -tag "Utils" -name 'ScubaConfigLoadConfig' {
         BeforeAll {
+            # Create default OPA directory for tests (needed in CI environments)
+            $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+            if (-not (Test-Path $script:DefaultOPAPath)) {
+                New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+            }
+
+            # Create dummy OPA executable
+            $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+            $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+            if ($IsLinuxOS) {
+                $script:OPAExeName = "opa_linux_amd64"
+            }
+            elseif ($IsMacOSOS) {
+                $script:OPAExeName = "opa_darwin_amd64"
+            }
+            else {
+                $script:OPAExeName = "opa_windows_amd64.exe"
+            }
+            $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
+            if (-not (Test-Path $script:OPAExePath)) {
+                New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
+            }
+
             Mock -CommandName Write-Warning {}
             function Get-ScubaDefault {throw 'this will be mocked'}
             Mock -ModuleName ScubaConfig Get-ScubaDefault {"."}
@@ -12,6 +35,11 @@ InModuleScope ScubaConfig {
         AfterAll {
             # Reset instance after all tests in this file
             [ScubaConfig]::ResetInstance()
+            
+            # Clean up dummy OPA executable
+            if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+                Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
+            }
         }
 
         context 'Handling repeated keys in YAML file' {
@@ -35,9 +63,10 @@ InModuleScope ScubaConfig {
                 [ScubaConfig]::ResetInstance()
                 $cfg = [ScubaConfig]::GetInstance()
                 # Load the first file and check the ProductNames value.
-                "ProductNames: ['teams']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
+                "OrgName: TestOrg`nProductNames: ['teams']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
                 function global:ConvertFrom-Yaml {
                     @{
+                        OrgName='TestOrg'
                         ProductNames=@('teams')
                         M365Environment='commercial'
                     }
@@ -46,9 +75,10 @@ InModuleScope ScubaConfig {
                 $cfg = [ScubaConfig]::GetInstance()
                 $cfg.Configuration.ProductNames | Should -Be 'teams'
                 # Load the second file and verify that ProductNames has changed.
-                "ProductNames: ['exo']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
+                "OrgName: TestOrg`nProductNames: ['exo']`nM365Environment: commercial" | Set-Content -Path $script:TempConfigFile
                 function global:ConvertFrom-Yaml {
                     @{
+                        OrgName='TestOrg'
                         ProductNames=@('exo')
                         M365Environment='commercial'
                     }
@@ -91,10 +121,11 @@ M365Environment: invalid-env
                 # Create valid config file for this test
                 $validFile = [System.IO.Path]::GetTempFileName()
                 $validFile = [System.IO.Path]::ChangeExtension($validFile, '.yaml')
-                "ProductNames: ['aad']" | Set-Content -Path $validFile
+                "OrgName: TestOrg`nProductNames: ['aad']" | Set-Content -Path $validFile
 
                 function global:ConvertFrom-Yaml {
                     @{
+                        OrgName='TestOrg'
                         ProductNames=@('aad')
                         M365Environment='commercial'
                     }
@@ -135,6 +166,21 @@ M365Environment: invalid-env
                 # Create temp directory for OPAPath
                 $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
                 New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
+
+                # Create dummy OPA executable
+                $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+                $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+                if ($IsLinuxOS) {
+                    $DummyOPAName = "opa_linux_amd64"
+                }
+                elseif ($IsMacOSOS) {
+                    $DummyOPAName = "opa_darwin_amd64"
+                }
+                else {
+                    $DummyOPAName = "opa_windows_amd64.exe"
+                }
+                $dummyOpaPath = Join-Path $tempOpaPath $DummyOPAName
+                New-Item -Path $dummyOpaPath -ItemType File -Force | Out-Null
 
                 function global:ConvertFrom-Yaml {
                     @{
@@ -202,6 +248,21 @@ M365Environment: invalid-env
                 $tempOpaPath = Join-Path ([System.IO.Path]::GetTempPath()) "TestOPA_$(Get-Random)"
                 New-Item -ItemType Directory -Path $tempOpaPath -Force | Out-Null
 
+                # Create dummy OPA executable
+                $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+                $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+                if ($IsLinuxOS) {
+                    $DummyOPAName = "opa_linux_amd64"
+                }
+                elseif ($IsMacOSOS) {
+                    $DummyOPAName = "opa_darwin_amd64"
+                }
+                else {
+                    $DummyOPAName = "opa_windows_amd64.exe"
+                }
+                $dummyOpaPath = Join-Path $tempOpaPath $DummyOPAName
+                New-Item -Path $dummyOpaPath -ItemType File -Force | Out-Null
+
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@('aad')
@@ -240,10 +301,11 @@ M365Environment: invalid-env
                 # Create valid config
                 $validFile = [System.IO.Path]::GetTempFileName()
                 $validFile = [System.IO.Path]::ChangeExtension($validFile, '.yaml')
-                "ProductNames: ['aad']" | Set-Content -Path $validFile
+                "OrgName: TestOrg`nProductNames: ['aad']" | Set-Content -Path $validFile
 
                 function global:ConvertFrom-Yaml {
                     @{
+                        OrgName='TestOrg'
                         ProductNames=@('aad')
                         M365Environment='commercial'
                     }

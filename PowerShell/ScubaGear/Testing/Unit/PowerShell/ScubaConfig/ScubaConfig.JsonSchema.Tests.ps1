@@ -85,9 +85,9 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
             # Test oneOf if it exists, otherwise just validate basic structure
             if ($PatternDef.oneOf) {
                 $PatternDef.oneOf.Count | Should -BeGreaterThan 0
-                $PatternDef.oneOf[1].properties.Rationale | Should -Not -BeNullOrEmpty
-                $PatternDef.oneOf[1].properties.Rationale.type | Should -Be "string"
-                $PatternDef.oneOf[1].required | Should -Contain "Rationale"
+                $PatternDef.oneOf[0].properties.Rationale | Should -Not -BeNullOrEmpty
+                $PatternDef.oneOf[0].properties.Rationale.type | Should -Be "string"
+                $PatternDef.oneOf[0].required | Should -Contain "Rationale"
             } else {
                 # If oneOf doesn't exist, just verify the pattern definition exists
                 $PatternDef | Should -Not -BeNullOrEmpty
@@ -108,9 +108,9 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
             # Test oneOf if it exists, otherwise just validate basic structure
             if ($PatternDef.oneOf) {
                 $PatternDef.oneOf.Count | Should -BeGreaterThan 0
-                $PatternDef.oneOf[1].properties.Comment | Should -Not -BeNullOrEmpty
-                $PatternDef.oneOf[1].properties.Comment.type | Should -Be "string"
-                $PatternDef.oneOf[1].required | Should -Contain "Comment"
+                $PatternDef.oneOf[0].properties.Comment | Should -Not -BeNullOrEmpty
+                $PatternDef.oneOf[0].properties.Comment.type | Should -Be "string"
+                $PatternDef.oneOf[0].required | Should -Contain "Comment"
             } else {
                 # If oneOf doesn't exist, just verify the pattern definition exists
                 $PatternDef | Should -Not -BeNullOrEmpty

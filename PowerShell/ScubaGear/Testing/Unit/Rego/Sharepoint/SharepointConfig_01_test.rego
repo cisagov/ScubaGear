@@ -104,7 +104,7 @@ test_SharingDomainRestrictionMode_SharingCapability_OnlyPeopleInOrg_NotApplicabl
         "in the SharePoint admin center is not set to Only People In Your Organization.",
         "See %v for more info"
         ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), false) == true
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
 test_SharingDomainRestrictionMode_SharingCapability_Anyone_Correct if {

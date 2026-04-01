@@ -10,7 +10,7 @@ InModuleScope Utility {
     $testCases = @(
         @{ Cmdlet = "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance"; Path = "roleManagement/directory/roleEligibilityScheduleInstances"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance"; Path = "identityGovernance/privilegedAccess/group/eligibilityScheduleInstances/?`$filter=groupId eq '$ID'"; NeedsID = $true; IdValue = $ID },
-        @{ Cmdlet = "Get-MgBetaPrivilegedAccessResource"; Path = "privilegedAccess/aadGroups/resources"; NeedsID = $true; IdValue = "aadGroups" },
+        @{ Cmdlet = "Get-MgBetaIdentityGovernancePrivilegedAccessGroup"; Path = "identityGovernance/privilegedAccess/group/resources"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance"; Path = "roleManagement/directory/roleAssignmentScheduleInstances"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaIdentityConditionalAccessPolicy"; Path = "identity/conditionalAccess/policies"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaUserCount"; Path = "users/`$count"; NeedsID = $false; IdValue = $null },

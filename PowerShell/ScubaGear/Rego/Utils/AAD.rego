@@ -163,7 +163,7 @@ IsGeneralMFA(Policy) := true if {
     # Check for authentication strength that includes MFA methods
     Strengths := ConvertToSet(Policy.GrantControls.AuthenticationStrength.AllowedCombinations)
     # Check if any of the allowed combinations contain MFA methods
-    # This includes combinations like "password, microsoftAuthenticatorPush", "password, softwareOath", etc.
+    # This includes combinations like "password,microsoftAuthenticatorPush", "password,softwareOath", etc.
     MFACombinations := {
         "windowsHelloForBusiness",
         "fido2", 
@@ -171,19 +171,27 @@ IsGeneralMFA(Policy) := true if {
         "deviceBasedPush",
         "temporaryAccessPassOneTime",
         "temporaryAccessPassMultiUse",
-        "password, microsoftAuthenticatorPush",
-        "password, softwareOath",
-        "password, hardwareOath", 
-        "password, sms",
-        "password, voice",
+        "password,microsoftAuthenticatorPush",
+        "password,softwareOath",
+        "password,hardwareOath", 
+        "password,sms",
+        "password,voice",
         "federatedMultiFactor",
-        "microsoftAuthenticatorPush, federatedSingleFactor",
-        "softwareOath, federatedSingleFactor",
-        "hardwareOath, federatedSingleFactor",
-        "sms, federatedSingleFactor",
-        "voice, federatedSingleFactor"
+        "microsoftAuthenticatorPush,federatedSingleFactor",
+        "softwareOath,federatedSingleFactor",
+        "hardwareOath,federatedSingleFactor",
+        "sms,federatedSingleFactor",
+        "voice,federatedSingleFactor"
     }
     Count(Strengths & MFACombinations) > 0
+        PRMFA := {"windowsHelloForBusiness", "fido2", "x509CertificateMultiFactor"}
+    # The following computation determines if there are any auth combinations in the CAP 
+    # are not considered MFA combinations
+    Count(Strengths - MFACombinations) == 0
+    # The following computation determines if there is at least one auth strength combination 
+    # in the CAP that is not considered a phishing-resistant MFA combination, this would 
+    # indicate that the CAP allows some form of general MFA even if it has PRMFA combinations
+    Count(Strengths - PRMFA) > 0
 } else := false
 
 # Returns a json object as a list. This is used to future proof against changes microsoft 

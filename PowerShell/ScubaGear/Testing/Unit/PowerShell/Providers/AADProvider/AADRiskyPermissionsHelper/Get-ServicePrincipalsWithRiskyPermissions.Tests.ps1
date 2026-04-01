@@ -41,7 +41,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 return $data
             }
 
-            Mock Get-ServicePrincipalAll { $MockServicePrincipals }
+            function Invoke-MgGraphRequest { }
 
             Mock Invoke-GraphDirectly {
                 return @{

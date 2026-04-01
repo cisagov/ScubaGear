@@ -101,8 +101,8 @@ Aad:
       Users:
         - 9d9ac7b2-5aa6-4830-a17a-6557e52140b0 # Example User 1
 
-  # If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
-  MS.AAD.3.2v1: *MfaCapExclusions
+  # MFA SHALL be enforced for all users.
+  MS.AAD.3.2v2: *MfaCapExclusions
 
   # Phishing-resistant MFA SHALL be required for highly privileged roles.
   MS.AAD.3.6v1: *MfaCapExclusions
