@@ -264,7 +264,7 @@ TestPlan:
                   State: disabled
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: N/A
+        ExpectedResult: true
       - TestDescription: MS.AAD.3.3v2 Non-Compliant case - MS Auth App name and Geolocation disabled
         Preconditions:
           - Command: UpdateProviderExport
