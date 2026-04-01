@@ -7,7 +7,7 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: true
+        ExpectedResult: N/A
   - PolicyId: MS.TEAMS.2.3v2
     TestDriver: RunScuba
     Tests:
@@ -15,7 +15,7 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: true
+        ExpectedResult: N/A
   - PolicyId: MS.TEAMS.4.1v1
     TestDriver: RunScuba
     Tests:
@@ -23,4 +23,4 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
-        ExpectedResult: true
+        ExpectedResult: N/A
