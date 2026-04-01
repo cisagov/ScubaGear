@@ -140,7 +140,7 @@ InModuleScope Orchestrator {
                 
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams')
+                        ProductNames=@('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams')
                         M365Environment='commercial'
                         OPAPath=$PSScriptRoot
                         Login=$true
@@ -159,7 +159,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }
