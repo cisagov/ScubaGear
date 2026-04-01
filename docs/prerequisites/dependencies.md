@@ -21,12 +21,10 @@ The following PowerShell modules are required for ScubaGear to function properly
 |:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
 | MicrosoftTeams |           4.9.3 |            7.6.0 | Microsoft Teams configuration management |
 | ExchangeOnlineManagement |           3.2.0 |            3.9.2 | Exchange Online and Microsoft Defender management |
-| Microsoft.PowerApps.Administration.PowerShell |         2.0.198 |          2.0.216 | Power Platform administrative functions |
-| Microsoft.PowerApps.PowerShell |           1.0.0 |           1.0.45 | Power Apps development and management |
 | Microsoft.Graph.Authentication |           2.0.0 |           2.25.0 | Microsoft Graph API authentication |
 | powershell-yaml |           0.4.2 |           0.4.12 | YAML file processing and configuration management |
 
-> **Note**: SharePoint data is now retrieved via REST API and no longer requires Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
+> **Note**: SharePoint and PowerApps data is now retrieved via REST API and no longer requires Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
 
 > **Note**: The maximum versions are updated to the latest available versions on a scheduled basis.
 
