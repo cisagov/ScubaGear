@@ -129,7 +129,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
 
