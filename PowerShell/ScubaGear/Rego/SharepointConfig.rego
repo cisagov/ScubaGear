@@ -154,11 +154,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
-=======
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
->>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -250,11 +246,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
-=======
-    "Commandlet": ["Get-SPOTenant"],
->>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -315,11 +307,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
-=======
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
->>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -380,11 +368,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",
-<<<<<<< 97-multi-platform-support
     "Commandlet": ["SharePoint REST API"],
-=======
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
->>>>>>> main
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
