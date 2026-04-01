@@ -798,25 +798,11 @@ FederatedDomains contains Domain.Id if {
 
 tests contains {
     "PolicyId": "MS.AAD.6.1v1",
-    "Criticality": "Shall",
-    "Commandlet": [ "Get-MgBetaDomain" ],
-    "ActualValue": {
-        "ValidDomains": ValidDomains,
-        "InvalidDomains": InvalidDomains,
-        "FederatedDomains": FederatedDomains
-    },
-    "ReportDetails": DomainReportDetails(Status, Metadata),
-    "RequirementMet": Status
-} if {
-    Conditions := [
-        Count(ValidDomains) > 0,
-        Count(InvalidDomains) == 0
-    ]
-    Status := Count(FilterArray(Conditions, true)) == 2
-    Metadata := {
-        "InvalidDomains": InvalidDomains,
-        "FederatedDomains": FederatedDomains
-    }
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-MgBetaDomain"],
+    "ActualValue": [],
+    "ReportDetails": "This policy is temporarily omitted until the bug is fixed.",
+    "RequirementMet": false
 }
 #--
 
