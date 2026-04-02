@@ -159,11 +159,10 @@ AppExclusionsFullyExempt(Policy, PolicyID) := true if {
 default GuestUserExclusionsFullyExempt(_, _) := false
 
 # Returns true (pass) when the CAP has no guest user type exclusions configured.
-# This covers cases where ExcludeGuestsOrExternalUsers is null, or has
-# no GuestOrExternalUserTypes value - meaning no guest types are being excluded
-# from the policy, so no config exemption is needed.
+# The Graph API returns ExcludeGuestsOrExternalUsers as null when no guest types
+# are excluded from the policy, meaning no config exemption is needed.
 GuestUserExclusionsFullyExempt(Policy, _) := true if {
-    not Policy.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes
+    Policy.Conditions.Users.ExcludeGuestsOrExternalUsers == null
 }
 
 # Returns true (pass) when the CAP does exclude specific guest user types, but every
