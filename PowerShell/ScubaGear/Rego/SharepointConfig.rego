@@ -150,6 +150,7 @@ tests contains {
     Status := Tenant.SharingDomainRestrictionMode == 1
 }
 
+# Test for N/A case where sharing is set to Only people in your organization
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
@@ -241,7 +242,7 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
@@ -302,7 +303,7 @@ tests contains {
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
@@ -363,7 +364,7 @@ tests contains {
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
 }
 
-# Test for N/A case
+# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v1",
     "Criticality": "Shall",

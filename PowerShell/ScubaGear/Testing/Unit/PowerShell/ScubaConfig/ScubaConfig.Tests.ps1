@@ -2,6 +2,29 @@ using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
 
 Describe "ScubaConfig Module Unit Tests" {
     BeforeAll {
+        # Create default OPA directory for tests (needed in CI environments)
+        $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+        if (-not (Test-Path $script:DefaultOPAPath)) {
+            New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
+        }
+
+        # Create dummy OPA executable
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        if ($IsLinuxOS) {
+            $script:OPAExeName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $script:OPAExeName = "opa_darwin_amd64"
+        }
+        else {
+            $script:OPAExeName = "opa_windows_amd64.exe"
+        }
+        $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
+        if (-not (Test-Path $script:OPAExePath)) {
+            New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
+        }
+
         # Create a global mock for ConvertFrom-Yaml to avoid needing powershell-yaml module in CI/CD
         function global:ConvertFrom-Yaml {
             param($Yaml)
@@ -36,6 +59,12 @@ Describe "ScubaConfig Module Unit Tests" {
     AfterAll {
         # Clean up the global mock
         Remove-Item -Path Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
+        
+        # Clean up dummy OPA executable and directory if created by tests
+        if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+            Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
+        }
+        # Note: We don't remove the .scubagear\Tools directory as it might be needed by other tests
     }
     
     BeforeEach {
@@ -112,7 +141,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance1.LoadConfig($TempFile)
+                $Instance1.LoadConfig($TempFile, $true)
                 $HasConfig1 = $Instance1.Configuration -ne $null
 
                 [ScubaConfig]::ResetInstance()
@@ -222,9 +251,12 @@ Describe "ScubaConfig Module Unit Tests" {
         It "Should load configuration files" {
             $Instance = [ScubaConfig]::GetInstance()
 
-            # Create a minimal test file
+            # Create a minimal test file with required fields
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            "ProductNames: [aad]" | Set-Content -Path $TempFile
+            @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
 
             try {
                 { $Instance.LoadConfig($TempFile) } | Should -Not -Throw
@@ -248,7 +280,10 @@ Describe "ScubaConfig Module Unit Tests" {
                 $OPAPathCreated = $true
             }
             
-            "ProductNames: [aad]" | Set-Content -Path $TempFile
+            @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
 
             try {
                 $Instance.LoadConfig($TempFile)
@@ -267,12 +302,17 @@ Describe "ScubaConfig Module Unit Tests" {
         It "Should support skip validation parameter in LoadConfig" {
             $Instance = [ScubaConfig]::GetInstance()
 
-            # Create a minimal test file
+            # Create a minimal test file - SkipValidation=true allows partial config
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
                 { $Instance.LoadConfig($TempFile, $true) } | Should -Not -Throw
+                # For SkipValidation=$false, need complete config with required fields
+                @"
+OrgName: TestOrg
+ProductNames: [aad]
+"@ | Set-Content -Path $TempFile
                 { $Instance.LoadConfig($TempFile, $false) } | Should -Not -Throw
             }
             finally {
@@ -307,7 +347,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance.LoadConfig($TempFile)
+                $Instance.LoadConfig($TempFile, $true)
                 $Instance.Configuration | Should -Not -BeNullOrEmpty
 
                 # Get same instance and check configuration persists
@@ -327,7 +367,7 @@ Describe "ScubaConfig Module Unit Tests" {
             "ProductNames: [aad]" | Set-Content -Path $TempFile
 
             try {
-                $Instance.LoadConfig($TempFile)
+                $Instance.LoadConfig($TempFile, $true)
                 $Instance.Configuration | Should -Not -BeNullOrEmpty
 
                 # Reset and get new instance

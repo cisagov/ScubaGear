@@ -1,7 +1,6 @@
 package teams
 import rego.v1
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.DefenderMirrorDetails
 import data.utils.report.ReportDetailsArray
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.FilterArray
@@ -314,11 +313,11 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
     IsUSGovTenantRegion
@@ -371,11 +370,11 @@ tests contains {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
-    "Criticality": "Should/Not-Implemented",
+    "Criticality": "Should",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
     IsUSGovTenantRegion
@@ -439,14 +438,14 @@ IsUSGovTenantRegion := true if {
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
         "AssignedPlans": AssignedPlans
     },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.4.1v1", Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
     IsUSGovTenantRegion
@@ -563,19 +562,19 @@ tests contains {
 } if {
     Policies := PoliciesBlockingDefaultApps
     LegacyCompliant := count(Policies) == 0
-    
+
     # Determine compliance based on what's available
     Status := GetDefaultAppComplianceStatus(LegacyCompliant)
-    
+
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "Microsoft Apps by default:"
     ]))
-    
+
     # Determine tenant details based on setting state
     TenantDetails := GetDefaultAppTenantDetails
-    
+
     # Use helper function to build details with proper prioritization
     Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
@@ -731,19 +730,19 @@ tests contains {
 } if {
     Policies := PoliciesAllowingGlobalApps
     LegacyCompliant := count(Policies) == 0
-    
+
     # Determine compliance based on what's available
     Status := GetGlobalAppComplianceStatus(LegacyCompliant)
-    
+
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "third-party apps by default:"
     ]))
-    
+
     # Determine tenant details based on setting state
     TenantDetails := GetGlobalAppTenantDetails
-    
+
     # Use helper function to build details with proper prioritization
     Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
@@ -899,19 +898,19 @@ tests contains {
 } if {
     Policies := PoliciesAllowingCustomApps
     LegacyCompliant := count(Policies) == 0
-    
+
     # Determine compliance based on what's available
     Status := GetPrivateAppComplianceStatus(LegacyCompliant)
-    
+
     # Build detailed report
     LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "custom apps by default:"
     ]))
-    
+
     # Determine tenant details based on setting state
     TenantDetails := GetPrivateAppTenantDetails
-    
+
     # Use helper function to build details with proper prioritization
     Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
 }
@@ -993,110 +992,5 @@ GetPrivateAppTenantDetails := concat("", [
     "legacy app permission policies were validated instead"
 ]) if {
     PrivateAppSettingValue == "Not Checked"
-}
-#--
-
-
-##############
-# MS.TEAMS.6 #
-##############
-
-#
-# MS.TEAMS.6.1v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.6.1v1",
-    "Criticality": "Shall/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.TEAMS.6.2v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.6.2v1",
-    "Criticality": "Shall/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.6.2v1"),
-    "RequirementMet": false
-}
-#--
-
-
-##############
-# MS.TEAMS.7 #
-##############
-
-#
-# MS.TEAMS.7.1v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.7.1v1",
-    "Criticality": "Should/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.7.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.TEAMS.7.2v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.7.2v1",
-    "Criticality": "Should/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.7.2v1"),
-    "RequirementMet": false
-}
-#--
-
-
-##############
-# MS.TEAMS.8 #
-##############
-
-#
-# MS.TEAMS.8.1v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.8.1v1",
-    "Criticality": "Should/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.8.1v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.TEAMS.8.2v1
-#--
-
-# At this time we are unable to test because settings are configured in M365 Defender or using a third-party app
-tests contains {
-    "PolicyId": "MS.TEAMS.8.2v1",
-    "Criticality": "Should/3rd Party",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": DefenderMirrorDetails("MS.TEAMS.8.2v1"),
-    "RequirementMet": false
 }
 #--

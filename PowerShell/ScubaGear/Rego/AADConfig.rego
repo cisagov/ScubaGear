@@ -325,11 +325,11 @@ AAD_3_3_Not_Applicable := true if {
 # First test is for N/A case
 tests contains {
     "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
-    "RequirementMet": false
+    "RequirementMet": true
 } if {
     PolicyId := "MS.AAD.3.3v2"
     # regal ignore:line-length

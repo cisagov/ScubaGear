@@ -37,7 +37,7 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
   - [Baselines](baselines/README.md)
     - [Microsoft Entra ID](PowerShell/ScubaGear/baselines/aad.md): Identity and access management policies
-    - [Defender](PowerShell/ScubaGear/baselines/defender.md): Advanced threat protection settings
+    - [Security Suite](PowerShell/ScubaGear/baselines/securitysuite.md): Advanced threat protection settings
     - [Exchange Online](PowerShell/ScubaGear/baselines/exo.md): Email security and compliance configurations
     - [Power BI](PowerShell/ScubaGear/baselines/powerbi.md): Cloud-based data visualization tool security settings
     - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md): Low-code application security settings
@@ -206,7 +206,7 @@ Reset-ScubaGearDependencies
 
 - [Multiple Tenants](docs/troubleshooting/tenants.md)
 - [Product-Specific Issues](docs/troubleshooting/)
-  - [Defender](docs/troubleshooting/defender.md)
+  - [Security Suite](docs/troubleshooting/securitysuite.md)
   - [Exchange Online](docs/troubleshooting/exchange.md)
   - [Power Platform](docs/troubleshooting/power.md)
   - [Microsoft Graph](docs/troubleshooting/graph.md)

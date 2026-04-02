@@ -5,6 +5,26 @@ Describe "ScubaConfig Additional Properties Validation" {
         # Initialize the system
         [ScubaConfig]::InitializeValidator()
 
+        # Create a dummy OPA executable for testing (required for configuration validation)
+        # Determine OS-specific executable name
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        
+        if ($IsLinuxOS) {
+            $script:DummyOPAName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $script:DummyOPAName = "opa_darwin_amd64"
+        }
+        else {
+            $script:DummyOPAName = "opa_windows_amd64.exe"
+        }
+        $script:DummyOPAPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\..\..\$script:DummyOPAName"
+        # Create empty file to satisfy OPA validation
+        if (-not (Test-Path $script:DummyOPAPath)) {
+            New-Item -Path $script:DummyOPAPath -ItemType File -Force | Out-Null
+        }
+
         # Mock ConvertFrom-Yaml to avoid dependency on powershell-yaml module in CI
         # This mock parses simple YAML structures that our tests use
         function global:ConvertFrom-Yaml {
@@ -72,16 +92,21 @@ Describe "ScubaConfig Additional Properties Validation" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
+        
+        # Remove dummy OPA executable
+        if (Test-Path $script:DummyOPAPath) {
+            Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue
+        }
     }
 
     Context "Valid root-level properties" {
         It "Should accept configuration with only documented properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
   - teams
 M365Environment: commercial
-OPAPath: .
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
@@ -102,6 +127,7 @@ SkipDoH: false
 
         It "Should accept configuration with optional authentication properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 M365Environment: commercial
@@ -124,6 +150,7 @@ Organization: example.com
     Context "Invalid root-level properties (additionalProperties: true allows custom properties)" {
         It "Should ALLOW configuration with custom root-level property" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 M365Environment: commercial
@@ -141,6 +168,7 @@ CustomProperty: this-is-now-allowed
 
         It "Should ALLOW configuration with typo in ProductNames (ProductName) as custom property" -Tag "test-typo" {
             $YamlWithTypo = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 ProductName:
@@ -157,6 +185,7 @@ M365Environment: commercial
 
             function global:ConvertFrom-Yaml {
                 @{
+                    OrgName='TestOrg'
                     ProductNames=@('aad')
                     ProductName=@('defender')
                     M365Environment='commercial'
@@ -181,6 +210,7 @@ M365Environment: commercial
 
         It "Should ALLOW configuration with custom property alongside required properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 Environment: commercial
@@ -198,6 +228,7 @@ Environment: commercial
 
         It "Should ALLOW configuration with arbitrary custom fields" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 M365Environment: commercial
@@ -216,6 +247,7 @@ AnotherCustomField: value2
 
         It "Should ALLOW configuration with snake_case custom properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 m365_environment: commercial
@@ -233,6 +265,7 @@ custom_field: value
 
         It "Should provide access to custom properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 M365Environment: commercial
@@ -244,6 +277,7 @@ MyCustomProperty: test-value
 
             function global:ConvertFrom-Yaml {
                 @{
+                    OrgName='TestOrg'
                     ProductNames=@('aad')
                     M365Environment='commercial'
                     MyCustomProperty='test-value'
@@ -260,6 +294,7 @@ MyCustomProperty: test-value
 
         It "Should allow multiple custom properties" {
             $ValidYaml = @"
+OrgName: TestOrg
 ProductNames:
   - aad
 M365Environment: commercial
@@ -273,6 +308,7 @@ CustomProp3: value3
 
             function global:ConvertFrom-Yaml {
                 @{
+                    OrgName='TestOrg'
                     ProductNames=@('aad')
                     M365Environment='commercial'
                     CustomProp1='value1'
