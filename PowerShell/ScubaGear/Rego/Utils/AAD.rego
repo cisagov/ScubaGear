@@ -158,24 +158,23 @@ AppExclusionsFullyExempt(Policy, PolicyID) := true if {
 
 default GuestUserExclusionsFullyExempt(_, _) := false
 
-# Returns true when there are no guest exclusions on the policy (GuestOrExternalUserTypes null)
-# and no guest config is defined
+# Returns true (pass) when the CAP has no guest user type exclusions configured.
+# This covers cases where ExcludeGuestsOrExternalUsers is null, or has
+# no GuestOrExternalUserTypes value - meaning no guest types are being excluded
+# from the policy, so no config exemption is needed.
 GuestUserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    GuestOrExternalUserTypes := Policy.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes
-    GuestOrExternalUserTypes == null
-    not input.scuba_config.Aad[PolicyID].CapExclusions.GuestUserTypes
+    not Policy.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes
 }
 
-GuestUserExclusionsFullyExempt(Policy, PolicyID) := true if {
-    Policy.Conditions.Users.ExcludeGuestsOrExternalUsers == null
-    not input.scuba_config.Aad[PolicyID].CapExclusions.GuestUserTypes
-}
-
-# Returns true when all excluded guest types are in the exemption list.
+# Returns true (pass) when the CAP does exclude specific guest user types, but every
+# excluded type appears in the ScubaConfig allowlist for this policy. The Graph API
+# returns the excluded types as a comma-separated string (e.g. "b2bCollaborationGuest,internalGuest"),
+# which is split into individual values and compared against the allowlist. If any
+# excluded type is NOT in the allowlist, this returns false and the policy fails.
 GuestUserExclusionsFullyExempt(Policy, PolicyID) := true if {
     GuestExclusions := Policy.Conditions.Users.ExcludeGuestsOrExternalUsers
     GuestExclusions != null
-    ExcludedTypes := {t | some t in split(GuestExclusions.GuestOrExternalUserTypes, ",")}
+    ExcludedTypes := ConvertToSet(split(GuestExclusions.GuestOrExternalUserTypes, ","))
     AllowedTypes := ConvertToSet(input.scuba_config.Aad[PolicyID].CapExclusions.GuestUserTypes)
     count(ExcludedTypes - AllowedTypes) == 0
 }
