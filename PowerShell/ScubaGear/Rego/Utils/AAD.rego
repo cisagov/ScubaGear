@@ -162,7 +162,7 @@ default GuestUserExclusionsFullyExempt(_, _) := false
 # This covers cases where ExcludeGuestsOrExternalUsers is null, or has
 # no GuestOrExternalUserTypes value - meaning no guest types are being excluded
 # from the policy, so no config exemption is needed.
-GuestUserExclusionsFullyExempt(Policy, PolicyID) := true if {
+GuestUserExclusionsFullyExempt(Policy, _) := true if {
     not Policy.Conditions.Users.ExcludeGuestsOrExternalUsers.GuestOrExternalUserTypes
 }
 
