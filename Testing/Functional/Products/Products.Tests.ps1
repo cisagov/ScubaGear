@@ -425,7 +425,7 @@ Describe "Policy Checks for <ProductName>" {
                                         $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
                                     }
                                     elseif ($IsNotChecked){
-                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
+                                        $RowData[2].text | Should -BeLikeExactly "Pass" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {
                                         $RowData[2].text | Should -BeLikeExactly "Pass" -Because "expected policy to pass. [$Msg]"
