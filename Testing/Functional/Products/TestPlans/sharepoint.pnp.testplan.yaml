@@ -181,32 +181,29 @@ TestPlan:
               SharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Compliant - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-PnPTenant
             Splat:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: Disabled
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
