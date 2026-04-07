@@ -968,7 +968,7 @@ function Set-SeverityScore {
         $NonAdminConsentedPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
             $Weights.RiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
-        
+
         $Score += $NonAdminConsentedPoints
         $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $NonAdminConsentedRiskyPermissions.Count
@@ -978,10 +978,7 @@ function Set-SeverityScore {
         # 3. Determine privileged roles weight factor (used only for service principals)
         $PrivilegedRolesPoints = 0
         if ($PrivilegedRoles.Count -gt 0) {
-            $PrivilegedRolesPoints = [Math]::Min(
-                $PrivilegedRoles.Count * $Weights.PrivilegedRoles.PointsPerRole,
-                $Weights.PrivilegedRoles.MaxPoints
-            )
+            $PrivilegedRolesPoints = $PrivilegedRoles.Count * $Weights.PrivilegedRoles.PointsPerRole
             $Score += $PrivilegedRolesPoints
 
             $ScoreBreakdown.PrivilegedRoles = [PSCustomObject]@{
@@ -1014,6 +1011,19 @@ function Set-SeverityScore {
                 TotalPoints = $ThirdPartyServicePrincipalPoints
             }
         }
+
+        # 6. Determine the credential base points by the highest risk level permission on the app/SP
+        $AllRiskyPermissions = @($Object.Permissions | Where-Object { $_.IsRisky -eq $true })
+        foreach ($Permission in $AllRiskyPermissions) {
+            switch ($Permission.RiskLevel) {
+                "Critical" { $HighestRiskLevel = $Weights.CredentialContextWeights.Critical; break }
+                "High" { $HighestRiskLevel = $Weights.CredentialContextWeights.High; break }
+                "Medium" { $HighestRiskLevel = $Weights.CredentialContextWeights.Medium; break }
+                "Low" { $HighestRiskLevel = $Weights.CredentialContextWeights.Low; break }
+                default { $HighestRiskLevel = 0 }
+            }
+        }
+        $CredentialBasePoints = $HighestRiskLevel
 
         # 6. Calculate password credential weight factor
         # Split merged credentials by source so service principal credentials are weighted appropriately
