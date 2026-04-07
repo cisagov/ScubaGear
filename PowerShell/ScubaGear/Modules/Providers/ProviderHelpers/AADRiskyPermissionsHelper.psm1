@@ -729,6 +729,8 @@ function Get-SeverityWeights {
     .Description
     Returns the weight factors used in severity score calculation.
 
+    The priority score is determined by the sum of all weight factors. A higher value indicates higher risk.
+
     The score is composed of the following factors:
 
     Factor                        App     SP      Notes
@@ -752,21 +754,16 @@ function Get-SeverityWeights {
     #>
     return [PSCustomObject]@{
         RiskLevelWeights = @{
-            Critical = 25
+            Critical = 50
             High = 15
             Medium = 5
             Low = 2
             Description = "Risk level weights are assigned based on the level of access granted by each permission."
         }
 
-        AdminConsentedRiskyPermissions = @{
-            MaxPoints = 50
-            Description = "Admin consented permissions pose a higher risk as they have been granted elevated privileges."
-        }
-
-        NonAdminConsentedRiskyPermissions = @{
-            MaxPoints = 10
-            Description = "Non-admin consented permissions pose less of a risk since they have not been granted elevated privileges. However, they can still be granted admin consent in the future and should be monitored."
+        PermissionVolume = @{
+            PointsPer10Permissions = 1
+            Description = "Over-permissioned applications/service principals represent an increased attack surface regardless of individual permission risk level."
         }
 
         # Context factors (25 points max)
@@ -782,51 +779,64 @@ function Get-SeverityWeights {
 
         PrivilegedRoles = @{
             PointsPerRole = 8
-            MaxPoints = 20
             Description = "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
         }
 
-        PasswordCredentials = @{
-            PointsPerCredential = 2
-            PointsPerLongLivedCredential = 3
-            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-            PointsPerServicePrincipalCredential = 4
-            MaxPoints = 10
-            ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
-            Description = "Credentials can be used to authenticate as the application/service principal."
+        CredentialContextWeights = @{
+            Critical = 50
+            High = 35
+            Medium = 15
+            Low = 5
+            Description = "Credential base points scale by the highest risk level permission on the app/SP."
         }
 
-        KeyCredentials = @{
-            PointsPerCredential = 1
-            PointsPerLongLivedCredential = 2
-            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-            PointsPerServicePrincipalCredential = 3
-            MaxPoints = 7
-            ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
-            Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
+        # Discount applied to credential base points.
+        # Key and federated credentials are discounted since key (certificate) credentials are more difficult to steal, and federated credentials contain no shared secret.
+        CredentialTypeDiscounts = @{
+            Password = 1.0
+            Key = 0.5
+            Federated = 0.25
+            Description = "Multiplier applied to credential and base points by credential type. Passwords hold the highest risk, then certificates, and federated creds with the least."
         }
 
-        FederatedCredentials = @{
-            PointsPerCredential = 1
-            # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-            PointsPerServicePrincipalCredential = 2
-            MaxPoints = 3
-            Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
+        CredentialLifetimeTiers = @(
+            @{ MinDays = 730; Points = 5 }  # 2+ years
+            @{ MinDays = 365; Points = 3 }  # 1 - 2 years
+            @{ MinDays = 180; Points = 2 }  # 6 months - 1 year
+        )
+
+        CredentialVolume = @{
+            PointsPerCredentialAfterFirst = 5
+            Description = "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
         }
 
-        Thresholds = @{
-            Critical = 75
-            High = 45
-            Medium = 25
-            Low = 0
-            Description = "Percentage-based severity thresholds for categorizing applications/service principals based on their calculated severity score."
-        }
+        #PasswordCredentials = @{
+        #    PointsPerCredential = 2
+        #    PointsPerLongLivedCredential = 3
+        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+        #    PointsPerServicePrincipalCredential = 4
+        #    MaxPoints = 10
+        #    ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
+        #    Description = "Credentials can be used to authenticate as the application/service principal."
+        #}
 
-        MaxScore = @{
-            Application = 90
-            ServicePrincipal = 120
-            Description = "Maximum achievable score varies by object type"
-        }
+        #KeyCredentials = @{
+        #    PointsPerCredential = 1
+        #    PointsPerLongLivedCredential = 2
+        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+        #    PointsPerServicePrincipalCredential = 3
+        #    MaxPoints = 7
+        #    ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
+        #    Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
+        #}
+
+        #FederatedCredentials = @{
+        #    PointsPerCredential = 1
+        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
+        #    PointsPerServicePrincipalCredential = 2
+        #    MaxPoints = 3
+        #    Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
+        #}
     }
 }
 
@@ -886,12 +896,12 @@ function Set-CredentialScore {
         $CredentialCount++
 
         # Use elevated base points for service principal credentials if they exist.
-        $BasePoints = if ($IsServicePrincipal) {
-            $WeightConfig.PointsPerServicePrincipalCredential
-        }
-        else {
-            $WeightConfig.PointsPerCredential
-        }
+        # $BasePoints = if ($IsServicePrincipal) {
+        #     $WeightConfig.PointsPerServicePrincipalCredential
+        # }
+        # else {
+        #     $WeightConfig.PointsPerCredential
+        # }
 
         # Base points for credential existence
         $CredentialPoints += $BasePoints
@@ -959,13 +969,10 @@ function Set-SeverityScore {
         $AdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $true
         })
-        $AdminConsentedRawPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
+        $AdminConsentedPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
             $Weights.RiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
-        $AdminConsentedPoints = [Math]::Min(
-            $AdminConsentedRawPoints,
-            $Weights.AdminConsentedRiskyPermissions.MaxPoints
-        )
+        
         $Score += $AdminConsentedPoints
         $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $AdminConsentedRiskyPermissions.Count
@@ -976,13 +983,10 @@ function Set-SeverityScore {
         $NonAdminConsentedRiskyPermissions = @($Object.Permissions | Where-Object {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $false
         })
-        $NonAdminConsentedRawPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
+        $NonAdminConsentedPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
             $Weights.RiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
-        $NonAdminConsentedPoints = [Math]::Min(
-            $NonAdminConsentedRawPoints,
-            $Weights.NonAdminConsentedRiskyPermissions.MaxPoints
-        )
+        
         $Score += $NonAdminConsentedPoints
         $ScoreBreakdown.NonAdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $NonAdminConsentedRiskyPermissions.Count

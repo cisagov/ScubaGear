@@ -125,7 +125,7 @@ InModuleScope AADRiskyPermissionsHelper {
             }
 
             It "does not include non-federated properties (StartDateTime/EndDateTime) in federated output" {
-                $Output = Format-Credentials -AccessKeys $MockFederatedCreds -IsFromApplication $true -IsFederated
+                $Output = Format-Credentials -AccessKeys $MockFederatedCredentials -IsFromApplication $true -IsFederated
                 foreach ($Obj in $Output) {
                     $Obj.PSObject.Properties.Name | Should -Not -Contain "StartDateTime"
                     $Obj.PSObject.Properties.Name | Should -Not -Contain "EndDateTime"
