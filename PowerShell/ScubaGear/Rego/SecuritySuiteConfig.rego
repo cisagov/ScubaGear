@@ -1,5 +1,11 @@
 package securitysuite
+import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
+import data.utils.report.ReportDetailsArray
+import data.utils.report.Description
+import data.utils.report.ArraySizeStr
 
 
 ######################
@@ -180,13 +186,36 @@ tests contains {
 #
 # MS.SECURITYSUITE.4.1v1
 #--
+
+# At a minimum, the alerts required by the EXO baseline SHALL be enabled.
+RequiredAlerts := {
+    "Suspicious email sending patterns detected",
+    "Suspicious Email Forwarding Activity",
+    "Messages have been delayed",
+    "Tenant restricted from sending unprovisioned email",
+    "User restricted from sending email",
+    "A potentially malicious URL click was detected",
+    "Suspicious connector activity"
+}
+
+# Save the names of all alerts that are enabled
+EnabledAlerts contains Alert.Name if {
+    some Alert in input.protection_alerts
+    Alert.Disabled == false
+}
+
+# If any of the required alerts are not enabled, the check should fail
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.4.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-ProtectionAlert"],
+    "ActualValue": MissingAlerts,
+    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
+    "RequirementMet": Status
+} if {
+    MissingAlerts := RequiredAlerts - EnabledAlerts
+    ErrorMessage := "disabled required alert(s) found:"
+    Status := count(MissingAlerts) == 0
 }
 #--
 
@@ -211,14 +240,28 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.1v1
 #--
+
+# Save the identity of audit logs that have logging enabled
+CorrectLogConfigs contains {
+    "Identity": AuditLog.Identity,
+    "UnifiedAuditLogIngestionEnabled": AuditLog.UnifiedAuditLogIngestionEnabled
+} if {
+    some AuditLog in input.admin_audit_log_config
+    AuditLog.UnifiedAuditLogIngestionEnabled == true
+}
+
+# The test should pass if at least one log exists
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.5.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-AdminAuditLogConfig"],
+    "ActualValue": CorrectLogConfigs,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Status := count(CorrectLogConfigs) >= 1
 }
+
 #--
 
 #
@@ -317,25 +360,51 @@ tests contains {
 #
 # MS.SECURITYSUITE.8.1v1
 #--
+# Loop thorugh connection filter. If filter has an IP allow
+# list, save the filter name to ConnFiltersWithIPAllowList array.
+ConnFiltersWithIPAllowList contains ConnFilter.Name if {
+    some ConnFilter in input.conn_filter
+    count(ConnFilter.IPAllowList) > 0
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.8.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.8.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-HostedConnectionFilterPolicy"],
+    "ActualValue": input.conn_filter,
+    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "RequirementMet": Status
+} if {
+    ConnFilterPolicies := ConnFiltersWithIPAllowList
+    ErrString := "connection filter polic(ies) with an IP allowlist:"
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
+    Status := count(ConnFilterPolicies) == 0
 }
 #--
 
 #
 # MS.SECURITYSUITE.8.2v1
 #--
+
+# Loop thorugh connection filter. If filter has safe
+# list enabled, save filter name to ConnFiltersWithSafeList
+# array.
+ConnFiltersWithSafeList contains ConnFilter.Name if {
+    some ConnFilter in input.conn_filter
+    ConnFilter.EnableSafeList == true
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.8.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.8.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-HostedConnectionFilterPolicy"],
+    "ActualValue": input.conn_filter,
+    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "RequirementMet": Status
+} if {
+    ConnFilterPolicies := ConnFiltersWithSafeList
+    ErrString := "connection filter polic(ies) with a safe list:"
+    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
+    Status := count(ConnFilterPolicies) == 0
 }
 #--

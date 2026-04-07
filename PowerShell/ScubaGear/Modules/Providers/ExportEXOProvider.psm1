@@ -78,11 +78,6 @@ function Export-EXOProvider {
     $TransportRules = ConvertTo-Json @($Tracker.TryCommand("Get-TransportRule"))
 
     <#
-    MS.EXO.12.1v1
-    #>
-    $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
-
-    <#
     MS.EXO.13.1v1
     #>
     $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object Name, DisplayName, AuditDisabled
@@ -102,7 +97,6 @@ function Export-EXOProvider {
     "transport_config": $TransportConfig,
     "sharing_policy": $SharingPolicy,
     "transport_rule": $TransportRules,
-    "conn_filter": $ConnectionFilter,
     "org_config": $Config,
     "exo_successful_commands": $SuccessfulCommands,
     "exo_unsuccessful_commands": $UnSuccessfulCommands,

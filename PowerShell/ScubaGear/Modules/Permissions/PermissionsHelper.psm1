@@ -19,7 +19,7 @@ Function Get-ScubaGearPermissions {
         The switch to indicate that the permissions are to be retrieved for a service principal
 
     .PARAMETER Product
-        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline
+        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'securitysute', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline
 
     .PARAMETER Environment
         The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
@@ -107,7 +107,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
+        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -134,7 +134,7 @@ Function Get-ScubaGearPermissions {
 
         # If ProductName is * then set Product to all possible values
         if ($Product -contains '*') {
-            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform')
+            $Product = @('aad', 'exo', 'securitysute', 'teams', 'sharepoint', 'powerplatform')
         }
 
         if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
@@ -156,9 +156,9 @@ Function Get-ScubaGearPermissions {
                 '00000002-0000-0ff1-ce00-000000000000',
                 '00000007-0000-0ff1-ce00-000000000000'
             )
-            'defender'   = '00000002-0000-0ff1-ce00-000000000000'
-            'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
-            'scubatank'  = '00000003-0000-0000-c000-000000000000'
+            'securitysuite'   = '00000002-0000-0ff1-ce00-000000000000'
+            'sharepoint'      = '00000003-0000-0ff1-ce00-000000000000'
+            'scubatank'       = '00000003-0000-0000-c000-000000000000'
         }
 
         # Start with an empty array to build the filter
@@ -197,7 +197,7 @@ Function Get-ScubaGearPermissions {
                             # Filter the resourceAPIAppId based on the product
                             $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
                             $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
-                        }elseif($ProductItem -match 'exo|sharepoint|defender'){
+                        }elseif($ProductItem -match 'exo|sharepoint|securitysuite'){
                             # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
                             # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
                             $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}

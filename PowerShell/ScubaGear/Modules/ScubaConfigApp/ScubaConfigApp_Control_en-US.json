@@ -239,9 +239,9 @@
       "showInViewer": true
     },
     {
-      "id": "Defender",
-      "name": "Defender",
-      "displayName": "Defender (defender)",
+      "id": "SecuritySuite",
+      "name": "Security Suite",
+      "displayName": "Security Suite (securitysuite)",
       "supportsExclusions": true,
       "showInApp": true,
       "showInViewer": true

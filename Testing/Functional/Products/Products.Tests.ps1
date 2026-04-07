@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -123,7 +123,7 @@ BeforeDiscovery {
         AppId = $AppId
         TenantDomain = $TenantDomain
     }{
-        if ($ProductName -eq "defender"){
+        if ($ProductName -eq "securitysuite"){
             $ProductNames = @($ProductName, "exo")
         }
         else {
@@ -157,7 +157,7 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-        defender = "Microsoft 365 Defender"
+        securitysuite = "Security Suite"
         exo = "Exchange Online"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"

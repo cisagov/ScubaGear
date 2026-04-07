@@ -12,7 +12,7 @@ function Invoke-SCuBA {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Defender for Office 365: defender
+    - Security Suite: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -39,7 +39,8 @@ function Invoke-SCuBA {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: defender will ask for authentication even if this variable is set to `$false`
+    Note: When assessing the Security Suite baseline, Defender will ask for authentication even if
+    this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -109,7 +110,7 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformance_*.
     .Example
     Invoke-SCuBA -Version
@@ -118,8 +119,8 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ConfigFilePath MyConfig.json
     This example uses the specified configuration file when executing SCuBAGear.
     .Example
-    Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-SCuBA -ProductNames aad, securitysuite -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Security Suite security
     baselines.
     .Example
     Invoke-SCuBA -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -140,7 +141,8 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        # Both defender and securitysuite are options, as defender is an alias for securitysuite
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -317,8 +319,17 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
+        }
+
+        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
+        if ($ProductNames.Contains('defender')){
+            if (-not $ProductNames.Contains('securitysuite')) {
+                $ProductNames = $PSBoundParameters['ProductNames'] = $ProductNames + "securitysuite"
+            }
+            $ProductNames = $PSBoundParameters['ProductNames'] = @($ProductNames | Where-Object {$_ -ne "defender" })
+            Write-Debug "Substituting defender with securitysuite in ProductNames"
         }
 
         # Default execution ParameterSet
@@ -715,7 +726,7 @@ function Invoke-SCuBA {
 $ArgToProd = @{
     teams = "Teams";
     exo = "EXO";
-    defender = "Defender";
+    securitysuite = "SecuritySuite";
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
@@ -724,7 +735,7 @@ $ArgToProd = @{
 $ProdToFullName = @{
     Teams = "Microsoft Teams";
     EXO = "Exchange Online";
-    Defender = "Microsoft 365 Defender";
+    SecuritySuite = "Security Suite";
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
@@ -832,8 +843,8 @@ function Invoke-ProviderList {
                         "exo" {
                             $RetVal = Export-EXOProvider -PreferredDnsResolvers $ScubaConfig.PreferredDnsResolvers -SkipDoH $ScubaConfig.SkipDoH | Select-Object -Last 1
                         }
-                        "defender" {
-                            $RetVal = Export-DefenderProvider @ConnectTenantParams  | Select-Object -Last 1
+                        "securitysuite" {
+                            $RetVal = Export-SecuritySuiteProvider @ConnectTenantParams  | Select-Object -Last 1
                         }
                         "powerplatform" {
                             $RetVal = Export-PowerPlatformProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
@@ -1163,7 +1174,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1269,7 +1280,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1666,7 +1677,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1694,7 +1705,7 @@ function Get-TenantDetail {
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
     }
-    elseif ($ProductNames.Contains("defender")) {
+    elseif ($ProductNames.Contains("securitysuite")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
     }
     else {
@@ -1755,13 +1766,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1912,7 +1923,7 @@ function Invoke-SCuBACached {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Defender for Office 365: defender
+    - Security Suite: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -1989,14 +2000,14 @@ function Invoke-SCuBACached {
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-SCuBACached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-SCuBACached -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-SCuBACached -ProductNames aad, securitysuite -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Security Suite security
     baselines.
     .Example
     Invoke-SCuBACached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -2017,7 +2028,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -2141,7 +2152,7 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "defender", "aad", "sharepoint", "powerplatform"
+                $ProductNames = "teams", "exo", "securitysuite", "aad", "sharepoint", "powerplatform"
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {

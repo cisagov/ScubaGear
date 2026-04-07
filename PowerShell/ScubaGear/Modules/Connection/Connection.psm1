@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+   [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -48,9 +48,12 @@ function Connect-Tenant {
    foreach ($Product in $ProductNames) {
        $N += 1
        $Percent = $N*100/$Len
+       # securitysuite technically isn't a "product" so say "Authenticating to defender" for it
+       # rather than "Authenticating to securitysuite"
+       $ProductName = if ($Product -ne "securitysuite") { $Product } else { "defender" }
        $ProgressParams = @{
            'Activity' = "Authenticating to each Product";
-           'Status' = "Authenticating to $($Product); $($N) of $($Len) Products authenticated to.";
+           'Status' = "Authenticating to $($ProductName); $($N) of $($Len) Products authenticated to.";
            'PercentComplete' = $Percent;
        }
        Write-Progress @ProgressParams
@@ -69,7 +72,7 @@ function Connect-Tenant {
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
-               {($_ -eq "exo") -or ($_ -eq "defender")} {
+               {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
                            M365Environment = $M365Environment;
@@ -77,7 +80,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Write-Verbose "Defender will require a sign in every single run regardless of what the LogIn parameter is set"
+                       Write-Verbose "For the Security Suite baseline, Defender will require a sign in every single run regardless of what the LogIn parameter is set"
                        Connect-EXOHelper @EXOHelperParams
                        $EXOAuthRequired = $false
                    }
@@ -247,10 +250,10 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-       [ValidateSet("aad", "defender", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+       [ValidateSet("aad", "securitysuite", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-       $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+       $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
    )
    $ErrorActionPreference = "SilentlyContinue"
 
@@ -277,8 +280,8 @@ function Disconnect-SCuBATenant {
            elseif ($Product -eq "powerplatform") {
                Remove-PowerAppsAccount -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
            }
-           elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
-               if($Product -eq "defender") {
+           elseif (($Product -eq "exo") -or ($Product -eq "securitysuite")) {
+               if($Product -eq "securitysuite") {
                    Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                }
                Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue -InformationAction SilentlyContinue | Out-Null
