@@ -142,8 +142,8 @@ try {
             Write-Output "Validation passed - No errors found"
         } else {
             Write-Error "Validation failed with $($ValidationErrors.Count) error(s):"
-            foreach ($error in $ValidationErrors) {
-                Write-Error "  - $error"
+            foreach ($ValidationError in $ValidationErrors) {
+                Write-Error "  - $ValidationError"
             }
             exit 1
         }
