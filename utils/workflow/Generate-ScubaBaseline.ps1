@@ -1,22 +1,22 @@
 <#
 .SYNOPSIS
-    Generates the ScubaBaseline.json asset package from baseline markdown files.
+    Generates the ScubaBaselines.json asset package from baseline markdown files.
 
 .DESCRIPTION
     This script is designed to be run as part of the GitHub Actions workflow to automatically
-    generate the machine-readable ScubaBaseline.json from the authoritative markdown baseline files.
+    generate the machine-readable ScubaBaselines.json from the authoritative markdown baseline files.
 
     The script:
     - Parses all baseline markdown files in PowerShell/ScubaGear/baselines/
     - Extracts policy details, exclusion mappings, and metadata
     - Generates a versioned JSON output file
-    - Places the file in the PowerShell/ScubaGear/schema/ directory for inclusion in the module package
+    - Places the file in the PowerShell/ScubaGear/schemas/ directory for inclusion in the module package
 
     This ensures the machine-readable SCBs are always in sync with the markdown source of truth.
 
 .PARAMETER OutputPath
-    The path where the ScubaBaseline.json file will be created.
-    Defaults to 'PowerShell/ScubaGear/schema/ScubaBaseline.json' (relative to repository root).
+    The path where the ScubaBaselines.json file will be created.
+    Defaults to 'PowerShell/ScubaGear/schemas/ScubaBaselines.json' (relative to repository root).
 
 .PARAMETER BaselineDirectory
     The directory containing the baseline markdown files.
@@ -30,7 +30,7 @@
     Generates the baseline JSON using default paths.
 
 .EXAMPLE
-    .\Generate-ScubaBaseline.ps1 -OutputPath "output/ScubaBaseline.json" -Validate
+    .\Generate-ScubaBaseline.ps1 -OutputPath "output/ScubaBaselines.json" -Validate
     Generates the baseline JSON to a custom location and validates it.
 
 .NOTES
@@ -41,7 +41,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$false)]
-    [string]$OutputPath = "PowerShell/ScubaGear/schema/ScubaBaseline.json",
+    [string]$OutputPath = "PowerShell/ScubaGear/schemas/ScubaBaselines.json",
 
     [Parameter(Mandatory=$false)]
     [string]$BaselineDirectory = "PowerShell/ScubaGear/baselines",

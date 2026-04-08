@@ -39,7 +39,7 @@ class ScubaConfig {
     # Cached JSON schema used for validation
     hidden static [object]$_ConfigSchema = $null
 
-    # Initializes validator subsystem once per session - loads schema/defaults from JSON files,
+    # Initializes validator subsystem once per session - loads schemas/defaults from JSON files,
     # caches resources in static properties for performance.
     # This is called automatically when needed and uses lazy loading pattern
     static [void] InitializeValidator() {

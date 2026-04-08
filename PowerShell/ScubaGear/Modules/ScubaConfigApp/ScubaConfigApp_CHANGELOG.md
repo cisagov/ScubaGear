@@ -45,7 +45,7 @@
 - Fixed baseline policy viewer failure when using pre-generated baseline schema
 
 ### Enhancements
-- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaseline.json from schema folder
+- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaselines.json from schema folder
 - Updated Show-SCuBABaselinePolicyViewer to use published baseline from schema folder instead of regenerating from markdown
 - Significantly improved startup performance by eliminating markdown parsing overhead for standard use cases
 - Maintained backward compatibility for custom baseline directories and GitHub URL scenarios
