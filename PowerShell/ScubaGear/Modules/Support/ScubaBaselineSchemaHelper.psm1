@@ -529,6 +529,18 @@ function Get-ScubaBaselinePolicy {
             $lines = Get-Content -Path $file.FullName -Encoding UTF8
         }
 
+        # Normalize problematic Unicode characters to standard ASCII equivalents
+        for ($j = 0; $j -lt $lines.Count; $j++) {
+            $lines[$j] = $lines[$j] -replace [char]0x2019, "'"    # Right single quotation mark to apostrophe
+            $lines[$j] = $lines[$j] -replace [char]0x201C, '"'    # Left double quotation mark
+            $lines[$j] = $lines[$j] -replace [char]0x201D, '"'    # Right double quotation mark
+            $lines[$j] = $lines[$j] -replace [char]0x2013, '-'    # En dash to hyphen
+            $lines[$j] = $lines[$j] -replace [char]0x2014, '--'   # Em dash to double hyphen
+            $lines[$j] = $lines[$j] -replace 'â€™', "'"           # Fix UTF-8 encoding error
+            $lines[$j] = $lines[$j] -replace 'â€œ', '"'           # Fix UTF-8 encoding error
+            $lines[$j] = $lines[$j] -replace 'â€\x9d', '"'         # Fix UTF-8 encoding error
+        }
+
         # Parse hierarchically by sections
         $fullContent = $lines -join "`n"
         $sections = Get-ScubaBaselineSections -Content $fullContent

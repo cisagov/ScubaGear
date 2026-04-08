@@ -1,8 +1,8 @@
-# ScubaBaseline.json Asset Package Schema
+# ScubaBaselines.json Asset Package Schema
 
 ## Overview
 
-The `ScubaBaseline.json` file is a machine-readable asset package derived from the authoritative markdown baseline documentation. It provides structured access to all SCuBA (Secure Cloud Business Applications) security configuration baselines for consumption by tools, scripts, and applications.
+The `ScubaBaselines.json` file is a machine-readable asset package derived from the authoritative markdown baseline documentation. It provides structured access to all SCuBA (Secure Cloud Business Applications) security configuration baselines for consumption by tools, scripts, and applications.
 
 **Important**: The markdown baseline files remain the authoritative source. The JSON format is an equivalent representation provided for machine consumption.
 
@@ -12,7 +12,7 @@ Current Schema Version: **1.0.0**
 
 ## File Location
 
-- **Path in Repository**: `baselines/ScubaBaseline.json`
+- **Path in Repository**: `baselines/ScubaBaselines.json`
 - **Available in**: 
   - GitHub releases (attached as release asset)
   - PowerShell Gallery package (included in module distribution)
@@ -212,7 +212,7 @@ Basic validation ensures:
 
 ```powershell
 # Load the baseline
-$baseline = Get-Content "baselines/ScubaBaseline.json" | ConvertFrom-Json
+$baseline = Get-Content "baselines/ScubaBaselines.json" | ConvertFrom-Json
 
 # Access a specific product
 $aadPolicies = $baseline.baselines.aad
@@ -234,7 +234,7 @@ $criticalPolicies = $baseline.baselines.aad | Where-Object {
 import json
 
 # Load the baseline
-with open('baselines/ScubaBaseline.json', 'r') as f:
+with open('baselines/ScubaBaselines.json', 'r') as f:
     baseline = json.load(f)
 
 # Get all products
@@ -248,7 +248,7 @@ defender_policies = [p for p in baseline['baselines']['defender']
 ### JavaScript/TypeScript
 
 ```typescript
-import baseline from './baselines/ScubaBaseline.json';
+import baseline from './baselines/ScubaBaselines.json';
 
 // Access version
 console.log(baseline.Version);
