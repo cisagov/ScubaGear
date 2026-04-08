@@ -333,11 +333,11 @@ Function Start-SCuBAConfigApp {
 
         # Strategy 0: Published schema baseline JSON (highest priority - pre-generated baseline)
         try {
-            Write-DebugOutput -Message "Attempting to load pre-generated baseline from schema folder" -Source $source -Level "Verbose"
+            Write-DebugOutput -Message "Attempting to load pre-generated baseline from schemas folder" -Source $source -Level "Verbose"
 
-            # Schema folder is at: ...\PowerShell\ScubaGear\schema\ScubaBaseline.json
+            # schemas folder is at: ...\PowerShell\ScubaGear\schemas\ScubaBaselines.json
             # PSScriptRoot is: ...\PowerShell\ScubaGear\Modules\ScubaConfigApp
-            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\schema\ScubaBaseline.json"
+            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\schemas\ScubaBaselines.json"
             $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
 
             if (Test-Path $SchemaBaselineResolved) {
@@ -349,7 +349,7 @@ Function Start-SCuBAConfigApp {
             }
         }
         catch {
-            Write-DebugOutput -Message "Failed to load baselines from schema folder: $($_.Exception.Message)" -Source $source -Level "Verbose"
+            Write-DebugOutput -Message "Failed to load baselines from schemas folder: $($_.Exception.Message)" -Source $source -Level "Verbose"
             $syncHash.Baselines = $null
         }
 
@@ -1418,14 +1418,14 @@ Function Show-SCuBABaselinePolicyViewer {
     }
 
     try {
-        # Strategy 1: Try to use pre-generated baseline from schema folder (highest priority)
+        # Strategy 1: Try to use pre-generated baseline from schemas folder (highest priority)
         $usePublishedBaseline = $false
-        $SchemaBaselinePath = Join-Path $PSScriptRoot "..\..\schema\ScubaBaseline.json"
+        $SchemaBaselinePath = Join-Path $PSScriptRoot "..\..\schemas\ScubaBaselines.json"
 
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
             # No custom baseline specified, check for published baseline
             if (Test-Path $SchemaBaselinePath) {
-                Write-Output "Found published baseline in schema folder. Using pre-generated baseline."
+                Write-Output "Found published baseline in schemas folder. Using pre-generated baseline."
                 # Copy the published baseline to the target location
                 Copy-Item -Path $SchemaBaselinePath -Destination $BaselineFilePath -Force
                 $usePublishedBaseline = $true
