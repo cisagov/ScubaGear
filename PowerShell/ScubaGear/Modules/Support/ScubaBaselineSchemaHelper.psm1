@@ -1,4 +1,4 @@
-<#
+﻿<#
 # Example usage:
 [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
 
