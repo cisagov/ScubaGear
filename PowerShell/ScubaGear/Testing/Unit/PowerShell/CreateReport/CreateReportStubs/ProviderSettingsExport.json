@@ -15886,7 +15886,7 @@
     }
   ],
   "defender_license": true,
-  "defender_successful_commands": [
+  "securitysuite_successful_commands": [
     "Get-AdminAuditLogConfig",
     "Get-EOPProtectionPolicyRule",
     "Get-MalwareFilterPolicy",
@@ -15902,7 +15902,7 @@
     "Get-ProtectionAlert",
     "Get-DlpComplianceRule"
   ],
-  "defender_unsuccessful_commands": [],
+  "securitysuite_unsuccessful_commands": [],
   "remote_domains": [
     {
       "DomainName": "*",

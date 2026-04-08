@@ -21,13 +21,13 @@ InModuleScope Orchestrator {
                 $FailedAuthList | Should -BeNullOrEmpty
             }
             It 'connects to defender' {
-                $ScubaConfig.ProductNames = @('defender')
+                $ScubaConfig.ProductNames = @('securitysuite')
                 $FailedAuthList = Invoke-Connection -ScubaConfig $ScubaConfig
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
                 $FailedAuthList | Should -BeNullOrEmpty
             }
             It 'connects to all products in one call' {
-                $ScubaConfig.ProductNames = @('aad','defender','exo','powerplatform','sharepoint','teams')
+                $ScubaConfig.ProductNames = @('aad','securitysuite','exo','powerplatform','sharepoint','teams')
                 $FailedAuthList = Invoke-Connection -ScubaConfig $ScubaConfig
                 # Still only one Connect-Tenant invocation expected (array passed)
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly

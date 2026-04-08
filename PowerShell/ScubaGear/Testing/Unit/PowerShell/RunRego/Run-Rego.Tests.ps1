@@ -3,7 +3,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Run
 InModuleScope 'RunRego' {
     Describe -Tag 'RunRego' -Name 'Invoke-Rego Success' -ForEach @(
         @{Product = 'aad'; Arg = 'AAD'},
-        @{Product = 'defender'; Arg = 'Defender'},
+        @{Product = 'securitysuite'; Arg = 'SecuritySuite'},
         @{Product = 'exo'; Arg = 'EXO'},
         @{Product = 'powerplatform'; Arg = 'PowerPlatform'},
         @{Product = 'sharepoint'; Arg = 'SharePoint'},
