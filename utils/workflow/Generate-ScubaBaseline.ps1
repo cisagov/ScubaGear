@@ -88,7 +88,7 @@ try {
     }
 
     # Use the module function to generate the baseline
-    $result = Update-ScubaConfigBaselineWithMarkdown `
+    $null = Update-ScubaConfigBaselineWithMarkdown `
         -BaselineFilePath $OutputFilePath `
         -BaselineDirectory $BaselineDirectoryPath
 
