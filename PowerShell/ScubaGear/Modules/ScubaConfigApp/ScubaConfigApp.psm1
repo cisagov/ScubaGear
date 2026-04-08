@@ -68,7 +68,7 @@ Function Start-SCuBAConfigApp {
     Start-SCuBAConfigApp
     # Opens the ScubaConfig UI.
 
-    .PARAMETER BaselineFilePath
+    .PARAMETER ConfigFilePath
     Specifies the YAML configuration file to load. If not provided, the default configuration will be used.
 
     .PARAMETER Language
@@ -87,7 +87,7 @@ Function Start-SCuBAConfigApp {
     Start-SCuBAConfigApp
 
     .EXAMPLE
-    $scubaui = Start-SCuBAConfigApp -BaselineFilePath "C:\path\to\config.yaml" -Online -M365Environment "gcc" -Passthru
+    $scubaui = Start-SCuBAConfigApp -ConfigFilePath "C:\path\to\config.yaml" -Online -M365Environment "gcc" -Passthru
 
     # To show configurations run:
     $scubaui.GeneralSettingsData | ConvertTo-Json
