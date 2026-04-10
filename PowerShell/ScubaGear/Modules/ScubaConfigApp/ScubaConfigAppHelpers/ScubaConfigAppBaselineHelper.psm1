@@ -674,28 +674,88 @@ function Get-ScubaBaselineSections {
         $currentContent += $line
     }
 
-        if ($currentPolicy) {
+    # Save last section
+    if ($currentSection) {
+        # Save last policy if exists
+        if ($currentPolicy -and $currentSubSection -eq "Policies") {
             $currentPolicy.Content = ($currentContent -join "`n").Trim()
-            $fullContent = $currentPolicy.Content
-            $policyDetails = Get-ScubaPolicyContent -Content $fullContent
+            $policyDetails = Get-ScubaPolicyContent -Content $currentPolicy.Content
             $currentPolicy.Criticality = $policyDetails.Criticality
             $currentPolicy.LastModified = $policyDetails.LastModified
             $currentPolicy.Rationale = $policyDetails.Rationale
             $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
-            $currentPolicy.Resources = $policyDetails.Resources
-            $policies += $currentPolicy
+            $currentPolicy.Badges = $policyDetails.Badges
+            # Extract implementation instructions for this policy
+            $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
+            $null = $currentSection.Policies.Add($currentPolicy)
         }
 
-        # Attach implementation instructions to the policies
-        foreach ($policy in $policies) {
-            if ($implementationInstructions.ContainsKey($policy.PolicyId)) {
-                $policy.Implementation = $implementationInstructions[$policy.PolicyId]
+        # Process remaining section content
+        if ($currentSubSection -eq "Resources") {
+            $currentSection.Resources = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources"
+        } elseif ($currentSubSection -eq "License Requirements") {
+            $sectionLicenseReq = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "LicenseRequirements"
+            $currentSection.LicenseRequirements = if ($sectionLicenseReq -and $sectionLicenseReq.Count -gt 0) { $sectionLicenseReq } else { @("N/A") }
+        }
+
+        $sections += $currentSection
+    }
+
+    return $sections
+}
+
+function Get-ScubaSectionContent {
+    <#
+    .SYNOPSIS
+    Parses section content for Resources or License Requirements
+    #>
+    param(
+        [string]$Content,
+        [string]$ContentType
+    )
+
+    $result = @()
+
+    if ($ContentType -eq "Resources") {
+        # Parse links for Resources
+        $linkPattern = '\[([^\]]+)\]\(([^)]+)\)'
+        $linkMatches = [regex]::Matches($Content, $linkPattern)
+
+        foreach ($match in $linkMatches) {
+            $linkName = $match.Groups[1].Value.Trim()
+            $linkUrl = $match.Groups[2].Value.Trim()
+            $result += @{ Name = $linkName; Url = $linkUrl }
+        }
+    }
+    elseif ($ContentType -eq "LicenseRequirements") {
+        # Parse bullet points for License Requirements - only split on actual bullets
+        # Use regex to find lines that start with bullet markers (- at beginning of line, possibly with whitespace)
+        $lines = $Content -split "`r?`n"
+        $currentBullet = ""
+
+        foreach ($line in $lines) {
+            $line = $line.Trim()
+            if ($line -match '^-\s*(.*)$') {
+                # This is a new bullet point - save previous one if it exists
+                if (-not [string]::IsNullOrWhiteSpace($currentBullet)) {
+                    $result += $currentBullet.Trim()
+                }
+                # Start new bullet with the content after the dash
+                $currentBullet = $matches[1].Trim()
+            } elseif (-not [string]::IsNullOrWhiteSpace($line) -and -not [string]::IsNullOrWhiteSpace($currentBullet)) {
+                # This is a continuation of the current bullet point
+                $currentBullet += " " + $line
             }
         }
 
-        if ($policies.Count -gt 0) {
-            $productName = ($file.Name -replace '\.md$', '').ToLower()
-            $policiesByProduct[$productName] = $policies
+        # Don't forget the last bullet point
+        if (-not [string]::IsNullOrWhiteSpace($currentBullet)) {
+            $result += $currentBullet.Trim()
+        }
+
+        # If no bullets found, ensure we still return an array (even if empty)
+        if ($result.Count -eq 0) {
+            $result = @()
         }
     }
 
@@ -820,10 +880,8 @@ function Get-ScubaPolicyContent {
         if (-not $linkUrl) { $linkUrl = "" }  # Handle badges without links
 
         $badges += @{
-            title = $match.Groups['Title'].Value -replace '_', ' '
             label = $label
             color = $color
-            imageUrl = $imageUrl
             linkUrl = $linkUrl
         }
     }
