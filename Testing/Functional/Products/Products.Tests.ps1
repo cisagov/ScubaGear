@@ -417,7 +417,7 @@ Describe "Policy Checks for <ProductName>" {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
-                                    elseif ($IsNotChecked){
+                                    if ($IsNotChecked){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {
