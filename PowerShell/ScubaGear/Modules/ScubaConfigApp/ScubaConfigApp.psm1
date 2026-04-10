@@ -337,7 +337,7 @@ Function Start-SCuBAConfigApp {
 
             # schemas folder is at: ...\PowerShell\ScubaGear\schemas\ScubaBaselines.json
             # PSScriptRoot is: ...\PowerShell\ScubaGear\Modules\ScubaConfigApp
-            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\schemas\ScubaBaselines.json"
+            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\..\schemas\ScubaBaselines.json"
             $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
 
             if (Test-Path $SchemaBaselineResolved) {
@@ -1363,7 +1363,10 @@ Function Show-SCuBABaselinePolicyViewer {
         [string]$BaselineFilePath = "$env:TEMP\ScubaBaselines.json",
 
         [Parameter(Mandatory=$false)]
-        [string]$NavigateToPolicyId
+        [string]$NavigateToPolicyId,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$PassThru
     )
 
     try {
@@ -1426,8 +1429,13 @@ Function Show-SCuBABaselinePolicyViewer {
             # No custom baseline specified, check for published baseline
             if (Test-Path $SchemaBaselinePath) {
                 Write-Output "Found published baseline in schemas folder. Using pre-generated baseline."
-                # Copy the published baseline to the target location
-                Copy-Item -Path $SchemaBaselinePath -Destination $BaselineFilePath -Force
+                # Copy the published baseline to the target location (if different)
+                $resolvedSchemaPath = (Resolve-Path $SchemaBaselinePath -ErrorAction SilentlyContinue).Path
+                $resolvedTargetPath = if (Test-Path $BaselineFilePath) { (Resolve-Path $BaselineFilePath -ErrorAction SilentlyContinue).Path } else { $BaselineFilePath }
+
+                if ($resolvedSchemaPath -ne $resolvedTargetPath) {
+                    Copy-Item -Path $SchemaBaselinePath -Destination $BaselineFilePath -Force
+                }
                 $usePublishedBaseline = $true
             }
         }
@@ -1645,18 +1653,28 @@ Function Show-SCuBABaselinePolicyViewer {
 
         # Call the helper function directly (it handles its own runspace)
         try {
-            if ((Test-Path $controlConfigPath) -and $NavigateToPolicyId) {
-                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -ControlConfigPath $controlConfigPath -NavigateToPolicyId $NavigateToPolicyId
-            } elseif (Test-Path $controlConfigPath) {
-                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -ControlConfigPath $controlConfigPath
-            } elseif ($NavigateToPolicyId) {
-                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -NavigateToPolicyId $NavigateToPolicyId
-            } else {
-                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath
+            # Build parameters hashtable
+            $helperParams = @{
+                BaselineFilePath = $BaselineFilePath
+            }
+            if (Test-Path $controlConfigPath) {
+                $helperParams.ControlConfigPath = $controlConfigPath
+            }
+            if ($NavigateToPolicyId) {
+                $helperParams.NavigateToPolicyId = $NavigateToPolicyId
+            }
+            if ($PassThru) {
+                $helperParams.PassThru = $true
             }
 
+            $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper @helperParams
+
             Write-Output "Baseline Policy Viewer launched successfully!"
-            #return $script:BaselineViewerInstance
+
+            # Return viewer instance if PassThru was specified
+            if ($PassThru) {
+                return $script:BaselineViewerInstance
+            }
         } catch {
             throw "Failed to launch baseline policy viewer: $($_.Exception.Message)"
         }
