@@ -80,7 +80,7 @@ function Get-LegacyExchangeServicePrincipal {
                 AppId                   = $ExchangeOnlineSP.AppId
                 DisplayName             = $ExchangeOnlineSP.DisplayName
                 SignInAudience          = $ExchangeOnlineSP.SignInAudience
-                HasKeyCredentials       = @($ExchangeOnlineSP.KeyCredentials).Count -gt 0
+                HasKeyCredentials       = ($null -ne $ExchangeOnlineSP.KeyCredentials) -and @($ExchangeOnlineSP.KeyCredentials).Count -gt 0
                 KeyCredentials          = Format-Credentials -AccessKeys $ExchangeOnlineSP.KeyCredentials -IsFromApplication $false
                 PasswordCredentials     = Format-Credentials -AccessKeys $ExchangeOnlineSP.PasswordCredentials -IsFromApplication $false
                 FederatedCredentials    = $ExchangeOnlineSP.FederatedIdentityCredentials
@@ -180,25 +180,23 @@ function Get-DedicatedExchangeHybridApplications {
                 }
 
                 # Fetch federated credentials separately via a dedicated Graph endpoint.
-                $FederatedCredentialsResults = $null
+                $FederatedCredentialsResults = @()
                 if ($null -ne $AppRegistration) {
-                    $FederatedCredentials = (Invoke-GraphDirectly `
+                    $FederatedCredentials = @((Invoke-GraphDirectly `
                         -Commandlet "Get-MgBetaApplicationFederatedIdentityCredential" `
                         -M365Environment $M365Environment `
                         -Id $AppRegistration.Id
-                    ).Value
+                    ).Value)
 
-                    if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
-                        $FederatedCredentialsResults = @()
-                        foreach ($FederatedCredential in $FederatedCredentials) {
-                            $FederatedCredentialsResults += [PSCustomObject]@{
-                                Id          = $FederatedCredential.Id
-                                Name        = $FederatedCredential.Name
-                                Description = $FederatedCredential.Description
-                                Issuer      = $FederatedCredential.Issuer
-                                Subject     = $FederatedCredential.Subject
-                                Audiences   = $FederatedCredential.Audiences | Out-String
-                            }
+                    foreach ($FederatedCredential in $FederatedCredentials) {
+                        if ($null -eq $FederatedCredential) { continue }
+                        $FederatedCredentialsResults += [PSCustomObject]@{
+                            Id          = $FederatedCredential.Id
+                            Name        = $FederatedCredential.Name
+                            Description = $FederatedCredential.Description
+                            Issuer      = $FederatedCredential.Issuer
+                            Subject     = $FederatedCredential.Subject
+                            Audiences   = $FederatedCredential.Audiences | Out-String
                         }
                     }
                 }
@@ -209,10 +207,10 @@ function Get-DedicatedExchangeHybridApplications {
                     DisplayName             = $ServicePrincipal.DisplayName
                     AppRegistrationExists   = ($null -ne $AppRegistration)
                     FullAccessAsAppRole     = $Assignment
-                    HasKeyCredentials       = ($null -ne $AppRegistration) -and @($AppRegistration.KeyCredentials).Count -gt 0
+                    HasKeyCredentials       = ($null -ne $AppRegistration) -and ($null -ne $AppRegistration.KeyCredentials) -and @($AppRegistration.KeyCredentials).Count -gt 0
                     KeyCredentials          = if ($null -ne $AppRegistration) { Format-Credentials -AccessKeys $AppRegistration.KeyCredentials -IsFromApplication $true } else { $null }
                     PasswordCredentials     = if ($null -ne $AppRegistration) { Format-Credentials -AccessKeys $AppRegistration.PasswordCredentials -IsFromApplication $true } else { $null }
-                    FederatedCredentials    = $FederatedCredentialsResults
+                    FederatedCredentials    = if (@($FederatedCredentialsResults).Count -gt 0) { @($FederatedCredentialsResults) } else { $null }
                     AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                 }
             }
