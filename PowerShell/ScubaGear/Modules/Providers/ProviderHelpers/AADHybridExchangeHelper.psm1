@@ -231,6 +231,7 @@ function Get-DedicatedExchangeHybridApplications {
 }
 
 Export-ModuleMember -Function @(
+    "Get-ExchangeHybridIds",
     "Get-LegacyExchangeServicePrincipal",
     "Get-DedicatedExchangeHybridApplications"
 )
