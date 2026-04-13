@@ -123,6 +123,63 @@ test_PhishingResistantMFAUserGroupExclusion_Correct if {
 
     TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
 }
+
+# tests for Application exclusions
+test_AppExclusionConditions_Correct_V4 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Applications as ["Office365"]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
+}
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V4 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V4 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+    TestResult("MS.AAD.3.1v1", Output, ReportDetailStr, false) == true
+}
 #--
 
 #
@@ -582,6 +639,65 @@ test_State_Incorrect_V1 if {
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
     TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
+}
+
+# tests for Application exclusions
+test_AppExclusionConditions_Correct_V5 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Applications as ["Office365"]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+}
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V5 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V5 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
 }
 #--
 
@@ -1420,6 +1536,69 @@ test_GroupExclusionsConditions_Correct_V2 if {
 
     TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
 }
+
+# tests for Application exclusions
+test_AppExclusionConditions_Correct_V6 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles", "value": ["Role1", "Role2"]},
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
+                        with input.scuba_config.Aad["MS.AAD.3.6v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.6v1"].CapExclusions.Applications as ["Office365"]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
+}
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V6 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles", "value": ["Role1", "Role2"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
+                        with input.scuba_config.Aad["MS.AAD.3.6v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.6v1"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V6 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/Users/IncludeRoles", "value": ["Role1", "Role2"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.privileged_roles as PrivilegedRoles
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+    TestResult("MS.AAD.3.6v1", Output, ReportDetailStr, false) == true
+}
 #--
 
 #
@@ -1605,6 +1784,69 @@ test_ApplicationExclusions_Incorrect_V3 if {
 
     TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
 }
+
+# tests for Application exclusions
+test_AppExclusionConditions_Correct_V7 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.Applications as ["Office365"]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
+}
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V7 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.7v1"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailStr := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V7 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+    TestResult("MS.AAD.3.7v1", Output, ReportDetailStr, false) == true
+}
 #--
 
 #
@@ -1746,6 +1988,44 @@ test_ApplicationExclusions_Incorrect_V4 if {
 
     TestResult("MS.AAD.3.8v1", Output, ReportDetailStr, false) == true
 }
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V8 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.8v1"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.8v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V8 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
+    TestResult("MS.AAD.3.8v1", Output, ReportDetailStr, false) == true
+}
 #--
 
 #
@@ -1843,6 +2123,58 @@ test_Entra_3_9_Application_Exclusion_Incorrect_V1 if {
 
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
+}
+
+# tests for Application exclusions
+test_AppExclusionConditions_Correct_V8 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.Applications as ["Office365"]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.9v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+# tests for guest user type exclusions
+test_GuestUserTypeExclusionConditions_Correct_V9 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.9v1"].CapExclusions.GuestUserTypes as [
+                            "b2bCollaborationGuest",
+                            "internalGuest"
+                        ]
+
+    ReportDetailArrayStrs := ["conditional access policy(s) found that meet(s) all requirements:"]
+    TestResultContains("MS.AAD.3.9v1", Output, ReportDetailArrayStrs, true) == true
+}
+
+test_GuestUserTypeExclusionNoExempt_Incorrect_V9 if {
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "replace", "path": "Conditions/AuthenticationFlows/TransferMethods", "value": "deviceCodeFlow"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
+                "value": {
+                    "GuestOrExternalUserTypes": "b2bCollaborationGuest",
+                    "ExternalTenants": {"MembershipKind": "all"}
+                }}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+
+    ReportDetailStr :=
+        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+
     TestResult("MS.AAD.3.9v1", Output, ReportDetailStr, false) == true
 }
 

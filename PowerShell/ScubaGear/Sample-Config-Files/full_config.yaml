@@ -85,6 +85,16 @@ Aad:
         - 1a0161f4-318c-4415-b2a0-862bde2c9cde # Example Group 1
       Users:
         - 9d9ac7b2-5aa6-4830-a17a-6557e52140b0 # Example User 1
+      Applications:
+        - 49b4dcdf-1f90-41a7-9b42-5cfe9dd7e3b4 # Example Application 1
+        - Office365 # Example Application 2
+      GuestUserTypes:
+        - internalGuest
+        - b2bCollaborationGuest
+        - b2bCollaborationMember
+        - b2bDirectConnectUser
+        - otherExternalUser
+        - serviceProvider
 
   # Users detected as high risk SHALL be blocked.
   MS.AAD.2.1v1: *CommonCapExclusions
@@ -100,6 +110,10 @@ Aad:
         - cb075a02-09cf-4754-a673-90345120e03b # Example Group 3
       Users:
         - 9d9ac7b2-5aa6-4830-a17a-6557e52140b0 # Example User 1
+      Applications:
+        - 49b4dcdf-1f90-41a7-9b42-5cfe9dd7e3b4 # Example Application 1
+      GuestUserTypes:
+        - b2bCollaborationGuest
 
   # If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
   MS.AAD.3.2v1: *MfaCapExclusions

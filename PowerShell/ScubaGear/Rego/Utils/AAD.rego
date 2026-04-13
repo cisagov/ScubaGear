@@ -138,6 +138,45 @@ GroupExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Groups}) == 0
 }
 
+default AppExclusionsFullyExempt(_, _) := false
+
+# Returns true when all application exclusions present in the conditional
+# access policy are exempted in matching config variable for the
+# baseline policy item.  Undefined if no exclusions AND no exemptions.
+AppExclusionsFullyExempt(Policy, PolicyID) := true if {
+    ExemptedApps := input.scuba_config.Aad[PolicyID].CapExclusions.Applications
+    ExcludedApps := ConvertToSet(Policy.Conditions.Applications.ExcludeApplications)
+    AllowedExcludedApps := ConvertToSet(ExemptedApps)
+    count(ExcludedApps - AllowedExcludedApps) == 0
+}
+
+# Returns true when both the policy exclusion list and the config list are empty
+AppExclusionsFullyExempt(Policy, PolicyID) := true if {
+    count({x | some x in Policy.Conditions.Applications.ExcludeApplications}) == 0
+    count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Applications}) == 0
+}
+
+default GuestUserExclusionsFullyExempt(_, _) := false
+
+# Returns true (pass) when the CAP has no guest user type exclusions configured.
+# The Graph API returns ExcludeGuestsOrExternalUsers as null when no guest types
+# are excluded from the policy, meaning no config exemption is needed.
+GuestUserExclusionsFullyExempt(Policy, _) := true if {
+    Policy.Conditions.Users.ExcludeGuestsOrExternalUsers == null
+}
+
+# Returns true (pass) when the CAP does exclude specific guest user types, but every
+# excluded type appears in the ScubaConfig allowlist for this policy. The Graph API
+# returns the excluded types as a comma-separated string (e.g. "b2bCollaborationGuest,internalGuest"),
+# which is split into individual values and compared against the allowlist. If any
+# excluded type is NOT in the allowlist, this returns false and the policy fails.
+GuestUserExclusionsFullyExempt(Policy, PolicyID) := true if {
+    GuestExclusions := Policy.Conditions.Users.ExcludeGuestsOrExternalUsers
+    GuestExclusions != null
+    ExcludedTypes := ConvertToSet(split(GuestExclusions.GuestOrExternalUserTypes, ","))
+    AllowedTypes := ConvertToSet(input.scuba_config.Aad[PolicyID].CapExclusions.GuestUserTypes)
+    count(ExcludedTypes - AllowedTypes) == 0
+}
 
 #########################
 # General AAD Functions #
