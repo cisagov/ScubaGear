@@ -261,4 +261,16 @@ jobs:
           subject: "ScubaGear Functional Test Failure - product: ${{ inputs.SelectedProduct || 'all' }} - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
-          body: "Functional test failed for product: ${{ inputs.SelectedProduct || 'all' }}, branch: ${{ inputs.RefName || github.ref_name }}. Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body: |
+            ScubaGear Functional Test Failure
+
+            Product: ${{ inputs.SelectedProduct || 'all' }}
+            Branch: ${{ inputs.RefName || github.ref_name }}
+            Workflow: SharePoint
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Tenant Job Results:
+              Shr_Tenant1_PNP: ${{ needs.Shr_Tenant1_PNP.result }}
+              Shr_Tenant2_PNP: ${{ needs.Shr_Tenant2_PNP.result }}
+              Shr_Tenant6_PNP: ${{ needs.Shr_Tenant6_PNP.result }}
+              Shr_Tenant7_PNP: ${{ needs.Shr_Tenant7_PNP.result }}

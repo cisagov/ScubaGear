@@ -261,4 +261,16 @@ jobs:
           subject: "ScubaGear Functional Test Failure - product: ${{ inputs.SelectedProduct || 'all' }} - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
-          body: "Functional test failed for product: ${{ inputs.SelectedProduct || 'all' }}, branch: ${{ inputs.RefName || github.ref_name }}. Details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          body: |
+            ScubaGear Functional Test Failure
+
+            Product: ${{ inputs.SelectedProduct || 'all' }}
+            Branch: ${{ inputs.RefName || github.ref_name }}
+            Workflow: Power Platform
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Tenant Job Results:
+              Pwr_Tenant1: ${{ needs.Pwr_Tenant1.result }}
+              Pwr_Tenant2: ${{ needs.Pwr_Tenant2.result }}
+              Pwr_Tenant6: ${{ needs.Pwr_Tenant6.result }}
+              Pwr_Tenant7: ${{ needs.Pwr_Tenant7.result }}
