@@ -103,7 +103,7 @@ function Get-DedicatedExchangeHybridApplications {
     The script creates a new app registration/service principal in the specified tenant with the display name "ExchangeServerApp-{exchange organization guid}"
     by default, but users can also specify a custom name to the script above. This function doesn't search for a specific display name, but instead
     seaches for all tenant-owned apps assigned the full_access_as_app role.
-    
+
     .Functionality
     Internal
     #>
