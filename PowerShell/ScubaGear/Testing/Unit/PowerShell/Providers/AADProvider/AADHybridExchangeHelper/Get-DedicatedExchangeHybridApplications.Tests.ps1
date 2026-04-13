@@ -6,12 +6,18 @@ InModuleScope AADHybridExchangeHelper {
     BeforeAll {
         # Import mock data
         $SnippetsPath = Join-Path -Path $PSScriptRoot -ChildPath "../HybridExchangeSnippets"
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockAppRoleAssignment')]
         $MockAppRoleAssignment = Get-Content "$SnippetsPath/MockAppRoleAssignment.json" | ConvertFrom-Json
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockDedicatedHybridAppRegistration')]
         $MockDedicatedHybridAppRegistration = Get-Content "$SnippetsPath/MockDedicatedHybridAppRegistration.json" | ConvertFrom-Json
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockDedicatedHybridSP')]
         $MockDedicatedHybridSP = Get-Content "$SnippetsPath/MockDedicatedHybridServicePrincipal.json" | ConvertFrom-Json
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockExchangeOnlineSP')]
         $MockExchangeOnlineSP = Get-Content "$SnippetsPath/MockExchangeOnlineServicePrincipal.json" | ConvertFrom-Json
 
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExchangeOnlineAppId')]
         $ExchangeOnlineAppId = "00000002-0000-0ff1-ce00-000000000000"
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'FullAccessAsAppRoleId')]
         $FullAccessAsAppRoleId = "dc890d15-9560-4a4c-9b7f-a736ec74ec40"
     }
 
@@ -19,7 +25,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When a dedicated hybrid app is fully configured with an app registration and service principal" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
@@ -115,7 +121,7 @@ InModuleScope AADHybridExchangeHelper {
                 }
 
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
@@ -161,7 +167,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When the service principal exists but has no app registration" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
@@ -231,7 +237,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments match full_access_as_app" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
@@ -260,7 +266,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments exist at all" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
@@ -293,7 +299,7 @@ InModuleScope AADHybridExchangeHelper {
                 $SecondSP.DisplayName = "ExchangeServerApp-SecondOrg"
 
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $M365Environment, $QueryParams, $Id)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
