@@ -31,6 +31,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Fetch full history to enable branch comparison
 
       - name: Configure Git
         run: |
