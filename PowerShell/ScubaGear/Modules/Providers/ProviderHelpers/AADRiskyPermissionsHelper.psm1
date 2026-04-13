@@ -1026,25 +1026,26 @@ function Set-SeverityScore {
         $CredentialBasePoints = $HighestRiskLevel
 
         # 6. Calculate password credential weight factor
-        # Split merged credentials by source so service principal credentials are weighted appropriately
-        $AppPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $true })
-        $ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
-
-        $AppPasswordScore = Set-CredentialScore `
-            -AccessKeys $AppPasswordCredentials `
-            -WeightConfig $Weights.PasswordCredentials `
-            -CheckLifetime
+        $PasswordBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Password)
         
-        $ServicePrincipalPasswordScore = Set-CredentialScore `
-            -AccessKeys $ServicePrincipalPasswordCredentials `
-            -WeightConfig $Weights.PasswordCredentials `
-            -CheckLifetime `
-            -IsServicePrincipal
-        
-        $PasswordCredentialPoints = [Math]::Min(
-            $AppPasswordScore.TotalPoints + $ServicePrincipalPasswordScore.TotalPoints,
-            $Weights.PasswordCredentials.MaxPoints
-        )
+        #$AppPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $true })
+        #$ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
+#
+        #$AppPasswordScore = Set-CredentialScore `
+        #    -AccessKeys $AppPasswordCredentials `
+        #    -WeightConfig $Weights.PasswordCredentials `
+        #    -CheckLifetime
+        #
+        #$ServicePrincipalPasswordScore = Set-CredentialScore `
+        #    -AccessKeys $ServicePrincipalPasswordCredentials `
+        #    -WeightConfig $Weights.PasswordCredentials `
+        #    -CheckLifetime `
+        #    -IsServicePrincipal
+        #
+        #$PasswordCredentialPoints = [Math]::Min(
+        #    $AppPasswordScore.TotalPoints + $ServicePrincipalPasswordScore.TotalPoints,
+        #    $Weights.PasswordCredentials.MaxPoints
+        #)
 
         $Score += $PasswordCredentialPoints
         $ScoreBreakdown.PasswordCredentials = [PSCustomObject]@{
