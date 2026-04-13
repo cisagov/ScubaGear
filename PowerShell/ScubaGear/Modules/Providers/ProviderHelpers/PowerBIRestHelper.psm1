@@ -35,15 +35,13 @@ function Get-PowerBIScope {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
-    # GCC High and DoD use sovereign cloud resource URIs; commercial and GCC use the standard endpoint.
-    if ($M365Environment -in @("commercial", "gcc")) {
-        return "https://analysis.windows.net/powerbi/api/.default"
-    }
-    elseif ($M365Environment -eq "gcchigh") {
-        return "https://high.analysis.usgovcloudapi.net/powerbi/api/.default"
-    }
-    else {
-        return "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default"
+
+    # Set the correct scope for the Power BI Admin API based on the environment
+    switch ($M365Environment) {
+        "commercial" { return "https://analysis.windows.net/powerbi/api/.default" }
+        "gcc"        { return "https://analysis.usgovcloudapi.net/powerbi/api/.default" }
+        "gcchigh"    { return "https://high.analysis.usgovcloudapi.net/powerbi/api/.default" }
+        "dod"        { return "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default" }
     }
 }
 
