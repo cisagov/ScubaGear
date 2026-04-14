@@ -113,7 +113,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When a dedicated hybrid app has federated credentials assigned" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams, $Id)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
