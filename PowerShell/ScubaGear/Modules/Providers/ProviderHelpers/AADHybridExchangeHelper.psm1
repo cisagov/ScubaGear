@@ -23,6 +23,8 @@ function Get-ExchangeHybridIds {
             throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
         }
 
+        # $FullAccessAsAppRoleId.Name  = role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
+        # $FullAccessAsAppRoleId.Value = role name ("full_access_as_app")
         $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
             $_.Value -eq "full_access_as_app"
         } | Select-Object -First 1
@@ -116,6 +118,8 @@ function Get-DedicatedExchangeHybridApplications {
         try {
             $Ids = Get-ExchangeHybridIds
 
+            # Exchange Online is the resource that owns the full_access_as_app role.
+            # Lookup the Exchange Online service principal first, then use its object ID to query for all app role assignments to the full_access_as_app role below.
             $ExchangeOnlineSP = (Invoke-GraphDirectly `
                 -Commandlet "Get-MgBetaServicePrincipal" `
                 -M365Environment $M365Environment `
@@ -131,7 +135,7 @@ function Get-DedicatedExchangeHybridApplications {
                     DedicatedHybridAppConfigured = $false
                     Apps                         = $null
                 }
-            }
+            } 
 
             $AllAppRoleAssignments = (Invoke-GraphDirectly `
                 -Commandlet "Get-MgBetaServicePrincipalAppRoleAssignedTo" `
@@ -179,7 +183,7 @@ function Get-DedicatedExchangeHybridApplications {
                     ServicePrincipal = $ServicePrincipal.Id
                 }
 
-                # Fetch federated credentials separately via a dedicated Graph endpoint.
+                # Fetch federated credentials from the app registration.
                 $FederatedCredentialsResults = @()
                 if ($null -ne $AppRegistration) {
                     $FederatedCredentials = (Invoke-GraphDirectly `
