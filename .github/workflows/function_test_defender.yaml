@@ -41,8 +41,6 @@ on:
         required: true
       NotifierPassword:
         required: true
-  workflow_dispatch:
-
 permissions:
   id-token: write
   contents: write

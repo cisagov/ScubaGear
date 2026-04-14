@@ -33,7 +33,7 @@ $failedCount = [int]$pesterResult.FailedCount
 $skippedCount = [int]$pesterResult.SkippedCount
 $totalCount = [int]$pesterResult.TotalCount
 
-Write-Host "Tests summary: $passedCount/$totalCount passing, $failedCount failed, $skippedCount skipped"
+Write-Output "Tests summary: $passedCount/$totalCount passing, $failedCount failed, $skippedCount skipped"
 
 if ($env:GITHUB_OUTPUT) {
     "passed=$passedCount" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
