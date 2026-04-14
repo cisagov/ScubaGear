@@ -240,7 +240,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments match full_access_as_app" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
+                    param($Commandlet)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
@@ -269,7 +269,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments exist at all" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
+                    param($Commandlet)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
