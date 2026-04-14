@@ -36,9 +36,9 @@ function Export-EXOProvider {
     <#
     MS.EXO.2.2v3 SPF
     #>
-    $domains = $Tracker.TryCommand("Get-AcceptedDomain")
+    $AcceptedDomains = $Tracker.TryCommand("Get-AcceptedDomain")
     $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{
-        "Domains"=$domains;
+        "Domains"=$AcceptedDomains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
         "SkipDoH"=$SkipDoH;
     })) -Depth 4
@@ -48,7 +48,7 @@ function Export-EXOProvider {
     #>
     $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
     $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{
-        "Domains"=$domains;
+        "Domains"=$AcceptedDomains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
         "SkipDoH"=$SkipDoH;
     })) -Depth 4
@@ -57,7 +57,7 @@ function Export-EXOProvider {
     MS.EXO.4.1v1 DMARC
     #>
     $DMARCRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDmarcRecord", @{
-        "Domains"=$domains;
+        "Domains"=$AcceptedDomains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
         "SkipDoH"=$SkipDoH;
     })) -Depth 4
@@ -110,6 +110,10 @@ function Export-EXOProvider {
     $IntraOrgConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-IntraOrganizationConnector")) -Depth 4
     $OrgRelationships = ConvertTo-Json @($Tracker.TryCommand("Get-OrganizationRelationship")) -Depth 4
 
+    # Convert accepted domains to JSON format AFTER its used in Get-ScubaSpfRecord, Get-ScubaDkimRecord, and Get-ScubaDmarcRecord methods.
+    # We want to store the accepted domain values to check for the "IsCoexistenceDomain" property.
+    $AcceptedDomains = ConvertTo-Json @($AcceptedDomains)
+
     # Used in the reporter to check successful cmdlet invocation
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
@@ -117,6 +121,7 @@ function Export-EXOProvider {
     # Note the spacing and the last comma in the json is important
     $json = @"
     "remote_domains": $RemoteDomains,
+    "accepted_domains": $AcceptedDomains,
     "spf_records": $SPFRecords,
     "dkim_config": $DKIMConfig,
     "dkim_records": $DKIMRecords,
@@ -646,7 +651,7 @@ function Get-ScubaDkimRecord {
 
     $DKIMRecords = @()
 
-    foreach ($d in $domains) {
+    foreach ($d in $Domains) {
         if ($d.IsCoexistenceDomain) {
             # Skip the coexistence domain (e.g., contoso.mail.onmicrosoft.com).
             # It's not actually possible to publish custom DNS records for this

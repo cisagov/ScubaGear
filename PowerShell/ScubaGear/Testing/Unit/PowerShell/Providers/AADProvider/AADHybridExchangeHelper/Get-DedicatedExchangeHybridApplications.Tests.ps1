@@ -15,10 +15,11 @@ InModuleScope AADHybridExchangeHelper {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockExchangeOnlineSP')]
         $MockExchangeOnlineSP = Get-Content "$SnippetsPath/MockExchangeOnlineServicePrincipal.json" | ConvertFrom-Json
 
+        $HybridIds = Get-ExchangeHybridIds
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExchangeOnlineAppId')]
-        $ExchangeOnlineAppId = "00000002-0000-0ff1-ce00-000000000000"
+        $ExchangeOnlineAppId = $HybridIds.ExchangeOnlineAppId
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'FullAccessAsAppRoleId')]
-        $FullAccessAsAppRoleId = "dc890d15-9560-4a4c-9b7f-a736ec74ec40"
+        $FullAccessAsAppRoleId = $HybridIds.FullAccessAsAppRoleId
     }
 
     Describe "Get-DedicatedExchangeHybridApplications" {
@@ -28,7 +29,7 @@ InModuleScope AADHybridExchangeHelper {
                     param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
+                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
                                 return @{ Value = $MockExchangeOnlineSP }
                             }
                             return @{ Value = $MockDedicatedHybridSP }
@@ -111,20 +112,11 @@ InModuleScope AADHybridExchangeHelper {
 
         Context "When a dedicated hybrid app has federated credentials assigned" {
             BeforeEach {
-                $MockFederatedCredential = [PSCustomObject]@{
-                    Id          = "00000000-0000-0000-0000-000000000099"
-                    Name        = "TestFederatedCredential"
-                    Description = "Test federated identity"
-                    Issuer      = "https://token.actions.githubusercontent.com"
-                    Subject     = "repo:org/repo:ref:refs/heads/main"
-                    Audiences   = @("api://AzureADTokenExchange")
-                }
-
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
+                    param($Commandlet, $QueryParams, $Id)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
+                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
                                 return @{ Value = $MockExchangeOnlineSP }
                             }
                             return @{ Value = $MockDedicatedHybridSP }
@@ -136,7 +128,18 @@ InModuleScope AADHybridExchangeHelper {
                             return @{ Value = $MockDedicatedHybridAppRegistration }
                         }
                         "Get-MgBetaApplicationFederatedIdentityCredential" {
-                            return @{ Value = @($MockFederatedCredential) }
+                            return @{
+                                Value = @(
+                                    [PSCustomObject]@{
+                                        Id          = "00000000-0000-0000-0000-000000000099"
+                                        Name        = "TestFederatedCredential"
+                                        Description = "Test federated identity"
+                                        Issuer      = "https://token.actions.githubusercontent.com"
+                                        Subject     = "repo:org/repo:ref:refs/heads/main"
+                                        Audiences   = @("api://AzureADTokenExchange")
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -145,7 +148,7 @@ InModuleScope AADHybridExchangeHelper {
             It "populates 'FederatedCredentials' with one entry" {
                 $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
                 $Result.Apps[0].FederatedCredentials | Should -Not -BeNullOrEmpty
-                $Result.Apps[0].FederatedCredentials.Count | Should -Be 1
+                @($Result.Apps[0].FederatedCredentials).Count | Should -Be 1
             }
 
             It "maps the correct federated credential 'Issuer'" {
@@ -170,7 +173,7 @@ InModuleScope AADHybridExchangeHelper {
                     param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "$($ExchangeOnlineAppId)") {
+                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
                                 return @{ Value = $MockExchangeOnlineSP }
                             }
                             return @{ Value = $MockDedicatedHybridSP }
@@ -237,7 +240,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments match full_access_as_app" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
@@ -266,7 +269,7 @@ InModuleScope AADHybridExchangeHelper {
         Context "When no app role assignments exist at all" {
             BeforeEach {
                 Mock Invoke-GraphDirectly {
-                    param($Commandlet)
+                    param($Commandlet, $QueryParams)
                     switch ($Commandlet) {
                         "Get-MgBetaServicePrincipal" {
                             return @{ Value = $MockExchangeOnlineSP }
