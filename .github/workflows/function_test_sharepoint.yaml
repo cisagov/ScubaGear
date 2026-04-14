@@ -58,6 +58,11 @@ jobs:
     concurrency:
       group: Sharepoint_Tenant1
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -89,6 +94,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -104,6 +110,11 @@ jobs:
     concurrency:
       group: Sharepoint_Tenant2
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -135,6 +146,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -150,6 +162,11 @@ jobs:
     concurrency:
       group: Sharepoint_Tenant6
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -181,6 +198,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -196,6 +214,11 @@ jobs:
     concurrency:
       group: Sharepoint_Tenant7
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -227,6 +250,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -258,19 +282,18 @@ jobs:
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: "ScubaGear Functional Test Failure - product: ${{ inputs.SelectedProduct || 'all' }} - branch: ${{ inputs.RefName || github.ref_name }}"
+          subject: "ScubaGear Functional Test Failure - SharePoint - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
           body: |
             ScubaGear Functional Test Failure
 
-            Product: ${{ inputs.SelectedProduct || 'all' }}
+            Product: SharePoint
             Branch: ${{ inputs.RefName || github.ref_name }}
-            Workflow: SharePoint
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Tenant Job Results:
-              Shr_Tenant1_PNP: ${{ needs.Shr_Tenant1_PNP.result }}
-              Shr_Tenant2_PNP: ${{ needs.Shr_Tenant2_PNP.result }}
-              Shr_Tenant6_PNP: ${{ needs.Shr_Tenant6_PNP.result }}
-              Shr_Tenant7_PNP: ${{ needs.Shr_Tenant7_PNP.result }}
+              Shr_Tenant1_PNP: ${{ needs.Shr_Tenant1_PNP.result }} (${{ needs.Shr_Tenant1_PNP.outputs.passed }}/${{ needs.Shr_Tenant1_PNP.outputs.total }} passing, ${{ needs.Shr_Tenant1_PNP.outputs.failed }} failed)
+              Shr_Tenant2_PNP: ${{ needs.Shr_Tenant2_PNP.result }} (${{ needs.Shr_Tenant2_PNP.outputs.passed }}/${{ needs.Shr_Tenant2_PNP.outputs.total }} passing, ${{ needs.Shr_Tenant2_PNP.outputs.failed }} failed)
+              Shr_Tenant6_PNP: ${{ needs.Shr_Tenant6_PNP.result }} (${{ needs.Shr_Tenant6_PNP.outputs.passed }}/${{ needs.Shr_Tenant6_PNP.outputs.total }} passing, ${{ needs.Shr_Tenant6_PNP.outputs.failed }} failed)
+              Shr_Tenant7_PNP: ${{ needs.Shr_Tenant7_PNP.result }} (${{ needs.Shr_Tenant7_PNP.outputs.passed }}/${{ needs.Shr_Tenant7_PNP.outputs.total }} passing, ${{ needs.Shr_Tenant7_PNP.outputs.failed }} failed)
