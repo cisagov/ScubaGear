@@ -182,11 +182,11 @@ function Get-DedicatedExchangeHybridApplications {
                 # Fetch federated credentials separately via a dedicated Graph endpoint.
                 $FederatedCredentialsResults = @()
                 if ($null -ne $AppRegistration) {
-                    $FederatedCredentials = @((Invoke-GraphDirectly `
+                    $FederatedCredentials = (Invoke-GraphDirectly `
                         -Commandlet "Get-MgBetaApplicationFederatedIdentityCredential" `
                         -M365Environment $M365Environment `
                         -Id $AppRegistration.Id
-                    ).Value)
+                    ).Value
 
                     foreach ($FederatedCredential in $FederatedCredentials) {
                         if ($null -eq $FederatedCredential) { continue }
