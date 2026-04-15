@@ -13,8 +13,8 @@ function Get-ExchangeHybridIds {
     process {
         $RiskyPermissionsJson = Get-RiskyPermissionsJson
 
-        # $ExchangeOnlineResource.Name  = appId (00000002-0000-0ff1-ce00-000000000000)
-        # $ExchangeOnlineResource.Value = display name ("Office 365 Exchange Online")
+        # $ExchangeOnlineResource.Name represents the exchange online appId (00000002-0000-0ff1-ce00-000000000000)
+        # $ExchangeOnlineResource.Value represents the display name ("Office 365 Exchange Online")
         $ExchangeOnlineResource = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
             $_.Value -eq "Office 365 Exchange Online"
         } | Select-Object -First 1
@@ -23,8 +23,8 @@ function Get-ExchangeHybridIds {
             throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
         }
 
-        # $FullAccessAsAppRoleId.Name  = role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
-        # $FullAccessAsAppRoleId.Value = role name ("full_access_as_app")
+        # $FullAccessAsAppRoleId.Name represents the role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
+        # $FullAccessAsAppRoleId.Value represents the role name ("full_access_as_app")
         $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
             $_.Value -eq "full_access_as_app"
         } | Select-Object -First 1
@@ -73,7 +73,6 @@ function Get-LegacyExchangeServicePrincipal {
             ).Value
 
             if ($null -eq $ExchangeOnlineSP) {
-                Write-Warning "Office 365 Exchange Online service principal not found in tenant."
                 return $null
             }
 
@@ -130,12 +129,11 @@ function Get-DedicatedExchangeHybridApplications {
             ).Value
 
             if ($null -eq $ExchangeOnlineSP) {
-                Write-Warning "Office 365 Exchange Online service principal not found in tenant."
                 return [PSCustomObject]@{
                     DedicatedHybridAppConfigured = $false
                     Apps                         = $null
                 }
-            } 
+            }
 
             $AllAppRoleAssignments = (Invoke-GraphDirectly `
                 -Commandlet "Get-MgBetaServicePrincipalAppRoleAssignedTo" `
