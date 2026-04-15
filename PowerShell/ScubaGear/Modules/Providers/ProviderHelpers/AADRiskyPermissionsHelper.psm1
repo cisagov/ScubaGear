@@ -849,17 +849,14 @@ function Set-CredentialScore {
         $AccessKeys,
 
         [ValidateNotNullOrEmpty()]
-        [Object]
-        $WeightConfig,
+        [int]
+        $BasePointsPerCredential,
+
+        [array]
+        $LifetimeTiers,
 
         [switch]
-        $CheckLifetime,
-
-        # If true, uses $PointsPerServicePrincipalCredential instead of $PointsPerCredential.
-        # Azure does not provide a UI option for setting credentials on service principals directly,
-        # so their presence indicates deliberate API usage and therefore higher risk.
-        [switch]
-        $IsServicePrincipal
+        $CheckLifetime
     )
 
     $CredentialPoints = 0
@@ -875,18 +872,20 @@ function Set-CredentialScore {
     }
 
     foreach ($Credential in $AccessKeys) {
+        $CurrentCredentialPoints = 0
+
+        # Skip expired credentials since they can't be used for authentication
+        if ($CheckLifetime -and $null -ne $Credential.EndDateTime) {
+            $End = ConvertFrom-DotNetDate -DateString $Credential.EndDateTime
+            if ($null -ne $End -and $End -lt (Get-Date)) {
+                continue
+            }
+        }
+
         $CredentialCount++
 
-        # Use elevated base points for service principal credentials if they exist.
-        # $BasePoints = if ($IsServicePrincipal) {
-        #     $WeightConfig.PointsPerServicePrincipalCredential
-        # }
-        # else {
-        #     $WeightConfig.PointsPerCredential
-        # }
-
-        # Base points for credential existence
-        $CredentialPoints += $BasePoints
+        # Base points are determined by the app/SP's highest permission risk level
+        $CurrentCredentialPoints += $BasePointsPerCredential
 
         # Add additional points for long-lived credentials (excludes federated)
         if ($CheckLifetime -and $null -ne $Credential.StartDateTime -and $null -ne $Credential.EndDateTime) {
@@ -894,14 +893,19 @@ function Set-CredentialScore {
             $End = ConvertFrom-DotNetDate -DateString $Credential.EndDateTime
             $Duration = (New-TimeSpan -Start $Start -End $End).Days
 
-            if ($Duration -gt $WeightConfig.ThresholdInDays) {
-                $CredentialPoints += $WeightConfig.PointsPerLongLivedCredential
-                $LongLivedCredentialCount++
+            if ($LifetimeTiers) {
+                foreach ($Tier in $LifetimeTiers) {
+                    if ($Duration -gt $Tier.MinDays) {
+                        $CurrentCredentialPoints += $Tier.Points
+                        $LongLivedCredentialCount++
+                        break
+                    }
+                }
             }
         }
     }
 
-    $CredentialPoints = [Math]::Min($CredentialPoints, $WeightConfig.MaxPoints)
+    $CredentialPoints += $CurrentCredentialPoints
 
     return @{
         CredentialCount = $CredentialCount
@@ -1027,82 +1031,60 @@ function Set-SeverityScore {
 
         # 6. Calculate password credential weight factor
         $PasswordBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Password)
-        
-        #$AppPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $true })
-        #$ServicePrincipalPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $_.IsFromApplication -eq $false })
-#
-        #$AppPasswordScore = Set-CredentialScore `
-        #    -AccessKeys $AppPasswordCredentials `
-        #    -WeightConfig $Weights.PasswordCredentials `
-        #    -CheckLifetime
-        #
-        #$ServicePrincipalPasswordScore = Set-CredentialScore `
-        #    -AccessKeys $ServicePrincipalPasswordCredentials `
-        #    -WeightConfig $Weights.PasswordCredentials `
-        #    -CheckLifetime `
-        #    -IsServicePrincipal
-        #
-        #$PasswordCredentialPoints = [Math]::Min(
-        #    $AppPasswordScore.TotalPoints + $ServicePrincipalPasswordScore.TotalPoints,
-        #    $Weights.PasswordCredentials.MaxPoints
-        #)
-
-        $Score += $PasswordCredentialPoints
-        $ScoreBreakdown.PasswordCredentials = [PSCustomObject]@{
-            CredentialCount = $AppPasswordScore.CredentialCount + $ServicePrincipalPasswordScore.CredentialCount
-            LongLivedCredentialCount = $AppPasswordScore.LongLivedCredentialCount + $ServicePrincipalPasswordScore.LongLivedCredentialCount
-            TotalPoints = $PasswordCredentialPoints
-        }
-
-        # 7. Calculate key credential weight factor
-        $AppKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $true })
-        $ServicePrincipalKeyCredentials = @($Object.KeyCredentials | Where-Object { $_.IsFromApplication -eq $false })
-
-        $AppKeyScore = Set-CredentialScore `
-            -AccessKeys $AppKeyCredentials `
-            -WeightConfig $Weights.KeyCredentials `
+        $AllPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $null -ne $_ })
+        $PasswordScore = Set-CredentialScore `
+            -AccessKeys $AllPasswordCredentials `
+            -BasePointsPerCredential $PasswordBasePoints `
+            -LifetimeTiers $Weights.CredentialLifetimeTiers `
             -CheckLifetime
 
-        $ServicePrincipalKeyScore = Set-CredentialScore `
-            -AccessKeys $ServicePrincipalKeyCredentials `
-            -WeightConfig $Weights.KeyCredentials `
-            -CheckLifetime `
-            -IsServicePrincipal
+        $Score += $PasswordScore.TotalPoints
+        $ScoreBreakdown.PasswordCredentials = [PSCustomObject]@{
+            CredentialCount = $PasswordScore.CredentialCount
+            LongLivedCredentialCount = $PasswordScore.LongLivedCredentialCount
+            TotalPoints = $PasswordScore.TotalPoints
+        }
 
-        $KeyCredentialPoints = [Math]::Min(
-            $AppKeyScore.TotalPoints + $ServicePrincipalKeyScore.TotalPoints,
-            $Weights.KeyCredentials.MaxPoints
-        )
+        $KeyBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Key)
+        $AllKeyCredentials = @($Object.KeyCredentials | Where-Object { $null -ne $_})
+        $KeyScore = Set-CredentialScore `
+            -AccessKeys $AllKeyCredentials `
+            -BasePointsPerCredential $KeyBasePoints `
+            -LifetimeTiers $Weights.CredentialLifetimeTiers `
+            -CheckLifetime
 
-        $Score += $KeyCredentialPoints
+        $Score += $KeyScore.TotalPoints
         $ScoreBreakdown.KeyCredentials = [PSCustomObject]@{
-            CredentialCount = $AppKeyScore.CredentialCount + $ServicePrincipalKeyScore.CredentialCount
-            LongLivedCredentialCount = $AppKeyScore.LongLivedCredentialCount + $ServicePrincipalKeyScore.LongLivedCredentialCount
-            TotalPoints = $KeyCredentialPoints
+            CredentialCount = $KeyScore.CredentialCount
+            LongLivedCredentialCount = $KeyScore.LongLivedCredentialCount
+            TotalPoints = $KeyScore.TotalPoints
         }
 
         # 8. Calculate federated credential weight factor
-        $AppFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $true })
-        $ServicePrincipalFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $_.IsFromApplication -eq $false })
+        $FederatedBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Federated)
+        $AllFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $null -ne $_})
+        $FederatedScore = Set-CredentialScore `
+            -AccessKeys $AllFederatedCredentials `
+            -BasePointsPerCredential $FederatedBasePoints `
 
-        $AppFederatedScore = Set-CredentialScore `
-            -AccessKeys $AppFederatedCredentials `
-            -WeightConfig $Weights.FederatedCredentials
-
-        $ServicePrincipalFederatedScore = Set-CredentialScore `
-            -AccessKeys $ServicePrincipalFederatedCredentials `
-            -WeightConfig $Weights.FederatedCredentials `
-            -IsServicePrincipal
-
-        $FederatedCredentialPoints = [Math]::Min(
-            $AppFederatedScore.TotalPoints + $ServicePrincipalFederatedScore.TotalPoints,
-            $Weights.FederatedCredentials.MaxPoints
-        )
-
-        $Score += $FederatedCredentialPoints
+        $Score += $FederatedScore.TotalPoints
         $ScoreBreakdown.FederatedCredentials = [PSCustomObject]@{
-            CredentialCount = $AppFederatedScore.CredentialCount + $ServicePrincipalFederatedScore.CredentialCount
-            TotalPoints = $FederatedCredentialPoints
+            CredentialCount = $FederatedScore.CredentialCount
+            TotalPoints = $FederatedScore.TotalPoints
+        }
+
+        # 9. Credential volume factor
+        $TotalActiveCredentials = $PasswordScore.CredentialCount + $KeyScore.CredentialCount + $FederatedScore.CredentialCount
+        $CredentialVolumePoints = 0
+
+        if ($TotalActiveCredentials -gt 1) {
+            $CredentialVolumePoints = ($TotalActiveCredentials - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
+            $Score += $CredentialVolumePoints
+        }
+
+        $ScoreBreakdown.CredentialVolume = [PSCustomObject]@{
+            TotalActiveCredentials = $TotalActiveCredentials
+            TotalPoints = $CredentialVolumePoints
         }
 
         $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
