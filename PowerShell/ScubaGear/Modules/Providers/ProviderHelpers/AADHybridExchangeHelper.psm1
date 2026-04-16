@@ -109,10 +109,6 @@ function Get-DedicatedExchangeHybridApplications {
     Internal
     #>
     param (
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment,
-
         [Object[]]
         $AggregateRiskyAppsRaw
     )

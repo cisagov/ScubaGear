@@ -215,7 +215,6 @@ function Export-AADProvider {
 
     $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
         $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
-            "M365Environment"=$M365Environment;
             "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
         })
     )
