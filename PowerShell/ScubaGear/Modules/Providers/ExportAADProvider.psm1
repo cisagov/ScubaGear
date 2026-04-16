@@ -178,7 +178,7 @@ function Export-AADProvider {
     # "Format-RiskyApplications" will match app registrations with and without a corresponding service principal object.
     # If an app registration does not have a service principal object, only app registration data will be displayed.
     # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+    $AggregateRiskyAppsRaw = @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
                 "RiskyApps"=$RiskyApps;
@@ -189,7 +189,7 @@ function Export-AADProvider {
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
     # It only returns risky service principals owned by external tenants.
-    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 4 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
@@ -207,17 +207,21 @@ function Export-AADProvider {
     # This is an indicator of compromise if keyCredentials are present. The organization has not completed
     # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
     # dedicated hybrid application, or they are still in the legacy hybrid configuration.
-    $LegacyExchangeSP = ConvertTo-Json -Depth 3 @(
+    $LegacyExchangeSP = ConvertTo-Json -Depth 4 @(
         $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
             "M365Environment"=$M365Environment
         })
     )
 
-    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 3 @(
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
         $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
-            "M365Environment"=$M365Environment
+            "M365Environment"=$M365Environment;
+            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
         })
     )
+
+    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
     ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
