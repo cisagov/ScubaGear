@@ -246,6 +246,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -469,6 +470,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -636,6 +638,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
