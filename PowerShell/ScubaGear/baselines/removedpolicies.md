@@ -7,7 +7,7 @@ The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
 
-For non-Federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -16,35 +16,37 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 Additional terminology in this document specific to their respective SCBs are to be interpreted as described in the following:
 
-1. [AAD](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
+1. [Microsoft Entra ID](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
 2. [Defender](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology)
-3. [Exo](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
+3. [Exchange Online](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
 4. [Power BI](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology)
-5. [PowerPlatform](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
-6. [SharePoint](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
-7. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
+5. [Power Platform](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)
+6. [Security Suite](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/securitysuite.md#key-terminology)
+7. [SharePoint & OneDrive](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology)
+8. [Teams](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/teams.md#key-terminology)
 
-## Azure Active Directory / Entra ID
-
-### Removed Policies
+## Removed Policies
+<details>
+<summary> Microsoft Entra ID </summary> 
 
 #### MS.AAD.5.4v1
 Group owners SHALL NOT be allowed to consent to applications.
 - _Removal date:_ March 2025
 - _Removal rationale:_ Microsoft announced via MC712143 that it will no longer be possible for group owners to consent to applications. All references including the policy, implementation steps, and section have been removed as the setting is no longer present.
+</details>
 
-## Defender
-
-### Removed Policies
+<details>
+<summary> Defender </summary> 
 
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Removal date:_ March 2025
 - _Removal rationale:_ MS.DEFENDER.6.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes is completed, Purview (Standard) includes the necessary auditing that is addressed by MS.DEFENDER.6.1v1.
+</details>
 
-## Exchange Online
+<details>
+<summary> Exchange Online </summary> 
 
-### Removed Policies
 #### MS.EXO.2.1v1
 A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
@@ -54,22 +56,32 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Removal date:_ March 2025
 - _Removal rationale:_ MS.EXO.17.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes has been completed, Purview (Standard) includes the necessary auditing which is addressed by MS.EXO.17.2v1
+</details>
 
-## Power BI
-
-### Removed Policies
-
-N/A
-
-## PowerPlatform
-
-### Removed Policies
+<details>
+<summary> Power BI </summary> 
 
 N/A
 
-## SharePoint Online
+</details>
 
-### Removed Policies
+
+<details>
+<summary> Power Platform </summary> 
+
+N/A
+
+</details>
+
+<details>
+<summary> Security Suite </summary> 
+
+N/A
+
+</details>
+
+<details>
+<summary> SharePoint Online & OneDrive </summary> 
 
 #### MS.SHAREPOINT.1.4v1
 Guest access SHALL be limited to the email the invitation was sent to.
@@ -86,15 +98,18 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 - _Removal date:_ November 2024
 - _Removal rationale:_ Microsoft has noted that after November 2024 it will no longer be possible to prevent SharePoint in resetting custom script settings to its original value (disabled) for all sites. All references including the policy, implementation steps, and section, by direction of CISA and Microsoft, have been removed as the setting will be automatically reverted back to **Blocked** within 24 hours.
 
-## Microsoft Teams
+</details>
 
-### Removed Policies
+
+<details>
+<summary> Teams </summary> 
 
 #### MS.TEAMS.3.1v1
 
 Contact with Skype users SHALL be blocked.
 - _Removal date:_ August 2025
 - _Removal rationale:_ The option to restrict contact with Skype users found in policy MS.TEAMS.3.1v1 has been deprecated by Microsoft. All references, including the policy and its implementation steps, have been removed since the setting is no longer present.
-  
+
+</details>
 
 **`TLP:CLEAR`**
