@@ -165,12 +165,6 @@ GuestUserExclusionsFullyExempt(Policy, _) := true if {
     Policy.Conditions.Users.ExcludeGuestsOrExternalUsers == null
 }
 
-GuestUserExclusionsFullyExempt(Policy, _) := true if {
-    GuestExclusions := Policy.Conditions.Users.ExcludeGuestsOrExternalUsers
-    GuestExclusions != null
-    GuestExclusions.GuestOrExternalUserTypes == null
-}
-
 # Returns true (pass) when the CAP does exclude specific guest user types, but every
 # excluded type appears in the ScubaConfig allowlist for this policy. The Graph API
 # returns the excluded types as a comma-separated string (e.g. "b2bCollaborationGuest,internalGuest"),

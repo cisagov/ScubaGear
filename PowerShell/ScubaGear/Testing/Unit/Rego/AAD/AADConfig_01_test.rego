@@ -519,25 +519,6 @@ test_GuestUserTypeExclusionConditions_Correct if {
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
 }
 
-test_GuestUserTypeExclusionNullObjectShape_Correct if {
-    CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
-                "value": {
-                    "GuestOrExternalUserTypes": null,
-                    "ExternalTenants": {"MembershipKind": null}
-                }}])
-
-    Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
-
-    ReportDetailStr := concat("", [
-        "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
-    ])
-
-    TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, true) == true
-}
-
 test_GuestUserTypeExclusionNoExempt_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGuestsOrExternalUsers",
