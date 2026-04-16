@@ -382,16 +382,19 @@ To enable external access for only specific domains:
 
 3.  Select the **Organization settings** tab.
 
-4.  Next to **Teams and Skype for Business users in external organizations**,
+4.  Next to **Manageexternal domains for this organization**,
+    ensure the slider is set to **On**
+
+5.  Next to **Allow or block external domains**,
     Click on the dropdown list and select **Allow only specific external domains**
 
-5.  Select **Add a domain**. Enter domains allowed in the box below **Enter the external domain you want to allow**, and then select **add**
+6.  Select **+ Add a domain** and enter domains allowed in the box below **Enter the external domain you want to allow**, and then select **add**
 
     **NOTE:** Domains will need to be added in this step in order for users to communicate with them.
 
-6.  Click **Done** once all domains have been added.
+7.  Click **Done** once all domains have been added.
 
-7.  Click **Save**
+8.  Click **Save**
 
 #### MS.TEAMS.2.2v2 Instructions
 
@@ -407,7 +410,7 @@ To enable external access for only specific domains:
     1. To completely block contact with unmanaged users, toggle the setting to **Off**.
     2. To allow contact with unmanaged users only if the internal user initiates the contact:
         - Toggle the setting to **On**.
-        - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
+        - Clear the check next to **People in my org can join external meetings and recieve new chats from users who have unmanaged Microsoft accounts.**
 
 #### MS.TEAMS.2.3v2 Instructions
 
