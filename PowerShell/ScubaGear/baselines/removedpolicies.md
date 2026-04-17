@@ -38,6 +38,36 @@ Group owners SHALL NOT be allowed to consent to applications.
 <details>
 <summary> Defender </summary> 
 
+#### MS.DEFENDER.1.1v1
+The standard and strict preset security policies SHALL be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+
+#### MS.DEFENDER.1.2v1
+All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+
+#### MS.DEFENDER.1.3v1
+All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+
+#### MS.DEFENDER.1.4v1
+Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+
+#### MS.DEFENDER.1.5v1
+Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+
+#### MS.DEFENDER.4.5v1
+A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
+
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Removal date:_ March 2025
@@ -51,6 +81,31 @@ Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
 - _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
+
+#### MS.EXO.8.3v1
+The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
+
+#### MS.EXO.9.2v1
+The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
+
+#### MS.EXO.9.4v1
+If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
+
+#### MS.EXO.11.2v1
+User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
+
+#### MS.EXO.11.3v1
+The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
+- _Removal date:_ April 2026
+- _Removal rationale:_ 
 
 #### MS.EXO.17.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
