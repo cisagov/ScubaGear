@@ -72,7 +72,7 @@ InModuleScope AADHybridExchangeHelper {
                 }
 
                 Mock Format-Credentials {
-                    param ($AccessKeys, $IsFromApplication)
+                    param ($AccessKeys)
                     return $AccessKeys
                 }
             }
