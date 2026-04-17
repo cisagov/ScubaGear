@@ -19249,7 +19249,7 @@
                            "OneDriveLoopDefaultSharingLinkRole":  0,
                            "OneDriveRequestFilesLinkEnabled":  false,
                            "OneDriveRequestFilesLinkExpirationInDays":  1,
-                           "OneDriveSharingCapability":  0,
+                           "ODBSharingCapability":  0,
                            "OneDriveDefaultShareLinkScope":  -1,
                            "OneDriveDefaultShareLinkRole":  0,
                            "OneDriveDefaultLinkToExistingAccess":  false,

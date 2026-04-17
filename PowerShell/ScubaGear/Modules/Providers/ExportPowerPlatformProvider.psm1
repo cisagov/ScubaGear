@@ -1,11 +1,10 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
 
 function Export-PowerPlatformProvider {
     <#
     .Description
     Gets the Power Platform settings that are relevant
-    to the SCuBA Power Platform baselines using direct REST API calls
-    authenticated via MSAL.
+    to the SCuBA Power Platform baselines using direct REST API calls.
     .Functionality
     Internal
     #>
@@ -17,9 +16,13 @@ function Export-PowerPlatformProvider {
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ServicePrincipalParams = @{}
+        [Parameter(Mandatory = $true)]
+        [string]
+        $AccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $BaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -32,30 +35,6 @@ function Export-PowerPlatformProvider {
 
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
     Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
-
-    # Acquire Power Platform access token - service principal or interactive
-    $BaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
-    $AccessToken = $null
-    try {
-        if ($ServicePrincipalParams.CertThumbprintParams) {
-            $AccessToken = Get-PowerPlatformAccessToken `
-                -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                -M365Environment $M365Environment
-        }
-        else {
-            # Interactive browser authentication - use tenant domain for authority
-            $InitialDomain = $TenantDetails.VerifiedDomains | Where-Object { $_.isInitial }
-            $TenantName = $InitialDomain.Name
-            $AccessToken = Get-PowerPlatformAccessTokenInteractive `
-                -Tenant $TenantName `
-                -M365Environment $M365Environment
-        }
-    }
-    catch {
-        Write-Warning "Failed to acquire Power Platform access token: $($_.Exception.Message)"
-    }
 
     # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1, MS.POWERPLATFORM.6.1v1
     $EnvironmentCreation = ConvertTo-Json @()

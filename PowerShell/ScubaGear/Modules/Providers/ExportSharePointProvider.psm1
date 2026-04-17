@@ -14,9 +14,13 @@ function Export-SharePointProvider {
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ServicePrincipalParams = @{}
+        [Parameter(Mandatory = $true)]
+        [string]
+        $AccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $AdminUrl
     )
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -29,46 +33,18 @@ function Export-SharePointProvider {
     # Get InitialDomainPrefix
     $InitialDomain = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}).VerifiedDomains | Where-Object {$_.isInitial}
     $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-    $TenantName = $InitialDomain.Name
 
     # Get SPOSiteIdentity
     $SPOSiteIdentity = Get-SPOSiteHelper -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
 
-    # Get Admin URL
-    $AdminUrl = Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
-
     $SPOTenant = ConvertTo-Json @()
     $SPOSite = ConvertTo-Json @()
     $UsedPnP = ConvertTo-Json $false
-    $AccessToken = $null
 
-    # Acquire access token - service principal or interactive
+    # Use access token acquired by Connection.psm1
     try {
-        if ($ServicePrincipalParams.CertThumbprintParams) {
-            # Service principal with certificate
-            $AccessToken = Get-SPOAccessToken `
-                -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                -M365Environment $M365Environment `
-                -AdminUrl $AdminUrl
-        }
-        else {
-            # Interactive browser authentication
-            $AccessToken = Get-SPOAccessTokenInteractive `
-                -Tenant $TenantName `
-                -M365Environment $M365Environment `
-                -AdminUrl $AdminUrl
-        }
-
         # Get tenant settings via REST
         $TenantData = Get-SPOTenantRest -AdminUrl $AdminUrl -AccessToken $AccessToken
-
-        # Map ODBSharingCapability to OneDriveSharingCapability for Rego policy compatibility
-        # REST API returns ODBSharingCapability, but Rego expects OneDriveSharingCapability
-        if ($null -ne $TenantData.ODBSharingCapability -and $null -eq $TenantData.OneDriveSharingCapability) {
-            $TenantData | Add-Member -NotePropertyName "OneDriveSharingCapability" -NotePropertyValue $TenantData.ODBSharingCapability -Force
-        }
 
         $SPOTenant = ConvertTo-Json @($TenantData) -Depth 10
         $Tracker.AddSuccessfulCommand("SharePoint REST API")

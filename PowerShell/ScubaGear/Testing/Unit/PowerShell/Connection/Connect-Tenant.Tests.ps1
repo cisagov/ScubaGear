@@ -31,6 +31,8 @@ InModuleScope Connection {
                     }
                 }
             }
+            function Get-MsalAccessToken {throw 'this will be mocked'}
+            Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
             }
         }
@@ -53,8 +55,8 @@ InModuleScope Connection {
         ){
 
             It "No Service Principal" {
-                $FailedAuthList = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
-                $FailedAuthList.Length | Should -Be 0
+                $ConnectionResult = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
+                $ConnectionResult.ProdAuthFailed.Count | Should -Be 0
             }
             It "With Service Principal" {
                 $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint

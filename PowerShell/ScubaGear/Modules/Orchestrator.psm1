@@ -521,10 +521,11 @@ function Invoke-SCuBA {
         Write-ScubaLog -Message "Starting product authentication..." -Level "Info" -Source "InvokeScuba" -Data @{
             ProductNames = ($ScubaConfig.ProductNames -join ', ')
             M365Environment = $ScubaConfig.M365Environment
-            UsesServicePrincipal = ($null -ne $ScubaConfig.AppID)
+            UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID)) #$null -ne $ScubaConfig.AppID)
         }
 
-        $ProdAuthFailed = Invoke-Connection -ScubaConfig $ScubaConfig
+        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
+        $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
         if ($ProdAuthFailed.Count -gt 0) {
             Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
 
@@ -587,11 +588,11 @@ function Invoke-SCuBA {
                     OutFolderPath = $OutFolderPath
                     Guid = $Guid
                 } -LogReturnValue $true -ScriptBlock {
-                    Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                    Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
                 }
             }
             else {
-                Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
             }
 
             if ($ProdProviderFailed.Count -gt 0) {
@@ -765,6 +766,10 @@ function Invoke-ProviderList {
         [object]
         $ScubaConfig,
 
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ConnectionResult = @{},
+
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -797,16 +802,12 @@ function Invoke-ProviderList {
             $ConnectTenantParams = @{
                 'M365Environment' = $ScubaConfig.M365Environment
             }
-            $SPOProviderParams = @{
-                'M365Environment' = $ScubaConfig.M365Environment
-            }
 
             $ServicePrincipalAuth = $false
             if ($ScubaConfig.AppID) {
                 $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
                 $ServicePrincipalAuth = $true
-                $SPOProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams }
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -838,13 +839,17 @@ function Invoke-ProviderList {
                         "powerplatform" {
                             $PPProviderParams = @{
                                 'M365Environment' = $ScubaConfig.M365Environment
-                            }
-                            if ($ServicePrincipalParams) {
-                                $PPProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                                'AccessToken'     = $ConnectionResult.PPAccessToken
+                                'BaseUrl'         = $ConnectionResult.PPBaseUrl
                             }
                             $RetVal = Export-PowerPlatformProvider @PPProviderParams | Select-Object -Last 1
                         }
                         "sharepoint" {
+                            $SPOProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken'     = $ConnectionResult.SPOAccessToken
+                                'AdminUrl'        = $ConnectionResult.SPOAdminUrl
+                            }
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "teams" {
@@ -1744,8 +1749,18 @@ function Invoke-Connection {
     }
 
     if ($ScubaConfig.LogIn) {
-        $AnyFailedAuth = Connect-Tenant @ConnectTenantParams
-        $AnyFailedAuth
+        $ConnectionResult = Connect-Tenant @ConnectTenantParams
+        $ConnectionResult
+    }
+    else {
+        # Return empty result when not logging in
+        @{
+            ProdAuthFailed  = @()
+            SPOAccessToken  = $null
+            SPOAdminUrl     = $null
+            PPAccessToken   = $null
+            PPBaseUrl       = $null
+        }
     }
 }
 
@@ -2275,7 +2290,8 @@ function Invoke-SCuBACached {
                     UsesServicePrincipal = ($null -ne $TempScubaConfig.AppID)
                 }
 
-                $ProdAuthFailed = Invoke-Connection -ScubaConfig $TempScubaConfig
+                $ConnectionResult = Invoke-Connection -ScubaConfig $TempScubaConfig
+                $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
                 if ($ProdAuthFailed.Count -gt 0) {
                     Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "ScubaCached" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
 
@@ -2322,7 +2338,7 @@ function Invoke-SCuBACached {
                     ModuleVersion = $ModuleVersion
                     Guid = $Guid
                 }
-                Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $TempScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
                 Write-ScubaLog -Message "Provider execution completed" -Level "Info" -Source "ScubaCached"
             }
             else {

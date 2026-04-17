@@ -34,6 +34,9 @@ function Connect-Tenant {
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPOSiteHelper.psm1 -Function Get-SPOSiteHelper
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -41,6 +44,14 @@ function Connect-Tenant {
    $AADAuthRequired = $true
 
    $ProdAuthFailed = @()
+
+   # Token data for REST-based products (populated during connection)
+   $TokenData = @{
+       SPOAccessToken  = $null
+       SPOAdminUrl     = $null
+       PPAccessToken   = $null
+       PPBaseUrl       = $null
+   }
 
    $N = 0
    $Len = $ProductNames.Length
@@ -94,7 +105,34 @@ function Connect-Tenant {
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
                    }
-                   Write-Verbose "Power Platform uses REST API with on-demand MSAL token - no persistent PowerApps connection needed"
+
+                   # Acquire Power Platform access token
+                   $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
+                   $TokenData.PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+
+                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                       $TokenData.PPAccessToken = Get-MsalAccessToken `
+                           -Scope $PPScope `
+                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                           -M365Environment $M365Environment
+                   }
+                   else {
+                       # Interactive - resolve tenant name for authority
+                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                       $TenantName = $InitialDomain.Name
+
+                       # Azure PowerShell well-known client ID
+                       $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+                       $TokenData.PPAccessToken = Get-MsalAccessToken `
+                           -Scope $PPScope `
+                           -ClientId $PPClientId `
+                           -Tenant $TenantName `
+                           -M365Environment $M365Environment
+                   }
+                   Write-Verbose "Power Platform token acquired successfully"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -109,9 +147,33 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       # SharePoint authentication is now handled via REST API in ExportSharePointProvider
-                       # Token is acquired on-demand using browser auth (interactive) or certificate (service principal)
-                       Write-Verbose "SharePoint will use REST API authentication (no SPO/PnP module required)"
+                       # Resolve tenant info needed for SharePoint URLs
+                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                       $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
+                       $TenantName = $InitialDomain.Name
+
+                       $TokenData.SPOAdminUrl = Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
+                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
+
+                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
+                               -Scope $SPOScope `
+                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                               -M365Environment $M365Environment
+                       }
+                       else {
+                           # SharePoint Online Management Shell app ID
+                           $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
+                               -Scope $SPOScope `
+                               -ClientId $SPOClientId `
+                               -Tenant $TenantName `
+                               -M365Environment $M365Environment
+                       }
+                       Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
                    }
                }
@@ -158,7 +220,15 @@ function Connect-Tenant {
        }
    }
    Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
-   $ProdAuthFailed
+
+   # Return connection result with token data for REST-based products
+   @{
+       ProdAuthFailed  = $ProdAuthFailed
+       SPOAccessToken  = $TokenData.SPOAccessToken
+       SPOAdminUrl     = $TokenData.SPOAdminUrl
+       PPAccessToken   = $TokenData.PPAccessToken
+       PPBaseUrl       = $TokenData.PPBaseUrl
+   }
 }
 
 function Disconnect-SCuBATenant {

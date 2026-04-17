@@ -85,21 +85,21 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
-# If OneDriveSharingCapability is set to Only People In Organization
+# If ODBSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Shall",
     "Commandlet": ["SharePoint REST API"],
-    "ActualValue": [OneDriveSharingCapability],
+    "ActualValue": [ODBSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     input.OneDrive_PnP_Flag == false
-    OneDriveSharingCapability := Tenant.OneDriveSharingCapability
+    ODBSharingCapability := Tenant.ODBSharingCapability
     Conditions := [
-        OneDriveSharingCapability == ONLYPEOPLEINORG,
-        OneDriveSharingCapability == EXISTINGGUESTS
+        ODBSharingCapability == ONLYPEOPLEINORG,
+        ODBSharingCapability == EXISTINGGUESTS
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
