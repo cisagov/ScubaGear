@@ -71,6 +71,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   ClientAppTypes:
                     - other
                     - exchangeActiveSync
@@ -107,6 +108,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -135,6 +137,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -186,6 +189,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -218,6 +222,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -236,11 +241,37 @@ TestPlan:
                       - "password, sms"
                       - "password, voice"
                       - "federatedMultiFactor"
-                      - "microsoftAuthenticatorPush, federatedSingleFactor"
-                      - "softwareOath, federatedSingleFactor"
-                      - "hardwareOath, federatedSingleFactor"
-                      - "sms, federatedSingleFactor"
-                      - "voice, federatedSingleFactor"
+                      - "microsoftAuthenticatorPush,federatedSingleFactor"
+                      - "softwareOath,federatedSingleFactor"
+                      - "hardwareOath,federatedSingleFactor"
+                      - "sms,federatedSingleFactor"
+                      - "voice,federatedSingleFactor"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.3.2v1 Compliant case - Custom Authentication Strength passwordless MFA
+        ### This test creates a custom MFA policy with authentication strength set to allow passwordless MFA only
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "deviceBasedPush"
         Postconditions: []
         ExpectedResult: true
 
@@ -440,6 +471,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -476,6 +508,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -534,6 +567,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -587,6 +621,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: []
                     ExcludeApplications: []
@@ -615,6 +650,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
@@ -640,6 +676,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
