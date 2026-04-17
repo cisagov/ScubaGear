@@ -64,3 +64,7 @@ InModuleScope AADHybridExchangeHelper {
         }
     }
 }
+
+AfterAll {
+    Remove-Module AADHybridExchangeHelper -Force -ErrorAction 'SilentlyContinue'
+}

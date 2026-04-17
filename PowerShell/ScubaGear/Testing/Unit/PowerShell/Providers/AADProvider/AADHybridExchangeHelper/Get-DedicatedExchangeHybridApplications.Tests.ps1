@@ -4,355 +4,139 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADHybridExchangeHelper
 
 InModuleScope AADHybridExchangeHelper {
     BeforeAll {
-        # Import mock data
-        $SnippetsPath = Join-Path -Path $PSScriptRoot -ChildPath "../HybridExchangeSnippets"
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockAppRoleAssignment')]
-        $MockAppRoleAssignment = Get-Content "$SnippetsPath/MockAppRoleAssignment.json" | ConvertFrom-Json
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockDedicatedHybridAppRegistration')]
-        $MockDedicatedHybridAppRegistration = Get-Content "$SnippetsPath/MockDedicatedHybridAppRegistration.json" | ConvertFrom-Json
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockDedicatedHybridSP')]
-        $MockDedicatedHybridSP = Get-Content "$SnippetsPath/MockDedicatedHybridServicePrincipal.json" | ConvertFrom-Json
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockExchangeOnlineSP')]
-        $MockExchangeOnlineSP = Get-Content "$SnippetsPath/MockExchangeOnlineServicePrincipal.json" | ConvertFrom-Json
-
         $HybridIds = Get-ExchangeHybridIds
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ExchangeOnlineAppId')]
-        $ExchangeOnlineAppId = $HybridIds.ExchangeOnlineAppId
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'FullAccessAsAppRoleId')]
         $FullAccessAsAppRoleId = $HybridIds.FullAccessAsAppRoleId
+
+        # Mock risky app that HAS the full_access_as_app permission (dedicated hybrid app)
+        $MockDedicatedHybridApp = [PSCustomObject]@{
+            ObjectId              = "00000000-0000-0000-0000-000000000010"
+            AppId                 = "10000000-0000-0000-0000-000000000000"
+            DisplayName           = "ExchangeServerApp-TestOrg"
+            IsMultiTenantEnabled  = $false
+            KeyCredentials        = @( [PSCustomObject]@{ KeyId = "key-1" } )
+            PasswordCredentials   = $null
+            FederatedCredentials  = $null
+            Permissions           = @(
+                [PSCustomObject]@{
+                    RoleId    = $FullAccessAsAppRoleId
+                    IsRisky   = $true
+                    RoleName  = "full_access_as_app"
+                }
+            )
+        }
+
+        # Mock risky app that does NOT have full_access_as_app
+        $MockNonHybridApp = [PSCustomObject]@{
+            ObjectId              = "00000000-0000-0000-0000-000000000020"
+            AppId                 = "20000000-0000-0000-0000-000000000000"
+            DisplayName           = "Some Other Risky App"
+            IsMultiTenantEnabled  = $false
+            KeyCredentials        = $null
+            PasswordCredentials   = $null
+            FederatedCredentials  = $null
+            Permissions           = @(
+                [PSCustomObject]@{
+                    RoleId    = "aaaaaaaa-0000-0000-0000-000000000000"
+                    IsRisky   = $true
+                    RoleName  = "SomeOtherPermission"
+                }
+            )
+        }
+
+        # Second dedicated hybrid app for multi-app tests
+        $MockSecondDedicatedHybridApp = [PSCustomObject]@{
+            ObjectId              = "00000000-0000-0000-0000-000000000030"
+            AppId                 = "30000000-0000-0000-0000-000000000000"
+            DisplayName           = "ExchangeServerApp-SecondOrg"
+            IsMultiTenantEnabled  = $false
+            KeyCredentials        = $null
+            PasswordCredentials   = $null
+            FederatedCredentials  = $null
+            Permissions           = @(
+                [PSCustomObject]@{
+                    RoleId    = $FullAccessAsAppRoleId
+                    IsRisky   = $true
+                    RoleName  = "full_access_as_app"
+                }
+            )
+        }
     }
 
     Describe "Get-DedicatedExchangeHybridApplications" {
-        Context "When a dedicated hybrid app is fully configured with an app registration and service principal" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
-                                return @{ Value = $MockExchangeOnlineSP }
-                            }
-                            return @{ Value = $MockDedicatedHybridSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = @($MockAppRoleAssignment) }
-                        }
-                        "Get-MgBetaApplication" {
-                            return @{ Value = $MockDedicatedHybridAppRegistration }
-                        }
-                        "Get-MgBetaApplicationFederatedIdentityCredential" {
-                            return @{ Value = $null }
-                        }
-                    }
-                }
-            }
-
+        Context "When a dedicated hybrid app is present in the risky apps list" {
             It "returns DedicatedHybridAppConfigured as true" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockNonHybridApp)
                 $Result.DedicatedHybridAppConfigured | Should -BeTrue
             }
 
             It "returns exactly one application in the 'Apps' array" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockNonHybridApp)
                 @($Result.Apps).Count | Should -Be 1
             }
 
-            It "returns the correct DisplayName from the service principal" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].DisplayName | Should -Be $MockDedicatedHybridSP.DisplayName
+            It "returns the correct app in the 'Apps' array" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockNonHybridApp)
+                $Result.Apps[0].DisplayName | Should -Be "ExchangeServerApp-TestOrg"
             }
 
-            It "returns the correct AppId from the service principal" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].AppId | Should -Be $MockDedicatedHybridSP.AppId
-            }
-
-            It "returns the correct AppOwnerOrganizationId from the service principal" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].AppOwnerOrganizationId | Should -Be $MockDedicatedHybridSP.AppOwnerOrganizationId
-            }
-
-            It "indicates AppRegistrationExists is true" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].AppRegistrationExists | Should -BeTrue
-            }
-
-            It "sets 'ObjectId.ServicePrincipal' from the service principal" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].ObjectId.ServicePrincipal | Should -Be $MockDedicatedHybridSP.Id
-            }
-
-            It "sets 'ObjectId.AppRegistration' from the app registration" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].ObjectId.Application | Should -Be $MockDedicatedHybridAppRegistration.Id
-            }
-
-            It "populates FullAccessAsAppRole with the correct AppRoleId" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FullAccessAsAppRole | Should -Not -BeNullOrEmpty
-                $Result.Apps[0].FullAccessAsAppRole.AppRoleId | Should -Be $FullAccessAsAppRoleId
-            }
-
-            It "indicates HasKeyCredentials is true when the app registration has key credentials" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].HasKeyCredentials | Should -BeTrue
-            }
-
-            It "populates KeyCredentials from the app registration" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].KeyCredentials | Should -Not -BeNullOrEmpty
-                $Result.Apps[0].KeyCredentials | Should -HaveCount $MockDedicatedHybridAppRegistration.KeyCredentials.Count
-            }
-
-            It "returns null for 'FederatedCredentials' when none exist" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FederatedCredentials | Should -BeNullOrEmpty
+            It "excludes apps that do not have the full_access_as_app permission" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockNonHybridApp)
+                $Result.Apps.DisplayName | Should -Not -Contain "Some Other Risky App"
             }
         }
 
-        Context "When a dedicated hybrid app has federated credentials assigned" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
-                                return @{ Value = $MockExchangeOnlineSP }
-                            }
-                            return @{ Value = $MockDedicatedHybridSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = @($MockAppRoleAssignment) }
-                        }
-                        "Get-MgBetaApplication" {
-                            return @{ Value = $MockDedicatedHybridAppRegistration }
-                        }
-                        "Get-MgBetaApplicationFederatedIdentityCredential" {
-                            return @{
-                                Value = @(
-                                    [PSCustomObject]@{
-                                        Id          = "00000000-0000-0000-0000-000000000099"
-                                        Name        = "TestFederatedCredential"
-                                        Description = "Test federated identity"
-                                        Issuer      = "https://token.actions.githubusercontent.com"
-                                        Subject     = "repo:org/repo:ref:refs/heads/main"
-                                        Audiences   = @("api://AzureADTokenExchange")
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            It "populates 'FederatedCredentials' with one entry" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FederatedCredentials | Should -Not -BeNullOrEmpty
-                @($Result.Apps[0].FederatedCredentials).Count | Should -Be 1
-            }
-
-            It "maps the correct federated credential 'Issuer'" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FederatedCredentials[0].Issuer | Should -Be "https://token.actions.githubusercontent.com"
-            }
-
-            It "maps the correct federated credential 'Subject'" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FederatedCredentials[0].Subject | Should -Be "repo:org/repo:ref:refs/heads/main"
-            }
-
-            It "maps the correct federated credential 'Name'" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].FederatedCredentials[0].Name | Should -Be "TestFederatedCredential"
-            }
-        }
-
-        Context "When the service principal exists but has no app registration" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
-                                return @{ Value = $MockExchangeOnlineSP }
-                            }
-                            return @{ Value = $MockDedicatedHybridSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = @($MockAppRoleAssignment) }
-                        }
-                        "Get-MgBetaApplication" {
-                            return @{ Value = $null }
-                        }
-                    }
-                }
-            }
-
+        Context "When multiple dedicated hybrid apps are present" {
             It "returns DedicatedHybridAppConfigured as true" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.DedicatedHybridAppConfigured | Should -BeTrue
-            }
-
-            It "indicates AppRegistrationExists is false" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].AppRegistrationExists | Should -BeFalse
-            }
-
-            It "sets 'ObjectId.Application' to null when no app registration exists" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].ObjectId.Application | Should -BeNullOrEmpty
-            }
-
-            It "sets 'HasKeyCredentials' to false when no app registration exists" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].HasKeyCredentials | Should -BeFalse
-            }
-
-            It "returns null for 'KeyCredentials' when no app registration exists" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].KeyCredentials | Should -BeNullOrEmpty
-            }
-
-            It "returns null for 'PasswordCredentials' when no app registration exists" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps[0].PasswordCredentials | Should -BeNullOrEmpty
-            }
-        }
-
-        Context "When the Exchange Online service principal is not found in the tenant" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    return @{ Value = $null }
-                }
-            }
-
-            It "returns DedicatedHybridAppConfigured as false" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.DedicatedHybridAppConfigured | Should -BeFalse
-            }
-
-            It "returns 'Apps' as null" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps | Should -BeNullOrEmpty
-            }
-        }
-
-        Context "When no app role assignments match full_access_as_app" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            return @{ Value = $MockExchangeOnlineSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = @([PSCustomObject]@{
-                                AppRoleId   = "00000000-0000-0000-0000-000000000000"
-                                PrincipalId = "00000000-0000-0000-0000-000000000020"
-                            })}
-                        }
-                    }
-                }
-            }
-
-            It "returns DedicatedHybridAppConfigured as false" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.DedicatedHybridAppConfigured | Should -BeFalse
-            }
-
-            It "returns Apps as null" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps | Should -BeNullOrEmpty
-            }
-        }
-
-        Context "When no app role assignments exist at all" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            return @{ Value = $MockExchangeOnlineSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = $null }
-                        }
-                    }
-                }
-            }
-
-            It "returns DedicatedHybridAppConfigured as false" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.DedicatedHybridAppConfigured | Should -BeFalse
-            }
-
-            It "returns Apps as null" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps | Should -BeNullOrEmpty
-            }
-        }
-
-        Context "When multiple dedicated hybrid apps are assigned full_access_as_app" {
-            BeforeEach {
-                $SecondAssignment = $MockAppRoleAssignment | Select-Object *
-                $SecondAssignment.PrincipalId = "00000000-0000-0000-0000-000000000021"
-
-                $SecondSP = $MockDedicatedHybridSP | Select-Object *
-                $SecondSP.Id = "00000000-0000-0000-0000-000000000021"
-                $SecondSP.DisplayName = "ExchangeServerApp-SecondOrg"
-
-                Mock Invoke-GraphDirectly {
-                    param($Commandlet, $QueryParams)
-                    switch ($Commandlet) {
-                        "Get-MgBetaServicePrincipal" {
-                            if ($QueryParams.'$filter' -like "*$($ExchangeOnlineAppId)*") {
-                                return @{ Value = $MockExchangeOnlineSP }
-                            }
-                            if ($QueryParams.'$filter' -like "*00000000-0000-0000-0000-000000000021*") {
-                                return @{ Value = $SecondSP }
-                            }
-                            return @{ Value = $MockDedicatedHybridSP }
-                        }
-                        "Get-MgBetaServicePrincipalAppRoleAssignedTo" {
-                            return @{ Value = @($MockAppRoleAssignment, $SecondAssignment) }
-                        }
-                        "Get-MgBetaApplication" {
-                            return @{ Value = $MockDedicatedHybridApp }
-                        }
-                        "Get-MgBetaApplicationFederatedIdentityCredential" {
-                            return @{ Value = $null }
-                        }
-                    }
-                }
-            }
-
-            It "returns DedicatedHybridAppConfigured as true" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockSecondDedicatedHybridApp, $MockNonHybridApp)
                 $Result.DedicatedHybridAppConfigured | Should -BeTrue
             }
 
             It "returns two apps in the Apps array" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockSecondDedicatedHybridApp, $MockNonHybridApp)
                 @($Result.Apps).Count | Should -Be 2
             }
 
             It "includes both DisplayNames in the Apps array" {
-                $Result = Get-DedicatedExchangeHybridApplications -M365Environment "gcc"
-                $Result.Apps.DisplayName | Should -Contain $MockDedicatedHybridSP.DisplayName
-                $Result.Apps.DisplayName | Should -Contain $SecondSP.DisplayName
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockDedicatedHybridApp, $MockSecondDedicatedHybridApp, $MockNonHybridApp)
+                $Result.Apps.DisplayName | Should -Contain "ExchangeServerApp-TestOrg"
+                $Result.Apps.DisplayName | Should -Contain "ExchangeServerApp-SecondOrg"
             }
         }
 
-        Context "When Invoke-GraphDirectly throws an exception" {
-            BeforeEach {
-                Mock Invoke-GraphDirectly {
-                    throw "Graph API error"
-                }
+        Context "When no dedicated hybrid apps are present in the risky apps list" {
+            It "returns DedicatedHybridAppConfigured as false" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockNonHybridApp)
+                $Result.DedicatedHybridAppConfigured | Should -BeFalse
             }
 
-            It "rethrows the exception" {
-                { Get-DedicatedExchangeHybridApplications -M365Environment "gcc" } | Should -Throw "Graph API error"
+            It "returns 'Apps' as null" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($MockNonHybridApp)
+                $Result.Apps | Should -BeNullOrEmpty
+            }
+        }
+
+        Context "When an app has the full_access_as_app role but IsRisky is false" {
+            It "does not include the app as a dedicated hybrid app" {
+                $NotRiskyApp = [PSCustomObject]@{
+                    ObjectId    = "00000000-0000-0000-0000-000000000040"
+                    AppId       = "40000000-0000-0000-0000-000000000000"
+                    DisplayName = "Non-Risky Exchange App"
+                    Permissions = @(
+                        [PSCustomObject]@{
+                            RoleId   = $FullAccessAsAppRoleId
+                            IsRisky  = $false
+                            RoleName = "full_access_as_app"
+                        }
+                    )
+                }
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($NotRiskyApp)
+                $Result.DedicatedHybridAppConfigured | Should -BeFalse
+                $Result.Apps | Should -BeNullOrEmpty
             }
         }
     }
+}
+
+AfterAll {
+    Remove-Module AADHybridExchangeHelper -Force -ErrorAction 'SilentlyContinue'
 }
