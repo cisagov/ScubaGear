@@ -7,7 +7,8 @@ InModuleScope AADHybridExchangeHelper {
         $HybridIds = Get-ExchangeHybridIds
         $FullAccessAsAppRoleId = $HybridIds.FullAccessAsAppRoleId
 
-        # Mock risky app that HAS the full_access_as_app permission (dedicated hybrid app)
+        # Mock dedicated hybrid app with full_access_as_app permission
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "MockDedicatedHybridApp")]
         $MockDedicatedHybridApp = [PSCustomObject]@{
             ObjectId              = "00000000-0000-0000-0000-000000000010"
             AppId                 = "10000000-0000-0000-0000-000000000000"
@@ -25,7 +26,8 @@ InModuleScope AADHybridExchangeHelper {
             )
         }
 
-        # Mock risky app that does NOT have full_access_as_app
+        # Mock non-hybrid app that does NOT have full_access_as_app
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "MockNonHybridApp")]
         $MockNonHybridApp = [PSCustomObject]@{
             ObjectId              = "00000000-0000-0000-0000-000000000020"
             AppId                 = "20000000-0000-0000-0000-000000000000"
@@ -36,14 +38,15 @@ InModuleScope AADHybridExchangeHelper {
             FederatedCredentials  = $null
             Permissions           = @(
                 [PSCustomObject]@{
-                    RoleId    = "aaaaaaaa-0000-0000-0000-000000000000"
+                    RoleId    = "0c4b2d20-7919-468d-8668-c54b09d4dee8"
                     IsRisky   = $true
-                    RoleName  = "SomeOtherPermission"
+                    RoleName  = "Bookings.ReadWrite.All"
                 }
             )
         }
 
         # Second dedicated hybrid app for multi-app tests
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "MockSecondDedicatedHybridApp")]
         $MockSecondDedicatedHybridApp = [PSCustomObject]@{
             ObjectId              = "00000000-0000-0000-0000-000000000030"
             AppId                 = "30000000-0000-0000-0000-000000000000"
@@ -131,6 +134,18 @@ InModuleScope AADHybridExchangeHelper {
                 }
                 $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @($NotRiskyApp)
                 $Result.DedicatedHybridAppConfigured | Should -BeFalse
+                $Result.Apps | Should -BeNullOrEmpty
+            }
+        }
+
+        Context "When AggregateRiskyAppsRaw is an empty array" {
+            It "returns DedicatedHybridAppConfigured as false" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @()
+                $Result.DedicatedHybridAppConfigured | Should -BeFalse
+            }
+
+            It "returns Apps as null" {
+                $Result = Get-DedicatedExchangeHybridApplications -AggregateRiskyAppsRaw @()
                 $Result.Apps | Should -BeNullOrEmpty
             }
         }

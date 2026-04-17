@@ -6,7 +6,7 @@ InModuleScope AADHybridExchangeHelper {
     BeforeAll {
         # Import mock data
         $SnippetsPath = Join-Path -Path $PSScriptRoot -ChildPath "../HybridExchangeSnippets"
-        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockExchangeOnlineSP')]
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignments", "MockExchangeOnlineSP")]
         $MockExchangeOnlineSP = Get-Content "$SnippetsPath/MockExchangeOnlineServicePrincipal.json" | ConvertFrom-Json
     }
     Describe "Get-LegacyExchangeServicePrincipal" {
@@ -51,6 +51,55 @@ InModuleScope AADHybridExchangeHelper {
                 $Result = Get-LegacyExchangeServicePrincipal -M365Environment "gcc"
                 $Result.KeyCredentials | Should -Not -BeNullOrEmpty
                 $Result.KeyCredentials | Should -HaveCount $MockExchangeOnlineSP.KeyCredentials.Count
+            }
+        }
+
+        Context "When the Exchange Online service principal has password and federated credentials" {
+            BeforeEach {
+                $MockSPWithAllCredentials = [PSCustomObject]@{
+                    Id                           = $MockExchangeOnlineSP.Id
+                    AppId                        = $MockExchangeOnlineSP.AppId
+                    DisplayName                  = $MockExchangeOnlineSP.DisplayName
+                    SignInAudience               = $MockExchangeOnlineSP.SignInAudience
+                    AppOwnerOrganizationId       = $MockExchangeOnlineSP.AppOwnerOrganizationId
+                    KeyCredentials               = $MockExchangeOnlineSP.KeyCredentials
+                    PasswordCredentials          = @([PSCustomObject]@{ KeyId = "pwd-1"; DisplayName = "Password Credential 1" })
+                    FederatedIdentityCredentials = @([PSCustomObject]@{ Id = "fed-1"; Name = "Federated Credential 1" })
+                }
+
+                Mock Invoke-GraphDirectly {
+                    return @{ Value = $MockSPWithAllCredentials }
+                }
+
+                Mock Format-Credentials {
+                    param ($AccessKeys, $IsFromApplication)
+                    return $AccessKeys
+                }
+            }
+
+            It "populates PasswordCredentials from the service principal" {
+                $Result = Get-LegacyExchangeServicePrincipal -M365Environment "gcc"
+                $Result.PasswordCredentials | Should -Not -BeNullOrEmpty
+                $Result.PasswordCredentials | Should -HaveCount $MockSPWithAllCredentials.PasswordCredentials.Count
+            }
+
+            It "populates FederatedCredentials from the service principal" {
+                $Result = Get-LegacyExchangeServicePrincipal -M365Environment "gcc"
+                $Result.FederatedCredentials | Should -Not -BeNullOrEmpty
+                $Result.FederatedCredentials | Should -HaveCount $MockSPWithAllCredentials.FederatedIdentityCredentials.Count
+            }
+        }
+
+        Context "When Invoke-GraphDirectly returns null for the service principal" {
+            BeforeEach {
+                Mock Invoke-GraphDirectly {
+                    return @{ Value = $null }
+                }
+            }
+
+            It "returns null" {
+                $Result = Get-LegacyExchangeServicePrincipal -M365Environment "gcc"
+                $Result | Should -BeNullOrEmpty
             }
         }
 
