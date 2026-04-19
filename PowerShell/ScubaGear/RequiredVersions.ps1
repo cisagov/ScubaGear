@@ -3,7 +3,7 @@ $ModuleList = @(
     @{
         ModuleName = 'MicrosoftTeams'
         ModuleVersion = [version] '4.9.3'
-        MaximumVersion = [version] '7.6.0'
+        MaximumVersion = [version] '7.7.0'
         Purpose = 'Microsoft Teams configuration management'
         IsPinned = "False"
     },
@@ -31,7 +31,7 @@ $ModuleList = @(
     @{
         ModuleName = 'Microsoft.PowerApps.Administration.PowerShell'
         ModuleVersion = [version] '2.0.198'
-        MaximumVersion = [version] '2.0.216'
+        MaximumVersion = [version] '2.0.217'
         Purpose = 'Power Platform administrative functions'
         IsPinned = "False"
     },
