@@ -41,27 +41,27 @@ Group owners SHALL NOT be allowed to consent to applications.
 #### MS.DEFENDER.1.1v1
 The standard and strict preset security policies SHALL be enabled.
 - _Removal date:_ April 2026
-- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+- _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
 #### MS.DEFENDER.1.2v1
 All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.
 - _Removal date:_ April 2026
-- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+- _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
 #### MS.DEFENDER.1.3v1
 All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.
 - _Removal date:_ April 2026
-- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+- _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
 #### MS.DEFENDER.1.4v1
 Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
 - _Removal date:_ April 2026
-- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+- _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
 #### MS.DEFENDER.1.5v1
 Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
 - _Removal date:_ April 2026
-- _Removal rationale:_ reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
+- _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
@@ -82,10 +82,29 @@ A list of approved IP addresses for sending mail SHALL be maintained.
 - _Removal date:_ May 2024
 - _Removal rationale:_ MS.EXO.2.1v1 is not a security configuration that can be audited and acts as a step in implementation of policy MS.EXO.2.2. Having the list of approved IPs will be added as a part of implementation of policy MS.EXO.2.2 and removed as a policy in the baseline.
 
+#### MS.EXO.8.1v2
+A DLP solution SHALL be used.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
+
+#### MS.EXO.8.2v2
+The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
+
 #### MS.EXO.8.3v1
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts. 
+
+#### MS.EXO.8.4v1
+At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
+
+#### MS.EXO.9.1v1
+Emails SHALL be filtered by attachment file types.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.1v1.
 
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
@@ -95,7 +114,30 @@ The attachment filter SHOULD attempt to determine the true file type and assess 
 #### MS.EXO.9.4v1
 If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts. 
+
+#### MS.EXO.9.5v1
+At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.1v1.
+
+#### MS.EXO.10.1v1
+Emails SHALL be scanned for malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.3v1.
+
+#### MS.EXO.10.2v1
+Emails identified as containing malware SHALL be quarantined or dropped.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.3v1.
+
+#### MS.EXO.11.1v1
+Impersonation protection checks SHOULD be used.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.1v1.
+
+MS.EXO.10.3v1
+Email scanning SHALL be capable of reviewing emails after delivery.
 
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
