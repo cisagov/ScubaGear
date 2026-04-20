@@ -1,7 +1,7 @@
 # Purpose: Automatically generates ScubaBaselines.json from baseline markdown files when they are modified in a PR.
 # This ensures the machine-readable baseline asset package stays in sync with the authoritative markdown source.
 
-name: (Baker test) Generate ScubaBaselines.json from Markdown
+name: Generate ScubaBaselines.json from Markdown
 
 on:
   pull_request:
@@ -14,7 +14,7 @@ on:
       - 'PowerShell/ScubaGear/baselines/sharepoint.md'
       - 'PowerShell/ScubaGear/baselines/teams.md'
       - 'utils/workflow/Generate-ScubaBaseline.ps1'
-      - '.github/workflows/baker_test_generate_baseline_json.yaml'
+      - '.github/workflows/generate_baseline_json.yaml'
   workflow_dispatch:
 
 permissions:
