@@ -149,6 +149,7 @@ Users detected as high risk SHALL be blocked.
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+    - [T1078.004: Test another ATTACK mapping insertion](https://attack.mitre.org/techniques/T1078/005/)
 
 #### MS.AAD.2.2v1
 A notification SHOULD be sent to the administrator when high-risk users are detected.
@@ -171,6 +172,30 @@ Sign-ins detected as high risk SHALL be blocked.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
+- _Rationale:_ This prevents compromised accounts from accessing the tenant.
+- _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+
+### Resources
+
+- [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)
+
+- [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
+
+- [Self-remediation experience with Microsoft Entra ID Protection and Conditional Access](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
+
+#### MS.AAD.2.4v1
+Testing if a new policy addition SHALL be included in ScubaBaselines.json.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
+<!--Policy: MS.AAD.2.4v1; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
