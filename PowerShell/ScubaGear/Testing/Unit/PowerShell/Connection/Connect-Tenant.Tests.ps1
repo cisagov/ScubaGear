@@ -42,13 +42,13 @@ InModuleScope Connection {
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "defender"; Services = @('Connect-EXOHelper')}
+            @{ProductNames = "securitysuite"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "powerplatform"; Services = @('Add-PowerAppsAccount')}
             @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper', 'Connect-PnPOnline')}
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
             @{
-                ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+                ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
                     'Connect-GraphHelper',
                     'Connect-EXOHelper',

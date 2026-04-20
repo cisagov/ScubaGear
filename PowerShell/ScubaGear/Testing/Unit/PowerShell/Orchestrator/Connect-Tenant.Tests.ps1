@@ -20,7 +20,7 @@ InModuleScope Orchestrator {
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
                 $FailedAuthList | Should -BeNullOrEmpty
             }
-            It 'connects to defender' {
+            It 'connects to security suite' {
                 $ScubaConfig.ProductNames = @('securitysuite')
                 $FailedAuthList = Invoke-Connection -ScubaConfig $ScubaConfig
                 Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
