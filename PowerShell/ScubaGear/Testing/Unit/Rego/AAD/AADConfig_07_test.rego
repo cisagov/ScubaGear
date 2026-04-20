@@ -59,7 +59,7 @@ test_SecureScore_Correct_V1 if {
 }
 
 # Correct because the ratio of global admins to non global admins is equal to 1
-test_SecureScore_Incorrect_V1 if {
+test_SecureScore_Correct_V2 if {
     Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
 
     Output := aad.tests with input.privileged_users as Users
@@ -100,7 +100,7 @@ test_SecureScore_Incorrect_V3 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
-# Incorrect because the total number of global admins is greater than eight
+# Incorrect because the total number of global admins is greater than eight, which makes policy 7.1 fail and thus the score is not computed 
 test_SecureScore_Incorrect_V4 if {
     Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "Exchange Administrator"}])
 
