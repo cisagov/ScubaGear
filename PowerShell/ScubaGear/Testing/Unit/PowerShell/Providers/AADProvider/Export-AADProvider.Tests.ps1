@@ -197,6 +197,18 @@ InModuleScope -ModuleName ExportAADProvider {
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
+
+        It "sets total_user_count to 0 if Get-MgBetaUserCount fails" {
+            # Force TryCommand to catch and return @() for user count retrieval.
+            $MockCommandTracker.AddMockCommand("Get-MgBetaUserCount", { throw "Get-MgBetaUserCount failed" })
+
+            $Json = Export-AADProvider
+            $Json = $Json.TrimEnd(",")
+            $Json = "{$($Json)}"
+            $ParsedJson = ConvertFrom-Json -InputObject $Json
+
+            $ParsedJson.total_user_count | Should -Be 0
+        }
     }
 }
 AfterAll {
