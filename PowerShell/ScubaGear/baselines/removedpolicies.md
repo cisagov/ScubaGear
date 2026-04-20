@@ -66,7 +66,7 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Removed the policy because it could not be automatically evaluated by the ScubaGear tool. It defined a best practice requiring agencies to create a list of applications restricted from accessing files protected by the DLP policy, but this is open to interpretation and varies by agency, making it difficult for the Scuba team to enforce.
 
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
