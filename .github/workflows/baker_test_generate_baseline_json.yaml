@@ -14,7 +14,7 @@ on:
       - 'PowerShell/ScubaGear/baselines/sharepoint.md'
       - 'PowerShell/ScubaGear/baselines/teams.md'
       - 'utils/workflow/Generate-ScubaBaseline.ps1'
-      - '.github/workflows/generate_baseline_json.yaml'
+      - '.github/workflows/baker_test_generate_baseline_json.yaml'
   workflow_dispatch:
 
 permissions:
