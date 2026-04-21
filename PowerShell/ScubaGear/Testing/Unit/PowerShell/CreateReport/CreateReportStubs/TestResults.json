@@ -188,6 +188,36 @@
         "RequirementMet":  true
     },
     {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-MgPolicyDefaultAppManagementPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.5.5v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-MgPolicyDefaultAppManagementPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.5.6v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-MgPolicyDefaultAppManagementPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.AAD.5.7v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
         "ActualValue":  {
                             "all_roleid_values":  [
                                                       {
