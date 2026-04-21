@@ -198,7 +198,7 @@ InModuleScope -ModuleName ExportAADProvider {
             $ValidJson | Should -Be $true
         }
 
-        It "sets total_user_count to 0 if Get-MgBetaUserCount fails" {
+        It "sets total_user_count to -1 if Get-MgBetaUserCount fails" {
             # Force TryCommand to catch and return @() for user count retrieval.
             $MockCommandTracker.AddMockCommand("Get-MgBetaUserCount", { throw "Get-MgBetaUserCount failed" })
 
@@ -207,7 +207,7 @@ InModuleScope -ModuleName ExportAADProvider {
             $Json = "{$($Json)}"
             $ParsedJson = ConvertFrom-Json -InputObject $Json
 
-            $ParsedJson.total_user_count | Should -Be 0
+            $ParsedJson.total_user_count | Should -Be -1
         }
     }
 }

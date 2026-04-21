@@ -118,9 +118,9 @@ function Export-AADProvider {
     # Retrieve tenant user count for both enabled/disabled accounts utilizing (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
     $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
     # Ensure we successfully got a count of users; command failures return empty arrays.
-    # Use 0 as a safe numeric fallback so generated JSON remains valid.
+    # Use -1 as numeric fallback so generated JSON remains valid.
     if ($UserCount -isnot [int]) {
-        $UserCount = 0
+        $UserCount = -1
     }
 
     # Provides data for policies such as user consent and guest user access, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
