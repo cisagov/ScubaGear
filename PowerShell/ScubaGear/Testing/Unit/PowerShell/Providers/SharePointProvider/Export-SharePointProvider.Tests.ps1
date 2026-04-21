@@ -114,29 +114,29 @@ InModuleScope -ModuleName ExportSharePointProvider {
         }
         Context 'When Running Interactively with REST API' {
             It "with -M365Environment 'commercial', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'commercial' -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'gcc', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcc' -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'gcchigh', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcchigh' -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.us'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.us'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'dod', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'dod' -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint-mil.us'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint-mil.us'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
         }
         Context 'When running with Service Principals via REST API' {
             It "with -M365Environment commercial, returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment commercial -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
