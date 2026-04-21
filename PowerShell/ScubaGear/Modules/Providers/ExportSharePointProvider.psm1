@@ -10,11 +10,6 @@ function Export-SharePointProvider {
     [OutputType([System.String])]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $true)]
         [string]
         $AccessToken,
 
@@ -25,7 +20,6 @@ function Export-SharePointProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPORestHelper.psm1")
-    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
     $Tracker = Get-CommandTracker
 
     $SPOTenant = ConvertTo-Json @()

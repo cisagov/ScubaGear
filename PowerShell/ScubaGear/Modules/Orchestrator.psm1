@@ -846,7 +846,6 @@ function Invoke-ProviderList {
                         }
                         "sharepoint" {
                             $SPOProviderParams = @{
-                                'M365Environment' = $ScubaConfig.M365Environment
                                 'AccessToken'     = $ConnectionResult.SPOAccessToken
                                 'AdminUrl'        = $ConnectionResult.SPOAdminUrl
                             }
