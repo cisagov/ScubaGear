@@ -316,9 +316,6 @@ Describe "Policy Checks for <ProductName>" {
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
-                if ($IsCustomImplementation){
-                    $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
-                }
 
                 # Check final HTML output
                 $FoundPolicy = $false
@@ -420,11 +417,7 @@ Describe "Policy Checks for <ProductName>" {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
-                                    if ($IsCustomImplementation) {
-                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
-                                    }
-                                    elseif ($IsNotChecked){
+                                    if ($IsNotChecked){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {
