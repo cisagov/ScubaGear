@@ -200,6 +200,10 @@ function Export-AADProvider {
     ##### End block
     $RiskyDelegatedPermissionClassifications =  ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
 
+    # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1
+    # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
+    $AppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -221,6 +225,7 @@ function Export-AADProvider {
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
+    "app_management_policy": $AppManagementPolicy,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
