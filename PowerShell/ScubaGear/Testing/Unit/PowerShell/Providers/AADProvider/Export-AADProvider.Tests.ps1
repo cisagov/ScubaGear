@@ -107,6 +107,29 @@ InModuleScope -ModuleName ExportAADProvider {
                         return [pscustomobject]@{}
                     })
 
+                    $this.AddMockCommand("Get-MgPolicyDefaultAppManagementPolicy", {
+                        return [pscustomobject]@{
+                            ApplicationRestrictions = @{
+                                PasswordCredentials = @(
+                                    @{RestrictionType = 'passwordAddition'; State = 'enabled'; MaxLifetime = $null},
+                                    @{RestrictionType = 'symmetricKeyAddition'; State = 'enabled'; MaxLifetime = $null}
+                                )
+                                KeyCredentials = @(
+                                    @{RestrictionType = 'asymmetricKeyLifetime'; State = 'enabled'; MaxLifetime = 'P180D'}
+                                )
+                            }
+                            ServicePrincipalRestrictions = @{
+                                PasswordCredentials = @(
+                                    @{RestrictionType = 'passwordAddition'; State = 'enabled'; MaxLifetime = $null},
+                                    @{RestrictionType = 'symmetricKeyAddition'; State = 'enabled'; MaxLifetime = $null}
+                                )
+                                KeyCredentials = @(
+                                    @{RestrictionType = 'asymmetricKeyLifetime'; State = 'enabled'; MaxLifetime = 'P180D'}
+                                )
+                            }
+                        }
+                    })
+
                     $this.AddMockCommand("Get-MgBetaDirectorySetting", {
                         return [pscustomobject]@{}
                     })
@@ -208,6 +231,11 @@ InModuleScope -ModuleName ExportAADProvider {
             $Json = Export-AADProvider
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
+        }
+
+        It "includes app_management_policy in the JSON output" {
+            $Json = Export-AADProvider
+            $Json | Should -Match '"app_management_policy":'
         }
     }
 }

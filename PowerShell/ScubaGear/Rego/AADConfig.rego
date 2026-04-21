@@ -759,6 +759,208 @@ tests contains {
 }
 #--
 
+#
+# MS.AAD.5.5v1 - Block Password Addition
+#--
+
+# Helper function to check if password addition is blocked for applications
+PasswordAdditionBlockedApps := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordAddition"
+    Restriction.State == "enabled"
+} else := false
+
+# Helper function to check if symmetric key addition is blocked for applications
+SymmetricKeyAdditionBlockedApps := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "symmetricKeyAddition"
+    Restriction.State == "enabled"
+} else := false
+
+# Helper function to check if password addition is blocked for service principals
+PasswordAdditionBlockedSPs := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordAddition"
+    Restriction.State == "enabled"
+} else := false
+
+# Helper function to check if symmetric key addition is blocked for service principals
+SymmetricKeyAdditionBlockedSPs := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "symmetricKeyAddition"
+    Restriction.State == "enabled"
+} else := false
+
+# Check if MS.AAD.5.5v1 passes (password addition fully blocked)
+PasswordAdditionFullyBlocked := true if {
+    PasswordAdditionBlockedApps == true
+    SymmetricKeyAdditionBlockedApps == true
+    PasswordAdditionBlockedSPs == true
+    SymmetricKeyAdditionBlockedSPs == true
+} else := false
+
+# Policy passes if all four restrictions are enabled
+tests contains {
+    "PolicyId": "MS.AAD.5.5v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
+    "ActualValue": [PasswordAdditionBlockedApps, SymmetricKeyAdditionBlockedApps, PasswordAdditionBlockedSPs, SymmetricKeyAdditionBlockedSPs],
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Conditions := [
+        PasswordAdditionBlockedApps,
+        SymmetricKeyAdditionBlockedApps,
+        PasswordAdditionBlockedSPs,
+        SymmetricKeyAdditionBlockedSPs
+    ]
+    Status := Count(FilterArray(Conditions, false)) == 0
+}
+#--
+
+#
+# MS.AAD.5.6v1 - Restrict Password Lifetime
+#--
+
+# Helper function to check password lifetime restriction for applications
+PasswordLifetimeRestrictedApps(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordLifetime"
+    Restriction.State == "enabled"
+    # maxLifetime format: "P181D" (ISO 8601 duration) - set to 181 to enforce "180 days or less" due to Microsoft's "less than" evaluation
+    # Extract number of days from format PnD
+    MaxLifetimeStr := Restriction.MaxLifetime
+    # Remove 'P' prefix and 'D' suffix to get days
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Helper function to check symmetric key lifetime restriction for applications
+SymmetricKeyLifetimeRestrictedApps(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "symmetricKeyLifetime"
+    Restriction.State == "enabled"
+    MaxLifetimeStr := Restriction.MaxLifetime
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Helper function to check password lifetime restriction for service principals
+PasswordLifetimeRestrictedSPs(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordLifetime"
+    Restriction.State == "enabled"
+    MaxLifetimeStr := Restriction.MaxLifetime
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Helper function to check symmetric key lifetime restriction for service principals
+SymmetricKeyLifetimeRestrictedSPs(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "symmetricKeyLifetime"
+    Restriction.State == "enabled"
+    MaxLifetimeStr := Restriction.MaxLifetime
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Policy is N/A if password addition is fully blocked (MS.AAD.5.5v1 passes)
+# Otherwise, passes if all four restrictions are set to 181 days (which enforces 180 days or less due to Microsoft's "less than" evaluation)
+tests contains {
+    "PolicyId": "MS.AAD.5.6v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
+    "ActualValue": [PasswordLifetimeRestrictedApps(181), SymmetricKeyLifetimeRestrictedApps(181), PasswordLifetimeRestrictedSPs(181), SymmetricKeyLifetimeRestrictedSPs(181)],
+    "ReportDetails": ReportDetails,
+    "RequirementMet": Status
+} if {
+    PasswordAdditionFullyBlocked == true
+    ReportDetails := "N/A: All password addition is blocked per MS.AAD.5.5v1."
+    Status := true
+}
+
+tests contains {
+    "PolicyId": "MS.AAD.5.6v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
+    "ActualValue": [PasswordLifetimeRestrictedApps(181), SymmetricKeyLifetimeRestrictedApps(181), PasswordLifetimeRestrictedSPs(181), SymmetricKeyLifetimeRestrictedSPs(181)],
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    PasswordAdditionFullyBlocked == false
+    MaxDays := 181
+    Conditions := [
+        PasswordLifetimeRestrictedApps(MaxDays),
+        SymmetricKeyLifetimeRestrictedApps(MaxDays),
+        PasswordLifetimeRestrictedSPs(MaxDays),
+        SymmetricKeyLifetimeRestrictedSPs(MaxDays)
+    ]
+    Status := Count(FilterArray(Conditions, false)) == 0
+}
+#--
+
+#
+# MS.AAD.5.7v1 - Restrict Certificate Lifetime
+#--
+
+# Helper function to check certificate lifetime restriction for applications
+CertificateLifetimeRestrictedApps(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ApplicationRestrictions.KeyCredentials
+    Restriction.RestrictionType == "asymmetricKeyLifetime"
+    Restriction.State == "enabled"
+    # maxLifetime format: "P366D" (ISO 8601 duration) - set to 366 to enforce "365 days or less" due to Microsoft's "less than" evaluation
+    # Extract number of days from format PnD
+    MaxLifetimeStr := Restriction.MaxLifetime
+    # Remove 'P' prefix and 'D' suffix to get days
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Helper function to check certificate lifetime restriction for service principals
+CertificateLifetimeRestrictedSPs(MaxDays) := true if {
+    Policy := input.app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.KeyCredentials
+    Restriction.RestrictionType == "asymmetricKeyLifetime"
+    Restriction.State == "enabled"
+    MaxLifetimeStr := Restriction.MaxLifetime
+    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
+    Days := to_number(DaysStr)
+    Days <= MaxDays
+} else := false
+
+# Policy passes if both certificate restrictions are set to 366 days (which enforces 365 days or less due to Microsoft's "less than" evaluation)
+tests contains {
+    "PolicyId": "MS.AAD.5.7v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
+    "ActualValue": [CertificateLifetimeRestrictedApps(366), CertificateLifetimeRestrictedSPs(366)],
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    MaxDays := 366
+    Conditions := [
+        CertificateLifetimeRestrictedApps(MaxDays),
+        CertificateLifetimeRestrictedSPs(MaxDays)
+    ]
+    Status := Count(FilterArray(Conditions, false)) == 0
+}
+#--
+
 ############
 # MS.AAD.6 #
 ############

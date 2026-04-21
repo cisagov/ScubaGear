@@ -113,7 +113,7 @@ test_UserConsentAllowedWithRiskyDelegatedPermissionClassifications_Incorrect if 
                     "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
                     "ManagePermissionGrantsForSelf.microsoft-user-default-low"
                 ]}])
-    
+
     RiskyClassifications := json.patch(Classifications,
                 [{"op": "add", "path": "RiskyPermClassifications",
                 "value": [
@@ -156,5 +156,96 @@ test_IsEnabled_Incorrect if {
     Output := aad.tests with input.directory_settings as [Settings]
 
     TestResult("MS.AAD.5.3v1", Output, FAIL, false) == true
+}
+#--
+
+#
+# Policy MS.AAD.5.5v1
+#--
+test_PasswordAdditionBlocked_Correct if {
+    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+
+    TestResult("MS.AAD.5.5v1", Output, PASS, true) == true
+}
+
+test_PasswordAdditionBlocked_Incorrect_V1 if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/State", "value": "disabled"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.5v1", Output, FAIL, false) == true
+}
+
+test_PasswordAdditionBlocked_Incorrect_V2 if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.5v1", Output, FAIL, false) == true
+}
+#--
+
+#
+# Policy MS.AAD.5.6v1
+#--
+test_PasswordLifetimeRestricted_Correct if {
+    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+
+    TestResult("MS.AAD.5.6v1", Output, "N/A: All password addition is blocked per MS.AAD.5.5v1.", true) == true
+}
+
+test_PasswordLifetimeRestricted_PasswordAdditionAllowed_Correct if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/State", "value": "disabled"},
+                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/1/State", "value": "disabled"},
+                 {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
+                 {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.6v1", Output, PASS, true) == true
+}
+
+test_PasswordLifetimeRestricted_Incorrect_TooLong if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/State", "value": "disabled"},
+                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/1/State", "value": "disabled"},
+                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/3/MaxLifetime", "value": "P180D"},
+                 {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
+                 {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.6v1", Output, FAIL, false) == true
+}
+#--
+
+#
+# Policy MS.AAD.5.7v1
+#--
+test_CertificateLifetimeRestricted_Correct if {
+    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+
+    TestResult("MS.AAD.5.7v1", Output, PASS, true) == true
+}
+
+test_CertificateLifetimeRestricted_Incorrect_TooLong if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/MaxLifetime", "value": "P366D"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.7v1", Output, FAIL, false) == true
+}
+
+test_CertificateLifetimeRestricted_Incorrect_Disabled if {
+    Policy := json.patch(AppManagementPolicy,
+                [{"op": "add", "path": "ServicePrincipalRestrictions/KeyCredentials/0/State", "value": "disabled"}])
+
+    Output := aad.tests with input.app_management_policy as [Policy]
+
+    TestResult("MS.AAD.5.7v1", Output, FAIL, false) == true
 }
 #--
