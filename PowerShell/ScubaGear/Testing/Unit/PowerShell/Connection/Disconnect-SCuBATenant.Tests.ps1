@@ -26,8 +26,8 @@ InModuleScope Connection {
             Disconnect-SCuBATenant -ProductNames 'exo'
             Should -Invoke -ModuleName Connection -CommandName Disconnect-ExchangeOnline -Times 1 -Exactly
         }
-        It 'Disconnects from Defender (Exchange Online and Security & Compliance)' {
-            {Disconnect-SCuBATenant -ProductNames 'defender'} | Should -Not -Throw
+        It 'Disconnects from Security Suite (Exchange Online and Security & Compliance)' {
+            {Disconnect-SCuBATenant -ProductNames 'securitysuite'} | Should -Not -Throw
         }
         It 'Disconnects from Power Platform' {
             {Disconnect-SCuBATenant -ProductNames 'powerplatform'} | Should -Not -Throw

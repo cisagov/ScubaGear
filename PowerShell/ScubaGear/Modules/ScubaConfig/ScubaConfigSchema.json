@@ -50,7 +50,7 @@
       },
       "SecuritySuite": {
         "supportsExclusions": true,
-        "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers", "AgencyDomains", "PartnerDomains"]
+        "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers", "PartnerDomains"]
       },
       "Exo": {
         "supportsExclusions": true,
