@@ -1198,10 +1198,10 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <!-- Security Suite Exclusions Tab -->
-                            <TabItem x:Name="SecuritySuiteExclusionsTab" Header="SECURITYSUITE" IsEnabled="False">
+                            <!-- Defender Exclusionss Tab -->
+                            <TabItem x:Name="DefenderExclusionsTab" Header="DEFENDER" IsEnabled="False">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SecuritySuiteExclusionsContent">
+                                    <StackPanel x:Name="DefenderExclusionsContent">
                                         <!-- Will be populated dynamically -->
                                     </StackPanel>
                                 </ScrollViewer>
@@ -1335,10 +1335,10 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <!-- Security Suite Annotations Tab -->
-                            <TabItem x:Name="SecuritySuiteAnnotationsTab" Header="SECURITYSUITE" IsEnabled="False">
+                            <!-- Defender Annotations Tab -->
+                            <TabItem x:Name="DefenderAnnotationsTab" Header="DEFENDER" IsEnabled="False">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SecuritySuiteAnnotationsContent">
+                                    <StackPanel x:Name="DefenderAnnotationsContent">
                                         <!-- Will be populated dynamically -->
                                     </StackPanel>
                                 </ScrollViewer>
@@ -1472,10 +1472,10 @@
                                 </ScrollViewer>
                             </TabItem>
 
-                            <!-- Security Suite Omissions Tab -->
-                            <TabItem x:Name="SecuritySuiteOmissionsTab" Header="SECURITYSUITE" IsEnabled="False">
+                            <!-- Defender Omissions Tab -->
+                            <TabItem x:Name="DefenderOmissionsTab" Header="DEFENDER" IsEnabled="False">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SecuritySuiteOmissionsContent">
+                                    <StackPanel x:Name="DefenderOmissionsContent">
                                         <!-- Will be populated dynamically -->
                                     </StackPanel>
                                 </ScrollViewer>

@@ -1326,7 +1326,7 @@ Function Show-SCuBABaselinePolicyViewer {
         Launches the viewer using baselines downloaded from GitHub.
 
     .EXAMPLE
-        Show-SCuBABaselinePolicyViewer -NavigateToPolicyId "MS.SECURITYSUITE.1.1v1"
+        Show-SCuBABaselinePolicyViewer -NavigateToPolicyId "MS.DEFENDER.1.1v1"
         Opens the viewer and navigates to the specified policy, or navigates existing window if already open.
     #>
 
