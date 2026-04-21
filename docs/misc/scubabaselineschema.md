@@ -212,7 +212,7 @@ Basic validation ensures:
 
 ```powershell
 # Load the baseline
-$baseline = Get-Content "baselines/ScubaBaselines.json" | ConvertFrom-Json
+$baseline = Get-Content "PowerShell/ScubaGear/schemas/ScubaBaselines.json" | ConvertFrom-Json
 
 # Access a specific product
 $aadPolicies = $baseline.baselines.aad
@@ -234,7 +234,7 @@ $criticalPolicies = $baseline.baselines.aad | Where-Object {
 import json
 
 # Load the baseline
-with open('baselines/ScubaBaselines.json', 'r') as f:
+with open('PowerShell/ScubaGear/schemas/ScubaBaselines.json', 'r') as f:
     baseline = json.load(f)
 
 # Get all products
@@ -248,7 +248,7 @@ defender_policies = [p for p in baseline['baselines']['defender']
 ### JavaScript/TypeScript
 
 ```typescript
-import baseline from './baselines/ScubaBaselines.json';
+import baseline from './PowerShell/ScubaGear/schemas/ScubaBaselines.json';
 
 // Access version
 console.log(baseline.Version);
@@ -291,7 +291,7 @@ Future schema changes will:
 ## Related Files
 
 - **Generation Script**: `utils/workflow/Generate-ScubaBaseline.ps1`
-- **Workflow**: `.github/workflows/generate_baseline_json.yaml`
+- **Workflow**: `.github/workflows/build_sign_release.yaml`
 - **Schema Helper Module**: `PowerShell/ScubaGear/Modules/Support/ScubaBaselineSchemaHelper.psm1`
 - **Source Baselines**: `PowerShell/ScubaGear/baselines/*.md`
 
