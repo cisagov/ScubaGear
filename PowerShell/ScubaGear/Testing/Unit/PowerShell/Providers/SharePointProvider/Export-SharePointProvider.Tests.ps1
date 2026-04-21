@@ -16,19 +16,19 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
                     try {
                         switch ($Command) {
-                            "Get-MgBetaOrganization" {
+                            "Get-SPOTenantRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
-                                    VerifiedDomains = @(
-                                        @{
-                                            "isInitial" = $true;
-                                            "Name"      = "contoso.onmicrosoft.com";
-                                        }
-                                        @{
-                                            "isInitial" = $false;
-                                            "Name"      = "example.onmicrosoft.com";
-                                        }
-                                    )
+                                    SharingCapability = 0
+                                    ODBSharingCapability = 0
+                                    SharingDomainRestrictionMode = 0
+                                    DefaultSharingLinkType = 1
+                                    DefaultLinkPermission = 1
+                                    RequireAnonymousLinksExpireInDays = 30
+                                    FileAnonymousLinkType = 2
+                                    FolderAnonymousLinkType = 2
+                                    EmailAttestationRequired = $true
+                                    EmailAttestationReAuthDays = 30
                                 }
                             }
                             default {
@@ -71,28 +71,6 @@ InModuleScope -ModuleName ExportSharePointProvider {
             function Get-CommandTracker {}
             Mock -ModuleName ExportSharePointProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
-            }
-
-            # Mock REST API functions
-            function Get-SPOTenantRest {}
-            Mock -ModuleName ExportSharePointProvider Get-SPOTenantRest {
-                return [pscustomobject]@{
-                    SharingCapability = 0
-                    ODBSharingCapability = 0
-                    SharingDomainRestrictionMode = 0
-                    DefaultSharingLinkType = 1
-                    DefaultLinkPermission = 1
-                    RequireAnonymousLinksExpireInDays = 30
-                    FileAnonymousLinkType = 2
-                    FolderAnonymousLinkType = 2
-                    EmailAttestationRequired = $true
-                    EmailAttestationReAuthDays = 30
-                }
-            }
-
-            function Get-SPOSiteRest {}
-            Mock -ModuleName ExportSharePointProvider Get-SPOSiteRest {
-                return [pscustomobject]@{}
             }
 
             function Test-SCuBAValidProviderJson {

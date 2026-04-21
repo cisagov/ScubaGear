@@ -25,18 +25,17 @@ function Get-SPOTenantRest {
     # SharePoint CSOM-style REST endpoint for tenant properties
     $Endpoint = "/_api/SPO.Tenant"
 
-    try {
-        # accept header https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/complete-basic-operations-using-sharepoint-rest-endpoints#properties-used-in-rest-requests
-        $SPOContentType = "application/json;odata=verbose"
+    # accept header https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/complete-basic-operations-using-sharepoint-rest-endpoints#properties-used-in-rest-requests
+    $SPOContentType = "application/json;odata=verbose"
 
-        # Data is wrapped in a "d" property when using odata=verbose
-        $Response = (Invoke-ScubaRestMethod -BaseUrl $AdminUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" -ContentType $SPOContentType -Accept $SPOContentType).d
+    # The SharePoint REST API wraps tenant properties in a "d" envelope when using
+    # odata=verbose content type (e.g., { "d": { "SharingCapability": 0, ... } }).
+    # Without odata=verbose the response would be a flat JSON object ($Response directly),
+    # or a collection under $Response.value. We use odata=verbose here to get the
+    # strongly-typed tenant object.
+    $Response = (Invoke-ScubaRestMethod -BaseUrl $AdminUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" -ContentType $SPOContentType -Accept $SPOContentType).d
 
-        return $Response
-    }
-    catch {
-        throw "Failed to get SPO Tenant settings: $($_.Exception.Message)"
-    }
+    return $Response
 }
 
 Export-ModuleMember -Function @(

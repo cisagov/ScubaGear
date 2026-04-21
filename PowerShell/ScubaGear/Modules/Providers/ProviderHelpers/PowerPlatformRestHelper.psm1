@@ -59,13 +59,8 @@ function Get-PowerPlatformTenantSettingsRest {
 
     $Endpoint = "/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01"
 
-    try {
-        $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "POST"
-        return $Response
-    }
-    catch {
-        throw "Failed to get Power Platform Tenant Settings: $($_.Exception.Message)"
-    }
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "POST"
+    return $Response
 }
 
 function Get-PowerPlatformEnvironmentsRest {
@@ -89,28 +84,23 @@ function Get-PowerPlatformEnvironmentsRest {
 
     $Endpoint = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01"
 
-    try {
-        $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
 
-        $Environments = @()
-        if ($Response.value) {
-            foreach ($Env in $Response.value) {
-                $Environments += [PSCustomObject]@{
-                    EnvironmentName = $Env.name
-                    DisplayName     = $Env.properties.displayName
-                    IsDefault       = $Env.properties.isDefault
-                    Location        = $Env.location
-                    EnvironmentType = $Env.properties.environmentSku
-                    CreatedTime     = $Env.properties.createdTime
-                }
+    $Environments = @()
+    if ($Response.value) {
+        foreach ($Env in $Response.value) {
+            $Environments += [PSCustomObject]@{
+                EnvironmentName = $Env.name
+                DisplayName     = $Env.properties.displayName
+                IsDefault       = $Env.properties.isDefault
+                Location        = $Env.location
+                EnvironmentType = $Env.properties.environmentSku
+                CreatedTime     = $Env.properties.createdTime
             }
         }
+    }
 
-        return $Environments
-    }
-    catch {
-        throw "Failed to get Power Platform Environments: $($_.Exception.Message)"
-    }
+    return $Environments
 }
 
 function Get-PowerPlatformDlpPoliciesRest {
@@ -133,43 +123,38 @@ function Get-PowerPlatformDlpPoliciesRest {
 
     $Endpoint = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01"
 
-    try {
-        $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
 
-        # The 2016-11-01 endpoint returns a nested schema (properties.definition) rather than
-        # the flat schema (displayName, environmentType, environments at the top level) that
-        # Rego expects. Normalize the response to match the flat schema.
-        $NormalizedPolicies = foreach ($Policy in $Response.value) {
-            $Def = $Policy.properties.definition
-            $Ef = $Def.constraints.environmentFilter1
+    # The 2016-11-01 endpoint returns a nested schema (properties.definition) rather than
+    # the flat schema (displayName, environmentType, environments at the top level) that
+    # Rego expects. Normalize the response to match the flat schema.
+    $NormalizedPolicies = foreach ($Policy in $Response.value) {
+        $Def = $Policy.properties.definition
+        $Ef = $Def.constraints.environmentFilter1
 
-            if ($null -eq $Ef) {
-                $EnvType = "AllEnvironments"
-                $Environments = @()
-            }
-            elseif ($Ef.parameters.filterType -eq "include") {
-                $EnvType = "OnlyEnvironments"
-                $Environments = @($Ef.parameters.environments)
-            }
-            else {
-                $EnvType = "ExceptEnvironments"
-                $Environments = @($Ef.parameters.environments)
-            }
-
-            [PSCustomObject]@{
-                name            = $Policy.name
-                displayName     = $Policy.properties.displayName
-                environmentType = $EnvType
-                environments    = $Environments
-                connectorGroups = @()
-            }
+        if ($null -eq $Ef) {
+            $EnvType = "AllEnvironments"
+            $Environments = @()
+        }
+        elseif ($Ef.parameters.filterType -eq "include") {
+            $EnvType = "OnlyEnvironments"
+            $Environments = @($Ef.parameters.environments)
+        }
+        else {
+            $EnvType = "ExceptEnvironments"
+            $Environments = @($Ef.parameters.environments)
         }
 
-        return [PSCustomObject]@{ value = @($NormalizedPolicies) }
+        [PSCustomObject]@{
+            name            = $Policy.name
+            displayName     = $Policy.properties.displayName
+            environmentType = $EnvType
+            environments    = $Environments
+            connectorGroups = @()
+        }
     }
-    catch {
-        throw "Failed to get Power Platform DLP Policies: $($_.Exception.Message)"
-    }
+
+    return [PSCustomObject]@{ value = @($NormalizedPolicies) }
 }
 
 function Get-PowerPlatformTenantIsolationRest {
@@ -198,13 +183,8 @@ function Get-PowerPlatformTenantIsolationRest {
     # provider: PowerPlatform.Governance/v1, not Microsoft.BusinessAppPlatform
     $Endpoint = "/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01"
 
-    try {
-        $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
-        return $Response
-    }
-    catch {
-        throw "Failed to get Power Platform Tenant Isolation Policy: $($_.Exception.Message)"
-    }
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    return $Response
 }
 
 Export-ModuleMember -Function @(

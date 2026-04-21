@@ -291,7 +291,8 @@ function Get-MsalAccessToken {
         }
         catch {
             if ($Attempt -ge $MaxAttempts) {
-                throw "Failed to acquire access token after $MaxAttempts attempts: $($_.Exception.Message)"
+                Write-Warning "Failed to acquire access token after $MaxAttempts attempts"
+                throw
             }
             Write-Warning "Token acquisition attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
             Start-Sleep -Seconds 5

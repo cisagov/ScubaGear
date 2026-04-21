@@ -55,15 +55,19 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                                     );
                                 }
                             }
-                            "Get-TenantSettings" {
+                            "Get-PowerPlatformTenantSettingsRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-AdminPowerAppEnvironment" {
+                            "Get-PowerPlatformEnvironmentsRest" {
                                 $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
+                                return @()
                             }
-                            "Get-AdminPowerAppEnvironment" {
+                            "Get-PowerPlatformDlpPoliciesRest" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{ value = @() }
+                            }
+                            "Get-PowerPlatformTenantIsolationRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -107,20 +111,6 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
             Mock -ModuleName ExportPowerPlatformProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
-            function Get-DlpPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-DlpPolicy {}
-            function Get-PowerAppTenantIsolationPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerAppTenantIsolationPolicy {}
-            function Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
-            function Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
-            function Get-PowerPlatformEnvironmentsRest { return @() }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformEnvironmentsRest { return @() }
-            function Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
-            function Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]

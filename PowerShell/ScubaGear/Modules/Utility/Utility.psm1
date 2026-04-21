@@ -622,13 +622,8 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
-    try {
-        $Response = Invoke-RestMethod @Params
-        return $Response
-    }
-    catch {
-        throw "REST API call to $Uri failed: $($_.Exception.Message)"
-    }
+    $Response = Invoke-RestMethod @Params
+    return $Response
 }
 
 Export-ModuleMember -Function @(

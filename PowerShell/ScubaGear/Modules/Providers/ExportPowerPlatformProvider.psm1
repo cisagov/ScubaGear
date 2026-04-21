@@ -37,51 +37,21 @@ function Export-PowerPlatformProvider {
     Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
 
     # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1, MS.POWERPLATFORM.6.1v1
-    $EnvironmentCreation = ConvertTo-Json @()
-    try {
-        $TenantSettings = Get-PowerPlatformTenantSettingsRest -BaseUrl $BaseUrl -AccessToken $AccessToken
-        $EnvironmentCreation = ConvertTo-Json -Depth 10 @($TenantSettings)
-        $Tracker.AddSuccessfulCommand("Get-TenantSettings")
-    }
-    catch {
-        Write-Warning "Error running Get-TenantSettings (REST): $($_)"
-        $Tracker.AddUnSuccessfulCommand("Get-TenantSettings")
-    }
+    $TenantSettings = $Tracker.TryCommand("Get-PowerPlatformTenantSettingsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $EnvironmentCreation = ConvertTo-Json -Depth 10 @($TenantSettings)
 
     # MS.POWERPLATFORM.2.1v1, MS.POWERPLATFORM.2.2v1, MS.POWERPLATFORM.2.3v1
-    $EnvironmentList = ConvertTo-Json @()
-    try {
-        $Environments = Get-PowerPlatformEnvironmentsRest -BaseUrl $BaseUrl -AccessToken $AccessToken
-        $EnvironmentList = ConvertTo-Json -Depth 4 @($Environments)
-        $Tracker.AddSuccessfulCommand("Get-AdminPowerAppEnvironment")
-    }
-    catch {
-        Write-Warning "Error running Get-AdminPowerAppEnvironment (REST): $($_)"
-        $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
-    }
+    $Environments = $Tracker.TryCommand("Get-PowerPlatformEnvironmentsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $EnvironmentList = ConvertTo-Json -Depth 4 @($Environments)
 
     # has to be tested manually because of http 403 errors
-    $DLPPolicies = ConvertTo-Json @()
-    try {
-        $DlpResponse = Get-PowerPlatformDlpPoliciesRest -BaseUrl $BaseUrl -AccessToken $AccessToken
-        $DLPPolicies = ConvertTo-Json -Depth 10 @($DlpResponse)
-        $Tracker.AddSuccessfulCommand("Get-DlpPolicy")
-    }
-    catch {
-        Write-Warning "Error running Get-DlpPolicy (REST): $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
-    }
+    $DlpResponse = $Tracker.TryCommand("Get-PowerPlatformDlpPoliciesRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $DLPPolicies = ConvertTo-Json -Depth 10 @($DlpResponse)
 
     # MS.POWERPLATFORM.3.1v1
     # has to be tested manually because of http 403 errors
-    $TenantIsolation = ConvertTo-Json @()
-    try {
-        $TenantIso = Get-PowerPlatformTenantIsolationRest -BaseUrl $BaseUrl -AccessToken $AccessToken -TenantId $TenantId
-        $TenantIsolation = ConvertTo-Json -Depth 4 @($TenantIso)
-        $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
-    }
-    catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy (REST): $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
-    }
+    $TenantIso = $Tracker.TryCommand("Get-PowerPlatformTenantIsolationRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken; TenantId = $TenantId})
+    $TenantIsolation = ConvertTo-Json -Depth 4 @($TenantIso)
 
     # MS.POWERPLATFORM.3.2v1 currently has no corresponding PowerShell Cmdlet
 

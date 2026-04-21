@@ -22,22 +22,11 @@ function Export-SharePointProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPORestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    $SPOTenant = ConvertTo-Json @()
     $UsedPnP = ConvertTo-Json $false
 
     # Use access token acquired by Connection.psm1
-    try {
-        # Get tenant settings via REST
-        $TenantData = Get-SPOTenantRest -AdminUrl $AdminUrl -AccessToken $AccessToken
-
-        $SPOTenant = ConvertTo-Json @($TenantData) -Depth 10
-        $Tracker.AddSuccessfulCommand("SharePoint REST API")
-
-    }
-    catch {
-        Write-Warning "SharePoint REST API call failed: $($_.Exception.Message)"
-        $Tracker.AddUnSuccessfulCommand("SharePoint REST API")
-    }
+    $TenantData = $Tracker.TryCommand("Get-SPOTenantRest", @{AdminUrl = $AdminUrl; AccessToken = $AccessToken})
+    $SPOTenant = ConvertTo-Json @($TenantData) -Depth 10
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
