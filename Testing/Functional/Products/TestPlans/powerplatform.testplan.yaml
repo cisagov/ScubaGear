@@ -282,6 +282,19 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
+  - PolicyId: MS.POWERPLATFORM.3.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERPLATFORM.3.1v1 Edge case - Tenant isolation never configured (null)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                tenant_isolation:
+                  - null
+        Postconditions: []
+        ExpectedResult: false
+
   - PolicyId: MS.POWERPLATFORM.3.2v1
     TestDriver: ScubaCached
     Tests:
