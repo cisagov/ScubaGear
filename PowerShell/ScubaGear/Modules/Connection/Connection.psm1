@@ -36,7 +36,6 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPOSiteHelper.psm1 -Function Get-SPOSiteHelper
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -153,7 +152,7 @@ function Connect-Tenant {
                        $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
                        $TenantName = $InitialDomain.Name
 
-                       $TokenData.SPOAdminUrl = Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
+                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix #Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
                        $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
                        if ($ServicePrincipalParams.CertThumbprintParams) {
