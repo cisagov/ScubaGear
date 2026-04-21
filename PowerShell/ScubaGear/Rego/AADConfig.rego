@@ -764,44 +764,54 @@ tests contains {
 #--
 
 # Helper function to check if password addition is blocked for applications
+default PasswordAdditionBlockedApps := false
+
 PasswordAdditionBlockedApps := true if {
     Policy := input.app_management_policy[0]
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
     Restriction.State == "enabled"
-} else := false
+}
 
 # Helper function to check if symmetric key addition is blocked for applications
+default SymmetricKeyAdditionBlockedApps := false
+
 SymmetricKeyAdditionBlockedApps := true if {
     Policy := input.app_management_policy[0]
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyAddition"
     Restriction.State == "enabled"
-} else := false
+}
 
 # Helper function to check if password addition is blocked for service principals
+default PasswordAdditionBlockedSPs := false
+
 PasswordAdditionBlockedSPs := true if {
     Policy := input.app_management_policy[0]
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
     Restriction.State == "enabled"
-} else := false
+}
 
 # Helper function to check if symmetric key addition is blocked for service principals
+default SymmetricKeyAdditionBlockedSPs := false
+
 SymmetricKeyAdditionBlockedSPs := true if {
     Policy := input.app_management_policy[0]
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyAddition"
     Restriction.State == "enabled"
-} else := false
+}
 
 # Check if MS.AAD.5.5v1 passes (password addition fully blocked)
+default PasswordAdditionFullyBlocked := false
+
 PasswordAdditionFullyBlocked := true if {
     PasswordAdditionBlockedApps == true
     SymmetricKeyAdditionBlockedApps == true
     PasswordAdditionBlockedSPs == true
     SymmetricKeyAdditionBlockedSPs == true
-} else := false
+}
 
 # Policy passes if all four restrictions are enabled
 tests contains {
@@ -883,7 +893,12 @@ tests contains {
     "PolicyId": "MS.AAD.5.6v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [PasswordLifetimeRestrictedApps(181), SymmetricKeyLifetimeRestrictedApps(181), PasswordLifetimeRestrictedSPs(181), SymmetricKeyLifetimeRestrictedSPs(181)],
+    "ActualValue": [
+        PasswordLifetimeRestrictedApps(181),
+        SymmetricKeyLifetimeRestrictedApps(181),
+        PasswordLifetimeRestrictedSPs(181),
+        SymmetricKeyLifetimeRestrictedSPs(181),
+    ],
     "ReportDetails": ReportDetails,
     "RequirementMet": Status
 } if {
@@ -896,7 +911,12 @@ tests contains {
     "PolicyId": "MS.AAD.5.6v1",
     "Criticality": "Should",
     "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [PasswordLifetimeRestrictedApps(181), SymmetricKeyLifetimeRestrictedApps(181), PasswordLifetimeRestrictedSPs(181), SymmetricKeyLifetimeRestrictedSPs(181)],
+    "ActualValue": [
+        PasswordLifetimeRestrictedApps(181),
+        SymmetricKeyLifetimeRestrictedApps(181),
+        PasswordLifetimeRestrictedSPs(181),
+        SymmetricKeyLifetimeRestrictedSPs(181),
+    ],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {

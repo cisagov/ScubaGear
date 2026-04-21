@@ -121,10 +121,12 @@ test_UserConsentAllowedWithRiskyDelegatedPermissionClassifications_Incorrect if 
                     "Mail.Send"
                 ]}])
 
-    Output := aad.tests with input.authorization_policies as [Policies] with input.risky_delegated_permission_classifications as [RiskyClassifications]
+    Output := aad.tests with input.authorization_policies as [Policies]
+        with input.risky_delegated_permission_classifications as [RiskyClassifications]
 
     ReportDetailStr := concat("", [
-        "1 authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications:",
+        "1 authorization policies found that allow non-admin users to consent to ",
+        "third-party applications with risky delegated permission classifications:",
         "<br/>authorizationPolicy"
     ])
 
