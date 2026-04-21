@@ -212,7 +212,7 @@ test_PasswordLifetimeRestricted_Incorrect_TooLong if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/State", "value": "disabled"},
                  {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/1/State", "value": "disabled"},
-                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/3/MaxLifetime", "value": "P180D"},
+                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/3/MaxLifetime", "value": "P182D"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
 
@@ -233,7 +233,7 @@ test_CertificateLifetimeRestricted_Correct if {
 
 test_CertificateLifetimeRestricted_Incorrect_TooLong if {
     Policy := json.patch(AppManagementPolicy,
-                [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/MaxLifetime", "value": "P366D"}])
+                [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/MaxLifetime", "value": "P367D"}])
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
