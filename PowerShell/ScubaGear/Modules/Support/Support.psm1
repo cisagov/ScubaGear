@@ -30,7 +30,7 @@ function Copy-SCuBABaselineDocument {
         New-Item -ItemType Directory -Path $Destination | Out-Null
     }
 
-    @("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
+    @("teams", "exo", "securitysuite", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
         $SourceFileName = Join-Path -Path $PSScriptRoot -ChildPath "..\..\baselines\$_.md"
         $TargetFileName = Join-Path -Path $Destination -ChildPath "$_.md"
         Copy-Item -Path $SourceFileName -Destination $Destination -Force:$Force -ErrorAction Stop  2> $null
