@@ -624,7 +624,7 @@ information by restricted apps and unwanted Bluetooth applications.
    **Next**.
 
 8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.
-   
+
 9. Under **Choose where to apply the policy**, set **Status** to **On**
    for at least the Exchange email, OneDrive accounts, SharePoint
    sites, Teams chat and channel messages, and Devices locations, then
@@ -957,7 +957,7 @@ administrator to start recording user and admin activity.
 
 #### MS.DEFENDER.6.3v1 Instructions
 To create one or more custom audit retention policies, if the default retention policy is not sufficient for agency needs, follow [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy) instructions.
-Ensure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31. 
+Ensure the duration selected in the retention policies is at least one year, in accordance with OMB M-21-31.
 
 As noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/defender.md#license-requirements-1) section above, the creation of a custom audit log retention policy and its retention in the M365 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses. No additional license is required to view and export logs. To view and export audit logs follow [Export, configure, and view audit log records | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-export-records) and/or [Untitled Goose Tool Fact Sheet | CISA.](https://www.cisa.gov/resources-tools/resources/untitled-goose-tool-fact-sheet)
 

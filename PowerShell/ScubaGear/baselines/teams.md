@@ -3,15 +3,25 @@
 
 Microsoft 365 (M365) Teams is a cloud-based text and live chat workspace that supports video calls, chat messaging, screen sharing, and file sharing. This secure configuration baseline (SCB) provides specific policies to strengthen Microsoft Teams' security.
 
+Many admin controls for Teams are found in the **Teams admin center**.
+However, several essential security functions for Teams require a dedicated security
+tool, e.g., for data loss prevention. M365 provides these security functions
+natively via Defender for Office 365. Notably, Defender for Office 365 capabilities
+require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
+and are available as add-ons for E3 and G3. However, third-party solutions that
+offer comparable security functions can be used in lieu of Defender.
+Refer to the [CISA M365 Secure Configuration Security Suite Baseline](securitysuite.md)
+for additional guidance.
+
 The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
 The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
 
-For non-Federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-Federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
-## License Compliance and Copyright 
+## License Compliance and Copyright
 Portions of this document are adapted from documents in Microsoft's [M365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
@@ -79,7 +89,7 @@ Anonymous users SHALL NOT be enabled to start meetings.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
-- _Rationale:_ This policy protects against anonymous users starting Microsoft Teams meetings to scrape internal contacts. The policy is beneficial for agencies that have implemented custom policies, providing flexibility for some users to automatically admit “everyone” to a Microsoft Teams meeting.
+- _Rationale:_ This policy protects against anonymous users starting Microsoft Teams meetings to scrape internal contacts. The policy is beneficial for agencies that have implemented custom policies, providing flexibility for some users to automatically admit "everyone" to a Microsoft Teams meeting.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
@@ -93,7 +103,7 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.3v1; Criticality: SHOULD -->
-- _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.  
+- _Rationale:_ Automatically allowing admittance to anonymous and dial-in users diminishes control of meeting participation and invites potential data breach. This policy reduces that risk by requiring all anonymous and dial-in users to wait in a lobby until admitted by an authorized meeting participant. If the agency has a use case to admit members of specific trusted organizations and/or B2B guests automatically, custom policies may be created and assigned to authorized meeting organizers.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility. For example, B2B guest users and trusted partner members may be admitted automatically into meetings organized by authorized users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
@@ -106,7 +116,7 @@ Internal users SHOULD be admitted automatically.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.4v1; Criticality: SHOULD -->
-- _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.  
+- _Rationale:_ Requiring internal users to wait in the lobby for explicit admission can lead to admission fatigue. This policy enables internal users to be automatically admitted to the meeting through global policy.
 - _Last modified:_ July 2023
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom meeting policies MAY be created to allow specific users more flexibility.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
@@ -121,7 +131,7 @@ Dial-in users SHOULD NOT be enabled to bypass the lobby.
 <!--Policy: MS.TEAMS.1.5v1; Criticality: SHOULD -->
 - _Rationale:_ Automatically admitting dial-in users reduces control over who can participate in a meeting and increases potential for data breaches. This policy reduces the risk by requiring all dial-in users to wait in a lobby until they are admitted by an authorized meeting participant.
 - _Last modified:_ July 2023
-- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.  
+- _Note:_ This policy applies to the Global (Org-wide default) meeting policy, as well as custom meeting policies.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -157,7 +167,7 @@ Record an event SHOULD NOT be set to Always record.
 ### Resources
 
 - [Manage who can present and request control in Microsoft Teams \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control) 
+  Learn](https://learn.microsoft.com/en-us/microsoftteams/meeting-who-present-request-control)
 - [Meeting policy settings \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-reference#meetings)
 
 - [Teams cloud meeting recording \| Microsoft
@@ -299,7 +309,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
-- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.  
+- _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.
 - _Last modified:_ August 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -314,9 +324,9 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
-- _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting. 
+- _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.
 - _Last modified:_ August 2025
-- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants. 
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -330,7 +340,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 <!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ August 2025
-- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.  
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -374,7 +384,7 @@ To enable external access for only specific domains:
     select **Allow only specific external domains**
 
 4.  Select **Add external domains**. Enter domains allowed, and then select **Done**
-   
+
     **NOTE:** Domains will need to be added in this step in order for users to communicate with them.
 
 5.  Click **Save**.
@@ -418,7 +428,7 @@ Teams email integration SHALL be disabled.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.  
+- _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.
 - _Last modified:_ July 2023
 - _Note:_ Teams email integration is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8, SC-7(10)(a), AC-4
@@ -515,7 +525,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 ### Implementation
 
-**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. Newer Tenants, created within 2024 and newer will follow the newer version 2 policy implementation steps while older tenants will follow the legacy implementation steps. 
+**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. Newer Tenants, created within 2024 and newer will follow the newer version 2 policy implementation steps while older tenants will follow the legacy implementation steps.
 
 **ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
 
@@ -552,7 +562,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
-   
+
 3.  In the upper right-hand corner select **Actions**
 
 4.  Select **Org-wide app settings**.
@@ -560,9 +570,9 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 5.  Under **Third-party apps** > Select **Off**
 
 6.  Click **Save**.
-   
+
     **NOTE:** This will make third party apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
-   
+
 7.  Select **Teams apps** > **Manage apps**.
 
 8.  Select each individual app.
@@ -578,7 +588,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
-   
+
 3.  In the upper right-hand corner select **Actions**
 
 4.  Select **Org-wide app settings**.
@@ -586,9 +596,9 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 5.  Under **Custom apps** > Select **Off**
 
 6.  Click **Save**.
-   
+
     **NOTE:** This will make Custom apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
-   
+
 7.  Select **Teams apps** > **Manage apps**.
 
 8.  Select each individual app.
@@ -600,7 +610,7 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 11.  Repeat steps 7 to 10 for each application
 
 
-### Legacy Policy Implementation 
+### Legacy Policy Implementation
 
 **NOTE:** Only Implement these settings if the v2 settings above are not available in your tenant.
 
@@ -669,221 +679,6 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 8.  If custom policies have been created, repeat steps 4 to 7 for each
     policy, selecting the appropriate policy in step 5.
-
-## 6. Data Loss Prevention
-
-Data loss prevention (DLP) helps prevent both accidental leakage of
-sensitive information as well as intentional exfiltration of data. DLP
-forms an integral part of securing Microsoft Teams. There are
-several commercial DLP solutions available documenting support for
-M365. Microsoft itself offers DLP services, controlled within the Microsoft Purview
-compliance portal. Agencies may select any service that fits their needs and meets
-the requirements outlined in this baseline setting. The DLP solution selected by an agency
-should offer services comparable to those offered by Microsoft.
-
-Though using Microsoft's DLP solution is not strictly
-required, guidance for configuring Microsoft's DLP solution can be found in following section of the CISA M365 Secure Configuration Baseline for Defender for Office 365.
-
-- [Data Loss Prevention \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#4-data-loss-prevention)
-
-### Policies
-
-#### MS.TEAMS.6.1v1
-A DLP solution SHALL be enabled and SHOULD offer services comparable to the native DLP solution offered by Microsoft.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams61v1-instructions)
-
-<!--Policy: MS.TEAMS.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently disclose sensitive information to unauthorized individuals. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-
-#### MS.TEAMS.6.2v1
-The DLP solution SHALL protect personally identifiable information (PII)
-and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, taxpayer identification numbers (TINs),
-and Social Security numbers (SSNs) via email SHALL be restricted.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams62v1-instructions)
-
-<!--Policy: MS.TEAMS.6.2v1; Criticality: SHALL -->
-- _Rationale:_ Teams users may inadvertently share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized sharing of sensitive information. 
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1213: Data from Information Repositories](https://attack.mitre.org/techniques/T1213/)
-  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
-
-### Resources
-
-- [Plan for data loss prevention (DLP) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/compliance/dlp-overview-plan-for-dlp?view=o365-worldwide)
-
-- [Personally identifiable information (PII) \|
-  NIST](https://csrc.nist.gov/glossary/term/personally_identifiable_information#:~:text=NISTIR%208259,2%20under%20PII%20from%20EGovAct)
-
-- [Sensitive information \|
-  NIST](https://csrc.nist.gov/glossary/term/sensitive_information)
-
-### License Requirements
-
-- DLP for Teams within Microsoft Purview requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
-  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
-
-### Implementation
-
-#### MS.TEAMS.6.1v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
-
-#### MS.TEAMS.6.2v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [DLP](./defender.md#implementation-3) for additional guidance.
-
-## 7. Malware Scanning
-
-Malware scanning protects M365 Teams assets from malicious software. Several commercial anti-malware solutions detect and prevent computer viruses, malware, and other malicious software from being introduced into M365 Teams. Agencies may select any product that meets the requirements outlined in this baseline policy group. If the agency is using Microsoft Defender to implement malware scanning, see the following policies of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
-
-- [MS.DEFENDER.3.1v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender31v1)
-  - Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
-
-### Policies
-
-#### MS.TEAMS.7.1v1
-Attachments included with Teams messages SHOULD be scanned for malware.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams71v1-instructions)
-
-<!--Policy: MS.TEAMS.7.1v1; Criticality: SHOULD -->
-- _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-
-#### MS.TEAMS.7.2v1
-Users SHOULD be prevented from opening or downloading files detected as malware.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams72v1-instructions)
-
-<!--Policy: MS.TEAMS.7.2v1; Criticality: SHOULD -->
-- _Rationale:_ Teams can be used as a mechanism for delivering malware. In many cases, malware can be detected through scanning, reducing the risk for end users.
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-
-
-### Resources
-
-- [Safe Attachments in Microsoft Defender for Office 365 \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-about?view=o365-worldwide#safe-attachments-policy-settings)
-
-- [Turn on Safe Attachments for SharePoint, OneDrive, and Microsoft
-  Teams \| Microsoft
-  Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-attachments-for-spo-odfb-teams-configure?view=o365-worldwide)
-
-### License Requirements
-
-- If using Microsoft Defender, require Defender for Office 365 Plan 1 or 2. These are included with
-  E5 and G5 and are available as add-ons for E3 and G3.
-
-### Implementation
-
-#### MS.TEAMS.7.1v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
-
-#### MS.TEAMS.7.2v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [Safe Attachments](./defender.md#implementation-2) for additional guidance.
-
-## 8. Link Protection
-
-Several technologies exist for protecting users from malicious links
-included in emails. For example, Microsoft Defender accomplishes this by
-prepending
-
-`https://*.safelinks.protection.outlook.com/?url=`
-
-to any URLs included in emails. By prepending the safe links URL,
-Microsoft can proxy the initial URL through their scanning service.
-Their proxy can perform the following actions:
-
-- Compare the URL with a block list.
-
-- Compare the URL with a list of know malicious sites.
-
-- If the URL points to a downloadable file, apply real-time file
-  scanning.
-
-If all checks pass, the user is redirected to the original URL.
-
-Microsoft Defender includes link-scanning capabilities. Using Microsoft Defender is not strictly required for this purpose; any product fulfilling the requirements outlined in this baseline policy group may be used.
-If the agency uses Microsoft Defender to meet this baseline policy group, see the following policy of the CISA M365 Secure Configuration Baseline for Defender for Office 365 for additional guidance.
-
-- [MS.DEFENDER.1.3v1 \| CISA M365 Secure Configuration Baseline for Defender for Office 365](./defender.md#msdefender13v1).
-  - All users SHALL be added to Defender for Office 365 Protection in either the standard or strict preset security policy.
-
-### Policies
-
-#### MS.TEAMS.8.1v1
-URL comparison with a blocklist SHOULD be enabled.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams81v1-instructions)
-
-<!--Policy: MS.TEAMS.8.1v1; Criticality: SHOULD -->
-- _Rationale:_ Users may be directed to malicious websites via links in Teams. Blocking access to known malicious URLs can help prevent users from accessing known malicious websites.
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3a
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
-
-#### MS.TEAMS.8.2v1
-User click tracking SHOULD be enabled.
-
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msteams82v1-instructions)
-
-<!--Policy: MS.TEAMS.8.2v1; Criticality: SHOULD -->
-- _Rationale:_ Users may click on malicious links in Teams, leading to compromise or authorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
-- _Last modified:_ July 2023
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12c
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
-    - [T1204.001: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
-    - [T1204.002: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
-  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
-    - [T1566.001: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
-  - [T1189: Drive-by Compromise](https://attack.mitre.org/techniques/T1189/)
-
-### Resources
-
-- [Recommended settings for EOP and Microsoft Defender for Office 365
-  security \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/recommended-settings-for-eop-and-office365)
-
-- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-policies-configure?view=o365-worldwide)
-  
-### License Requirements
-
-- N/A
-
-### Implementation
-
-#### MS.TEAMS.8.1v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
-
-#### MS.TEAMS.8.2v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be used. If the agency uses Microsoft Defender, see the following implementation steps for [standard or strict preset security policy](defender.md#msdefender13v1-instructions) for additional guidance.
 
 
 [^1]: Note that B2B guest users and all anonymous users except for
