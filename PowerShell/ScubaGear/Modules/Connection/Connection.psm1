@@ -152,7 +152,7 @@ function Connect-Tenant {
                        $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
                        $TenantName = $InitialDomain.Name
 
-                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix #Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
+                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
                        $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
                        if ($ServicePrincipalParams.CertThumbprintParams) {

@@ -28,10 +28,6 @@ function Export-SharePointProvider {
     Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
     $Tracker = Get-CommandTracker
 
-    # Get InitialDomainPrefix
-    $InitialDomain = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}).VerifiedDomains | Where-Object {$_.isInitial}
-    $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-
     $SPOTenant = ConvertTo-Json @()
     $UsedPnP = ConvertTo-Json $false
 
