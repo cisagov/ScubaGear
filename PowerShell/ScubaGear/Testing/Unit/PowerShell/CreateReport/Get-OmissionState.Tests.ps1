@@ -16,7 +16,7 @@ InModuleScope CreateReport {
                         "MS.EXO.1.1v2" = [PSCustomObject]@{ "Rationale" = "Example rationale" }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $false
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -26,10 +26,10 @@ InModuleScope CreateReport {
                 # expiration date is optional, the function should mark the policy as omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{ "Rationale" = "Example rationale" }
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{ "Rationale" = "Example rationale" }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $true
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -55,12 +55,12 @@ InModuleScope CreateReport {
                 # policy as not omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Rationale" = "Example rationale";
                             "Expiration" = "2024-01-03" }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $true
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -70,12 +70,12 @@ InModuleScope CreateReport {
                 # and mark the policy as not omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Rationale" = "Example rationale";
                             "Expiration" = "2024-01-01" }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $false
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
@@ -85,12 +85,12 @@ InModuleScope CreateReport {
                 # and mark the policy as not omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Rationale" = "Example rationale";
                             "Expiration" = "bad date" }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $false
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
@@ -100,12 +100,12 @@ InModuleScope CreateReport {
                 # and mark the policy as not omitted.
                 $Config = [PSCustomObject]@{
                     "OmitPolicy" = [PSCustomObject]@{
-                        "MSSECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MSDEFENDER.1.1v1" = [PSCustomObject]@{
                             "Rationale" = "Example rationale";
                         }
                     }
                 }
-                $Result = Get-OmissionState $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Get-OmissionState $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be $false
             }
         }

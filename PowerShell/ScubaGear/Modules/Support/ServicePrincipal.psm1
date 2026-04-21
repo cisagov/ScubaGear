@@ -132,7 +132,7 @@ function Compare-ScubaGearPermission {
         Used to pass in the service principal permissions if already obtained. This can be used to skip the call to Microsoft Graph to get the service principal permissions.
 
     .PARAMETER ProductNames
-        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", and "*". The default is to check for all permissions.
+        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "defender", and "*". The default is to check for all permissions.
 
     .EXAMPLE
         Compare-ScubaGearPermission -ServicePrincipalID "AppID" -AppRoleIDs $AppRoleIDs -M365Environment commercial
@@ -179,7 +179,7 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -223,7 +223,7 @@ function Compare-ScubaGearPermission {
         $FilteredAppRoleIDs = $AppRoleIDs
     }
 
-    # Handle case where NO application permissions are required (e.g., Security Suite - role-only)
+    # Handle case where NO application permissions are required (e.g., Defender - role-only)
     # Some products only require directory roles and no application permissions
     if ($null -eq $FilteredAppRoleIDs -or $FilteredAppRoleIDs.Count -eq 0) {
         Write-Verbose "No application permissions required for product(s): $($ProductNames -join ', ')"
@@ -859,7 +859,7 @@ function Get-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be assessing and only compare against those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*' (which includes all products)
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames 'aad'
@@ -904,7 +904,7 @@ function Get-ScubaGearAppPermission {
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
@@ -921,7 +921,7 @@ function Get-ScubaGearAppPermission {
 
     if($ProductNames -contains '*'){
         # If wildcard is specified, include all products
-        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
+        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
     }
 
     # Check Power Platform registration - always check to report current status
@@ -1410,7 +1410,7 @@ function Set-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         Products to configure permissions for. Required when not using pipeline.
-        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*'
+        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*'
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames "aad" | Set-ScubaGearAppPermission
@@ -1469,7 +1469,7 @@ function Set-ScubaGearAppPermission {
             Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
@@ -2241,7 +2241,7 @@ function New-ScubaGearServicePrincipal {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be configured for and only apply those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', '*' (which includes all products)
 
     .PARAMETER ServicePrincipalName
         Used to define the name of the Service Principal that will be created. The default is "ScubaGear Application"
@@ -2300,7 +2300,7 @@ function New-ScubaGearServicePrincipal {
         [string]$M365Environment,
 
         [Parameter(Mandatory=$false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
@@ -2316,7 +2316,7 @@ function New-ScubaGearServicePrincipal {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
             # If wildcard is specified, include all products
-            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
+            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender')
         }
 
         # Get permissions using the same approach as Get-ScubaGearAppPermission

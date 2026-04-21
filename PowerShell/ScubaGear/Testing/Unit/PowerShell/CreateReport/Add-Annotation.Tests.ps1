@@ -15,13 +15,13 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                             "IncorrectResult" = $true;
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Test result marked incorrect by user. <span class='comment-heading'>User justification</span>`"Example comment`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -32,12 +32,12 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "IncorrectResult" = $true;
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Test result marked incorrect by user. <span class='comment-heading'>User justification not provided</span>"
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
@@ -51,12 +51,12 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -67,12 +67,12 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -99,13 +99,13 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                             "RemediationDate" = "2025-01-02"
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`"<span class='comment-heading'>Anticipated remediation date</span>`"2025-01-02`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -116,13 +116,13 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                             "RemediationDate" = "2024-01-02"
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`"<span class='comment-heading'>Anticipated remediation date</span>`"2024-01-02`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
@@ -133,13 +133,13 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                             "RemediationDate" = "2024-01-02"
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`"<span class='comment-heading'>Anticipated remediation date</span>`"2024-01-02`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 0
             }
@@ -150,13 +150,13 @@ InModuleScope CreateReport {
                 }
                 $Config = [PSCustomObject]@{
                     "AnnotatePolicy" = [PSCustomObject]@{
-                        "MS.SECURITYSUITE.1.1v1" = [PSCustomObject]@{
+                        "MS.DEFENDER.1.1v1" = [PSCustomObject]@{
                             "Comment" = "Example comment";
                             "RemediationDate" = "2025-99-02"
                         }
                     }
                 }
-                $Result = Add-Annotation $Result $Config "MS.SECURITYSUITE.1.1v1"
+                $Result = Add-Annotation $Result $Config "MS.DEFENDER.1.1v1"
                 $Result | Should -Be "Details<span class='comment-heading'>User comment</span>`"Example comment`"<span class='comment-heading'>Anticipated remediation date</span>`"2025-99-02`""
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }

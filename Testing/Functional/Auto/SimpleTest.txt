@@ -1,5 +1,5 @@
 aad
-securitysuite
+defender
 exo
 onedrive
 sharepoint
