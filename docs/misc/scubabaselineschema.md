@@ -12,7 +12,7 @@ Current Schema Version: **1.0.0**
 
 ## File Location
 
-- **Path in Repository**: `baselines/ScubaBaselines.json`
+- **Path in Repository**: `PowerShell/ScubaGear/schemas/ScubaBaselines.json`
 - **Available in**: 
   - GitHub releases (attached as release asset)
   - PowerShell Gallery package (included in module distribution)
