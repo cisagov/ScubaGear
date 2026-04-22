@@ -54,9 +54,9 @@ jobs:
       SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
 
-  test_securitysuite:
-    name: Test Security Suite
-    uses: ./.github/workflows/function_test_securitysuite.yaml
+  test_defender:
+    name: Test Defender
+    uses: ./.github/workflows/function_test_defender.yaml
     permissions:
       contents: write
       id-token: write
