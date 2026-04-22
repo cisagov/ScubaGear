@@ -187,9 +187,10 @@
                        }
                        # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
                        # if PowerPlatform already signed in interactively this session.
+                       $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
                        $TokenData.PBIAccessToken = Get-MsalAccessToken `
                            -Scope $PBIScope `
-                           -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                           -ClientId $PBIClientId `
                            -Tenant $TenantName `
                            -M365Environment $M365Environment `
                            -LoginHint $LoginHint
