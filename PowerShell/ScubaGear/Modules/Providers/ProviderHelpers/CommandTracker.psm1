@@ -1,6 +1,8 @@
 Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaSpfRecord, Get-ScubaDkimRecord, Get-ScubaDmarcRecord
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals, Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications
+Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
+Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 Import-Module -Name $PSScriptRoot/../../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
 

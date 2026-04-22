@@ -1,11 +1,10 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
 
 function Export-PowerPlatformProvider {
     <#
     .Description
     Gets the Power Platform settings that are relevant
-    to the SCuBA Power Platform baselines using the Power Platform Administartion
-    PowerShell Module
+    to the SCuBA Power Platform baselines using direct REST API calls.
     .Functionality
     Internal
     #>
@@ -15,16 +14,21 @@ function Export-PowerPlatformProvider {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $AccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $BaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
+    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "PowerPlatformRestHelper.psm1")
     $Tracker = Get-CommandTracker
-
-    # Manually importing the module name here to bypass cmdlet name conflicts
-    # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
-    Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
     $TenantDetails = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
     $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
@@ -33,57 +37,21 @@ function Export-PowerPlatformProvider {
     Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
 
     # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1, MS.POWERPLATFORM.6.1v1
-    $EnvironmentCreation = ConvertTo-Json -Depth 4 @($Tracker.TryCommand("Get-TenantSettings"))
+    $TenantSettings = $Tracker.TryCommand("Get-PowerPlatformTenantSettingsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $EnvironmentCreation = ConvertTo-Json -Depth 10 @($TenantSettings)
 
     # MS.POWERPLATFORM.2.1v1, MS.POWERPLATFORM.2.2v1, MS.POWERPLATFORM.2.3v1
-    $EnvironmentList = ConvertTo-Json @($Tracker.TryCommand("Get-AdminPowerAppEnvironment"))
-
-    # Check for null return
-    if (-not $EnvironmentList) {
-        $EnvironmentList = ConvertTo-Json @()
-        $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
-    }
+    $Environments = $Tracker.TryCommand("Get-PowerPlatformEnvironmentsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $EnvironmentList = ConvertTo-Json -Depth 4 @($Environments)
 
     # has to be tested manually because of http 403 errors
-    $DLPPolicies = ConvertTo-Json @()
-    try {
-        $DLPPolicies = Get-DlpPolicy -ErrorAction "Stop"
-        if ($DLPPolicies.StatusCode) {
-            $Tracker.AddUnSuccessfulCommand("Get-DlpPolicy")
-            $StatusCode = $DLPPolicies.StatusCode
-            $Message = $DLPPolicies.Message
-            $DLPPolicies = ConvertTo-Json @()
-            throw "$($Message) HTTP $($StatusCode) ERROR"
-        }
-        else {
-            $DLPPolicies = ConvertTo-Json -Depth 7 @($DLPPolicies)
-            $Tracker.AddSuccessfulCommand("Get-DlpPolicy")
-        }
-    }
-    catch {
-        Write-Warning "Error running Get-DlpPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
-    }
+    $DlpResponse = $Tracker.TryCommand("Get-PowerPlatformDlpPoliciesRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $DLPPolicies = ConvertTo-Json -Depth 10 @($DlpResponse)
 
     # MS.POWERPLATFORM.3.1v1
     # has to be tested manually because of http 403 errors
-    $TenantIsolation = ConvertTo-Json @()
-    try {
-        $TenantIso = Get-PowerAppTenantIsolationPolicy -TenantID $TenantID -ErrorAction "Stop"
-        if ($TenantIso.StatusCode) {
-            $Tracker.AddUnSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
-            $TenantIsolation = ConvertTo-Json @()
-            $StatusCode = $DLPPolicies.StatusCode
-            $Message = $DLPPolicies.Message
-            throw "$($Message) HTTP $($StatusCode) ERROR"
-        }
-        else {
-            $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
-            $TenantIsolation = ConvertTo-Json @($TenantIso)
-        }
-    }
-    catch {
-        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy: $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
-    }
+    $TenantIso = $Tracker.TryCommand("Get-PowerPlatformTenantIsolationRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken; TenantId = $TenantId})
+    $TenantIsolation = ConvertTo-Json -Depth 4 @($TenantIso)
 
     # MS.POWERPLATFORM.3.2v1 currently has no corresponding PowerShell Cmdlet
 
@@ -258,7 +226,6 @@ function Get-PowerPlatformTenantDetail {
         [string]
         $M365Environment
     )
-    Import-Module Microsoft.PowerApps.Administration.PowerShell -DisableNameChecking
 
     try {
         $TenantDetails = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
