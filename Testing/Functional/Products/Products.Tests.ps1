@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -98,6 +98,10 @@ param (
 )
 
 BeforeDiscovery {
+    if ($ProductName -eq "defender") {
+        $ProductName = "securitysuite"
+    }
+
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     Import-Module $ScubaModule
