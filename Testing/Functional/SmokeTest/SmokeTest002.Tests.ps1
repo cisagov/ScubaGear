@@ -72,6 +72,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
@@ -92,6 +93,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             @{Product = "aad"; LinkText = "Azure Active Directory"}
             @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
