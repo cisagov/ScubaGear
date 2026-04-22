@@ -38,6 +38,7 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -45,6 +46,13 @@ function Connect-Tenant {
    $AADAuthRequired = $true
 
    $ProdAuthFailed = @()
+
+   # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
+   $TenantName = $null
+   $InitialDomainPrefix = $null
+   # UPN captured after first successful Connect-GraphHelper; enables SSO (prompt=none) for PP, PBI, and SPO
+   # by reusing the AAD browser session already established by Connect-MgGraph.
+   $LoginHint = $null
 
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
@@ -80,6 +88,9 @@ function Connect-Tenant {
                    }
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
+                   if (-not $LoginHint) {
+                       $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
+                   }
                }
                {($_ -eq "exo") -or ($_ -eq "defender")} {
                    if ($EXOAuthRequired) {
@@ -105,6 +116,9 @@ function Connect-Tenant {
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
+                       if (-not $LoginHint) {
+                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
+                       }
                    }
 
                    # Acquire Power Platform access token
@@ -120,10 +134,13 @@ function Connect-Tenant {
                            -M365Environment $M365Environment
                    }
                    else {
-                       # Interactive - resolve tenant name for authority
-                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                       $TenantName = $InitialDomain.Name
+                       # Resolve tenant name if not already cached from a previous product
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       }
 
                        # Azure PowerShell well-known client ID
                        $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
@@ -131,7 +148,8 @@ function Connect-Tenant {
                            -Scope $PPScope `
                            -ClientId $PPClientId `
                            -Tenant $TenantName `
-                           -M365Environment $M365Environment
+                           -M365Environment $M365Environment `
+                           -LoginHint $LoginHint
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
@@ -146,12 +164,37 @@ function Connect-Tenant {
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
+                       if (-not $LoginHint) {
+                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
+                       }
                    }
-                   $PBIConnectParams = @{M365Environment = $M365Environment}
-                   if ($ServicePrincipalParams) {
-                       $PBIConnectParams.ServicePrincipalParams = $ServicePrincipalParams
+
+                   $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                       $script:PowerBIToken = Get-MsalAccessToken `
+                           -Scope $PBIScope `
+                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                           -M365Environment $M365Environment
                    }
-                   $script:PowerBIToken = Connect-PowerBIHelper @PBIConnectParams
+                   else {
+                       # Resolve tenant name if not already cached from a previous product
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       }
+                       # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
+                       # if PowerPlatform already signed in interactively this session.
+                       $script:PowerBIToken = Get-MsalAccessToken `
+                           -Scope $PBIScope `
+                           -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                           -Tenant $TenantName `
+                           -M365Environment $M365Environment `
+                           -LoginHint $LoginHint
+                   }
                    Write-Verbose "Power BI access token acquired"
                }
                "sharepoint" {
@@ -165,13 +208,18 @@ function Connect-Tenant {
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
+                       if (-not $LoginHint) {
+                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
+                       }
                    }
                    if ($SPOAuthRequired) {
-                       # Resolve tenant info needed for SharePoint URLs
-                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                       $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-                       $TenantName = $InitialDomain.Name
+                       # Resolve tenant info if not already cached from a previous product
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       }
 
                        $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
                        $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
@@ -191,7 +239,8 @@ function Connect-Tenant {
                                -Scope $SPOScope `
                                -ClientId $SPOClientId `
                                -Tenant $TenantName `
-                               -M365Environment $M365Environment
+                               -M365Environment $M365Environment `
+                               -LoginHint $LoginHint
                        }
                        Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
