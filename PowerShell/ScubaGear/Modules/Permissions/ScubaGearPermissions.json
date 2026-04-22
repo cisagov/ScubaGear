@@ -1,4 +1,4 @@
-[
+﻿[
     {
         "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
         "apiResource": "/v1.0/roleManagement/directory/roleDefinitions/{id}",
@@ -31,7 +31,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/unifiedroledefinition-get?view=graph-rest-1.0"
         ],
-        "notes": "Used by the Service Principal module for role assignment details"
+        "notes": "Used by the Service Principal module for role assignment details",
+        "oauthScope": ""
     },
 
     {
@@ -68,7 +69,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
         ],
-        "notes": "Used by the Service Principal module to retrieve service principal details"
+        "notes": "Used by the Service Principal module to retrieve service principal details",
+        "oauthScope": ""
     },
 
     {
@@ -104,7 +106,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -136,7 +139,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-oauth2permissiongrants?view=graph-rest-1.0"
         ],
-        "notes": "Used by Service Principal module to retrieve delegated permissions assignment"
+        "notes": "Used by Service Principal module to retrieve delegated permissions assignment",
+        "oauthScope": ""
     },
 
     {
@@ -169,7 +173,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0&tabs=http"
         ],
-        "notes": "Used by the Service Principal module to create new service principals"
+        "notes": "Used by the Service Principal module to create new service principals",
+        "oauthScope": ""
     },
 
     {
@@ -205,7 +210,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0"
         ],
-        "notes": "Used by the Service Principal module to retrieve assigned permissions"
+        "notes": "Used by the Service Principal module to retrieve assigned permissions",
+        "oauthScope": ""
     },
 
     {
@@ -237,7 +243,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete-approleassignments?view=graph-rest-1.0&tabs=http"
         ],
-        "notes": "Used by the Service Principal to remove assigned permissions"
+        "notes": "Used by the Service Principal to remove assigned permissions",
+        "oauthScope": ""
     },
 
     {
@@ -269,7 +276,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http"
         ],
-        "notes": "Used by the Service Principal module to remove delegated permissions assignment"
+        "notes": "Used by the Service Principal module to remove delegated permissions assignment",
+        "oauthScope": ""
     },
 
     {
@@ -303,7 +311,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
         ],
-        "notes": "Used by the Service Principal module to assign missing permissions"
+        "notes": "Used by the Service Principal module to assign missing permissions",
+        "oauthScope": ""
     },
 
     {
@@ -340,7 +349,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
         ],
-        "notes": "Used by the Service Principal and RiskyPermissions modules to retrieve application details"
+        "notes": "Used by the Service Principal and RiskyPermissions modules to retrieve application details",
+        "oauthScope": ""
     },
 
     {
@@ -376,7 +386,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/federatedidentitycredential-get?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -407,7 +418,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -438,7 +450,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/rbacapplication-post-roleassignmentschedulerequests?view=graph-rest-1.0"
         ],
-        "notes": "This is used by the service principal module for assigning roles."
+        "notes": "This is used by the service principal module for assigning roles.",
+        "oauthScope": ""
     },
 
     {
@@ -470,7 +483,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -503,7 +517,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -540,7 +555,8 @@
         ],
         "notes": [
             "Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."
-        ]
+        ],
+        "oauthScope": ""
     },
 
     {
@@ -574,7 +590,8 @@
             "https://learn.microsoft.com/en-us/graph/api/directoryobject-get?view=graph-rest-beta&tabs=http"
         ],
         "notes" : [
-        ]
+        ],
+        "oauthScope": ""
     },
 
     {
@@ -608,7 +625,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRole?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/directoryrole-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -644,7 +662,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectoryrolemember?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/directoryrole-list-members?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -680,7 +699,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRoleTemplate?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/directoryroletemplate-list?view=graph-rest-beta"
         ],
-        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module",
+        "oauthScope": ""
     },
 
     {
@@ -716,7 +736,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectorysetting?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/group-list-settings?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -751,7 +772,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDomain?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/domain-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -788,7 +810,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.groups/get-mgbetagroup?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/group-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -825,7 +848,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Groups/Get-MgBetaGroupMember?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/group-list-members?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -857,7 +881,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaIdentityConditionalAccessPolicy?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -891,7 +916,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/get-mgbetaidentitygovernanceprivilegedaccessgroupeligibilityschedule?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/privilegedaccessgroup-list-eligibilityscheduleinstances?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -925,7 +951,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaIdentityGovernancePrivilegedAccessGroup?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccessroot?view=graph-rest-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -962,7 +989,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaOrganization?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/organization-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -996,7 +1024,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAuthenticationMethodPolicy?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/authenticationmethodspolicy-get?view=graph-rest-beta&tabs=http"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1030,7 +1059,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicyauthorizationpolicy?view=graph-powershell-1.0",
             "https://learn.microsoft.com/graph/api/authorizationpolicy-get?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1069,7 +1099,8 @@
         "notes": [
             "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'",
             "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
-        ]
+        ],
+        "oauthScope": ""
     },
 
     {
@@ -1106,7 +1137,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/rbacapplication-list-roleassignmentscheduleinstances?view=graph-rest-beta&tabs=http"
         ],
-        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module",
+        "oauthScope": ""
     },
 
     {
@@ -1143,7 +1175,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.governance/get-mgrolemanagementdirectoryroleeligibilityscheduleinstance?view=graph-powershell-1.0",
             "https://learn.microsoft.com/graph/api/rbacapplication-list-roleeligibilityscheduleinstances?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1177,7 +1210,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/unifiedroleassignment-get?view=graph-rest-1.0"
         ],
-        "notes": "Used by the Service Principal module to assign the role assignment"
+        "notes": "Used by the Service Principal module to assign the role assignment",
+        "oauthScope": ""
     },
 
     {
@@ -1212,7 +1246,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaSubscribedSku?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/subscribedsku-list?view=graph-rest-beta"
         ],
-        "notes": "The leastPermissions LicenseAssignment.Read.All does not work for this cmdlet. The cmdlet requires Organization.Read.All permission."
+        "notes": "The leastPermissions LicenseAssignment.Read.All does not work for this cmdlet. The cmdlet requires Organization.Read.All permission.",
+        "oauthScope": ""
     },
 
     {
@@ -1248,7 +1283,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.users/get-mgbetauser?view=graph-powershell-beta",
             "https://learn.microsoft.com/graph/api/user-list?view=graph-rest-beta"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1286,7 +1322,8 @@
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Users/Get-MgBetaUserCount?view=graph-powershell-beta",
             "https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-beta&tabs=powershell#example-6-get-only-a-count-of-users"
         ],
-        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call header."
+        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call header.",
+        "oauthScope": ""
     },
 
     {
@@ -1317,7 +1354,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1347,7 +1385,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1378,7 +1417,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
         ],
-        "notes": "Microsoft Exchange Online Protection app id is required for gcchigh/DoD environments."
+        "notes": "Microsoft Exchange Online Protection app id is required for gcchigh/DoD environments.",
+        "oauthScope": ""
     },
 
     {
@@ -1408,7 +1448,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-exchangeonline?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1437,7 +1478,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1465,7 +1507,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1493,7 +1536,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1524,18 +1568,19 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/teams/connect-microsoftteams?view=teams-ps"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
+        "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.com",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1551,20 +1596,21 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
+        "oauthScope": "https://{domain}-admin.sharepoint.com/.default"
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
+        "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.us",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1579,20 +1625,21 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
+        "oauthScope": "https://{domain}-admin.sharepoint.us/.default"
     },
 
     {
-        "moduleCmdlet": "Connect-SPOService",
-        "apiResource": "https://{domain}-admin.sharepoint.mil.us",
+        "moduleCmdlet": "SharePoint REST API",
+        "apiResource": "https://{domain}-admin.sharepoint-mil.us",
         "apiFilter": "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "Microsoft.Online.SharePoint.PowerShell"
+            "None - Direct REST API"
         ],
         "leastPermissions": [
             "Sites.FullControl.All"
@@ -1607,94 +1654,118 @@
         ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/sharepoint/sharepoint-online/connect-sharepoint-online"
+            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
         ],
-        "notes": ""
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
+        "oauthScope": "https://{domain}-admin.sharepoint-mil.us/.default"
     },
 
     {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.com",
-        "apiFilter": "",
+        "moduleCmdlet":  "PowerPlatform REST API",
+        "apiResource":  "https://api.bap.microsoft.com",
+        "apiFilter":  "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "PnP.PowerShell"
+            "None - Direct REST API"
         ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "powerplatform"
         ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
+        "supportedEnv":  [
+            "commercial"
         ],
-        "supportedEnv": [
-            "commercial",
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
+        ],
+        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
+        "oauthScope":  "https://service.powerapps.com//.default"
+    },
+
+    {
+        "moduleCmdlet":  "PowerPlatform REST API",
+        "apiResource":  "https://gov.api.bap.microsoft.us",
+        "apiFilter":  "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "None - Direct REST API"
+        ],
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "powerplatform"
+        ],
+        "supportedEnv":  [
             "gcc"
         ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
         ],
-        "notes": ""
+        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
+        "oauthScope":  "https://gov.service.powerapps.us//.default"
     },
 
     {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.us",
-        "apiFilter": "",
+        "moduleCmdlet":  "PowerPlatform REST API",
+        "apiResource":  "https://high.api.bap.microsoft.us",
+        "apiFilter":  "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "PnP.PowerShell"
+            "None - Direct REST API"
         ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "powerplatform"
         ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
+        "supportedEnv":  [
             "gcchigh"
         ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
         ],
-        "notes": ""
+        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
+        "oauthScope":  "https://high.service.powerapps.us//.default"
     },
 
     {
-        "moduleCmdlet": "Connect-PnPOnline",
-        "apiResource": "https://{domain}-admin.sharepoint.mil.us",
-        "apiFilter": "",
+        "moduleCmdlet":  "PowerPlatform REST API",
+        "apiResource":  "https://api.appsplatform.us",
+        "apiFilter":  "",
         "apiHeader": [
             { }
         ],
         "poshModule": [
-            "PnP.PowerShell"
+            "None - Direct REST API"
         ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "powerplatform"
         ],
-        "higherPermissions": [],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
+        "supportedEnv":  [
             "dod"
         ],
-        "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-pnppowershell"
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
         ],
-        "notes": ""
+        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
+        "oauthScope":  "https://service.apps.appsplatform.us//.default"
     },
 
     {
@@ -1725,7 +1796,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1755,7 +1827,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1785,7 +1858,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
         ],
-        "notes": ""
+        "notes": "",
+        "oauthScope": ""
     },
 
     {
@@ -1817,7 +1891,8 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/application-post-applications?view=graph-rest-1.0&tabs=http"
         ],
-        "notes": "Used by the Service Principal module to create a new Application registration"
+        "notes": "Used by the Service Principal module to create a new Application registration",
+        "oauthScope": ""
     },
 
     {
@@ -1849,6 +1924,7 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http"
         ],
-        "notes": "Used by the Service Principal module to add permissions."
+        "notes": "Used by the Service Principal module to add permissions.",
+        "oauthScope": ""
     }
 ]

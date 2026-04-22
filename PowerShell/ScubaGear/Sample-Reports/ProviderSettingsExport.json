@@ -16643,7 +16643,7 @@
                            "OneDriveLoopDefaultSharingLinkRole":  0,
                            "OneDriveRequestFilesLinkEnabled":  false,
                            "OneDriveRequestFilesLinkExpirationInDays":  1,
-                           "OneDriveSharingCapability":  0,
+                           "ODBSharingCapability":  0,
                            "OneDriveDefaultShareLinkScope":  -1,
                            "OneDriveDefaultShareLinkRole":  0,
                            "OneDriveDefaultLinkToExistingAccess":  false,
@@ -16834,10 +16834,10 @@
     "OneDrive_PnP_Flag":  false,
     "SharePoint_successful_commands":  [
                                            "Get-MgBetaOrganization",
-                                           "Get-SPOTenant",
-                                           "Get-SPOSite",
-                                           "Get-PnPTenant",
-                                           "Get-PnPTenantSite"
+                                           "SharePoint REST API",
+                                           "SharePoint REST API",
+                                           "SharePoint REST API",
+                                           "SharePoint REST API"
                                        ],
     "SharePoint_unsuccessful_commands":  [
 
