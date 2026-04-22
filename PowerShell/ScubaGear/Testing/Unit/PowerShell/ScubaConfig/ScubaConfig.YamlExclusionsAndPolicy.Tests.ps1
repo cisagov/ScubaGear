@@ -45,7 +45,7 @@ Describe "ScubaConfig Exclusions and Policy Validation Tests" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
-        
+
         # Clean up dummy OPA executable
         if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
             Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
