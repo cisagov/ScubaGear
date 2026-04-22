@@ -1,11 +1,6 @@
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
-import data.utils.report.ReportDetailsBoolean
-import data.utils.report.ReportDetailsString
-import data.utils.report.ReportDetailsArray
-import data.utils.report.Description
-import data.utils.report.ArraySizeStr
 
 
 ######################
