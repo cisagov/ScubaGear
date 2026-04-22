@@ -146,10 +146,14 @@ function Invoke-Products {
         $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
         Where-Object { $_.Name -like "*BaseConfig*" }
         if ($ConfigFilename.length -eq 0) {
-            & $OPAExe test $RegoPolicyPath $Directory $UtilFilename $Flag
+            $OpaArgs = @($RegoPolicyPath, $Directory)
+            if ($Flag) { $OpaArgs += $Flag }
+            & $OPAExe test @OpaArgs
         }
         else {
-            & $OPAExe test $RegoPolicyPath $Directory $($ConfigFilename.FullName) $UtilFilename $Flag
+            $OpaArgs = @($RegoPolicyPath, $Directory, $($ConfigFilename.FullName))
+            if ($Flag) { $OpaArgs += $Flag }
+            & $OPAExe test @OpaArgs
         }
     }
     Write-Output ""
@@ -202,10 +206,14 @@ function Invoke-ControlGroups {
             elseif (Test-Path -Path $UnitTestFile.Fullname -PathType Leaf) {
                 Write-Output "# Testing Control Group $($GroupNum[1])"
                 if ($ConfigFilename.length -eq 0) {
-                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $UtilFilename $Flag
+                    $OpaArgs = @($RegoPolicyPath, $($UnitTestFile.Fullname))
+                    if ($Flag) { $OpaArgs += $Flag }
+                    & $OPAExe test @OpaArgs
                 }
                 else {
-                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $($ConfigFilename.FullName) $UtilFilename $Flag
+                    $OpaArgs = @($RegoPolicyPath, $($UnitTestFile.Fullname), $($ConfigFilename.FullName))
+                    if ($Flag) { $OpaArgs += $Flag }
+                    & $OPAExe test @OpaArgs
                 }
                 Write-Output "" | Out-Host
             }
@@ -254,10 +262,14 @@ function Invoke-SpecificTests {
             foreach ($Test in $IndividualTests) {
                 Write-Output "## Testing $Test"
                 if ($ConfigFilename.length -eq 0) {
-                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $UtilFilename -r $Test $Flag
+                    $OpaArgs = @($RegoPolicyPath, $($UnitTestFile.Fullname), '-r', $Test)
+                    if ($Flag) { $OpaArgs += $Flag }
+                    & $OPAExe test @OpaArgs
                 }
                 else {
-                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $($ConfigFilename.FullName) $UtilFilename -r $Test $Flag
+                    $OpaArgs = @($RegoPolicyPath, $($UnitTestFile.Fullname), $($ConfigFilename.FullName), '-r', $Test)
+                    if ($Flag) { $OpaArgs += $Flag }
+                    & $OPAExe test @OpaArgs
                 }
                 Write-Output "" | Out-Host
             }
