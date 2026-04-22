@@ -86,7 +86,7 @@ jobs:
           tag_name: v${{ inputs.version }}
           files: |
             ScubaGear-${{ inputs.version }}.zip
-            repo/PowerShell/ScubaGear/schemas/ScubaBaselines.json
+            ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
