@@ -59,6 +59,7 @@
        PPAccessToken   = $null
        PPBaseUrl       = $null
        PBIAccessToken  = $null
+       PBIBaseUrl      = $null
    }
 
    $N = 0
@@ -168,7 +169,9 @@
                        }
                    }
 
+                   # Acquire Power BI access token
                    $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+                   $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
                    if ($ServicePrincipalParams.CertThumbprintParams) {
                        $TokenData.PBIAccessToken = Get-MsalAccessToken `
                            -Scope $PBIScope `
@@ -195,7 +198,7 @@
                            -M365Environment $M365Environment `
                            -LoginHint $LoginHint
                    }
-                   Write-Verbose "Power BI access token acquired"
+                   Write-Verbose "Power BI token acquired successfully"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -298,6 +301,7 @@
        PPAccessToken   = $TokenData.PPAccessToken
        PPBaseUrl       = $TokenData.PPBaseUrl
        PBIAccessToken  = $TokenData.PBIAccessToken
+       PBIBaseUrl      = $TokenData.PBIBaseUrl
    }
 }
 

@@ -13,21 +13,19 @@ function Export-PowerBIProvider {
     [OutputType([string])]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment,
+        $AccessToken,
 
         [Parameter(Mandatory = $true)]
         [string]
-        $AccessToken
+        $BaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     $Tracker = Get-CommandTracker
 
-    $EnvironmentUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+    $EnvironmentUrl = $BaseUrl
 
     $headers = @{
         Authorization  = "Bearer $AccessToken"
