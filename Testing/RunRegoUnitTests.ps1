@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
-    [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', '*')]
+    [ValidateSet('AAD', 'Defender', 'EXO', 'PowerBI', 'PowerPlatform', 'Sharepoint', 'Teams', '*')]
     [Alias('p')]
     [string[]]$Products = '*',
 
@@ -136,7 +136,7 @@ function Invoke-Products {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerBI', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string[]]$Products
     )
 
@@ -146,10 +146,10 @@ function Invoke-Products {
         $ConfigFilename = Get-ChildItem $(Join-Path -Path $RegoUnitTestPath -ChildPath $Product) |
         Where-Object { $_.Name -like "*BaseConfig*" }
         if ($ConfigFilename.length -eq 0) {
-            & $OPAExe test $RegoPolicyPath $Directory .\$UtilFilename $Flag
+            & $OPAExe test $RegoPolicyPath $Directory $UtilFilename $Flag
         }
         else {
-            & $OPAExe test $RegoPolicyPath $Directory .\$($ConfigFilename.FullName) .\$UtilFilename $Flag
+            & $OPAExe test $RegoPolicyPath $Directory $($ConfigFilename.FullName) $UtilFilename $Flag
         }
     }
     Write-Output ""
@@ -180,7 +180,7 @@ function Invoke-ControlGroups {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerBI', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -202,10 +202,10 @@ function Invoke-ControlGroups {
             elseif (Test-Path -Path $UnitTestFile.Fullname -PathType Leaf) {
                 Write-Output "# Testing Control Group $($GroupNum[1])"
                 if ($ConfigFilename.length -eq 0) {
-                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$UtilFilename $Flag
+                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $UtilFilename $Flag
                 }
                 else {
-                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$($ConfigFilename.FullName) .\$UtilFilename $Flag
+                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $($ConfigFilename.FullName) $UtilFilename $Flag
                 }
                 Write-Output "" | Out-Host
             }
@@ -228,7 +228,7 @@ function Invoke-SpecificTests {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerBI', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -254,10 +254,10 @@ function Invoke-SpecificTests {
             foreach ($Test in $IndividualTests) {
                 Write-Output "## Testing $Test"
                 if ($ConfigFilename.length -eq 0) {
-                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$UtilFilename -r $Test $Flag
+                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $UtilFilename -r $Test $Flag
                 }
                 else {
-                    & $OPAExe test $RegoPolicyPath .\$($UnitTestFile.Fullname) .\$($ConfigFilename.FullName) .\$UtilFilename -r $Test $Flag
+                    & $OPAExe test $RegoPolicyPath $($UnitTestFile.Fullname) $($ConfigFilename.FullName) $UtilFilename -r $Test $Flag
                 }
                 Write-Output "" | Out-Host
             }
@@ -281,7 +281,7 @@ if ($Verbosity.IsPresent) {
     $Flag = "-v"
 }
 if ($pEmpty) {
-    Invoke-Products -Flag $Flag -Products @('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')
+    Invoke-Products -Flag $Flag -Products @('AAD', 'Defender', 'EXO', 'PowerBI', 'PowerPlatform', 'Sharepoint', 'Teams')
 }
 elseif ((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
     if (($Products.Count -gt 1) -or ($ControlGroups.Count -gt 1)) {
