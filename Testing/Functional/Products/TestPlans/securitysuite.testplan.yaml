@@ -116,27 +116,14 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
-  # Use cached run for 5.1 tests since audit changes can take 60 minutes to take effect
   - PolicyId: MS.SECURITYSUITE.5.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.1v1 Compliant case
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: true
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.5.1v1 Not-Compliant case
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: false
-        Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
-
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
