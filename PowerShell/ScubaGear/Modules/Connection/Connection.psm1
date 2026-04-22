@@ -1,6 +1,4 @@
-﻿$script:PowerBIToken = $null
-
-function Connect-Tenant {
+﻿function Connect-Tenant {
     <#
    .Description
    This function uses the various PowerShell modules to establish
@@ -60,6 +58,7 @@ function Connect-Tenant {
        SPOAdminUrl     = $null
        PPAccessToken   = $null
        PPBaseUrl       = $null
+       PBIAccessToken  = $null
    }
 
    $N = 0
@@ -171,7 +170,7 @@ function Connect-Tenant {
 
                    $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $script:PowerBIToken = Get-MsalAccessToken `
+                       $TokenData.PBIAccessToken = Get-MsalAccessToken `
                            -Scope $PBIScope `
                            -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
                            -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
@@ -188,7 +187,7 @@ function Connect-Tenant {
                        }
                        # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
                        # if PowerPlatform already signed in interactively this session.
-                       $script:PowerBIToken = Get-MsalAccessToken `
+                       $TokenData.PBIAccessToken = Get-MsalAccessToken `
                            -Scope $PBIScope `
                            -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
                            -Tenant $TenantName `
@@ -297,6 +296,7 @@ function Connect-Tenant {
        SPOAdminUrl     = $TokenData.SPOAdminUrl
        PPAccessToken   = $TokenData.PPAccessToken
        PPBaseUrl       = $TokenData.PPBaseUrl
+       PBIAccessToken  = $TokenData.PBIAccessToken
    }
 }
 
@@ -376,18 +376,7 @@ function Disconnect-SCuBATenant {
 
 }
 
-function Get-PowerBIToken {
-   <#
-   .SYNOPSIS
-       Returns the Power BI access token acquired during Connect-Tenant.
-   .FUNCTIONALITY
-   Internal
-   #>
-   return $script:PowerBIToken
-}
-
 Export-ModuleMember -Function @(
    'Connect-Tenant',
-   'Disconnect-SCuBATenant',
-   'Get-PowerBIToken'
+   'Disconnect-SCuBATenant'
 )

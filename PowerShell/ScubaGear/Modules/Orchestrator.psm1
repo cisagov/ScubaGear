@@ -856,7 +856,7 @@ function Invoke-ProviderList {
                         "powerbi" {
                             $PBIProviderParams = @{
                                 'M365Environment' = $ScubaConfig.M365Environment
-                                'AccessToken'     = Get-PowerBIToken
+                                'AccessToken'     = $ConnectionResult.PBIAccessToken
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
@@ -1771,6 +1771,7 @@ function Invoke-Connection {
             SPOAdminUrl     = $null
             PPAccessToken   = $null
             PPBaseUrl       = $null
+            PBIAccessToken  = $null
         }
     }
 }
