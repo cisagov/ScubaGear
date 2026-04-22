@@ -150,6 +150,10 @@ BeforeDiscovery {
 }
 
 BeforeAll {
+    if ($ProductName -eq "defender") {
+        $ProductName = "securitysuite"
+    }
+
     # Shared Data for functional test
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
